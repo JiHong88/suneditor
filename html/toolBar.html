@@ -1,0 +1,292 @@
+<!-- 툴바 -->
+<div class="cover_je_toolbar" id="cover_je_toolbar" style="display:none;"></div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li class="compact_editor">
+            <button type="button" class="btn_editor btn_font" data-display="sub">
+                <span class="txt" id="font_family">글꼴</span><span class="img_editor ico_more"></span>
+            </button>
+            <div class="layer_editor" style="display: none;">
+                <div class="inner_layer list_family">
+                    <ul class="list_editor" id="fontFamily_list">
+                        <li><button type="button" class="btn_edit default" data-command="fontName" data-value="inherit" data-txt="글꼴" style="font-family:inherit;">글꼴 제거</button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="맑은 고딕,Malgun Gothic" data-txt="맑은고딕" style="font-family:맑은 고딕,Malgun Gothic;">맑은고딕 <span class="txt_abc">(가나다라)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="굴림,gulim" data-txt="굴림" style="font-family:굴림,gulim;">굴림 <span class="txt_abc">(가나다라)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="바탕,batang" data-txt="바탕" style="font-family:바탕,batang;">바탕 <span class="txt_abc">(가나다라)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="돋움,dotum" data-txt="돋움" style="font-family:돋움,dotum;">돋움 <span class="txt_abc">(가나다라)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="궁서,gungseo" data-txt="궁서" style="font-family:궁서,gungseo;">궁서 <span class="txt_abc">(가나다라)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Arial,Helvetica,sans-serif" data-txt="Arial" style="font-family:Arial,Helvetica,sans-serif;">Arial <span class="txt_abc">(abcd)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Verdana,Geneva,sans-serif" data-txt="Verdana" style="font-family:Verdana,Geneva,sans-serif;">Verdana <span class="txt_abc">(abcd)</span></button></li>
+                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="tahoma,sans-serif" data-txt="tahoma" style="font-family:tahoma,sans-serif;">tahoma <span class="txt_abc">(abcd)</span></button></li>
+                    </ul>
+                    <ul class="list_editor list_family_add" id="fontFamily_list_add">
+                        <li><button type="button" class="btn_edit" data-command="fontfamily" data-value="나눔고딕,NanumGothic,Sans-serif" data-txt="나눔고딕" style="font-family:나눔고딕,NanumGothic,Sans-serif;">나눔고딕 <span class="txt_abc">(가나다라)</span></button></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li class="compact_editor">
+            <button type="button" class="btn_editor btn_size" title="글자크기" data-display="sub">
+                <span class="txt">Formats</span><span class="img_editor ico_more"></span>
+            </button>
+            <div class="layer_editor layer_size">
+                <div class="inner_layer">
+                    <ul class="list_editor font_size_list">
+                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>
+                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>
+                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>
+                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="format" data-value="h3"><h3>Header 3</h3></button></li>
+                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="format" data-value="h4"><h4>Header 4</h4></button></li>
+                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="format" data-value="h5"><h5>Header 5</h5></button></li>
+                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="format" data-value="h6"><h6>Header 6</h6></button></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li class="compact_editor">
+            <button type="button" id="bold" class="btn_editor btn_bold" title="굵게 (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>
+        </li>
+        <li class="compact_editor">
+            <button type="button" id="underline" class="btn_editor btn_underline" title="밑줄 (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>
+        </li>
+        <li>
+            <button type="button" id="italic" class="btn_editor btn_italic" title="기울임 (Ctrl+I)" data-command="italic"><div class="ico_italic"></div></button>
+        </li>
+        <li>
+            <button type="button" id="strike" class="btn_editor btn_strike" title="취소선 (Ctrl+D)" data-command="strikethrough"><div class="ico_strike"></div></button>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li class="compact_editor">
+            <div class="box_color" data-display="sub">
+                <strong class="screen_out">글자색 선택상자</strong>
+                <button type="button" class="btn_editor btn_fcolor" title="글자색">
+                    <div class="ico_fcolor">
+                        <em class="color_font" style="background-color:#1f92fe"></em>
+                    </div>
+                </button>
+            </div>
+            <div class="layer_editor layer_color" id="foreColor">
+                <div class="inner_layer">
+                    <div class="pallet_bgcolor">
+                        <ul class="list_color list_bgcolor">
+                            <li><button type="button" class="btn_color color_ff0000" style="background-color:#ff0000;">#ff0000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ff5e00" style="background-color:#ff5e00;">#ff5e00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffe400" style="background-color:#ffe400;">#ffe400<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_abf200" style="background-color:#abf200;">#abf200<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_00d8ff" style="background-color:#00d8ff;">#00d8ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_0055ff" style="background-color:#0055ff;">#0055ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_6600ff" style="background-color:#6600ff;">#6600ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ff00dd" style="background-color:#ff00dd;">#ff00dd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_000000" style="background-color:#000000;">#000000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffd8d8" style="background-color:#ffd8d8;">#ffd8d8<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_fae0d4" style="background-color:#fae0d4;">#fae0d4<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_faf4c0" style="background-color:#faf4c0;">#faf4c0<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_e4f7ba" style="background-color:#e4f7ba;">#e4f7ba<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_d4f4fa" style="background-color:#d4f4fa;">#d4f4fa<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_d9e5ff" style="background-color:#d9e5ff;">#d9e5ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_e8d9ff" style="background-color:#e8d9ff;">#e8d9ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffd9fa" style="background-color:#ffd9fa;">#ffd9fa<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffffff color_white" style="background-color:#ffffff;">#ffffff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffa7a7" style="background-color:#ffa7a7;">#ffa7a7<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffc19e" style="background-color:#ffc19e;">#ffc19e<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_faed7d" style="background-color:#faed7d;">#faed7d<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_cef279" style="background-color:#cef279;">#cef279<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_b2ebf4" style="background-color:#b2ebf4;">#b2ebf4<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_b2ccff" style="background-color:#b2ccff;">#b2ccff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_d1b2ff" style="background-color:#d1b2ff;">#d1b2ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_ffb2f5" style="background-color:#ffb2f5;">#ffb2f5<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_bdbdbd" style="background-color:#bdbdbd;">#bdbdbd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_f15f5f" style="background-color:#f15f5f;">#f15f5f<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_f29661" style="background-color:#f29661;">#f29661<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_e5d85c" style="background-color:#e5d85c;">#e5d85c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_bce55c" style="background-color:#bce55c;">#bce55c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_5cd1e5" style="background-color:#5cd1e5;">#5cd1e5<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_6699ff" style="background-color:#6699ff;">#6699ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_a366ff" style="background-color:#a366ff;">#a366ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_f261df" style="background-color:#f261df;">#f261df<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_8c8c8c" style="background-color:#8c8c8c;">#8c8c8c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_980000" style="background-color:#980000;">#980000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_993800" style="background-color:#993800;">#993800<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_998a00" style="background-color:#998a00;">#998a00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_6b9900" style="background-color:#6b9900;">#6b9900<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_008299" style="background-color:#008299;">#008299<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_003399" style="background-color:#003399;">#003399<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_3d0099" style="background-color:#3d0099;">#3d0099<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_990085" style="background-color:#990085;">#990085<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_353535" style="background-color:#353535;">#353535<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_670000" style="background-color:#670000;">#670000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_662500" style="background-color:#662500;">#662500<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_665c00" style="background-color:#665c00;">#665c00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_476600" style="background-color:#476600;">#476600<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_005766" style="background-color:#005766;">#005766<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_002266" style="background-color:#002266;">#002266<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_290066" style="background-color:#290066;">#290066<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_660058" style="background-color:#660058;">#660058<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li class="compact_color"><button type="button" class="btn_color" style="background-color:#222222;">#222222<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <strong class="screen_out">글자 배경색 선택상자</strong>
+            <button type="button" class="btn_editor btn_fcolor btn_fbgcolor" title="글자 및 배경색" data-display="sub">
+                <div class="img_editor ico_fcolor_w">
+                    <em class="color_font" style="background-color:#1f92fe"></em>
+                </div>
+            </button>
+            <div class="layer_editor layer_color" id="hiliteColor">
+                <div class="inner_layer">
+                    <div class="pallet_bgcolor pallet_text">
+                        <ul class="list_color list_bgcolor">
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#1e9af9;">#1e9af9<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#00b8c6;">#00b8c6<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#6cce02;">#6cce02<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff9702;">#ff9702<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff0000;">#ff0000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff00dd;">#ff00dd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#6600ff;">#6600ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#000;background-color:#cce9ff;">#cce9ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#000;background-color:#fcfd4c;">#fcfd4c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color color_white" style="color:#000;background-color:#ffffff;">#ffffff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#000;background-color:#dfdede;">#dfdede<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#8c8c8c;">#8c8c8c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#000000;">#000000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                            <li class="compact_color"><button type="button" class="btn_color" style="background-color:#222222;">#222222<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li>
+            <button type="button" class="btn_editor btn_tab" title="들여쓰기" data-command="indent">
+                <div class="img_editor ico_indnet"></div>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="btn_editor btn_tab" title="내어쓰기" data-command="outdent">
+                <div class="img_editor ico_outdent"></div>
+            </button>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li>
+            <strong class="screen_out">정렬 선택상자</strong>
+            <button type="button" class="btn_editor btn_align" title="정렬" data-display="sub">
+                <span class="img_editor ico_align_l">왼쪽정렬</span>
+            </button>
+            <div class="layer_editor layer_align">
+                <div class="inner_layer inner_layer_type2">
+                    <ul class="list_editor">
+                        <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" title="왼쪽정렬 (Ctrl+,)"><span class="img_editor ico_align_l"></span>왼쪽</button></li>
+                        <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" title="가운데정렬 (Ctrl+.)"><span class="img_editor ico_align_c"></span>중간</button></li>
+                        <li><button type="button" class="btn_edit btn_align" data-command="justifyright" title="오른쪽정렬 (Ctrl+/)"><span class="img_editor ico_align_r"></span>오른쪽</button></li>
+                        <li><button type="button" class="btn_edit btn_align" data-command="justifyfull" title="양쪽정렬"><span class="img_editor ico_align_f"></span>양쪽</button></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li>
+            <button type="button" class="btn_editor btn_list" title="리스트" data-display="sub">
+                <span class="img_editor ico_list ico_list_num"></span>
+            </button>
+            <div class="layer_editor layer_list">
+                <div class="inner_layer inner_layer_type2">
+                    <ul class="list_editor">
+                        <li><button type="button" class="btn_edit btn_list" data-command="insertOrderedList" data-value="DECIMAL" title="숫자형 불릿"><span class="img_editor ico_list ico_list_num"></span></button></li>
+                        <li><button type="button" class="btn_edit btn_list" data-command="insertUnorderedList" data-value="DISC" title="원형 불릿"><span class="img_editor ico_list ico_list_square"></span></button></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li>
+            <strong class="screen_out">구분선</strong>
+            <button type="button" class="btn_editor btn_line" title="구분선" data-display="sub">
+                <hr style="border-width: 1px 0px 0px; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">
+                <hr style="border-width: 1px 0px 0px; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">
+                <hr style="border-width: 1px 0px 0px; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">
+            </button>
+            <div class="layer_editor layer_line">
+                <div class="inner_layer inner_layer_type2">
+                    <ul class="list_editor">
+                        <li><button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr1">
+                                <hr style="border-width: 1px 0px 0px; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr2">
+                                <hr style="border-width: 1px 0px 0px; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr3">
+                                <hr style="border-width: 1px 0px 0px; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li>
+            <button class="btn_editor btn_url" title="테이블" data-display="sub" data-command="table">
+                <div class="img_editor ico_table"></div>
+            </button>
+            <div class="table-content" style="display: none;">
+                <div class="table-data-form">
+                    <div class="table-picker" id="table_picker" data-command="insertTable" data-value="1x1"></div>
+                    <div class="table-highlighted" id="table_highlighted"></div>
+                    <div class="table-unhighlighted" id="table_unhighlighted"></div>
+                </div>
+                <div id="table_display">1 x 1</div>
+            </div>
+        </li>
+        <li>
+            <button class="btn_editor btn_url" title="링크 (Ctrl+K)" data-display="modal" data-command="link">
+                <div class="img_editor ico_url"></div>
+            </button>
+        </li>
+        <li>
+            <button class="btn_editor btn_picture" title="사진" data-display="modal" data-command="image">
+                <div class="img_editor ico_picture"></div>
+            </button>
+        </li>
+    </ul>
+</div>
+<div class="tool_module">
+    <ul class="editor_tool">
+        <li>
+            <button class="btn_editor btn_picture" title="동영상" data-display="modal" data-command="video">
+                <div class="img_editor ico_video"></div>
+            </button>
+        </li>
+        <li>
+            <button class="btn_editor btn_picture" title="전체화면" data-command="fullScreen">
+                <div class="img_editor ico_full_screen_e"></div>
+            </button>
+        </li>
+        <li>
+            <button class="btn_editor btn_picture" title="HTML 편집" data-command="sorceFrame">
+                <div class="img_editor ico_html"></div>
+            </button>
+        </li>
+    </ul>
+</div>
+<!-- //툴바 -->
+
