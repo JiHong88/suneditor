@@ -2,23 +2,20 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <script src="./js/FrameCreator.js"></script>
+    <script src="./js/jeditor.js"></script>
     <link href="./css/JEditor_Basic.css" rel="stylesheet" type="text/css">
     <title>.</title>
     <script>
         window.onload = function () {
-            jihong.editor.creator({
-                textElement: document.getElementById("test")
-                //,skinURI: "/jeditor/JEditorSkin_Basic.html"
-            });
+
+            document.getElementById("test").testnote();
         }
     </script>
 </head>
 <body>
-<div style="margin:70px auto; width:860px; height:100%;">
-    <div style="width:100%; height:400px;">
+<div style="margin:70px auto; width:860px; height:100%;" id="a">
+    <div style="width:100%; height:400px;" id="b">
         <textarea id="test" style="width:100%; height:100%;"></textarea>
-        <div></div>
     </div>
 </div>
 </body>

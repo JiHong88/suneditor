@@ -1,14 +1,14 @@
 <!-- 툴바 -->
-<div class="cover_je_toolbar" id="cover_je_toolbar" style="display:none;"></div>
+<div class="test-note-id-toolbar-cover" style="display:none;"></div>
 <div class="tool_module">
     <ul class="editor_tool">
         <li class="compact_editor">
             <button type="button" class="btn_editor btn_font" data-display="sub">
-                <span class="txt" id="font_family">글꼴</span><span class="img_editor ico_more"></span>
+                <span class="txt test-note-font-family">글꼴</span><span class="img_editor ico_more"></span>
             </button>
             <div class="layer_editor" style="display: none;">
                 <div class="inner_layer list_family">
-                    <ul class="list_editor" id="fontFamily_list">
+                    <ul class="list_editor test-note-list-font-family">
                         <li><button type="button" class="btn_edit default" data-command="fontName" data-value="inherit" data-txt="글꼴" style="font-family:inherit;">글꼴 제거</button></li>
                         <li><button type="button" class="btn_edit" data-command="fontName" data-value="맑은 고딕,Malgun Gothic" data-txt="맑은고딕" style="font-family:맑은 고딕,Malgun Gothic;">맑은고딕 <span class="txt_abc">(가나다라)</span></button></li>
                         <li><button type="button" class="btn_edit" data-command="fontName" data-value="굴림,gulim" data-txt="굴림" style="font-family:굴림,gulim;">굴림 <span class="txt_abc">(가나다라)</span></button></li>
@@ -19,7 +19,7 @@
                         <li><button type="button" class="btn_edit" data-command="fontName" data-value="Verdana,Geneva,sans-serif" data-txt="Verdana" style="font-family:Verdana,Geneva,sans-serif;">Verdana <span class="txt_abc">(abcd)</span></button></li>
                         <li><button type="button" class="btn_edit" data-command="fontName" data-value="tahoma,sans-serif" data-txt="tahoma" style="font-family:tahoma,sans-serif;">tahoma <span class="txt_abc">(abcd)</span></button></li>
                     </ul>
-                    <ul class="list_editor list_family_add" id="fontFamily_list_add">
+                    <ul class="list_editor list_family_add test-note-list-font-family-add">
                         <li><button type="button" class="btn_edit" data-command="fontfamily" data-value="나눔고딕,NanumGothic,Sans-serif" data-txt="나눔고딕" style="font-family:나눔고딕,NanumGothic,Sans-serif;">나눔고딕 <span class="txt_abc">(가나다라)</span></button></li>
                     </ul>
                 </div>
@@ -48,16 +48,16 @@
 <div class="tool_module">
     <ul class="editor_tool">
         <li class="compact_editor">
-            <button type="button" id="bold" class="btn_editor btn_bold" title="굵게 (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>
+            <button type="button" class="btn_editor btn_bold test-note-id-bold" title="굵게 (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>
         </li>
         <li class="compact_editor">
-            <button type="button" id="underline" class="btn_editor btn_underline" title="밑줄 (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>
+            <button type="button" class="btn_editor btn_underline test-note-id-underline" title="밑줄 (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>
         </li>
         <li>
-            <button type="button" id="italic" class="btn_editor btn_italic" title="기울임 (Ctrl+I)" data-command="italic"><div class="ico_italic"></div></button>
+            <button type="button" class="btn_editor btn_italic test-note-id-italic" title="기울임 (Ctrl+I)" data-command="italic"><div class="ico_italic"></div></button>
         </li>
         <li>
-            <button type="button" id="strike" class="btn_editor btn_strike" title="취소선 (Ctrl+D)" data-command="strikethrough"><div class="ico_strike"></div></button>
+            <button type="button" class="btn_editor btn_strike test-note-id-strike" title="취소선 (Ctrl+D)" data-command="strikethrough"><div class="ico_strike"></div></button>
         </li>
     </ul>
 </div>
@@ -72,7 +72,7 @@
                     </div>
                 </button>
             </div>
-            <div class="layer_editor layer_color" id="foreColor">
+            <div class="layer_editor layer_color">
                 <div class="inner_layer">
                     <div class="pallet_bgcolor">
                         <ul class="list_color list_bgcolor">
@@ -142,7 +142,7 @@
                     <em class="color_font" style="background-color:#1f92fe"></em>
                 </div>
             </button>
-            <div class="layer_editor layer_color" id="hiliteColor">
+            <div class="layer_editor layer_color">
                 <div class="inner_layer">
                     <div class="pallet_bgcolor pallet_text">
                         <ul class="list_color list_bgcolor">
@@ -250,11 +250,11 @@
             </button>
             <div class="table-content" style="display: none;">
                 <div class="table-data-form">
-                    <div class="table-picker" id="table_picker" data-command="insertTable" data-value="1x1"></div>
-                    <div class="table-highlighted" id="table_highlighted"></div>
-                    <div class="table-unhighlighted" id="table_unhighlighted"></div>
+                    <div class="table-picker test-note-id-table-picker" data-command="insertTable" data-value="1x1"></div>
+                    <div class="table-highlighted test-note-id-table-highlighted"></div>
+                    <div class="table-unhighlighted test-note-id-table-unhighlighted"></div>
                 </div>
-                <div id="table_display">1 x 1</div>
+                <div class="test-note-table-display">1 x 1</div>
             </div>
         </li>
         <li>

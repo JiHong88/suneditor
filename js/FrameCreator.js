@@ -1,11 +1,11 @@
 /**
  * frame 생성 js
  */
-if(typeof window.jihong=='undefined') window.jihong = {};
-if (!jihong.editor) jihong.editor = {};
+if(typeof window.test=='undefined') window.test = {};
+if (!test.editor) test.editor = {};
 
 
-jihong.editor = new (function(){
+test.editor = new (function(){
 
 	this.textElement, // 에디터를 적용할 textarea 태그 (필수)
 
@@ -67,8 +67,6 @@ jihong.editor = new (function(){
 		iframe.setAttribute("frameborder", "0");
 		iframe.setAttribute("scrolling", "no");
 		iframe.allowFullscreen = true;
-		iframe.style.width = "100%";
-		iframe.style.height = "100%";
 
 		/* iframe에 스킨html 적용 */
 		iframe.src = skinURI;
@@ -76,6 +74,7 @@ jihong.editor = new (function(){
 		/* 최상위 div */
 		var top_div = document.createElement("DIV");
 		top_div.className = "test-note";
+        top_div.style.width = /%|auto/.test(textElement.style.width)? textElement.style.width: textElement.clientWidth + "px";
 
 		/* 툴바 */
 		var tool_bar = document.createElement("DIV");
@@ -103,11 +102,11 @@ jihong.editor = new (function(){
 		top_div.appendChild(resize_bar);
 		top_div.appendChild(dialog_div);
 
-        jihong.editor._document = document;
-        jihong.editor.textElement = textElement;
-        jihong.editor._resizeBar = resize_bar;
-        // jihong.editor._resizeBackground = resizeBack;
-        // jihong.editor._iframeArea = iframe_div;
+        test.editor._document = document;
+        test.editor.textElement = textElement;
+        test.editor._resizeBar = resize_bar;
+        // test.editor._resizeBackground = resizeBack;
+        // test.editor._iframeArea = iframe_div;
 
 		/* iframe 로드시 이벤트 핸들러
 		 * inner 크기 조정
@@ -121,16 +120,16 @@ jihong.editor = new (function(){
 				iframe_div.style.width = "230px";
 			}
 
-            jihong.editor._iframeOuterHeight = editorClientHeight + (iframe.contentWindow.document.getElementById('je_toolbar').offsetHeight);
-            jihong.editor._iframeInnerHeight = editorClientHeight;
-            jihong.editor._iframeCssText = iframe_div.style.cssText;
-            jihong.editor.videoX = /^\d+$/.test(options.videoX)? options.videoX: 560;
-            jihong.editor.videoY = /^\d+$/.test(options.videoY)? options.videoY: 315;
+            test.editor._iframeOuterHeight = editorClientHeight + (iframe.contentWindow.document.getElementById('je_toolbar').offsetHeight);
+            test.editor._iframeInnerHeight = editorClientHeight;
+            test.editor._iframeCssText = iframe_div.style.cssText;
+            test.editor.videoX = /^\d+$/.test(options.videoX)? options.videoX: 560;
+            test.editor.videoY = /^\d+$/.test(options.videoY)? options.videoY: 315;
 
-			iframe_div.style.height = jihong.editor._iframeOuterHeight + "px";
-			iframe.contentWindow.document.getElementById('je_input_area').style.height = jihong.editor._iframeInnerHeight + "px";
-			iframe.contentWindow.je_iframe.document.body.innerHTML = "<p>&#65279" + textElement.value; + "</p>";
-			iframe.contentWindow.document.body.style.margin = "0";
+			iframe_div.style.height = test.editor._iframeOuterHeight + "px";
+			test.contentWindow.document.getElementById('je_input_area').style.height = test.editor._iframeInnerHeight + "px";
+			test.contentWindow.je_iframe.document.body.innerHTML = "<p>&#65279" + textElement.value; + "</p>";
+			test.contentWindow.document.body.style.margin = "0";
 		}
 
 		/* iframe 로드 이벤트 등록 */
@@ -140,7 +139,7 @@ jihong.editor = new (function(){
 			iframe.attachEvent("onload", frameLoadStyle);
 		}
 
-		/* applyFrame 밑에 생성 후 applyFrame display 옵션 none으로 변경 */
+		/* textElement 밑에 생성 후 textElement display 옵션 none으로 변경 */
 		textElement.parentNode.insertBefore(top_div, textElement.nextSibling);
 		textElement.style.display = "none";
 	}
