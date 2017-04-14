@@ -1,9 +1,6 @@
 /**
- * jeditor
+ * @brif test editor
  */
-if (!window.jihong) window.jihong = window.parent.jihong;
-
-
 (function(editorEl){
 	/* 에디터 함수 */
 	var editor = (function(){

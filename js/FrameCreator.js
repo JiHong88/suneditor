@@ -75,29 +75,26 @@ jihong.editor = new (function(){
 
 		/* 최상위 div */
 		var top_div = document.createElement("DIV");
-		top_div.className = "j_editor";
-        top_div.id = "j_editor";
+		top_div.className = "test-note";
 
 		/* 툴바 */
 		var tool_bar = document.createElement("DIV");
-		tool_bar.className = "je_toolbar";
-		tool_bar.id = "je_toolbar";
+		tool_bar.className = "test-note-toolbar";
         tool_bar.innerHTML = readTextFile("./html/toolBar.html");
 
         /* 에디터 */
         var editor_div = document.createElement("DIV");
-        editor_div.className = "je_input_area";
-        editor_div.id = "je_input_area";
+        editor_div.className = "test-note-inputArea";
         editor_div.style.height = editorClientHeight + "px";
         editor_div.innerHTML = readTextFile("./html/editor.html");
 
 		/* 리사이즈바 */
 		var resize_bar = document.createElement("DIV");
-		resize_bar.className = "resize_bar";
-		resize_bar.id = "resize_bar";
+		resize_bar.className = "test-note-resizeBar";
 
 		/* 다이얼로그 */
 		var dialog_div = document.createElement("DIV");
+        dialog_div.className = "test-note-dialogBox";
         dialog_div.innerHTML = readTextFile("./html/dialog.html");
 
 		/* 최상위 div에 append */
