@@ -18,7 +18,7 @@
 
     /**
 	 * document func
-     * @type {{nextIdx, prevIdx, isCell, getlistChildren, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass}}
+     * @type {{nextIdx, prevIdx, isCell, getListChildren, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass}}
      */
     var dom = (function(){
         var nextIdx = function(array, item) {
@@ -39,7 +39,7 @@
             return node && /^TD|^TH/i.test(node.nodeName);
         };
 
-        var getlistChildren = function(element, validation) {
+        var getListChildren = function(element, validation) {
             var children = [];
             validation = validation || func.returnTrue;
 
@@ -104,7 +104,7 @@
             nextIdx : nextIdx,
             prevIdx : prevIdx,
             isCell : isCell,
-            getlistChildren : getlistChildren,
+            getListChildren : getListChildren,
             getParentNode : getParentNode,
             changeTxt : changeTxt,
             changeClass : changeClass,
@@ -182,7 +182,7 @@
             };
 
             var getPElementInFocusNode = function() {
-                var parentElement = context._selectionNode;
+                var parentElement = context.argument._selectionNode;
                 while(!/P/.test(parentElement.tagName) && !/BODY/.test(parentElement.tagName)) {
                     parentElement = parentElement.parentNode;
                 }
@@ -231,8 +231,9 @@
                 if(this.modalForm) {
                     this.modalForm.style.display = "none";
                     context.dialog.back.style.display = "none";
+                    context.dialog.modalArea.style.display = "none";
                 }
-                if(context._imageElement) {
+                if(context.argument._imageElement) {
                     event.cancel_image_resize();
                 }
 
@@ -240,47 +241,47 @@
             };
 
             var toggleFrame = function(){
-                if(!context._wysiwygActive) {
+                if(!context.argument._wysiwygActive) {
                     var ec = {"&amp;":"&","&nbsp;":"\u00A0","&quot;":"\"","&lt;":"<","&gt;":">"};
-                    var je_source_html = context.source.value.replace(/&[a-z]+;/g, function(m){ return (typeof ec[m] == "string")?ec[m]:m; });
+                    var je_source_html = context.element.source.value.replace(/&[a-z]+;/g, function(m){ return (typeof ec[m] == "string")?ec[m]:m; });
                     context.element.wysiwygWindow.document.body.innerHTML = je_source_html.trim().length > 0? je_source_html: "<p>&#65279</p>";
                     context.element.wysiwygElement.style.display = "block";
                     context.element.source.style.display = "none";
-                    context.element.tool.cover.style.display = "none";
-                    context._wysiwygActive = true;
+                    // context.tool.cover.style.display = "none";
+                    context.argument._wysiwygActive = true;
                 }
                 else {
                     context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML;
                     context.element.source.style.display = "block";
                     context.element.wysiwygElement.style.display = "none";
-                    context.element.tool.cover.style.display = "block";
-                    context._wysiwygActive = false;
+                    // context.tool.cover.style.display = "block";
+                    context.argument._wysiwygActive = false;
                 }
             };
 
             var toggleFullScreen = function(element){
-                if(!context._isFullScreen) {
+                if(!context.argument._isFullScreen) {
                     context.element.topArea.style.position = "fixed";
                     context.element.topArea.style.top = "0";
                     context.element.topArea.style.left = "0";
                     context.element.topArea.style.width = "100%";
                     context.element.topArea.style.height = "100%";
 
-                    context._innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
-                    context.element.editorArea.style.height = context._innerHeight_fullScreen + "px"
+                    context.argument._innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
+                    context.element.editorArea.style.height = context.argument._innerHeight_fullScreen + "px"
 
                     dom.removeClass(element.firstElementChild, 'ico_full_screen_e');
                     dom.addClass(element.firstElementChild, 'ico_full_screen_i');
                 }
                 else {
-                    context.element.topArea.style.cssText = context._originCssText;
-                    context.element.editorArea.style.height = context._innerHeight + "px";
+                    context.element.topArea.style.cssText = context.argument._originCssText;
+                    context.element.editorArea.style.height = context.argument._innerHeight + "px";
 
                     dom.removeClass(element.firstElementChild, 'ico_full_screen_i');
                     dom.addClass(element.firstElementChild, 'ico_full_screen_e');
                 }
 
-                context._isFullScreen = !context._isFullScreen;
+                context.argument._isFullScreen = !context.argument._isFullScreen;
             };
 
             var appendHr = function(value) {
@@ -301,7 +302,7 @@
                 oHr.style.border = "black 0px none";
                 oHr.style.borderTop = borderStyle;
                 oHr.style.height = "1px";
-                context._selectionNode.parentNode.appendChild(oHr);
+                context.argument._selectionNode.parentNode.appendChild(oHr);
 
                 editor.appendP(oHr);
             };
@@ -349,6 +350,7 @@
                         break;
                 }
 
+                context.dialog.modalArea.style.display = "block";
                 context.dialog.back.style.display = "block";
                 context.dialog.modal.style.display = "block";
                 this.modalForm.style.display = "block";
@@ -357,15 +359,15 @@
             };
 
             var showLoding = function() {
-                context.dialog.loding.style.display = "block";
+                context.element.loding.style.display = "block";
             };
 
             var closeLoding = function() {
-                context.dialog.loding.style.display = "none";
+                context.element.loding.style.display = "none";
             };
 
             var insertDataToSave = function() {
-                if(context._wysiwygActive) {
+                if(context.argument._wysiwygActive) {
                     context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
                 } else {
                     context.element.textElement.innerHTML = context.element.source.value;
@@ -397,12 +399,12 @@
             var window_resize = function() {
                 if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
 
-                if(!context._isFullScreen) {
+                if(!context.argument._isFullScreen) {
                     context.tool.barHeight = context.tool.bar.offsetHeight;
                 }
                 else {
-                    context._innerHeight_fullScreen += (context.tool.barHeight - context.tool.bar.offsetHeight);
-                    context.element.editorArea.style.height = context._innerHeight_fullScreen + "px";
+                    context.argument._innerHeight_fullScreen += (context.tool.barHeight - context.tool.bar.offsetHeight);
+                    context.element.editorArea.style.height = context.argument._innerHeight_fullScreen + "px";
 
                     context.tool.barHeight = context.tool.bar.offsetHeight;
                 }
@@ -446,13 +448,11 @@
                 }
 
                 if(/layer_color/.test(className) && /BUTTON/.test(e.target.tagName)) {
-                    command = targetElement.id;
                     value = e.target.textContent;
                 }
 
                 // 커멘드 명령어 실행
                 if(command) {
-
                     if(/fontName/.test(command)) {
                         dom.changeTxt(editor.originSub.firstElementChild, txt);
                         editor.pure_execCommand(command, false, value);
@@ -483,7 +483,7 @@
                         editor.pure_execCommand(command, false);
                     }
                     else if(/insertTable/.test(command)) {
-                        editor.appendTable(context._tableXY[0], context._tableXY[1]);
+                        editor.appendTable(context.argument._tableXY[0], context.argument._tableXY[1]);
                     }
                     else {
                         editor.pure_execCommand(command, false, value);
@@ -515,10 +515,10 @@
                         parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
                         parentElement = parentElement.offsetParent;
                     }
-                    context._imageResize_parent_t = (context.tool.bar.offsetHeight + parentT);
+                    context.argument._imageResize_parent_t = (context.tool.bar.offsetHeight + parentT);
                     context._imageResize_parent_l = parentL;
 
-                    t = (targetElement.offsetTop + context._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
+                    t = (targetElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
                     l = (targetElement.offsetLeft + parentL);
 
                     resizeDiv.style.top = t + "px";
@@ -531,11 +531,11 @@
 
                     dom.changeTxt(context.imageResize_display, w + " x " + h);
 
-                    context._imageElement = targetElement;
-                    context._imageElement_w = w;
-                    context._imageElement_h = h;
-                    context._imageElement_t = t;
-                    context._imageElement_l = l;
+                    context.argument._imageElement = targetElement;
+                    context.argument._imageElement_w = w;
+                    context.argument._imageElement_h = h;
+                    context.argument._imageElement_t = t;
+                    context.argument._imageElement_l = l;
 
                     context.modalDialog_imageResize.style.display = "block";
                     context.imageResize_btn.style.display = "block";
@@ -546,9 +546,9 @@
             };
 
             var onSelectionChange_wysiwyg = function(e) {
-                context._selectionNode = context.element.wysiwygWindow.getSelection().anchorNode;
+                context.argument._selectionNode = context.element.wysiwygWindow.getSelection().anchorNode;
 
-                var selectionParent = context._selectionNode;
+                var selectionParent = context.argument._selectionNode;
                 var selectionNodeStr = "";
                 var fontFamily = context.tool.default_fontFamily;
                 while(!/P|BODY|HTML/.test(selectionParent.tagName)) {
@@ -618,7 +618,7 @@
 
                         if(currentNode && /TD/.test(currentNode.tagName)) {
                             var table = dom.getParentNode(currentNode, "table");
-                            var cells = dom.getlistChildren(table, dom.isCell);
+                            var cells = dom.getListChildren(table, dom.isCell);
                             var idx = shift? dom.prevIdx(cells, currentNode): dom.nextIdx(cells, currentNode);
 
                             if(idx == cells.length && !shift) idx = 0;
@@ -736,16 +736,16 @@
             };
 
             var onScroll_wysiwyg = function(e) {
-                if(context._imageElement) {
-                    var t = (context._imageElement.offsetTop + context._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
+                if(context.argument._imageElement) {
+                    var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
 
                     context.modalDialog_imageResize.style.top = t + "px"
-                    context.imageResize_btn.style.top = (t + context._imageElement_h) + "px";
+                    context.imageResize_btn.style.top = (t + context.argument._imageElement_h) + "px";
                 }
             };
 
             var onBlur_wysiwyg = function(e) {
-                context._selectionNode = e.target.getSelection().anchorNode;
+                context.argument._selectionNode = e.target.getSelection().anchorNode;
             };
 
             var onClick_dialog = function(e) {
@@ -762,15 +762,15 @@
                     var reader = new FileReader();
 
                     reader.onload = function (e) {
-                        context._imageFileSrc =  e.target.result;
+                        context.argument._imageFileSrc =  e.target.result;
 
                         var oImg = document.createElement("IMG");
-                        oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context._imageFileSrc;
+                        oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context.argument._imageFileSrc;
                         oImg.style.width = "350px";
                         wysiwygSelection.getPElementInFocusNode().appendChild(oImg);
                         editor.appendP(oImg);
 
-                        context._imageFileSrc = null;
+                        context.argument._imageFileSrc = null;
                         context.dialog.imgInputFile.value = "";
                         context.dialog.imgInputUrl.value = "";
 
@@ -792,11 +792,11 @@
                 if(!command) return;
 
                 if(/^\d+$/.test(command)) {
-                    context._imageElement.style.height = "";
-                    context._imageElement.style.width = command + "%";
+                    context.argument._imageElement.style.height = "";
+                    context.argument._imageElement.style.width = command + "%";
                 }
                 else if(/remove/.test(command)){
-                    context._imageElement.remove();
+                    context.argument._imageElement.remove();
                 }
 
                 editor.subOff();
@@ -804,21 +804,21 @@
             };
 
             var onMouseMove_image_Background = function(e) {
-                var w = (e.offsetX - context._imageElement_l);
-                var h = ((context._imageElement_h/context._imageElement_w) * w);
+                var w = (e.offsetX - context.argument._imageElement_l);
+                var h = ((context.argument._imageElement_h/context.argument._imageElement_w) * w);
                 var l = 0;
 
-                context._imageElement.style.width = w + "px";
-                context._imageElement.style.height = h + "px";
+                context.argument._imageElement.style.width = w + "px";
+                context.argument._imageElement.style.height = h + "px";
 
-                var parentElement = context._imageElement.offsetParent;
+                var parentElement = context.argument._imageElement.offsetParent;
                 var parentL = 1;
                 while(parentElement) {
                     parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
                     parentElement = parentElement.offsetParent;
                 }
 
-                l = (context._imageElement.offsetLeft + parentL);
+                l = (context.argument._imageElement.offsetLeft + parentL);
 
                 context.modalDialog_imageResize.style.left = l + "px";
                 context.modalDialog_imageResize.style.width = w + "px";
@@ -831,7 +831,7 @@
                 context.modalDialog_image_background.style.display = "none";
                 context.modalDialog_imageResize.style.display = "none";
                 context.imageResize_btn.style.display = "none";
-                context._imageElement = null;
+                context.argument._imageElement = null;
             };
 
             var onMouseMove_tablePicker = function(e) {
@@ -848,7 +848,7 @@
                 context.tool.tableUnHighlight.style.height = y_u + "em";
 
                 dom.changeTxt(context.tool.tableDisplay, x + " x " + y);
-                context._tableXY = [x, y];
+                context.argument._tableXY = [x, y];
             };
 
             var onSubmit = function(e) {
@@ -872,15 +872,15 @@
                             context.dialog.linkAnchorText.value = "";
                             break;
                         case 'editor_image':
-                            if(!context._imageFileSrc && context.dialog.imgInputUrl.value.trim().length == 0) break;
+                            if(!context.argument._imageFileSrc && context.dialog.imgInputUrl.value.trim().length == 0) break;
 
                             var oImg = document.createElement("IMG");
-                            oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context._imageFileSrc;
+                            oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context.argument._imageFileSrc;
                             oImg.style.width = "350px";
                             wysiwygSelection.getPElementInFocusNode().appendChild(oImg);
                             editor.appendP(oImg);
 
-                            context._imageFileSrc = null;
+                            context.argument._imageFileSrc = null;
                             context.dialog.imgInputFile.value = "";
                             context.dialog.imgInputUrl.value = "";
                             break;
@@ -926,17 +926,30 @@
             };
 
             var onMouseDown_resizeBar = function(e) {
-                context._resizeEditor = true;
-                context._resizeClientY = e.clientY;
-                context.dialog.resizeBackground.style.display = "block";
+                context.argument._resizeEditor = true;
+                context.argument._resizeClientY = e.clientY;
+                context.element.resizeBackground.style.display = "block";
 
 
-                document.addEventListener('mousemove', event.resize_editor);
+                document.addEventListener('mousemove', resize_editor);
                 document.addEventListener('mouseup', function () {
-                    document.removeEventListener('mousemove', event.resize_editor);
-                    context.dialog.resizeBackground.style.display = "none";
+                    document.removeEventListener('mousemove', resize_editor);
+                    context.element.resizeBackground.style.display = "none";
                 });
             };
+
+            var resize_editor = function(e) {
+                if(!context.argument._resizeEditor) return;
+
+                var resizeInterval = (e.clientY - context.argument._resizeClientY);
+
+                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
+
+                context.argument._innerHeight = (context.element.editorArea.offsetHeight + resizeInterval);
+
+                context.argument._resizeClientY = e.clientY;
+            };
+
 
 			/* 이벤트 등록 */
             window.onresize = function(){window_resize()};
@@ -944,7 +957,6 @@
 
             context.element.wysiwygWindow.addEventListener("mousedown", onMouseDown_wysiwyg);
             context.element.wysiwygWindow.document.addEventListener("selectionchange", onSelectionChange_wysiwyg);
-            context.element.wysiwygWindow.document.onselectionchange = function(){onSelectionChange_wysiwyg()};
             context.element.wysiwygWindow.addEventListener("keydown", onKeyDown_wysiwyg);
             context.element.wysiwygWindow.addEventListener('scroll', onScroll_wysiwyg);
             context.element.wysiwygWindow.addEventListener("blur", onBlur_wysiwyg);
@@ -1007,6 +1019,9 @@
         var top_div = document.createElement("DIV");
         top_div.className = "test-note";
         top_div.style.width = /%|auto/.test(element.style.width)? element.style.width: element.clientWidth + "px";
+        /* relative div */
+        var relative = document.createElement("DIV");
+        relative.className = "test-note-container";
 		/* 툴바 */
         var tool_bar = document.createElement("DIV");
         tool_bar.className = "test-note-id-toolbar";
@@ -1023,16 +1038,26 @@
         var dialog_div = document.createElement("DIV");
         dialog_div.className = "test-note-id-dialogBox";
         dialog_div.innerHTML = readTextFile("./html/dialog.html");
+        /* loding box */
+        var loding_box = document.createElement("DIV");
+        loding_box.className = "test-note-id-loding";
+        loding_box.innerHTML = "<div class=\"ico-loding\"></div>";
+        /* resize 동작시 background */
+        var resize_back = document.createElement("DIV");
+        resize_back.className = "test-note-id-resize-background";
 
         /* 사용자 옵션 값 넣기*/
         dialog_div.getElementsByClassName('test-note-id-video-x')[0].value = options.videoX;
         dialog_div.getElementsByClassName('test-note-id-video-y')[0].value = options.videoY;
 
 		/* 최상위 div에 append */
-        top_div.appendChild(tool_bar);
-        top_div.appendChild(editor_div);
-        top_div.appendChild(resize_bar);
-        top_div.appendChild(dialog_div);
+        relative.appendChild(tool_bar);
+        relative.appendChild(editor_div);
+        relative.appendChild(resize_bar);
+        relative.appendChild(dialog_div);
+        relative.appendChild(resize_back);
+        relative.appendChild(loding_box);
+        top_div.appendChild(relative);
 
         return {
         	constructed : {
@@ -1040,7 +1065,9 @@
 				_toolBar : tool_bar,
 				_editorArea : editor_div,
 				_resizeBar : resize_bar,
-				_dialog : dialog_div
+				_dialog : dialog_div,
+                _loding : loding_box,
+                _resizeBack : resize_back
 			},
 			options : options
         };
@@ -1076,12 +1103,14 @@
 			},
 			element : {
                 textElement: element,
-                topArea: cons,
+                topArea: cons._top,
                 resizebar: cons._resizeBar,
                 editorArea: cons._editorArea,
                 wysiwygWindow: cons._editorArea.getElementsByClassName('test-note-id-wysiwyg')[0].contentWindow,
                 wysiwygElement: cons._editorArea.getElementsByClassName('test-note-id-wysiwyg')[0],
-                source: cons._editorArea.getElementsByClassName('test-note-id-source')[0]
+                source: cons._editorArea.getElementsByClassName('test-note-id-source')[0],
+                loding : cons._loding,
+                resizeBackground : cons._resizeBack
             },
 			tool : {
 				bar : cons._toolBar,
@@ -1101,10 +1130,10 @@
 				list_fontFamily_add : cons._toolBar.getElementsByClassName('test-note-list-font-family-add')[0]
 			},
 			dialog : {
-				forms : cons._dialog.getElementsByTagName('FORM'),
-				loding : cons._dialog.getElementsByClassName('test-note-id-loding')[0],
-				back : cons._dialog.getElementsByClassName('test-note-id-dialog-back')[0],
-				modal : cons._dialog.getElementsByClassName('test-note-id-dialog-modal')[0],
+                modalArea : cons._dialog,
+                back : cons._dialog.getElementsByClassName('test-note-id-dialog-back')[0],
+                modal : cons._dialog.getElementsByClassName('test-note-id-dialog-modal')[0],
+                forms : cons._dialog.getElementsByTagName('FORM'),
 				link : cons._dialog.getElementsByClassName('test-note-id-dialog-link')[0],
 				linkText : cons._dialog.getElementsByClassName('test-note-id-linkurl')[0],
 				linkAnchorText : cons._dialog.getElementsByClassName('test-note-id-linktext')[0],
@@ -1114,15 +1143,13 @@
 				video : cons._dialog.getElementsByClassName('test-note-id-dialog-video')[0],
 				videoInputUrl : cons._dialog.getElementsByClassName('test-note-id-video-url')[0],
 				video_x : cons._dialog.getElementsByClassName('test-note-id-video-x')[0],
-				video_y : cons._dialog.getElementsByClassName('test-note-id-video-y')[0],
+				video_y : cons._dialog.getElementsByClassName('test-note-id-video-y')[0]
 
                 /*modalDialog_image_background : cons._dialog.getElementsByClassName('')[0].modal_image_background,
                 modalDialog_imageResize : cons._dialog.getElementsByClassName('')[0].modal_image_resize,
                 imageResize_controller : cons._dialog.getElementsByClassName('')[0].image_resize_controller,
                 imageResize_display : cons._dialog.getElementsByClassName('')[0].image_size_display,
                 imageResize_btn : cons._dialog.getElementsByClassName('')[0].image_resize_btn,*/
-
-				resizeBackground : cons._dialog.getElementsByClassName('test-note-id-resize-background')[0]
 			},
 			user : {
                 videoX : options.videoX, // 동영상 프레임 기본 가로 크기

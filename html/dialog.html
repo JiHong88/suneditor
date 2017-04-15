@@ -1,19 +1,40 @@
-<!-- resize 동작시 background -->
-<div class="test-note-id-resize-background"></div>
-<!-- //resize 동작시 background -->
-
-<!-- 로딩 background -->
-<div class="modal-loding-background test-note-id-loding" style="display: none;">
-    <div class="ico-loding"></div>
+<!-- 이미지 크기 조절 -->
+<div class="modal-image-resize" id="modal_image_resize" style="display: none;">
+    <div class="image-resize-dot tl"></div>
+    <div class="image-resize-dot tr"></div>
+    <div class="image-resize-dot bl"></div>
+    <div class="image-resize-dot br-controller" id="image_resize_controller"></div>
+    <div class="image-size-display" id="image_size_display"></div>
 </div>
-<!-- //로딩 background -->
-
-<!-- 이미지 크기 조절 background modal -->
+<div class="image-resize-btn" id="image_resize_btn" style="display: none;">
+    <div class="btn-group">
+        <button type="button" data-command="100">
+            <span class="note-fontsize-10">100%</span>
+        </button>
+        <button type="button" data-command="75">
+            <span class="note-fontsize-10">75%</span>
+        </button>
+        <button type="button" data-command="50">
+            <span class="note-fontsize-10">50%</span>
+        </button>
+        <button type="button" data-command="25">
+            <span class="note-fontsize-10">25%</span>
+        </button>
+    </div>
+    <div class="btn-group remove">
+        <button type="button" data-command="remove">
+            <div class="image_remove"></div>
+        </button>
+    </div>
+</div>
 <div class="modal-dialog-image-background" id="modal_image_background" style="display: none;"></div>
-<!-- //이미지 크기 조절 background modal -->
+<!-- //이미지 크기 조절 -->
 
-<div class="modal-dialog-background test-note-id-dialog-back" style="display: none;"></div>
+
 <!-- modal dialog -->
+<!-- background -->
+<div class="modal-dialog-background test-note-id-dialog-back" style="display: none;"></div>
+<!-- //background -->
 <div class="modal-dialog test-note-id-dialog-modal" style="display: none;">
     <!-- 링크 삽입 다이얼로그 -->
     <div class="modal-content test-note-id-dialog-link" style="display: none;">
@@ -22,14 +43,14 @@
                 <button type="button" data-command="close" class="close" aria-label="Close">
                     <span aria-hidden="true" data-command="close">×</span>
                 </button>
-                <h4 class="modal-title">링크 삽입</h4>
+                <h5 class="modal-title">링크 삽입</h5>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>이동할 인터넷 주소</label>
                     <input class="form-control test-note-id-linkurl" type="text">
                 </div>
-                <div class="form-group" style="overflow:auto;">
+                <div class="form-group">
                     <label>화면 텍스트</label><input class="form-control test-note-id-linktext" type="text">
                 </div>
             </div>
@@ -47,14 +68,14 @@
                 <button type="button" data-command="close" class="close" aria-label="Close">
                     <span aria-hidden="true" data-command="close">×</span>
                 </button>
-                <h4 class="modal-title">이미지 삽입</h4>
+                <h5 class="modal-title">이미지 삽입</h5>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>파일 선택</label>
                     <input class="form-control test-note-id-image-file" type="file" accept="image/*" multiple="multiple">
                 </div>
-                <div class="form-group" style="overflow:auto;">
+                <div class="form-group">
                     <label>이미지 주소</label><input class="form-control test-note-id-image-url" type="text">
                 </div>
             </div>
@@ -72,14 +93,14 @@
                 <button type="button" data-command="close" class="close" aria-label="Close">
                     <span aria-hidden="true" data-command="close">×</span>
                 </button>
-                <h4 class="modal-title">동영상 삽입</h4>
+                <h5 class="modal-title">동영상 삽입</h5>
             </div>
             <div class="modal-body">
                 <div class="form-group">
                     <label>유튜브 동영상 주소</label>
                     <input class="form-control test-note-id-video-url" type="text">
                 </div>
-                <div class="form-group form-size" style="overflow:auto;">
+                <div class="form-group form-size">
                     <div class="size-text"><label class="size-w">가로</label><label class="size-x"> </label><label class="size-h">세로</label></div>
                     <input type="text" class="form-size-control test-note-id-video-x"><label class="size-x">x</label><input type="text" class="form-size-control test-note-id-video-y">
                 </div>
