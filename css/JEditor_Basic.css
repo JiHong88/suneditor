@@ -99,7 +99,7 @@
 .test-note .test-note-id-toolbar .ico_align_c {width:17px; height:17px; background:url('../img/align_center_icon&48.png') no-repeat; background-size:100%;}
 .test-note .test-note-id-toolbar .ico_align_f {width:17px; height:17px; background:url('../img/align_just_icon&48.png') no-repeat; background-size:100%;}
 .test-note .test-note-id-toolbar .ico_list {display: inline-block; width:17px; height:17px;}
-.test-note .test-note-id-toolbar .ico_list_num {background:url('../img/list_num_icon&48.png') no-repeat; background-size:100%;}
+.test-note .test-note-id-toolbar .ico_list_num {display:block; margin:0 auto;background:url('../img/list_num_icon&48.png') no-repeat; background-size:100%;}
 .test-note .test-note-id-toolbar .ico_list_square {background:url('../img/list_bullets_icon&48.png') no-repeat; background-size:100%;}
 .test-note .test-note-id-toolbar .ico_indnet {width:17px; height:17px; margin: 0 auto; background:url('../img/indent_increase_icon&48.png') no-repeat; background-size:100%;}
 .test-note .test-note-id-toolbar .ico_outdent {width:17px; height:17px; margin: 0 auto; background:url('../img/indent_decrease_icon&48.png') no-repeat; background-size:100%;}
