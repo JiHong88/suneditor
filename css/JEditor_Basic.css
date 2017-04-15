@@ -10,7 +10,7 @@
 .test-note {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF;}
 .test-note button {border:0 none; background-color:transparent; cursor:pointer;}
 .test-note input, .test-note select, .test-note textarea, .test-note button {vertical-align: middle;}
-.test-note button .txt {display: block; margin-top: -3px;}
+.test-note button .txt {display: block; margin-top: 0px;}
 .test-note .btn_align .img_editor {display: inline-block; width:14px; height:13px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .test-note .layer_line .img_editor {display: inline-block; width:138px; height:1px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .test-note .screen_out {overflow:hidden; position:absolute; width:0; height:0; line-height:0; text-indent:-9999px;}
@@ -137,13 +137,13 @@
 .test-note .test-note-id-toolbar .layer_color .pallet_text .list_color {width:140px; height:44px; margin:8px 6px 0 10px; padding:0; border-top:0;}
 
 /* 에디터 영역 */
-.test-note  .test-note-id-editorArea {width:100%; height:100%;}
+.test-note  .test-note-id-editorArea {width:100%;}
 .test-note  .test-note-id-editorArea .input_editor {width:100%; height:100%; background-color:#FFF;}
-.test-note  .test-note-id-editorArea .input_editor.html {padding:8px; outline-style:none;}
+.test-note  .test-note-id-editorArea .input_editor.html {/*padding:8px;*/ outline-style:none;}
 
 /* 리사이즈 바 */
 .test-note .test-note-id-resizeBar {width:100%; height:10px; border-top:1px solid #dadada; background-color:#fafafa; cursor:ns-resize;}
-.test-note .test-note-id-resize-background {position:fixed; display:none; top:0; left:0; width:100%; height:100%; opacity:0; z-index:10000;}
+.test-note .test-note-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 
 /* 다이얼로그 */
 .test-note .test-note-id-dialogBox {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:9999;}
@@ -187,7 +187,7 @@
 
 
 /* 다이얼로그 - 이미지 크기 조절 */
-.modal-dialog-image-background {
+/*.modal-dialog-image-background {
 	position:absolute;
 	top:0px;
 	left:0px;
@@ -195,9 +195,10 @@
 	height:100%;
 	cursor: se-resize;
 	z-index:11;
-}
+}*/
 .modal-image-resize {
 	position:absolute;
+    display:none;
 	background-color:black;
 	opacity:0.3;
 	z-index:8;
@@ -254,7 +255,7 @@
 /* 이미지 크기 조절 */
 .image-resize-btn {
 	position: absolute;
-	display: block;
+	display: none;
     top: 0;
     left: 0;
     margin-top: -50px;
@@ -347,65 +348,4 @@
 	border-color: #adadad !important;
 	outline: 0 none !important;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
