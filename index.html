@@ -6,14 +6,21 @@
     <link href="src/css/suneditor.css" rel="stylesheet" type="text/css">
     <title>.</title>
     <script>
+        var suneditor;
         window.onload = function () {
-            document.getElementById("sample").suneditor();
+            suneditor = document.getElementById("sample").suneditor();
         }
+
+        function save(){
+            suneditor.save();
+        }
+
     </script>
 </head>
 <body>
 <div style="margin:70px auto; max-width:860px; height:100%;">
     <textarea id="sample" style="width:100%; height:400px;"></textarea>
+    <button onclick="save()">save</button>
 </div>
 </body>
 </html>
