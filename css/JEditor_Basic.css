@@ -146,7 +146,7 @@
 @media screen and (max-width: 509px) {.test-note .modal-dialog .modal-content {width:100%;} }
 .test-note .modal-dialog .modal-header {padding:15px; border-bottom:1px solid #e5e5e5;}
 .test-note .modal-dialog button.close {-webkit-appearance:none; padding:0; cursor:pointer; background:transparent; border:0;}
-.test-note .modal-dialog .close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; text-shadow:0 1px 0 #fff; filter:alpha(opacity=20); opacity:.2;}
+.test-note .modal-dialog .close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; text-shadow:0 1px 0 #fff; filter:alpha(opacity=50); opacity:.5;}
 .test-note .modal-dialog .close:hover {opacity:1;}
 .test-note .modal-dialog .modal-body {position:relative; padding:15px;}
 .test-note .modal-dialog .form-group {margin-bottom:15px;}
