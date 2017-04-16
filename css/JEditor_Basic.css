@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 
 /* 공통 */
-.test-note th, .test-note td, .test-note input, .test-note select, .test-note textarea, .test-note button {font-size:14px; line-height:1.5; color:#111;}
+.test-note th, .test-note td, .test-note input, .test-note select, .test-note textarea, .test-note button {font-size:14px; font-family:sans-serif; line-height:1.5; color:#111;}
 .test-note body, .test-note div, .test-note dl, .test-note dt, .test-note dd, .test-note ul, .test-note ol, .test-note li,
 .test-note h1, .test-note h2, .test-note h3, .test-note h4, .test-note h5, .test-note h6, .test-note pre, .test-note code, .test-note form, .test-note fieldset,
 .test-note legend, .test-note textarea, .test-note p, .test-note blockquote, .test-note th, .test-note td, .test-note input, .test-note select, .test-note textarea, .test-note button {margin:0; padding:0;}
@@ -183,7 +183,7 @@
 .modal-image-resize .image-size-display {position:absolute;	right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:black; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; -webkit-opacity:.7; -khtml-opacity:.7; -moz-opacity:.7; opacity:.7;}
 
 /* 이미지 크기 조절 버튼 */
-.image-resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:8; display:none; max-width:276px; padding:1px; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:left; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.image-resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:8; display:none; max-width:310px; padding:1px; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:left; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .image-resize-btn .btn-group {position:relative; display:inline-block; vertical-align:middle; padding:5px 5px 5px 0;}
 .image-resize-btn .btn-group button {position:relative; float:left; border-top-right-radius:0; border-bottom-right-radius:0; margin-left:2px; padding:5px 10px !important; font-size:12px !important; line-height:1.5 !important; border:1px solid #222 !important; border-radius:3px !important; color:#333; background-color:#fff !important; border-color:#ccc !important; display:inline-block; font-size:14px !important; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
 .image-resize-btn .btn-group.remove {width:40px; height:33px; padding:0 10px 0 0 !important;}
