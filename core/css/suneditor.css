@@ -8,7 +8,6 @@
 .sun-editor dl, .sun-editor ul, .sun-editor ol, .sun-editor menu, .sun-editor li {list-style: none;}
 .sun-editor hr {margin:6px 0 6px 0}
 .sun-editor textarea {resize:none; border:0;}
-.sun-editor div[disabled] ~ * {cursor:not-allowed; opacity:.5; filter:alpha(opacity=50);}
 
 .sun-editor {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor button {border:0 none; background-color:transparent; cursor:pointer;}
