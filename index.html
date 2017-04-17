@@ -2,14 +2,16 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <script src="src/js/suneditor.js"></script>
-    <link href="src/css/suneditor.css" rel="stylesheet" type="text/css">
+    <script src="core/js/suneditor.js"></script>
+    <link href="core/css/suneditor.css" rel="stylesheet" type="text/css">
     <title>.</title>
     <script>
         var suneditor;
         window.onload = function () {
             suneditor = document.getElementById("sample").suneditor({
-
+                showVideo : false,
+                showImage : false,
+                showLink : false
             });
         }
 
