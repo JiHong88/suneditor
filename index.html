@@ -10,6 +10,13 @@
         window.onload = function () {
             suneditor = document.getElementById("sample").suneditor({
             });
+
+            var f = document.querySelector("form");
+            f.onsubmit = s.bind(f);
+
+            function s() {
+                alert('sss');
+            }
         }
 
         function save(){
@@ -22,7 +29,11 @@
 <div style="margin:70px auto; max-width:860px; height:100%;">
     <textarea id="sample" style="width:100%; height:400px;"></textarea>
     <button onclick="save()">save</button>
-    <input type="file"/>
+
+    <form>
+        <input type="file"/>
+        <input type="submit">
+    </form>
 </div>
 </body>
 </html>
