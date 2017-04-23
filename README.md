@@ -1,1 +1,1 @@
-pure javascript **wysiwyg Web Editor**
+pure javascript based **WYSIWYG Web Editor**
