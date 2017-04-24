@@ -73,8 +73,6 @@
 .sun-editor .sun-editor-id-toolbar .btn_font {width:80px; text-align:left; text-indent:10px;}
 .sun-editor .sun-editor-id-toolbar .btn_size {width:75px; text-align:left; text-indent:7px;}
 .sun-editor .sun-editor-id-toolbar .btn_line {padding:0 5px 0 5px;}
-.sun-editor .sun-editor-id-toolbar .btn_picture {cursor:pointer;}
-.sun-editor .sun-editor-id-toolbar .btn_etc {width:49px; text-align:left; text-indent:7px;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .list_color .btn_color.checked_color .bg_check {display:block;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .list_color .btn_color.checked_color {border:1px solid #000;}
 
