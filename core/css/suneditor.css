@@ -12,7 +12,7 @@
 .sun-editor {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor button {border:0 none; background-color:transparent; cursor:pointer;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align: middle;}
-.sun-editor button .txt {display: block; margin-top: 0px;}
+.sun-editor button .txt {display: block; margin-top: 0px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .sun-editor .btn_align .img_editor {display: inline-block; width:14px; height:13px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .sun-editor .layer_line .img_editor {display: inline-block; width:138px; height:1px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .sun-editor .screen_out {overflow:hidden; position:absolute; width:0; height:0; line-height:0; text-indent:-9999px;}
