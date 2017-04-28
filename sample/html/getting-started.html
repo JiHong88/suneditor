@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suneditor</title>
+    <!-- JQuery -->
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <!-- bootstrap -->
+    <script type="text/javascript" charset="utf-8" src="../bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../bootstrap/bootstrap.css" media="all">
+    <!-- main css -->
+    <link rel="stylesheet" href="../css/sample.css" media="all">
+    <link rel="stylesheet"
+          href="//assets-cdn.github.com/assets/github-d8af8b7dd51ee94d7ab4f44b513e681da376a0e759768cc5e8888151ec02ab9c.css">
+    <link rel="stylesheet"
+          href="//assets-cdn.github.com/assets/frameworks-d7b19415c108234b91acac0d0c02091c860993c13687a757ee345cc1ecd3a9d1.css">
+    <!-- suneditor -->
+    <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
+    <script src="../../suneditor/js/suneditor.js"></script>
+    <script src="../../suneditor/lang/en.js"></script>
+</head>
+<body style="min-width:100%; background-color: #333;">
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../index.html"><b>Suneditor</b></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="getting-started.html">Getting started</a></li>
+                <li><a href="#">Examples</a></li>
+                <li><a href="#">Document</a></li>
+                <li><a href="//codeload.github.com/JiHong88/WYSIWYG-SunEditor/zip/master">Download</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="content">
+    <article class="markdown-body entry-content" itemprop="text">
+        <h4>1. include JS/CSS</h4>
+        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span
+                class="pl-s"><span class="pl-pds">"</span>suneditor/css/suneditor.css<span
+                class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span
+                class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span
+                class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span
+                class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/js/suneditor.js<span
+                    class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/lang/en.js<span
+                    class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre>
+        </div>
+        <h4>2. target a element</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span
+                    class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hello World!!!&lt;/<span
+                    class="pl-ent">textarea</span>&gt;</pre>
+        </div>
+        <h4>3. create</h4>
+        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span
+                class="pl-k">=</span> <span class="pl-c1">document</span>.<span
+                class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span
+                class="pl-pds">'</span></span>).<span class="pl-en">suneditor</span>({
+    <span class="pl-c"><span class="pl-c">//</span> insert options</span>
+});</pre>
+        </div>
+    </article>
+
+    <footer>
+        <p>Suneditor v0.9 create by JiHong.Lee</p>
+        <p>Based on javascript</p>
+        <p>Suneditor distributed under the MIT license.</p>
+        <p><a href="//github.com/JiHong88/WYSIWYG-SunEditor" target="_blank" style="color:#f4b124;">go to GitHub suneditor</a></p>
+    </footer>
+</div>
+
+<script>
+
+</script>
+</body>
+</html>

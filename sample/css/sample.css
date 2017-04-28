@@ -1,4 +1,14 @@
 .content {
     max-width: 960px;
-    margin: 0 auto;
+    margin: 150px auto 0 auto;
+}
+
+footer {
+    color: #ffebc1!important;
+    bottom: 0;
+    margin-top: 50px;
+}
+
+h4 {
+    color: #f4b124!important;
 }

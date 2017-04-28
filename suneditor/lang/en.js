@@ -40,7 +40,12 @@ SUNEDITOR.lang = {
         imageBox : {
             title : 'Insert Image',
             file : 'Select from files',
-            url : 'Image URL'
+            url : 'Image URL',
+            resize100 : 'resize 100%',
+            resize75 : 'resize 75%',
+            resize50 : 'resize 50%',
+            resize25 : 'resize 25%',
+            remove : 'remove image'
         },
         videoBox : {
             title : 'Insert Video',

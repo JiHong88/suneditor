@@ -26,6 +26,12 @@ var suneditor = document.getElementById('sample').suneditor({
     // insert options
 });
 ```
+or
+```javascript
+var suneditor = SUNEDITOR.create('sample',{
+    // insert options
+});
+```
 
 ### License
 suneditor may be freely distributed under the MIT license.
