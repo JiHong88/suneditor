@@ -16,7 +16,7 @@ pure javascript based WYSIWYG web editor
 #### 2. target a element
 
 ```html
-<textarea id="sample">Hello World!!!</div>
+<textarea id="sample">Hello World!!!</textarea>
 ```
 
 #### 3. create
