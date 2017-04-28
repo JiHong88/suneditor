@@ -2,7 +2,7 @@ SUNEDITOR.lang = {
     toolbar : {
         fontFamily : '글꼴',
         fontFamilyDelete : '글꼴 제거',
-        fontFormat : '글자크기',
+        formats : '크기',
         bold : '굵게',
         underline : '밑줄',
         italic : '기울임',
@@ -16,6 +16,10 @@ SUNEDITOR.lang = {
         alignRight : '오른쪽 정렬',
         alignCenter : '가운데 정렬',
         justifyFull : '양쪽 정렬',
+        left : '왼쪽',
+        right : '오른쪽',
+        center : '중간',
+        bothSide : '양쪽',
         list : '리스트',
         orderList : '숫자형 불릿',
         unorderList : '원형 불릿',
@@ -40,31 +44,10 @@ SUNEDITOR.lang = {
         },
         videoBox : {
             title : '동영상 삽입',
-            url : '미디어 임베드 주소, 유튜브'
+            url : '미디어 임베드 주소, 유튜브',
+            width : '가로',
+            height : '세로'
         },
         submitButton : '확인'
     }
 };
-
-
-/*
-var jsParam = function() {
-    var scripts = document.getElementsByTagName('script');
-    var script = scripts.item(scripts.length-1);
-    var match = script.src.match(/\?(.+)$/);
-    var get = '&';
-    var data = [];
-    if(match){
-        var get = match[1];
-        var params = get.split('&');
-        for (var i = 0; i < params.length; i++) {
-            var param = params[i].split('=');
-            var name  = param[0];
-            var value = param[1];
-            data[name] = value;
-        }
-    }else{
-        data["ver"] = "10";
-    }
-    this.get = function(oName) { return data[oName]; };
-};*/

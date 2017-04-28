@@ -1,13 +1,13 @@
 SUNEDITOR.lang = {
     toolbar : {
-        fontFamily : 'Font Family',
+        fontFamily : 'Font',
         fontFamilyDelete : 'Remove Font Family',
-        fontFormat : 'Font Size',
+        formats : 'Formats',
         bold : 'Bold',
         underline : 'Underline',
         italic : 'Italic',
         strike : 'Strike',
-        foreColor : 'Fore Color',
+        fontColor : 'Font Color',
         backgroundColor : 'Background Color',
         indent : 'Indent',
         outdent : 'Outdent',
@@ -16,6 +16,10 @@ SUNEDITOR.lang = {
         alignRight : 'Align right',
         alignCenter : 'Align center',
         justifyFull : 'Justify full',
+        left : 'Left',
+        right : 'Right',
+        center : 'Center',
+        bothSide : 'Justify full',
         list : 'list',
         orderList : 'Ordered list',
         unorderList : 'Unordered list',
@@ -40,7 +44,9 @@ SUNEDITOR.lang = {
         },
         videoBox : {
             title : 'Insert Video',
-            url : 'Media embed URL, YouTube'
+            url : 'Media embed URL, YouTube',
+            width : 'Width',
+            height : 'Height'
         },
         submitButton : 'Submit'
     }
