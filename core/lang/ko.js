@@ -1,4 +1,4 @@
-SUNEDITOR.lang['ko'] = {
+SUNEDITOR.lang = {
     toolbar : {
         fontFamily : '글꼴',
         fontFamilyDelete : '글꼴 제거',

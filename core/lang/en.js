@@ -1,4 +1,4 @@
-SUNEDITOR.lang['en'] = {
+SUNEDITOR.lang = {
     toolbar : {
         fontFamily : 'Font Family',
         fontFamilyDelete : 'Remove Font Family',
