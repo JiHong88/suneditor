@@ -1607,6 +1607,7 @@ pre code {
   padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
+  max-width: 1020px;
 }
 .row {
   margin-right: -15px;
@@ -4590,10 +4591,11 @@ fieldset[disabled] .navbar-default .btn-link:focus {
 }
 .navbar-inverse {
   background-color: #f4b124;
-  border-color: #f4b124;
+  border-color: #ffebc1;
 }
 .navbar-inverse .navbar-brand {
-  color: #9d9d9d;
+  color: #fff;
+  font-size: 22px;
 }
 .navbar-inverse .navbar-brand:hover,
 .navbar-inverse .navbar-brand:focus {
@@ -4604,7 +4606,7 @@ fieldset[disabled] .navbar-default .btn-link:focus {
   color: #9d9d9d;
 }
 .navbar-inverse .navbar-nav > li > a {
-  color: #9d9d9d;
+  /*color: #9d9d9d;*/
 }
 .navbar-inverse .navbar-nav > li > a:hover,
 .navbar-inverse .navbar-nav > li > a:focus {
