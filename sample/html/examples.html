@@ -46,39 +46,19 @@
 
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
-        <h4>1. include JS/CSS</h4>
-        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span
-                class="pl-s"><span class="pl-pds">"</span>suneditor/css/suneditor.css<span
-                class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span
-                class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span
-                class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span
-                class="pl-pds">"</span></span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/js/suneditor.js<span
-                    class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/lang/en.js<span
-                    class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre>
-        </div>
-        <h4>2. target a element</h4>
-        <div class="highlight highlight-text-html-basic">
-            <pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span
-                    class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hello World!!!&lt;/<span
-                    class="pl-ent">textarea</span>&gt;</pre>
-        </div>
-        <h4>3. create</h4>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span
-                class="pl-k">=</span> <span class="pl-c1">document</span>.<span
-                class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span
-                class="pl-pds">'</span></span>).<span class="pl-en">suneditor</span>({
-    <span class="pl-c"><span class="pl-c">//</span> insert options</span>
-});</pre>
-        </div>
-        <p style="color:#f4b124;">or</p>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span
-                class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span
-                class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
-    <span class="pl-c"><span class="pl-c">//</span> insert options</span>
-});</pre>
-        </div>
+        <h4>1. User Function</h4>
+        <form id="frm" name="frm">
+            <textarea id="exampleEditor" style="width:100%; height:300px;">Hello World</textarea>
+            <p></p>
+            <button type="button" onclick="sun_save()">Submit</button>
+            <button type="button" onclick="sun_getContent()">GetContent</button>
+            <button type="button" onclick="sun_setContent('set content')">SetContent</button>
+            <button type="button" onclick="sun_appendContent('append content<br>')">AppendContent</button>
+            <button type="button" onclick="sun_disabled()">Disabled</button>
+            <button type="button" onclick="sun_enabled()">Enabled</button>
+            <button type="button" onclick="sun_hide()">Hide</button>
+            <button type="button" onclick="sun_show()">Show</button>
+        </form>
     </article>
 
     <footer>
@@ -91,7 +71,43 @@
 </div>
 
 <script>
+    var suneditor = SUNEDITOR.create('exampleEditor',{
 
+    });
+
+    function sun_save() {
+        suneditor.save();
+        document.getElementById('frm').submit();
+    };
+
+    function sun_getContent() {
+        var content = suneditor.getContent();
+        alert(content);
+    };
+
+    function sun_setContent(content) {
+        suneditor.setContent(content);
+    };
+
+    function sun_appendContent(content) {
+        suneditor.appendContent(content);
+    };
+
+    function sun_disabled() {
+        suneditor.disabled();
+    };
+
+    function sun_enabled() {
+        suneditor.enabled();
+    };
+
+    function sun_show() {
+        suneditor.show();
+    };
+
+    function sun_hide() {
+        suneditor.hide();
+    };
 </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Suneditor</title>
     <!-- JQuery -->
-    <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <!-- bootstrap -->
     <script type="text/javascript" charset="utf-8" src="bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="bootstrap/bootstrap.css" media="all">
@@ -32,7 +32,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="html/getting-started.html">Getting started</a></li>
-                <li><a href="#">Examples</a></li>
+                <li><a href="html/examples.html">Examples</a></li>
                 <li><a href="#">Document</a></li>
                 <li><a href="//codeload.github.com/JiHong88/WYSIWYG-SunEditor/zip/master">Download</a></li>
             </ul>
@@ -41,8 +41,9 @@
 </nav>
 
 <div class="content">
-    <textarea id="editor" style="width:100%; height:300px;">Hello World</textarea>
-
+    <form name="frm">
+        <textarea id="editor" style="width:100%; height:300px;">Hello World</textarea>
+    </form>
     <footer>
         <p>Suneditor v0.9 create by JiHong.Lee</p>
         <p>Based on javascript</p>
@@ -53,7 +54,7 @@
 
 <script>
 //    document.getElementById("editor").suneditor();
-    SUNEDITOR.create('editor',{
+    var suneditor = SUNEDITOR.create('editor',{
 
     });
 </script>
