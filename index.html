@@ -2,22 +2,21 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <script src="suneditor/js/suneditor.js"></script>
     <link href="suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
+    <script src="suneditor/js/suneditor.js"></script>
     <script src="suneditor/lang/en.js"></script>
     <title>.</title>
-    <script>
-        var suneditor;
-        window.onload = function () {
-            suneditor = document.getElementById("sample").suneditor({
-                addFont : [{value:'굴림', text:'굴림'},{value:'맑은고딕', text:'맑은 고딕'},{value:'궁서', text:'궁서'}]
-            });
-        }
-    </script>
 </head>
 <body>
 <div style="margin:70px auto; max-width:860px; height:100%;">
     <textarea id="sample" style="width:100%; height:300px;"></textarea>
 </div>
+
+<script>
+    var suneditor = document.getElementById("sample").suneditor({
+        addFont : [{value:'굴림', text:'굴림'},{value:'맑은고딕', text:'맑은 고딕'},{value:'궁서', text:'궁서'}]
+    });
+</script>
+
 </body>
 </html>
