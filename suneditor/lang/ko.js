@@ -1,3 +1,5 @@
+if(typeof window.SUNEDITOR=='undefined') window.SUNEDITOR = {};
+
 SUNEDITOR.lang = {
     toolbar : {
         fontFamily : '글꼴',
