@@ -45,23 +45,6 @@
 </nav>
 
 <div class="content">
-    <article class="markdown-body entry-content" itemprop="text">
-        <h4>1. User Function</h4>
-        <form id="frm" name="frm">
-            <textarea id="exampleEditor" style="width:100%; height:150px;">Hello World</textarea>
-            <p></p>
-            <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContent()">GetContent</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContent('set content')">SetContent</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContent('append content<br>')">AppendContent</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_disabled()">Disabled</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_enabled()">Enabled</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_hide()">Hide</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_show()">Show</button>
-        </form>
-
-        <h4>2. Options Setting</h4>
-    </article>
 
     <footer>
         <p>Suneditor v0.9 create by JiHong.Lee</p>
@@ -72,44 +55,5 @@
     </footer>
 </div>
 
-<script>
-    var suneditor = SUNEDITOR.create('exampleEditor',{
-
-    });
-
-    function sun_save() {
-        suneditor.save();
-        document.getElementById('frm').submit();
-    };
-
-    function sun_getContent() {
-        var content = suneditor.getContent();
-        alert(content);
-    };
-
-    function sun_setContent(content) {
-        suneditor.setContent(content);
-    };
-
-    function sun_appendContent(content) {
-        suneditor.appendContent(content);
-    };
-
-    function sun_disabled() {
-        suneditor.disabled();
-    };
-
-    function sun_enabled() {
-        suneditor.enabled();
-    };
-
-    function sun_show() {
-        suneditor.show();
-    };
-
-    function sun_hide() {
-        suneditor.hide();
-    };
-</script>
 </body>
 </html>

@@ -4,11 +4,15 @@
 }
 
 footer {
-    color: #ffebc1!important;
+    color: #ffebc1 !important;
     bottom: 0;
     margin-top: 50px;
 }
 
 h4 {
-    color: #f4b124!important;
+    color: #f4b124 !important;
+}
+
+button {
+    margin-bottom:10px !important;
 }
