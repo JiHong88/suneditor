@@ -2,22 +2,19 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script src="core/js/suneditor.js"></script>
     <link href="core/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="core/lang/ko.js"></script>
+    <script src="core/lang/en.js"></script>
+    <!--<script src="sample/summernote-master/dist/summernote.js"></script>-->
+    <!--<link href="sample/summernote-master/dist/summernote.css" rel="stylesheet" type="text/css">-->
     <title>.</title>
     <script>
         var suneditor;
         window.onload = function () {
             suneditor = document.getElementById("sample").suneditor({
+                addFont : [{value:'굴림', text:'굴림'},{value:'맑은고딕', text:'맑은 고딕'},{value:'궁서', text:'궁서'}]
             });
-
-            var f = document.querySelector("form");
-            f.onsubmit = s.bind(f);
-
-            function s() {
-                alert('sss');
-            }
         }
     </script>
 </head>
