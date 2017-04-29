@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <link href="suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
     <script src="suneditor/js/suneditor.js"></script>
-    <script src="suneditor/lang/en.js"></script>
+    <script src="suneditor/lang/ko.js"></script>
     <title>.</title>
 </head>
 <body>
 <div style="margin:70px auto; max-width:860px; height:100%;">
     <form id="frm" name="frm">
         <textarea id="sample" style="width:100%; height:300px;"></textarea>
-        <p>User Function</p>
         <button type="button" onclick="sun_save()">Submit</button>
         <button type="button" onclick="sun_getContent()">GetContent</button>
         <button type="button" onclick="sun_setContent('set content')">SetContent</button>
@@ -24,7 +23,7 @@
 </div>
 
 <script>
-    var suneditor = document.getElementById("sample").suneditor({
+    var suneditor = SUNEDITOR.create("sample", {
         addFont : [{value:'맑은고딕', text:'맑은 고딕'},{value:'궁서', text:'궁서'}], /** default: null */
         videoX : 560, /** default: 560 */
         videoY : 315, /** default: 315 */
