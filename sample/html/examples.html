@@ -52,29 +52,30 @@
         <h4>1. Options Setting</h4>
         <div class="highlight highlight-source-js">
 <pre>
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor       <span class="pl-ent">[default : </span><span class="pl-c1">textarea.offsetHeight</span><span class="pl-ent">]</span>
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor      <span class="pl-ent">[default : </span><span class="pl-c1">(textarea.style.width || textarea.offsetWidth)</span><span class="pl-ent">]</span>
-<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                     <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
-<span class="pl-s">videoX</span><span class="pl-k">          : </span>The width size of the video frame  <span class="pl-ent">[default : </span><span class="pl-c1">560</span><span class="pl-ent">]</span>
-<span class="pl-s">videoY</span><span class="pl-k">          : </span>The heigth size of the video frame <span class="pl-ent">[default : </span><span class="pl-c1">315</span><span class="pl-ent">]</span>
-<span class="pl-s">showFont</span><span class="pl-k">        : </span>Display font module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFormats</span><span class="pl-k">     : </span>Display formats module             <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showBold</span><span class="pl-k">        : </span>Display bold module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showUnderline</span><span class="pl-k">   : </span>Display underline module           <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showItalic</span><span class="pl-k">      : </span>Display italic module              <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showStrike</span><span class="pl-k">      : </span>Display strike module              <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFontColor</span><span class="pl-k">   : </span>Display font color module          <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showHiliteColor</span><span class="pl-k"> : </span>Display hilite color module        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showInOutDent</span><span class="pl-k">   : </span>Display indent, outdent module     <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showAlign</span><span class="pl-k">       : </span>Display align module               <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showList</span><span class="pl-k">        : </span>Display list module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showLine</span><span class="pl-k">        : </span>Display line module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showTable</span><span class="pl-k">       : </span>Display table module               <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showLink</span><span class="pl-k">        : </span>Display link module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showImage</span><span class="pl-k">       : </span>Display image module               <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showVideo</span><span class="pl-k">       : </span>Display video module               <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFullScreen</span><span class="pl-k">  : </span>Display full screen module         <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showCodeView</span><span class="pl-k">    : </span>Display code view module           <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor               <span class="pl-ent">[default : </span><span class="pl-c1">textarea.offsetHeight</span><span class="pl-ent">]</span>
+<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor              <span class="pl-ent">[default : </span><span class="pl-c1">(textarea.style.width || textarea.offsetWidth)</span><span class="pl-ent">]</span>
+<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                             <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
+<span class="pl-s">videoX</span><span class="pl-k">          : </span>The default width size of the video frame  <span class="pl-ent">[default : </span><span class="pl-c1">560</span><span class="pl-ent">]</span>
+<span class="pl-s">videoY</span><span class="pl-k">          : </span>The default heigth size of the video frame <span class="pl-ent">[default : </span><span class="pl-c1">315</span><span class="pl-ent">]</span>
+<span class="pl-s">imageS</span><span class="pl-k">          : </span>The default width size of the image frame  <span class="pl-ent">[default : </span><span class="pl-c1">350px</span><span class="pl-ent">]</span>
+<span class="pl-s">showFont</span><span class="pl-k">        : </span>Display font module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showFormats</span><span class="pl-k">     : </span>Display formats module                     <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showBold</span><span class="pl-k">        : </span>Display bold module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showUnderline</span><span class="pl-k">   : </span>Display underline module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showItalic</span><span class="pl-k">      : </span>Display italic module                      <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showStrike</span><span class="pl-k">      : </span>Display strike module                      <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showFontColor</span><span class="pl-k">   : </span>Display font color module                  <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showHiliteColor</span><span class="pl-k"> : </span>Display hilite color module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showInOutDent</span><span class="pl-k">   : </span>Display indent, outdent module             <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showAlign</span><span class="pl-k">       : </span>Display align module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showList</span><span class="pl-k">        : </span>Display list module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showLine</span><span class="pl-k">        : </span>Display line module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showTable</span><span class="pl-k">       : </span>Display table module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showLink</span><span class="pl-k">        : </span>Display link module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showImage</span><span class="pl-k">       : </span>Display image module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showVideo</span><span class="pl-k">       : </span>Display video module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showFullScreen</span><span class="pl-k">  : </span>Display full screen module                 <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">showCodeView</span><span class="pl-k">    : </span>Display code view module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
 </pre>
         </div>
 
@@ -172,6 +173,7 @@
         ],
         videoX : 360,
         videoY : 115,
+        imageS : '50%',
         height : '150px',
         width : '100%',
         showUnderline : false,
