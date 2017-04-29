@@ -144,10 +144,10 @@
 .sun-editor .modal-dialog {position:absolute; width:100%; height:100%; top:0px; left:0px; z-index:11;}
 .sun-editor .modal-dialog .modal-content {position:relative; width:500px; margin:8px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #999; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); z-index:11;}
 @media screen and (max-width: 509px) {.sun-editor .modal-dialog .modal-content {width:100%;} }
-.sun-editor .modal-dialog .modal-header {padding:15px; border-bottom:1px solid #e5e5e5;}
+.sun-editor .modal-dialog .modal-header {padding:15px 15px 5px 15px; border-bottom:1px solid #e5e5e5;}
 .sun-editor .modal-dialog button.close {-webkit-appearance:none; padding:0; cursor:pointer; background:transparent; border:0;}
-.sun-editor .modal-dialog .close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; text-shadow:0 1px 0 #fff; filter:alpha(opacity=50); opacity:.5;}
-.sun-editor .modal-dialog .close:hover {opacity:1;}
+.sun-editor .modal-dialog .close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; text-shadow:0 1px 0 #fff; filter:alpha(opacity=100); opacity: 1;}
+.sun-editor .modal-dialog .close:hover, .sun-editor .modal-dialog .close:focus {color:#f4b124 !important;}
 .sun-editor .modal-dialog .modal-body {position:relative; padding:15px;}
 .sun-editor .modal-dialog .form-group {margin-bottom:15px;}
 .sun-editor .modal-dialog .form-size .size-text {width:100%;}
@@ -157,9 +157,11 @@
 .sun-editor .modal-dialog .form-size-control {display:inline-block; width:70px; height:34px; /*padding:6px 12px;*/ font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
 .sun-editor .modal-dialog .modal-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
 .sun-editor .modal-dialog .form-control {display:block; width:100%; height:34px; /*padding:6px 12px;*/ font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
-.sun-editor .modal-dialog .modal-footer {padding:10px 15px; text-align:right; border-top:1px solid #e5e5e5;}
+.sun-editor .modal-dialog .modal-footer {padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
 .sun-editor .modal-dialog .btn-primary {color:#fff; background-color:#f4b124; border-color:#f4b124;}
 .sun-editor .modal-dialog .modal-content .btn {display:inline-block; padding:6px 12px; margin-bottom:0; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; cursor:pointer; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; background-image:none; border:1px solid transparent; border-radius:4px;}
+.sun-editor .modal-dialog .modal-content .btn:hover, .sun-editor .modal-dialog .modal-content .btn:focus {background-color: #f4a500;}
+.sun-editor .modal-dialog .modal-content input:focus {border-color:#f4b124; outline:0; -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6); box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6);}
 
 /* 로딩 박스 */
 .sun-editor .sun-editor-id-loding {position:absolute; display:none; width:100%; height:100%; top:0px; left:0px; background:url('../img/loding.jpg') no-repeat; background-size:100%; z-index:9999;}

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="Suneditor">
+    <output-path>$PROJECT_DIR$/out/artifacts/Suneditor</output-path>
+    <root id="root">
+      <element id="archive" name="Suneditor.jar" />
+    </root>
+  </artifact>
+</component>
