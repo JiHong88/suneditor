@@ -30,3 +30,19 @@ var suneditor = SUNEDITOR.create('sample',{
 
 ### License
 suneditor may be freely distributed under the MIT license.
+
+```javascript
+var suneditor = SUNEDITOR.create('exampleEditor');
+
+function sun_save() {
+    suneditor.save();
+    document.getElementById('frm').submit();
+}
+function sun_getContent(){alert(suneditor.getContent());}
+function sun_setContent(content) {suneditor.setContent(content);}
+function sun_appendContent(content) {suneditor.appendContent(content);}
+function sun_disabled() {suneditor.disabled();}
+function sun_enabled() {suneditor.enabled();}
+function sun_show() {suneditor.show();}
+function sun_hide() {suneditor.hide();}
+```
