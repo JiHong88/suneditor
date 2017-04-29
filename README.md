@@ -1,7 +1,7 @@
 # Suneditor
 pure javascript based WYSIWYG web editor
 
-**Demo site : <a href="#">www.suneditor.com</a>**
+**Demo site : <a href="#" target="_blank">www.suneditor.com</a>**
 
 ## Getting Started
 
