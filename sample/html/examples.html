@@ -48,7 +48,7 @@
     <article class="markdown-body entry-content" itemprop="text">
         <h4>1. User Function</h4>
         <form id="frm" name="frm">
-            <textarea id="exampleEditor" style="width:100%; height:150px;">Hello World</textarea>
+            <textarea id="exampleEditor" style="width:100%; height:150px;">User Function Test</textarea>
             <p></p>
             <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContent()">GetContent</button>
@@ -61,36 +61,25 @@
         </form>
 
         <h4>2. Options Setting</h4>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
+        <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
             <span class="pl-c"><span class="pl-c">//</span> insert options</span>
             addFont <span class="pl-k">:</span> [
                 {value<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Times New Roman,Times,serif;<span class="pl-pds">'</span></span>, text<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Times New Roman<span class="pl-pds">'</span></span>},
                 {value<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Trebuchet MS,Helvetica,sans-serif;<span class="pl-pds">'</span></span>, text<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Trebuchet MS<span class="pl-pds">'</span></span>}
-            ], <span class="pl-c">/** default: null */</span>
-            videoX <span class="pl-k">:</span> <span class="pl-c1">560</span>, <span class="pl-c">/** default: 560 */</span>
-            videoY <span class="pl-k">:</span> <span class="pl-c1">315</span>, <span class="pl-c">/** default: 315 */</span>
-            height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>, <span class="pl-c">/** default: textarea.offsetHeight */</span>
-            width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span>, <span class="pl-c">/** default: textarea.style.width or offsetWidth */</span>
-            showFontFamily <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showFormats <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showBold <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showUnderline <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showItalic <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showStrike <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showForeColor <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showHiliteColor <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showInOutDent <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showAlign <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showList <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showLine <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showTable <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showLink <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showImage <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showVideo <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showFullScreen <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c">/** default: true */</span>
-            showCodeView <span class="pl-k">:</span> <span class="pl-c1">true</span> <span class="pl-c">/** default: true */</span>
+            ],
+            videoX <span class="pl-k">:</span> <span class="pl-c1">360</span>,
+            videoY <span class="pl-k">:</span> <span class="pl-c1">115</span>,
+            height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
+            width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>450px<span class="pl-pds">'</span></span>,
+            showUnderline <span class="pl-k">:</span> <span class="pl-c1">false</span>,
+            showItalic <span class="pl-k">:</span> <span class="pl-c1">false</span>,
+            showInOutDent <span class="pl-k">:</span> <span class="pl-c1">false</span>,
+            showLink <span class="pl-k">:</span> <span class="pl-c1">false</span>,
+            showCodeView <span class="pl-k">:</span> <span class="pl-c1">false</span>
         });</pre>
         </div>
+        <p></p>
+        <textarea id="exampleEditor2" style="width:100%; height:200px;">Options Setting</textarea>
     </article>
 
     <footer>
@@ -140,6 +129,23 @@
     function sun_hide() {
         suneditor.hide();
     };
+
+
+    SUNEDITOR.create('exampleEditor2',{
+        addFont : [
+            {value:'Times New Roman,Times,serif;', text:'Times New Roman'},
+            {value:'Trebuchet MS,Helvetica,sans-serif;', text:'Trebuchet MS'}
+        ],
+        videoX : 360,
+        videoY : 115,
+        height : '150px',
+        width : '450px',
+        showUnderline : false,
+        showItalic : false,
+        showInOutDent : false,
+        showLink : false,
+        showCodeView : false
+    });
 </script>
 </body>
 </html>

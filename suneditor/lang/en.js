@@ -10,7 +10,7 @@ SUNEDITOR.lang = {
         italic : 'Italic',
         strike : 'Strike',
         fontColor : 'Font Color',
-        backgroundColor : 'Background Color',
+        hiliteColor : 'Background Color',
         indent : 'Indent',
         outdent : 'Outdent',
         align : 'Align',

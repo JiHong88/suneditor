@@ -10,7 +10,7 @@ SUNEDITOR.lang = {
         italic : '기울임',
         strike : '취소선',
         fontColor : '글자색',
-        foreColor : '글자 배경색',
+        hiliteColor : '글자 배경색',
         indent : '들여쓰기',
         outdent : '내어쓰기',
         align : '정렬',
