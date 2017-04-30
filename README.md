@@ -28,50 +28,46 @@ var suneditor = SUNEDITOR.create('sample',{
 });
 ```
 
-```javascript
-var suneditor = SUNEDITOR.create('exampleEditor');
+## Options Setting
 
-/** Copies the contents of the suneditor into a [textarea] */
-function sun_save() {
-    suneditor.save();
-    document.getElementById('frm').submit();
-};
+```properties
+addFont         : Add a new font
+width           : The width size of the editor
+height          : The height size of the editor
+videoX          : The default width size of the video frame
+videoY          : The default heigth size of the video frame
+imageS          : The default width size of the image frame
+showFont        : Display font module
+showFormats     : Display formats module
+showBold        : Display bold module
+showUnderline   : Display underline module
+showItalic      : Display italic module
+showStrike      : Display strike module
+showFontColor   : Display font color module
+showHiliteColor : Display hilite color module
+showInOutDent   : Display indent, outdent module
+showAlign       : Display align module
+showList        : Display list module
+showLine        : Display line module
+showTable       : Display table module
+showLink        : Display link module
+showImage       : Display image module
+showVideo       : Display video module
+showFullScreen  : Display full screen module
+showCodeView    : Display code view module
+```
+    
+## Function
 
-/** Gets the contents of the suneditor */
-function sun_getContent() {
-    var content = suneditor.getContent();
-    alert(content);
-};
-
-/** Change the contents of the suneditor */
-function sun_setContent(content) {
-    suneditor.setContent(content);
-};
-
-/** Add content to the suneditor */
-function sun_appendContent(content) {
-    suneditor.appendContent(content);
-};
-
-/** Disable the suneditor */
-function sun_disabled() {
-    suneditor.disabled();
-};
-
-/** Enabled the suneditor */
-function sun_enabled() {
-    suneditor.enabled();
-};
-
-/** Hide the suneditor */
-function sun_hide() {
-    suneditor.hide();
-};
-
-/** Show the suneditor */
-function sun_show() {
-    suneditor.show();
-};
+```properties
+save() : Copies the contents of the suneditor into a [textarea]
+getContent() : Gets the contents of the suneditor
+setContent(content) : Change the contents of the suneditor
+appendContent(content) : Add content to the suneditor
+disabled() : Disable the suneditor
+enabled() : Enabled the suneditor
+hide() : Hide the suneditor
+show() : Show the suneditor
 ```
 
 ### License
