@@ -28,33 +28,33 @@ var suneditor = SUNEDITOR.create('sample',{
 });
 ```
 
-## Options Setting
+## Options
 
 ```properties
-addFont         : Add a new font
-width           : The width size of the editor
-height          : The height size of the editor
-videoX          : The default width size of the video frame
-videoY          : The default heigth size of the video frame
-imageS          : The default width size of the image frame
-showFont        : Display font module
-showFormats     : Display formats module
-showBold        : Display bold module
-showUnderline   : Display underline module
-showItalic      : Display italic module
-showStrike      : Display strike module
-showFontColor   : Display font color module
-showHiliteColor : Display hilite color module
-showInOutDent   : Display indent, outdent module
-showAlign       : Display align module
-showList        : Display list module
-showLine        : Display line module
-showTable       : Display table module
-showLink        : Display link module
-showImage       : Display image module
-showVideo       : Display video module
-showFullScreen  : Display full screen module
-showCodeView    : Display code view module
+addFont         : Add a new font (ex) [{value:'Times New Roman,Times,serif;', text:'Times New Roman'},{value:'Trebuchet MS,Helvetica,sans-serif;', text:'Trebuchet MS'}]
+width           : The width size of the editor (ex) '100%' /default - textarea.style.width or textarea.offsetWidth
+height          : The height size of the editor (ex) '300px' /default - textarea.offsetHeight
+videoX          : The default width size of the video frame /default - 560
+videoY          : The default heigth size of the video frame /default - 315
+imageS          : The default width size of the image frame (ex) '50%' /default -'350px'
+showFont        : Display font module /default - true
+showFormats     : Display formats module /default - true
+showBold        : Display bold module /default - true
+showUnderline   : Display underline module /default - true
+showItalic      : Display italic module /default - true
+showStrike      : Display strike module /default - true
+showFontColor   : Display font color module /default - true
+showHiliteColor : Display hilite color module /default - true
+showInOutDent   : Display indent, outdent module /default - true
+showAlign       : Display align module /default - true
+showList        : Display list module /default - true
+showLine        : Display line module /default - true
+showTable       : Display table module /default - true
+showLink        : Display link module /default - true
+showImage       : Display image module /default - true
+showVideo       : Display video module /default - true
+showFullScreen  : Display full screen module /default - true
+showCodeView    : Display code view module /default - true
 ```
     
 ## Function
