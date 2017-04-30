@@ -60,14 +60,14 @@ showCodeView    : Display code view module
 ## Function
 
 ```properties
-save() : Copies the contents of the suneditor into a [textarea]
-getContent() : Gets the contents of the suneditor
-setContent(content) : Change the contents of the suneditor
+save()                 : Copies the contents of the suneditor into a [textarea]
+getContent()           : Gets the contents of the suneditor
+setContent(content)    : Change the contents of the suneditor
 appendContent(content) : Add content to the suneditor
-disabled() : Disable the suneditor
-enabled() : Enabled the suneditor
-hide() : Hide the suneditor
-show() : Show the suneditor
+disabled()             : Disable the suneditor
+enabled()              : Enabled the suneditor
+hide()                 : Hide the suneditor
+show()                 : Show the suneditor
 ```
 
 ### License
