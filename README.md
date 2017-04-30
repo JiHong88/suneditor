@@ -1,5 +1,5 @@
 # Suneditor
-pure javascript based WYSIWYG web editor
+Pure javascript based WYSIWYG web editor
 
 **Demo site : <a href="#" target="_blank">www.suneditor.com</a>**
 
@@ -26,6 +26,52 @@ pure javascript based WYSIWYG web editor
 var suneditor = SUNEDITOR.create('sample',{
     // insert options
 });
+```
+
+```javascript
+var suneditor = SUNEDITOR.create('exampleEditor');
+
+/** Copies the contents of the suneditor into a [textarea] */
+function sun_save() {
+    suneditor.save();
+    document.getElementById('frm').submit();
+};
+
+/** Gets the contents of the suneditor */
+function sun_getContent() {
+    var content = suneditor.getContent();
+    alert(content);
+};
+
+/** Change the contents of the suneditor */
+function sun_setContent(content) {
+    suneditor.setContent(content);
+};
+
+/** Add content to the suneditor */
+function sun_appendContent(content) {
+    suneditor.appendContent(content);
+};
+
+/** Disable the suneditor */
+function sun_disabled() {
+    suneditor.disabled();
+};
+
+/** Enabled the suneditor */
+function sun_enabled() {
+    suneditor.enabled();
+};
+
+/** Hide the suneditor */
+function sun_hide() {
+    suneditor.hide();
+};
+
+/** Show the suneditor */
+function sun_show() {
+    suneditor.show();
+};
 ```
 
 ### License
