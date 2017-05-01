@@ -1,5 +1,5 @@
 # Suneditor
-Pure javascript based WYSIWYG web editor
+Pure JavaScript based WYSIWYG web editor
 
 **Demo site : <a href="#" target="_blank">www.suneditor.com</a>**
 

@@ -3,6 +3,11 @@
     margin: 150px auto 0 auto;
 }
 
+body {
+    background: url("../img/Space-sun-title.jpg") no-repeat;
+    background-size: 100% 581px;
+}
+
 footer {
     color: #ffebc1 !important;
     bottom: 0;
@@ -15,6 +20,13 @@ h4 {
 
 button {
     margin-bottom: 10px !important;
+}
+
+.intro {
+    color: #fff !important;
+    bottom: 0;
+    margin-top: 50px;
+    font-size: 20px;
 }
 
 .github-cat {
