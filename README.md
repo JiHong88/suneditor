@@ -80,4 +80,4 @@ show()                 : Show the suneditor
 ```
 
 ### License
-suneditor may be freely distributed under the MIT license.
+Suneditor may be freely distributed under the MIT license.
