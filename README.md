@@ -36,7 +36,7 @@ width           : The width size of the editor (ex) '100%' /default - textarea.s
 height          : The height size of the editor (ex) '300px' /default - textarea.offsetHeight
 videoX          : The default width size of the video frame /default - 560
 videoY          : The default heigth size of the video frame /default - 315
-imageS          : The default width size of the image frame (ex) '50%' /default -'350px'
+imageSize       : The default width size of the image frame (ex) '50%' /default -'350px'
 showFont        : Display font module /default - true
 showFormats     : Display formats module /default - true
 showBold        : Display bold module /default - true
