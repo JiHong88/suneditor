@@ -3,6 +3,11 @@ Pure javascript based WYSIWYG web editor
 
 **Demo site : <a href="#" target="_blank">www.suneditor.com</a>**
 
+## Examples
+```properties
+Download and run : sample/index.html
+```
+
 ## Getting Started
 
 #### 1. include JS/CSS
