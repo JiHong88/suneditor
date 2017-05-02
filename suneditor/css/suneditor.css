@@ -1,6 +1,7 @@
 @CHARSET "UTF-8";
 
 /* 공통 */
+.sun-editor {z-index:10000;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; font-family:sans-serif; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
