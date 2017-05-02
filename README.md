@@ -7,11 +7,6 @@ Pure JavaScript based WYSIWYG web editor
 The Suneditor is based on pure JavaScript
 ```
 
-## Examples
-```properties
-Download and run : sample/index.html
-```
-
 ## Getting Started
 
 #### 1. include JS/CSS
