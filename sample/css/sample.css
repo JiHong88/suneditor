@@ -1,18 +1,18 @@
 .content {
     max-width: 960px;
-    margin: 150px auto 0 auto;
+    margin: 60px auto 0 auto;
 }
 
 .back_index {
-    background: url("../img/Space-sun-title.jpg") no-repeat;
-    background-size: 100% 581px;
-    -webkit-background-size: 100% 581px;
+    background: url("../img/sun_big.jpg") repeat;
+    background-size: auto auto;
+    background-position: 0 64px;
 }
 
 .back_categorys {
-    background: url("../img/Space-sun-slide.jpg") no-repeat;
-    background-size: 100% 190px;
-    -webkit-background-size: 100% 190px;
+    background: url("../img/sun_big.jpg") repeat;
+    background-size: auto auto;
+    background-position: 0 64px;
 }
 
 footer {
