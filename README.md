@@ -6,7 +6,7 @@ Pure JavaScript based WYSIWYG web editor
 ```properties
 The Suneditor is based on pure JavaScript
 
-supported browser -
+Supported Browser -
 Chrome, Opera, Safari, Firefox(not fully), Edge, IE 10+
 Mobile is not yet fully supported
 ```
