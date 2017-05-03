@@ -5,16 +5,14 @@
 
 .back_index {
     background: url("../img/Space-sun-title.jpg") no-repeat;
-    /*background-size: 100% 581px;*/
-    -webkit-background-size: auto auto;
-    background-size: auto auto;
+    background-size: 100% 581px;
+    -webkit-background-size: 100% 581px;
 }
 
 .back_categorys {
     background: url("../img/Space-sun-slide.jpg") no-repeat;
-    /*background-size: 100% 190px;*/
-    -webkit-background-size: auto auto;
-    background-size: auto auto;
+    background-size: 100% 190px;
+    -webkit-background-size: 100% 190px;
 }
 
 footer {
