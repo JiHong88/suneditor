@@ -8,7 +8,7 @@ The Suneditor is based on pure JavaScript
 
 Supported Browser -
 Chrome, Firefox(not fully), Safari, Opera, Edge, IE 10+
-Mobile is not yet fully supported
+IOS Mobile is not yet fully supported
 ```
 
 ## Getting Started
