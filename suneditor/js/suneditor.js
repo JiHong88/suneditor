@@ -715,7 +715,7 @@ SUNEDITOR.defaultLang = {
 
                 switch(keyCode) {
                     case 8: /**backspace key*/
-                        if(target.childElementCount == 1 && target.children[0].innerHTML == "<br>") {
+                        if(target.childElementCount === 1 && target.children[0].innerHTML === "<br>") {
                             e.preventDefault();
                             e.stopPropagation();
                             return false;
@@ -734,8 +734,8 @@ SUNEDITOR.defaultLang = {
                             var cells = dom.getListChildren(table, dom.isCell);
                             var idx = shift? dom.prevIdx(cells, currentNode): dom.nextIdx(cells, currentNode);
 
-                            if(idx == cells.length && !shift) idx = 0;
-                            if(idx == -1 && shift) idx = cells.length - 1;
+                            if(idx === cells.length && !shift) idx = 0;
+                            if(idx === -1 && shift) idx = cells.length - 1;
 
                             var moveCell = cells[idx];
                             if(!moveCell) return false;
@@ -938,11 +938,11 @@ SUNEDITOR.defaultLang = {
                 try {
                     switch(className) {
                         case 'sun-editor-id-submit-link':
-                            if(context.dialog.linkText.value.trim().length == 0) break;
+                            if(context.dialog.linkText.value.trim().length === 0) break;
 
                             var url = /^https?:\/\//.test(context.dialog.linkText.value)? context.dialog.linkText.value: "http://" +  context.dialog.linkText.value;
                             var anchor = context.dialog.linkAnchorText || context.dialog.document.getElementById("linkAnchorText");
-                            var anchorText = anchor.value.length == 0? url: anchor.value;
+                            var anchorText = anchor.value.length === 0? url: anchor.value;
 
                             var oA = document.createElement("A");
                             oA.href = url;
@@ -956,7 +956,7 @@ SUNEDITOR.defaultLang = {
                             context.dialog.linkAnchorText.value = "";
                             break;
                         case 'sun-editor-id-submit-image':
-                            if(!context.argument._imageFileSrc && context.dialog.imgInputUrl.value.trim().length == 0) break;
+                            if(!context.argument._imageFileSrc && context.dialog.imgInputUrl.value.trim().length === 0) break;
 
                             var oImg = document.createElement("IMG");
                             oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context.argument._imageFileSrc;
@@ -971,7 +971,7 @@ SUNEDITOR.defaultLang = {
                             context.dialog.imgInputUrl.value = "";
                             break;
                         case'sun-editor-id-submit-video':
-                            if(context.dialog.videoInputUrl.value.trim().length == 0) break;
+                            if(context.dialog.videoInputUrl.value.trim().length === 0) break;
 
                             var url = context.dialog.videoInputUrl.value.replace(/^https?:/, '');
                             var oIframe = document.createElement("IFRAME");
