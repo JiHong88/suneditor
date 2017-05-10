@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 
-/* 공통 */
-.sun-editor {z-index:10000;}
+/* 메인 */
+.sun-editor {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; font-family:sans-serif; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
@@ -9,16 +9,15 @@
 .sun-editor dl, .sun-editor ul, .sun-editor ol, .sun-editor menu, .sun-editor li {list-style: none !important;}
 .sun-editor hr {margin:6px 0 6px 0 !important;}
 .sun-editor textarea {resize:none !important; border:0 !important;}
-
-.sun-editor {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align: middle;}
 .sun-editor button .txt {display: block; margin-top: 0px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
 .sun-editor .btn_align .img_editor {display: inline-block; width:14px; height:13px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .sun-editor .layer_line .img_editor {display: inline-block; width:138px; height:1px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .sun-editor .screen_out {overflow:hidden; position:absolute; width:0; height:0; line-height:0; text-indent:-9999px;}
 
-/* relative */
+/* 컨테이너 */
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}
 
 /* 툴바 */
