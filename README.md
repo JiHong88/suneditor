@@ -45,9 +45,10 @@ height          : The height size of the editor (ex) '300px' /default - textarea
 videoX          : The default width size of the video frame /default - 560
 videoY          : The default heigth size of the video frame /default - 315
 imageSize       : The default width size of the image frame (ex) '50%' /default -'350px'
-imageUploadUrl  : The image upload to server address(url mapping address) when append Img tag (ex) "/editor/uploadImage.ajax" /default - null
+imageUploadUrl  : he image upload to server mapping address when append Img tag (ex) "/editor/uploadImage.ajax" /default - null
                   When not used, it enters base64 data
-                  return type : JsonArray (ex) [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
+                  return type : JsonArray (ex) [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
+                                                {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
 showFont        : Display font module /default - true
 showFormats     : Display formats module /default - true
 showBold        : Display bold module /default - true
@@ -81,14 +82,16 @@ hide()                 : Hide the suneditor
 show()                 : Show the suneditor
 ```
 
-### License
-Suneditor may be freely distributed under the MIT license.
+## Image upload to server
 
+######Javascript
 ```javascript
 var suneditor = SUNEDITOR.create('sample',{
     imageUploadUrl:"/editor/uploadImage.ajax"
 });
 ```
+
+######Java
 ```java
 package suneditor.test.controller;
 
@@ -107,7 +110,7 @@ import java.io.PrintWriter;
 import java.util.*;
 
 @Controller
-public class TestController {
+public class SuneditorImgUploadController {
 
     @RequestMapping(value="/editor/uploadImage.ajax")
     public void uploadImg(MultipartHttpServletRequest request, HttpServletResponse response) {
@@ -169,3 +172,6 @@ public class TestController {
     }
 }
 ```
+
+### License
+Suneditor may be freely distributed under the MIT license.
