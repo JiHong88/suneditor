@@ -609,8 +609,8 @@ SUNEDITOR.defaultLang = {
                     var h = targetElement.offsetHeight;
 
                     var parentElement = targetElement.offsetParent;
-                    var parentT = 1;
-                    var parentL = 1;
+                    var parentT = 0;
+                    var parentL = 0;
                     while(parentElement) {
                         parentT += (parentElement.offsetTop + parentElement.clientTop);
                         parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
@@ -790,37 +790,106 @@ SUNEDITOR.defaultLang = {
                 }
             };
 
+            /**
+             * 이미지 업로드를 위한 xmlHttpRequest 생성 함수
+             * @returns {*}
+             */
+            var getXMLHttpRequest = function() {
+                /** 익스플로러 */
+                if(window.ActiveXObject){
+                    try{
+                        return new ActiveXObject("Msxml2.XMLHTTP");
+                    }catch(e){
+                        try{
+                            return new ActiveXObject("Microsoft.XMLHTTP");
+                        }catch(e1){
+                            return null;
+                        }
+                    }
+                }
+                /** 네스케이프 */
+                else if(window.XMLHttpRequest){
+                    return new XMLHttpRequest();
+                }
+                /** 브라우저 식별 실패 */
+                else {
+                    return null;
+                }
+            };
+
             var onChange_imgInput = function() {
                 try {
-                    if (this.files && this.files[0]) {
+                    if (this.files) {
                         editor.showLoding();
                         editor.subOff();
 
-                        var reader = new FileReader();
+                        var url = context.user.imageUploadUrl;
 
-                        reader.onload = function () {
+                        if(url != null && url.length > 0) {
                             try {
-                                context.argument._imageFileSrc = reader.result;
+                                var xmlHttp;
+                                var formData = new FormData();
 
-                                var oImg = document.createElement("IMG");
-                                oImg.src = context.dialog.imgInputUrl.value.trim().length > 0 ? context.dialog.imgInputUrl.value : context.argument._imageFileSrc;
-                                oImg.style.width = context.user.imageSize;
-                                // wysiwygSelection.getPElementInFocusNode().appendChild(oImg);
-                                editor.insertNode(oImg);
-                                // editor.appendP(oImg);
+                                function imgUpload_collBack() {
+                                    if(xmlHttp.readyState == 4){
+                                        if(xmlHttp.status == 200){
+                                            var result = eval(xmlHttp.responseText);
 
-                                context.argument._imageFileSrc = null;
-                                context.dialog.imgInputFile.value = "";
-                                context.dialog.imgInputUrl.value = "";
+                                            for(var i=0; i<result.length; i++) {
+                                                var oImg = document.createElement("IMG");
+                                                oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
+                                                oImg.style.width = context.user.imageSize;
+                                                editor.insertNode(oImg);
+                                            }
+                                        } else{
+                                            var WindowObject = window.open('', "_blank");
+                                            WindowObject.document.writeln(xmlHttp.responseText);
+                                            WindowObject.document.close();
+                                            WindowObject.focus();
+                                        }
+                                    }
+                                };
+
+                                for(var i=0; i<this.files.length; i++) {
+                                    formData.append("file-" + i, this.files[i]);
+                                }
+
+                                xmlHttp = getXMLHttpRequest();
+                                xmlHttp.onreadystatechange = imgUpload_collBack;
+                                xmlHttp.open("post", url, true);
+                                xmlHttp.send(formData);
                             } finally {
                                 editor.closeLoding();
                             }
-                        };
+                        } else {
+                            function setup_reader(file) {
+                                var reader = new FileReader();
 
-                        reader.readAsDataURL(this.files[0]);
+                                reader.onload = function () {
+                                    try {
+                                        var oImg = document.createElement("IMG");
+                                        oImg.src = reader.result;
+                                        oImg.style.width = context.user.imageSize;
+                                        editor.insertNode(oImg);
+                                    } finally {
+                                        editor.closeLoding();
+                                    }
+                                };
+
+                                reader.readAsDataURL(file);
+                            }
+
+                            for(var i=0; i<this.files.length; i++) {
+                                setup_reader(this.files[i])
+                            }
+                        }
+
+                        context.dialog.imgInputFile.value = "";
+                        context.dialog.imgInputUrl.value = "";
                     }
                 } catch(e) {
                     editor.closeLoding();
+                    alert(e);
                 }
             };
 
@@ -845,6 +914,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var onMouseDown_image_ctrl = function(e) {
+                context.argument._imageClientX = e.clientX;
+
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -859,21 +930,25 @@ SUNEDITOR.defaultLang = {
             };
 
             var resize_image = function(e) {
-                var w = (e.clientX - context.argument._imageElement_l - context.element.topArea.offsetLeft);
+                var w = context.argument._imageElement_w + (e.clientX - context.argument._imageClientX);
                 var h = ((context.argument._imageElement_h/context.argument._imageElement_w) * w);
 
                 context.argument._imageElement.style.width = w + "px";
                 context.argument._imageElement.style.height = h + "px";
 
                 var parentElement = context.argument._imageElement.offsetParent;
-                var parentL = 1;
+                var parentT = 0;
+                var parentL = 0;
                 while(parentElement) {
+                    parentT += (parentElement.offsetTop + parentElement.clientTop);
                     parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
                     parentElement = parentElement.offsetParent;
                 }
 
+                var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.document.body.scrollTop);
                 var l = (context.argument._imageElement.offsetLeft + parentL);
 
+                context.element.imageResizeDiv.style.top = t + "px";
                 context.element.imageResizeDiv.style.left = l + "px";
                 context.element.imageResizeDiv.style.width = w + "px";
                 context.element.imageResizeDiv.style.height = h + "px";
@@ -956,17 +1031,14 @@ SUNEDITOR.defaultLang = {
                             context.dialog.linkAnchorText.value = "";
                             break;
                         case 'sun-editor-id-submit-image':
-                            if(!context.argument._imageFileSrc && context.dialog.imgInputUrl.value.trim().length === 0) break;
+                            if(context.dialog.imgInputUrl.value.trim().length === 0) break;
 
                             var oImg = document.createElement("IMG");
-                            oImg.src = context.dialog.imgInputUrl.value.trim().length>0? context.dialog.imgInputUrl.value: context.argument._imageFileSrc;
+                            oImg.src = context.dialog.imgInputUrl.value;
                             oImg.style.width = "350px";
 
-                            // wysiwygSelection.getPElementInFocusNode().appendChild(oImg);
                             editor.insertNode(oImg);
-                            // editor.appendP(oImg);
 
-                            context.argument._imageFileSrc = null;
                             context.dialog.imgInputFile.value = "";
                             context.dialog.imgInputUrl.value = "";
                             break;
@@ -1602,6 +1674,7 @@ SUNEDITOR.defaultLang = {
         options.imageSize = options.imageSize || '350px';
         options.height = /^\d+/.test(options.height)?  (/^\d+$/.test(options.height)? options.height+"px": options.height): element.clientHeight+"px";
         options.width = /^\d+/.test(options.width)?  (/^\d+$/.test(options.width)? options.width+"px": options.width): (/%|auto/.test(element.style.width)? element.style.width: element.clientWidth+"px");
+        options.imageUploadUrl = options.imageUploadUrl || null;
         /** 툴바 버튼 보이기 설정 */
         options.showFont = options.showFont !== undefined? options.showFont: true;
         options.showFormats = options.showFormats !== undefined? options.showFormats: true;
@@ -1743,12 +1816,12 @@ SUNEDITOR.defaultLang = {
             argument : {
                 _copySelection : null,
                 _selectionNode : null,
-                _imageFileSrc : null,
                 _imageElement : null,
                 _imageElement_w : 0,
                 _imageElement_h : 0,
                 _imageElement_l : 0,
                 _imageElement_t : 0,
+                _imageClientX : 0,
                 _imageResize_parent_t : 0,
                 _imageResize_parent_l : 0,
                 _wysiwygActive : true,
@@ -1811,7 +1884,8 @@ SUNEDITOR.defaultLang = {
 			user : {
                 videoX : options.videoX,
                 videoY : options.videoY,
-                imageSize : options.imageSize
+                imageSize : options.imageSize,
+                imageUploadUrl : options.imageUploadUrl
             }
 		}
     };
