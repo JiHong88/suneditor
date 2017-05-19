@@ -84,14 +84,14 @@ show()                 : Show the suneditor
 
 ## Image upload to server
 
-######Javascript
+#####Javascript
 ```javascript
 var suneditor = SUNEDITOR.create('sample',{
     imageUploadUrl:"/editor/uploadImage.ajax"
 });
 ```
 
-######Java
+#####Java
 ```java
 package suneditor.test.controller;
 
