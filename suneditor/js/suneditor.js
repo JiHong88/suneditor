@@ -1674,6 +1674,7 @@ SUNEDITOR.defaultLang = {
         options.imageSize = options.imageSize || '350px';
         options.height = /^\d+/.test(options.height)?  (/^\d+$/.test(options.height)? options.height+"px": options.height): element.clientHeight+"px";
         options.width = /^\d+/.test(options.width)?  (/^\d+$/.test(options.width)? options.width+"px": options.width): (/%|auto/.test(element.style.width)? element.style.width: element.clientWidth+"px");
+        options.display = options.display || 'block';
         options.imageUploadUrl = options.imageUploadUrl || null;
         /** 툴바 버튼 보이기 설정 */
         options.showFont = options.showFont !== undefined? options.showFont: true;
@@ -1792,8 +1793,17 @@ SUNEDITOR.defaultLang = {
      */
     var Context = function(element, cons, options) {
         /** 내부 옵션값 초기화 */
-        options._originCssText = cons._top.style.cssText;
+        var styleTmp = document.createElement("div");
+
+        styleTmp.style.cssText = cons._top.style.cssText;
+        if(/none/i.test(styleTmp.style.display)) {
+            styleTmp.style.display = options.display;
+        }
+
+        options._originCssText = styleTmp.style.cssText;
         options._innerHeight = cons._editorArea.clientHeight;
+
+        styleTmp = null;
 
         setTimeout(function(){
             cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.head.innerHTML = ''+
@@ -1905,6 +1915,10 @@ SUNEDITOR.defaultLang = {
         }
 
         var cons = Constructor(element, options);
+
+        if(/none/i.test(element.style.display)) {
+            cons.constructed._top.style.display = "none";
+        }
 
         /** 형제 노드로 생성 후 숨김 */
         if(typeof element.nextElementSibling === 'object') {

@@ -42,6 +42,7 @@ var suneditor = SUNEDITOR.create('sample',{
 addFont         : Add a new font (ex) [{value:'Times New Roman,Times,serif;', text:'Times New Roman'},{value:'Trebuchet MS,Helvetica,sans-serif;', text:'Trebuchet MS'}]
 width           : The width size of the editor (ex) '100%' /default - textarea.style.width or textarea.offsetWidth
 height          : The height size of the editor (ex) '300px' /default - textarea.offsetHeight
+display         : The display property to be applied when calling ".show ()" when rendered with target <textarea style:"display:none"> /default - 'block'
 videoX          : The default width size of the video frame /default - 560
 videoY          : The default heigth size of the video frame /default - 315
 imageSize       : The default width size of the image frame (ex) '50%' /default -'350px'
