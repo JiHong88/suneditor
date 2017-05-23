@@ -692,10 +692,11 @@ SUNEDITOR.defaultLang = {
                     linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
                     linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
 
-                    linkBtn.style.display = "block";
                     linkBtn.style.left = selectionParent.offsetLeft + "px";
-                    linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + linkBtn.offsetHeight + 10) + "px";
+                    linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + context.tool.bar.offsetHeight + 10) + "px";
+                    linkBtn.style.display = "block";
 
+                    linkBtn = null;
                     return;
                 } else if(editor.editLink) {
                     context.element.linkBtn.style.display = "none";
@@ -959,6 +960,7 @@ SUNEDITOR.defaultLang = {
               else { /** delete */
                   context.argument._linkAnchor.remove();
                   context.argument._linkAnchor = null;
+                  wysiwygSelection.focus();
               }
 
               context.element.linkBtn.style.display = "none";
@@ -1707,8 +1709,8 @@ SUNEDITOR.defaultLang = {
               '<div class="arrow"></div>'+
               '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
               '   <div class="btn-group">'+
-              '     <button type="button" data-command="update" class="btn btn-sm" tabindex="-1" title="'+lang.editLink.edit+'">Edit</button>'+
-              '     <button type="button" data-command="delete" class="btn btn-sm" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
+              '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
+              '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
               '   </div>'+
               '</div>';
         };
@@ -1881,7 +1883,7 @@ SUNEDITOR.defaultLang = {
             cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.head.innerHTML = ''+
                 '<meta charset=\"utf-8\">' +
                 '<style type=\"text/css\">' +
-                '   body {margin:15px; word-break:break-all; overflow:auto; font-family:sans-serif;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
+                '   body {font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; margin:15px; word-break:break-all; overflow:auto;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
                 '   table {table-layout:fixed; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0px; border-collapse:collapse;}'+
                 '   table tr {border:1px solid #ccc;}'+
                 '   table tr td {border:1px solid #ccc; padding:8px;}'+

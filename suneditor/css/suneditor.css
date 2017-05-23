@@ -1,8 +1,8 @@
 @CHARSET "UTF-8";
 
 /* 메인 */
-.sun-editor {width:auto; height:auto; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
-.sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; font-family:sans-serif; line-height:1.5; color:#111;}
+.sun-editor {width:auto; height:auto; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
+.sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
 .sun-editor legend, .sun-editor textarea, .sun-editor p, .sun-editor blockquote, .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {margin:0; padding:0; border:0; color:#000 !important;}
@@ -108,7 +108,7 @@
 .sun-editor .sun-editor-id-toolbar .editor_link {padding:8px 5px 12px 15px;}
 .sun-editor .sun-editor-id-toolbar .editor_link .write_place {height:79px; border:0; overflow:hidden; float:left; position:relative;}
 .sun-editor .sun-editor-id-toolbar .editor_link .write_place .lab_url {position:absolute;top:0;left:0;width:228px;height:23px;font-size:12px;line-height:24px;color:#999; cursor:text;}
-.sun-editor .sun-editor-id-toolbar .editor_link .write_place .inp_txt {height:23px; font-size:12px; font-family:Verdana; line-height:24px; text-indent:0px; margin-top:8px; border:1px solid #CCC}
+.sun-editor .sun-editor-id-toolbar .editor_link .write_place .inp_txt {height:23px; font-size:12px; line-height:24px; text-indent:0; margin-top:8px; border:1px solid #CCC}
 .sun-editor .sun-editor-id-toolbar .editor_link .btn_apply_url {float:right; width:35px; height:69px;}
 
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_bgcolor {width:196px;}
@@ -121,13 +121,13 @@
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text {width:156px;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor {position:relative; z-index:1; width:158px; height:25px; border-radius:2px; border-bottom:0 none; margin: -1px 0 0 -1px;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor .emph_txtbgcolor {display:block; width:147px; height:25px; padding-left:11px; font-size:12px; line-height:24px; color:#fff; -webkit-transition-property:background-color,color; -webkit-transition-duration:.2s; transition-property:background-color,color; transition-duration:.2s;}
-.sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor .bg_frame {position:absolute; top:0; left:0; width:156px; height:24px; border:1px solid #000; border-bottom:0 none; opacity:.1; filter:alpha(opacity=10); -webkit-transition:opacity .2s; -webkit-transition:opacity .2s;}
+.sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor .bg_frame {position:absolute; top:0; left:0; width:156px; height:24px; border:1px solid #000; border-bottom:0 none; opacity:.1; filter:alpha(opacity=10); -webkit-transition:opacity .2s;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .list_color {width:140px; height:44px; margin:8px 6px 0 10px; padding:0; border-top:0;}
 
 /* 에디터 영역 */
 .sun-editor  .sun-editor-id-editorArea {width:100%;}
 .sun-editor  .sun-editor-id-editorArea .input_editor {width:100%; height:100%; background-color:#FFF;}
-.sun-editor  .sun-editor-id-editorArea .input_editor.html {/*padding:8px;*/ outline-style:none;}
+.sun-editor  .sun-editor-id-editorArea .input_editor.html {outline-style:none;}
 
 /* 리사이즈 바 */
 .sun-editor .sun-editor-id-resizeBar {width:100%; height:10px; border-top:1px solid #dadada; background-color:#fafafa; cursor:ns-resize;}
@@ -136,25 +136,24 @@
 /* 다이얼로그 */
 .sun-editor .sun-editor-id-dialogBox {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:9999;}
 .sun-editor .sun-editor-id-dialogBox label, .sun-editor .sun-editor-id-dialogBox input, .sun-editor .sun-editor-id-dialogBox button {font-size:14px; line-height:1.5; color:#111; margin:0;}
-.sun-editor .sun-editor-id-dialogBox .modal-dialog-background {position:absolute; width:100%; height:100%; top:0px; left:0px; background-color:#222; opacity:0.5; z-index:10;}
+.sun-editor .sun-editor-id-dialogBox .modal-dialog-background {position:absolute; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5; z-index:10;}
 
 /* 다이얼로그 - modal */
-.sun-editor .modal-dialog {position:absolute; width:100%; height:100%; top:0px; left:0px; z-index:11;}
-.sun-editor .modal-dialog .modal-content {position:relative; width:500px; margin:8px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #999; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); z-index:11;}
+.sun-editor .modal-dialog {position:absolute; width:100%; height:100%; top:0; left:0; z-index:11;}
+.sun-editor .modal-dialog .modal-content {position:relative; width:500px; margin:8px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); z-index:11;}
 @media screen and (max-width: 509px) {.sun-editor .modal-dialog .modal-content {width:100%;} }
-.sun-editor .modal-dialog .modal-header {padding:15px 15px 5px 15px; border-bottom:1px solid #e5e5e5;}
-.sun-editor .modal-dialog button.close {-webkit-appearance:none; padding:0; cursor:pointer; background:transparent; border:0;}
-.sun-editor .modal-dialog .close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; text-shadow:0 1px 0 #fff; filter:alpha(opacity=100); opacity: 1;}
-.sun-editor .modal-dialog .close:hover, .sun-editor .modal-dialog .close:focus {color:#f4b124 !important;}
+.sun-editor .modal-dialog .modal-header {height:26px; padding:15px 15px 5px 15px; border-bottom:1px solid #e5e5e5;}
+.sun-editor .modal-dialog button.close {float:right; font-size:21px; font-weight:bold; line-height:1; color:#000; padding:0 !important; margin:0 !important; cursor:pointer; background:transparent; border:0; text-shadow:0 1px 0 #fff; -webkit-appearance:none; filter:alpha(opacity=100); opacity: 1;}
+.sun-editor .modal-dialog button.close:hover, .sun-editor .modal-dialog button.close:focus {color:#f4b124 !important;}
 .sun-editor .modal-dialog .modal-body {position:relative; padding:15px;}
 .sun-editor .modal-dialog .form-group {margin-bottom:15px;}
 .sun-editor .modal-dialog .form-size .size-text {width:100%;}
 .sun-editor .modal-dialog .form-size .size-text .size-w {width:70px; text-align:center;}
 .sun-editor .modal-dialog .form-size .size-text .size-h {width:70px; text-align:center;}
 .sun-editor .modal-dialog .form-size .size-x {margin:0 8px 0 8px;}
-.sun-editor .modal-dialog .form-size-control {display:inline-block; width:70px; height:34px; /*padding:6px 12px;*/ font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
+.sun-editor .modal-dialog .form-size-control {display:inline-block; width:70px; height:34px; font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
 .sun-editor .modal-dialog .modal-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
-.sun-editor .modal-dialog .form-control {display:block; width:100%; height:34px; /*padding:6px 12px;*/ font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
+.sun-editor .modal-dialog .form-control {display:block; width:100%; height:34px; font-size:14px; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); box-shadow:inset 0 1px 1px rgba(0, 0, 0, .075); -webkit-transition:border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s; -o-transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s; transition:border-color ease-in-out .15s, box-shadow ease-in-out .15s;}
 .sun-editor .modal-dialog .modal-footer {padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
 .sun-editor .modal-dialog .btn-primary {color:#fff; background-color:#f4b124; border-color:#f4b124;}
 .sun-editor .modal-dialog .modal-content .btn {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; cursor:pointer; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; background-image:none; border:1px solid transparent; border-radius:4px;}
@@ -162,11 +161,11 @@
 .sun-editor .modal-dialog .modal-content input:focus {border-color:#f4b124; outline:0; -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6); box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6);}
 
 /* 로딩 박스 */
-.sun-editor .sun-editor-id-loding {position:absolute; display:none; width:100%; height:100%; top:0px; left:0px; background-color:#191f26; background-image:url('../img/loding.jpg'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
+.sun-editor .sun-editor-id-loding {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loding.jpg'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
 .sun-editor .sun-editor-id-loding .ico-loding {display:none;}
 
 /* 테이블 선택 */
-.sun-editor .table-content {position:absolute; top:34px; left:1px; z-index:11; padding:5px; float:left; padding:5px 0; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border:1px solid rgba(0, 0, 0, .15); border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
+.sun-editor .table-content {position:absolute; top:34px; left:1px; z-index:11; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .table-data-form {font-size:18px; padding:0 5px;}
 .sun-editor .table-picker {position:absolute!important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
 .sun-editor .table-highlighted {position:absolute!important; z-index:2; font-size:18px; width:1em; height:1em; background:url('../img/pixel_sun.png') repeat;}
@@ -183,144 +182,25 @@
 .sun-editor .modal-image-resize .image-size-display {position:absolute;	right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:#F00; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 
 /* 이미지 크기 조절 버튼 */
-.sun-editor .image-resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:12; display:none; max-width:310px; padding:1px; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:left; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .image-resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:12; max-width:310px; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .sun-editor .image-resize-btn .btn-group {position:relative; display:inline-block; vertical-align:middle; padding:5px 5px 5px 0;}
-.sun-editor .image-resize-btn .btn-group button {position:relative; float:left; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px !important; padding:5px 10px !important; font-size:12px !important; line-height:1.5 !important; border:1px solid #222 !important; border-radius:3px !important; color:#333; background-color:#fff !important; border-color:#ccc !important; display:inline-block; font-size:14px !important; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
-/*.sun-editor .image-resize-btn .btn-group.remove {width:40px; height:33px; padding:0 10px 0 0 !important;}*/
+.sun-editor .image-resize-btn .btn-group button {position:relative; float:left; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px !important; padding:5px 10px !important; font-size:12px !important; line-height:1.5 !important; border:1px solid rgba(0, 0, 0, .2) !important; border-radius:3px !important; background-color:#fff !important; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
 .sun-editor .image-resize-btn .btn-group.remove button {width:100%; height:100%;}
 .sun-editor .image-resize-btn .btn-group.remove button .image_remove {font-weight:bold;}
 .sun-editor .image-resize-btn button:hover, .sun-editor .image-resize-btn button:focus {background-color:#ffebc1 !important; border-color:#f4b124 !important; outline:0 none !important;}
 
 /* 링크 수정 박스 */
 /* 박스 */
-.sun-editor .sun-editor-id-link-btn {
-    display: none;
-    max-width: none;
-}
-.sun-editor .sun-editor-id-link-btn.bottom {
-    margin-top: 10px;
-}
-.sun-editor .sun-editor-id-link-btn {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1060;
-    display: none;
-    max-width: 276px;
-    padding: 1px;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: normal;
-    line-height: 1.42857143;
-    text-align: left;
-    text-align: start;
-    text-decoration: none;
-    text-shadow: none;
-    text-transform: none;
-    letter-spacing: normal;
-    word-break: normal;
-    word-spacing: normal;
-    word-wrap: normal;
-    white-space: normal;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 6px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    line-break: auto;
-}
+.sun-editor .sun-editor-id-link-btn {position:absolute; top:0; left:0; z-index:11; display:none; max-width:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 /* arrow */
-.sun-editor .sun-editor-id-link-btn > .arrow, .sun-editor .sun-editor-id-link-btn > .arrow:after {
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid;
-    border-width: 11px;
-}
-.sun-editor .sun-editor-id-link-btn .arrow {
-    top: -11px;
-    left: 20px!important;
-    margin-left: -11px;
-    border-top-width: 0;
-    border-bottom-color: #999;
-    border-bottom-color: rgba(0, 0, 0, .25);
-}
-.popover.bottom > .arrow:after {
-    top: 1px;
-    margin-left: -10px;
-    content: " ";
-    border-top-width: 0;
-    border-bottom-color: #fff;
-    content: "";
-    border-width: 10px;
-}
-
-
-.sun-editor .sun-editor-id-link-btn > .arrow:after {
-    top: 1px;
-    margin-left: -10px;
-    content: " ";
-    border-top-width: 0;
-    border-bottom-color: #fff;
-}
-.sun-editor .sun-editor-id-link-btn > .arrow:after {
-    content: "";
-    border-width: 10px;
-}
-.sun-editor .sun-editor-id-link-btn:before, sun-editor-id-link-btn:after {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-/* 수정 */
-.sun-editor .sun-editor-id-link-btn .link-content {
-    padding: 0;
-    margin: 0;
-}
-.sun-editor .sun-editor-id-link-btn .link-content a {
-    display: inline-block;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
-    margin-left: 5px;
-}
-.sun-editor .sun-editor-id-link-btn .link-content>.btn-group {
-    margin-top: 5px;
-    margin-right: 5px;
-    margin-left: 0;
-    margin-bottom: 5px;
-}
-.sun-editor .sun-editor-id-link-btn .btn-group {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-}
-.sun-editor .sun-editor-id-link-btn .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-.sun-editor .sun-editor-id-link-btn .btn-group > .btn:first-child {
-    margin-left: 0;
-}
-.sun-editor .sun-editor-id-link-btn .btn-group > .btn {
-    position: relative;
-    float: left;
-    margin: 0!important;
-    padding: 5px 10px;
-    font-size: 12px;
-    line-height: 1.5;
-    border-radius: 3px;
-
-}
-.sun-editor .sun-editor-id-link-btn .btn-group > .btn:last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
+.sun-editor .sun-editor-id-link-btn .arrow, .sun-editor .sun-editor-id-link-btn .arrow:after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
+.sun-editor .sun-editor-id-link-btn .arrow {top:-11px; left:20px!important; margin-left:-11px; border-top-width:0; border-bottom-color:#999; border-bottom-color:rgba(0, 0, 0, .25);}
+.sun-editor .sun-editor-id-link-btn .arrow:after {top:1px; margin-left:-10px; content:" "; border-top-width:0; border-bottom-color:#fff;}
+.sun-editor .sun-editor-id-link-btn:before, .sun-editor .sun-editor-id-link-btn:after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
+/* 링크, 버튼 */
+.sun-editor .sun-editor-id-link-btn .link-content {padding:0; margin:0;}
+.sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
+.sun-editor .sun-editor-id-link-btn .link-content .btn-group {position:relative; display:inline-block; vertical-align:middle; margin:5px 5px 5px 0;}
+.sun-editor .sun-editor-id-link-btn .btn-group button .ico_url {width:18px; height:18px; margin:0 auto; background:url('../img/link_icon&48.png') no-repeat; background-size:100%;}
+.sun-editor .sun-editor-id-link-btn .btn-group button {position:relative; float:left; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px !important; padding:5px 10px !important; font-size:12px !important; line-height:1.5 !important; border:1px solid rgba(0, 0, 0, .2) !important; border-radius:3px !important; background-color:#fff !important; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;}
+.sun-editor .sun-editor-id-link-btn .btn-group button:hover, .sun-editor .sun-editor-id-link-btn .btn-group button:focus {background-color:#ffebc1 !important; border-color:#f4b124 !important; outline:0 none !important;}
