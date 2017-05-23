@@ -56,5 +56,9 @@ SUNEDITOR.lang = {
             height : 'Height'
         },
         submitButton : 'Submit'
+    },
+    editLink : {
+        edit : 'Edit',
+        remove : 'Remove'
     }
 };

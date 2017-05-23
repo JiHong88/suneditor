@@ -191,3 +191,136 @@
 .sun-editor .image-resize-btn .btn-group.remove button .image_remove {font-weight:bold;}
 .sun-editor .image-resize-btn button:hover, .sun-editor .image-resize-btn button:focus {background-color:#ffebc1 !important; border-color:#f4b124 !important; outline:0 none !important;}
 
+/* 링크 수정 박스 */
+/* 박스 */
+.sun-editor .sun-editor-id-link-btn {
+    display: none;
+    max-width: none;
+}
+.sun-editor .sun-editor-id-link-btn.bottom {
+    margin-top: 10px;
+}
+.sun-editor .sun-editor-id-link-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    display: none;
+    max-width: 276px;
+    padding: 1px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: left;
+    text-align: start;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-break: normal;
+    word-spacing: normal;
+    word-wrap: normal;
+    white-space: normal;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    line-break: auto;
+}
+/* arrow */
+.sun-editor .sun-editor-id-link-btn > .arrow, .sun-editor .sun-editor-id-link-btn > .arrow:after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 11px;
+}
+.sun-editor .sun-editor-id-link-btn .arrow {
+    top: -11px;
+    left: 20px!important;
+    margin-left: -11px;
+    border-top-width: 0;
+    border-bottom-color: #999;
+    border-bottom-color: rgba(0, 0, 0, .25);
+}
+.popover.bottom > .arrow:after {
+    top: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-width: 0;
+    border-bottom-color: #fff;
+    content: "";
+    border-width: 10px;
+}
+
+
+.sun-editor .sun-editor-id-link-btn > .arrow:after {
+    top: 1px;
+    margin-left: -10px;
+    content: " ";
+    border-top-width: 0;
+    border-bottom-color: #fff;
+}
+.sun-editor .sun-editor-id-link-btn > .arrow:after {
+    content: "";
+    border-width: 10px;
+}
+.sun-editor .sun-editor-id-link-btn:before, sun-editor-id-link-btn:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/* 수정 */
+.sun-editor .sun-editor-id-link-btn .link-content {
+    padding: 0;
+    margin: 0;
+}
+.sun-editor .sun-editor-id-link-btn .link-content a {
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+.sun-editor .sun-editor-id-link-btn .link-content>.btn-group {
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-left: 0;
+    margin-bottom: 5px;
+}
+.sun-editor .sun-editor-id-link-btn .btn-group {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.sun-editor .sun-editor-id-link-btn .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.sun-editor .sun-editor-id-link-btn .btn-group > .btn:first-child {
+    margin-left: 0;
+}
+.sun-editor .sun-editor-id-link-btn .btn-group > .btn {
+    position: relative;
+    float: left;
+    margin: 0!important;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+
+}
+.sun-editor .sun-editor-id-link-btn .btn-group > .btn:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

@@ -56,5 +56,9 @@ SUNEDITOR.lang = {
             height : '세로'
         },
         submitButton : '확인'
+    },
+    editLink : {
+        edit : '편집',
+        remove : '삭제'
     }
 };

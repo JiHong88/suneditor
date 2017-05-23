@@ -57,6 +57,10 @@ SUNEDITOR.defaultLang = {
             height : 'Height'
         },
         submitButton : 'Submit'
+    },
+    editLink : {
+        edit : 'Edit',
+        remove : 'Remove'
     }
 };
 
@@ -255,6 +259,7 @@ SUNEDITOR.defaultLang = {
                 subMenu : null,
                 originSub : null,
                 modalForm : null,
+                editLink : null,
                 tabSize : 4,
 
                 pure_execCommand : function(command, showDefaultUI, value) {
@@ -279,9 +284,17 @@ SUNEDITOR.defaultLang = {
                         this.modalForm.style.display = "none";
                         context.dialog.back.style.display = "none";
                         context.dialog.modalArea.style.display = "none";
+                        this.modalForm = null;
                     }
                     if(context.argument._imageElement) {
                         event.cancel_resize_image();
+                    }
+                    if(this.editLink) {
+                        context.element.linkBtn.style.display = "none";
+                        context.dialog.linkText.value = "";
+                        context.dialog.linkAnchorText.value = "";
+                        context.argument._linkAnchor = null;
+                        this.editLink = null;
                     }
 
                     return;
@@ -662,7 +675,7 @@ SUNEDITOR.defaultLang = {
                 var selectionParent = context.argument._selectionNode;
                 var selectionNodeStr = "";
                 var fontFamily = context.tool.default_fontFamily;
-                while(!/^P$|^BODY$|^HTML$/i.test(selectionParent.nodeName)) {
+                while(!/^P$|^BODY$|^HTML$|^A$/i.test(selectionParent.nodeName)) {
                     selectionNodeStr += selectionParent.nodeName + "|";
                     if(/^FONT$/i.test(selectionParent.nodeName) && selectionParent.face.length > 0) {
                         var selectFont = list.fontFamilyMap[selectionParent.face.replace(/\s*/g,"")];
@@ -670,6 +683,23 @@ SUNEDITOR.defaultLang = {
                         break;
                     }
                     selectionParent = selectionParent.parentNode;
+                }
+
+                if(/^A$/i.test(selectionParent.nodeName) && editor.editLink !== context.element.linkBtn) {
+                    editor.editLink = context.argument._linkAnchor = selectionParent;
+                    var linkBtn = context.element.linkBtn;
+
+                    linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
+                    linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
+
+                    linkBtn.style.display = "block";
+                    linkBtn.style.left = selectionParent.offsetLeft + "px";
+                    linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + linkBtn.offsetHeight + 10) + "px";
+
+                    return;
+                } else if(editor.editLink) {
+                    context.element.linkBtn.style.display = "none";
+                    editor.subOff();
                 }
 
                 if(/^SPAN$/i.test(selectionParent.nodeName)) {
@@ -898,6 +928,9 @@ SUNEDITOR.defaultLang = {
 
                 if(!command) return;
 
+                e.preventDefault();
+                e.stopPropagation();
+
                 if(/^\d+$/.test(command)) {
                     context.argument._imageElement.style.height = "";
                     context.argument._imageElement.style.width = command + "%";
@@ -908,9 +941,27 @@ SUNEDITOR.defaultLang = {
 
                 editor.subOff();
                 wysiwygSelection.focus();
+            };
 
-                e.preventDefault();
-                e.stopPropagation();
+            var onClick_linkBtn = function(e) {
+              var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+
+              if(!command) return;
+
+              e.preventDefault();
+              e.stopPropagation();
+
+              if(/update/.test(command)) {
+                  context.dialog.linkText.value = context.argument._linkAnchor.href;
+                  context.dialog.linkAnchorText.value = context.argument._linkAnchor.textContent;
+                  editor.openDialog('link');
+              }
+              else { /** delete */
+                  context.argument._linkAnchor.remove();
+                  context.argument._linkAnchor = null;
+              }
+
+              context.element.linkBtn.style.display = "none";
             };
 
             var onMouseDown_image_ctrl = function(e) {
@@ -1001,11 +1052,10 @@ SUNEDITOR.defaultLang = {
                 context.argument._resizeClientY = e.clientY;
             };
 
-            var dialog_submit = function(e) {
+            var submit_dialog = function(e) {
                 var className = this.classList[this.classList.length - 1];
 
                 editor.showLoding();
-                editor.subOff();
 
                 e.preventDefault();
                 e.stopPropagation();
@@ -1019,13 +1069,16 @@ SUNEDITOR.defaultLang = {
                             var anchor = context.dialog.linkAnchorText || context.dialog.document.getElementById("linkAnchorText");
                             var anchorText = anchor.value.length === 0? url: anchor.value;
 
-                            var oA = document.createElement("A");
-                            oA.href = url;
-                            oA.textContent = anchorText;
+                            if(context.argument._linkAnchor === null) {
+                                var oA = document.createElement("A");
+                                oA.href = url;
+                                oA.textContent = anchorText;
 
-                            editor.insertNode(oA);
-                            // editor.pure_execCommand("createLink", false, url);
-                            // wysiwygSelection.getSelection().focusNode.parentNode.text = anchorText;
+                                editor.insertNode(oA);
+                            } else {
+                                context.argument._linkAnchor.href = url;
+                                context.argument._linkAnchor.textContent = anchorText;
+                            }
 
                             context.dialog.linkText.value = "";
                             context.dialog.linkAnchorText.value = "";
@@ -1075,12 +1128,11 @@ SUNEDITOR.defaultLang = {
 
                             break;
                     }
-                }catch(e) {
+                } finally {
+                    editor.subOff();
                     editor.closeLoding();
-                    return false;
                 }
 
-                editor.closeLoding();
                 return false;
             };
 
@@ -1097,8 +1149,9 @@ SUNEDITOR.defaultLang = {
             context.element.imageResizeController.addEventListener('mousedown', onMouseDown_image_ctrl);
             context.element.wysiwygWindow.addEventListener("mousedown", onMouseDown_wysiwyg);
             context.element.wysiwygWindow.document.addEventListener("selectionchange", onSelectionChange_wysiwyg);
+            context.element.linkBtn.addEventListener('click', onClick_linkBtn);
             for(var i=0; i<context.dialog.forms.length; i++) {
-                context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener("click", dialog_submit);
+                context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener("click", submit_dialog);
             };
 
             return {
@@ -1649,11 +1702,23 @@ SUNEDITOR.defaultLang = {
                 '</div>';
         };
 
+        var linkBtn = function() {
+          return ''+
+              '<div class="arrow"></div>'+
+              '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
+              '   <div class="btn-group">'+
+              '     <button type="button" data-command="update" class="btn btn-sm" tabindex="-1" title="'+lang.editLink.edit+'">Edit</button>'+
+              '     <button type="button" data-command="delete" class="btn btn-sm" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
+              '   </div>'+
+              '</div>';
+        };
+
         return {
             toolBar : toolBar,
             dialogBox : dialogBox,
             imgDiv : imgDIv,
-            imgBtn : imgBtn
+            imgBtn : imgBtn,
+            linkBtn : linkBtn
         };
     };
 
@@ -1751,6 +1816,11 @@ SUNEDITOR.defaultLang = {
         var resize_back = document.createElement("DIV");
         resize_back.className = "sun-editor-id-resize-background";
 
+        /** 링크 수정 버튼 */
+        var link_button = document.createElement("DIV");
+        link_button.className = "sun-editor-id-link-btn";
+        link_button.innerHTML = createEditor(options).linkBtn();
+
         /** 사용자 옵션 값 넣기 */
         dialog_div.getElementsByClassName('sun-editor-id-video-x')[0].value = options.videoX;
         dialog_div.getElementsByClassName('sun-editor-id-video-y')[0].value = options.videoY;
@@ -1766,6 +1836,7 @@ SUNEDITOR.defaultLang = {
         relative.appendChild(resize_img);
         relative.appendChild(resize_img_button);
         relative.appendChild(loding_box);
+        relative.appendChild(link_button);
         top_div.appendChild(relative);
 
         return {
@@ -1778,7 +1849,8 @@ SUNEDITOR.defaultLang = {
                 _loding : loding_box,
                 _resizeImg : resize_img,
                 _resizeImgBtn : resize_img_button,
-                _resizeBack : resize_back
+                _resizeBack : resize_back,
+                _linkBtn : link_button
 			},
 			options : options
         };
@@ -1841,7 +1913,8 @@ SUNEDITOR.defaultLang = {
                 _resizeClientY : 0,
                 _originCssText : options._originCssText,
                 _innerHeight : options._innerHeight,
-                _windowHeight : window.innerHeight
+                _windowHeight : window.innerHeight,
+                _linkAnchor : null
 			},
 			element : {
                 textElement: element,
@@ -1856,7 +1929,8 @@ SUNEDITOR.defaultLang = {
                 imageResizeController : cons._resizeImg.getElementsByClassName('sun-editor-img-controller')[0],
                 imageResizeDisplay : cons._resizeImg.getElementsByClassName('sun-editor-id-img-display')[0],
                 imageResizeBtn : cons._resizeImgBtn,
-                resizeBackground : cons._resizeBack
+                resizeBackground : cons._resizeBack,
+                linkBtn : cons._linkBtn
             },
 			tool : {
 				bar : cons._toolBar,
