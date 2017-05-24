@@ -1238,6 +1238,11 @@ SUNEDITOR.defaultLang = {
         }
 	};
 
+    /**
+     * create Dom
+     * @param options
+     * @returns {{toolBar: toolBar, dialogBox: dialogBox, imgDiv: imgDIv, imgBtn: imgBtn, linkBtn: linkBtn}}
+     */
     var createEditor = function (options){
         var lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
 
