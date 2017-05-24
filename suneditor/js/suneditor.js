@@ -38,7 +38,8 @@ SUNEDITOR.defaultLang = {
         linkBox : {
             title : 'Insert Link',
             url : 'URL to link',
-            text : 'Text to display'
+            text : 'Text to display',
+            newWindowCheck : 'Open in new window'
         },
         imageBox : {
             title : 'Insert Image',
@@ -293,6 +294,7 @@ SUNEDITOR.defaultLang = {
                         context.element.linkBtn.style.display = "none";
                         context.dialog.linkText.value = "";
                         context.dialog.linkAnchorText.value = "";
+                        context.dialog.linkNewWindowCheck.checked = false;
                         context.argument._linkAnchor = null;
                         this.editLink = null;
                     }
@@ -955,6 +957,7 @@ SUNEDITOR.defaultLang = {
               if(/update/.test(command)) {
                   context.dialog.linkText.value = context.argument._linkAnchor.href;
                   context.dialog.linkAnchorText.value = context.argument._linkAnchor.textContent;
+                  context.dialog.linkNewWindowCheck.checked = (/_blank/i.test(context.argument._linkAnchor.target)? true: false);
                   editor.openDialog('link');
               }
               else { /** delete */
@@ -1075,11 +1078,13 @@ SUNEDITOR.defaultLang = {
                                 var oA = document.createElement("A");
                                 oA.href = url;
                                 oA.textContent = anchorText;
+                                oA.target = (context.dialog.linkNewWindowCheck.checked? "_blank": "");
 
                                 editor.insertNode(oA);
                             } else {
                                 context.argument._linkAnchor.href = url;
                                 context.argument._linkAnchor.textContent = anchorText;
+                                context.argument._linkAnchor.target = (context.dialog.linkNewWindowCheck.checked? "_blank": "");
                             }
 
                             context.dialog.linkText.value = "";
@@ -1622,6 +1627,7 @@ SUNEDITOR.defaultLang = {
                     '                <div class="form-group">'+
                     '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text">'+
                     '                </div>'+
+                    '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
                     '            </div>'+
                     '            <div class="modal-footer">'+
                     '                <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>'+lang.dialogBox.submitButton+'</span></button>'+
@@ -1959,6 +1965,7 @@ SUNEDITOR.defaultLang = {
 				link : cons._dialog.getElementsByClassName('sun-editor-id-dialog-link')[0],
 				linkText : cons._dialog.getElementsByClassName('sun-editor-id-linkurl')[0],
 				linkAnchorText : cons._dialog.getElementsByClassName('sun-editor-id-linktext')[0],
+                linkNewWindowCheck : cons._dialog.getElementsByClassName('sun-editor-id-linkCheck')[0],
 				image : cons._dialog.getElementsByClassName('sun-editor-id-dialog-image')[0],
 				imgInputFile : cons._dialog.getElementsByClassName('sun-editor-id-image-file')[0],
 				imgInputUrl : cons._dialog.getElementsByClassName('sun-editor-id-image-url')[0],

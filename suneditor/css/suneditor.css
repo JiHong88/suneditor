@@ -159,6 +159,7 @@
 .sun-editor .modal-dialog .modal-content .btn {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; cursor:pointer; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; background-image:none; border:1px solid transparent; border-radius:4px;}
 .sun-editor .modal-dialog .modal-content .btn:hover, .sun-editor .modal-dialog .modal-content .btn:focus {background-color: #f4a500;}
 .sun-editor .modal-dialog .modal-content input:focus {border-color:#f4b124; outline:0; -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6); box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6);}
+.sun-editor .modal-dialog .modal-body .label-check {cursor:pointer;}
 
 /* 로딩 박스 */
 .sun-editor .sun-editor-id-loding {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loding.jpg'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}

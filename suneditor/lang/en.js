@@ -37,7 +37,8 @@ SUNEDITOR.lang = {
         linkBox : {
             title : 'Insert Link',
             url : 'URL to link',
-            text : 'Text to display'
+            text : 'Text to display',
+            newWindowCheck : 'Open in new window'
         },
         imageBox : {
             title : 'Insert Image',
