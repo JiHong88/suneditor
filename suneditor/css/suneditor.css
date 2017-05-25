@@ -116,6 +116,7 @@
 .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor li {float:left; position:relative; width:16px; height:16px; margin:0 4px 4px 0;}
 .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor button {display:block; overflow:hidden; width:16px; height:16px; border-radius:2px; vertical-align:top; text-indent:-9999px;}
 .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor button.color_white {display:block; overflow:hidden; width:16px; height:16px; border:1px solid #d3d3d3; vertical-align:top; text-indent:-9999px;}
+.sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor button:hover, .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor button:focus {border:1px solid #000; width:19px; height:19px;}
 .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor .bg_btnframe {display:none; position:absolute; top:0; left:0; width:14px; height:14px; border:1px solid #000; border-radius:2px; opacity:.2; filter:alpha(opacity=20);}
 
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text {width:156px;}
