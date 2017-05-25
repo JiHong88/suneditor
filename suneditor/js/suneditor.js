@@ -745,6 +745,50 @@ SUNEDITOR.defaultLang = {
                 var ctrl = e.ctrlKey;
                 var alt = e.altKey;
 
+                if(ctrl) {
+                    var nodeName = false;
+
+                    switch(keyCode) {
+                        case 66: /** B */
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            editor.pure_execCommand('bold', false);
+                            nodeName = 'B';
+
+                            break;
+                        case 85: /** U */
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            editor.pure_execCommand('underline', false);
+                            nodeName = 'U';
+
+                            break;
+                        case 73: /** I */
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            editor.pure_execCommand('italic', false);
+                            nodeName = 'I';
+
+                            break;
+                        case 83: /** S */
+                            if(!shift) break;
+
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            editor.pure_execCommand('strikethrough', false);
+                            nodeName = 'STRIKE';
+
+                            break;
+                    }
+
+                    if(!nodeName) {
+                        dom.toggleClass(list.commandMap[nodeName], "on");
+                    }
+                }
 
                 switch(keyCode) {
                     case 8: /**backspace key*/
@@ -1330,7 +1374,7 @@ SUNEDITOR.defaultLang = {
                 if(options.showStrike) {
                     html += ''+
                     '       <li>'+
-                    '           <button type="button" class="btn_editor sun-editor-id-strike" title="'+lang.toolbar.strike+' (Ctrl+D)" data-command="strikethrough"><div class="ico_strike"></div></button>'+
+                    '           <button type="button" class="btn_editor sun-editor-id-strike" title="'+lang.toolbar.strike+' (Ctrl+SHIFT+S)" data-command="strikethrough"><div class="ico_strike"></div></button>'+
                     '       </li>';
                 }
             html +='</ul>'+
