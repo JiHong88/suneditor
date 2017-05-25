@@ -856,7 +856,7 @@ SUNEDITOR.defaultLang = {
                 if(context.argument._imageElement) {
                     var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
 
-                    context.element.imageResizeDiv.style.top = t + "px"
+                    context.element.imageResizeDiv.style.top = t + "px";
                     context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
                 }
             };
