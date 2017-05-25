@@ -785,7 +785,7 @@ SUNEDITOR.defaultLang = {
                             break;
                     }
 
-                    if(!nodeName) {
+                    if(nodeName) {
                         dom.toggleClass(list.commandMap[nodeName], "on");
                     }
                 }
