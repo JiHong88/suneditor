@@ -657,6 +657,8 @@ SUNEDITOR.defaultLang = {
                     context.element.imageResizeBtn.style.display = "block";
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)){
+                    e.preventDefault();
+                    e.stopPropagation();
                     wysiwygSelection.focus();
                 }
             };
