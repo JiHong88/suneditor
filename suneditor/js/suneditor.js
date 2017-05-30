@@ -1191,7 +1191,14 @@ SUNEDITOR.defaultLang = {
 
 			/** 이벤트 등록 */
             window.onresize = function(){resize_window()};
+
             context.tool.bar.addEventListener("click", onClick_toolbar);
+            context.tool.bar.addEventListener('touchstart', onClick_toolbar);
+            context.tool.bar.addEventListener('touchend', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+            });
+
             context.dialog.modal.addEventListener("click", onClick_dialog);
             context.element.imageResizeBtn.addEventListener('click', onClick_imageResizeBtn);
             context.element.wysiwygWindow.addEventListener("keydown", onKeyDown_wysiwyg);
