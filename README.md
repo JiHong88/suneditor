@@ -9,7 +9,7 @@ Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your 
 
 Supported Browser -
 Chrome, Safari, Opera, Edge, IE 10+, Android,
-IOS(not fully : table, line), Firefox(not fully : selectionchange)
+IOS(not fully : table), Firefox(not fully : selectionchange)
 ```
 
 ## Getting Started
