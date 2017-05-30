@@ -1193,11 +1193,11 @@ SUNEDITOR.defaultLang = {
             window.onresize = function(){resize_window()};
 
             context.tool.bar.addEventListener("click", onClick_toolbar);
-            context.tool.bar.addEventListener('touchstart', onClick_toolbar);
-            context.tool.bar.addEventListener('touchend', function(event) {
+            context.tool.bar.addEventListener('touchstart', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
             });
+            context.tool.bar.addEventListener('touchend', onClick_toolbar);
 
             context.dialog.modal.addEventListener("click", onClick_dialog);
             context.element.imageResizeBtn.addEventListener('click', onClick_imageResizeBtn);
