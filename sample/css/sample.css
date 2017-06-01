@@ -40,16 +40,26 @@ button {
 }
 
 .github-cat {
-    padding: 3px 0 0 0 !important;
-    margin: 0 !important;
+    color: #0d2636 !important;
+    font-family: initial;
+}
+
+.github-cat::before {
+    content: "";
+    display: inline-block;
+    background-image: url(../img/github_blue.png);
+    width: 22px;
+    height: 22px;
+    background-repeat: no-repeat;
+    background-size: 22px 22px;
+    vertical-align: bottom;
+    margin-right: 2px;
 }
 
 .github-cat:hover, .github-cat:focus {
-    opacity: 0.7;
+    color: #d33f03 !important;
 }
 
-@media screen and (max-width: 767px) {
-    .github-cat {
-        display: none;
-    }
+.github-cat:hover::before {
+    background-image: url(../img/github.png);
 }
