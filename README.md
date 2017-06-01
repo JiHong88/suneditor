@@ -12,6 +12,11 @@ Chrome, Safari, Opera, Edge, IE 10+, Android,
 IOS(not fully : table), Firefox(not fully : selectionchange)
 ```
 
+## Sample
+```text
+run : sample/index.html
+```
+
 ## Getting Started
 
 #### 1. include JS/CSS
