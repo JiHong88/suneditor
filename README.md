@@ -14,7 +14,8 @@ IOS(not fully : table), Firefox(not fully : selectionchange)
 
 ## Sample
 ```text
-run : sample/index.html
+Download source and run
+ - sample/index.html
 ```
 
 ## Getting Started
