@@ -524,7 +524,7 @@ SUNEDITOR.defaultLang = {
             var onClick_toolbar = function(e) {
                 if(context.argument._isTouchMove) {
                     context.argument._isTouchMove = false;
-                    return false;
+                    return;
                 }
 
                 var targetElement = e.target;
@@ -532,17 +532,19 @@ SUNEDITOR.defaultLang = {
                 var command = targetElement.getAttribute("data-command");
                 var className = targetElement.className;
 
-                e.preventDefault();
-                e.stopPropagation();
-
-                wysiwygSelection.focus();
-
                 while(!command && !display && !/layer_color|layer_url|editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
                     targetElement = targetElement.parentNode;
                     command = targetElement.getAttribute("data-command");
                     display = targetElement.getAttribute("data-display");
                     className = targetElement.className;
                 }
+
+                if(!command && !display) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                wysiwygSelection.focus();
 
                 var value = targetElement.getAttribute("data-value");
                 var txt = targetElement.getAttribute("data-txt");
