@@ -522,11 +522,6 @@ SUNEDITOR.defaultLang = {
             };
 
             var onClick_toolbar = function(e) {
-                if(context.argument._isTouchMove) {
-                    context.argument._isTouchMove = false;
-                    return;
-                }
-
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
                 var command = targetElement.getAttribute("data-command");
@@ -1201,7 +1196,6 @@ SUNEDITOR.defaultLang = {
 
             context.tool.bar.addEventListener('click', onClick_toolbar);
             context.tool.bar.addEventListener('touchstart', function(e) {e.preventDefault(); e.stopPropagation();});
-            context.tool.bar.addEventListener('touchmove', function() {context.argument._isTouchMove = true;});
             context.tool.bar.addEventListener('touchend', onClick_toolbar);
 
             context.dialog.modal.addEventListener('click', onClick_dialog);
@@ -1986,8 +1980,7 @@ SUNEDITOR.defaultLang = {
                 _originCssText : options._originCssText,
                 _innerHeight : options._innerHeight,
                 _windowHeight : window.innerHeight,
-                _linkAnchor : null,
-                _isTouchMove : false
+                _linkAnchor : null
 			},
 			element : {
                 textElement: element,
