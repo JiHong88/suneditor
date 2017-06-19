@@ -19,6 +19,11 @@
     <!-- suneditor -->
     <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
     <script src="../../suneditor/js/suneditor.js"></script>
+    <script>
+        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
+            $('#stargazers').html(' Stargazers ' + data.stargazers_count);
+        });
+    </script>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
 <nav class="navbar navbar-inverse">
@@ -40,9 +45,7 @@
                 <li><a href="examples.html" style="color:#fff;" title="Examples">Examples</a></li>
                 <li><a href="//codeload.github.com/JiHong88/SunEditor/zip/master" title="Download">Download</a></li>
                 <li>
-                    <a href="https://github.com/JiHong88/SunEditor" target="_blank" class="github-cat" title="go to github">
-                        GitHub
-                    </a>
+                    <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
                 </li>
             </ul>
         </div>
