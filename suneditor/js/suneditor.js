@@ -521,6 +521,25 @@ SUNEDITOR.defaultLang = {
                 context.argument._windowHeight = this.innerHeight;
             };
 
+            var touchstart_toolbar = function(e) {
+                var targetElement = e.target;
+                var display = targetElement.getAttribute("data-display");
+                var command = targetElement.getAttribute("data-command");
+                var className = targetElement.className;
+
+                while(!command && !display && !/layer_color|layer_url|editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
+                    targetElement = targetElement.parentNode;
+                    command = targetElement.getAttribute("data-command");
+                    display = targetElement.getAttribute("data-display");
+                    className = targetElement.className;
+                }
+
+                if(command) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            };
+
             var onClick_toolbar = function(e) {
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
@@ -1195,7 +1214,7 @@ SUNEDITOR.defaultLang = {
             window.onresize = function(){resize_window()};
 
             context.tool.bar.addEventListener('click', onClick_toolbar);
-            context.tool.bar.addEventListener('touchstart', function(e) {e.preventDefault(); e.stopPropagation();});
+            context.tool.bar.addEventListener('touchstart', touchstart_toolbar);
             context.tool.bar.addEventListener('touchend', onClick_toolbar);
 
             context.dialog.modal.addEventListener('click', onClick_dialog);
