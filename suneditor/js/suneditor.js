@@ -243,13 +243,8 @@ SUNEDITOR.defaultLang = {
                     return context.element.wysiwygWindow.getSelection();
                 },
 
-                getPElementInFocusNode : function() {
-                    var parentElement = context.argument._selectionNode;
-                    while(!/^P$/i.test(parentElement.tagName) && !/^BODY$/i.test(parentElement.tagName)) {
-                        parentElement = parentElement.parentNode;
-                    }
-
-                    return parentElement;
+                getSelectionNode : function() {
+                    return wysiwygSelection.getSelection().extentNode || wysiwygSelection.getSelection().anchorNode;
                 }
             }
         })();
@@ -695,7 +690,7 @@ SUNEDITOR.defaultLang = {
 
             var onSelectionChange_wysiwyg = function() {
                 context.argument._copySelection = copyObj(wysiwygSelection.getSelection());
-                context.argument._selectionNode = wysiwygSelection.getSelection().anchorNode;
+                context.argument._selectionNode = wysiwygSelection.getSelectionNode();
 
                 var selectionParent = context.argument._selectionNode;
                 var selectionNodeStr = "";
@@ -827,7 +822,10 @@ SUNEDITOR.defaultLang = {
 
                         if(ctrl || alt) break;
 
-                        var currentNode = wysiwygSelection.getPElementInFocusNode().parentNode;
+                        var currentNode = context.argument._selectionNode || wysiwygSelection.getSelection().anchorNode;
+                        while(!/^TD$/i.test(currentNode.tagName) && !/^BODY$/i.test(currentNode.tagName)) {
+                            currentNode = currentNode.parentNode;
+                        }
 
                         if(currentNode && /^TD$/i.test(currentNode.tagName)) {
                             var table = dom.getParentNode(currentNode, "table");
@@ -1192,7 +1190,6 @@ SUNEDITOR.defaultLang = {
                             oIframe.frameBorder = "0";
                             oIframe.allowFullscreen = true;
 
-                            // wysiwygSelection.getPElementInFocusNode().appendChild(oIframe);
                             editor.insertNode(oIframe);
                             editor.appendP(oIframe);
 
