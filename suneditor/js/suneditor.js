@@ -1845,6 +1845,7 @@ SUNEDITOR.defaultLang = {
         /** 최상위 div */
         var top_div = document.createElement("DIV");
         top_div.className = "sun-editor";
+        top_div.id = "suneditor_" + element.id;
         top_div.style.width = options.width;
         /** relative div */
         var relative = document.createElement("DIV");
@@ -2067,7 +2068,7 @@ SUNEDITOR.defaultLang = {
         var element = document.getElementById(elementId);
 
         if(element === null || element === undefined) {
-            alert('Suneditor creation failed :\n\rThe element for that id was not found');
+            throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + elementId +'")');
             return null;
         }
 

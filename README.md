@@ -38,10 +38,15 @@ Download source and run
 #### 3. create
 
 ```javascript
+/**
+* ID : 'suneditor_sample'
+* ClassName : 'sun-eidtor'
+*/
 var suneditor = SUNEDITOR.create('sample',{
     // insert options
 });
 ```
+
 
 ## Options
 
