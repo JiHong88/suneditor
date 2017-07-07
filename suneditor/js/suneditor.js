@@ -308,7 +308,7 @@ SUNEDITOR.defaultLang = {
                         context.argument._wysiwygActive = true;
                     }
                     else {
-                        context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim();
+                        context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?!^\r)(?!^\n)/gi, "<\/p>\r\n");
                         context.element.wysiwygElement.style.display = "none";
                         context.element.source.style.display = "block";
                         context.argument._wysiwygActive = false;
@@ -2067,9 +2067,8 @@ SUNEDITOR.defaultLang = {
     SUNEDITOR.create = function (elementId, options) {
         var element = document.getElementById(elementId);
 
-        if(element === null || element === undefined) {
+        if(element === null) {
             throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + elementId +'")');
-            return null;
         }
 
         var cons = Constructor(element, options);
