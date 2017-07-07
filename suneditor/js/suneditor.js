@@ -529,7 +529,7 @@ SUNEDITOR.defaultLang = {
                     className = targetElement.className;
                 }
 
-                if(command) {
+                if(command || display) {
                     e.stopPropagation();
                     e.preventDefault();
                 }
@@ -924,54 +924,48 @@ SUNEDITOR.defaultLang = {
                         var url = context.user.imageUploadUrl;
 
                         if(url != null && url.length > 0) {
-                            try {
-                                var xmlHttp;
-                                var formData = new FormData();
+                            var xmlHttp;
+                            var formData = new FormData();
 
-                                function imgUpload_collBack() {
-                                    if(xmlHttp.readyState == 4){
-                                        if(xmlHttp.status == 200){
-                                            var result = eval(xmlHttp.responseText);
+                            function imgUpload_collBack() {
+                                if(xmlHttp.readyState == 4){
+                                    if(xmlHttp.status == 200){
+                                        var result = eval(xmlHttp.responseText);
 
-                                            for(var i=0; i<result.length; i++) {
-                                                var oImg = document.createElement("IMG");
-                                                oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
-                                                oImg.style.width = context.user.imageSize;
-                                                editor.insertNode(oImg);
-                                            }
-                                        } else{
-                                            var WindowObject = window.open('', "_blank");
-                                            WindowObject.document.writeln(xmlHttp.responseText);
-                                            WindowObject.document.close();
-                                            WindowObject.focus();
+                                        for(var i=0; i<result.length; i++) {
+                                            var oImg = document.createElement("IMG");
+                                            oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
+                                            oImg.style.width = context.user.imageSize;
+                                            editor.insertNode(oImg);
+                                            editor.appendP(oImg);
                                         }
+                                    } else{
+                                        var WindowObject = window.open('', "_blank");
+                                        WindowObject.document.writeln(xmlHttp.responseText);
+                                        WindowObject.document.close();
+                                        WindowObject.focus();
                                     }
-                                };
-
-                                for(var i=0; i<this.files.length; i++) {
-                                    formData.append("file-" + i, this.files[i]);
                                 }
-
-                                xmlHttp = getXMLHttpRequest();
-                                xmlHttp.onreadystatechange = imgUpload_collBack;
-                                xmlHttp.open("post", url, true);
-                                xmlHttp.send(formData);
-                            } finally {
-                                editor.closeLoding();
                             }
+
+                            for(var i=0; i<this.files.length; i++) {
+                                formData.append("file-" + i, this.files[i]);
+                            }
+
+                            xmlHttp = getXMLHttpRequest();
+                            xmlHttp.onreadystatechange = imgUpload_collBack;
+                            xmlHttp.open("post", url, true);
+                            xmlHttp.send(formData);
                         } else {
                             function setup_reader(file) {
                                 var reader = new FileReader();
 
                                 reader.onload = function () {
-                                    try {
-                                        var oImg = document.createElement("IMG");
-                                        oImg.src = reader.result;
-                                        oImg.style.width = context.user.imageSize;
-                                        editor.insertNode(oImg);
-                                    } finally {
-                                        editor.closeLoding();
-                                    }
+                                    var oImg = document.createElement("IMG");
+                                    oImg.src = reader.result;
+                                    oImg.style.width = context.user.imageSize;
+                                    editor.insertNode(oImg);
+                                    editor.appendP(oImg);
                                 };
 
                                 reader.readAsDataURL(file);
@@ -986,8 +980,9 @@ SUNEDITOR.defaultLang = {
                         context.dialog.imgInputUrl.value = "";
                     }
                 } catch(e) {
+                    throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message +'"');
+                } finally {
                     editor.closeLoding();
-                    alert(e);
                 }
             };
 
@@ -1163,6 +1158,7 @@ SUNEDITOR.defaultLang = {
                             oImg.style.width = "350px";
 
                             editor.insertNode(oImg);
+                            editor.appendP(oImg);
 
                             context.dialog.imgInputFile.value = "";
                             context.dialog.imgInputUrl.value = "";
