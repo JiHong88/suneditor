@@ -257,6 +257,7 @@ SUNEDITOR.defaultLang = {
                 modalForm : null,
                 editLink : null,
                 tabSize : 4,
+                fontSizeUnit : "pt",
 
                 pure_execCommand : function(command, showDefaultUI, value) {
                     context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
@@ -503,6 +504,7 @@ SUNEDITOR.defaultLang = {
                 appendSpan : function(fontsize) {
                     var selection = wysiwygSelection.getSelection();
                     var nativeRng = null;
+                    var unit = editor.fontSizeUnit;
 
                     if(selection.rangeCount > 0) {
                         nativeRng = selection.getRangeAt(0);
@@ -522,9 +524,9 @@ SUNEDITOR.defaultLang = {
                     /** 범위선택 없을때 */
                     if(startCon === endCon && startOff === endOff) {
                         var oSpan = document.createElement("SPAN");
-                        oSpan.style.fontSize = fontsize + "pt";
+                        oSpan.style.fontSize = fontsize + unit;
                         oSpan.innerHTML = "&nbsp;";//"&#65279";
-                        startCon.parentNode.insertBefore(oSpan, endCon.nextElementSibling);
+                        startCon.parentNode.insertBefore(oSpan, endCon.nextSibling);
 
                         var range = wysiwygSelection.createRange();
                         range.setStart(oSpan, 0);
@@ -538,22 +540,35 @@ SUNEDITOR.defaultLang = {
                     }
                     /** 범위선택 했을때 */
                     else {
+                        /** 같은 노드안에서 선택 */
                         if(startCon === endCon) {
-                            var sNodes = startCon.parentNode.childNodes;
+                            var start_nodes = startCon.parentNode.childNodes;
+                            var start_nodesLen = start_nodes.length;
 
-                            for(var i = 0 in sNodes) {
-                                if(startCon === sNodes[i]) {
+                            for(var i=0, j=0; i<start_nodesLen; i++) {
+                                if(startCon === start_nodes[i]) {
                                     var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                                     var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
                                     var spanNode = document.createElement("SPAN");
-                                    spanNode.style.fontSize = fontsize + 'pt';
+                                    spanNode.style.fontSize = fontsize + unit;
                                     spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
 
-                                    sNodes[i].data = beforeNode.data;
-                                    startCon.parentNode.insertBefore(spanNode, sNodes[i].nextElementSibling);
-                                    startCon.parentNode.insertBefore(afterNode, sNodes[++i].nextElementSibling);
+                                    startCon.parentNode.insertBefore(spanNode, start_nodes[i].nextSibling);
 
+                                    if(beforeNode.data.length > 0) {
+                                        start_nodes[i].data = beforeNode.data;
+                                        j = (i + 1);
+                                    } else {
+                                        start_nodes[i].data = startCon.substringData(0, startOff);
+                                        j = (i + 1);
+                                    }
+
+                                    if(afterNode.data.length > 0) {
+                                        startCon.parentNode.insertBefore(afterNode, start_nodes[j].nextSibling);
+                                    }
+
+                                    /** selection */
                                     var range = wysiwygSelection.createRange();
                                     range.setStart(spanNode, 0);
                                     range.setEnd(spanNode, 1);
@@ -568,50 +583,62 @@ SUNEDITOR.defaultLang = {
                                 }
                             }
                         }
+                        /** 여러개의 노드 동시에 선택 */
                         else {
-                            var sNodes = startCon.parentNode.childNodes;
-                            var eNodes = endCon.parentNode.childNodes;
-                            var sSpanNode = null;
-                            var nSpanNode = null;
+                            var start_nodes = startCon.parentNode.childNodes;
+                            var end_nodes = endCon.parentNode.childNodes;
+                            var start_nodesLen = start_nodes.length;
+                            var end_nodesLen = end_nodes.length;
 
-                            for(var i = 0 in sNodes) {
-                                if(startCon === sNodes[i]) {
-                                    var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                                    // var afterNode = null;
+                            var start_spanNode;
+                            var end_spanNode;
 
-                                    sSpanNode = document.createElement("SPAN");
-                                    sSpanNode.style.fontSize = fontsize + 'pt';
-                                    sSpanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
+                            /** end Container */
+                            for(var i=0; i<end_nodesLen; i++) {
+                                if(end_nodes[i].length === 0) continue;
+                                if(/^SPAN$/i.test(endCon.parentNode.nodeName) && endCon.parentNode.style.fontSize === (fontsize + unit)) continue;
+                                if(end_nodes[i].data === undefined) continue;
 
-                                    sNodes[i].data = beforeNode.data;
-                                    startCon.parentNode.insertBefore(sSpanNode, sNodes[i].nextElementSibling);
-                                    // startCon.parentNode.insertBefore(afterNode, sNodes[++i].nextElementSibling);
+                                var afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
 
-                                    break;
+                                end_spanNode = document.createElement("SPAN");
+                                end_spanNode.style.fontSize = fontsize + unit;
+                                end_spanNode.innerText = endCon.substringData(0, endOff);
+
+                                if(afterNode.length > 0) {
+                                    end_nodes[i].data = afterNode.data;
+                                } else {
+                                    end_nodes[i].remove();
+                                }
+
+                                endCon.parentNode.insertBefore(end_spanNode, end_nodes[i]);
+                            }
+
+                            /** start Container */
+                            for(var i=0; i<start_nodesLen; i++) {
+                                if(start_nodes[i].length === 0) continue;
+                                if(/^SPAN$/i.test(startCon.parentNode.nodeName) && startCon.parentNode.style.fontSize === (fontsize + unit)) continue;
+                                if(start_nodes[i].data === undefined) continue;
+
+                                var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+
+                                start_spanNode = document.createElement("SPAN");
+                                start_spanNode.style.fontSize = fontsize + unit;
+                                start_spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
+
+                                startCon.parentNode.insertBefore(start_spanNode, start_nodes[i].nextSibling);
+
+                                if(beforeNode.length > 0) {
+                                    start_nodes[i].data = beforeNode.data;
+                                } else {
+                                    start_nodes[i].remove();
                                 }
                             }
 
-                            for(var i = 0 in eNodes) {
-                                if(endCon === eNodes[i]) {
-                                    // var beforeNode = document.createTextNode(endCon.substringData(0, startOff));
-                                    var afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-
-                                    nSpanNode = document.createElement("SPAN");
-                                    nSpanNode.style.fontSize = fontsize + 'pt';
-                                    nSpanNode.innerText = endCon.substringData(0, endOff);
-
-                                    eNodes[i].data = afterNode.data;
-                                    // endCon.parentNode.insertBefore(spanNode, eNodes[i].nextElementSibling);
-                                    endCon.parentNode.insertBefore(nSpanNode, eNodes[i]);
-
-                                    break;
-                                }
-                            }
-
-
+                            /** selection */
                             var range = wysiwygSelection.createRange();
-                            range.setStart(sSpanNode, 0);
-                            range.setEnd(nSpanNode, 1);
+                            range.setStart(start_spanNode, 0);
+                            range.setEnd(end_spanNode, 1);
 
                             selection = wysiwygSelection.getSelection();
                             if (selection.rangeCount > 0) {
@@ -713,6 +740,7 @@ SUNEDITOR.defaultLang = {
                         editor.pure_execCommand("formatBlock", false, value);
                     }
                     else if(/fontSize/.test(command)) {
+                        editor.subOff();
                         editor.appendSpan(value);
                     }
                     else if(/justifyleft|justifyright|justifycenter|justifyfull/.test(command)) {
