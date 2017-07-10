@@ -18,8 +18,6 @@
     <!-- suneditor -->
     <link href="../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
     <script src="testeditor.js"></script>
-
-    <script src="ckeditor/ckeditor.js"></script>
 </head>
 <body class="back_index" style="min-width:100%; background-color:#000;">
 
@@ -38,15 +36,10 @@
         <button type="button" class="btn btn-lg btn-danger" onclick="sun_hide()">Hide</button>
         <button type="button" class="btn btn-lg btn-danger" onclick="sun_show()">Show</button>
     </form>
-
-    <textarea id="cke" style="width:100%; height:400px;">Hello World~~</textarea>
     <br>
 </div>
 
 <script>
-    CKEDITOR.replace( 'editor' );
-
-
     var suneditor = SUNEDITOR.create('editor');
 
     function sun_save() {

@@ -539,15 +539,85 @@ SUNEDITOR.defaultLang = {
                     /** 범위선택 했을때 */
                     else {
                         if(startCon === endCon) {
-                            var oSpan = startCon.substringData(0, startOff) + '<span style="font-size:'+fontsize+'pt;">' + startCon.substringData(startOff, (endOff- startOff)) + '</span>' + startCon.substringData(endOff, startCon.length);
-                            selection.baseNode.parentNode.innerHTML = oSpan;
+                            var sNodes = startCon.parentNode.childNodes;
+
+                            for(var i = 0 in sNodes) {
+                                if(startCon === sNodes[i]) {
+                                    var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                                    var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+
+                                    var spanNode = document.createElement("SPAN");
+                                    spanNode.style.fontSize = fontsize + 'pt';
+                                    spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+
+                                    sNodes[i].data = beforeNode.data;
+                                    startCon.parentNode.insertBefore(spanNode, sNodes[i].nextElementSibling);
+                                    startCon.parentNode.insertBefore(afterNode, sNodes[++i].nextElementSibling);
+
+                                    var range = wysiwygSelection.createRange();
+                                    range.setStart(spanNode, 0);
+                                    range.setEnd(spanNode, 1);
+
+                                    selection = wysiwygSelection.getSelection();
+                                    if (selection.rangeCount > 0) {
+                                        selection.removeAllRanges();
+                                    }
+                                    selection.addRange(range);
+
+                                    break;
+                                }
+                            }
                         }
                         else {
-                            var endSpan = '<span style="font-size:'+fontsize+'pt;">' + endCon.substringData(0, endOff) + '</span>' + endCon.substringData(endOff, endCon.length);
-                            var startSpan = startCon.substringData(0, startOff) + '<span style="font-size:'+fontsize+'pt;">' + startCon.substringData(startOff, startCon.length) + '</span>';
+                            var sNodes = startCon.parentNode.childNodes;
+                            var eNodes = endCon.parentNode.childNodes;
+                            var sSpanNode = null;
+                            var nSpanNode = null;
 
-                            selection.focusNode.parentNode.innerHTML = endSpan;
-                            selection.anchorNode.innerHTML = selection.baseNode.data + startSpan;
+                            for(var i = 0 in sNodes) {
+                                if(startCon === sNodes[i]) {
+                                    var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                                    // var afterNode = null;
+
+                                    sSpanNode = document.createElement("SPAN");
+                                    sSpanNode.style.fontSize = fontsize + 'pt';
+                                    sSpanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
+
+                                    sNodes[i].data = beforeNode.data;
+                                    startCon.parentNode.insertBefore(sSpanNode, sNodes[i].nextElementSibling);
+                                    // startCon.parentNode.insertBefore(afterNode, sNodes[++i].nextElementSibling);
+
+                                    break;
+                                }
+                            }
+
+                            for(var i = 0 in eNodes) {
+                                if(endCon === eNodes[i]) {
+                                    // var beforeNode = document.createTextNode(endCon.substringData(0, startOff));
+                                    var afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+
+                                    nSpanNode = document.createElement("SPAN");
+                                    nSpanNode.style.fontSize = fontsize + 'pt';
+                                    nSpanNode.innerText = endCon.substringData(0, endOff);
+
+                                    eNodes[i].data = afterNode.data;
+                                    // endCon.parentNode.insertBefore(spanNode, eNodes[i].nextElementSibling);
+                                    endCon.parentNode.insertBefore(nSpanNode, eNodes[i]);
+
+                                    break;
+                                }
+                            }
+
+
+                            var range = wysiwygSelection.createRange();
+                            range.setStart(sSpanNode, 0);
+                            range.setEnd(nSpanNode, 1);
+
+                            selection = wysiwygSelection.getSelection();
+                            if (selection.rangeCount > 0) {
+                                selection.removeAllRanges();
+                            }
+                            selection.addRange(range);
                         }
                     }
                 }
