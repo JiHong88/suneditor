@@ -124,6 +124,10 @@ SUNEDITOR.defaultLang = {
                 return node && /^TD$|^TH$/i.test(node.nodeName);
             },
 
+            isNode : function(node) {
+                return (node.nodeType === ELEMENT_NODE || node.nodeType === TEXT_NODE);
+            },
+
             getListChildren : function(element, validation) {
                 var children = [];
                 validation = validation || func.returnTrue;
@@ -134,6 +138,22 @@ SUNEDITOR.defaultLang = {
                     }
                     for (var i = 0, len = current.children.length; i < len; i++) {
                         recursionFunc(current.children[i]);
+                    }
+                })(element);
+
+                return children;
+            },
+
+            getListChildNodes : function(element, validation) {
+                var children = [];
+                validation = validation || func.returnTrue;
+
+                (function recursionFunc(current){
+                    if (element !== current && validation(current)) {
+                        children.push(current);
+                    }
+                    for (var i = 0, len = current.childNodes.length; i < len; i++) {
+                        recursionFunc(current.childNodes[i]);
                     }
                 })(element);
 
@@ -522,6 +542,7 @@ SUNEDITOR.defaultLang = {
                     var startOff = nativeRng.startOffset;
                     var endCon = nativeRng.endContainer;
                     var endOff = nativeRng.endOffset;
+                    var commonCon = nativeRng.commonAncestorContainer;
 
                     /** 범위선택 없을때 */
                     if(startCon === endCon && startOff === endOff) {
@@ -585,16 +606,55 @@ SUNEDITOR.defaultLang = {
                                 }
                             }
                         }
-                        /** 여러개의 노드 동시에 선택 */
+                        /** 여러개의 노드 선택 */
                         else {
-                            var start_nodes = startCon.parentNode.childNodes;
+                            /*var start_nodes = startCon.parentNode.childNodes;
                             var start_nodesLen = start_nodes.length;
 
                             var start_spanNode;
-                            var end_spanNode;
+                            var end_spanNode;*/
 
                             /** end Container */
-                            var prevCon = endCon.previousSibling;
+                            var childNodes = dom.getListChildNodes(commonCon, dom.isNode);
+
+                            childNodes.forEach(function (item, index, array) {
+                                if(item.length !== 0 || !(item.nodeType === TEXT_NODE && item.data === undefined)) {
+                                    var parentNode = item.parentNode;
+
+                                    var t = true;
+
+                                    if(t && /^SPAN$/i.test(parentNode.nodeName)) {
+                                        if(/^SPAN$/i.test(item.nodeName)) {
+                                            var textNode = document.createTextNode(item.textContent);
+                                            parentNode.insertBefore(textNode, item);
+                                            item.remove();
+                                        }
+                                        t = false;
+                                    }
+
+                                    if(/^SPAN$/i.test(item.nodeName)) {
+                                        if(item.style.fontSize !== fontsize) item.style.fontSize = fontsize;
+                                        t = false;
+                                    }
+
+                                    if(t) {
+                                        var spanNode = document.createElement("SPAN");
+                                        spanNode.style.fontSize = fontsize;
+
+                                        if(item.nodeType === ELEMENT_NODE) {
+                                            spanNode.innerHTML = item.innerHTML;
+                                        } else if(item.nodeType === TEXT_NODE) {
+                                            spanNode.innerText = item.data;
+                                        }
+
+                                        commonCon.insertBefore(spanNode, item);
+                                        item.remove();
+                                    }
+                                }
+                            });
+
+
+                            /*var prevCon = endCon.previousSibling;
 
                             if(/^SPAN$/i.test(endCon.nodeName)) {
                                 if(!(endCon.style.fontSize === fontsize)) {
@@ -626,15 +686,35 @@ SUNEDITOR.defaultLang = {
                                 var roofCon = prevCon;
                                 prevCon = prevCon.previousSibling;
 
+                                if(roofCon.length === 0) continue;
+                                if(roofCon.nodeType === TEXT_NODE && (roofCon.data === undefined || roofCon.data.length === 0)) continue;
+
+                                var nodes = dom.getListChildren(roofCon, dom.isNode);
                                 var end_nodes = roofCon.childNodes;
                                 var end_nodesLen = end_nodes.length;
 
-                                if(/^SPAN$/i.test(roofCon.nodeName)) roofCon.style.fontSize = fontsize;
+                                if(/^SPAN$/i.test(roofCon.nodeName)) {
+                                    if(roofCon.style.fontSize !== fontsize) {
+                                        roofCon.style.fontSize = fontsize;
+                                    }
+                                } else {
+                                    var spanNode = document.createElement("SPAN");
+                                    spanNode.style.fontSize = fontsize;
+
+                                    if(roofCon.nodeType === ELEMENT_NODE) {
+                                        spanNode.innerHTML = roofCon.innerHTML;
+                                    } else if(roofCon.nodeType === TEXT_NODE) {
+                                        spanNode.innerText = roofCon.data;
+                                    }
+
+                                    roofCon.parentNode.insertBefore(spanNode, roofCon);
+                                    roofCon.remove();
+                                }
+
 
                                 for(var i=0; i<end_nodesLen; i++) {
                                     if(end_nodes[i].length === 0) continue;
                                     if(end_nodes[i].nodeType === TEXT_NODE && end_nodes[i].data === undefined) continue;
-
                                     if(/^SPAN$/i.test(roofCon.nodeName)) {
                                         if(end_nodes[i].nodeType === ELEMENT_NODE) {
                                             var textNode = document.createTextNode(end_nodes[i].textContent);
@@ -645,7 +725,7 @@ SUNEDITOR.defaultLang = {
                                     }
 
                                     if(/^SPAN$/i.test(end_nodes[i].nodeName)) {
-                                        if(!(end_nodes[i].style.fontSize !== fontsize)) {
+                                        if(end_nodes[i].style.fontSize !== fontsize) {
                                             end_nodes[i].style.fontSize = fontsize;
                                         }
                                         continue;
@@ -666,7 +746,7 @@ SUNEDITOR.defaultLang = {
                             }
 
 
-                            /** start Container */
+                            /!** start Container *!/
                             if(/^SPAN$/i.test(startCon.nodeName)) startCon.style.fontSize = fontsize;
 
 
@@ -725,7 +805,7 @@ SUNEDITOR.defaultLang = {
                                 } else {
                                     startCon.remove();
                                 }
-                            }
+                            }*/
                         }
                     }
                 }
