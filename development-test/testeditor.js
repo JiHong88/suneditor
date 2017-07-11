@@ -614,10 +614,14 @@ SUNEDITOR.defaultLang = {
                             var start_spanNode;
                             var end_spanNode;*/
 
-                            /** end Container */
                             var childNodes = dom.getListChildNodes(commonCon, dom.isNode);
 
+                            var startIndex = dom.getArrayIndex(childNodes, startCon);
+                            var endIndex = dom.getArrayIndex(childNodes, endCon);
+
                             childNodes.forEach(function (item, index, array) {
+                                if(item === startCon) isSelectNode = true;
+
                                 if(item.length !== 0 || !(item.nodeType === TEXT_NODE && item.data === undefined)) {
                                     var parentNode = item.parentNode;
 
