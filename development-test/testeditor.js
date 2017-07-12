@@ -124,10 +124,6 @@ SUNEDITOR.defaultLang = {
                 return node && /^TD$|^TH$/i.test(node.nodeName);
             },
 
-            isNode : function(node) {
-                return (node.nodeType === ELEMENT_NODE || node.nodeType === TEXT_NODE);
-            },
-
             getListChildren : function(element, validation) {
                 var children = [];
                 validation = validation || func.returnTrue;
@@ -608,208 +604,118 @@ SUNEDITOR.defaultLang = {
                         }
                         /** 여러개의 노드 선택 */
                         else {
-                            /*var start_nodes = startCon.parentNode.childNodes;
-                            var start_nodesLen = start_nodes.length;
-
-                            var start_spanNode;
-                            var end_spanNode;*/
-
-                            var childNodes = dom.getListChildNodes(commonCon, dom.isNode);
-
+                            var childNodes = dom.getListChildNodes(commonCon);
                             var startIndex = dom.getArrayIndex(childNodes, startCon);
                             var endIndex = dom.getArrayIndex(childNodes, endCon);
 
-                            childNodes.forEach(function (item, index, array) {
-                                if(item === startCon) isSelectNode = true;
+                            var startNode = startCon;
+                            for(var i=startIndex+1; i>=0; i--) {
+                                if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode) {
+                                    startIndex = i;
+                                    startNode = startNode.parentNode;
+                                }
+                            }
 
-                                if(item.length !== 0 || !(item.nodeType === TEXT_NODE && item.data === undefined)) {
-                                    var parentNode = item.parentNode;
+                            var endNode = endCon;
+                            for(var i=endIndex-1; i>startIndex; i--) {
+                                if(childNodes[i] === endNode.parentNode && !/^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].textContent === endNode.data) {
+                                    childNodes.splice(i, 1);
+                                    endNode = endNode.parentNode;
+                                    --endIndex;
+                                }
+                            }
 
-                                    var t = true;
+                            for(var i=startIndex; i<=endIndex; i++) {
+                                var item = childNodes[i];
 
-                                    if(t && /^SPAN$/i.test(parentNode.nodeName)) {
-                                        if(/^SPAN$/i.test(item.nodeName)) {
-                                            var textNode = document.createTextNode(item.textContent);
-                                            parentNode.insertBefore(textNode, item);
-                                            item.remove();
-                                        }
-                                        t = false;
+                                if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
+                                    item.remove();
+                                    continue;
+                                }
+
+                                if(item === startCon) {
+                                    var afterNode;
+                                    var spanNode = document.createElement("SPAN");
+                                    spanNode.style.fontSize = fontsize;
+
+                                    if(startCon.nodeType === ELEMENT_NODE) {
+                                        afterNode = document.createTextNode(startCon.textContent);
+                                        spanNode.innerHTML = startCon.innerHTML;
+                                    } else if(startCon.nodeType === TEXT_NODE) {
+                                        afterNode = document.createTextNode(startCon.substringData(0, startOff));
+                                        spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
                                     }
 
-                                    if(/^SPAN$/i.test(item.nodeName)) {
-                                        if(item.style.fontSize !== fontsize) item.style.fontSize = fontsize;
-                                        t = false;
+                                    startCon.parentNode.insertBefore(spanNode, item.nextSibling);
+
+                                    if(afterNode.length > 0) {
+                                        startCon.data = afterNode.data;
+                                    } else {
+                                        startCon.remove();
+                                        startCon = spanNode;
                                     }
 
-                                    if(t) {
-                                        var spanNode = document.createElement("SPAN");
-                                        spanNode.style.fontSize = fontsize;
+                                    continue;
+                                }
 
-                                        if(item.nodeType === ELEMENT_NODE) {
-                                            spanNode.innerHTML = item.innerHTML;
-                                        } else if(item.nodeType === TEXT_NODE) {
-                                            spanNode.innerText = item.data;
-                                        }
+                                if(item === endCon) {
+                                    var afterNode;
+                                    var spanNode = document.createElement("SPAN");
+                                    spanNode.style.fontSize = fontsize;
 
-                                        commonCon.insertBefore(spanNode, item);
+                                    if(endCon.nodeType === ELEMENT_NODE) {
+                                        afterNode = document.createTextNode(endCon.textContent);
+                                        spanNode.innerHTML = endCon.innerHTML;
+                                    } else if(endCon.nodeType === TEXT_NODE) {
+                                        afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                                        spanNode.innerText = endCon.substringData(0, endOff);
+                                    }
+
+                                    endCon.parentNode.insertBefore(spanNode, endCon);
+
+                                    if(afterNode.length > 0) {
+                                        endCon.data = afterNode.data;
+                                    } else {
+                                        endCon.remove();
+                                        endCon = spanNode;
+                                    }
+
+                                    continue;
+                                }
+
+                                var parentNode = item.parentNode;
+                                if(/^SPAN$/i.test(parentNode.nodeName)) {
+                                    if(parentNode.style.fontSize === fontsize) {
+                                        var textNode = document.createTextNode(item.textContent);
+                                        parentNode.insertBefore(textNode, item);
                                         item.remove();
                                     }
-                                }
-                            });
-
-
-                            /*var prevCon = endCon.previousSibling;
-
-                            if(/^SPAN$/i.test(endCon.nodeName)) {
-                                if(!(endCon.style.fontSize === fontsize)) {
-                                    endCon.style.fontSize = fontsize;
-                                }
-                            } else {
-                                var afterNode;
-                                end_spanNode = document.createElement("SPAN");
-                                end_spanNode.style.fontSize = fontsize;
-
-                                if(endCon.nodeType === ELEMENT_NODE) {
-                                    afterNode = document.createTextNode(endCon.textContent);
-                                    end_spanNode.innerHTML = endCon.innerHTML;
-                                } else if(endCon.nodeType === TEXT_NODE) {
-                                    afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                                    end_spanNode.innerText = endCon.substringData(0, endOff);
-                                }
-
-                                endCon.parentNode.insertBefore(end_spanNode, endCon);
-
-                                if(afterNode.length > 0) {
-                                    endCon.data = afterNode.data;
-                                } else {
-                                    endCon.remove();
-                                }
-                            }
-
-                            while(!(prevCon === startCon || prevCon === startCon.parentNode || prevCon === null)) {
-                                var roofCon = prevCon;
-                                prevCon = prevCon.previousSibling;
-
-                                if(roofCon.length === 0) continue;
-                                if(roofCon.nodeType === TEXT_NODE && (roofCon.data === undefined || roofCon.data.length === 0)) continue;
-
-                                var nodes = dom.getListChildren(roofCon, dom.isNode);
-                                var end_nodes = roofCon.childNodes;
-                                var end_nodesLen = end_nodes.length;
-
-                                if(/^SPAN$/i.test(roofCon.nodeName)) {
-                                    if(roofCon.style.fontSize !== fontsize) {
-                                        roofCon.style.fontSize = fontsize;
-                                    }
-                                } else {
-                                    var spanNode = document.createElement("SPAN");
-                                    spanNode.style.fontSize = fontsize;
-
-                                    if(roofCon.nodeType === ELEMENT_NODE) {
-                                        spanNode.innerHTML = roofCon.innerHTML;
-                                    } else if(roofCon.nodeType === TEXT_NODE) {
-                                        spanNode.innerText = roofCon.data;
+                                    else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
+                                        item.style.fontSize = fontsize;
                                     }
 
-                                    roofCon.parentNode.insertBefore(spanNode, roofCon);
-                                    roofCon.remove();
-                                }
-
-
-                                for(var i=0; i<end_nodesLen; i++) {
-                                    if(end_nodes[i].length === 0) continue;
-                                    if(end_nodes[i].nodeType === TEXT_NODE && end_nodes[i].data === undefined) continue;
-                                    if(/^SPAN$/i.test(roofCon.nodeName)) {
-                                        if(end_nodes[i].nodeType === ELEMENT_NODE) {
-                                            var textNode = document.createTextNode(end_nodes[i].textContent);
-                                            roofCon.insertBefore(textNode, end_nodes[i++]);
-                                            end_nodes[i].remove();
-                                        }
-                                        continue;
-                                    }
-
-                                    if(/^SPAN$/i.test(end_nodes[i].nodeName)) {
-                                        if(end_nodes[i].style.fontSize !== fontsize) {
-                                            end_nodes[i].style.fontSize = fontsize;
-                                        }
-                                        continue;
-                                    }
-
-                                    var spanNode = document.createElement("SPAN");
-                                    spanNode.style.fontSize = fontsize;
-
-                                    if(end_nodes[i].nodeType === ELEMENT_NODE) {
-                                        spanNode.innerHTML = end_nodes[i].innerHTML;
-                                    } else if(end_nodes[i].nodeType === TEXT_NODE) {
-                                        spanNode.innerText = end_nodes[i].data;
-                                    }
-
-                                    roofCon.insertBefore(spanNode, end_nodes[i++]);
-                                    end_nodes[i].remove();
-                                }
-                            }
-
-
-                            /!** start Container *!/
-                            if(/^SPAN$/i.test(startCon.nodeName)) startCon.style.fontSize = fontsize;
-
-
-                            if(startCon.nodeType === ELEMENT_NODE) {
-                                afterNode = document.createTextNode(startCon.textContent);
-                                start_spanNode.innerHTML = startCon.innerHTML;
-                            } else if(startCon.nodeType === TEXT_NODE) {
-                                afterNode = document.createTextNode(startCon.substringData(0, startOff));
-                                start_spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
-                            }
-
-                            startCon.parentNode.insertBefore(start_spanNode, start_nodes[i]);
-
-                            if(afterNode.length > 0) {
-                                startCon.data = afterNode.data;
-                            } else {
-                                startCon.remove();
-                            }
-
-                            for(var i=0; i<start_nodesLen; i++) {
-                                if(start_nodes[i].length === 0) continue;
-                                if(start_nodes[i].nodeType === TEXT_NODE && start_nodes[i].data === undefined) continue;
-
-                                if(/^SPAN$/i.test(startCon.nodeName)) {
-                                    if(start_nodes[i].nodeType === ELEMENT_NODE) {
-                                        var textNode = document.createTextNode(start_nodes[i].textContent);
-                                        startCon.insertBefore(textNode, start_nodes[i++]);
-                                        start_nodes[i].remove();
-                                    }
                                     continue;
                                 }
 
-                                if(/^SPAN$/i.test(start_nodes[i].nodeName)) {
-                                    if(!(start_nodes[i].style.fontSize !== fontsize)) {
-                                        start_nodes[i].style.fontSize = fontsize;
-                                    }
+                                if(/^SPAN$/i.test(item.nodeName)) {
+                                    item.style.fontSize = fontsize;
                                     continue;
                                 }
 
-                                var afterNode;
-                                start_spanNode = document.createElement("SPAN");
-                                start_spanNode.style.fontSize = fontsize;
+                                var spanNode = document.createElement("SPAN");
+                                spanNode.style.fontSize = fontsize;
 
-                                if(startCon.nodeType === ELEMENT_NODE) {
-                                    afterNode = document.createTextNode(startCon.textContent);
-                                    start_spanNode.innerHTML = startCon.innerHTML;
-                                } else if(startCon.nodeType === TEXT_NODE) {
-                                    afterNode = document.createTextNode(startCon.substringData(0, startOff));
-                                    start_spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
+                                if(item.nodeType === ELEMENT_NODE) {
+                                    spanNode.innerHTML = item.innerHTML;
+                                } else if(item.nodeType === TEXT_NODE) {
+                                    spanNode.innerText = item.data;
                                 }
 
-                                startCon.parentNode.insertBefore(start_spanNode, start_nodes[i]);
+                                commonCon.insertBefore(spanNode, item);
+                                item.remove();
+                            }
 
-                                if(afterNode.length > 0) {
-                                    startCon.data = afterNode.data;
-                                } else {
-                                    startCon.remove();
-                                }
-                            }*/
+                            /** selection */
                         }
                     }
                 }
