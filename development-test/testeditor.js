@@ -610,7 +610,7 @@ SUNEDITOR.defaultLang = {
 
                             var startNode = startCon;
                             for(var i=startIndex+1; i>=0; i--) {
-                                if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode) {
+                                if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
                                     startIndex = i;
                                     startNode = startNode.parentNode;
                                 }
@@ -618,7 +618,7 @@ SUNEDITOR.defaultLang = {
 
                             var endNode = endCon;
                             for(var i=endIndex-1; i>startIndex; i--) {
-                                if(childNodes[i] === endNode.parentNode && !/^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].textContent === endNode.data) {
+                                if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
                                     childNodes.splice(i, 1);
                                     endNode = endNode.parentNode;
                                     --endIndex;
@@ -627,6 +627,7 @@ SUNEDITOR.defaultLang = {
 
                             for(var i=startIndex; i<=endIndex; i++) {
                                 var item = childNodes[i];
+                                var parentNode = item.parentNode;
 
                                 if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
                                     item.remove();
@@ -634,6 +635,13 @@ SUNEDITOR.defaultLang = {
                                 }
 
                                 if(item === startCon) {
+                                    if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                        if(/^SPAN$/i.test(item.nodeName)) {
+                                            item.style.fontSize = fontsize;
+                                        }
+                                        continue;
+                                    }
+
                                     var afterNode;
                                     var spanNode = document.createElement("SPAN");
                                     spanNode.style.fontSize = fontsize;
@@ -652,13 +660,22 @@ SUNEDITOR.defaultLang = {
                                         startCon.data = afterNode.data;
                                     } else {
                                         startCon.remove();
-                                        startCon = spanNode;
                                     }
+
+                                    startCon = spanNode.firstChild;
+                                    startOff = 0;
 
                                     continue;
                                 }
 
                                 if(item === endCon) {
+                                    if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                        if(/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
+                                            item.style.fontSize = fontsize;
+                                        }
+                                        continue;
+                                    }
+
                                     var afterNode;
                                     var spanNode = document.createElement("SPAN");
                                     spanNode.style.fontSize = fontsize;
@@ -677,24 +694,25 @@ SUNEDITOR.defaultLang = {
                                         endCon.data = afterNode.data;
                                     } else {
                                         endCon.remove();
-                                        endCon = spanNode;
                                     }
+
+                                    endCon = spanNode.firstChild;
+                                    endOff = spanNode.textContent.length;
 
                                     continue;
                                 }
 
-                                var parentNode = item.parentNode;
-                                if(/^SPAN$/i.test(parentNode.nodeName)) {
-                                    if(parentNode.style.fontSize === fontsize) {
+                                if(parentNode.nodeType === ELEMENT_NODE) {
+                                    if(parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
                                         var textNode = document.createTextNode(item.textContent);
                                         parentNode.insertBefore(textNode, item);
                                         item.remove();
+                                        continue;
                                     }
                                     else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
                                         item.style.fontSize = fontsize;
+                                        continue;
                                     }
-
-                                    continue;
                                 }
 
                                 if(/^SPAN$/i.test(item.nodeName)) {
@@ -711,11 +729,21 @@ SUNEDITOR.defaultLang = {
                                     spanNode.innerText = item.data;
                                 }
 
-                                commonCon.insertBefore(spanNode, item);
+                                item.parentNode.insertBefore(spanNode, item);
                                 item.remove();
                             }
 
                             /** selection */
+                            /** selection */
+                            var range = wysiwygSelection.createRange();
+                            range.setStart(startCon, startOff);
+                            range.setEnd(endCon, endOff);
+
+                            selection = wysiwygSelection.getSelection();
+                            if (selection.rangeCount > 0) {
+                                selection.removeAllRanges();
+                            }
+                            selection.addRange(range);
                         }
                     }
                 }
