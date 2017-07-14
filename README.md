@@ -64,6 +64,7 @@ imageUploadUrl  : he image upload to server mapping address when append Img tag 
                                                 {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
 showFont        : Display font module /default - true
 showFormats     : Display formats module /default - true
+showFontSize    : Display font size module /default - true
 showBold        : Display bold module /default - true
 showUnderline   : Display underline module /default - true
 showItalic      : Display italic module /default - true

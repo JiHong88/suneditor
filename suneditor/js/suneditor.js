@@ -6,6 +6,7 @@ SUNEDITOR.defaultLang = {
         fontFamily : 'Font',
         fontFamilyDelete : 'Remove Font Family',
         formats : 'Formats',
+        fontSize : 'Size',
         bold : 'Bold',
         underline : 'Underline',
         italic : 'Italic',
@@ -73,8 +74,10 @@ SUNEDITOR.defaultLang = {
  * MIT license.
  */
 (function(){
+    var ELEMENT_NODE = 1;
+    var TEXT_NODE = 3;
     /**
-	 * utile func
+     * utile func
      * @type {{returnTrue}}
      */
     var func = (function(){
@@ -138,6 +141,22 @@ SUNEDITOR.defaultLang = {
                 return children;
             },
 
+            getListChildNodes : function(element, validation) {
+                var children = [];
+                validation = validation || func.returnTrue;
+
+                (function recursionFunc(current){
+                    if (validation(current)) {
+                        children.push(current);
+                    }
+                    for (var i = 0, len = current.childNodes.length; i < len; i++) {
+                        recursionFunc(current.childNodes[i]);
+                    }
+                })(element);
+
+                return children;
+            },
+
             getParentNode : function(element, tagName) {
                 var check = new RegExp("^"+tagName+"$", "i");
 
@@ -181,28 +200,37 @@ SUNEDITOR.defaultLang = {
                 else {
                     element.className += " " + className;
                 }
+            },
+
+            removeItem : function(item) {
+                try {
+                    item.remove();
+                } catch(e) {
+                    item.removeNode();
+                }
             }
         };
     })();
 
     /**
-	 * SunEditor
+     * SunEditor
      * @param context
      */
-	var core = function(context){
-		/** 배열 관련 */
+    var core = function(context){
+        /** 배열 관련 */
         var list = (function(){
             var commandMap = {
                 'FONT': context.tool.fontFamily,
                 'B' : context.tool.bold,
                 'U' : context.tool.underline,
                 'I' : context.tool.italic,
-                'STRIKE' : context.tool.strike
+                'STRIKE' : context.tool.strike,
+                'SIZE' : context.tool.fontSize
             };
 
             /** 글꼴 목록 가져오기 */
             var fontFamilyMap = {};
-			var list_fontFamily = context.tool.list_fontFamily.children;
+            var list_fontFamily = context.tool.list_fontFamily.children;
 
             list_fontFamily[0].firstChild.getAttribute("data-value");
             for(var i=0; i<list_fontFamily.length; i++) {
@@ -224,7 +252,7 @@ SUNEDITOR.defaultLang = {
             }
         })();
 
-		/** selection 관련 */
+        /** selection 관련 */
         var wysiwygSelection = (function(){
             return {
                 focus : function(){
@@ -245,18 +273,54 @@ SUNEDITOR.defaultLang = {
 
                 getSelectionNode : function() {
                     return wysiwygSelection.getSelection().extentNode || wysiwygSelection.getSelection().anchorNode;
+                },
+
+                getRange : function() {
+                    var selection = this.getSelection();
+                    var nativeRng = null;
+
+                    if(selection.rangeCount > 0) {
+                        nativeRng = selection.getRangeAt(0);
+                    } else {
+                        selection = context.argument._copySelection;
+
+                        nativeRng = this.createRange();
+                        nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
+                        nativeRng.setEnd(selection.focusNode, selection.focusOffset);
+                    }
+
+                    return {
+                        startCon : nativeRng.startContainer,
+                        startOff : nativeRng.startOffset,
+                        endCon : nativeRng.endContainer,
+                        endOff : nativeRng.endOffset,
+                        commonCon : nativeRng.commonAncestorContainer
+                    }
+                },
+
+                setRange : function(startCon, startOff, endCon, endOff) {
+                    var range = this.createRange();
+                    range.setStart(startCon, startOff);
+                    range.setEnd(endCon, endOff);
+
+                    var selection = this.getSelection();
+                    if (selection.rangeCount > 0) {
+                        selection.removeAllRanges();
+                    }
+                    selection.addRange(range);
                 }
             }
         })();
 
-		/** 에디터 */
-		var editor = (function(){
+        /** 에디터 */
+        var editor = (function(){
             return {
                 subMenu : null,
                 originSub : null,
                 modalForm : null,
                 editLink : null,
                 tabSize : 4,
+                fontSizeUnit : "pt",
 
                 pure_execCommand : function(command, showDefaultUI, value) {
                     context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
@@ -429,22 +493,12 @@ SUNEDITOR.defaultLang = {
 
                 insertNode : function(oNode) {
                     var selection = wysiwygSelection.getSelection();
-                    var nativeRng = null;
+                    var nativeRng = wysiwygSelection.getRange();
 
-                    if(selection.rangeCount > 0) {
-                        nativeRng = selection.getRangeAt(0);
-                    } else {
-                        selection = context.argument._copySelection;
-
-                        nativeRng = wysiwygSelection.createRange();
-                        nativeRng.setStart(selection.focusNode, selection.anchorOffset);
-                        nativeRng.setEnd(selection.focusNode, selection.focusOffset);
-                    }
-
-                    var startCon = nativeRng.startContainer;
-                    var startOff = nativeRng.startOffset;
-                    var endCon = nativeRng.endContainer;
-                    var endOff = nativeRng.endOffset;
+                    var startCon = nativeRng.startCon;
+                    var startOff = nativeRng.startOff;
+                    var endCon = nativeRng.endCon;
+                    var endOff = nativeRng.endOff;
 
                     var pNode = startCon;
                     if(/^#text$/i.test(startCon.nodeName)) {
@@ -453,7 +507,7 @@ SUNEDITOR.defaultLang = {
 
                     /** 범위선택 없을때 */
                     if(startCon === endCon && startOff === endOff) {
-                        if(/^#text$/i.test(selection.focusNode.nodeName)) {
+                        if(selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
                             var rightNode = selection.focusNode.splitText(endOff);
                             pNode.insertBefore(oNode, rightNode);
                         }
@@ -498,11 +552,195 @@ SUNEDITOR.defaultLang = {
 
                         pNode.insertBefore(oNode, rightNode);
                     }
+                },
+
+                appendSpan : function(fontsize) {
+                    fontsize = fontsize + editor.fontSizeUnit;
+                    var nativeRng = wysiwygSelection.getRange();
+
+                    var startCon = nativeRng.startCon;
+                    var startOff = nativeRng.startOff;
+                    var endCon = nativeRng.endCon;
+                    var endOff = nativeRng.endOff;
+                    var commonCon = nativeRng.commonCon;
+
+                    /** 같은 노드안에서 선택 */
+                    if(startCon === endCon) {
+                        var afterNodeStandardPosition;
+                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+
+                        var spanNode = document.createElement("SPAN");
+                        spanNode.style.fontSize = fontsize;
+
+                        if(startOff === endOff) {
+                            spanNode.innerHTML = "&nbsp;";
+                            afterNodeStandardPosition = spanNode.nextSibling;
+                        } else {
+                            spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+
+                            try {
+                                afterNodeStandardPosition = startCon.nextSibling.nextSibling;
+                            } catch(e) {
+                                afterNodeStandardPosition = startCon.nextSibling;
+                            }
+                        }
+
+                        startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
+
+                        if(beforeNode.data.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            startCon.data = startCon.substringData(0, startOff);
+                        }
+
+                        if(afterNode.data.length > 0) {
+                            startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
+                        }
+
+                        startCon = spanNode;
+                        startOff = 0;
+                        endCon = spanNode;
+                        endOff = 1;
+                    }
+                    /** 여러개의 노드 선택 */
+                    else {
+                        var childNodes = dom.getListChildNodes(commonCon);
+                        var startIndex = dom.getArrayIndex(childNodes, startCon);
+                        var endIndex = dom.getArrayIndex(childNodes, endCon);
+
+                        var startNode = startCon;
+                        for(var i=startIndex+1; i>=0; i--) {
+                            if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
+                                startIndex = i;
+                                startNode = startNode.parentNode;
+                            }
+                        }
+
+                        var endNode = endCon;
+                        for(var i=endIndex-1; i>startIndex; i--) {
+                            if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
+                                childNodes.splice(i, 1);
+                                endNode = endNode.parentNode;
+                                --endIndex;
+                            }
+                        }
+
+                        for(var i=startIndex; i<=endIndex; i++) {
+                            var item = childNodes[i];
+                            var parentNode = item.parentNode;
+
+                            if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
+                                dom.removeItem(item);
+                                continue;
+                            }
+
+                            if(item === startCon) {
+                                if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                    if(/^SPAN$/i.test(item.nodeName)) {
+                                        item.style.fontSize = fontsize;
+                                    }
+                                    continue;
+                                }
+
+                                var beforeNode;
+                                var spanNode = document.createElement("SPAN");
+                                spanNode.style.fontSize = fontsize;
+
+                                if(startCon.nodeType === ELEMENT_NODE) {
+                                    beforeNode = document.createTextNode(startCon.textContent);
+                                    spanNode.innerHTML = startCon.innerHTML;
+                                } else if(startCon.nodeType === TEXT_NODE) {
+                                    beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                                    spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
+                                }
+
+                                startCon.parentNode.insertBefore(spanNode, item.nextSibling);
+
+                                if(beforeNode.length > 0) {
+                                    startCon.data = beforeNode.data;
+                                } else {
+                                    dom.removeItem(startCon);
+                                }
+
+                                startCon = spanNode.firstChild;
+                                startOff = 0;
+
+                                continue;
+                            }
+
+                            if(item === endCon) {
+                                if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                    if(/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
+                                        item.style.fontSize = fontsize;
+                                    }
+                                    continue;
+                                }
+
+                                var afterNode;
+                                var spanNode = document.createElement("SPAN");
+                                spanNode.style.fontSize = fontsize;
+
+                                if(endCon.nodeType === ELEMENT_NODE) {
+                                    afterNode = document.createTextNode(endCon.textContent);
+                                    spanNode.innerHTML = endCon.innerHTML;
+                                } else if(endCon.nodeType === TEXT_NODE) {
+                                    afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                                    spanNode.innerText = endCon.substringData(0, endOff);
+                                }
+
+                                endCon.parentNode.insertBefore(spanNode, endCon);
+
+                                if(afterNode.length > 0) {
+                                    endCon.data = afterNode.data;
+                                } else {
+                                    dom.removeItem(endCon);
+                                }
+
+                                endCon = spanNode.firstChild;
+                                endOff = spanNode.textContent.length;
+
+                                continue;
+                            }
+
+                            if(parentNode.nodeType === ELEMENT_NODE) {
+                                if(parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
+                                    var textNode = document.createTextNode(item.textContent);
+                                    parentNode.insertBefore(textNode, item);
+                                    dom.removeItem(item);
+                                    continue;
+                                }
+                                else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
+                                    item.style.fontSize = fontsize;
+                                    continue;
+                                }
+                            }
+
+                            if(/^SPAN$/i.test(item.nodeName)) {
+                                item.style.fontSize = fontsize;
+                                continue;
+                            }
+
+                            var spanNode = document.createElement("SPAN");
+                            spanNode.style.fontSize = fontsize;
+
+                            if(item.nodeType === ELEMENT_NODE) {
+                                spanNode.innerHTML = item.innerHTML;
+                            } else if(item.nodeType === TEXT_NODE) {
+                                spanNode.innerText = item.data;
+                            }
+
+                            item.parentNode.insertBefore(spanNode, item);
+                            dom.removeItem(item);
+                        }
+                    }
+
+                    wysiwygSelection.setRange(startCon, startOff, endCon, endOff);
                 }
             };
-		})();
+        })();
 
-		/** 이벤트 */
+        /** 이벤트 */
         var event = (function(){
             var resize_window = function() {
                 // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
@@ -589,6 +827,9 @@ SUNEDITOR.defaultLang = {
                     }
                     else if(/format/.test(command)) {
                         editor.pure_execCommand("formatBlock", false, value);
+                    }
+                    else if(/fontSize/.test(command)) {
+                        editor.appendSpan(value);
                     }
                     else if(/justifyleft|justifyright|justifycenter|justifyfull/.test(command)) {
                         dom.changeTxt(editor.originSub.firstElementChild, targetElement.title.split(" ")[0]);
@@ -693,62 +934,69 @@ SUNEDITOR.defaultLang = {
                 context.argument._selectionNode = wysiwygSelection.getSelectionNode();
 
                 var selectionParent = context.argument._selectionNode;
-                var selectionNodeStr = "";
-                var fontFamily = context.tool.default_fontFamily;
-                while(!/^P$|^BODY$|^HTML$|^A$/i.test(selectionParent.nodeName)) {
-                    selectionNodeStr += selectionParent.nodeName + "|";
-                    if(/^FONT$/i.test(selectionParent.nodeName) && selectionParent.face.length > 0) {
+                var findFont = true;
+                var findSize = true;
+                var findA = true;
+                var map = "B|U|I|STRIKE|FONT|SIZE|";
+                var check = new RegExp(map, "i");
+                while(!/^P$|^BODY$|^HTML$|^DIV$/i.test(selectionParent.nodeName)) {
+                    var nodeName = (/^STRONG$/.test(selectionParent.nodeName)? 'B': (/^EM/.test(selectionParent.nodeName)? 'I': selectionParent.nodeName));
+
+                    /** 폰트 */
+                    if(findFont && (/^FONT$/i.test(nodeName) && selectionParent.face.length > 0)) {
                         var selectFont = list.fontFamilyMap[selectionParent.face.replace(/\s*/g,"")];
-                        fontFamily = (selectFont? selectFont: fontFamily);
-                        break;
+                        dom.changeTxt(list.commandMap[nodeName], selectFont);
+                        findFont = false;
+                        map = map.replace(nodeName+"|", "");
+                        check = new RegExp(map, "i");
                     }
+
+                    /** A */
+                    if(findA && /^A$/i.test(selectionParent.nodeName) && editor.editLink !== context.element.linkBtn) {
+                        editor.editLink = context.argument._linkAnchor = selectionParent;
+                        var linkBtn = context.element.linkBtn;
+
+                        linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
+                        linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
+
+                        linkBtn.style.left = selectionParent.offsetLeft + "px";
+                        linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + context.tool.bar.offsetHeight + 10) + "px";
+                        linkBtn.style.display = "block";
+
+                        linkBtn = null;
+                        findA = false;
+                    } else if(findA && editor.editLink) {
+                        context.element.linkBtn.style.display = "none";
+                        editor.subOff();
+                    }
+
+                    /** span (font size) */
+                    if(findSize && /^SPAN$/i.test(nodeName) && selectionParent.style.fontSize.length > 0) {
+                        dom.changeTxt(list.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        findSize = false;
+                        map = map.replace("SIZE|", "");
+                        check = new RegExp(map, "i");
+                    }
+
+                    /** command */
+                    if(check.test(nodeName)) {
+                        dom.addClass(list.commandMap[nodeName], "on");
+                        map = map.replace(nodeName+"|", "");
+                        check = new RegExp(map, "i");
+                    }
+
                     selectionParent = selectionParent.parentNode;
                 }
 
-                if(/^A$/i.test(selectionParent.nodeName) && editor.editLink !== context.element.linkBtn) {
-                    editor.editLink = context.argument._linkAnchor = selectionParent;
-                    var linkBtn = context.element.linkBtn;
-
-                    linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
-                    linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
-
-                    linkBtn.style.left = selectionParent.offsetLeft + "px";
-                    linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + context.tool.bar.offsetHeight + 10) + "px";
-                    linkBtn.style.display = "block";
-
-                    linkBtn = null;
-                    return;
-                } else if(editor.editLink) {
-                    context.element.linkBtn.style.display = "none";
-                    editor.subOff();
-                }
-
-                if(/^SPAN$/i.test(selectionParent.nodeName)) {
-                    for(var i=0; i<selectionParent.children.length; i++) {
-                        selectionNodeStr += selectionParent.children[i].tagName;
-                    }
-                }
-
-
-                /** add */
-                var onNode = selectionNodeStr.split("|");
-                var map = "B|U|I|STRIKE|FONT|";
-                for(var i=0; i<onNode.length - 1; i++) {
-                    var nodeName = (/^STRONG$/.test(onNode[i])? 'B': (/^EM/.test(onNode[i])? 'I': onNode[i]));
-                    if(/^FONT$/i.test(nodeName)) {
-                        dom.changeTxt(list.commandMap[nodeName], fontFamily);
-                    }
-                    else {
-                        dom.addClass(list.commandMap[nodeName], "on");
-                    }
-                    map = map.replace(nodeName+"|", "");
-                }
 
                 /** remove */
                 map = map.split("|");
                 for(var i=0; i<map.length - 1; i++) {
                     if(/^FONT$/i.test(map[i])) {
-                        dom.changeTxt(list.commandMap[map[i]], fontFamily);
+                        dom.changeTxt(list.commandMap[map[i]], context.tool.default_fontFamily);
+                    }
+                    else if(/^SIZE$/i.test(map[i])) {
+                        dom.changeTxt(list.commandMap[map[i]], context.tool.default_fontSize);
                     }
                     else {
                         dom.removeClass(list.commandMap[map[i]], "on");
@@ -999,7 +1247,7 @@ SUNEDITOR.defaultLang = {
                     context.argument._imageElement.style.width = command + "%";
                 }
                 else if(/remove/.test(command)){
-                    context.argument._imageElement.remove();
+                    dom.removeItem(context.argument._imageElement);
                 }
 
                 editor.subOff();
@@ -1007,26 +1255,26 @@ SUNEDITOR.defaultLang = {
             };
 
             var onClick_linkBtn = function(e) {
-              var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
 
-              if(!command) return;
+                if(!command) return;
 
-              e.preventDefault();
-              e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
 
-              if(/update/.test(command)) {
-                  context.dialog.linkText.value = context.argument._linkAnchor.href;
-                  context.dialog.linkAnchorText.value = context.argument._linkAnchor.textContent;
-                  context.dialog.linkNewWindowCheck.checked = (/_blank/i.test(context.argument._linkAnchor.target)? true: false);
-                  editor.openDialog('link');
-              }
-              else { /** delete */
-                  context.argument._linkAnchor.remove();
-                  context.argument._linkAnchor = null;
-                  wysiwygSelection.focus();
-              }
+                if(/update/.test(command)) {
+                    context.dialog.linkText.value = context.argument._linkAnchor.href;
+                    context.dialog.linkAnchorText.value = context.argument._linkAnchor.textContent;
+                    context.dialog.linkNewWindowCheck.checked = (/_blank/i.test(context.argument._linkAnchor.target)? true: false);
+                    editor.openDialog('link');
+                }
+                else { /** delete */
+                    dom.removeItem(context.argument._linkAnchor);
+                    context.argument._linkAnchor = null;
+                    wysiwygSelection.focus();
+                }
 
-              context.element.linkBtn.style.display = "none";
+                context.element.linkBtn.style.display = "none";
             };
 
             var onMouseDown_image_ctrl = function(e) {
@@ -1203,7 +1451,7 @@ SUNEDITOR.defaultLang = {
                 return false;
             };
 
-			/** 이벤트 등록 */
+            /** 이벤트 등록 */
             window.onresize = function(){resize_window()};
 
             context.tool.bar.addEventListener('click', onClick_toolbar);
@@ -1300,7 +1548,7 @@ SUNEDITOR.defaultLang = {
             show : user.show,
             hide : user.hide
         }
-	};
+    };
 
     /**
      * create Dom
@@ -1315,95 +1563,125 @@ SUNEDITOR.defaultLang = {
                 /** 글꼴, 포멧 */
                 '<div class="tool_module">'+
                 '    <ul class="editor_tool">';
-                    if(options.showFont) {
-                        html += ''+
-                        '        <li class="compact_editor">'+
-                        '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="sub">'+
-                        '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
-                        '            </button>'+
-                        '            <div class="layer_editor" style="display: none;">'+
-                        '                <div class="inner_layer list_family">'+
-                        '                    <ul class="list_editor sun-editor-list-font-family">'+
-                        '                        <li><button type="button" class="btn_edit default" data-command="fontName" data-value="inherit" data-txt="'+lang.toolbar.fontFamily+'" style="font-family:inherit;">'+lang.toolbar.fontFamilyDelete+'</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Arial" data-txt="Arial" style="font-family:Arial;">Arial</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Comic Sans MS" data-txt="Comic Sans MS" style="font-family:Comic Sans MS;">Comic Sans MS</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Courier New,Courier" data-txt="Courier New" style="font-family:Courier New,Courier;">Courier New</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Georgia" data-txt="Georgia" style="font-family:Georgia;">Georgia</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="tahoma" data-txt="tahoma" style="font-family:tahoma;">Tahoma</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Trebuchet MS,Helvetica" data-txt="Trebuchet MS" style="font-family:Trebuchet MS,Helvetica;">Trebuchet MS</button></li>'+
-                        '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Verdana" data-txt="Verdana" style="font-family:Verdana;">Verdana</button></li>'+
-                        '                    </ul>';
-                        /** 사용자 추가 글꼴 */
-                        if(options.addFont) {
-                            html += '        <ul class="list_editor list_family_add sun-editor-list-font-family-add">';
-                            for (var i = 0; i < options.addFont.length; i++) {
-                                var font = options.addFont[i];
-                                html += '        <li><button type="button" class="btn_edit" data-command="fontName" data-value="'+font.value+'" data-txt="'+font.text+'" style="font-family:'+font.value+'">'+font.text+'</button></li>';
-                            }
-                            html += '        </ul>';
-                        }
+            if(options.showFont) {
+                html += ''+
+                    '        <li class="compact_editor">'+
+                    '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="sub">'+
+                    '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
+                    '            </button>'+
+                    '            <div class="layer_editor" style="display: none;">'+
+                    '                <div class="inner_layer list_family">'+
+                    '                    <ul class="list_editor sun-editor-list-font-family">'+
+                    '                        <li><button type="button" class="btn_edit default" data-command="fontName" data-value="inherit" data-txt="'+lang.toolbar.fontFamily+'" style="font-family:inherit;">'+lang.toolbar.fontFamilyDelete+'</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Arial" data-txt="Arial" style="font-family:Arial;">Arial</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Comic Sans MS" data-txt="Comic Sans MS" style="font-family:Comic Sans MS;">Comic Sans MS</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Courier New,Courier" data-txt="Courier New" style="font-family:Courier New,Courier;">Courier New</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Georgia" data-txt="Georgia" style="font-family:Georgia;">Georgia</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="tahoma" data-txt="tahoma" style="font-family:tahoma;">Tahoma</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Trebuchet MS,Helvetica" data-txt="Trebuchet MS" style="font-family:Trebuchet MS,Helvetica;">Trebuchet MS</button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontName" data-value="Verdana" data-txt="Verdana" style="font-family:Verdana;">Verdana</button></li>'+
+                    '                    </ul>';
+                /** 사용자 추가 글꼴 */
+                if(options.addFont) {
+                    html += '        <ul class="list_editor list_family_add sun-editor-list-font-family-add">';
+                    for (var i = 0; i < options.addFont.length; i++) {
+                        var font = options.addFont[i];
+                        html += '        <li><button type="button" class="btn_edit" data-command="fontName" data-value="'+font.value+'" data-txt="'+font.text+'" style="font-family:'+font.value+'">'+font.text+'</button></li>';
+                    }
+                    html += '        </ul>';
+                }
 
-                        html += '        </div>'+
-                        '            </div>'+
-                        '        </li>';
-                    }
-                    if(options.showFormats) {
-                        html += ''+
-                        '        <li class="compact_editor">'+
-                        '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.formats+'" data-display="sub">'+
-                        '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
-                        '            </button>'+
-                        '            <div class="layer_editor layer_size">'+
-                        '                <div class="inner_layer">'+
-                        '                    <ul class="list_editor format_list">'+
-                        '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="format" data-value="h3"><h3>Header 3</h3></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="format" data-value="h4"><h4>Header 4</h4></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="format" data-value="h5"><h5>Header 5</h5></button></li>'+
-                        '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="format" data-value="h6"><h6>Header 6</h6></button></li>'+
-                        '                    </ul>'+
-                        '                </div>'+
-                        '            </div>'+
-                        '        </li>' ;
-                    }
-                html += '</ul>'+
-                    '</div>'+
+                html += '        </div>'+
+                    '            </div>'+
+                    '        </li>';
+            }
+            if(options.showFormats) {
+                html += ''+
+                    '        <li class="compact_editor">'+
+                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.formats+'" data-display="sub">'+
+                    '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
+                    '            </button>'+
+                    '            <div class="layer_editor layer_size">'+
+                    '                <div class="inner_layer">'+
+                    '                    <ul class="list_editor format_list">'+
+                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="format" data-value="h3"><h3>Header 3</h3></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="format" data-value="h4"><h4>Header 4</h4></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="format" data-value="h5"><h5>Header 5</h5></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="format" data-value="h6"><h6>Header 6</h6></button></li>'+
+                    '                    </ul>'+
+                    '                </div>'+
+                    '            </div>'+
+                    '        </li>' ;
+            }
+            if(options.showFontSize) {
+                html += ''+
+                    '        <li class="compact_editor">'+
+                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="sub">'+
+                    '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
+                    '            </button>'+
+                    '            <div class="layer_editor layer_size">'+
+                    '                <div class="inner_layer">'+
+                    '                    <ul class="list_editor font_size_list">'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="8"><span style="font-size:8pt;">8</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="9"><span style="font-size:9pt;">9</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="10"><span style="font-size:10pt;">10</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="11"><span style="font-size:11pt;">11</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="12"><span style="font-size:12pt;">12</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="14"><span style="font-size:14pt;">14</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="16"><span style="font-size:16pt;">16</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="18"><span style="font-size:18pt;">18</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="20"><span style="font-size:20pt;">20</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="22"><span style="font-size:22pt;">22</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="24"><span style="font-size:24pt;">24</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="26"><span style="font-size:26pt;">26</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="28"><span style="font-size:28pt;">28</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="36"><span style="font-size:36pt;">36</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="48"><span style="font-size:48pt;">48</span></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="72"><span style="font-size:72pt;">72</span></button></li>'+
+                    '                    </ul>'+
+                    '                </div>'+
+                    '            </div>'+
+                    '        </li>' ;
+            }
+            html += '</ul>'+
+                '</div>'+
                 /** 굵게, 밑줄 등 */
                 '<div class="tool_module">'+
                 '   <ul class="editor_tool">';
-                if(options.showBold) {
-                    html += ''+
+            if(options.showBold) {
+                html += ''+
                     '       <li class="compact_editor">'+
                     '           <button type="button" class="btn_editor sun-editor-id-bold" title="'+lang.toolbar.bold+' (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>'+
                     '       </li>';
-                }
-                if(options.showUnderline) {
-                    html += ''+
+            }
+            if(options.showUnderline) {
+                html += ''+
                     '       <li class="compact_editor">'+
                     '           <button type="button" class="btn_editor sun-editor-id-underline" title="'+lang.toolbar.underline+' (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>'+
                     '       </li>';
-                }
-                if(options.showItalic) {
-                    html += ''+
+            }
+            if(options.showItalic) {
+                html += ''+
                     '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-italic" title="'+lang.toolbar.italic+' (Ctrl+I)" data-command="italic"><div class="ico_italic"></div></button>'+
                     '       </li>';
-                }
-                if(options.showStrike) {
-                    html += ''+
+            }
+            if(options.showStrike) {
+                html += ''+
                     '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-strike" title="'+lang.toolbar.strike+' (Ctrl+SHIFT+S)" data-command="strikethrough"><div class="ico_strike"></div></button>'+
                     '       </li>';
-                }
+            }
             html +='</ul>'+
                 '</div>'+
                 /** 색상 선택 */
                 '<div class="tool_module">'+
                 '    <ul class="editor_tool">';
-                if(options.showFontColor) {
-                    html += ''+
+            if(options.showFontColor) {
+                html += ''+
                     '        <li class="compact_editor">'+
                     '            <div class="box_color" data-display="sub">'+
                     '                <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
@@ -1476,9 +1754,9 @@ SUNEDITOR.defaultLang = {
                     '                </div>'+
                     '            </div>'+
                     '        </li>';
-                }
-                if(options.showHiliteColor) {
-                    html += ''+
+            }
+            if(options.showHiliteColor) {
+                html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.hiliteColor+'</strong>'+
                     '            <button type="button" class="btn_editor btn_fbgcolor" title="'+lang.toolbar.hiliteColor+'" data-display="sub">'+
@@ -1509,32 +1787,32 @@ SUNEDITOR.defaultLang = {
                     '                </div>'+
                     '            </div>'+
                     '        </li>';
-                }
+            }
             html +='</ul>'+
                 '</div>';
-                /** 들여쓰기, 내어쓰기 */
+            /** 들여쓰기, 내어쓰기 */
             if(options.showInOutDent) {
                 html += ''+
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">'+
-                '        <li>'+
-                '            <button type="button" class="btn_editor" title="'+lang.toolbar.indent+'" data-command="indent">'+
-                '                <div class="img_editor ico_indnet"></div>'+
-                '            </button>'+
-                '        </li>'+
-                '        <li>'+
-                '            <button type="button" class="btn_editor" title="'+lang.toolbar.outdent+'" data-command="outdent">'+
-                '                <div class="img_editor ico_outdent"></div>'+
-                '            </button>'+
-                '        </li>'+
-                '    </ul>'+
-                '</div>';
+                    '<div class="tool_module">'+
+                    '    <ul class="editor_tool">'+
+                    '        <li>'+
+                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.indent+'" data-command="indent">'+
+                    '                <div class="img_editor ico_indnet"></div>'+
+                    '            </button>'+
+                    '        </li>'+
+                    '        <li>'+
+                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.outdent+'" data-command="outdent">'+
+                    '                <div class="img_editor ico_outdent"></div>'+
+                    '            </button>'+
+                    '        </li>'+
+                    '    </ul>'+
+                    '</div>';
             }
-                /** 정렬, 구분선 상자 */
+            /** 정렬, 구분선 상자 */
             html += '<div class="tool_module">'+
                 '    <ul class="editor_tool">';
-                if(options.showAlign) {
-                    html += ''+
+            if(options.showAlign) {
+                html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.align+'</strong>'+
                     '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-display="sub">'+
@@ -1551,9 +1829,9 @@ SUNEDITOR.defaultLang = {
                     '                </div>'+
                     '            </div>'+
                     '        </li>';
-                }
-                if(options.showList) {
-                    html += ''+
+            }
+            if(options.showList) {
+                html += ''+
                     '        <li>'+
                     '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-display="sub">'+
                     '                <div class="img_editor ico_list ico_list_num"></div>'+
@@ -1567,9 +1845,9 @@ SUNEDITOR.defaultLang = {
                     '                </div>'+
                     '            </div>'+
                     '        </li>';
-                }
-                if(options.showLine) {
-                    html += ''+
+            }
+            if(options.showLine) {
+                html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
                     '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="sub">'+
@@ -1598,7 +1876,7 @@ SUNEDITOR.defaultLang = {
                     '                </div>'+
                     '            </div>'+
                     '        </li>';
-                }
+            }
             html +='</ul>'+
                 '</div>'+
                 /** 테이블, 링크, 사진 */
@@ -1678,80 +1956,80 @@ SUNEDITOR.defaultLang = {
                 '<div class="modal-dialog-background sun-editor-id-dialog-back" style="display: none;"></div>'+
                 /** 다이얼로그 */
                 '<div class="modal-dialog sun-editor-id-dialog-modal" style="display: none;">';
-                /** 링크 삽입 다이얼로그 */
-                html += ''+
-                    '    <div class="modal-content sun-editor-id-dialog-link" style="display: none;">'+
-                    '        <form class="editor_link">'+
-                    '            <div class="modal-header">'+
-                    '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                    '                    <span aria-hidden="true" data-command="close">×</span>'+
-                    '                </button>'+
-                    '                <h5 class="modal-title">'+lang.dialogBox.linkBox.title+'</h5>'+
-                    '            </div>'+
-                    '            <div class="modal-body">'+
-                    '                <div class="form-group">'+
-                    '                    <label>'+lang.dialogBox.linkBox.url+'</label>'+
-                    '                    <input class="form-control sun-editor-id-linkurl" type="text">'+
-                    '                </div>'+
-                    '                <div class="form-group">'+
-                    '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text">'+
-                    '                </div>'+
-                    '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
-                    '            </div>'+
-                    '            <div class="modal-footer">'+
-                    '                <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                    '            </div>'+
-                    '        </form>'+
-                    '    </div>';
-                /** 이미지 삽입 다이얼로그 */
-                html += ''+
-                    '    <div class="modal-content sun-editor-id-dialog-image" style="display: none;">'+
-                    '        <form class="editor_image" method="post" enctype="multipart/form-data">'+
-                    '            <div class="modal-header">'+
-                    '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                    '                    <span aria-hidden="true" data-command="close">×</span>'+
-                    '                </button>'+
-                    '                <h5 class="modal-title">'+lang.dialogBox.imageBox.title+'</h5>'+
-                    '            </div>'+
-                    '            <div class="modal-body">'+
-                    '                <div class="form-group">'+
-                    '                    <label>'+lang.dialogBox.imageBox.file+'</label>'+
-                    '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple">'+
-                    '                </div>'+
-                    '                <div class="form-group">'+
-                    '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text">'+
-                    '                </div>'+
-                    '            </div>'+
-                    '            <div class="modal-footer">'+
-                    '                <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                    '            </div>'+
-                    '        </form>'+
-                    '    </div>';
-                /** 동영상 삽입 다이얼로그 */
-                html += ''+
-                    '    <div class="modal-content sun-editor-id-dialog-video" style="display: none;">'+
-                    '        <form class="editor_video">'+
-                    '            <div class="modal-header">'+
-                    '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                    '                    <span aria-hidden="true" data-command="close">×</span>'+
-                    '                </button>'+
-                    '                <h5 class="modal-title">'+lang.dialogBox.videoBox.title+'</h5>'+
-                    '            </div>'+
-                    '            <div class="modal-body">'+
-                    '                <div class="form-group">'+
-                    '                    <label>'+lang.dialogBox.videoBox.url+'</label>'+
-                    '                    <input class="form-control sun-editor-id-video-url" type="text">'+
-                    '                </div>'+
-                    '                <div class="form-group form-size">'+
-                    '                    <div class="size-text"><label class="size-w">'+lang.dialogBox.videoBox.width+'</label><label class="size-x"> </label><label class="size-h">'+lang.dialogBox.videoBox.height+'</label></div>'+
-                    '                    <input type="text" class="form-size-control sun-editor-id-video-x"><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y">'+
-                    '                </div>'+
-                    '            </div>'+
-                    '            <div class="modal-footer">'+
-                    '                <button type="submit" class="btn btn-primary sun-editor-id-submit-video"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                    '            </div>'+
-                    '        </form>'+
-                    '    </div>';
+            /** 링크 삽입 다이얼로그 */
+            html += ''+
+                '    <div class="modal-content sun-editor-id-dialog-link" style="display: none;">'+
+                '        <form class="editor_link">'+
+                '            <div class="modal-header">'+
+                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
+                '                    <span aria-hidden="true" data-command="close">×</span>'+
+                '                </button>'+
+                '                <h5 class="modal-title">'+lang.dialogBox.linkBox.title+'</h5>'+
+                '            </div>'+
+                '            <div class="modal-body">'+
+                '                <div class="form-group">'+
+                '                    <label>'+lang.dialogBox.linkBox.url+'</label>'+
+                '                    <input class="form-control sun-editor-id-linkurl" type="text">'+
+                '                </div>'+
+                '                <div class="form-group">'+
+                '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text">'+
+                '                </div>'+
+                '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
+                '            </div>'+
+                '            <div class="modal-footer">'+
+                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>'+lang.dialogBox.submitButton+'</span></button>'+
+                '            </div>'+
+                '        </form>'+
+                '    </div>';
+            /** 이미지 삽입 다이얼로그 */
+            html += ''+
+                '    <div class="modal-content sun-editor-id-dialog-image" style="display: none;">'+
+                '        <form class="editor_image" method="post" enctype="multipart/form-data">'+
+                '            <div class="modal-header">'+
+                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
+                '                    <span aria-hidden="true" data-command="close">×</span>'+
+                '                </button>'+
+                '                <h5 class="modal-title">'+lang.dialogBox.imageBox.title+'</h5>'+
+                '            </div>'+
+                '            <div class="modal-body">'+
+                '                <div class="form-group">'+
+                '                    <label>'+lang.dialogBox.imageBox.file+'</label>'+
+                '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple">'+
+                '                </div>'+
+                '                <div class="form-group">'+
+                '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text">'+
+                '                </div>'+
+                '            </div>'+
+                '            <div class="modal-footer">'+
+                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>'+lang.dialogBox.submitButton+'</span></button>'+
+                '            </div>'+
+                '        </form>'+
+                '    </div>';
+            /** 동영상 삽입 다이얼로그 */
+            html += ''+
+                '    <div class="modal-content sun-editor-id-dialog-video" style="display: none;">'+
+                '        <form class="editor_video">'+
+                '            <div class="modal-header">'+
+                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
+                '                    <span aria-hidden="true" data-command="close">×</span>'+
+                '                </button>'+
+                '                <h5 class="modal-title">'+lang.dialogBox.videoBox.title+'</h5>'+
+                '            </div>'+
+                '            <div class="modal-body">'+
+                '                <div class="form-group">'+
+                '                    <label>'+lang.dialogBox.videoBox.url+'</label>'+
+                '                    <input class="form-control sun-editor-id-video-url" type="text">'+
+                '                </div>'+
+                '                <div class="form-group form-size">'+
+                '                    <div class="size-text"><label class="size-w">'+lang.dialogBox.videoBox.width+'</label><label class="size-x"> </label><label class="size-h">'+lang.dialogBox.videoBox.height+'</label></div>'+
+                '                    <input type="text" class="form-size-control sun-editor-id-video-x"><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y">'+
+                '                </div>'+
+                '            </div>'+
+                '            <div class="modal-footer">'+
+                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-video"><span>'+lang.dialogBox.submitButton+'</span></button>'+
+                '            </div>'+
+                '        </form>'+
+                '    </div>';
             html +='</div>';
 
             return html;
@@ -1780,14 +2058,14 @@ SUNEDITOR.defaultLang = {
         };
 
         var linkBtn = function() {
-          return ''+
-              '<div class="arrow"></div>'+
-              '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
-              '   <div class="btn-group">'+
-              '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
-              '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
-              '   </div>'+
-              '</div>';
+            return ''+
+                '<div class="arrow"></div>'+
+                '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
+                '   <div class="btn-group">'+
+                '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
+                '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
+                '   </div>'+
+                '</div>';
         };
 
         return {
@@ -1800,7 +2078,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-	 * document create
+     * document create
      * @param element
      * @param options
      * @returns {{constructed: Element, options: *}}
@@ -1821,6 +2099,7 @@ SUNEDITOR.defaultLang = {
         /** 툴바 버튼 보이기 설정 */
         options.showFont = options.showFont !== undefined? options.showFont: true;
         options.showFormats = options.showFormats !== undefined? options.showFormats: true;
+        options.showFontSize = options.showFontSize !== undefined? options.showFontSize: true;
         options.showBold = options.showBold !== undefined? options.showBold: true;
         options.showUnderline = options.showUnderline !== undefined? options.showUnderline: true;
         options.showItalic = options.showItalic !== undefined? options.showItalic: true;
@@ -1847,12 +2126,12 @@ SUNEDITOR.defaultLang = {
         var relative = document.createElement("DIV");
         relative.className = "sun-editor-container";
 
-		/** 툴바 */
+        /** 툴바 */
         var tool_bar = document.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
         tool_bar.innerHTML = createEditor(options).toolBar();
 
-		/** 에디터 */
+        /** 에디터 */
         var editor_div = document.createElement("DIV");
         editor_div.className = "sun-editor-id-editorArea";
         editor_div.style.height = options.height;
@@ -1867,11 +2146,11 @@ SUNEDITOR.defaultLang = {
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
 
-		/** 리사이즈바 */
+        /** 리사이즈바 */
         var resize_bar = document.createElement("DIV");
         resize_bar.className = "sun-editor-id-resizeBar";
 
-		/** 다이얼로그 */
+        /** 다이얼로그 */
         var dialog_div = document.createElement("DIV");
         dialog_div.className = "sun-editor-id-dialogBox";
         dialog_div.innerHTML = createEditor(options).dialogBox();
@@ -1903,7 +2182,7 @@ SUNEDITOR.defaultLang = {
         dialog_div.getElementsByClassName('sun-editor-id-video-x')[0].value = options.videoX;
         dialog_div.getElementsByClassName('sun-editor-id-video-y')[0].value = options.videoY;
 
-		/** append */
+        /** append */
         editor_div.appendChild(iframe);
         editor_div.appendChild(textarea);
         relative.appendChild(tool_bar);
@@ -1918,24 +2197,24 @@ SUNEDITOR.defaultLang = {
         top_div.appendChild(relative);
 
         return {
-        	constructed : {
+            constructed : {
                 _top : top_div,
-				_toolBar : tool_bar,
-				_editorArea : editor_div,
-				_resizeBar : resize_bar,
-				_dialog : dialog_div,
+                _toolBar : tool_bar,
+                _editorArea : editor_div,
+                _resizeBar : resize_bar,
+                _dialog : dialog_div,
                 _loding : loding_box,
                 _resizeImg : resize_img,
                 _resizeImgBtn : resize_img_button,
                 _resizeBack : resize_back,
                 _linkBtn : link_button
-			},
-			options : options
+            },
+            options : options
         };
     };
 
     /**
-	 * option and module define
+     * option and module define
      * @param cons
      * @param options
      * @returns {...}
@@ -1961,7 +2240,7 @@ SUNEDITOR.defaultLang = {
                 '<meta charset=\"utf-8\">' +
                 '<style type=\"text/css\">' +
                 '   body {font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
-                '   table {table-layout:fixed; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0px; border-collapse:collapse;}'+
+                '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0px; border-collapse:collapse;}'+
                 '   table tr {border:1px solid #ccc;}'+
                 '   table tr td {border:1px solid #ccc; padding:8px;}'+
                 '</style>';
@@ -1994,8 +2273,8 @@ SUNEDITOR.defaultLang = {
                 _innerHeight : options._innerHeight,
                 _windowHeight : window.innerHeight,
                 _linkAnchor : null
-			},
-			element : {
+            },
+            element : {
                 textElement: element,
                 topArea: cons._top,
                 resizebar: cons._resizeBar,
@@ -2011,47 +2290,49 @@ SUNEDITOR.defaultLang = {
                 resizeBackground : cons._resizeBack,
                 linkBtn : cons._linkBtn
             },
-			tool : {
-				bar : cons._toolBar,
-				barHeight : cons._toolBar.offsetHeight,
-				cover : cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
-				bold : cons._toolBar.getElementsByClassName('sun-editor-id-bold')[0],
-				underline : cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
-				italic : cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
-				strike : cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
-				tablePicker : cons._toolBar.getElementsByClassName('sun-editor-id-table-picker')[0],
-				tableHighlight : cons._toolBar.getElementsByClassName('sun-editor-id-table-highlighted')[0],
-				tableUnHighlight : cons._toolBar.getElementsByClassName('sun-editor-id-table-unhighlighted')[0],
-				tableDisplay : cons._toolBar.getElementsByClassName('sun-editor-table-display')[0],
-				fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
-				default_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0].textContent,
-				list_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-list-font-family')[0],
-				list_fontFamily_add : cons._toolBar.getElementsByClassName('sun-editor-list-font-family-add')[0]
-			},
-			dialog : {
+            tool : {
+                bar : cons._toolBar,
+                barHeight : cons._toolBar.offsetHeight,
+                cover : cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
+                bold : cons._toolBar.getElementsByClassName('sun-editor-id-bold')[0],
+                underline : cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
+                italic : cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
+                strike : cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
+                tablePicker : cons._toolBar.getElementsByClassName('sun-editor-id-table-picker')[0],
+                tableHighlight : cons._toolBar.getElementsByClassName('sun-editor-id-table-highlighted')[0],
+                tableUnHighlight : cons._toolBar.getElementsByClassName('sun-editor-id-table-unhighlighted')[0],
+                tableDisplay : cons._toolBar.getElementsByClassName('sun-editor-table-display')[0],
+                fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
+                default_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0].textContent,
+                list_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-list-font-family')[0],
+                list_fontFamily_add : cons._toolBar.getElementsByClassName('sun-editor-list-font-family-add')[0],
+                fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0],
+                default_fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0].textContent
+            },
+            dialog : {
                 modalArea : cons._dialog,
                 back : cons._dialog.getElementsByClassName('sun-editor-id-dialog-back')[0],
                 modal : cons._dialog.getElementsByClassName('sun-editor-id-dialog-modal')[0],
                 forms : cons._dialog.getElementsByTagName('FORM'),
-				link : cons._dialog.getElementsByClassName('sun-editor-id-dialog-link')[0],
-				linkText : cons._dialog.getElementsByClassName('sun-editor-id-linkurl')[0],
-				linkAnchorText : cons._dialog.getElementsByClassName('sun-editor-id-linktext')[0],
+                link : cons._dialog.getElementsByClassName('sun-editor-id-dialog-link')[0],
+                linkText : cons._dialog.getElementsByClassName('sun-editor-id-linkurl')[0],
+                linkAnchorText : cons._dialog.getElementsByClassName('sun-editor-id-linktext')[0],
                 linkNewWindowCheck : cons._dialog.getElementsByClassName('sun-editor-id-linkCheck')[0],
-				image : cons._dialog.getElementsByClassName('sun-editor-id-dialog-image')[0],
-				imgInputFile : cons._dialog.getElementsByClassName('sun-editor-id-image-file')[0],
-				imgInputUrl : cons._dialog.getElementsByClassName('sun-editor-id-image-url')[0],
-				video : cons._dialog.getElementsByClassName('sun-editor-id-dialog-video')[0],
-				videoInputUrl : cons._dialog.getElementsByClassName('sun-editor-id-video-url')[0],
-				video_x : cons._dialog.getElementsByClassName('sun-editor-id-video-x')[0],
-				video_y : cons._dialog.getElementsByClassName('sun-editor-id-video-y')[0]
-			},
-			user : {
+                image : cons._dialog.getElementsByClassName('sun-editor-id-dialog-image')[0],
+                imgInputFile : cons._dialog.getElementsByClassName('sun-editor-id-image-file')[0],
+                imgInputUrl : cons._dialog.getElementsByClassName('sun-editor-id-image-url')[0],
+                video : cons._dialog.getElementsByClassName('sun-editor-id-dialog-video')[0],
+                videoInputUrl : cons._dialog.getElementsByClassName('sun-editor-id-video-url')[0],
+                video_x : cons._dialog.getElementsByClassName('sun-editor-id-video-x')[0],
+                video_y : cons._dialog.getElementsByClassName('sun-editor-id-video-y')[0]
+            },
+            user : {
                 videoX : options.videoX,
                 videoY : options.videoY,
                 imageSize : options.imageSize,
                 imageUploadUrl : options.imageUploadUrl
             }
-		}
+        }
     };
 
     /**
