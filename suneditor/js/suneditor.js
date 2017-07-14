@@ -1355,7 +1355,7 @@ SUNEDITOR.defaultLang = {
                         '            </button>'+
                         '            <div class="layer_editor layer_size">'+
                         '                <div class="inner_layer">'+
-                        '                    <ul class="list_editor font_size_list">'+
+                        '                    <ul class="list_editor format_list">'+
                         '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
                         '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>'+
                         '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>'+
