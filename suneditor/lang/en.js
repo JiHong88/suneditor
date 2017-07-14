@@ -5,6 +5,7 @@ SUNEDITOR.lang = {
         fontFamily : 'Font',
         fontFamilyDelete : 'Remove Font Family',
         formats : 'Formats',
+        fontSize : 'Size',
         bold : 'Bold',
         underline : 'Underline',
         italic : 'Italic',

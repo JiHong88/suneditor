@@ -4,7 +4,8 @@ SUNEDITOR.lang = {
     toolbar : {
         fontFamily : '글꼴',
         fontFamilyDelete : '글꼴 제거',
-        formats : '크기',
+        formats : '포맷',
+        fontSize : '크기',
         bold : '굵게',
         underline : '밑줄',
         italic : '기울임',

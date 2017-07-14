@@ -28,18 +28,20 @@
 .sun-editor .sun-editor-id-toolbar .editor_tool {float: left;height: 32px;margin:5px 0 5px 5px;}
 .sun-editor .sun-editor-id-toolbar .editor_tool li {position:relative; float:left;}
 
-.sun-editor .sun-editor-id-toolbar .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:280px; overflow-y:auto; overflow-x:hidden; z-index:1; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .sun-editor-id-toolbar .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:220px; overflow-y:auto; overflow-x:hidden; z-index:1; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .write_place .inp_txt {float:left; width:100%; height:23px; margin-top:0; font-size:12px; text-indent:6px; border:0 none; outline:0 none;}
 .sun-editor .sun-editor-id-toolbar .layer_editor button {margin:0 !important; overflow: hidden; width:100%;}
 .sun-editor .sun-editor-id-toolbar .layer_editor button:hover, .sun-editor .editor_tool .layer_editor button:focus {background-color:#f4b124; border-color:#ffebc1; outline:0 none;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .list_family {left:0; width:156px;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .list_family .default {border-bottom:1px solid #CCC;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .list_family_add {left:0; width:160px; border-top:1px solid #CCC;}
-.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list {left:0; width:180px;}
-.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list .btn_edit {height:auto; margin:0 0 7px 0 !important; padding:2px 10px 5px; line-height:100%;}
-.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list .txt_size18 {padding:1px 10px 6px}
-.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list .txt_size24 {padding:3px 10px 11px; line-height:24px;}
-.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list .txt_size36 {padding:4px 10px 15px; line-height:36px;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .format_list {left:0; width:140px;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .format_list .btn_edit {height:auto; margin:0 0 7px 0 !important; padding:2px 10px 5px; line-height:100%;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .format_list .txt_size18 {padding:1px 10px 6px}
+.sun-editor .sun-editor-id-toolbar .layer_editor .format_list .txt_size24 {padding:3px 10px 11px; line-height:24px;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .format_list .txt_size36 {padding:4px 10px 15px; line-height:36px;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list {left:0; width:140px;}
+.sun-editor .sun-editor-id-toolbar .layer_editor .font_size_list .btn_edit {height:auto; margin:0 0 7px 0 !important; padding:2px 10px 5px; line-height:normal !important;}
 .sun-editor .sun-editor-id-toolbar .layer_editor.layer_list {left:0; width:42px;}
 .sun-editor .sun-editor-id-toolbar .layer_editor.layer_line {left:0; width:158px;}
 .sun-editor .sun-editor-id-toolbar .layer_editor.write_place {overflow:hidden; float:left; position:relative; height:25px; border:1px solid #dadada;}
@@ -63,6 +65,7 @@
 .sun-editor .sun-editor-id-toolbar .list_editor {overflow:hidden; width:100%; padding:6px 0;}
 .sun-editor .sun-editor-id-toolbar .list_editor li:first-child {padding-top:0;}
 .sun-editor .sun-editor-id-toolbar .list_editor li {padding-top:5px; width:100%;}
+.sun-editor .sun-editor-id-toolbar .format_list li {padding:0px; width:100%;}
 .sun-editor .sun-editor-id-toolbar .font_size_list li {padding:0px; width:100%;}
 
 .sun-editor .sun-editor-id-toolbar .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:1px solid #ccc; margin-left:2px; border-radius:2px; font-size:12px; line-height:27px; background-color:#FFF;}
