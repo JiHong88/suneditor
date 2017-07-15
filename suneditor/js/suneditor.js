@@ -750,15 +750,15 @@ SUNEDITOR.defaultLang = {
             };
 
             var touchstart_toolbar = function() {
-                context.argument._isTouchMove = true;
-            };
-
-            var touchmove_toolbar = function() {
                 context.argument._isTouchMove = false;
             };
 
+            var touchmove_toolbar = function() {
+                context.argument._isTouchMove = true;
+            };
+
             var onClick_toolbar = function(e) {
-                if(!context.argument._isTouchMove) return true;
+                if(context.argument._isTouchMove) return true;
 
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
