@@ -749,33 +749,16 @@ SUNEDITOR.defaultLang = {
                 context.argument._windowHeight = this.innerHeight;
             };
 
-            var touchstart_toolbar = function(e) {
+            var touchstart_toolbar = function() {
                 context.argument._isTouchMove = true;
-
-                var targetElement = e.target;
-                var display = targetElement.getAttribute("data-display");
-                var command = targetElement.getAttribute("data-command");
-                var className = targetElement.className;
-
-                while(!command && !display && !/layer_color|layer_url|editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
-                    targetElement = targetElement.parentNode;
-                    command = targetElement.getAttribute("data-command");
-                    display = targetElement.getAttribute("data-display");
-                    className = targetElement.className;
-                }
-
-                if(command || display) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
             };
 
-            var touchmove_toolbar = function(e) {
+            var touchmove_toolbar = function() {
                 context.argument._isTouchMove = false;
             };
 
             var onClick_toolbar = function(e) {
-                if(context.argument._isTouchMove) return true;
+                if(!context.argument._isTouchMove) return true;
 
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
