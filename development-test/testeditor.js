@@ -289,13 +289,7 @@ SUNEDITOR.defaultLang = {
                         nativeRng.setEnd(selection.focusNode, selection.focusOffset);
                     }
 
-                    return {
-                        startCon : nativeRng.startContainer,
-                        startOff : nativeRng.startOffset,
-                        endCon : nativeRng.endContainer,
-                        endOff : nativeRng.endOffset,
-                        commonCon : nativeRng.commonAncestorContainer
-                    }
+                    return nativeRng;
                 },
 
                 setRange : function(startCon, startOff, endCon, endOff) {
@@ -495,34 +489,35 @@ SUNEDITOR.defaultLang = {
                     var selection = wysiwygSelection.getSelection();
                     var nativeRng = wysiwygSelection.getRange();
 
-                    var startCon = nativeRng.startCon;
-                    var startOff = nativeRng.startOff;
-                    var endCon = nativeRng.endCon;
-                    var endOff = nativeRng.endOff;
+                    var startCon = nativeRng.startContainer;
+                    var startOff = nativeRng.startOffset;
+                    var endCon = nativeRng.endContainer;
+                    var endOff = nativeRng.endOffset;
 
-                    var pNode = startCon;
+                    var parentNode = startCon;
                     if(/^#text$/i.test(startCon.nodeName)) {
-                        pNode = startCon.parentNode;
+                        parentNode = startCon.parentNode;
                     }
 
                     /** 범위선택 없을때 */
                     if(startCon === endCon && startOff === endOff) {
                         if(selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
                             var rightNode = selection.focusNode.splitText(endOff);
-                            pNode.insertBefore(oNode, rightNode);
+                            parentNode.insertBefore(oNode, rightNode);
                         }
                         else {
-                            if(/^BR$/i.test(pNode.lastChild.nodeName)) {
-                                pNode.removeChild(pNode.lastChild);
+                            if(/^BR$/i.test(parentNode.lastChild.nodeName)) {
+                                parentNode.removeChild(parentNode.lastChild);
                             }
-                            pNode.appendChild(oNode);
+                            parentNode.appendChild(oNode);
                         }
                     }
                     /** 범위선택 했을때 */
                     else {
-                        var removeNode = startCon;
                         var rightNode = null;
+                        var removeNode = startCon;
                         var isSameContainer = startCon === endCon;
+                        var endLen = endCon.data.length;
 
                         if(isSameContainer) {
                             if(!wysiwygSelection.isEdgePoint(endCon, endOff)) {
@@ -533,24 +528,24 @@ SUNEDITOR.defaultLang = {
                                 removeNode = startCon.splitText(startOff);
                             }
 
-                            pNode.removeChild(removeNode);
+                            parentNode.removeChild(removeNode);
                         }
                         else {
-                            var nodes = [];
-                            var container = startCon;
-                            while(container.nodeType == 3 && !(endCon == container)) {
-                                nodes.push(container);
-                                container = container.nextSibling;
+                            try {
+                                selection.deleteFromDocument();
+                            } catch(e) {
+
                             }
 
-                            nodes.push(container);
-
-                            for(var i=0; i<nodes.length; i++) {
-                                pNode.removeChild(nodes[i]);
-                            }
+                            if(endLen === endCon.data.length) rightNode = endCon.nextSibling;
+                            else rightNode = endCon;
                         }
 
-                        pNode.insertBefore(oNode, rightNode);
+                        try {
+                            parentNode.insertBefore(oNode, rightNode);
+                        } catch(e) {
+                            parentNode.appendChild(oNode);
+                        }
                     }
                 },
 
@@ -558,11 +553,11 @@ SUNEDITOR.defaultLang = {
                     fontsize = fontsize + editor.fontSizeUnit;
                     var nativeRng = wysiwygSelection.getRange();
 
-                    var startCon = nativeRng.startCon;
-                    var startOff = nativeRng.startOff;
-                    var endCon = nativeRng.endCon;
-                    var endOff = nativeRng.endOff;
-                    var commonCon = nativeRng.commonCon;
+                    var startCon = nativeRng.startContainer;
+                    var startOff = nativeRng.startOffset;
+                    var endCon = nativeRng.endContainer;
+                    var endOff = nativeRng.endOffset;
+                    var commonCon = nativeRng.commonAncestorContainer;
 
                     /** 같은 노드안에서 선택 */
                     if(startCon === endCon) {
@@ -650,7 +645,7 @@ SUNEDITOR.defaultLang = {
                                 if(startCon.nodeType === ELEMENT_NODE) {
                                     beforeNode = document.createTextNode(startCon.textContent);
                                     spanNode.innerHTML = startCon.innerHTML;
-                                } else if(startCon.nodeType === TEXT_NODE) {
+                                } else {
                                     beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                                     spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
                                 }
@@ -684,7 +679,7 @@ SUNEDITOR.defaultLang = {
                                 if(endCon.nodeType === ELEMENT_NODE) {
                                     afterNode = document.createTextNode(endCon.textContent);
                                     spanNode.innerHTML = endCon.innerHTML;
-                                } else if(endCon.nodeType === TEXT_NODE) {
+                                } else {
                                     afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
                                     spanNode.innerText = endCon.substringData(0, endOff);
                                 }
@@ -726,7 +721,7 @@ SUNEDITOR.defaultLang = {
 
                             if(item.nodeType === ELEMENT_NODE) {
                                 spanNode.innerHTML = item.innerHTML;
-                            } else if(item.nodeType === TEXT_NODE) {
+                            } else {
                                 spanNode.innerText = item.data;
                             }
 
@@ -755,6 +750,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var touchstart_toolbar = function(e) {
+                context.argument._isTouchMove = true;
+
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
                 var command = targetElement.getAttribute("data-command");
@@ -773,7 +770,13 @@ SUNEDITOR.defaultLang = {
                 }
             };
 
+            var touchmove_toolbar = function(e) {
+                context.argument._isTouchMove = false;
+            };
+
             var onClick_toolbar = function(e) {
+                if(context.argument._isTouchMove) return true;
+
                 var targetElement = e.target;
                 var display = targetElement.getAttribute("data-display");
                 var command = targetElement.getAttribute("data-command");
@@ -1456,6 +1459,7 @@ SUNEDITOR.defaultLang = {
 
             context.tool.bar.addEventListener('click', onClick_toolbar);
             context.tool.bar.addEventListener('touchstart', touchstart_toolbar);
+            context.tool.bar.addEventListener('touchmove', touchmove_toolbar);
             context.tool.bar.addEventListener('touchend', onClick_toolbar);
 
             context.dialog.modal.addEventListener('click', onClick_dialog);
@@ -2272,7 +2276,8 @@ SUNEDITOR.defaultLang = {
                 _originCssText : options._originCssText,
                 _innerHeight : options._innerHeight,
                 _windowHeight : window.innerHeight,
-                _linkAnchor : null
+                _linkAnchor : null,
+                _isTouchMove : false
             },
             element : {
                 textElement: element,
