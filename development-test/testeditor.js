@@ -90,7 +90,7 @@ SUNEDITOR.defaultLang = {
 
     /**
      * document func
-     * @type {{getArrayIndex, nextIdx, prevIdx, isCell, getListChildren, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass}}
+     * @type {{getArrayIndex, nextIdx, prevIdx, isCell, getListChildren, getListChildNodes, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass, removeItem}}
      */
     var dom = (function(){
         return {
@@ -129,11 +129,11 @@ SUNEDITOR.defaultLang = {
                 var children = [];
                 validation = validation || func.returnTrue;
 
-                (function recursionFunc(current){
+                (function recursionFunc(current) {
                     if (element !== current && validation(current)) {
                         children.push(current);
                     }
-                    for (var i = 0, len = current.children.length; i < len; i++) {
+                    for(var i=0, len=current.children.length; i<len; i++) {
                         recursionFunc(current.children[i]);
                     }
                 })(element);
@@ -145,11 +145,11 @@ SUNEDITOR.defaultLang = {
                 var children = [];
                 validation = validation || func.returnTrue;
 
-                (function recursionFunc(current){
+                (function recursionFunc(current) {
                     if (validation(current)) {
                         children.push(current);
                     }
-                    for (var i = 0, len = current.childNodes.length; i < len; i++) {
+                    for(var i=0, len=current.childNodes.length; i<len; i++) {
                         recursionFunc(current.childNodes[i]);
                     }
                 })(element);
@@ -561,42 +561,47 @@ SUNEDITOR.defaultLang = {
 
                     /** 같은 노드안에서 선택 */
                     if(startCon === endCon) {
-                        var afterNodeStandardPosition;
-                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+                        if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
+                            startCon.style.fontSize = fontsize;
+                        }
+                        else {
+                            var afterNodeStandardPosition;
+                            var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                            var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
-                        var spanNode = document.createElement("SPAN");
-                        spanNode.style.fontSize = fontsize;
+                            var spanNode = document.createElement("SPAN");
+                            spanNode.style.fontSize = fontsize;
 
-                        if(startOff === endOff) {
-                            spanNode.innerHTML = "&nbsp;";
-                            afterNodeStandardPosition = spanNode.nextSibling;
-                        } else {
-                            spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+                            if(startOff === endOff) {
+                                spanNode.innerHTML = "&nbsp;";
+                                afterNodeStandardPosition = spanNode.nextSibling;
+                            } else {
+                                spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
 
-                            try {
-                                afterNodeStandardPosition = startCon.nextSibling.nextSibling;
-                            } catch(e) {
-                                afterNodeStandardPosition = startCon.nextSibling;
+                                try {
+                                    afterNodeStandardPosition = startCon.nextSibling.nextSibling;
+                                } catch(e) {
+                                    afterNodeStandardPosition = startCon.nextSibling;
+                                }
                             }
+
+                            startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
+
+                            if(beforeNode.data.length > 0) {
+                                startCon.data = beforeNode.data;
+                            } else {
+                                startCon.data = startCon.substringData(0, startOff);
+                            }
+
+                            if(afterNode.data.length > 0) {
+                                startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
+                            }
+
+                            startCon = spanNode;
+                            startOff = 0;
+                            endCon = spanNode;
+                            endOff = 1;
                         }
-
-                        startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
-
-                        if(beforeNode.data.length > 0) {
-                            startCon.data = beforeNode.data;
-                        } else {
-                            startCon.data = startCon.substringData(0, startOff);
-                        }
-
-                        if(afterNode.data.length > 0) {
-                            startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
-                        }
-
-                        startCon = spanNode;
-                        startOff = 0;
-                        endCon = spanNode;
-                        endOff = 1;
                     }
                     /** 여러개의 노드 선택 */
                     else {
@@ -1002,7 +1007,7 @@ SUNEDITOR.defaultLang = {
 
                     switch(keyCode) {
                         case 66: /** B */
-                        e.preventDefault();
+                            e.preventDefault();
                             e.stopPropagation();
 
                             editor.pure_execCommand('bold', false);
@@ -1010,7 +1015,7 @@ SUNEDITOR.defaultLang = {
 
                             break;
                         case 85: /** U */
-                        e.preventDefault();
+                            e.preventDefault();
                             e.stopPropagation();
 
                             editor.pure_execCommand('underline', false);
@@ -1018,7 +1023,7 @@ SUNEDITOR.defaultLang = {
 
                             break;
                         case 73: /** I */
-                        e.preventDefault();
+                            e.preventDefault();
                             e.stopPropagation();
 
                             editor.pure_execCommand('italic', false);
@@ -1051,7 +1056,7 @@ SUNEDITOR.defaultLang = {
                         }
                         break;
                     case 9: /**tab key*/
-                    e.preventDefault();
+                        e.preventDefault();
                         e.stopPropagation();
 
                         if(ctrl || alt) break;
@@ -1255,7 +1260,7 @@ SUNEDITOR.defaultLang = {
                     editor.openDialog('link');
                 }
                 else { /** delete */
-                dom.removeItem(context.argument._linkAnchor);
+                    dom.removeItem(context.argument._linkAnchor);
                     context.argument._linkAnchor = null;
                     wysiwygSelection.focus();
                 }
