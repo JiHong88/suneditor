@@ -1,4 +1,4 @@
-if(typeof window.SUNEDITOR=='undefined') window.SUNEDITOR = {};
+if(typeof window.SUNEDITOR === 'undefined') window.SUNEDITOR = {};
 
 /** default language english */
 SUNEDITOR.defaultLang = {
@@ -74,8 +74,6 @@ SUNEDITOR.defaultLang = {
  * MIT license.
  */
 (function(){
-    var ELEMENT_NODE = 1;
-    var TEXT_NODE = 3;
     /**
      * utile func
      * @type {{returnTrue}}
@@ -96,8 +94,9 @@ SUNEDITOR.defaultLang = {
         return {
             getArrayIndex : function(array, element) {
                 var idx = -1;
+                var len = array.length;
 
-                for(var i=0; i<array.length; i++) {
+                for(var i=0; i<len; i++) {
                     if(array[i] === element) {
                         idx = i;
                         break;
@@ -133,7 +132,9 @@ SUNEDITOR.defaultLang = {
                     if (element !== current && validation(current)) {
                         children.push(current);
                     }
-                    for(var i=0, len=current.children.length; i<len; i++) {
+
+                    var childLen = current.children.length;
+                    for(var i=0, len=childLen; i<len; i++) {
                         recursionFunc(current.children[i]);
                     }
                 })(element);
@@ -149,7 +150,9 @@ SUNEDITOR.defaultLang = {
                     if (validation(current)) {
                         children.push(current);
                     }
-                    for(var i=0, len=current.childNodes.length; i<len; i++) {
+
+                    var childLen = current.childNodes.length;
+                    for(var i=0, len=childLen; i<len; i++) {
                         recursionFunc(current.childNodes[i]);
                     }
                 })(element);
@@ -218,7 +221,7 @@ SUNEDITOR.defaultLang = {
      */
     var core = function(context){
         /** 배열 관련 */
-        var list = (function(){
+        var list = (function(context){
             var commandMap = {
                 'FONT': context.tool.fontFamily,
                 'B' : context.tool.bold,
@@ -231,29 +234,28 @@ SUNEDITOR.defaultLang = {
             /** 글꼴 목록 가져오기 */
             var fontFamilyMap = {};
             var list_fontFamily = context.tool.list_fontFamily.children;
+            var fontFamilyLen = list_fontFamily.length;
 
-            list_fontFamily[0].firstChild.getAttribute("data-value");
-            for(var i=0; i<list_fontFamily.length; i++) {
+            for(var i=0; i<fontFamilyLen; i++) {
                 fontFamilyMap[list_fontFamily[i].firstChild.getAttribute("data-value").replace(/\s*/g,"")] = list_fontFamily[i].firstChild.getAttribute("data-txt");
             }
 
-            if(context.tool.list_fontFamily_add) {
+            if(!!context.tool.list_fontFamily_add) {
                 list_fontFamily = context.tool.list_fontFamily_add.children;
-                for(var i=0; i<list_fontFamily.length; i++) {
+                fontFamilyLen = list_fontFamily.length;
+                for(var i=0; i<fontFamilyLen; i++) {
                     fontFamilyMap[list_fontFamily[i].firstChild.getAttribute("data-value").replace(/\s*/g,"")] = list_fontFamily[i].firstChild.getAttribute("data-txt");
                 }
             }
-
-            list_fontFamily = null;
 
             return {
                 commandMap : commandMap,
                 fontFamilyMap : fontFamilyMap
             }
-        })();
+        })(context);
 
         /** selection 관련 */
-        var wysiwygSelection = (function(){
+        var wysiwygSelection = (function(context){
             return {
                 focus : function(){
                     context.element.wysiwygWindow.document.body.focus();
@@ -304,10 +306,10 @@ SUNEDITOR.defaultLang = {
                     selection.addRange(range);
                 }
             }
-        })();
+        })(context);
 
         /** 에디터 */
-        var editor = (function(){
+        var editor = (function(context){
             return {
                 subMenu : null,
                 originSub : null,
@@ -329,21 +331,21 @@ SUNEDITOR.defaultLang = {
                 },
 
                 subOff : function() {
-                    if(this.subMenu) {
+                    if(!!this.subMenu) {
                         this.subMenu.style.display = "none";
                         this.subMenu = null;
                         this.cancel_table_picker();
                     }
-                    if(this.modalForm) {
+                    if(!!this.modalForm) {
                         this.modalForm.style.display = "none";
                         context.dialog.back.style.display = "none";
                         context.dialog.modalArea.style.display = "none";
                         this.modalForm = null;
                     }
-                    if(context.argument._imageElement) {
+                    if(!!context.argument._imageElement) {
                         event.cancel_resize_image();
                     }
-                    if(this.editLink) {
+                    if(!!this.editLink) {
                         context.element.linkBtn.style.display = "none";
                         context.dialog.linkText.value = "";
                         context.dialog.linkAnchorText.value = "";
@@ -351,8 +353,6 @@ SUNEDITOR.defaultLang = {
                         context.argument._linkAnchor = null;
                         this.editLink = null;
                     }
-
-                    return;
                 },
 
                 toggleFrame : function(){
@@ -501,7 +501,7 @@ SUNEDITOR.defaultLang = {
 
                     /** 범위선택 없을때 */
                     if(startCon === endCon && startOff === endOff) {
-                        if(selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
+                        if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
                             var rightNode = selection.focusNode.splitText(endOff);
                             parentNode.insertBefore(oNode, rightNode);
                         }
@@ -559,6 +559,9 @@ SUNEDITOR.defaultLang = {
                     var endOff = nativeRng.endOffset;
                     var commonCon = nativeRng.commonAncestorContainer;
 
+                    var ELEMENT_NODE = 1;
+                    var TEXT_NODE = 3;
+
                     /** 같은 노드안에서 선택 */
                     if(startCon === endCon) {
                         if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
@@ -608,6 +611,9 @@ SUNEDITOR.defaultLang = {
                         var childNodes = dom.getListChildNodes(commonCon);
                         var startIndex = dom.getArrayIndex(childNodes, startCon);
                         var endIndex = dom.getArrayIndex(childNodes, endCon);
+                        var spanNode = null;
+                        var beforeNode = null;
+                        var afterNode = null;
 
                         var startNode = startCon;
                         for(var i=startIndex+1; i>=0; i--) {
@@ -643,8 +649,7 @@ SUNEDITOR.defaultLang = {
                                     continue;
                                 }
 
-                                var beforeNode;
-                                var spanNode = document.createElement("SPAN");
+                                spanNode = document.createElement("SPAN");
                                 spanNode.style.fontSize = fontsize;
 
                                 if(startCon.nodeType === ELEMENT_NODE) {
@@ -677,8 +682,7 @@ SUNEDITOR.defaultLang = {
                                     continue;
                                 }
 
-                                var afterNode;
-                                var spanNode = document.createElement("SPAN");
+                                spanNode = document.createElement("SPAN");
                                 spanNode.style.fontSize = fontsize;
 
                                 if(endCon.nodeType === ELEMENT_NODE) {
@@ -721,7 +725,7 @@ SUNEDITOR.defaultLang = {
                                 continue;
                             }
 
-                            var spanNode = document.createElement("SPAN");
+                            spanNode = document.createElement("SPAN");
                             spanNode.style.fontSize = fontsize;
 
                             if(item.nodeType === ELEMENT_NODE) {
@@ -738,10 +742,10 @@ SUNEDITOR.defaultLang = {
                     wysiwygSelection.setRange(startCon, startOff, endCon, endOff);
                 }
             };
-        })();
+        })(context);
 
         /** 이벤트 */
-        var event = (function(){
+        var event = (function(context){
             var resize_window = function() {
                 // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
 
@@ -788,11 +792,11 @@ SUNEDITOR.defaultLang = {
                 var txt = targetElement.getAttribute("data-txt");
 
                 /** 서브메뉴 보이기 */
-                if(display || /^BODY$/i.test(targetElement.tagName)) {
+                if(!!display || /^BODY$/i.test(targetElement.tagName)) {
                     var nextSibling = editor.subMenu;
                     editor.subOff();
 
-                    if(targetElement.nextElementSibling != null && targetElement.nextElementSibling != nextSibling){
+                    if(targetElement.nextElementSibling !== null && targetElement.nextElementSibling !== nextSibling){
                         editor.subMenu = targetElement.nextElementSibling;
                         editor.subMenu.style.display = "block";
                         editor.originSub = editor.subMenu.previousElementSibling;
@@ -811,7 +815,7 @@ SUNEDITOR.defaultLang = {
                 }
 
                 /** 커멘드 명령어 실행 */
-                if(command) {
+                if(!!command) {
                     if(/fontName/.test(command)) {
                         dom.changeTxt(editor.originSub.firstElementChild, txt);
                         editor.pure_execCommand(command, false, value);
@@ -858,8 +862,9 @@ SUNEDITOR.defaultLang = {
             };
 
             var onMouseDown_wysiwyg = function(e) {
-                var targetElement = e.target;
+                e.stopPropagation();
 
+                var targetElement = e.target;
                 editor.subOff();
 
                 if(/^IMG$/i.test(targetElement.nodeName)) {
@@ -906,7 +911,6 @@ SUNEDITOR.defaultLang = {
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)){
                     e.preventDefault();
-                    e.stopPropagation();
                     wysiwygSelection.focus();
                 }
             };
@@ -982,7 +986,8 @@ SUNEDITOR.defaultLang = {
 
                 /** remove */
                 map = map.split("|");
-                for(var i=0; i<map.length - 1; i++) {
+                var mapLen = map.length - 1;
+                for(var i=0; i<mapLen; i++) {
                     if(/^FONT$/i.test(map[i])) {
                         dom.changeTxt(list.commandMap[map[i]], context.tool.default_fontFamily);
                     }
@@ -996,6 +1001,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var onKeyDown_wysiwyg = function(e) {
+                e.stopPropagation();
+
                 var target = e.target;
                 var keyCode = e.keyCode;
                 var shift = e.shiftKey;
@@ -1008,7 +1015,6 @@ SUNEDITOR.defaultLang = {
                     switch(keyCode) {
                         case 66: /** B */
                             e.preventDefault();
-                            e.stopPropagation();
 
                             editor.pure_execCommand('bold', false);
                             nodeName = 'B';
@@ -1016,7 +1022,6 @@ SUNEDITOR.defaultLang = {
                             break;
                         case 85: /** U */
                             e.preventDefault();
-                            e.stopPropagation();
 
                             editor.pure_execCommand('underline', false);
                             nodeName = 'U';
@@ -1024,7 +1029,6 @@ SUNEDITOR.defaultLang = {
                             break;
                         case 73: /** I */
                             e.preventDefault();
-                            e.stopPropagation();
 
                             editor.pure_execCommand('italic', false);
                             nodeName = 'I';
@@ -1034,7 +1038,6 @@ SUNEDITOR.defaultLang = {
                             if(!shift) break;
 
                             e.preventDefault();
-                            e.stopPropagation();
 
                             editor.pure_execCommand('strikethrough', false);
                             nodeName = 'STRIKE';
@@ -1042,7 +1045,7 @@ SUNEDITOR.defaultLang = {
                             break;
                     }
 
-                    if(nodeName) {
+                    if(!!nodeName) {
                         dom.toggleClass(list.commandMap[nodeName], "on");
                     }
                 }
@@ -1051,13 +1054,11 @@ SUNEDITOR.defaultLang = {
                     case 8: /**backspace key*/
                         if(target.childElementCount === 1 && target.children[0].innerHTML === "<br>") {
                             e.preventDefault();
-                            e.stopPropagation();
                             return false;
                         }
                         break;
                     case 9: /**tab key*/
                         e.preventDefault();
-                        e.stopPropagation();
 
                         if(ctrl || alt) break;
 
@@ -1066,7 +1067,7 @@ SUNEDITOR.defaultLang = {
                             currentNode = currentNode.parentNode;
                         }
 
-                        if(currentNode && /^TD$/i.test(currentNode.tagName)) {
+                        if(!!currentNode && /^TD$/i.test(currentNode.tagName)) {
                             var table = dom.getParentNode(currentNode, "table");
                             var cells = dom.getListChildren(table, dom.isCell);
                             var idx = shift? dom.prevIdx(cells, currentNode): dom.nextIdx(cells, currentNode);
@@ -1113,7 +1114,7 @@ SUNEDITOR.defaultLang = {
             };
 
             var onScroll_wysiwyg = function() {
-                if(context.argument._imageElement) {
+                if(!!context.argument._imageElement) {
                     var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
 
                     context.element.imageResizeDiv.style.top = t + "px";
@@ -1122,6 +1123,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var onClick_dialog = function(e) {
+                e.stopPropagation();
+
                 if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
                     editor.subOff();
                 }
@@ -1155,14 +1158,15 @@ SUNEDITOR.defaultLang = {
             };
 
             var onChange_imgInput = function() {
-                try {
-                    if (this.files) {
+                function inputAction(files) {
+                    if (files) {
                         editor.showLoding();
                         editor.subOff();
 
                         var url = context.user.imageUploadUrl;
+                        var filesLen = files.length;
 
-                        if(url != null && url.length > 0) {
+                        if(url !== null && url.length > 0) {
                             var xmlHttp;
                             var formData = new FormData();
 
@@ -1170,8 +1174,9 @@ SUNEDITOR.defaultLang = {
                                 if(xmlHttp.readyState == 4){
                                     if(xmlHttp.status == 200){
                                         var result = eval(xmlHttp.responseText);
+                                        var resultLen = result.length;
 
-                                        for(var i=0; i<result.length; i++) {
+                                        for(var i=0; i<resultLen; i++) {
                                             var oImg = document.createElement("IMG");
                                             oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
                                             oImg.style.width = context.user.imageSize;
@@ -1187,8 +1192,8 @@ SUNEDITOR.defaultLang = {
                                 }
                             }
 
-                            for(var i=0; i<this.files.length; i++) {
-                                formData.append("file-" + i, this.files[i]);
+                            for(var i=0; i<filesLen; i++) {
+                                formData.append("file-" + i, files[i]);
                             }
 
                             xmlHttp = getXMLHttpRequest();
@@ -1210,14 +1215,18 @@ SUNEDITOR.defaultLang = {
                                 reader.readAsDataURL(file);
                             }
 
-                            for(var i=0; i<this.files.length; i++) {
-                                setup_reader(this.files[i])
+                            for(var i=0; i<filesLen; i++) {
+                                setup_reader(files[i])
                             }
                         }
 
                         context.dialog.imgInputFile.value = "";
                         context.dialog.imgInputUrl.value = "";
                     }
+                }
+
+                try {
+                    inputAction(this.files);
                 } catch(e) {
                     throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message +'"');
                 } finally {
@@ -1226,12 +1235,12 @@ SUNEDITOR.defaultLang = {
             };
 
             var onClick_imageResizeBtn = function(e) {
-                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+                e.stopPropagation();
 
+                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
                 if(!command) return;
 
                 e.preventDefault();
-                e.stopPropagation();
 
                 if(/^\d+$/.test(command)) {
                     context.argument._imageElement.style.height = "";
@@ -1246,12 +1255,12 @@ SUNEDITOR.defaultLang = {
             };
 
             var onClick_linkBtn = function(e) {
-                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+                e.stopPropagation();
 
+                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
                 if(!command) return;
 
                 e.preventDefault();
-                e.stopPropagation();
 
                 if(/update/.test(command)) {
                     context.dialog.linkText.value = context.argument._linkAnchor.href;
@@ -1319,6 +1328,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var onMouseMove_tablePicker = function(e) {
+                e.stopPropagation();
+
                 var x = Math.ceil(e.offsetX/18);
                 var y = Math.ceil(e.offsetY/18);
                 x = x<1? 1: x;
@@ -1336,6 +1347,8 @@ SUNEDITOR.defaultLang = {
             };
 
             var onMouseDown_resizeBar = function(e) {
+                e.stopPropagation();
+
                 context.argument._resizeClientY = e.clientY;
                 context.element.resizeBackground.style.display = "block";
 
@@ -1364,7 +1377,7 @@ SUNEDITOR.defaultLang = {
                 e.preventDefault();
                 e.stopPropagation();
 
-                try {
+                function submitAction(className) {
                     switch(className) {
                         case 'sun-editor-id-submit-link':
                             if(context.dialog.linkText.value.trim().length === 0) break;
@@ -1434,6 +1447,10 @@ SUNEDITOR.defaultLang = {
 
                             break;
                     }
+                }
+
+                try {
+                    submitAction(className);
                 } finally {
                     editor.subOff();
                     editor.closeLoding();
@@ -1461,20 +1478,22 @@ SUNEDITOR.defaultLang = {
             context.element.wysiwygWindow.addEventListener('mousedown', onMouseDown_wysiwyg);
             context.element.wysiwygWindow.document.addEventListener('selectionchange', onSelectionChange_wysiwyg);
             context.element.linkBtn.addEventListener('click', onClick_linkBtn);
-            for(var i=0; i<context.dialog.forms.length; i++) {
+
+            var dialogLen = context.dialog.forms.length;
+            for(var i=0; i<dialogLen; i++) {
                 context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', submit_dialog);
             };
 
             return {
                 cancel_resize_image : cancel_resize_image
             };
-        })();
+        })(context);
 
         /**
          * user func
          * @type {{save, getContent, setContent, appendContent, disabled, enabled, show, hide}}
          */
-        var user = (function() {
+        var user = (function(context) {
             return {
                 save : function() {
                     if(context.argument._wysiwygActive) {
@@ -1504,7 +1523,9 @@ SUNEDITOR.defaultLang = {
 
                 appendContent : function(content) {
                     if(context.argument._wysiwygActive) {
-                        context.element.wysiwygWindow.document.body.innerHTML += content;
+                        var oP = document.createElement("P");
+                        oP.innerHTML = content;
+                        context.element.wysiwygWindow.document.body.appendChild(oP);
                     } else {
                         context.element.source.value += content;
                     }
@@ -1528,7 +1549,7 @@ SUNEDITOR.defaultLang = {
                     context.element.topArea.style.display = "none";
                 }
             };
-        })();
+        })(context);
 
         return {
             save : user.save,
@@ -1576,7 +1597,8 @@ SUNEDITOR.defaultLang = {
                 /** 사용자 추가 글꼴 */
                 if(options.addFont) {
                     html += '        <ul class="list_editor list_family_add sun-editor-list-font-family-add">';
-                    for (var i = 0; i < options.addFont.length; i++) {
+                    var addFontLen = options.addFont.length;
+                    for (var i = 0; i < addFontLen; i++) {
                         var font = options.addFont[i];
                         html += '        <li><button type="button" class="btn_edit" data-command="fontName" data-value="'+font.value+'" data-txt="'+font.text+'" style="font-family:'+font.value+'">'+font.text+'</button></li>';
                     }
