@@ -82,6 +82,29 @@ SUNEDITOR.defaultLang = {
         return {
             returnTrue : function() {
                 return true;
+            },
+
+            getXMLHttpRequest : function() {
+                /** 익스플로러 */
+                if(window.ActiveXObject){
+                    try{
+                        return new ActiveXObject("Msxml2.XMLHTTP");
+                    }catch(e){
+                        try{
+                            return new ActiveXObject("Microsoft.XMLHTTP");
+                        }catch(e1){
+                            return null;
+                        }
+                    }
+                }
+                /** 네스케이프 */
+                else if(window.XMLHttpRequest){
+                    return new XMLHttpRequest();
+                }
+                /** 브라우저 식별 실패 */
+                else {
+                    return null;
+                }
             }
         };
     })();
@@ -211,6 +234,14 @@ SUNEDITOR.defaultLang = {
                 } catch(e) {
                     item.removeNode();
                 }
+            },
+
+            copyObj : function(obj) {
+                var copy = {};
+                for (var attr in obj) {
+                    copy[attr] = obj[attr];
+                }
+                return copy;
             }
         };
     })();
@@ -255,498 +286,538 @@ SUNEDITOR.defaultLang = {
         })(context);
 
         /** selection 관련 */
-        var wysiwygSelection = (function(context){
-            return {
-                focus : function(){
-                    context.element.wysiwygWindow.document.body.focus();
-                },
+        var wysiwygSelection = {
+            focus : function(){
+                context.element.wysiwygWindow.document.body.focus();
+            },
 
-                isEdgePoint : function(container, offset) {
-                    return (offset === 0) || (offset === container.nodeValue.length);
-                },
+            isEdgePoint : function(container, offset) {
+                return (offset === 0) || (offset === container.nodeValue.length);
+            },
 
-                createRange : function() {
-                    return context.element.wysiwygWindow.document.createRange();
-                },
+            createRange : function() {
+                return context.element.wysiwygWindow.document.createRange();
+            },
 
-                getSelection : function() {
-                    return context.element.wysiwygWindow.getSelection();
-                },
+            getSelection : function() {
+                return context.element.wysiwygWindow.getSelection();
+            },
 
-                getSelectionNode : function() {
-                    return wysiwygSelection.getSelection().extentNode || wysiwygSelection.getSelection().anchorNode;
-                },
+            getSelectionNode : function() {
+                return wysiwygSelection.getSelection().extentNode || wysiwygSelection.getSelection().anchorNode;
+            },
 
-                getRange : function() {
-                    var selection = this.getSelection();
-                    var nativeRng = null;
+            getRange : function() {
+                var selection = this.getSelection();
+                var nativeRng = null;
 
-                    if(selection.rangeCount > 0) {
-                        nativeRng = selection.getRangeAt(0);
-                    } else {
-                        selection = context.argument._copySelection;
+                if(selection.rangeCount > 0) {
+                    nativeRng = selection.getRangeAt(0);
+                } else {
+                    selection = context.argument._copySelection;
 
-                        nativeRng = this.createRange();
-                        nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
-                        nativeRng.setEnd(selection.focusNode, selection.focusOffset);
-                    }
-
-                    return nativeRng;
-                },
-
-                setRange : function(startCon, startOff, endCon, endOff) {
-                    var range = this.createRange();
-                    range.setStart(startCon, startOff);
-                    range.setEnd(endCon, endOff);
-
-                    var selection = this.getSelection();
-                    if (selection.rangeCount > 0) {
-                        selection.removeAllRanges();
-                    }
-                    selection.addRange(range);
+                    nativeRng = this.createRange();
+                    nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
+                    nativeRng.setEnd(selection.focusNode, selection.focusOffset);
                 }
+
+                return nativeRng;
+            },
+
+            setRange : function(startCon, startOff, endCon, endOff) {
+                var range = this.createRange();
+                range.setStart(startCon, startOff);
+                range.setEnd(endCon, endOff);
+
+                var selection = this.getSelection();
+                if (selection.rangeCount > 0) {
+                    selection.removeAllRanges();
+                }
+                selection.addRange(range);
             }
-        })(context);
+        };
 
         /** 에디터 */
-        var editor = (function(context){
-            return {
-                subMenu : null,
-                originSub : null,
-                modalForm : null,
-                editLink : null,
-                tabSize : 4,
-                fontSizeUnit : "pt",
+        var editor = {
+            subMenu : null,
+            originSub : null,
+            modalForm : null,
+            editLink : null,
+            tabSize : 4,
+            fontSizeUnit : "pt",
 
-                pure_execCommand : function(command, showDefaultUI, value) {
-                    context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
-                },
+            pure_execCommand : function(command, showDefaultUI, value) {
+                context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
+            },
 
-                cancel_table_picker : function() {
-                    context.tool.tableHighlight.style.width = "1em";
-                    context.tool.tableHighlight.style.height = "1em";
-                    context.tool.tableUnHighlight.style.width = "5em";
-                    context.tool.tableUnHighlight.style.height = "5em";
-                    dom.changeTxt(context.tool.tableDisplay, "1 x 1");
-                },
+            cancel_table_picker : function() {
+                context.tool.tableHighlight.style.width = "1em";
+                context.tool.tableHighlight.style.height = "1em";
+                context.tool.tableUnHighlight.style.width = "5em";
+                context.tool.tableUnHighlight.style.height = "5em";
+                dom.changeTxt(context.tool.tableDisplay, "1 x 1");
+            },
 
-                subOff : function() {
-                    if(!!this.subMenu) {
-                        this.subMenu.style.display = "none";
-                        this.subMenu = null;
-                        this.cancel_table_picker();
-                    }
-                    if(!!this.modalForm) {
-                        this.modalForm.style.display = "none";
-                        context.dialog.back.style.display = "none";
-                        context.dialog.modalArea.style.display = "none";
-                        this.modalForm = null;
-                    }
-                    if(!!context.argument._imageElement) {
-                        event.cancel_resize_image();
-                    }
-                    if(!!this.editLink) {
-                        context.element.linkBtn.style.display = "none";
-                        context.dialog.linkText.value = "";
-                        context.dialog.linkAnchorText.value = "";
-                        context.dialog.linkNewWindowCheck.checked = false;
-                        context.argument._linkAnchor = null;
-                        this.editLink = null;
-                    }
-                },
+            subOff : function() {
+                if(!!this.subMenu) {
+                    this.subMenu.style.display = "none";
+                    this.subMenu = null;
+                    this.cancel_table_picker();
+                }
+                if(!!this.modalForm) {
+                    this.modalForm.style.display = "none";
+                    context.dialog.back.style.display = "none";
+                    context.dialog.modalArea.style.display = "none";
+                    this.modalForm = null;
+                }
+                if(!!context.argument._imageElement) {
+                    this.cancel_resize_image();
+                }
+                if(!!this.editLink) {
+                    context.element.linkBtn.style.display = "none";
+                    context.dialog.linkText.value = "";
+                    context.dialog.linkAnchorText.value = "";
+                    context.dialog.linkNewWindowCheck.checked = false;
+                    context.argument._linkAnchor = null;
+                    this.editLink = null;
+                }
+            },
 
-                toggleFrame : function(){
-                    if(!context.argument._wysiwygActive) {
-                        var ec = {"&amp;":"&","&nbsp;":"\u00A0","&quot;":"\"","&lt;":"<","&gt;":">"};
-                        var source_html = context.element.source.value.replace(/&[a-z]+;/g, function(m){ return (typeof ec[m] === "string")?ec[m]:m; });
-                        context.element.wysiwygWindow.document.body.innerHTML = source_html.trim().length > 0? source_html: "<p>&#65279</p>";
-                        context.element.wysiwygWindow.document.body.scrollTop = 0;
-                        context.element.source.style.display = "none";
-                        context.element.wysiwygElement.style.display = "block";
-                        context.argument._wysiwygActive = true;
+            toggleFrame : function(){
+                if(!context.argument._wysiwygActive) {
+                    var ec = {"&amp;":"&","&nbsp;":"\u00A0","&quot;":"\"","&lt;":"<","&gt;":">"};
+                    var source_html = context.element.source.value.replace(/&[a-z]+;/g, function(m){ return (typeof ec[m] === "string")?ec[m]:m; });
+                    context.element.wysiwygWindow.document.body.innerHTML = source_html.trim().length > 0? source_html: "<p>&#65279</p>";
+                    context.element.wysiwygWindow.document.body.scrollTop = 0;
+                    context.element.source.style.display = "none";
+                    context.element.wysiwygElement.style.display = "block";
+                    context.argument._wysiwygActive = true;
+                }
+                else {
+                    context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?!^\r)(?!^\n)/gi, "<\/p>\r\n");
+                    context.element.wysiwygElement.style.display = "none";
+                    context.element.source.style.display = "block";
+                    context.argument._wysiwygActive = false;
+                }
+            },
+
+            toggleFullScreen : function(element){
+                if(!context.argument._isFullScreen) {
+                    context.element.topArea.style.position = "fixed";
+                    context.element.topArea.style.top = "0";
+                    context.element.topArea.style.left = "0";
+                    context.element.topArea.style.width = "100%";
+                    context.element.topArea.style.height = "100%";
+
+                    context.argument._innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
+                    context.element.editorArea.style.height = context.argument._innerHeight_fullScreen + "px";
+
+                    dom.removeClass(element.firstElementChild, 'ico_full_screen_e');
+                    dom.addClass(element.firstElementChild, 'ico_full_screen_i');
+                }
+                else {
+                    context.element.topArea.style.cssText = context.argument._originCssText;
+                    context.element.editorArea.style.height = context.argument._innerHeight + "px";
+
+                    dom.removeClass(element.firstElementChild, 'ico_full_screen_i');
+                    dom.addClass(element.firstElementChild, 'ico_full_screen_e');
+                }
+
+                context.argument._isFullScreen = !context.argument._isFullScreen;
+            },
+
+            appendHr : function(value) {
+                var borderStyle = "";
+                switch(value) {
+                    case 'hr1':
+                        borderStyle = "black 1px solid";
+                        break;
+                    case 'hr2':
+                        borderStyle = "black 1px dotted";
+                        break;
+                    case 'hr3':
+                        borderStyle = "black 1px dashed";
+                        break;
+                }
+
+                var oHr = document.createElement("HR");
+                oHr.style.border = "black 0px none";
+                oHr.style.borderTop = borderStyle;
+                oHr.style.height = "1px";
+                context.argument._selectionNode.parentNode.appendChild(oHr);
+
+                editor.appendP(oHr);
+            },
+
+            appendTable : function(x, y) {
+                var oTable = document.createElement("TABLE");
+
+                var tableHTML = '<tbody>';
+                while(y>0) {
+                    tableHTML += '<tr>';
+                    var tdCnt = x;
+                    while(tdCnt>0) {
+                        tableHTML += '<td><p>&#65279</p></td>';
+                        --tdCnt;
+                    }
+                    tableHTML += '</tr>';
+                    --y;
+                }
+                tableHTML += '</tbody>';
+
+                oTable.innerHTML = tableHTML;
+
+                editor.insertNode(oTable);
+                editor.appendP(oTable);
+            },
+
+            appendP : function(element) {
+                var oP = document.createElement("P");
+                oP.innerHTML = '&#65279';
+                element.parentNode.insertBefore(oP, element.nextElementSibling);
+            },
+
+            openDialog : function(kind) {
+                var focusText = null;
+
+                switch(kind) {
+                    case 'link':
+                        this.modalForm = context.dialog.link;
+                        focusText = context.dialog.linkText;
+                        break;
+                    case 'image':
+                        this.modalForm = context.dialog.image;
+                        focusText = context.dialog.imgInputUrl;
+                        break;
+                    case 'video':
+                        this.modalForm = context.dialog.video;
+                        focusText = context.dialog.videoInputUrl;
+                        break;
+                }
+
+                context.dialog.modalArea.style.display = "block";
+                context.dialog.back.style.display = "block";
+                context.dialog.modal.style.display = "block";
+                this.modalForm.style.display = "block";
+
+                this.subMenu = context.dialog.modal;
+
+                focusText.focus();
+            },
+
+            showLoding : function() {
+                context.element.loding.style.display = "block";
+            },
+
+            closeLoding : function() {
+                context.element.loding.style.display = "none";
+            },
+
+            insertNode : function(oNode) {
+                var selection = wysiwygSelection.getSelection();
+                var nativeRng = wysiwygSelection.getRange();
+
+                var startCon = nativeRng.startContainer;
+                var startOff = nativeRng.startOffset;
+                var endCon = nativeRng.endContainer;
+                var endOff = nativeRng.endOffset;
+
+                var parentNode = startCon;
+                if(/^#text$/i.test(startCon.nodeName)) {
+                    parentNode = startCon.parentNode;
+                }
+
+                /** 범위선택 없을때 */
+                if(startCon === endCon && startOff === endOff) {
+                    if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
+                        var rightNode = selection.focusNode.splitText(endOff);
+                        parentNode.insertBefore(oNode, rightNode);
                     }
                     else {
-                        context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?!^\r)(?!^\n)/gi, "<\/p>\r\n");
-                        context.element.wysiwygElement.style.display = "none";
-                        context.element.source.style.display = "block";
-                        context.argument._wysiwygActive = false;
+                        if(/^BR$/i.test(parentNode.lastChild.nodeName)) {
+                            parentNode.removeChild(parentNode.lastChild);
+                        }
+                        parentNode.appendChild(oNode);
                     }
-                },
+                }
+                /** 범위선택 했을때 */
+                else {
+                    var rightNode = null;
+                    var removeNode = startCon;
+                    var isSameContainer = startCon === endCon;
+                    var endLen = endCon.data.length;
 
-                toggleFullScreen : function(element){
-                    if(!context.argument._isFullScreen) {
-                        context.element.topArea.style.position = "fixed";
-                        context.element.topArea.style.top = "0";
-                        context.element.topArea.style.left = "0";
-                        context.element.topArea.style.width = "100%";
-                        context.element.topArea.style.height = "100%";
+                    if(isSameContainer) {
+                        if(!wysiwygSelection.isEdgePoint(endCon, endOff)) {
+                            rightNode = endCon.splitText(endOff);
+                        }
 
-                        context.argument._innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
-                        context.element.editorArea.style.height = context.argument._innerHeight_fullScreen + "px";
+                        if(!wysiwygSelection.isEdgePoint(startCon, startOff)) {
+                            removeNode = startCon.splitText(startOff);
+                        }
 
-                        dom.removeClass(element.firstElementChild, 'ico_full_screen_e');
-                        dom.addClass(element.firstElementChild, 'ico_full_screen_i');
+                        parentNode.removeChild(removeNode);
                     }
                     else {
-                        context.element.topArea.style.cssText = context.argument._originCssText;
-                        context.element.editorArea.style.height = context.argument._innerHeight + "px";
-
-                        dom.removeClass(element.firstElementChild, 'ico_full_screen_i');
-                        dom.addClass(element.firstElementChild, 'ico_full_screen_e');
-                    }
-
-                    context.argument._isFullScreen = !context.argument._isFullScreen;
-                },
-
-                appendHr : function(value) {
-                    var borderStyle = "";
-                    switch(value) {
-                        case 'hr1':
-                            borderStyle = "black 1px solid";
-                            break;
-                        case 'hr2':
-                            borderStyle = "black 1px dotted";
-                            break;
-                        case 'hr3':
-                            borderStyle = "black 1px dashed";
-                            break;
-                    }
-
-                    var oHr = document.createElement("HR");
-                    oHr.style.border = "black 0px none";
-                    oHr.style.borderTop = borderStyle;
-                    oHr.style.height = "1px";
-                    context.argument._selectionNode.parentNode.appendChild(oHr);
-
-                    editor.appendP(oHr);
-                },
-
-                appendTable : function(x, y) {
-                    var oTable = document.createElement("TABLE");
-
-                    var tableHTML = '<tbody>';
-                    while(y>0) {
-                        tableHTML += '<tr>';
-                        var tdCnt = x;
-                        while(tdCnt>0) {
-                            tableHTML += '<td><p>&#65279</p></td>';
-                            --tdCnt;
-                        }
-                        tableHTML += '</tr>';
-                        --y;
-                    }
-                    tableHTML += '</tbody>';
-
-                    oTable.innerHTML = tableHTML;
-
-                    editor.insertNode(oTable);
-                    editor.appendP(oTable);
-                },
-
-                appendP : function(element) {
-                    var oP = document.createElement("P");
-                    oP.innerHTML = '&#65279';
-                    element.parentNode.insertBefore(oP, element.nextElementSibling);
-                },
-
-                openDialog : function(kind) {
-                    var focusText = null;
-
-                    switch(kind) {
-                        case 'link':
-                            this.modalForm = context.dialog.link;
-                            focusText = context.dialog.linkText;
-                            break;
-                        case 'image':
-                            this.modalForm = context.dialog.image;
-                            focusText = context.dialog.imgInputUrl;
-                            break;
-                        case 'video':
-                            this.modalForm = context.dialog.video;
-                            focusText = context.dialog.videoInputUrl;
-                            break;
-                    }
-
-                    context.dialog.modalArea.style.display = "block";
-                    context.dialog.back.style.display = "block";
-                    context.dialog.modal.style.display = "block";
-                    this.modalForm.style.display = "block";
-
-                    this.subMenu = context.dialog.modal;
-
-                    focusText.focus();
-                },
-
-                showLoding : function() {
-                    context.element.loding.style.display = "block";
-                },
-
-                closeLoding : function() {
-                    context.element.loding.style.display = "none";
-                },
-
-                insertNode : function(oNode) {
-                    var selection = wysiwygSelection.getSelection();
-                    var nativeRng = wysiwygSelection.getRange();
-
-                    var startCon = nativeRng.startContainer;
-                    var startOff = nativeRng.startOffset;
-                    var endCon = nativeRng.endContainer;
-                    var endOff = nativeRng.endOffset;
-
-                    var parentNode = startCon;
-                    if(/^#text$/i.test(startCon.nodeName)) {
-                        parentNode = startCon.parentNode;
-                    }
-
-                    /** 범위선택 없을때 */
-                    if(startCon === endCon && startOff === endOff) {
-                        if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
-                            var rightNode = selection.focusNode.splitText(endOff);
-                            parentNode.insertBefore(oNode, rightNode);
-                        }
-                        else {
-                            if(/^BR$/i.test(parentNode.lastChild.nodeName)) {
-                                parentNode.removeChild(parentNode.lastChild);
-                            }
-                            parentNode.appendChild(oNode);
-                        }
-                    }
-                    /** 범위선택 했을때 */
-                    else {
-                        var rightNode = null;
-                        var removeNode = startCon;
-                        var isSameContainer = startCon === endCon;
-                        var endLen = endCon.data.length;
-
-                        if(isSameContainer) {
-                            if(!wysiwygSelection.isEdgePoint(endCon, endOff)) {
-                                rightNode = endCon.splitText(endOff);
-                            }
-
-                            if(!wysiwygSelection.isEdgePoint(startCon, startOff)) {
-                                removeNode = startCon.splitText(startOff);
-                            }
-
-                            parentNode.removeChild(removeNode);
-                        }
-                        else {
-                            try {
-                                selection.deleteFromDocument();
-                            } catch(e) {
-
-                            }
-
-                            if(endLen === endCon.data.length) rightNode = endCon.nextSibling;
-                            else rightNode = endCon;
-                        }
-
                         try {
-                            parentNode.insertBefore(oNode, rightNode);
+                            selection.deleteFromDocument();
                         } catch(e) {
-                            parentNode.appendChild(oNode);
+
                         }
+
+                        if(endLen === endCon.data.length) rightNode = endCon.nextSibling;
+                        else rightNode = endCon;
                     }
-                },
 
-                appendSpan : function(fontsize) {
-                    fontsize = fontsize + editor.fontSizeUnit;
-                    var nativeRng = wysiwygSelection.getRange();
-
-                    var startCon = nativeRng.startContainer;
-                    var startOff = nativeRng.startOffset;
-                    var endCon = nativeRng.endContainer;
-                    var endOff = nativeRng.endOffset;
-                    var commonCon = nativeRng.commonAncestorContainer;
-
-                    var ELEMENT_NODE = 1;
-                    var TEXT_NODE = 3;
-
-                    /** 같은 노드안에서 선택 */
-                    if(startCon === endCon) {
-                        if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
-                            startCon.style.fontSize = fontsize;
-                        }
-                        else {
-                            var afterNodeStandardPosition;
-                            var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                            var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
-
-                            var spanNode = document.createElement("SPAN");
-                            spanNode.style.fontSize = fontsize;
-
-                            if(startOff === endOff) {
-                                spanNode.innerHTML = "&nbsp;";
-                                afterNodeStandardPosition = spanNode.nextSibling;
-                            } else {
-                                spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-
-                                try {
-                                    afterNodeStandardPosition = startCon.nextSibling.nextSibling;
-                                } catch(e) {
-                                    afterNodeStandardPosition = startCon.nextSibling;
-                                }
-                            }
-
-                            startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
-
-                            if(beforeNode.data.length > 0) {
-                                startCon.data = beforeNode.data;
-                            } else {
-                                startCon.data = startCon.substringData(0, startOff);
-                            }
-
-                            if(afterNode.data.length > 0) {
-                                startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
-                            }
-
-                            startCon = spanNode;
-                            startOff = 0;
-                            endCon = spanNode;
-                            endOff = 1;
-                        }
+                    try {
+                        parentNode.insertBefore(oNode, rightNode);
+                    } catch(e) {
+                        parentNode.appendChild(oNode);
                     }
-                    /** 여러개의 노드 선택 */
+                }
+            },
+
+            appendSpan : function(fontsize) {
+                fontsize = fontsize + editor.fontSizeUnit;
+                var nativeRng = wysiwygSelection.getRange();
+
+                var startCon = nativeRng.startContainer;
+                var startOff = nativeRng.startOffset;
+                var endCon = nativeRng.endContainer;
+                var endOff = nativeRng.endOffset;
+                var commonCon = nativeRng.commonAncestorContainer;
+
+                var ELEMENT_NODE = 1;
+                var TEXT_NODE = 3;
+
+                /** 같은 노드안에서 선택 */
+                if(startCon === endCon) {
+                    if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
+                        startCon.style.fontSize = fontsize;
+                    }
                     else {
-                        var childNodes = dom.getListChildNodes(commonCon);
-                        var startIndex = dom.getArrayIndex(childNodes, startCon);
-                        var endIndex = dom.getArrayIndex(childNodes, endCon);
-                        var spanNode = null;
-                        var beforeNode = null;
-                        var afterNode = null;
+                        var afterNodeStandardPosition;
+                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
-                        var startNode = startCon;
-                        for(var i=startIndex+1; i>=0; i--) {
-                            if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
-                                startIndex = i;
-                                startNode = startNode.parentNode;
+                        var spanNode = document.createElement("SPAN");
+                        spanNode.style.fontSize = fontsize;
+
+                        if(startOff === endOff) {
+                            spanNode.innerHTML = "&nbsp;";
+                            afterNodeStandardPosition = spanNode.nextSibling;
+                        } else {
+                            spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+
+                            try {
+                                afterNodeStandardPosition = startCon.nextSibling.nextSibling;
+                            } catch(e) {
+                                afterNodeStandardPosition = startCon.nextSibling;
                             }
                         }
 
-                        var endNode = endCon;
-                        for(var i=endIndex-1; i>startIndex; i--) {
-                            if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
-                                childNodes.splice(i, 1);
-                                endNode = endNode.parentNode;
-                                --endIndex;
-                            }
+                        startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
+
+                        if(beforeNode.data.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            startCon.data = startCon.substringData(0, startOff);
                         }
 
-                        for(var i=startIndex; i<=endIndex; i++) {
-                            var item = childNodes[i];
-                            var parentNode = item.parentNode;
+                        if(afterNode.data.length > 0) {
+                            startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
+                        }
 
-                            if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
-                                dom.removeItem(item);
-                                continue;
-                            }
+                        startCon = spanNode;
+                        startOff = 0;
+                        endCon = spanNode;
+                        endOff = 1;
+                    }
+                }
+                /** 여러개의 노드 선택 */
+                else {
+                    var childNodes = dom.getListChildNodes(commonCon);
+                    var startIndex = dom.getArrayIndex(childNodes, startCon);
+                    var endIndex = dom.getArrayIndex(childNodes, endCon);
+                    var spanNode = null;
+                    var beforeNode = null;
+                    var afterNode = null;
 
-                            if(item === startCon) {
-                                if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                                    if(/^SPAN$/i.test(item.nodeName)) {
-                                        item.style.fontSize = fontsize;
-                                    }
-                                    continue;
-                                }
+                    var startNode = startCon;
+                    for(var i=startIndex+1; i>=0; i--) {
+                        if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
+                            startIndex = i;
+                            startNode = startNode.parentNode;
+                        }
+                    }
 
-                                spanNode = document.createElement("SPAN");
-                                spanNode.style.fontSize = fontsize;
+                    var endNode = endCon;
+                    for(var i=endIndex-1; i>startIndex; i--) {
+                        if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
+                            childNodes.splice(i, 1);
+                            endNode = endNode.parentNode;
+                            --endIndex;
+                        }
+                    }
 
-                                if(startCon.nodeType === ELEMENT_NODE) {
-                                    beforeNode = document.createTextNode(startCon.textContent);
-                                    spanNode.innerHTML = startCon.innerHTML;
-                                } else {
-                                    beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                                    spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
-                                }
+                    for(var i=startIndex; i<=endIndex; i++) {
+                        var item = childNodes[i];
+                        var parentNode = item.parentNode;
 
-                                startCon.parentNode.insertBefore(spanNode, item.nextSibling);
+                        if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
+                            dom.removeItem(item);
+                            continue;
+                        }
 
-                                if(beforeNode.length > 0) {
-                                    startCon.data = beforeNode.data;
-                                } else {
-                                    dom.removeItem(startCon);
-                                }
-
-                                startCon = spanNode.firstChild;
-                                startOff = 0;
-
-                                continue;
-                            }
-
-                            if(item === endCon) {
-                                if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                                    if(/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
-                                        item.style.fontSize = fontsize;
-                                    }
-                                    continue;
-                                }
-
-                                spanNode = document.createElement("SPAN");
-                                spanNode.style.fontSize = fontsize;
-
-                                if(endCon.nodeType === ELEMENT_NODE) {
-                                    afterNode = document.createTextNode(endCon.textContent);
-                                    spanNode.innerHTML = endCon.innerHTML;
-                                } else {
-                                    afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                                    spanNode.innerText = endCon.substringData(0, endOff);
-                                }
-
-                                endCon.parentNode.insertBefore(spanNode, endCon);
-
-                                if(afterNode.length > 0) {
-                                    endCon.data = afterNode.data;
-                                } else {
-                                    dom.removeItem(endCon);
-                                }
-
-                                endCon = spanNode.firstChild;
-                                endOff = spanNode.textContent.length;
-
-                                continue;
-                            }
-
-                            if(parentNode.nodeType === ELEMENT_NODE) {
-                                if(parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
-                                    var textNode = document.createTextNode(item.textContent);
-                                    parentNode.insertBefore(textNode, item);
-                                    dom.removeItem(item);
-                                    continue;
-                                }
-                                else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
+                        if(item === startCon) {
+                            if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                if(/^SPAN$/i.test(item.nodeName)) {
                                     item.style.fontSize = fontsize;
-                                    continue;
                                 }
-                            }
-
-                            if(/^SPAN$/i.test(item.nodeName)) {
-                                item.style.fontSize = fontsize;
                                 continue;
                             }
 
                             spanNode = document.createElement("SPAN");
                             spanNode.style.fontSize = fontsize;
 
-                            if(item.nodeType === ELEMENT_NODE) {
-                                spanNode.innerHTML = item.innerHTML;
+                            if(startCon.nodeType === ELEMENT_NODE) {
+                                beforeNode = document.createTextNode(startCon.textContent);
+                                spanNode.innerHTML = startCon.innerHTML;
                             } else {
-                                spanNode.innerText = item.data;
+                                beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                                spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
                             }
 
-                            item.parentNode.insertBefore(spanNode, item);
-                            dom.removeItem(item);
-                        }
-                    }
+                            startCon.parentNode.insertBefore(spanNode, item.nextSibling);
 
-                    wysiwygSelection.setRange(startCon, startOff, endCon, endOff);
+                            if(beforeNode.length > 0) {
+                                startCon.data = beforeNode.data;
+                            } else {
+                                dom.removeItem(startCon);
+                            }
+
+                            startCon = spanNode.firstChild;
+                            startOff = 0;
+
+                            continue;
+                        }
+
+                        if(item === endCon) {
+                            if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
+                                if(/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
+                                    item.style.fontSize = fontsize;
+                                }
+                                continue;
+                            }
+
+                            spanNode = document.createElement("SPAN");
+                            spanNode.style.fontSize = fontsize;
+
+                            if(endCon.nodeType === ELEMENT_NODE) {
+                                afterNode = document.createTextNode(endCon.textContent);
+                                spanNode.innerHTML = endCon.innerHTML;
+                            } else {
+                                afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                                spanNode.innerText = endCon.substringData(0, endOff);
+                            }
+
+                            endCon.parentNode.insertBefore(spanNode, endCon);
+
+                            if(afterNode.length > 0) {
+                                endCon.data = afterNode.data;
+                            } else {
+                                dom.removeItem(endCon);
+                            }
+
+                            endCon = spanNode.firstChild;
+                            endOff = spanNode.textContent.length;
+
+                            continue;
+                        }
+
+                        if(parentNode.nodeType === ELEMENT_NODE) {
+                            if(parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
+                                var textNode = document.createTextNode(item.textContent);
+                                parentNode.insertBefore(textNode, item);
+                                dom.removeItem(item);
+                                continue;
+                            }
+                            else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
+                                item.style.fontSize = fontsize;
+                                continue;
+                            }
+                        }
+
+                        if(/^SPAN$/i.test(item.nodeName)) {
+                            item.style.fontSize = fontsize;
+                            continue;
+                        }
+
+                        spanNode = document.createElement("SPAN");
+                        spanNode.style.fontSize = fontsize;
+
+                        if(item.nodeType === ELEMENT_NODE) {
+                            spanNode.innerHTML = item.innerHTML;
+                        } else {
+                            spanNode.innerText = item.data;
+                        }
+
+                        item.parentNode.insertBefore(spanNode, item);
+                        dom.removeItem(item);
+                    }
                 }
-            };
-        })(context);
+
+                wysiwygSelection.setRange(startCon, startOff, endCon, endOff);
+            },
+
+            resize_editor : function(e) {
+                var resizeInterval = (e.clientY - context.argument._resizeClientY);
+
+                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
+
+                context.argument._innerHeight = (context.element.editorArea.offsetHeight + resizeInterval);
+
+                context.argument._resizeClientY = e.clientY;
+            },
+
+            resize_image : function(e) {
+                var w = context.argument._imageElement_w + (e.clientX - context.argument._imageClientX);
+                var h = ((context.argument._imageElement_h/context.argument._imageElement_w) * w);
+
+                context.argument._imageElement.style.width = w + "px";
+                context.argument._imageElement.style.height = h + "px";
+
+                var parentElement = context.argument._imageElement.offsetParent;
+                var parentT = 0;
+                var parentL = 0;
+                while(parentElement) {
+                    parentT += (parentElement.offsetTop + parentElement.clientTop);
+                    parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
+                    parentElement = parentElement.offsetParent;
+                }
+
+                var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.document.body.scrollTop);
+                var l = (context.argument._imageElement.offsetLeft + parentL);
+
+                context.element.imageResizeDiv.style.top = t + "px";
+                context.element.imageResizeDiv.style.left = l + "px";
+                context.element.imageResizeDiv.style.width = w + "px";
+                context.element.imageResizeDiv.style.height = h + "px";
+
+                dom.changeTxt(context.element.imageResizeDisplay, Math.round(w) + " x " + Math.round(h));
+            },
+
+            cancel_resize_image : function() {
+                context.element.resizeBackground.style.display = "none";
+                context.element.imageResizeDiv.style.display = "none";
+                context.element.imageResizeBtn.style.display = "none";
+                // context.argument._imageElement = null;
+            }
+        };
 
         /** 이벤트 */
-        var event = (function(context){
-            var resize_window = function() {
+        var event = {
+            resize_window : function() {
                 // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
 
                 if(context.argument._isFullScreen) {
@@ -756,17 +827,17 @@ SUNEDITOR.defaultLang = {
 
                 context.tool.barHeight = context.tool.bar.offsetHeight;
                 context.argument._windowHeight = this.innerHeight;
-            };
+            },
 
-            var touchstart_toolbar = function() {
+            touchstart_toolbar : function() {
                 context.argument._isTouchMove = false;
-            };
+            },
 
-            var touchmove_toolbar = function() {
+            touchmove_toolbar : function() {
                 context.argument._isTouchMove = true;
-            };
+            },
 
-            var onClick_toolbar = function(e) {
+            onClick_toolbar : function(e) {
                 if(context.argument._isTouchMove) return true;
 
                 var targetElement = e.target;
@@ -859,9 +930,9 @@ SUNEDITOR.defaultLang = {
                     editor.subOff();
                 }
 
-            };
+            },
 
-            var onMouseDown_wysiwyg = function(e) {
+            onMouseDown_wysiwyg : function(e) {
                 e.stopPropagation();
 
                 var targetElement = e.target;
@@ -913,19 +984,10 @@ SUNEDITOR.defaultLang = {
                     e.preventDefault();
                     wysiwygSelection.focus();
                 }
-            };
+            },
 
-            /** selection 객체 복사용(IE...) */
-            function copyObj(obj) {
-                var copy = {};
-                for (var attr in obj) {
-                    copy[attr] = obj[attr];
-                }
-                return copy;
-            }
-
-            var onSelectionChange_wysiwyg = function() {
-                context.argument._copySelection = copyObj(wysiwygSelection.getSelection());
+            onSelectionChange_wysiwyg : function() {
+                context.argument._copySelection = dom.copyObj(wysiwygSelection.getSelection());
                 context.argument._selectionNode = wysiwygSelection.getSelectionNode();
 
                 var selectionParent = context.argument._selectionNode;
@@ -998,9 +1060,9 @@ SUNEDITOR.defaultLang = {
                         dom.removeClass(list.commandMap[map[i]], "on");
                     }
                 }
-            };
+            },
 
-            var onKeyDown_wysiwyg = function(e) {
+            onKeyDown_wysiwyg : function(e) {
                 e.stopPropagation();
 
                 var target = e.target;
@@ -1014,21 +1076,21 @@ SUNEDITOR.defaultLang = {
 
                     switch(keyCode) {
                         case 66: /** B */
-                            e.preventDefault();
+                        e.preventDefault();
 
                             editor.pure_execCommand('bold', false);
                             nodeName = 'B';
 
                             break;
                         case 85: /** U */
-                            e.preventDefault();
+                        e.preventDefault();
 
                             editor.pure_execCommand('underline', false);
                             nodeName = 'U';
 
                             break;
                         case 73: /** I */
-                            e.preventDefault();
+                        e.preventDefault();
 
                             editor.pure_execCommand('italic', false);
                             nodeName = 'I';
@@ -1058,7 +1120,7 @@ SUNEDITOR.defaultLang = {
                         }
                         break;
                     case 9: /**tab key*/
-                        e.preventDefault();
+                    e.preventDefault();
 
                         if(ctrl || alt) break;
 
@@ -1111,53 +1173,26 @@ SUNEDITOR.defaultLang = {
 
                         break;
                 }
-            };
+            },
 
-            var onScroll_wysiwyg = function() {
+            onScroll_wysiwyg : function() {
                 if(!!context.argument._imageElement) {
                     var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
 
                     context.element.imageResizeDiv.style.top = t + "px";
                     context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
                 }
-            };
+            },
 
-            var onClick_dialog = function(e) {
+            onClick_dialog : function(e) {
                 e.stopPropagation();
 
                 if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
                     editor.subOff();
                 }
-            };
+            },
 
-            /**
-             * 이미지 업로드를 위한 xmlHttpRequest 생성 함수
-             * @returns {*}
-             */
-            var getXMLHttpRequest = function() {
-                /** 익스플로러 */
-                if(window.ActiveXObject){
-                    try{
-                        return new ActiveXObject("Msxml2.XMLHTTP");
-                    }catch(e){
-                        try{
-                            return new ActiveXObject("Microsoft.XMLHTTP");
-                        }catch(e1){
-                            return null;
-                        }
-                    }
-                }
-                /** 네스케이프 */
-                else if(window.XMLHttpRequest){
-                    return new XMLHttpRequest();
-                }
-                /** 브라우저 식별 실패 */
-                else {
-                    return null;
-                }
-            };
-
-            var onChange_imgInput = function() {
+            onChange_imgInput : function() {
                 function inputAction(files) {
                     if (files) {
                         editor.showLoding();
@@ -1196,7 +1231,7 @@ SUNEDITOR.defaultLang = {
                                 formData.append("file-" + i, files[i]);
                             }
 
-                            xmlHttp = getXMLHttpRequest();
+                            xmlHttp = func.getXMLHttpRequest();
                             xmlHttp.onreadystatechange = imgUpload_collBack;
                             xmlHttp.open("post", url, true);
                             xmlHttp.send(formData);
@@ -1232,9 +1267,9 @@ SUNEDITOR.defaultLang = {
                 } finally {
                     editor.closeLoding();
                 }
-            };
+            },
 
-            var onClick_imageResizeBtn = function(e) {
+            onClick_imageResizeBtn : function(e) {
                 e.stopPropagation();
 
                 var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
@@ -1252,9 +1287,9 @@ SUNEDITOR.defaultLang = {
 
                 editor.subOff();
                 wysiwygSelection.focus();
-            };
+            },
 
-            var onClick_linkBtn = function(e) {
+            onClick_linkBtn : function(e) {
                 e.stopPropagation();
 
                 var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
@@ -1269,15 +1304,15 @@ SUNEDITOR.defaultLang = {
                     editor.openDialog('link');
                 }
                 else { /** delete */
-                    dom.removeItem(context.argument._linkAnchor);
+                dom.removeItem(context.argument._linkAnchor);
                     context.argument._linkAnchor = null;
                     wysiwygSelection.focus();
                 }
 
                 context.element.linkBtn.style.display = "none";
-            };
+            },
 
-            var onMouseDown_image_ctrl = function(e) {
+            onMouseDown_image_ctrl : function(e) {
                 context.argument._imageClientX = e.clientX;
 
                 e.preventDefault();
@@ -1286,48 +1321,14 @@ SUNEDITOR.defaultLang = {
                 context.element.resizeBackground.style.display = "block";
                 context.element.imageResizeBtn.style = "none";
 
-                document.addEventListener('mousemove', resize_image);
+                document.addEventListener('mousemove', editor.resize_image);
                 document.addEventListener('mouseup', function(){
-                    document.removeEventListener('mousemove', resize_image);
-                    cancel_resize_image();
+                    document.removeEventListener('mousemove', editor.resize_image);
+                    editor.cancel_resize_image();
                 });
-            };
+            },
 
-            var resize_image = function(e) {
-                var w = context.argument._imageElement_w + (e.clientX - context.argument._imageClientX);
-                var h = ((context.argument._imageElement_h/context.argument._imageElement_w) * w);
-
-                context.argument._imageElement.style.width = w + "px";
-                context.argument._imageElement.style.height = h + "px";
-
-                var parentElement = context.argument._imageElement.offsetParent;
-                var parentT = 0;
-                var parentL = 0;
-                while(parentElement) {
-                    parentT += (parentElement.offsetTop + parentElement.clientTop);
-                    parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
-                    parentElement = parentElement.offsetParent;
-                }
-
-                var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.document.body.scrollTop);
-                var l = (context.argument._imageElement.offsetLeft + parentL);
-
-                context.element.imageResizeDiv.style.top = t + "px";
-                context.element.imageResizeDiv.style.left = l + "px";
-                context.element.imageResizeDiv.style.width = w + "px";
-                context.element.imageResizeDiv.style.height = h + "px";
-
-                dom.changeTxt(context.element.imageResizeDisplay, Math.round(w) + " x " + Math.round(h));
-            };
-
-            var cancel_resize_image = function() {
-                context.element.resizeBackground.style.display = "none";
-                context.element.imageResizeDiv.style.display = "none";
-                context.element.imageResizeBtn.style.display = "none";
-                // context.argument._imageElement = null;
-            };
-
-            var onMouseMove_tablePicker = function(e) {
+            onMouseMove_tablePicker : function(e) {
                 e.stopPropagation();
 
                 var x = Math.ceil(e.offsetX/18);
@@ -1344,32 +1345,22 @@ SUNEDITOR.defaultLang = {
 
                 dom.changeTxt(context.tool.tableDisplay, x + " x " + y);
                 context.argument._tableXY = [x, y];
-            };
+            },
 
-            var onMouseDown_resizeBar = function(e) {
+            onMouseDown_resizeBar : function(e) {
                 e.stopPropagation();
 
                 context.argument._resizeClientY = e.clientY;
                 context.element.resizeBackground.style.display = "block";
 
-                document.addEventListener('mousemove', resize_editor);
+                document.addEventListener('mousemove', editor.resize_editor);
                 document.addEventListener('mouseup', function () {
-                    document.removeEventListener('mousemove', resize_editor);
+                    document.removeEventListener('mousemove', editor.resize_editor);
                     context.element.resizeBackground.style.display = "none";
                 });
-            };
+            },
 
-            var resize_editor = function(e) {
-                var resizeInterval = (e.clientY - context.argument._resizeClientY);
-
-                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
-
-                context.argument._innerHeight = (context.element.editorArea.offsetHeight + resizeInterval);
-
-                context.argument._resizeClientY = e.clientY;
-            };
-
-            var submit_dialog = function(e) {
+            submit_dialog : function(e) {
                 var className = this.classList[this.classList.length - 1];
 
                 editor.showLoding();
@@ -1457,99 +1448,91 @@ SUNEDITOR.defaultLang = {
                 }
 
                 return false;
-            };
+            }
 
-            /** 이벤트 등록 */
-            window.onresize = function(){resize_window()};
+        };
 
-            context.tool.bar.addEventListener('click', onClick_toolbar);
-            context.tool.bar.addEventListener('touchstart', touchstart_toolbar);
-            context.tool.bar.addEventListener('touchmove', touchmove_toolbar);
-            context.tool.bar.addEventListener('touchend', onClick_toolbar);
-
-            context.dialog.modal.addEventListener('click', onClick_dialog);
-            context.element.imageResizeBtn.addEventListener('click', onClick_imageResizeBtn);
-            context.element.wysiwygWindow.addEventListener('keydown', onKeyDown_wysiwyg);
-            context.dialog.imgInputFile.addEventListener('change', onChange_imgInput);
-            context.element.wysiwygWindow.addEventListener('scroll', onScroll_wysiwyg);
-            context.tool.tablePicker.addEventListener('mousemove', onMouseMove_tablePicker);
-            context.element.resizebar.addEventListener('mousedown', onMouseDown_resizeBar);
-            context.element.imageResizeController.addEventListener('mousedown', onMouseDown_image_ctrl);
-            context.element.wysiwygWindow.addEventListener('mousedown', onMouseDown_wysiwyg);
-            context.element.wysiwygWindow.document.addEventListener('selectionchange', onSelectionChange_wysiwyg);
-            context.element.linkBtn.addEventListener('click', onClick_linkBtn);
-
-            var dialogLen = context.dialog.forms.length;
-            for(var i=0; i<dialogLen; i++) {
-                context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', submit_dialog);
-            };
-
-            return {
-                cancel_resize_image : cancel_resize_image
-            };
-        })(context);
-
-        /**
-         * user func
-         * @type {{save, getContent, setContent, appendContent, disabled, enabled, show, hide}}
-         */
-        var user = (function(context) {
-            return {
-                save : function() {
-                    if(context.argument._wysiwygActive) {
-                        context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
-                    } else {
-                        context.element.textElement.innerHTML = context.element.source.value;
-                    }
-                },
-
-                getContent : function() {
-                    var content = "";
-                    if(context.argument._wysiwygActive) {
-                        content = context.element.wysiwygWindow.document.body.innerHTML;
-                    } else {
-                        content = context.element.source.value;
-                    }
-                    return content;
-                },
-
-                setContent : function(content) {
-                    if(context.argument._wysiwygActive) {
-                        context.element.wysiwygWindow.document.body.innerHTML = content;
-                    } else {
-                        context.element.source.value = content;
-                    }
-                },
-
-                appendContent : function(content) {
-                    if(context.argument._wysiwygActive) {
-                        var oP = document.createElement("P");
-                        oP.innerHTML = content;
-                        context.element.wysiwygWindow.document.body.appendChild(oP);
-                    } else {
-                        context.element.source.value += content;
-                    }
-                },
-
-                disabled : function() {
-                    context.tool.cover.style.display = "block";
-                    context.element.wysiwygWindow.document.body.setAttribute("contenteditable", false);
-                },
-
-                enabled : function() {
-                    context.tool.cover.style.display = "none";
-                    context.element.wysiwygWindow.document.body.setAttribute("contenteditable", true);
-                },
-
-                show : function() {
-                    context.element.topArea.style.cssText = context.argument._originCssText;
-                },
-
-                hide : function() {
-                    context.element.topArea.style.display = "none";
+        /** 유저 사용 함수 {{save, getContent, setContent, appendContent, disabled, enabled, show, hide}} */
+        var user = {
+            save : function() {
+                if(context.argument._wysiwygActive) {
+                    context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
+                } else {
+                    context.element.textElement.innerHTML = context.element.source.value;
                 }
-            };
-        })(context);
+            },
+
+            getContent : function() {
+                var content = "";
+                if(context.argument._wysiwygActive) {
+                    content = context.element.wysiwygWindow.document.body.innerHTML;
+                } else {
+                    content = context.element.source.value;
+                }
+                return content;
+            },
+
+            setContent : function(content) {
+                if(context.argument._wysiwygActive) {
+                    context.element.wysiwygWindow.document.body.innerHTML = content;
+                } else {
+                    context.element.source.value = content;
+                }
+            },
+
+            appendContent : function(content) {
+                if(context.argument._wysiwygActive) {
+                    var oP = document.createElement("P");
+                    oP.innerHTML = content;
+                    context.element.wysiwygWindow.document.body.appendChild(oP);
+                } else {
+                    context.element.source.value += content;
+                }
+            },
+
+            disabled : function() {
+                context.tool.cover.style.display = "block";
+                context.element.wysiwygWindow.document.body.setAttribute("contenteditable", false);
+            },
+
+            enabled : function() {
+                context.tool.cover.style.display = "none";
+                context.element.wysiwygWindow.document.body.setAttribute("contenteditable", true);
+            },
+
+            show : function() {
+                context.element.topArea.style.cssText = context.argument._originCssText;
+            },
+
+            hide : function() {
+                context.element.topArea.style.display = "none";
+            }
+        };
+
+        /** 이벤트 등록 */
+        window.onresize = function(){event.resize_window()};
+
+        context.tool.bar.addEventListener('click', event.onClick_toolbar);
+        context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
+        context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
+        context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
+
+        context.dialog.modal.addEventListener('click', event.onClick_dialog);
+        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
+        context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
+        context.dialog.imgInputFile.addEventListener('change', event.onChange_imgInput);
+        context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
+        context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
+        context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
+        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
+        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
+        context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
+        context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
+
+        var dialogLen = context.dialog.forms.length;
+        for(var i=0; i<dialogLen; i++) {
+            context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', event.submit_dialog);
+        };
 
         return {
             save : user.save,
@@ -1560,7 +1543,7 @@ SUNEDITOR.defaultLang = {
             enabled : user.enabled,
             show : user.show,
             hide : user.hide
-        }
+        };
     };
 
     /**
@@ -2378,7 +2361,7 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        return new core(Context(element, cons.constructed, cons.options));
+        return core(Context(element, cons.constructed, cons.options));
     };
 
 })();
