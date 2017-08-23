@@ -73,7 +73,7 @@ SUNEDITOR.defaultLang = {
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-(function(){
+(function(SUNEDITOR){
     /**
      * utile func
      * @type {{returnTrue}}
@@ -534,7 +534,7 @@ SUNEDITOR.defaultLang = {
                         parentNode.insertBefore(oNode, rightNode);
                     }
                     else {
-                        if(/^BR$/i.test(parentNode.lastChild.nodeName)) {
+                        if(parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
                             parentNode.removeChild(parentNode.lastChild);
                         }
                         parentNode.appendChild(oNode);
@@ -811,7 +811,7 @@ SUNEDITOR.defaultLang = {
                 context.element.resizeBackground.style.display = "none";
                 context.element.imageResizeDiv.style.display = "none";
                 context.element.imageResizeBtn.style.display = "none";
-                // context.argument._imageElement = null;
+                context.argument._imageElement = null;
             }
         };
 
@@ -1177,10 +1177,13 @@ SUNEDITOR.defaultLang = {
 
             onScroll_wysiwyg : function() {
                 if(!!context.argument._imageElement) {
-                    var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
-
-                    context.element.imageResizeDiv.style.top = t + "px";
-                    context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
+                    // var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - (context.element.wysiwygWindow.scrollY || context.element.wysiwygWindow.pageXOffset));
+                    //
+                    // context.element.imageResizeDiv.style.top = t + "px";
+                    // context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
+                    context.element.imageResizeDiv.style.display = "none";
+                    context.element.imageResizeBtn.style.display = "none";
+                    context.argument._imageElement = null;
                 }
             },
 
@@ -1313,19 +1316,21 @@ SUNEDITOR.defaultLang = {
             },
 
             onMouseDown_image_ctrl : function(e) {
-                context.argument._imageClientX = e.clientX;
-
-                e.preventDefault();
                 e.stopPropagation();
+                e.preventDefault();
 
+                context.argument._imageClientX = e.clientX;
                 context.element.resizeBackground.style.display = "block";
-                context.element.imageResizeBtn.style = "none";
+                context.element.imageResizeBtn.style.display = "none";
+
+                function closureFunc() {
+                    editor.cancel_resize_image();
+                    document.removeEventListener('mousemove', editor.resize_image);
+                    document.removeEventListener('mouseup', closureFunc);
+                };
 
                 document.addEventListener('mousemove', editor.resize_image);
-                document.addEventListener('mouseup', function(){
-                    document.removeEventListener('mousemove', editor.resize_image);
-                    editor.cancel_resize_image();
-                });
+                document.addEventListener('mouseup', closureFunc);
             },
 
             onMouseMove_tablePicker : function(e) {
@@ -1353,11 +1358,14 @@ SUNEDITOR.defaultLang = {
                 context.argument._resizeClientY = e.clientY;
                 context.element.resizeBackground.style.display = "block";
 
-                document.addEventListener('mousemove', editor.resize_editor);
-                document.addEventListener('mouseup', function () {
-                    document.removeEventListener('mousemove', editor.resize_editor);
+                function closureFunc() {
                     context.element.resizeBackground.style.display = "none";
-                });
+                    document.removeEventListener('mousemove', editor.resize_editor);
+                    document.removeEventListener('mouseup', closureFunc);
+                };
+
+                document.addEventListener('mousemove', editor.resize_editor);
+                document.addEventListener('mouseup', closureFunc);
             },
 
             submit_dialog : function(e) {
@@ -2114,64 +2122,65 @@ SUNEDITOR.defaultLang = {
         options.showFullScreen = options.showFullScreen !== undefined? options.showFullScreen: true;
         options.showCodeView = options.showCodeView !== undefined? options.showCodeView: true;
 
+        var doc = document;
         /** 최상위 div */
-        var top_div = document.createElement("DIV");
+        var top_div = doc.createElement("DIV");
         top_div.className = "sun-editor";
         top_div.id = "suneditor_" + element.id;
         top_div.style.width = options.width;
         /** relative div */
-        var relative = document.createElement("DIV");
+        var relative = doc.createElement("DIV");
         relative.className = "sun-editor-container";
 
         /** 툴바 */
-        var tool_bar = document.createElement("DIV");
+        var tool_bar = doc.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
         tool_bar.innerHTML = createEditor(options).toolBar();
 
         /** 에디터 */
-        var editor_div = document.createElement("DIV");
+        var editor_div = doc.createElement("DIV");
         editor_div.className = "sun-editor-id-editorArea";
         editor_div.style.height = options.height;
         /** iframe */
-        var iframe = document.createElement("IFRAME");
+        var iframe = doc.createElement("IFRAME");
         iframe.allowFullscreen = true;
         iframe.frameBorder = 0;
         iframe.className = "input_editor sun-editor-id-wysiwyg";
         iframe.style.display = "block";
         /** textarea */
-        var textarea = document.createElement("TEXTAREA");
+        var textarea = doc.createElement("TEXTAREA");
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
 
         /** 리사이즈바 */
-        var resize_bar = document.createElement("DIV");
+        var resize_bar = doc.createElement("DIV");
         resize_bar.className = "sun-editor-id-resizeBar";
 
         /** 다이얼로그 */
-        var dialog_div = document.createElement("DIV");
+        var dialog_div = doc.createElement("DIV");
         dialog_div.className = "sun-editor-id-dialogBox";
         dialog_div.innerHTML = createEditor(options).dialogBox();
 
         /** 이미지 조절 div */
-        var resize_img = document.createElement("DIV");
+        var resize_img = doc.createElement("DIV");
         resize_img.className = "modal-image-resize";
         resize_img.innerHTML = createEditor(options).imgDiv();
         /** 이미지 조절 버튼 */
-        var resize_img_button = document.createElement("DIV");
+        var resize_img_button = doc.createElement("DIV");
         resize_img_button.className = "image-resize-btn";
         resize_img_button.innerHTML = createEditor(options).imgBtn();
 
         /** 로딩 박스 */
-        var loding_box = document.createElement("DIV");
+        var loding_box = doc.createElement("DIV");
         loding_box.className = "sun-editor-id-loding";
         loding_box.innerHTML = "<div class=\"ico-loding\"></div>";
 
         /** resize 동작시 background */
-        var resize_back = document.createElement("DIV");
+        var resize_back = doc.createElement("DIV");
         resize_back.className = "sun-editor-id-resize-background";
 
         /** 링크 수정 버튼 */
-        var link_button = document.createElement("DIV");
+        var link_button = doc.createElement("DIV");
         link_button.className = "sun-editor-id-link-btn";
         link_button.innerHTML = createEditor(options).linkBtn();
 
@@ -2231,9 +2240,11 @@ SUNEDITOR.defaultLang = {
 
         styleTmp = null;
 
+        var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
+
         setTimeout(function(){
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].setAttribute("scrolling", "auto");
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.head.innerHTML = ''+
+            sun_wysiwyg.setAttribute("scrolling", "auto");
+            sun_wysiwyg.contentWindow.document.head.innerHTML = ''+
                 '<meta charset=\"utf-8\">' +
                 '<style type=\"text/css\">' +
                 '   body {font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
@@ -2241,11 +2252,11 @@ SUNEDITOR.defaultLang = {
                 '   table tr {border:1px solid #ccc;}'+
                 '   table tr td {border:1px solid #ccc; padding:8px;}'+
                 '</style>';
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.setAttribute("contenteditable", true);
+            sun_wysiwyg.contentWindow.document.body.setAttribute("contenteditable", true);
             if(element.value.length > 0) {
-                cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
+                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
             } else {
-                cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.innerHTML = '<p>&#65279</p>';
+                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
             }
         }, 0);
 
@@ -2277,8 +2288,8 @@ SUNEDITOR.defaultLang = {
                 topArea: cons._top,
                 resizebar: cons._resizeBar,
                 editorArea: cons._editorArea,
-                wysiwygWindow: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow,
-                wysiwygElement: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0],
+                wysiwygWindow: sun_wysiwyg.contentWindow,
+                wysiwygElement: sun_wysiwyg,
                 source: cons._editorArea.getElementsByClassName('sun-editor-id-source')[0],
                 loding : cons._loding,
                 imageResizeDiv : cons._resizeImg,
@@ -2364,4 +2375,4 @@ SUNEDITOR.defaultLang = {
         return core(Context(element, cons.constructed, cons.options));
     };
 
-})();
+})(SUNEDITOR);
