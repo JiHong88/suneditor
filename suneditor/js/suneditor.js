@@ -76,181 +76,176 @@ SUNEDITOR.defaultLang = {
 (function(SUNEDITOR){
     /**
      * utile func
-     * @type {{returnTrue}}
      */
-    var func = (function(){
-        return {
-            returnTrue : function() {
-                return true;
-            },
+    var func = {
+        returnTrue : function() {
+            return true;
+        },
 
-            getXMLHttpRequest : function() {
-                /** 익스플로러 */
-                if(window.ActiveXObject){
+        getXMLHttpRequest : function() {
+            /** 익스플로러 */
+            if(window.ActiveXObject){
+                try{
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                }catch(e){
                     try{
-                        return new ActiveXObject("Msxml2.XMLHTTP");
-                    }catch(e){
-                        try{
-                            return new ActiveXObject("Microsoft.XMLHTTP");
-                        }catch(e1){
-                            return null;
-                        }
+                        return new ActiveXObject("Microsoft.XMLHTTP");
+                    }catch(e1){
+                        return null;
                     }
                 }
-                /** 네스케이프 */
-                else if(window.XMLHttpRequest){
-                    return new XMLHttpRequest();
-                }
-                /** 브라우저 식별 실패 */
-                else {
-                    return null;
-                }
             }
-        };
-    })();
+            /** 네스케이프 */
+            else if(window.XMLHttpRequest){
+                return new XMLHttpRequest();
+            }
+            /** 브라우저 식별 실패 */
+            else {
+                return null;
+            }
+        }
+    };
 
     /**
      * document func
-     * @type {{getArrayIndex, nextIdx, prevIdx, isCell, getListChildren, getListChildNodes, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass, removeItem}}
      */
-    var dom = (function(){
-        return {
-            getArrayIndex : function(array, element) {
-                var idx = -1;
-                var len = array.length;
+    var dom = {
+        getArrayIndex : function(array, element) {
+            var idx = -1;
+            var len = array.length;
 
-                for(var i=0; i<len; i++) {
-                    if(array[i] === element) {
-                        idx = i;
-                        break;
-                    }
+            for(var i=0; i<len; i++) {
+                if(array[i] === element) {
+                    idx = i;
+                    break;
                 }
-
-                return idx;
-            },
-
-            nextIdx : function(array, item) {
-                var idx = this.getArrayIndex(array, item);
-                if (idx === -1) return -1;
-
-                return idx + 1;
-            },
-
-            prevIdx : function(array, item) {
-                var idx = this.getArrayIndex(array, item);
-                if (idx === -1) return -1;
-
-                return idx - 1;
-            },
-
-            isCell : function(node) {
-                return node && /^TD$|^TH$/i.test(node.nodeName);
-            },
-
-            getListChildren : function(element, validation) {
-                var children = [];
-                validation = validation || func.returnTrue;
-
-                (function recursionFunc(current) {
-                    if (element !== current && validation(current)) {
-                        children.push(current);
-                    }
-
-                    var childLen = current.children.length;
-                    for(var i=0, len=childLen; i<len; i++) {
-                        recursionFunc(current.children[i]);
-                    }
-                })(element);
-
-                return children;
-            },
-
-            getListChildNodes : function(element, validation) {
-                var children = [];
-                validation = validation || func.returnTrue;
-
-                (function recursionFunc(current) {
-                    if (validation(current)) {
-                        children.push(current);
-                    }
-
-                    var childLen = current.childNodes.length;
-                    for(var i=0, len=childLen; i<len; i++) {
-                        recursionFunc(current.childNodes[i]);
-                    }
-                })(element);
-
-                return children;
-            },
-
-            getParentNode : function(element, tagName) {
-                var check = new RegExp("^"+tagName+"$", "i");
-
-                while(!check.test(element.tagName)) {
-                    element = element.parentNode;
-                }
-
-                return element;
-            },
-
-            changeTxt : function(element, txt) {
-                element.textContent = txt;
-            },
-
-            changeClass : function(element, className) {
-                element.className = className;
-            },
-
-            addClass : function(element, className) {
-                if(!element) return;
-
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-                if(check.test(element.className)) return;
-
-                element.className += " " + className;
-            },
-
-            removeClass : function(element, className) {
-                if(!element) return;
-
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-                element.className = element.className.replace(check, " ").trim();
-            },
-
-            toggleClass : function(element, className) {
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-
-                if (check.test(element.className)) {
-                    element.className = element.className.replace(check, " ").trim();
-                }
-                else {
-                    element.className += " " + className;
-                }
-            },
-
-            removeItem : function(item) {
-                try {
-                    item.remove();
-                } catch(e) {
-                    item.removeNode();
-                }
-            },
-
-            copyObj : function(obj) {
-                var copy = {};
-                for (var attr in obj) {
-                    copy[attr] = obj[attr];
-                }
-                return copy;
             }
-        };
-    })();
+
+            return idx;
+        },
+
+        nextIdx : function(array, item) {
+            var idx = this.getArrayIndex(array, item);
+            if (idx === -1) return -1;
+
+            return idx + 1;
+        },
+
+        prevIdx : function(array, item) {
+            var idx = this.getArrayIndex(array, item);
+            if (idx === -1) return -1;
+
+            return idx - 1;
+        },
+
+        isCell : function(node) {
+            return node && /^TD$|^TH$/i.test(node.nodeName);
+        },
+
+        getListChildren : function(element, validation) {
+            var children = [];
+            validation = validation || func.returnTrue;
+
+            (function recursionFunc(current) {
+                if (element !== current && validation(current)) {
+                    children.push(current);
+                }
+
+                var childLen = current.children.length;
+                for(var i=0, len=childLen; i<len; i++) {
+                    recursionFunc(current.children[i]);
+                }
+            })(element);
+
+            return children;
+        },
+
+        getListChildNodes : function(element, validation) {
+            var children = [];
+            validation = validation || func.returnTrue;
+
+            (function recursionFunc(current) {
+                if (validation(current)) {
+                    children.push(current);
+                }
+
+                var childLen = current.childNodes.length;
+                for(var i=0, len=childLen; i<len; i++) {
+                    recursionFunc(current.childNodes[i]);
+                }
+            })(element);
+
+            return children;
+        },
+
+        getParentNode : function(element, tagName) {
+            var check = new RegExp("^"+tagName+"$", "i");
+
+            while(!check.test(element.tagName)) {
+                element = element.parentNode;
+            }
+
+            return element;
+        },
+
+        changeTxt : function(element, txt) {
+            element.textContent = txt;
+        },
+
+        changeClass : function(element, className) {
+            element.className = className;
+        },
+
+        addClass : function(element, className) {
+            if(!element) return;
+
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            if(check.test(element.className)) return;
+
+            element.className += " " + className;
+        },
+
+        removeClass : function(element, className) {
+            if(!element) return;
+
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            element.className = element.className.replace(check, " ").trim();
+        },
+
+        toggleClass : function(element, className) {
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+
+            if (check.test(element.className)) {
+                element.className = element.className.replace(check, " ").trim();
+            }
+            else {
+                element.className += " " + className;
+            }
+        },
+
+        removeItem : function(item) {
+            try {
+                item.remove();
+            } catch(e) {
+                item.removeNode();
+            }
+        },
+
+        copyObj : function(obj) {
+            var copy = {};
+            for (var attr in obj) {
+                copy[attr] = obj[attr];
+            }
+            return copy;
+        }
+    };
 
     /**
      * SunEditor
      * @param context
      */
     var core = function(context){
+
         /** 배열 관련 */
         var list = (function(context){
             var commandMap = {
@@ -282,7 +277,7 @@ SUNEDITOR.defaultLang = {
             return {
                 commandMap : commandMap,
                 fontFamilyMap : fontFamilyMap
-            }
+            };
         })(context);
 
         /** selection 관련 */
