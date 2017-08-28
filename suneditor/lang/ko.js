@@ -32,7 +32,9 @@ SUNEDITOR.lang = {
         image : '사진',
         video : '동영상',
         fullScreen : '전체화면',
-        htmlEditor : 'HTML 편집'
+        htmlEditor : 'HTML 편집',
+        undo : '실행 취소',
+        redo : '다시 실행'
     },
     dialogBox : {
         linkBox : {

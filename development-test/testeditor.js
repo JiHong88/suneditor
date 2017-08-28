@@ -33,7 +33,9 @@ SUNEDITOR.defaultLang = {
         image : 'Picture',
         video : 'Video',
         fullScreen : 'Full Screen',
-        htmlEditor : 'Code View'
+        htmlEditor : 'Code View',
+        undo : 'Undo',
+        redo : 'Redo'
     },
     dialogBox : {
         linkBox : {
@@ -73,184 +75,179 @@ SUNEDITOR.defaultLang = {
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-(function(){
+(function(SUNEDITOR){
     /**
      * utile func
-     * @type {{returnTrue}}
      */
-    var func = (function(){
-        return {
-            returnTrue : function() {
-                return true;
-            },
+    var func = {
+        returnTrue : function() {
+            return true;
+        },
 
-            getXMLHttpRequest : function() {
-                /** 익스플로러 */
-                if(window.ActiveXObject){
+        getXMLHttpRequest : function() {
+            /** 익스플로러 */
+            if(window.ActiveXObject){
+                try{
+                    return new ActiveXObject("Msxml2.XMLHTTP");
+                }catch(e){
                     try{
-                        return new ActiveXObject("Msxml2.XMLHTTP");
-                    }catch(e){
-                        try{
-                            return new ActiveXObject("Microsoft.XMLHTTP");
-                        }catch(e1){
-                            return null;
-                        }
+                        return new ActiveXObject("Microsoft.XMLHTTP");
+                    }catch(e1){
+                        return null;
                     }
                 }
-                /** 네스케이프 */
-                else if(window.XMLHttpRequest){
-                    return new XMLHttpRequest();
-                }
-                /** 브라우저 식별 실패 */
-                else {
-                    return null;
-                }
             }
-        };
-    })();
+            /** 네스케이프 */
+            else if(window.XMLHttpRequest){
+                return new XMLHttpRequest();
+            }
+            /** 브라우저 식별 실패 */
+            else {
+                return null;
+            }
+        }
+    };
 
     /**
      * document func
-     * @type {{getArrayIndex, nextIdx, prevIdx, isCell, getListChildren, getListChildNodes, getParentNode, changeTxt, changeClass, addClass, removeClass, toggleClass, removeItem}}
      */
-    var dom = (function(){
-        return {
-            getArrayIndex : function(array, element) {
-                var idx = -1;
-                var len = array.length;
+    var dom = {
+        getArrayIndex : function(array, element) {
+            var idx = -1;
+            var len = array.length;
 
-                for(var i=0; i<len; i++) {
-                    if(array[i] === element) {
-                        idx = i;
-                        break;
-                    }
+            for(var i=0; i<len; i++) {
+                if(array[i] === element) {
+                    idx = i;
+                    break;
                 }
-
-                return idx;
-            },
-
-            nextIdx : function(array, item) {
-                var idx = this.getArrayIndex(array, item);
-                if (idx === -1) return -1;
-
-                return idx + 1;
-            },
-
-            prevIdx : function(array, item) {
-                var idx = this.getArrayIndex(array, item);
-                if (idx === -1) return -1;
-
-                return idx - 1;
-            },
-
-            isCell : function(node) {
-                return node && /^TD$|^TH$/i.test(node.nodeName);
-            },
-
-            getListChildren : function(element, validation) {
-                var children = [];
-                validation = validation || func.returnTrue;
-
-                (function recursionFunc(current) {
-                    if (element !== current && validation(current)) {
-                        children.push(current);
-                    }
-
-                    var childLen = current.children.length;
-                    for(var i=0, len=childLen; i<len; i++) {
-                        recursionFunc(current.children[i]);
-                    }
-                })(element);
-
-                return children;
-            },
-
-            getListChildNodes : function(element, validation) {
-                var children = [];
-                validation = validation || func.returnTrue;
-
-                (function recursionFunc(current) {
-                    if (validation(current)) {
-                        children.push(current);
-                    }
-
-                    var childLen = current.childNodes.length;
-                    for(var i=0, len=childLen; i<len; i++) {
-                        recursionFunc(current.childNodes[i]);
-                    }
-                })(element);
-
-                return children;
-            },
-
-            getParentNode : function(element, tagName) {
-                var check = new RegExp("^"+tagName+"$", "i");
-
-                while(!check.test(element.tagName)) {
-                    element = element.parentNode;
-                }
-
-                return element;
-            },
-
-            changeTxt : function(element, txt) {
-                element.textContent = txt;
-            },
-
-            changeClass : function(element, className) {
-                element.className = className;
-            },
-
-            addClass : function(element, className) {
-                if(!element) return;
-
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-                if(check.test(element.className)) return;
-
-                element.className += " " + className;
-            },
-
-            removeClass : function(element, className) {
-                if(!element) return;
-
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-                element.className = element.className.replace(check, " ").trim();
-            },
-
-            toggleClass : function(element, className) {
-                var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-
-                if (check.test(element.className)) {
-                    element.className = element.className.replace(check, " ").trim();
-                }
-                else {
-                    element.className += " " + className;
-                }
-            },
-
-            removeItem : function(item) {
-                try {
-                    item.remove();
-                } catch(e) {
-                    item.removeNode();
-                }
-            },
-
-            copyObj : function(obj) {
-                var copy = {};
-                for (var attr in obj) {
-                    copy[attr] = obj[attr];
-                }
-                return copy;
             }
-        };
-    })();
+
+            return idx;
+        },
+
+        nextIdx : function(array, item) {
+            var idx = this.getArrayIndex(array, item);
+            if (idx === -1) return -1;
+
+            return idx + 1;
+        },
+
+        prevIdx : function(array, item) {
+            var idx = this.getArrayIndex(array, item);
+            if (idx === -1) return -1;
+
+            return idx - 1;
+        },
+
+        isCell : function(node) {
+            return node && /^TD$|^TH$/i.test(node.nodeName);
+        },
+
+        getListChildren : function(element, validation) {
+            var children = [];
+            validation = validation || func.returnTrue;
+
+            (function recursionFunc(current) {
+                if (element !== current && validation(current)) {
+                    children.push(current);
+                }
+
+                var childLen = current.children.length;
+                for(var i=0, len=childLen; i<len; i++) {
+                    recursionFunc(current.children[i]);
+                }
+            })(element);
+
+            return children;
+        },
+
+        getListChildNodes : function(element, validation) {
+            var children = [];
+            validation = validation || func.returnTrue;
+
+            (function recursionFunc(current) {
+                if (validation(current)) {
+                    children.push(current);
+                }
+
+                var childLen = current.childNodes.length;
+                for(var i=0, len=childLen; i<len; i++) {
+                    recursionFunc(current.childNodes[i]);
+                }
+            })(element);
+
+            return children;
+        },
+
+        getParentNode : function(element, tagName) {
+            var check = new RegExp("^"+tagName+"$", "i");
+
+            while(!check.test(element.tagName)) {
+                element = element.parentNode;
+            }
+
+            return element;
+        },
+
+        changeTxt : function(element, txt) {
+            element.textContent = txt;
+        },
+
+        changeClass : function(element, className) {
+            element.className = className;
+        },
+
+        addClass : function(element, className) {
+            if(!element) return;
+
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            if(check.test(element.className)) return;
+
+            element.className += " " + className;
+        },
+
+        removeClass : function(element, className) {
+            if(!element) return;
+
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            element.className = element.className.replace(check, " ").trim();
+        },
+
+        toggleClass : function(element, className) {
+            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+
+            if (check.test(element.className)) {
+                element.className = element.className.replace(check, " ").trim();
+            }
+            else {
+                element.className += " " + className;
+            }
+        },
+
+        removeItem : function(item) {
+            try {
+                item.remove();
+            } catch(e) {
+                item.removeNode();
+            }
+        },
+
+        copyObj : function(obj) {
+            var copy = {};
+            for (var attr in obj) {
+                copy[attr] = obj[attr];
+            }
+            return copy;
+        }
+    };
 
     /**
      * SunEditor
      * @param context
      */
     var core = function(context){
+
         /** 배열 관련 */
         var list = (function(context){
             var commandMap = {
@@ -282,7 +279,7 @@ SUNEDITOR.defaultLang = {
             return {
                 commandMap : commandMap,
                 fontFamilyMap : fontFamilyMap
-            }
+            };
         })(context);
 
         /** selection 관련 */
@@ -534,7 +531,7 @@ SUNEDITOR.defaultLang = {
                         parentNode.insertBefore(oNode, rightNode);
                     }
                     else {
-                        if(/^BR$/i.test(parentNode.lastChild.nodeName)) {
+                        if(parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
                             parentNode.removeChild(parentNode.lastChild);
                         }
                         parentNode.appendChild(oNode);
@@ -811,7 +808,7 @@ SUNEDITOR.defaultLang = {
                 context.element.resizeBackground.style.display = "none";
                 context.element.imageResizeDiv.style.display = "none";
                 context.element.imageResizeBtn.style.display = "none";
-                // context.argument._imageElement = null;
+                context.argument._imageElement = null;
             }
         };
 
@@ -887,44 +884,46 @@ SUNEDITOR.defaultLang = {
 
                 /** 커멘드 명령어 실행 */
                 if(!!command) {
-                    if(/fontName/.test(command)) {
-                        dom.changeTxt(editor.originSub.firstElementChild, txt);
-                        editor.pure_execCommand(command, false, value);
-                    }
-                    else if(/format/.test(command)) {
-                        editor.pure_execCommand("formatBlock", false, value);
-                    }
-                    else if(/fontSize/.test(command)) {
-                        editor.appendSpan(value);
-                    }
-                    else if(/justifyleft|justifyright|justifycenter|justifyfull/.test(command)) {
-                        dom.changeTxt(editor.originSub.firstElementChild, targetElement.title.split(" ")[0]);
-//					dom.changeClass(editor.originSub.firstElementChild, targetElement.firstElementChild.className);
-                        editor.pure_execCommand(command, false);
-                    }
-                    else if(/foreColor|hiliteColor/.test(command)) {
-                        editor.pure_execCommand(command, false, value);
-                    }
-                    else if(/horizontalRules/.test(command)) {
-                        editor.appendHr(value);
-                    }
-                    else if(/sorceFrame/.test(command)) {
-                        editor.toggleFrame();
-                        dom.toggleClass(targetElement, 'on');
-                    }
-                    else if(/fullScreen/.test(command)) {
-                        editor.toggleFullScreen(targetElement);
-                        dom.toggleClass(targetElement, "on");
-                    }
-                    else if(/indent|outdent/.test(command)) {
-                        editor.pure_execCommand(command, false);
-                    }
-                    else if(/insertTable/.test(command)) {
-                        editor.appendTable(context.argument._tableXY[0], context.argument._tableXY[1]);
-                    }
-                    else {
-                        editor.pure_execCommand(command, false, value);
-                        dom.toggleClass(targetElement, "on");
+                    switch(command) {
+                        case 'fontName':
+                            dom.changeTxt(editor.originSub.firstElementChild, txt);
+                            editor.pure_execCommand(command, false, value);
+                            break;
+                        case 'fontSize':
+                            editor.appendSpan(value);
+                            break;
+                        case 'horizontalRules':
+                            editor.appendHr(value);
+                            break;
+                        case 'sorceFrame':
+                            editor.toggleFrame();
+                            dom.toggleClass(targetElement, 'on');
+                            break;
+                        case 'fullScreen':
+                            editor.toggleFullScreen(targetElement);
+                            dom.toggleClass(targetElement, "on");
+                            break;
+                        case 'insertTable':
+                            editor.appendTable(context.argument._tableXY[0], context.argument._tableXY[1]);
+                            break;
+                        case 'justifyleft':
+                        case 'justifyright':
+                        case 'justifycenter':
+                        case 'justifyfull':
+                        case 'indent':
+                        case 'outdent':
+                        case 'redo':
+                        case 'undo':
+                            editor.pure_execCommand(command, false);
+                            break;
+                        case 'formatBlock':
+                        case 'foreColor':
+                        case 'hiliteColor':
+                            editor.pure_execCommand(command, false, value);
+                            break;
+                        default :
+                            editor.pure_execCommand(command, false, value);
+                            dom.toggleClass(targetElement, "on");
                     }
 
                     editor.subOff();
@@ -1071,45 +1070,48 @@ SUNEDITOR.defaultLang = {
                 var ctrl = e.ctrlKey;
                 var alt = e.altKey;
 
-                if(ctrl) {
+                if(ctrl && !shift) {
                     var nodeName = false;
 
                     switch(keyCode) {
                         case 66: /** B */
                         e.preventDefault();
-
                             editor.pure_execCommand('bold', false);
                             nodeName = 'B';
-
                             break;
                         case 85: /** U */
                         e.preventDefault();
-
                             editor.pure_execCommand('underline', false);
                             nodeName = 'U';
-
                             break;
                         case 73: /** I */
                         e.preventDefault();
-
                             editor.pure_execCommand('italic', false);
                             nodeName = 'I';
-
                             break;
-                        case 83: /** S */
-                            if(!shift) break;
-
-                            e.preventDefault();
-
-                            editor.pure_execCommand('strikethrough', false);
-                            nodeName = 'STRIKE';
-
+                        case 89: /** Y */
+                        e.preventDefault();
+                            editor.pure_execCommand('redo', false);
                             break;
+                        case 90: /** Z */
+                        e.preventDefault();
+                            editor.pure_execCommand('undo', false);
                     }
 
                     if(!!nodeName) {
                         dom.toggleClass(list.commandMap[nodeName], "on");
                     }
+
+                    return;
+                }
+
+                /** ctrl + shift + S */
+                if(ctrl && shift && keyCode === 83) {
+                    e.preventDefault();
+                    editor.pure_execCommand('strikethrough', false);
+                    dom.toggleClass(list.commandMap['STRIKE'], "on");
+
+                    return;
                 }
 
                 switch(keyCode) {
@@ -1121,7 +1123,6 @@ SUNEDITOR.defaultLang = {
                         break;
                     case 9: /**tab key*/
                     e.preventDefault();
-
                         if(ctrl || alt) break;
 
                         var currentNode = context.argument._selectionNode || wysiwygSelection.getSelection().anchorNode;
@@ -1177,10 +1178,12 @@ SUNEDITOR.defaultLang = {
 
             onScroll_wysiwyg : function() {
                 if(!!context.argument._imageElement) {
-                    var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.scrollY);
-
-                    context.element.imageResizeDiv.style.top = t + "px";
-                    context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
+                    // var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - (context.element.wysiwygWindow.scrollY || context.element.wysiwygWindow.pageXOffset));
+                    // context.element.imageResizeDiv.style.top = t + "px";
+                    // context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
+                    context.element.imageResizeDiv.style.display = "none";
+                    context.element.imageResizeBtn.style.display = "none";
+                    context.argument._imageElement = null;
                 }
             },
 
@@ -1313,19 +1316,21 @@ SUNEDITOR.defaultLang = {
             },
 
             onMouseDown_image_ctrl : function(e) {
-                context.argument._imageClientX = e.clientX;
-
-                e.preventDefault();
                 e.stopPropagation();
+                e.preventDefault();
 
+                context.argument._imageClientX = e.clientX;
                 context.element.resizeBackground.style.display = "block";
-                context.element.imageResizeBtn.style = "none";
+                context.element.imageResizeBtn.style.display = "none";
+
+                function closureFunc() {
+                    editor.cancel_resize_image();
+                    document.removeEventListener('mousemove', editor.resize_image);
+                    document.removeEventListener('mouseup', closureFunc);
+                };
 
                 document.addEventListener('mousemove', editor.resize_image);
-                document.addEventListener('mouseup', function(){
-                    document.removeEventListener('mousemove', editor.resize_image);
-                    editor.cancel_resize_image();
-                });
+                document.addEventListener('mouseup', closureFunc);
             },
 
             onMouseMove_tablePicker : function(e) {
@@ -1353,11 +1358,14 @@ SUNEDITOR.defaultLang = {
                 context.argument._resizeClientY = e.clientY;
                 context.element.resizeBackground.style.display = "block";
 
-                document.addEventListener('mousemove', editor.resize_editor);
-                document.addEventListener('mouseup', function () {
-                    document.removeEventListener('mousemove', editor.resize_editor);
+                function closureFunc() {
                     context.element.resizeBackground.style.display = "none";
-                });
+                    document.removeEventListener('mousemove', editor.resize_editor);
+                    document.removeEventListener('mouseup', closureFunc);
+                };
+
+                document.addEventListener('mousemove', editor.resize_editor);
+                document.addEventListener('mouseup', closureFunc);
             },
 
             submit_dialog : function(e) {
@@ -1392,6 +1400,7 @@ SUNEDITOR.defaultLang = {
 
                             context.dialog.linkText.value = "";
                             context.dialog.linkAnchorText.value = "";
+
                             break;
                         case 'sun-editor-id-submit-image':
                             if(context.dialog.imgInputUrl.value.trim().length === 0) break;
@@ -1405,6 +1414,7 @@ SUNEDITOR.defaultLang = {
 
                             context.dialog.imgInputFile.value = "";
                             context.dialog.imgInputUrl.value = "";
+
                             break;
                         case'sun-editor-id-submit-video':
                             if(context.dialog.videoInputUrl.value.trim().length === 0) break;
@@ -1561,7 +1571,7 @@ SUNEDITOR.defaultLang = {
                 '    <ul class="editor_tool">';
             if(options.showFont) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="sub">'+
                     '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
@@ -1594,20 +1604,20 @@ SUNEDITOR.defaultLang = {
             }
             if(options.showFormats) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.formats+'" data-display="sub">'+
                     '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_size">'+
                     '                <div class="inner_layer">'+
                     '                    <ul class="list_editor format_list">'+
-                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="format" data-value="h3"><h3>Header 3</h3></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="format" data-value="h4"><h4>Header 4</h4></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="format" data-value="h5"><h5>Header 5</h5></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="format" data-value="h6"><h6>Header 6</h6></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="formatBlock" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="formatBlock" data-value="h1"><h1>Header 1</h1></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="formatBlock" data-value="h2"><h2>Header 2</h2></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="formatBlock" data-value="h3"><h3>Header 3</h3></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="formatBlock" data-value="h4"><h4>Header 4</h4></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="formatBlock" data-value="h5"><h5>Header 5</h5></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="formatBlock" data-value="h6"><h6>Header 6</h6></button></li>'+
                     '                    </ul>'+
                     '                </div>'+
                     '            </div>'+
@@ -1615,7 +1625,7 @@ SUNEDITOR.defaultLang = {
             }
             if(options.showFontSize) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="sub">'+
                     '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
@@ -1650,13 +1660,13 @@ SUNEDITOR.defaultLang = {
                 '   <ul class="editor_tool">';
             if(options.showBold) {
                 html += ''+
-                    '       <li class="compact_editor">'+
+                    '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-bold" title="'+lang.toolbar.bold+' (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>'+
                     '       </li>';
             }
             if(options.showUnderline) {
                 html += ''+
-                    '       <li class="compact_editor">'+
+                    '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-underline" title="'+lang.toolbar.underline+' (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>'+
                     '       </li>';
             }
@@ -1679,7 +1689,7 @@ SUNEDITOR.defaultLang = {
                 '    <ul class="editor_tool">';
             if(options.showFontColor) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <div class="box_color" data-display="sub">'+
                     '                <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
                     '                <button type="button" class="btn_editor" title="'+lang.toolbar.fontColor+'">'+
@@ -1942,7 +1952,27 @@ SUNEDITOR.defaultLang = {
             }
             html += '</ul>'+
                 '</div>'+
-                '';
+                /** 실행취소 관련 */
+                '<div class="tool_module">'+
+                '    <ul class="editor_tool">';
+            if(options.showUndo) {
+                html += ''+
+                    '        <li>'+
+                    '            <button class="btn_editor" title="'+lang.toolbar.undo+' (Ctrl+Z)" data-command="undo">'+
+                    '                <div class="img_editor ico_undo"></div>'+
+                    '            </button>'+
+                    '        </li>';
+            }
+            if(options.showRedo) {
+                html += ''+
+                    '        <li>'+
+                    '            <button class="btn_editor" title="'+lang.toolbar.redo+' (Ctrl+Y)" data-command="redo">'+
+                    '                <div class="img_editor ico_redo"></div>'+
+                    '            </button>'+
+                    '        </li>';
+            }
+            html += '</ul>'+
+                '</div>';
 
             return html;
         };
@@ -2113,65 +2143,68 @@ SUNEDITOR.defaultLang = {
         options.showVideo = options.showVideo !== undefined? options.showVideo: true;
         options.showFullScreen = options.showFullScreen !== undefined? options.showFullScreen: true;
         options.showCodeView = options.showCodeView !== undefined? options.showCodeView: true;
+        options.showUndo = options.showUndo !== undefined? options.showUndo: true;
+        options.showRedo = options.showRedo !== undefined? options.showRedo: true;
 
+        var doc = document;
         /** 최상위 div */
-        var top_div = document.createElement("DIV");
+        var top_div = doc.createElement("DIV");
         top_div.className = "sun-editor";
         top_div.id = "suneditor_" + element.id;
         top_div.style.width = options.width;
         /** relative div */
-        var relative = document.createElement("DIV");
+        var relative = doc.createElement("DIV");
         relative.className = "sun-editor-container";
 
         /** 툴바 */
-        var tool_bar = document.createElement("DIV");
+        var tool_bar = doc.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
         tool_bar.innerHTML = createEditor(options).toolBar();
 
         /** 에디터 */
-        var editor_div = document.createElement("DIV");
+        var editor_div = doc.createElement("DIV");
         editor_div.className = "sun-editor-id-editorArea";
         editor_div.style.height = options.height;
         /** iframe */
-        var iframe = document.createElement("IFRAME");
+        var iframe = doc.createElement("IFRAME");
         iframe.allowFullscreen = true;
         iframe.frameBorder = 0;
         iframe.className = "input_editor sun-editor-id-wysiwyg";
         iframe.style.display = "block";
         /** textarea */
-        var textarea = document.createElement("TEXTAREA");
+        var textarea = doc.createElement("TEXTAREA");
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
 
         /** 리사이즈바 */
-        var resize_bar = document.createElement("DIV");
+        var resize_bar = doc.createElement("DIV");
         resize_bar.className = "sun-editor-id-resizeBar";
 
         /** 다이얼로그 */
-        var dialog_div = document.createElement("DIV");
+        var dialog_div = doc.createElement("DIV");
         dialog_div.className = "sun-editor-id-dialogBox";
         dialog_div.innerHTML = createEditor(options).dialogBox();
 
         /** 이미지 조절 div */
-        var resize_img = document.createElement("DIV");
+        var resize_img = doc.createElement("DIV");
         resize_img.className = "modal-image-resize";
         resize_img.innerHTML = createEditor(options).imgDiv();
         /** 이미지 조절 버튼 */
-        var resize_img_button = document.createElement("DIV");
+        var resize_img_button = doc.createElement("DIV");
         resize_img_button.className = "image-resize-btn";
         resize_img_button.innerHTML = createEditor(options).imgBtn();
 
         /** 로딩 박스 */
-        var loding_box = document.createElement("DIV");
+        var loding_box = doc.createElement("DIV");
         loding_box.className = "sun-editor-id-loding";
         loding_box.innerHTML = "<div class=\"ico-loding\"></div>";
 
         /** resize 동작시 background */
-        var resize_back = document.createElement("DIV");
+        var resize_back = doc.createElement("DIV");
         resize_back.className = "sun-editor-id-resize-background";
 
         /** 링크 수정 버튼 */
-        var link_button = document.createElement("DIV");
+        var link_button = doc.createElement("DIV");
         link_button.className = "sun-editor-id-link-btn";
         link_button.innerHTML = createEditor(options).linkBtn();
 
@@ -2231,9 +2264,11 @@ SUNEDITOR.defaultLang = {
 
         styleTmp = null;
 
+        var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
+
         setTimeout(function(){
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].setAttribute("scrolling", "auto");
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.head.innerHTML = ''+
+            sun_wysiwyg.setAttribute("scrolling", "auto");
+            sun_wysiwyg.contentWindow.document.head.innerHTML = ''+
                 '<meta charset=\"utf-8\">' +
                 '<style type=\"text/css\">' +
                 '   body {font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
@@ -2241,11 +2276,11 @@ SUNEDITOR.defaultLang = {
                 '   table tr {border:1px solid #ccc;}'+
                 '   table tr td {border:1px solid #ccc; padding:8px;}'+
                 '</style>';
-            cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.setAttribute("contenteditable", true);
+            sun_wysiwyg.contentWindow.document.body.setAttribute("contenteditable", true);
             if(element.value.length > 0) {
-                cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
+                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
             } else {
-                cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow.document.body.innerHTML = '<p>&#65279</p>';
+                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
             }
         }, 0);
 
@@ -2277,8 +2312,8 @@ SUNEDITOR.defaultLang = {
                 topArea: cons._top,
                 resizebar: cons._resizeBar,
                 editorArea: cons._editorArea,
-                wysiwygWindow: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow,
-                wysiwygElement: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0],
+                wysiwygWindow: sun_wysiwyg.contentWindow,
+                wysiwygElement: sun_wysiwyg,
                 source: cons._editorArea.getElementsByClassName('sun-editor-id-source')[0],
                 loding : cons._loding,
                 imageResizeDiv : cons._resizeImg,
@@ -2364,4 +2399,4 @@ SUNEDITOR.defaultLang = {
         return core(Context(element, cons.constructed, cons.options));
     };
 
-})();
+})(SUNEDITOR);

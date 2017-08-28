@@ -32,7 +32,9 @@ SUNEDITOR.lang = {
         image : 'Picture',
         video : 'Video',
         fullScreen : 'Full Screen',
-        htmlEditor : 'Code View'
+        htmlEditor : 'Code View',
+        undo : 'Undo',
+        redo : 'Redo'
     },
     dialogBox : {
         linkBox : {

@@ -33,7 +33,9 @@ SUNEDITOR.defaultLang = {
         image : 'Picture',
         video : 'Video',
         fullScreen : 'Full Screen',
-        htmlEditor : 'Code View'
+        htmlEditor : 'Code View',
+        undo : 'Undo',
+        redo : 'Redo'
     },
     dialogBox : {
         linkBox : {
@@ -882,44 +884,46 @@ SUNEDITOR.defaultLang = {
 
                 /** 커멘드 명령어 실행 */
                 if(!!command) {
-                    if(/fontName/.test(command)) {
-                        dom.changeTxt(editor.originSub.firstElementChild, txt);
-                        editor.pure_execCommand(command, false, value);
-                    }
-                    else if(/format/.test(command)) {
-                        editor.pure_execCommand("formatBlock", false, value);
-                    }
-                    else if(/fontSize/.test(command)) {
-                        editor.appendSpan(value);
-                    }
-                    else if(/justifyleft|justifyright|justifycenter|justifyfull/.test(command)) {
-                        dom.changeTxt(editor.originSub.firstElementChild, targetElement.title.split(" ")[0]);
-//					dom.changeClass(editor.originSub.firstElementChild, targetElement.firstElementChild.className);
-                        editor.pure_execCommand(command, false);
-                    }
-                    else if(/foreColor|hiliteColor/.test(command)) {
-                        editor.pure_execCommand(command, false, value);
-                    }
-                    else if(/horizontalRules/.test(command)) {
-                        editor.appendHr(value);
-                    }
-                    else if(/sorceFrame/.test(command)) {
-                        editor.toggleFrame();
-                        dom.toggleClass(targetElement, 'on');
-                    }
-                    else if(/fullScreen/.test(command)) {
-                        editor.toggleFullScreen(targetElement);
-                        dom.toggleClass(targetElement, "on");
-                    }
-                    else if(/indent|outdent/.test(command)) {
-                        editor.pure_execCommand(command, false);
-                    }
-                    else if(/insertTable/.test(command)) {
-                        editor.appendTable(context.argument._tableXY[0], context.argument._tableXY[1]);
-                    }
-                    else {
-                        editor.pure_execCommand(command, false, value);
-                        dom.toggleClass(targetElement, "on");
+                    switch(command) {
+                        case 'fontName':
+                            dom.changeTxt(editor.originSub.firstElementChild, txt);
+                            editor.pure_execCommand(command, false, value);
+                            break;
+                        case 'fontSize':
+                            editor.appendSpan(value);
+                            break;
+                        case 'horizontalRules':
+                            editor.appendHr(value);
+                            break;
+                        case 'sorceFrame':
+                            editor.toggleFrame();
+                            dom.toggleClass(targetElement, 'on');
+                            break;
+                        case 'fullScreen':
+                            editor.toggleFullScreen(targetElement);
+                            dom.toggleClass(targetElement, "on");
+                            break;
+                        case 'insertTable':
+                            editor.appendTable(context.argument._tableXY[0], context.argument._tableXY[1]);
+                            break;
+                        case 'justifyleft':
+                        case 'justifyright':
+                        case 'justifycenter':
+                        case 'justifyfull':
+                        case 'indent':
+                        case 'outdent':
+                        case 'redo':
+                        case 'undo':
+                            editor.pure_execCommand(command, false);
+                            break;
+                        case 'formatBlock':
+                        case 'foreColor':
+                        case 'hiliteColor':
+                            editor.pure_execCommand(command, false, value);
+                            break;
+                        default :
+                            editor.pure_execCommand(command, false, value);
+                            dom.toggleClass(targetElement, "on");
                     }
 
                     editor.subOff();
@@ -1066,45 +1070,48 @@ SUNEDITOR.defaultLang = {
                 var ctrl = e.ctrlKey;
                 var alt = e.altKey;
 
-                if(ctrl) {
+                if(ctrl && !shift) {
                     var nodeName = false;
 
                     switch(keyCode) {
                         case 66: /** B */
-                        e.preventDefault();
-
+                            e.preventDefault();
                             editor.pure_execCommand('bold', false);
                             nodeName = 'B';
-
                             break;
                         case 85: /** U */
-                        e.preventDefault();
-
+                            e.preventDefault();
                             editor.pure_execCommand('underline', false);
                             nodeName = 'U';
-
                             break;
                         case 73: /** I */
-                        e.preventDefault();
-
+                            e.preventDefault();
                             editor.pure_execCommand('italic', false);
                             nodeName = 'I';
-
                             break;
-                        case 83: /** S */
-                            if(!shift) break;
-
+                        case 89: /** Y */
                             e.preventDefault();
-
-                            editor.pure_execCommand('strikethrough', false);
-                            nodeName = 'STRIKE';
-
+                            editor.pure_execCommand('redo', false);
                             break;
+                        case 90: /** Z */
+                            e.preventDefault();
+                            editor.pure_execCommand('undo', false);
                     }
 
                     if(!!nodeName) {
                         dom.toggleClass(list.commandMap[nodeName], "on");
                     }
+
+                    return;
+                }
+
+                /** ctrl + shift + S */
+                if(ctrl && shift && keyCode === 83) {
+                    e.preventDefault();
+                    editor.pure_execCommand('strikethrough', false);
+                    dom.toggleClass(list.commandMap['STRIKE'], "on");
+
+                    return;
                 }
 
                 switch(keyCode) {
@@ -1115,8 +1122,7 @@ SUNEDITOR.defaultLang = {
                         }
                         break;
                     case 9: /**tab key*/
-                    e.preventDefault();
-
+                        e.preventDefault();
                         if(ctrl || alt) break;
 
                         var currentNode = context.argument._selectionNode || wysiwygSelection.getSelection().anchorNode;
@@ -1173,7 +1179,6 @@ SUNEDITOR.defaultLang = {
             onScroll_wysiwyg : function() {
                 if(!!context.argument._imageElement) {
                     // var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - (context.element.wysiwygWindow.scrollY || context.element.wysiwygWindow.pageXOffset));
-                    //
                     // context.element.imageResizeDiv.style.top = t + "px";
                     // context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
                     context.element.imageResizeDiv.style.display = "none";
@@ -1395,6 +1400,7 @@ SUNEDITOR.defaultLang = {
 
                             context.dialog.linkText.value = "";
                             context.dialog.linkAnchorText.value = "";
+
                             break;
                         case 'sun-editor-id-submit-image':
                             if(context.dialog.imgInputUrl.value.trim().length === 0) break;
@@ -1408,6 +1414,7 @@ SUNEDITOR.defaultLang = {
 
                             context.dialog.imgInputFile.value = "";
                             context.dialog.imgInputUrl.value = "";
+
                             break;
                         case'sun-editor-id-submit-video':
                             if(context.dialog.videoInputUrl.value.trim().length === 0) break;
@@ -1564,7 +1571,7 @@ SUNEDITOR.defaultLang = {
                 '    <ul class="editor_tool">';
             if(options.showFont) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="sub">'+
                     '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
@@ -1597,20 +1604,20 @@ SUNEDITOR.defaultLang = {
             }
             if(options.showFormats) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.formats+'" data-display="sub">'+
                     '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_size">'+
                     '                <div class="inner_layer">'+
                     '                    <ul class="list_editor format_list">'+
-                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="format" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="format" data-value="h1"><h1>Header 1</h1></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="format" data-value="h2"><h2>Header 2</h2></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="format" data-value="h3"><h3>Header 3</h3></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="format" data-value="h4"><h4>Header 4</h4></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="format" data-value="h5"><h5>Header 5</h5></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="format" data-value="h6"><h6>Header 6</h6></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="formatBlock" data-value="P"><p style="font-size:13pt;">nomal</p></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="formatBlock" data-value="h1"><h1>Header 1</h1></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="formatBlock" data-value="h2"><h2>Header 2</h2></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="formatBlock" data-value="h3"><h3>Header 3</h3></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="formatBlock" data-value="h4"><h4>Header 4</h4></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="formatBlock" data-value="h5"><h5>Header 5</h5></button></li>'+
+                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="formatBlock" data-value="h6"><h6>Header 6</h6></button></li>'+
                     '                    </ul>'+
                     '                </div>'+
                     '            </div>'+
@@ -1618,7 +1625,7 @@ SUNEDITOR.defaultLang = {
             }
             if(options.showFontSize) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="sub">'+
                     '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
@@ -1653,13 +1660,13 @@ SUNEDITOR.defaultLang = {
                 '   <ul class="editor_tool">';
             if(options.showBold) {
                 html += ''+
-                    '       <li class="compact_editor">'+
+                    '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-bold" title="'+lang.toolbar.bold+' (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>'+
                     '       </li>';
             }
             if(options.showUnderline) {
                 html += ''+
-                    '       <li class="compact_editor">'+
+                    '       <li>'+
                     '           <button type="button" class="btn_editor sun-editor-id-underline" title="'+lang.toolbar.underline+' (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>'+
                     '       </li>';
             }
@@ -1682,7 +1689,7 @@ SUNEDITOR.defaultLang = {
                 '    <ul class="editor_tool">';
             if(options.showFontColor) {
                 html += ''+
-                    '        <li class="compact_editor">'+
+                    '        <li>'+
                     '            <div class="box_color" data-display="sub">'+
                     '                <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
                     '                <button type="button" class="btn_editor" title="'+lang.toolbar.fontColor+'">'+
@@ -1945,7 +1952,27 @@ SUNEDITOR.defaultLang = {
             }
             html += '</ul>'+
                 '</div>'+
-                '';
+                /** 실행취소 관련 */
+                '<div class="tool_module">'+
+                '    <ul class="editor_tool">';
+            if(options.showUndo) {
+                html += ''+
+                    '        <li>'+
+                    '            <button class="btn_editor" title="'+lang.toolbar.undo+' (Ctrl+Z)" data-command="undo">'+
+                    '                <div class="img_editor ico_undo"></div>'+
+                    '            </button>'+
+                    '        </li>';
+            }
+            if(options.showRedo) {
+                html += ''+
+                    '        <li>'+
+                    '            <button class="btn_editor" title="'+lang.toolbar.redo+' (Ctrl+Y)" data-command="redo">'+
+                    '                <div class="img_editor ico_redo"></div>'+
+                    '            </button>'+
+                    '        </li>';
+            }
+            html += '</ul>'+
+                '</div>';
 
             return html;
         };
@@ -2116,6 +2143,8 @@ SUNEDITOR.defaultLang = {
         options.showVideo = options.showVideo !== undefined? options.showVideo: true;
         options.showFullScreen = options.showFullScreen !== undefined? options.showFullScreen: true;
         options.showCodeView = options.showCodeView !== undefined? options.showCodeView: true;
+        options.showUndo = options.showUndo !== undefined? options.showUndo: true;
+        options.showRedo = options.showRedo !== undefined? options.showRedo: true;
 
         var doc = document;
         /** 최상위 div */

@@ -103,6 +103,8 @@
 .sun-editor .sun-editor-id-toolbar .ico_full_screen_e {width:17px; height:17px; margin: 0 auto; background:url('../img/expand_icon&48.png') no-repeat; background-size:100%;}
 .sun-editor .sun-editor-id-toolbar .ico_full_screen_i {width:17px; height:17px; margin: 0 auto; background:url('../img/import_icon&48.png') no-repeat; background-size:100%;}
 .sun-editor .sun-editor-id-toolbar .ico_html {width:17px; height:17px; margin: 0 auto; background:url('../img/brackets_icon&48.png') no-repeat; background-size:100%;}
+.sun-editor .sun-editor-id-toolbar .ico_undo {width:17px; height:17px; margin: 0 auto; background:url('../img/undo_icon&48.png') no-repeat; background-size:100%;}
+.sun-editor .sun-editor-id-toolbar .ico_redo {width:17px; height:17px; margin: 0 auto; background:url('../img/redo_icon&48.png') no-repeat; background-size:100%;}
 
 .sun-editor .sun-editor-id-toolbar .img_line1 {height:2px; background-position:0 -30px;}
 .sun-editor .sun-editor-id-toolbar .img_line2 {height:3px; background-position:0 -35px;}
