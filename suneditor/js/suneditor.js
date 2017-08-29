@@ -76,6 +76,8 @@ SUNEDITOR.defaultLang = {
  * MIT license.
  */
 (function(SUNEDITOR){
+    'use strict';
+
     /**
      * utile func
      */
@@ -247,6 +249,8 @@ SUNEDITOR.defaultLang = {
      * @param context
      */
     var core = function(context){
+        /** xmlHttp */
+        var xmlHttp;
 
         /** 배열 관련 */
         var list = (function(context){
@@ -809,6 +813,42 @@ SUNEDITOR.defaultLang = {
                 context.element.imageResizeDiv.style.display = "none";
                 context.element.imageResizeBtn.style.display = "none";
                 context.argument._imageElement = null;
+            },
+
+            imgUpload_collBack : function() {
+                if(xmlHttp.readyState == 4){
+                    if(xmlHttp.status == 200){
+                        var result = eval(xmlHttp.responseText);
+                        var resultLen = result.length;
+
+                        for(var i=0; i<resultLen; i++) {
+                            var oImg = document.createElement("IMG");
+                            oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
+                            oImg.style.width = context.user.imageSize;
+                            editor.insertNode(oImg);
+                            editor.appendP(oImg);
+                        }
+                    } else{
+                        var WindowObject = window.open('', "_blank");
+                        WindowObject.document.writeln(xmlHttp.responseText);
+                        WindowObject.document.close();
+                        WindowObject.focus();
+                    }
+                }
+            },
+
+            setup_reader : function(file) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    var oImg = document.createElement("IMG");
+                    oImg.src = reader.result;
+                    oImg.style.width = context.user.imageSize;
+                    editor.insertNode(oImg);
+                    editor.appendP(oImg);
+                };
+
+                reader.readAsDataURL(file);
             }
         };
 
@@ -1201,60 +1241,23 @@ SUNEDITOR.defaultLang = {
                         editor.showLoding();
                         editor.subOff();
 
-                        var url = context.user.imageUploadUrl;
+                        var imageUploadUrl = context.user.imageUploadUrl;
                         var filesLen = files.length;
 
-                        if(url !== null && url.length > 0) {
-                            var xmlHttp;
+                        if(imageUploadUrl !== null && imageUploadUrl.length > 0) {
                             var formData = new FormData();
-
-                            function imgUpload_collBack() {
-                                if(xmlHttp.readyState == 4){
-                                    if(xmlHttp.status == 200){
-                                        var result = eval(xmlHttp.responseText);
-                                        var resultLen = result.length;
-
-                                        for(var i=0; i<resultLen; i++) {
-                                            var oImg = document.createElement("IMG");
-                                            oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
-                                            oImg.style.width = context.user.imageSize;
-                                            editor.insertNode(oImg);
-                                            editor.appendP(oImg);
-                                        }
-                                    } else{
-                                        var WindowObject = window.open('', "_blank");
-                                        WindowObject.document.writeln(xmlHttp.responseText);
-                                        WindowObject.document.close();
-                                        WindowObject.focus();
-                                    }
-                                }
-                            }
 
                             for(var i=0; i<filesLen; i++) {
                                 formData.append("file-" + i, files[i]);
                             }
 
                             xmlHttp = func.getXMLHttpRequest();
-                            xmlHttp.onreadystatechange = imgUpload_collBack;
-                            xmlHttp.open("post", url, true);
+                            xmlHttp.onreadystatechange = editor.imgUpload_collBack;
+                            xmlHttp.open("post", imageUploadUrl, true);
                             xmlHttp.send(formData);
                         } else {
-                            function setup_reader(file) {
-                                var reader = new FileReader();
-
-                                reader.onload = function () {
-                                    var oImg = document.createElement("IMG");
-                                    oImg.src = reader.result;
-                                    oImg.style.width = context.user.imageSize;
-                                    editor.insertNode(oImg);
-                                    editor.appendP(oImg);
-                                };
-
-                                reader.readAsDataURL(file);
-                            }
-
                             for(var i=0; i<filesLen; i++) {
-                                setup_reader(files[i])
+                                editor.setup_reader(files[i])
                             }
                         }
 
