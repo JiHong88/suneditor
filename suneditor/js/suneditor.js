@@ -1462,8 +1462,35 @@ SUNEDITOR.defaultLang = {
 
         };
 
-        /** 유저 사용 함수 {{save, getContent, setContent, appendContent, disabled, enabled, show, hide}} */
-        var user = {
+        /** 이벤트 등록 */
+        window.onresize = function(){event.resize_window()};
+
+        context.tool.bar.addEventListener('click', event.onClick_toolbar);
+        context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
+        context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
+        context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
+
+        context.dialog.modal.addEventListener('click', event.onClick_dialog);
+        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
+        context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
+        context.dialog.imgInputFile.addEventListener('change', event.onChange_imgInput);
+        context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
+        context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
+        context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
+        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
+        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
+        context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
+        context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
+
+        var dialogLen = context.dialog.forms.length;
+        for(var i=0; i<dialogLen; i++) {
+            context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', event.submit_dialog);
+        }
+    };
+
+    /** 유저 사용 함수 */
+    var user = function(context) {
+        return {
             save : function() {
                 if(context.argument._wysiwygActive) {
                     context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
@@ -1517,42 +1544,6 @@ SUNEDITOR.defaultLang = {
             hide : function() {
                 context.element.topArea.style.display = "none";
             }
-        };
-
-        /** 이벤트 등록 */
-        window.onresize = function(){event.resize_window()};
-
-        context.tool.bar.addEventListener('click', event.onClick_toolbar);
-        context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
-        context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
-        context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
-
-        context.dialog.modal.addEventListener('click', event.onClick_dialog);
-        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
-        context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
-        context.dialog.imgInputFile.addEventListener('change', event.onChange_imgInput);
-        context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
-        context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
-        context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
-        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
-        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
-        context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
-        context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
-
-        var dialogLen = context.dialog.forms.length;
-        for(var i=0; i<dialogLen; i++) {
-            context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', event.submit_dialog);
-        };
-
-        return {
-            save : user.save,
-            getContent : user.getContent,
-            setContent : user.setContent,
-            appendContent : user.appendContent,
-            disabled : user.disabled,
-            enabled : user.enabled,
-            show : user.show,
-            hide : user.hide
         };
     };
 
@@ -2396,7 +2387,10 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        return core(Context(element, cons.constructed, cons.options));
+        var contextNode = Context(element, cons.constructed, cons.options);
+        core(contextNode);
+
+        return user(contextNode);
     };
 
 })(SUNEDITOR);
