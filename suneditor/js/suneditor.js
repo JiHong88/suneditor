@@ -2120,7 +2120,8 @@ SUNEDITOR.defaultLang = {
         options.width = /^\d+/.test(options.width)?  (/^\d+$/.test(options.width)? options.width+"px": options.width): (/%|auto/.test(element.style.width)? element.style.width: element.clientWidth+"px");
         options.display = options.display || 'block';
         options.imageUploadUrl = options.imageUploadUrl || null;
-        /** 툴바 버튼 보이기 설정 */
+        options.editorIframeFont = options.editorIframeFont || 'inherit';
+            /** 툴바 버튼 보이기 설정 */
         options.showFont = options.showFont !== undefined? options.showFont: true;
         options.showFormats = options.showFormats !== undefined? options.showFormats: true;
         options.showFontSize = options.showFontSize !== undefined? options.showFontSize: true;
@@ -2268,7 +2269,7 @@ SUNEDITOR.defaultLang = {
             sun_wysiwyg.contentWindow.document.head.innerHTML = ''+
                 '<meta charset=\"utf-8\">' +
                 '<style type=\"text/css\">' +
-                '   body {font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
+                '   body {font-family:'+options.editorIframeFont+'; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
                 '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0px; border-collapse:collapse;}'+
                 '   table tr {border:1px solid #ccc;}'+
                 '   table tr td {border:1px solid #ccc; padding:8px;}'+
