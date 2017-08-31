@@ -62,6 +62,7 @@ imageUploadUrl  : he image upload to server mapping address when append Img tag 
                   When not used, it enters base64 data
                   return type : JsonArray (ex) [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
                                                 {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
+editorIframeFont: Change iframe font of the suneditor /default - "inherit"
 showFont        : Display font module /default - true
 showFormats     : Display formats module /default - true
 showFontSize    : Display font size module /default - true
