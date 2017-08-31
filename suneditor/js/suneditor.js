@@ -445,8 +445,11 @@ SUNEDITOR.defaultLang = {
                 oHr.style.border = "black 0px none";
                 oHr.style.borderTop = borderStyle;
                 oHr.style.height = "1px";
-                context.argument._selectionNode.parentNode.appendChild(oHr);
 
+                var pNode = context.argument._selectionNode.parentNode;
+                if(/body/i.test(pNode)) pNode = context.argument._selectionNode;
+
+                pNode.appendChild(oHr);
                 editor.appendP(oHr);
             },
 
