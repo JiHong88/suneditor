@@ -265,18 +265,20 @@ SUNEDITOR.defaultLang = {
 
             /** 글꼴 목록 가져오기 */
             var fontFamilyMap = {};
-            var list_fontFamily = context.tool.list_fontFamily.children;
-            var fontFamilyLen = list_fontFamily.length;
+            if(!!context.tool.list_fontFamily) {
+                var list_fontFamily = context.tool.list_fontFamily.children;
+                var fontFamilyLen = list_fontFamily.length;
 
-            for(var i=0; i<fontFamilyLen; i++) {
-                fontFamilyMap[list_fontFamily[i].firstChild.getAttribute("data-value").replace(/\s*/g,"")] = list_fontFamily[i].firstChild.getAttribute("data-txt");
-            }
-
-            if(!!context.tool.list_fontFamily_add) {
-                list_fontFamily = context.tool.list_fontFamily_add.children;
-                fontFamilyLen = list_fontFamily.length;
                 for(var i=0; i<fontFamilyLen; i++) {
                     fontFamilyMap[list_fontFamily[i].firstChild.getAttribute("data-value").replace(/\s*/g,"")] = list_fontFamily[i].firstChild.getAttribute("data-txt");
+                }
+
+                if(!!context.tool.list_fontFamily_add) {
+                    list_fontFamily = context.tool.list_fontFamily_add.children;
+                    fontFamilyLen = list_fontFamily.length;
+                    for(var i=0; i<fontFamilyLen; i++) {
+                        fontFamilyMap[list_fontFamily[i].firstChild.getAttribute("data-value").replace(/\s*/g,"")] = list_fontFamily[i].firstChild.getAttribute("data-txt");
+                    }
                 }
             }
 
@@ -352,10 +354,16 @@ SUNEDITOR.defaultLang = {
             },
 
             cancel_table_picker : function() {
-                context.tool.tableHighlight.style.width = "1em";
-                context.tool.tableHighlight.style.height = "1em";
-                context.tool.tableUnHighlight.style.width = "5em";
-                context.tool.tableUnHighlight.style.height = "5em";
+                if(!context.tool.tableHighlight) return;
+
+                var highlight = context.tool.tableHighlight.style;
+                var unHighlight = context.tool.tableUnHighlight.style;
+
+                highlight.width = "1em";
+                highlight.height = "1em";
+                unHighlight.width = "5em";
+                unHighlight.height = "5em";
+
                 dom.changeTxt(context.tool.tableDisplay, "1 x 1");
             },
 
@@ -1087,7 +1095,6 @@ SUNEDITOR.defaultLang = {
                     selectionParent = selectionParent.parentNode;
                 }
 
-
                 /** remove */
                 map = map.split("|");
                 var mapLen = map.length - 1;
@@ -1481,12 +1488,13 @@ SUNEDITOR.defaultLang = {
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
         context.dialog.imgInputFile.addEventListener('change', event.onChange_imgInput);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
-        context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
         context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
         context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
         context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
         context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
+
+        if(!!context.tool.tablePicker) context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
 
         var dialogLen = context.dialog.forms.length;
         for(var i=0; i<dialogLen; i++) {
@@ -1602,7 +1610,7 @@ SUNEDITOR.defaultLang = {
             if(options.showFormats) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.formats+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-display="sub">'+
                     '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_size">'+
@@ -2121,7 +2129,7 @@ SUNEDITOR.defaultLang = {
         options.display = options.display || 'block';
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.editorIframeFont = options.editorIframeFont || 'inherit';
-            /** 툴바 버튼 보이기 설정 */
+        /** 툴바 버튼 보이기 설정 */
         options.showFont = options.showFont !== undefined? options.showFont: true;
         options.showFormats = options.showFormats !== undefined? options.showFormats: true;
         options.showFontSize = options.showFontSize !== undefined? options.showFontSize: true;
@@ -2334,11 +2342,11 @@ SUNEDITOR.defaultLang = {
                 tableUnHighlight : cons._toolBar.getElementsByClassName('sun-editor-id-table-unhighlighted')[0],
                 tableDisplay : cons._toolBar.getElementsByClassName('sun-editor-table-display')[0],
                 fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
-                default_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0].textContent,
+                default_fontFamily : (cons._toolBar.getElementsByClassName('sun-editor-font-family').length>0? cons._toolBar.getElementsByClassName('sun-editor-font-family')[0].textContent: undefined),
                 list_fontFamily : cons._toolBar.getElementsByClassName('sun-editor-list-font-family')[0],
                 list_fontFamily_add : cons._toolBar.getElementsByClassName('sun-editor-list-font-family-add')[0],
                 fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0],
-                default_fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0].textContent
+                default_fontSize : (cons._toolBar.getElementsByClassName('sun-editor-font-size').length>0? cons._toolBar.getElementsByClassName('sun-editor-font-size')[0].textContent: undefined)
             },
             dialog : {
                 modalArea : cons._dialog,
