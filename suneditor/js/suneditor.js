@@ -539,10 +539,12 @@ SUNEDITOR.defaultLang = {
                     parentNode = startCon.parentNode;
                 }
 
+                var rightNode = null;
+
                 /** 범위선택 없을때 */
                 if(startCon === endCon && startOff === endOff) {
                     if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
-                        var rightNode = selection.focusNode.splitText(endOff);
+                        rightNode = selection.focusNode.splitText(endOff);
                         parentNode.insertBefore(oNode, rightNode);
                     }
                     else {
@@ -554,7 +556,6 @@ SUNEDITOR.defaultLang = {
                 }
                 /** 범위선택 했을때 */
                 else {
-                    var rightNode = null;
                     var removeNode = startCon;
                     var isSameContainer = startCon === endCon;
                     var endLen = endCon.data.length;
@@ -602,6 +603,10 @@ SUNEDITOR.defaultLang = {
                 var ELEMENT_NODE = 1;
                 var TEXT_NODE = 3;
 
+                var spanNode = null;
+                var beforeNode = null;
+                var afterNode = null;
+
                 /** 같은 노드안에서 선택 */
                 if(startCon === endCon) {
                     if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
@@ -609,10 +614,10 @@ SUNEDITOR.defaultLang = {
                     }
                     else {
                         var afterNodeStandardPosition;
-                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+                        beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
-                        var spanNode = document.createElement("SPAN");
+                        spanNode = document.createElement("SPAN");
                         spanNode.style.fontSize = fontsize;
 
                         if(startOff === endOff) {
@@ -651,9 +656,6 @@ SUNEDITOR.defaultLang = {
                     var childNodes = dom.getListChildNodes(commonCon);
                     var startIndex = dom.getArrayIndex(childNodes, startCon);
                     var endIndex = dom.getArrayIndex(childNodes, endCon);
-                    var spanNode = null;
-                    var beforeNode = null;
-                    var afterNode = null;
 
                     var startNode = startCon;
                     for(var i=startIndex+1; i>=0; i--) {
@@ -1121,7 +1123,7 @@ SUNEDITOR.defaultLang = {
                 var alt = e.altKey;
 
                 if(ctrl && !shift) {
-                    var nodeName = false;
+                    var nodeName = "";
 
                     switch(keyCode) {
                         case 66: /** B */
@@ -1340,7 +1342,7 @@ SUNEDITOR.defaultLang = {
                     editor.cancel_resize_image();
                     document.removeEventListener('mousemove', editor.resize_image);
                     document.removeEventListener('mouseup', closureFunc);
-                };
+                }
 
                 document.addEventListener('mousemove', editor.resize_image);
                 document.addEventListener('mouseup', closureFunc);
@@ -1375,7 +1377,7 @@ SUNEDITOR.defaultLang = {
                     context.element.resizeBackground.style.display = "none";
                     document.removeEventListener('mousemove', editor.resize_editor);
                     document.removeEventListener('mouseup', closureFunc);
-                };
+                }
 
                 document.addEventListener('mousemove', editor.resize_editor);
                 document.addEventListener('mouseup', closureFunc);
