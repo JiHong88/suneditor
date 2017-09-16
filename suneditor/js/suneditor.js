@@ -403,7 +403,7 @@ SUNEDITOR.defaultLang = {
                     context.argument._wysiwygActive = true;
                 }
                 else {
-                    context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?!^\r)(?!^\n)/gi, "<\/p>\r\n");
+                    context.element.source.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, "<\/p>\n");
                     context.element.wysiwygElement.style.display = "none";
                     context.element.source.style.display = "block";
                     context.argument._wysiwygActive = false;
