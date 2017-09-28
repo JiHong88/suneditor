@@ -245,10 +245,13 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * SunEditor
+     * SunEditor core closure
      * @param context
+     * @param dom
+     * @param func
+     * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    var core = function(context){
+    var core = function(context, dom, func){
         /** xmlHttp */
         var xmlHttp;
 
@@ -1443,7 +1446,7 @@ SUNEDITOR.defaultLang = {
                             if(/youtu\.?be/.test(url)) {
                                 url = url.replace('watch?v=', '');
                                 if(!/^\/\/.+\/embed\//.test(url)) {
-                                    var youtubeUrl = url.match(/^\/\/.+\//)[0]
+                                    var youtubeUrl = url.match(/^\/\/.+\//)[0];
                                     url = url.replace(youtubeUrl, '//www.youtube.com/embed/');
                                 }
                             }
@@ -1502,10 +1505,8 @@ SUNEDITOR.defaultLang = {
         for(var i=0; i<dialogLen; i++) {
             context.dialog.forms[i].getElementsByClassName("btn-primary")[0].addEventListener('click', event.submit_dialog);
         }
-    };
 
-    /** 유저 사용 함수 */
-    var user = function(context) {
+        /** 유저 사용 함수 */
         return {
             save : function() {
                 if(context.argument._wysiwygActive) {
@@ -1559,6 +1560,21 @@ SUNEDITOR.defaultLang = {
 
             hide : function() {
                 context.element.topArea.style.display = "none";
+            },
+
+            destroy : function() {
+                context.element.topArea.parentNode.removeChild(context.element.topArea);
+                context.element.textElement.style.display = "";
+
+                delete this.save;
+                delete this.getContent;
+                delete this.setContent;
+                delete this.appendContent;
+                delete this.disabled;
+                delete this.enabled;
+                delete this.show;
+                delete this.hide;
+                delete this.destroy;
             }
         };
     };
@@ -1865,25 +1881,25 @@ SUNEDITOR.defaultLang = {
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
                     '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="sub">'+
-                    '                <hr style="border-width: 1px 0px 0px; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
-                    '                <hr style="border-width: 1px 0px 0px; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
-                    '                <hr style="border-width: 1px 0px 0px; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
                     '            </button>'+
                     '            <div class="layer_editor layer_line">'+
                     '                <div class="inner_layer inner_layer_type2">'+
                     '                    <ul class="list_editor">'+
                     '                        <li><button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr1">'+
-                    '                                <hr style="border-width: 1px 0px 0px; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
                     '                            </button>'+
                     '                        </li>'+
                     '                        <li>'+
                     '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr2">'+
-                    '                                <hr style="border-width: 1px 0px 0px; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
                     '                            </button>'+
                     '                        </li>'+
                     '                        <li>'+
                     '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr3">'+
-                    '                                <hr style="border-width: 1px 0px 0px; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
                     '                            </button>'+
                     '                        </li>'+
                     '                    </ul>'+
@@ -2183,6 +2199,23 @@ SUNEDITOR.defaultLang = {
         var textarea = doc.createElement("TEXTAREA");
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
+        iframe.addEventListener("load", function(){
+            this.setAttribute("scrolling", "auto");
+            this.contentWindow.document.head.innerHTML = ''+
+                '<meta charset=\"utf-8\">' +
+                '<style type=\"text/css\">' +
+                '   body {font-family:'+options.editorIframeFont+'; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
+                '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0; border-collapse:collapse;}'+
+                '   table tr {border:1px solid #ccc;}'+
+                '   table tr td {border:1px solid #ccc; padding:8px;}'+
+                '</style>';
+            this.contentWindow.document.body.setAttribute("contenteditable", true);
+            if(element.value.length > 0) {
+                this.contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
+            } else {
+                this.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
+            }
+        });
 
         /** 리사이즈바 */
         var resize_bar = doc.createElement("DIV");
@@ -2259,6 +2292,9 @@ SUNEDITOR.defaultLang = {
      * @constructor
      */
     var Context = function(element, cons, options) {
+        /** iframe 태그 **/
+        var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
+
         /** 내부 옵션값 초기화 */
         var styleTmp = document.createElement("div");
 
@@ -2268,29 +2304,7 @@ SUNEDITOR.defaultLang = {
         }
 
         options._originCssText = styleTmp.style.cssText;
-        options._innerHeight = cons._editorArea.clientHeight;
-
-        styleTmp = null;
-
-        var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
-
-        setTimeout(function(){
-            sun_wysiwyg.setAttribute("scrolling", "auto");
-            sun_wysiwyg.contentWindow.document.head.innerHTML = ''+
-                '<meta charset=\"utf-8\">' +
-                '<style type=\"text/css\">' +
-                '   body {font-family:'+options.editorIframeFont+'; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
-                '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0px; border-collapse:collapse;}'+
-                '   table tr {border:1px solid #ccc;}'+
-                '   table tr td {border:1px solid #ccc; padding:8px;}'+
-                '</style>';
-            sun_wysiwyg.contentWindow.document.body.setAttribute("contenteditable", true);
-            if(element.value.length > 0) {
-                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>'+element.value+'</p>';
-            } else {
-                sun_wysiwyg.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
-            }
-        }, 0);
+        options._innerHeight = options.height.match(/\d+/)[0];
 
         return {
             argument : {
@@ -2380,7 +2394,7 @@ SUNEDITOR.defaultLang = {
      * create Suneditor
      * @param elementId
      * @param options
-     * @returns {core}
+     * @returns {{save, getContent, setContent, appendContent, disabled, enabled, show, hide, destroy}}
      */
     SUNEDITOR.create = function (elementId, options) {
         var element = document.getElementById(elementId);
@@ -2390,6 +2404,10 @@ SUNEDITOR.defaultLang = {
         }
 
         var cons = Constructor(element, options);
+
+        if(!!document.getElementById(cons.constructed._top.id)) {
+            throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id +'")');
+        }
 
         if(/none/i.test(element.style.display)) {
             cons.constructed._top.style.display = "none";
@@ -2404,10 +2422,17 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        var contextNode = Context(element, cons.constructed, cons.options);
-        core(contextNode);
+        return core(Context(element, cons.constructed, cons.options), dom, func);
+    };
 
-        return user(contextNode);
+    /**
+     * destroy Suneditor
+     * @param elementId
+     */
+    SUNEDITOR.destroy = function(elementId) {
+        var element = document.getElementById('suneditor_' + elementId);
+        element.parentNode.removeChild(element);
+        document.getElementById(elementId).style.display = "";
     };
 
 })(SUNEDITOR);

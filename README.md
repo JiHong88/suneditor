@@ -97,6 +97,7 @@ disabled()             : Disable the suneditor
 enabled()              : Enabled the suneditor
 hide()                 : Hide the suneditor
 show()                 : Show the suneditor
+destroy()              : Destroy the suneditor
 ```
 
 ## Image upload to server
