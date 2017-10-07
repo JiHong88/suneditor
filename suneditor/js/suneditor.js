@@ -1171,7 +1171,7 @@ SUNEDITOR.defaultLang = {
 
                 switch(keyCode) {
                     case 8: /**backspace key*/
-                        if(target.childElementCount === 1 && target.children[0].innerHTML === "<br>") {
+                        if(target.childElementCount === 1 && target.children[0].innerHTML === "<br/>") {
                             e.preventDefault();
                             return false;
                         }
@@ -1881,25 +1881,25 @@ SUNEDITOR.defaultLang = {
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
                     '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="sub">'+
-                    '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
-                    '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
-                    '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
+                    '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
+                    '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '            </button>'+
                     '            <div class="layer_editor layer_line">'+
                     '                <div class="inner_layer inner_layer_type2">'+
                     '                    <ul class="list_editor">'+
                     '                        <li><button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr1">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                            </button>'+
                     '                        </li>'+
                     '                        <li>'+
                     '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr2">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                            </button>'+
                     '                        </li>'+
                     '                        <li>'+
                     '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr3">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;">'+
+                    '                                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                            </button>'+
                     '                        </li>'+
                     '                    </ul>'+
@@ -2019,12 +2019,12 @@ SUNEDITOR.defaultLang = {
                 '            <div class="modal-body">'+
                 '                <div class="form-group">'+
                 '                    <label>'+lang.dialogBox.linkBox.url+'</label>'+
-                '                    <input class="form-control sun-editor-id-linkurl" type="text">'+
+                '                    <input class="form-control sun-editor-id-linkurl" type="text" />'+
                 '                </div>'+
                 '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text">'+
+                '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text" />'+
                 '                </div>'+
-                '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
+                '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
                 '            </div>'+
                 '            <div class="modal-footer">'+
                 '                <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>'+lang.dialogBox.submitButton+'</span></button>'+
@@ -2044,10 +2044,10 @@ SUNEDITOR.defaultLang = {
                 '            <div class="modal-body">'+
                 '                <div class="form-group">'+
                 '                    <label>'+lang.dialogBox.imageBox.file+'</label>'+
-                '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple">'+
+                '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />'+
                 '                </div>'+
                 '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text">'+
+                '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text" />'+
                 '                </div>'+
                 '            </div>'+
                 '            <div class="modal-footer">'+
@@ -2068,11 +2068,11 @@ SUNEDITOR.defaultLang = {
                 '            <div class="modal-body">'+
                 '                <div class="form-group">'+
                 '                    <label>'+lang.dialogBox.videoBox.url+'</label>'+
-                '                    <input class="form-control sun-editor-id-video-url" type="text">'+
+                '                    <input class="form-control sun-editor-id-video-url" type="text" />'+
                 '                </div>'+
                 '                <div class="form-group form-size">'+
                 '                    <div class="size-text"><label class="size-w">'+lang.dialogBox.videoBox.width+'</label><label class="size-x"> </label><label class="size-h">'+lang.dialogBox.videoBox.height+'</label></div>'+
-                '                    <input type="text" class="form-size-control sun-editor-id-video-x"><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y">'+
+                '                    <input type="text" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y" />'+
                 '                </div>'+
                 '            </div>'+
                 '            <div class="modal-footer">'+
@@ -2202,7 +2202,7 @@ SUNEDITOR.defaultLang = {
         iframe.addEventListener("load", function(){
             this.setAttribute("scrolling", "auto");
             this.contentWindow.document.head.innerHTML = ''+
-                '<meta charset=\"utf-8\">' +
+                '<meta charset=\"utf-8\" />' +
                 '<style type=\"text/css\">' +
                 '   body {font-family:'+options.editorIframeFont+'; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
                 '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0; border-collapse:collapse;}'+
