@@ -520,12 +520,12 @@ SUNEDITOR.defaultLang = {
                 focusText.focus();
             },
 
-            showLoding : function() {
-                context.element.loding.style.display = "block";
+            showLoading : function() {
+                context.element.loading.style.display = "block";
             },
 
-            closeLoding : function() {
-                context.element.loding.style.display = "none";
+            closeLoading : function() {
+                context.element.loading.style.display = "none";
             },
 
             insertNode : function(oNode) {
@@ -850,6 +850,8 @@ SUNEDITOR.defaultLang = {
                         WindowObject.document.close();
                         WindowObject.focus();
                     }
+
+                    editor.closeLoading();
                 }
             },
 
@@ -1253,7 +1255,7 @@ SUNEDITOR.defaultLang = {
             onChange_imgInput : function() {
                 function inputAction(files) {
                     if (files) {
-                        editor.showLoding();
+                        editor.showLoading();
                         editor.subOff();
 
                         var imageUploadUrl = context.user.imageUploadUrl;
@@ -1274,6 +1276,8 @@ SUNEDITOR.defaultLang = {
                             for(var i=0; i<filesLen; i++) {
                                 editor.setup_reader(files[i])
                             }
+
+                            editor.closeLoading();
                         }
 
                         context.dialog.imgInputFile.value = "";
@@ -1284,9 +1288,8 @@ SUNEDITOR.defaultLang = {
                 try {
                     inputAction(this.files);
                 } catch(e) {
+                    editor.closeLoading();
                     throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message +'"');
-                } finally {
-                    editor.closeLoding();
                 }
             },
 
@@ -1389,7 +1392,7 @@ SUNEDITOR.defaultLang = {
             submit_dialog : function(e) {
                 var className = this.classList[this.classList.length - 1];
 
-                editor.showLoding();
+                editor.showLoading();
 
                 e.preventDefault();
                 e.stopPropagation();
@@ -1472,7 +1475,7 @@ SUNEDITOR.defaultLang = {
                     submitAction(className);
                 } finally {
                     editor.subOff();
-                    editor.closeLoding();
+                    editor.closeLoading();
                 }
 
                 return false;
@@ -2236,9 +2239,9 @@ SUNEDITOR.defaultLang = {
         resize_img_button.innerHTML = createEditor(options).imgBtn();
 
         /** 로딩 박스 */
-        var loding_box = doc.createElement("DIV");
-        loding_box.className = "sun-editor-id-loding";
-        loding_box.innerHTML = "<div class=\"ico-loding\"></div>";
+        var loading_box = doc.createElement("DIV");
+        loading_box.className = "sun-editor-id-loading";
+        loading_box.innerHTML = "<div class=\"ico-loading\"></div>";
 
         /** resize 동작시 background */
         var resize_back = doc.createElement("DIV");
@@ -2263,7 +2266,7 @@ SUNEDITOR.defaultLang = {
         relative.appendChild(resize_back);
         relative.appendChild(resize_img);
         relative.appendChild(resize_img_button);
-        relative.appendChild(loding_box);
+        relative.appendChild(loading_box);
         relative.appendChild(link_button);
         top_div.appendChild(relative);
 
@@ -2274,7 +2277,7 @@ SUNEDITOR.defaultLang = {
                 _editorArea : editor_div,
                 _resizeBar : resize_bar,
                 _dialog : dialog_div,
-                _loding : loding_box,
+                _loading : loading_box,
                 _resizeImg : resize_img,
                 _resizeImgBtn : resize_img_button,
                 _resizeBack : resize_back,
@@ -2337,7 +2340,7 @@ SUNEDITOR.defaultLang = {
                 wysiwygWindow: sun_wysiwyg.contentWindow,
                 wysiwygElement: sun_wysiwyg,
                 source: cons._editorArea.getElementsByClassName('sun-editor-id-source')[0],
-                loding : cons._loding,
+                loading : cons._loading,
                 imageResizeDiv : cons._resizeImg,
                 imageResizeController : cons._resizeImg.getElementsByClassName('sun-editor-img-controller')[0],
                 imageResizeDisplay : cons._resizeImg.getElementsByClassName('sun-editor-id-img-display')[0],

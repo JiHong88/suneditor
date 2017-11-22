@@ -171,8 +171,8 @@
 .sun-editor .modal-dialog .modal-body .label-check {cursor:pointer;}
 
 /* 로딩 박스 */
-.sun-editor .sun-editor-id-loding {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loding.jpg'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
-.sun-editor .sun-editor-id-loding .ico-loding {display:none;}
+.sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loadinfo.gif'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
+.sun-editor .sun-editor-id-loading .ico-loading {display:none;}
 
 /* 테이블 선택 */
 .sun-editor .table-content {position:absolute; top:34px; left:1px; z-index:11; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
