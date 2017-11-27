@@ -78,6 +78,9 @@ SUNEDITOR.defaultLang = {
 (function(SUNEDITOR){
     'use strict';
 
+    var ELEMENT_NODE = 1;
+    var TEXT_NODE = 3;
+
     /**
      * utile func
      */
@@ -528,6 +531,83 @@ SUNEDITOR.defaultLang = {
                 context.element.loading.style.display = "none";
             },
 
+            removeNode : function() {
+                var nativeRng = wysiwygSelection.getRange();
+
+                var startCon = nativeRng.startContainer;
+                var startOff = nativeRng.startOffset;
+                var endCon = nativeRng.endContainer;
+                var endOff = nativeRng.endOffset;
+                var commonCon = nativeRng.commonAncestorContainer;
+
+                var beforeNode = null;
+                var afterNode = null;
+
+                var childNodes = dom.getListChildNodes(commonCon);
+                var startIndex = dom.getArrayIndex(childNodes, startCon);
+                var endIndex = dom.getArrayIndex(childNodes, endCon);
+
+                var startNode = startCon;
+                for(var i=startIndex+1; i>=0; i--) {
+                    if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
+                        startIndex = i;
+                        startNode = startNode.parentNode;
+                    }
+                }
+
+                var endNode = endCon;
+                for(var i=endIndex-1; i>startIndex; i--) {
+                    if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
+                        childNodes.splice(i, 1);
+                        endNode = endNode.parentNode;
+                        --endIndex;
+                    }
+                }
+
+                for(var i=startIndex; i<=endIndex; i++) {
+                    var item = childNodes[i];
+
+                    if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
+                        dom.removeItem(item);
+                        continue;
+                    }
+
+                    if(item === startCon) {
+                        if(startCon.nodeType === ELEMENT_NODE) {
+                            beforeNode = document.createTextNode(startCon.textContent);
+                        } else {
+                            beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        }
+
+                        if(beforeNode.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            dom.removeItem(startCon);
+                        }
+
+                        continue;
+                    }
+
+                    if(item === endCon) {
+                        if(endCon.nodeType === ELEMENT_NODE) {
+                            afterNode = document.createTextNode(endCon.textContent);
+                        } else {
+                            afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                        }
+
+                        if(afterNode.length > 0) {
+                            endCon.data = afterNode.data;
+                        } else {
+                            dom.removeItem(endCon);
+                        }
+
+                        continue;
+                    }
+
+                    dom.removeItem(item);
+                }
+            },
+
             insertNode : function(oNode) {
                 var selection = wysiwygSelection.getSelection();
                 var nativeRng = wysiwygSelection.getRange();
@@ -578,7 +658,7 @@ SUNEDITOR.defaultLang = {
                         try {
                             selection.deleteFromDocument();
                         } catch(e) {
-
+                            this.removeNode();
                         }
 
                         if(endLen === endCon.data.length) rightNode = endCon.nextSibling;
@@ -590,6 +670,8 @@ SUNEDITOR.defaultLang = {
                     } catch(e) {
                         parentNode.appendChild(oNode);
                     }
+
+                    wysiwygSelection.setRange(oNode, 0, oNode, 0);
                 }
             },
 
@@ -602,9 +684,6 @@ SUNEDITOR.defaultLang = {
                 var endCon = nativeRng.endContainer;
                 var endOff = nativeRng.endOffset;
                 var commonCon = nativeRng.commonAncestorContainer;
-
-                var ELEMENT_NODE = 1;
-                var TEXT_NODE = 3;
 
                 var spanNode = null;
                 var beforeNode = null;
