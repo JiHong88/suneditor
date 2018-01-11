@@ -1,4 +1,4 @@
-if(typeof window.SUNEDITOR === 'undefined') window.SUNEDITOR = {};
+if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
 /** default language english */
 SUNEDITOR.defaultLang = {
@@ -110,7 +110,25 @@ SUNEDITOR.defaultLang = {
             else {
                 return null;
             }
-        }
+        },
+
+        getBasePath : (function() {
+            var path = SUNEDITOR.SUNEDITOR_BASEPATH || "";
+            if(!path) {
+                for(var c = document.getElementsByTagName("script"), i = 0; i < c.length; i++) {
+                    var editorTag = c[i].src.match(/(^|.*[\\\/])suneditor\.js(?:\?.*|;.*)?$/i);
+                    if(editorTag) {
+                        path = editorTag[1];
+                        break
+                    }
+                }
+            }
+            - 1 === path.indexOf(":/") && "//" !== path.slice(0, 2) && (path = 0 === path.indexOf("/") ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+
+            if (!path) throw '[SUNEDITOR.func.getBasePath.fail] The SUNEDITOR installation path could not be automatically detected. Please set the global variable "SUNEDITOR_BASEPATH" before creating editor instances.';
+
+            return path;
+        })()
     };
 
     /**
@@ -293,6 +311,31 @@ SUNEDITOR.defaultLang = {
                 fontFamilyMap : fontFamilyMap
             };
         })(context);
+
+        var module = {
+            setScriptHead : function(moduleName, option) {
+                var returnValue = false;
+                moduleName = 'dialog';
+                if(!SUNEDITOR.plugin[moduleName]) {
+                    var script = document.createElement("script");
+                    script.type = "text/javascript";
+                    script.src = func.getBasePath + 'plugins/' + moduleName + '/' + moduleName + '.js';
+                    script.onload = function(){
+                        SUNEDITOR.plugin[moduleName].add(context, option);
+                    };
+                    document.getElementsByTagName("head")[0].appendChild(script);
+                    returnValue = true;
+                } else {
+
+                }
+
+                return returnValue;
+            },
+
+            add : function() {
+
+            }
+        };
 
         /** selection 관련 */
         var wysiwygSelection = {
@@ -991,6 +1034,8 @@ SUNEDITOR.defaultLang = {
                 e.preventDefault();
                 e.stopPropagation();
 
+                module.setScriptHead(command);
+
                 wysiwygSelection.focus();
 
                 var value = targetElement.getAttribute("data-value");
@@ -1667,7 +1712,7 @@ SUNEDITOR.defaultLang = {
      * @returns {{toolBar: toolBar, dialogBox: dialogBox, imgDiv: imgDIv, imgBtn: imgBtn, linkBtn: linkBtn}}
      */
     var createEditor = function (options){
-        var lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
+        var lang = SUNEDITOR.lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
 
         var toolBar = function() {
             var html = '<div class="sun-editor-id-toolbar-cover"></div>'+

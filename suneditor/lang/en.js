@@ -1,4 +1,4 @@
-if(typeof window.SUNEDITOR === 'undefined') window.SUNEDITOR = {};
+if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
 SUNEDITOR.lang = {
     toolbar : {
