@@ -1,6 +1,6 @@
 (function () {
-    SUNEDITOR.plugin.dialog = {
-        add : function(context, dialogName) {
+    SUNEDITOR.plugin.image = {
+        add : function(context, _this) {
             var dialog_div = null;
             if(!context.dialog.modalArea) {
                 dialog_div = document.createElement("DIV");
@@ -14,7 +14,7 @@
                 dialog_area.className = "modal-dialog sun-editor-id-dialog-modal";
                 dialog_area.style.display = "none";
 
-                dialog_area.innerHTML += this.setDialog(dialogName);
+                dialog_area.appendChild(eval(this.setDialog()));
 
                 dialog_div.appendChild(dialog_back);
                 dialog_div.appendChild(dialog_area);
@@ -25,22 +25,20 @@
                 context.dialog.forms = {};
             } else {
                 dialog_div = context.dialog.modalArea;
-                context.dialog.forms.image = this.setDialog();
             }
 
+            context.dialog.forms.image = eval(this.setDialog());
             context.dialog.image = dialog_div.getElementsByClassName('sun-editor-id-dialog-image')[0];
             context.dialog.imgInputFile = dialog_div.getElementsByClassName('sun-editor-id-image-file')[0];
             context.dialog.imgInputUrl = dialog_div.getElementsByClassName('sun-editor-id-image-url')[0];
 
-            context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.dialog.onClick_dialog.bind(context));
+            /** 이벤트 선언 */
+            context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.image.onClick_dialog.bind(context, _this));
+            context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(context, _this));
+            context.dialog.forms.image.addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(context, _this));
 
-            // SUNEDITOR.dialogFunc.showDialog(dialogName, context);
-
-            context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.dialog.onChange_imgInput.bind(context));
-            context.dialog.forms.image.addEventListener('click', SUNEDITOR.plugin.dialog.submit_dialog.bind(context));
             context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
 
-            alert(12);
             return context;
         },
 
@@ -51,48 +49,46 @@
             dialog.style.display = 'none';
             /** 이미지 삽입 다이얼로그 */
             dialog.innerHTML = ''+
-                '    <div class="modal-content sun-editor-id-dialog-image" style="display: none;">'+
-                '        <form class="editor_image" method="post" enctype="multipart/form-data">'+
-                '            <div class="modal-header">'+
-                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                '                    <span aria-hidden="true" data-command="close">x</span>'+
-                '                </button>'+
-                '                <h5 class="modal-title">'+lang.dialogBox.imageBox.title+'</h5>'+
-                '            </div>'+
-                '            <div class="modal-body">'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.imageBox.file+'</label>'+
-                '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />'+
-                '                </div>'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text" />'+
-                '                </div>'+
-                '            </div>'+
-                '            <div class="modal-footer">'+
-                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                '            </div>'+
-                '        </form>'+
-                '    </div>';
+                '<form class="editor_image" method="post" enctype="multipart/form-data">'+
+                '   <div class="modal-header">'+
+                '       <button type="button" data-command="close" class="close" aria-label="Close">'+
+                '           <span aria-hidden="true" data-command="close">x</span>'+
+                '       </button>'+
+                '       <h5 class="modal-title">'+lang.dialogBox.imageBox.title+'</h5>'+
+                '   </div>'+
+                '   <div class="modal-body">'+
+                '       <div class="form-group">'+
+                '           <label>'+lang.dialogBox.imageBox.file+'</label>'+
+                '               <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />'+
+                '       </div>'+
+                '       <div class="form-group">'+
+                '           <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text" />'+
+                '       </div>'+
+                '   </div>'+
+                '   <div class="modal-footer">'+
+                '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>'+lang.dialogBox.submitButton+'</span></button>'+
+                '   </div>'+
+                '</form>';
 
             return dialog;
         },
 
-        onClick_dialog : function(e) {
+        onClick_dialog : function(_this, e) {
             e.stopPropagation();
 
             if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
-                SUNEDITOR.dialogFunc.dialogOff(this);
+                SUNEDITOR.editor.subOff().call(_this);
             }
         },
 
         xmlHttp : null,
 
-        onChange_imgInput : function(e) {
+        onChange_imgInput : function(_this, e) {
             e = e || window.event;
             function inputAction(files) {
                 if(files) {
-                    SUNEDITOR.editor.showLoading(this.context);
-                    SUNEDITOR.dialogFunc.dialogOff(this.context);
+                    SUNEDITOR.editor.showLoading();
+                    SUNEDITOR.editor.subOff();
 
                     var imageUploadUrl = this.user.imageUploadUrl;
                     var filesLen = files.length;
@@ -115,7 +111,7 @@
                             SUNEDITOR.editor.setup_reader(files[i])
                         }
 
-                        SUNEDITOR.dialogFunc.closeLoading();
+                        SUNEDITOR.editor.closeLoading();
                     }
 
                     this.dialog.imgInputFile.value = "";
@@ -126,12 +122,12 @@
             try {
                 inputAction.call(this, e.target.files);
             } catch(e) {
-                SUNEDITOR.dialogFunc.closeLoading();
+                SUNEDITOR.editor.closeLoading();
                 throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message +'"');
             }
         },
 
-        imgUpload_collBack : function() {
+        imgUpload_collBack : function(_this) {
             var xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
             if(xmlHttp.readyState === 4){
                 if(xmlHttp.status === 200){
@@ -152,11 +148,11 @@
                     WindowObject.focus();
                 }
 
-                SUNEDITOR.dialogFunc.closeLoading();
+                SUNEDITOR.editor.closeLoading();
             }
         },
 
-        submit_dialog : function(e) {
+        submit_dialog : function(_this, e) {
             SUNEDITOR.editor.showLoading();
 
             e.preventDefault();
@@ -179,8 +175,8 @@
             try {
                 submitAction.call(this);
             } finally {
-                SUNEDITOR.dialogFunc.dialogOff(this.context);
-                SUNEDITOR.dialogFunc.closeLoading(this.context);
+                SUNEDITOR.editor.subOff();
+                SUNEDITOR.editor.closeLoading();
             }
 
             return false;
