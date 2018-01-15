@@ -84,7 +84,7 @@ SUNEDITOR.defaultLang = {
     /**
      * utile func
      */
-    var func = SUNEDITOR.func = {
+    var func = {
         returnTrue : function() {
             return true;
         },
@@ -134,7 +134,7 @@ SUNEDITOR.defaultLang = {
     /**
      * document func
      */
-    var dom = SUNEDITOR.dom = {
+    var dom = {
         getArrayIndex : function(array, element) {
             var idx = -1;
             var len = array.length;
@@ -310,7 +310,7 @@ SUNEDITOR.defaultLang = {
         })(context);
 
         /** 에디터 */
-        var editor = SUNEDITOR.editor = {
+        var editor = {
             context : context,
             plugin : {
                 dialog : false,
@@ -327,26 +327,29 @@ SUNEDITOR.defaultLang = {
             fontSizeUnit : "pt",
 
             /** 모듈 추가 **/
-            setScriptHead : function(moduleName, callBackFunction, subModuleName) {
+            setScriptHead : function(moduleName, callBackFunction) {
                 if(this.plugin[moduleName] === undefined) return false;
+
                 var returnValue = true;
+
+                var callBack_moduleAdd = function() {
+                    SUNEDITOR.plugin[moduleName].add(this);
+                    this.plugin[moduleName] = true;
+                    callBackFunction();
+                    returnValue = false;
+                }.bind(this);
+
                 if(!SUNEDITOR.plugin[moduleName]) {
                     var script = document.createElement("script");
                     script.type = "text/javascript";
                     script.src = func.getBasePath + 'plugins/' + moduleName + '/' + moduleName + '.js';
-                    script.onload = function(){
-                        SUNEDITOR.plugin[moduleName].add(this);
-                        this.plugin[moduleName] = true;
-                        callBackFunction();
-                        returnValue = false;
-                    }.bind(this);
+                    script.onload = callBack_moduleAdd;
 
                     document.getElementsByTagName("head")[0].appendChild(script);
                     returnValue = false;
                 }
                 else if(!this.plugin[moduleName]) {
-                    SUNEDITOR.plugin[moduleName].add(this);
-                    this.plugin[moduleName] = true;
+                    callBack_moduleAdd();
                 }
 
                 return returnValue;
@@ -1017,7 +1020,7 @@ SUNEDITOR.defaultLang = {
                         editor.originSub = editor.subMenu.previousElementSibling;
                     }
                     else if(/modal/.test(display)) {
-                        if(editor.setScriptHead('dialog', function(){editor.setScriptHead(command, function(){editor.openDialog(command)})}, command)) {
+                        if(editor.setScriptHead('dialog', function(){editor.setScriptHead(command, function(){editor.openDialog(command)})})) {
                             editor.openDialog(command);
                         }
                     }
@@ -1532,14 +1535,16 @@ SUNEDITOR.defaultLang = {
         context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
         context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
         context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
-
-        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
+        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
-        context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
-        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
-        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
         context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
+        context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
+
+
+        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
+        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
+
         context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
 
         if(!!context.tool.tablePicker) context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);

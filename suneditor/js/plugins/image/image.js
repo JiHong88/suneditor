@@ -12,7 +12,7 @@
 
             /** 이벤트 선언 */
             context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(_this));
-            context.dialog.forms.image.addEventListener('click', SUNEDITOR.plugin.image.submit_dialog_image.bind(_this));
+            context.dialog.forms.image.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
 
             return context;
         },
@@ -54,8 +54,8 @@
             e = e || window.event;
             function inputAction(files) {
                 if(files) {
-                    SUNEDITOR.editor.showLoading.call(this);
-                    SUNEDITOR.editor.subOff.call(this);
+                    this.showLoading();
+                    this.subOff();
 
                     var imageUploadUrl = this.context.user.imageUploadUrl;
                     var filesLen = files.length;
@@ -78,7 +78,7 @@
                             SUNEDITOR.plugin.image.setup_reader.call(this, files[i])
                         }
 
-                        SUNEDITOR.editor.closeLoading.call(this);
+                        this.closeLoading();
                     }
 
                     this.context.dialog.imgInputFile.value = "";
@@ -89,7 +89,7 @@
             try {
                 inputAction.call(this, e.target.files);
             } catch(e) {
-                SUNEDITOR.editor.closeLoading.call(this);
+                this.closeLoading();
                 throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message +'"');
             }
         },
@@ -101,8 +101,8 @@
                 var oImg = document.createElement("IMG");
                 oImg.src = reader.result;
                 oImg.style.width = this.context.user.imageSize;
-                SUNEDITOR.editor.insertNode.call(this, oImg);
-                SUNEDITOR.editor.appendP.call(this, oImg);
+                this.insertNode(oImg);
+                this.appendP(oImg);
             }.bind(this);
 
             reader.readAsDataURL(file);
@@ -119,8 +119,8 @@
                         var oImg = document.createElement("IMG");
                         oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
                         oImg.style.width = this.context.user.imageSize;
-                        SUNEDITOR.editor.insertNode.call(this, oImg);
-                        SUNEDITOR.editor.appendP.call(this, oImg);
+                        this.insertNode(oImg);
+                        this.appendP(oImg);
                     }
                 } else{
                     var WindowObject = window.open('', "_blank");
@@ -129,35 +129,35 @@
                     WindowObject.focus();
                 }
 
-                SUNEDITOR.editor.closeLoading.call(this);
+                this.closeLoading();
             }
         },
 
-        submit_dialog_image : function(e) {
-            SUNEDITOR.editor.showLoading.call(this);
+        submit_dialog : function(e) {
+            this.showLoading();
 
             e.preventDefault();
             e.stopPropagation();
 
             function submitAction() {
-                if(this.dialog.imgInputUrl.value.trim().length === 0) return;
+                if(this.context.dialog.imgInputUrl.value.trim().length === 0) return;
 
                 var oImg = document.createElement("IMG");
-                oImg.src = this.dialog.imgInputUrl.value;
+                oImg.src = this.context.dialog.imgInputUrl.value;
                 oImg.style.width = "350px";
 
-                SUNEDITOR.editor.insertNode.call(this, oImg);
-                SUNEDITOR.editor.appendP.call(this, oImg);
+                this.insertNode(oImg);
+                this.appendP(oImg);
 
-                this.dialog.imgInputFile.value = "";
-                this.dialog.imgInputUrl.value = "";
+                this.context.dialog.imgInputFile.value = "";
+                this.context.dialog.imgInputUrl.value = "";
             }
 
             try {
-                submitAction.call(this);
+                submitAction();
             } finally {
-                SUNEDITOR.editor.subOff.call(this);
-                SUNEDITOR.editor.closeLoading.call(this);
+                this.subOff();
+                this.closeLoading();
             }
 
             return false;

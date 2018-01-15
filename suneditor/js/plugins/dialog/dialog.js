@@ -40,7 +40,7 @@
             e.stopPropagation();
 
             if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
-                SUNEDITOR.editor.subOff.call(this);
+                this.subOff();
             }
         }
     }
