@@ -1,44 +1,18 @@
 (function () {
     SUNEDITOR.plugin.image = {
         add : function(_this) {
-            var dialog_div = null;
             var context = _this.context;
-            if(!context.dialog.modalArea) {
-                dialog_div = document.createElement("DIV");
-                dialog_div.className = "sun-editor-id-dialogBox";
+            var dialog_div = context.dialog.modalArea;
 
-                var dialog_back = document.createElement("DIV");
-                dialog_back.className = "modal-dialog-background sun-editor-id-dialog-back";
-                dialog_back.style.display = "none";
-
-                var dialog_area = document.createElement("DIV");
-                dialog_area.className = "modal-dialog sun-editor-id-dialog-modal";
-                dialog_area.style.display = "none";
-
-                dialog_area.appendChild(eval(this.setDialog()));
-
-                dialog_div.appendChild(dialog_back);
-                dialog_div.appendChild(dialog_area);
-
-                context.dialog.modalArea = dialog_div;
-                context.dialog.back = dialog_back;
-                context.dialog.modal = dialog_area;
-                context.dialog.forms = {};
-            } else {
-                dialog_div = context.dialog.modalArea;
-            }
-
-            context.dialog.forms.image = eval(this.setDialog());
+            context.dialog.modal.appendChild(eval(this.setDialog()));
+            context.dialog.forms.image = dialog_div.getElementsByClassName('sun-editor-id-dialog-image')[0];
             context.dialog.image = dialog_div.getElementsByClassName('sun-editor-id-dialog-image')[0];
             context.dialog.imgInputFile = dialog_div.getElementsByClassName('sun-editor-id-image-file')[0];
             context.dialog.imgInputUrl = dialog_div.getElementsByClassName('sun-editor-id-image-url')[0];
 
             /** 이벤트 선언 */
-            context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.image.onClick_dialog.bind(_this));
             context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(_this));
-            context.dialog.forms.image.addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
-
-            context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
+            context.dialog.forms.image.addEventListener('click', SUNEDITOR.plugin.image.submit_dialog_image.bind(_this));
 
             return context;
         },
@@ -72,14 +46,6 @@
                 '</form>';
 
             return dialog;
-        },
-
-        onClick_dialog : function(e) {
-            e.stopPropagation();
-
-            if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
-                SUNEDITOR.editor.subOff.call(this);
-            }
         },
 
         xmlHttp : null,
@@ -167,7 +133,7 @@
             }
         },
 
-        submit_dialog : function(e) {
+        submit_dialog_image : function(e) {
             SUNEDITOR.editor.showLoading.call(this);
 
             e.preventDefault();

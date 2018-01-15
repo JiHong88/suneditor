@@ -273,9 +273,6 @@ SUNEDITOR.defaultLang = {
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     var core = function(context, dom, func){
-        /** xmlHttp */
-        var xmlHttp;
-
         /** 배열 관련 */
         var list = (function(context){
             var commandMap = {
@@ -312,28 +309,15 @@ SUNEDITOR.defaultLang = {
             };
         })(context);
 
-        // var module = {
-        //     setScriptHead : function(moduleName) {
-        //         var returnValue = false;
-        //         if(!SUNEDITOR.plugin[moduleName]) {
-        //             var script = document.createElement("script");
-        //             script.type = "text/javascript";
-        //             script.src = func.getBasePath + 'plugins/' + moduleName + '/' + moduleName + '.js';
-        //             script.onload = function(){
-        //                 SUNEDITOR.plugin[moduleName].add(context);
-        //                 editor.openDialog(moduleName);
-        //             };
-        //             document.getElementsByTagName("head")[0].appendChild(script);
-        //             returnValue = true;
-        //         }
-        //
-        //         return returnValue;
-        //     }
-        // };
-
         /** 에디터 */
         var editor = SUNEDITOR.editor = {
             context : context,
+            plugin : {
+                dialog : false,
+                image : false,
+                link : false,
+                video : false
+            },
 
             subMenu : null,
             originSub : null,
@@ -343,21 +327,26 @@ SUNEDITOR.defaultLang = {
             fontSizeUnit : "pt",
 
             /** 모듈 추가 **/
-            setScriptHead : function(moduleName) {
-                var returnValue = false;
+            setScriptHead : function(moduleName, callBackFunction, subModuleName) {
+                if(this.plugin[moduleName] === undefined) return false;
+                var returnValue = true;
                 if(!SUNEDITOR.plugin[moduleName]) {
                     var script = document.createElement("script");
                     script.type = "text/javascript";
                     script.src = func.getBasePath + 'plugins/' + moduleName + '/' + moduleName + '.js';
                     script.onload = function(){
                         SUNEDITOR.plugin[moduleName].add(this);
-                        editor.openDialog(moduleName);
+                        this.plugin[moduleName] = true;
+                        callBackFunction();
+                        returnValue = false;
                     }.bind(this);
+
                     document.getElementsByTagName("head")[0].appendChild(script);
-                    returnValue = true;
-                } else {
+                    returnValue = false;
+                }
+                else if(!this.plugin[moduleName]) {
                     SUNEDITOR.plugin[moduleName].add(this);
-                    editor.openDialog(moduleName);
+                    this.plugin[moduleName] = true;
                 }
 
                 return returnValue;
@@ -1028,7 +1017,7 @@ SUNEDITOR.defaultLang = {
                         editor.originSub = editor.subMenu.previousElementSibling;
                     }
                     else if(/modal/.test(display)) {
-                        if(!editor.setScriptHead(command)) {
+                        if(editor.setScriptHead('dialog', function(){editor.setScriptHead(command, function(){editor.openDialog(command)})}, command)) {
                             editor.openDialog(command);
                         }
                     }
@@ -1346,6 +1335,22 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            onMouseDown_resizeBar : function(e) {
+                e.stopPropagation();
+
+                context.argument._resizeClientY = e.clientY;
+                context.element.resizeBackground.style.display = "block";
+
+                function closureFunc() {
+                    context.element.resizeBackground.style.display = "none";
+                    document.removeEventListener('mousemove', editor.resize_editor);
+                    document.removeEventListener('mouseup', closureFunc);
+                }
+
+                document.addEventListener('mousemove', editor.resize_editor);
+                document.addEventListener('mouseup', closureFunc);
+            },
+
             onClick_imageResizeBtn : function(e) {
                 e.stopPropagation();
 
@@ -1424,22 +1429,6 @@ SUNEDITOR.defaultLang = {
 
                 dom.changeTxt(context.tool.tableDisplay, x + " x " + y);
                 context.argument._tableXY = [x, y];
-            },
-
-            onMouseDown_resizeBar : function(e) {
-                e.stopPropagation();
-
-                context.argument._resizeClientY = e.clientY;
-                context.element.resizeBackground.style.display = "block";
-
-                function closureFunc() {
-                    context.element.resizeBackground.style.display = "none";
-                    document.removeEventListener('mousemove', editor.resize_editor);
-                    document.removeEventListener('mouseup', closureFunc);
-                }
-
-                document.addEventListener('mousemove', editor.resize_editor);
-                document.addEventListener('mouseup', closureFunc);
             },
 
             submit_dialog : function(e) {
