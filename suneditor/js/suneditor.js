@@ -84,7 +84,7 @@ SUNEDITOR.defaultLang = {
     /**
      * utile func
      */
-    var func = {
+    SUNEDITOR.func = {
         returnTrue : function() {
             return true;
         },
@@ -134,7 +134,7 @@ SUNEDITOR.defaultLang = {
     /**
      * document func
      */
-    var dom = {
+    SUNEDITOR.dom = {
         getArrayIndex : function(array, element) {
             var idx = -1;
             var len = array.length;
@@ -351,6 +351,9 @@ SUNEDITOR.defaultLang = {
                 else if(!this.plugin[moduleName]) {
                     callBack_moduleAdd();
                 }
+                else {
+                    callBackFunction();
+                }
 
                 return returnValue;
             },
@@ -437,7 +440,7 @@ SUNEDITOR.defaultLang = {
                     this.modalForm = null;
                 }
                 if(!!this.context.argument._imageElement) {
-                    this.cancel_resize_image();
+                    SUNEDITOR.plugin.image.cancel_resize_image.call(this);
                 }
                 if(!!this.editLink) {
                     this.context.element.linkBtn.style.display = "none";
@@ -544,34 +547,6 @@ SUNEDITOR.defaultLang = {
                 var oP = document.createElement("P");
                 oP.innerHTML = '&#65279';
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
-            },
-
-            openDialog : function(kind) {
-                var focusText = null;
-
-                switch(kind) {
-                    case 'link':
-                        this.modalForm = this.context.dialog.link;
-                        focusText = this.context.dialog.linkText;
-                        break;
-                    case 'image':
-                        this.modalForm = this.context.dialog.image;
-                        focusText = this.context.dialog.imgInputUrl;
-                        break;
-                    case 'video':
-                        this.modalForm = this.context.dialog.video;
-                        focusText = this.context.dialog.videoInputUrl;
-                        break;
-                }
-
-                this.context.dialog.modalArea.style.display = "block";
-                this.context.dialog.back.style.display = "block";
-                this.context.dialog.modal.style.display = "block";
-                this.modalForm.style.display = "block";
-
-                this.subMenu = this.context.dialog.modal;
-
-                focusText.focus();
             },
 
             showLoading : function() {
@@ -925,40 +900,6 @@ SUNEDITOR.defaultLang = {
                 this.context.argument._innerHeight = (this.context.element.editorArea.offsetHeight + resizeInterval);
 
                 this.context.argument._resizeClientY = e.clientY;
-            },
-
-            resize_image : function(e) {
-                var w = this.context.argument._imageElement_w + (e.clientX - this.context.argument._imageClientX);
-                var h = ((this.context.argument._imageElement_h/this.context.argument._imageElement_w) * w);
-
-                this.context.argument._imageElement.style.width = w + "px";
-                this.context.argument._imageElement.style.height = h + "px";
-
-                var parentElement = this.context.argument._imageElement.offsetParent;
-                var parentT = 0;
-                var parentL = 0;
-                while(parentElement) {
-                    parentT += (parentElement.offsetTop + parentElement.clientTop);
-                    parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
-                    parentElement = parentElement.offsetParent;
-                }
-
-                var t = (this.context.argument._imageElement.offsetTop + this.context.argument._imageResize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
-                var l = (this.context.argument._imageElement.offsetLeft + parentL);
-
-                this.context.element.imageResizeDiv.style.top = t + "px";
-                this.context.element.imageResizeDiv.style.left = l + "px";
-                this.context.element.imageResizeDiv.style.width = w + "px";
-                this.context.element.imageResizeDiv.style.height = h + "px";
-
-                dom.changeTxt(this.context.element.imageResizeDisplay, Math.round(w) + " x " + Math.round(h));
-            },
-
-            cancel_resize_image : function() {
-                this.context.element.resizeBackground.style.display = "none";
-                this.context.element.imageResizeDiv.style.display = "none";
-                this.context.element.imageResizeBtn.style.display = "none";
-                this.context.argument._imageElement = null;
             }
         };
 
@@ -1020,9 +961,9 @@ SUNEDITOR.defaultLang = {
                         editor.originSub = editor.subMenu.previousElementSibling;
                     }
                     else if(/modal/.test(display)) {
-                        if(editor.setScriptHead('dialog', function(){editor.setScriptHead(command, function(){editor.openDialog(command)})})) {
-                            editor.openDialog(command);
-                        }
+                        editor.setScriptHead('dialog', function(){
+                            editor.setScriptHead(command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command));
+                        });
                     }
 
                     nextSibling = null;
@@ -1090,46 +1031,7 @@ SUNEDITOR.defaultLang = {
                 editor.subOff();
 
                 if(/^IMG$/i.test(targetElement.nodeName)) {
-                    /** ie,firefox image resize handle : false*/
-                    targetElement.setAttribute('unselectable', 'on');
-                    targetElement.contentEditable = false;
-
-                    var resizeDiv = context.element.imageResizeDiv;
-                    var w = targetElement.offsetWidth;
-                    var h = targetElement.offsetHeight;
-
-                    var parentElement = targetElement.offsetParent;
-                    var parentT = 0;
-                    var parentL = 0;
-                    while(parentElement) {
-                        parentT += (parentElement.offsetTop + parentElement.clientTop);
-                        parentL += (parentElement.offsetLeft + + parentElement.clientLeft);
-                        parentElement = parentElement.offsetParent;
-                    }
-                    context.argument._imageResize_parent_t = (context.tool.bar.offsetHeight + parentT);
-                    context._imageResize_parent_l = parentL;
-
-                    var t = (targetElement.offsetTop + context.argument._imageResize_parent_t - context.element.wysiwygWindow.document.body.scrollTop);
-                    var l = (targetElement.offsetLeft + parentL);
-
-                    resizeDiv.style.top = t + "px";
-                    resizeDiv.style.left = l + "px";
-                    resizeDiv.style.width = w + "px";
-                    resizeDiv.style.height = h + "px";
-
-                    context.element.imageResizeBtn.style.top = (h + t) + "px";
-                    context.element.imageResizeBtn.style.left = l + "px";
-
-                    dom.changeTxt(context.element.imageResizeDisplay, w + " x " + h);
-
-                    context.argument._imageElement = targetElement;
-                    context.argument._imageElement_w = w;
-                    context.argument._imageElement_h = h;
-                    context.argument._imageElement_t = t;
-                    context.argument._imageElement_l = l;
-
-                    context.element.imageResizeDiv.style.display = "block";
-                    context.element.imageResizeBtn.style.display = "block";
+                    editor.setScriptHead('image', SUNEDITOR.plugin.image.call_image_resize_div.bind(editor, targetElement));
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)){
                     e.preventDefault();
@@ -1329,9 +1231,6 @@ SUNEDITOR.defaultLang = {
 
             onScroll_wysiwyg : function() {
                 if(!!context.argument._imageElement) {
-                    // var t = (context.argument._imageElement.offsetTop + context.argument._imageResize_parent_t - (context.element.wysiwygWindow.scrollY || context.element.wysiwygWindow.pageXOffset));
-                    // context.element.imageResizeDiv.style.top = t + "px";
-                    // context.element.imageResizeBtn.style.top = (t + context.argument._imageElement_h) + "px";
                     context.element.imageResizeDiv.style.display = "none";
                     context.element.imageResizeBtn.style.display = "none";
                     context.argument._imageElement = null;
@@ -1354,25 +1253,6 @@ SUNEDITOR.defaultLang = {
                 document.addEventListener('mouseup', closureFunc);
             },
 
-            onClick_imageResizeBtn : function(e) {
-                e.stopPropagation();
-
-                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
-                if(!command) return;
-
-                e.preventDefault();
-
-                if(/^\d+$/.test(command)) {
-                    context.argument._imageElement.style.height = "";
-                    context.argument._imageElement.style.width = command + "%";
-                }
-                else if(/remove/.test(command)){
-                    dom.removeItem(context.argument._imageElement);
-                }
-
-                editor.subOff();
-                editor.focus();
-            },
 
             onClick_linkBtn : function(e) {
                 e.stopPropagation();
@@ -1395,24 +1275,6 @@ SUNEDITOR.defaultLang = {
                 }
 
                 context.element.linkBtn.style.display = "none";
-            },
-
-            onMouseDown_image_ctrl : function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-
-                context.argument._imageClientX = e.clientX;
-                context.element.resizeBackground.style.display = "block";
-                context.element.imageResizeBtn.style.display = "none";
-
-                function closureFunc() {
-                    editor.cancel_resize_image();
-                    document.removeEventListener('mousemove', editor.resize_image);
-                    document.removeEventListener('mouseup', closureFunc);
-                }
-
-                document.addEventListener('mousemove', editor.resize_image);
-                document.addEventListener('mouseup', closureFunc);
             },
 
             onMouseMove_tablePicker : function(e) {
@@ -1468,20 +1330,7 @@ SUNEDITOR.defaultLang = {
                             context.dialog.linkAnchorText.value = "";
 
                             break;
-                        // case 'sun-editor-id-submit-image':
-                        //     if(context.dialog.imgInputUrl.value.trim().length === 0) break;
-                        //
-                        //     var oImg = document.createElement("IMG");
-                        //     oImg.src = context.dialog.imgInputUrl.value;
-                        //     oImg.style.width = "350px";
-                        //
-                        //     editor.insertNode(oImg);
-                        //     editor.appendP(oImg);
-                        //
-                        //     context.dialog.imgInputFile.value = "";
-                        //     context.dialog.imgInputUrl.value = "";
-                        //
-                        //     break;
+
                         case'sun-editor-id-submit-video':
                             if(context.dialog.videoInputUrl.value.trim().length === 0) break;
 
@@ -1542,8 +1391,7 @@ SUNEDITOR.defaultLang = {
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
 
 
-        context.element.imageResizeBtn.addEventListener('click', event.onClick_imageResizeBtn);
-        context.element.imageResizeController.addEventListener('mousedown', event.onMouseDown_image_ctrl);
+
 
         context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
 
@@ -2079,30 +1927,6 @@ SUNEDITOR.defaultLang = {
                 '            </div>'+
                 '        </form>'+
                 '    </div>';
-            /!** 이미지 삽입 다이얼로그 *!/
-            html += ''+
-                '    <div class="modal-content sun-editor-id-dialog-image" style="display: none;">'+
-                '        <form class="editor_image" method="post" enctype="multipart/form-data">'+
-                '            <div class="modal-header">'+
-                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                '                    <span aria-hidden="true" data-command="close">×</span>'+
-                '                </button>'+
-                '                <h5 class="modal-title">'+lang.dialogBox.imageBox.title+'</h5>'+
-                '            </div>'+
-                '            <div class="modal-body">'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.imageBox.file+'</label>'+
-                '                    <input class="form-control sun-editor-id-image-file" type="file" accept="image/!*" multiple="multiple" />'+
-                '                </div>'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.imageBox.url+'</label><input class="form-control sun-editor-id-image-url" type="text" />'+
-                '                </div>'+
-                '            </div>'+
-                '            <div class="modal-footer">'+
-                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                '            </div>'+
-                '        </form>'+
-                '    </div>';
             /!** 동영상 삽입 다이얼로그 *!/
             html += ''+
                 '    <div class="modal-content sun-editor-id-dialog-video" style="display: none;">'+
@@ -2133,28 +1957,6 @@ SUNEDITOR.defaultLang = {
             return html;
         };*/
 
-        var imgDIv = function() {
-            return ''+
-                '<div class="image-resize-dot tl"></div>'+
-                '<div class="image-resize-dot tr"></div>'+
-                '<div class="image-resize-dot bl"></div>'+
-                '<div class="image-resize-dot br-controller sun-editor-img-controller"></div>'+
-                '<div class="image-size-display sun-editor-id-img-display"></div>';
-        };
-
-        var imgBtn = function() {
-            return ''+
-                '<div class="btn-group">'+
-                '   <button type="button" data-command="100" title="'+lang.dialogBox.imageBox.resize100+'"><span class="note-fontsize-10">100%</span></button>'+
-                '   <button type="button" data-command="75" title="'+lang.dialogBox.imageBox.resize75+'"><span class="note-fontsize-10">75%</span></button>'+
-                '   <button type="button" data-command="50" title="'+lang.dialogBox.imageBox.resize50+'"><span class="note-fontsize-10">50%</span></button>'+
-                '   <button type="button" data-command="25" title="'+lang.dialogBox.imageBox.resize25+'"><span class="note-fontsize-10">25%</span></button>'+
-                '</div>'+
-                '<div class="btn-group remove">'+
-                '   <button type="button" data-command="remove" title="'+lang.dialogBox.imageBox.remove+'"><span class="image_remove">X</span></button>'+
-                '</div>';
-        };
-
         var linkBtn = function() {
             return ''+
                 '<div class="arrow"></div>'+
@@ -2168,9 +1970,6 @@ SUNEDITOR.defaultLang = {
 
         return {
             toolBar : toolBar,
-            // dialogBox : dialogBox,
-            imgDiv : imgDIv,
-            imgBtn : imgBtn,
             linkBtn : linkBtn
         };
     };
@@ -2269,20 +2068,6 @@ SUNEDITOR.defaultLang = {
         var resize_bar = doc.createElement("DIV");
         resize_bar.className = "sun-editor-id-resizeBar";
 
-        /*/!** 다이얼로그 *!/
-        var dialog_div = doc.createElement("DIV");
-        dialog_div.className = "sun-editor-id-dialogBox";
-        dialog_div.innerHTML = createEditor(options).dialogBox();*/
-
-        /** 이미지 조절 div */
-        var resize_img = doc.createElement("DIV");
-        resize_img.className = "modal-image-resize";
-        resize_img.innerHTML = createEditor(options).imgDiv();
-        /** 이미지 조절 버튼 */
-        var resize_img_button = doc.createElement("DIV");
-        resize_img_button.className = "image-resize-btn";
-        resize_img_button.innerHTML = createEditor(options).imgBtn();
-
         /** 로딩 박스 */
         var loading_box = doc.createElement("DIV");
         loading_box.className = "sun-editor-id-loading";
@@ -2307,10 +2092,7 @@ SUNEDITOR.defaultLang = {
         relative.appendChild(tool_bar);
         relative.appendChild(editor_div);
         relative.appendChild(resize_bar);
-        // relative.appendChild(dialog_div);
         relative.appendChild(resize_back);
-        relative.appendChild(resize_img);
-        relative.appendChild(resize_img_button);
         relative.appendChild(loading_box);
         relative.appendChild(link_button);
         top_div.appendChild(relative);
@@ -2318,13 +2100,11 @@ SUNEDITOR.defaultLang = {
         return {
             constructed : {
                 _top : top_div,
+                _relative : relative,
                 _toolBar : tool_bar,
                 _editorArea : editor_div,
                 _resizeBar : resize_bar,
-                // _dialog : dialog_div,
                 _loading : loading_box,
-                _resizeImg : resize_img,
-                _resizeImgBtn : resize_img_button,
                 _resizeBack : resize_back,
                 _linkBtn : link_button
             },
@@ -2380,16 +2160,17 @@ SUNEDITOR.defaultLang = {
             element : {
                 textElement: element,
                 topArea: cons._top,
+                relative: cons._relative,
                 resizebar: cons._resizeBar,
                 editorArea: cons._editorArea,
                 wysiwygWindow: sun_wysiwyg.contentWindow,
                 wysiwygElement: sun_wysiwyg,
                 source: cons._editorArea.getElementsByClassName('sun-editor-id-source')[0],
                 loading : cons._loading,
-                imageResizeDiv : cons._resizeImg,
-                imageResizeController : cons._resizeImg.getElementsByClassName('sun-editor-img-controller')[0],
-                imageResizeDisplay : cons._resizeImg.getElementsByClassName('sun-editor-id-img-display')[0],
-                imageResizeBtn : cons._resizeImgBtn,
+                // imageResizeDiv : cons._resizeImg,
+                // imageResizeController : cons._resizeImg.getElementsByClassName('sun-editor-img-controller')[0],
+                // imageResizeDisplay : cons._resizeImg.getElementsByClassName('sun-editor-id-img-display')[0],
+                // imageResizeBtn : cons._resizeImgBtn,
                 resizeBackground : cons._resizeBack,
                 linkBtn : cons._linkBtn
             },
@@ -2470,7 +2251,7 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        return core(Context(element, cons.constructed, cons.options), dom, func);
+        return core(Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.func);
     };
 
     /**

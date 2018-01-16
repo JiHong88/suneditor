@@ -42,6 +42,34 @@
             if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
                 this.subOff();
             }
-        }
+        },
+
+        openDialog : function(kind) {
+            var focusText = null;
+
+            switch(kind) {
+                case 'link':
+                    this.modalForm = this.context.dialog.link;
+                    focusText = this.context.dialog.linkText;
+                    break;
+                case 'image':
+                    this.modalForm = this.context.dialog.image;
+                    focusText = this.context.dialog.imgInputUrl;
+                    break;
+                case 'video':
+                    this.modalForm = this.context.dialog.video;
+                    focusText = this.context.dialog.videoInputUrl;
+                    break;
+            }
+
+            this.context.dialog.modalArea.style.display = "block";
+            this.context.dialog.back.style.display = "block";
+            this.context.dialog.modal.style.display = "block";
+            this.modalForm.style.display = "block";
+
+            this.subMenu = this.context.dialog.modal;
+
+            focusText.focus();
+        },
     }
 })();
