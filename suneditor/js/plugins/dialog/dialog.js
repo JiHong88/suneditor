@@ -3,6 +3,8 @@
         add : function(_this) {
             var dialog_div = null;
             var context = _this.context;
+
+            /** dialog **/
             if(!context.dialog) {
                 context.dialog = {};
                 dialog_div = document.createElement("DIV");
@@ -26,10 +28,9 @@
                 dialog_div = context.dialog.modalArea;
             }
 
+            /** set event **/
             context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.dialog.onClick_dialog.bind(_this));
             context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
-
-            return context;
         },
 
         onClick_dialog : function(e) {

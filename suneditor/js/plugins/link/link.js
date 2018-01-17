@@ -23,8 +23,6 @@
             /** append **/
             context.dialog.modal.appendChild(link_dialog);
             context.element.relative.appendChild(link_button);
-
-            return context;
         },
 
         /** dialog **/

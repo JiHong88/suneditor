@@ -38,8 +38,6 @@
             context.dialog.modal.appendChild(image_dialog);
             context.element.relative.appendChild(resize_img_div);
             context.element.relative.appendChild(resize_img_button);
-
-            return context;
         },
 
         /** dialog **/
