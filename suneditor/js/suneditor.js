@@ -1063,17 +1063,7 @@ SUNEDITOR.defaultLang = {
 
                     /** A */
                     if(findA && /^A$/i.test(selectionParent.nodeName) && editor.editLink !== context.element.linkBtn) {
-                        editor.editLink = context.argument._linkAnchor = selectionParent;
-                        var linkBtn = context.element.linkBtn;
-
-                        linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
-                        linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
-
-                        linkBtn.style.left = selectionParent.offsetLeft + "px";
-                        linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + context.tool.bar.offsetHeight + 10) + "px";
-                        linkBtn.style.display = "block";
-
-                        linkBtn = null;
+                        editor.setScriptHead('link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent));
                         findA = false;
                     } else if(findA && editor.editLink) {
                         context.element.linkBtn.style.display = "none";
@@ -1253,30 +1243,6 @@ SUNEDITOR.defaultLang = {
                 document.addEventListener('mouseup', closureFunc);
             },
 
-
-            onClick_linkBtn : function(e) {
-                e.stopPropagation();
-
-                var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
-                if(!command) return;
-
-                e.preventDefault();
-
-                if(/update/.test(command)) {
-                    context.dialog.linkText.value = context.argument._linkAnchor.href;
-                    context.dialog.linkAnchorText.value = context.argument._linkAnchor.textContent;
-                    context.dialog.linkNewWindowCheck.checked = (/_blank/i.test(context.argument._linkAnchor.target)? true: false);
-                    editor.openDialog('link');
-                }
-                else { /** delete */
-                dom.removeItem(context.argument._linkAnchor);
-                    context.argument._linkAnchor = null;
-                    editor.focus();
-                }
-
-                context.element.linkBtn.style.display = "none";
-            },
-
             onMouseMove_tablePicker : function(e) {
                 e.stopPropagation();
 
@@ -1306,30 +1272,6 @@ SUNEDITOR.defaultLang = {
 
                 function submitAction(className) {
                     switch(className) {
-                        case 'sun-editor-id-submit-link':
-                            if(context.dialog.linkText.value.trim().length === 0) break;
-
-                            var url = /^https?:\/\//.test(context.dialog.linkText.value)? context.dialog.linkText.value: "http://" +  context.dialog.linkText.value;
-                            var anchor = context.dialog.linkAnchorText || context.dialog.document.getElementById("linkAnchorText");
-                            var anchorText = anchor.value.length === 0? url: anchor.value;
-
-                            if(context.argument._linkAnchor === null) {
-                                var oA = document.createElement("A");
-                                oA.href = url;
-                                oA.textContent = anchorText;
-                                oA.target = (context.dialog.linkNewWindowCheck.checked? "_blank": "");
-
-                                editor.insertNode(oA);
-                            } else {
-                                context.argument._linkAnchor.href = url;
-                                context.argument._linkAnchor.textContent = anchorText;
-                                context.argument._linkAnchor.target = (context.dialog.linkNewWindowCheck.checked? "_blank": "");
-                            }
-
-                            context.dialog.linkText.value = "";
-                            context.dialog.linkAnchorText.value = "";
-
-                            break;
 
                         case'sun-editor-id-submit-video':
                             if(context.dialog.videoInputUrl.value.trim().length === 0) break;
@@ -1390,10 +1332,6 @@ SUNEDITOR.defaultLang = {
         context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
 
-
-
-
-        context.element.linkBtn.addEventListener('click', event.onClick_linkBtn);
 
         if(!!context.tool.tablePicker) context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
 
@@ -1902,31 +1840,7 @@ SUNEDITOR.defaultLang = {
                 '<div class="modal-dialog-background sun-editor-id-dialog-back" style="display: none;"></div>'+
                 /!** 다이얼로그 *!/
                 '<div class="modal-dialog sun-editor-id-dialog-modal" style="display: none;">';
-            /!** 링크 삽입 다이얼로그 *!/
-            html += ''+
-                '    <div class="modal-content sun-editor-id-dialog-link" style="display: none;">'+
-                '        <form class="editor_link">'+
-                '            <div class="modal-header">'+
-                '                <button type="button" data-command="close" class="close" aria-label="Close">'+
-                '                    <span aria-hidden="true" data-command="close">×</span>'+
-                '                </button>'+
-                '                <h5 class="modal-title">'+lang.dialogBox.linkBox.title+'</h5>'+
-                '            </div>'+
-                '            <div class="modal-body">'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.linkBox.url+'</label>'+
-                '                    <input class="form-control sun-editor-id-linkurl" type="text" />'+
-                '                </div>'+
-                '                <div class="form-group">'+
-                '                    <label>'+lang.dialogBox.linkBox.text+'</label><input class="form-control sun-editor-id-linktext" type="text" />'+
-                '                </div>'+
-                '                <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>'+
-                '            </div>'+
-                '            <div class="modal-footer">'+
-                '                <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>'+lang.dialogBox.submitButton+'</span></button>'+
-                '            </div>'+
-                '        </form>'+
-                '    </div>';
+
             /!** 동영상 삽입 다이얼로그 *!/
             html += ''+
                 '    <div class="modal-content sun-editor-id-dialog-video" style="display: none;">'+
@@ -1957,20 +1871,8 @@ SUNEDITOR.defaultLang = {
             return html;
         };*/
 
-        var linkBtn = function() {
-            return ''+
-                '<div class="arrow"></div>'+
-                '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
-                '   <div class="btn-group">'+
-                '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
-                '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
-                '   </div>'+
-                '</div>';
-        };
-
         return {
-            toolBar : toolBar,
-            linkBtn : linkBtn
+            toolBar : toolBar
         };
     };
 
@@ -2036,16 +1938,19 @@ SUNEDITOR.defaultLang = {
         var editor_div = doc.createElement("DIV");
         editor_div.className = "sun-editor-id-editorArea";
         editor_div.style.height = options.height;
+
         /** iframe */
         var iframe = doc.createElement("IFRAME");
         iframe.allowFullscreen = true;
         iframe.frameBorder = 0;
         iframe.className = "input_editor sun-editor-id-wysiwyg";
         iframe.style.display = "block";
+
         /** textarea */
         var textarea = doc.createElement("TEXTAREA");
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
+
         iframe.addEventListener("load", function(){
             this.setAttribute("scrolling", "auto");
             this.contentWindow.document.head.innerHTML = ''+
@@ -2077,11 +1982,6 @@ SUNEDITOR.defaultLang = {
         var resize_back = doc.createElement("DIV");
         resize_back.className = "sun-editor-id-resize-background";
 
-        /** 링크 수정 버튼 */
-        var link_button = doc.createElement("DIV");
-        link_button.className = "sun-editor-id-link-btn";
-        link_button.innerHTML = createEditor(options).linkBtn();
-
         /** 사용자 옵션 값 넣기 */
         // dialog_div.getElementsByClassName('sun-editor-id-video-x')[0].value = options.videoX;
         // dialog_div.getElementsByClassName('sun-editor-id-video-y')[0].value = options.videoY;
@@ -2094,7 +1994,6 @@ SUNEDITOR.defaultLang = {
         relative.appendChild(resize_bar);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
-        relative.appendChild(link_button);
         top_div.appendChild(relative);
 
         return {
@@ -2105,8 +2004,7 @@ SUNEDITOR.defaultLang = {
                 _editorArea : editor_div,
                 _resizeBar : resize_bar,
                 _loading : loading_box,
-                _resizeBack : resize_back,
-                _linkBtn : link_button
+                _resizeBack : resize_back
             },
             options : options
         };
@@ -2171,8 +2069,8 @@ SUNEDITOR.defaultLang = {
                 // imageResizeController : cons._resizeImg.getElementsByClassName('sun-editor-img-controller')[0],
                 // imageResizeDisplay : cons._resizeImg.getElementsByClassName('sun-editor-id-img-display')[0],
                 // imageResizeBtn : cons._resizeImgBtn,
-                resizeBackground : cons._resizeBack,
-                linkBtn : cons._linkBtn
+                resizeBackground : cons._resizeBack
+                // linkBtn : cons._linkBtn
             },
             tool : {
                 bar : cons._toolBar,

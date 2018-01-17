@@ -6,13 +6,12 @@
 
             /** 이미지 다이얼로그 */
             context.dialog.modal.appendChild(eval(this.setDialog()));
-            context.dialog.forms.image = dialog_div.getElementsByClassName('sun-editor-id-dialog-image')[0];
             context.dialog.image = dialog_div.getElementsByClassName('sun-editor-id-dialog-image')[0];
             context.dialog.imgInputFile = dialog_div.getElementsByClassName('sun-editor-id-image-file')[0];
             context.dialog.imgInputUrl = dialog_div.getElementsByClassName('sun-editor-id-image-url')[0];
 
             context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(_this));
-            context.dialog.forms.image.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
+            context.dialog.image.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
 
             /** 이미지 조절 */
             var resize_img_div = eval(this.setImgDiv());
@@ -32,12 +31,12 @@
             return context;
         },
 
+        /** 이미지 삽입 다이얼로그 */
         setDialog : function() {
             var lang = SUNEDITOR.lang;
             var dialog = document.createElement('DIV');
             dialog.className = 'modal-content sun-editor-id-dialog-image';
             dialog.style.display = 'none';
-            /** 이미지 삽입 다이얼로그 */
             dialog.innerHTML = ''+
                 '<form class="editor_image" method="post" enctype="multipart/form-data">'+
                 '   <div class="modal-header">'+
