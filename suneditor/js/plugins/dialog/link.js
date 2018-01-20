@@ -104,20 +104,6 @@
             return false;
         },
 
-        call_link_button : function(selectionParent) {
-            this.editLink = this.context.link._linkAnchor = selectionParent;
-            var linkBtn = this.context.link.linkBtn;
-
-            linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
-            linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
-
-            linkBtn.style.left = selectionParent.offsetLeft + "px";
-            linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + this.context.tool.bar.offsetHeight + 10) + "px";
-            linkBtn.style.display = "block";
-
-            linkBtn = null;
-        },
-
         /** button */
         setController_LinkBtn : function() {
             var lang = SUNEDITOR.lang;
@@ -156,6 +142,20 @@
             }
 
             this.context.link.linkBtn.style.display = "none";
+        },
+
+        call_link_button : function(selectionParent) {
+            this.editLink = this.context.link._linkAnchor = selectionParent;
+            var linkBtn = this.context.link.linkBtn;
+
+            linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
+            linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
+
+            linkBtn.style.left = selectionParent.offsetLeft + "px";
+            linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + this.context.tool.bar.offsetHeight + 10) + "px";
+            linkBtn.style.display = "block";
+
+            linkBtn = null;
         }
     }
 })();

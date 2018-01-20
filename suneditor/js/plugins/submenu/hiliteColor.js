@@ -8,7 +8,7 @@
 (function () {
     SUNEDITOR.plugin.hiliteColor = {
         add: function (_this, targetElement) {
-            /** color picker */
+            /** set submenu */
             var color_picker = eval(this.setSubmenu_hiliteColor());
 
             /** add event listeners */
@@ -18,7 +18,7 @@
             targetElement.parentNode.appendChild(color_picker);
         },
 
-        setSubmenu_hiliteColor: function () {
+        setSubmenu: function () {
             var foreColor_div = document.createElement('DIV');
             foreColor_div.className = 'layer_editor layer_color';
             foreColor_div.setAttribute('data-command', 'foreColor');

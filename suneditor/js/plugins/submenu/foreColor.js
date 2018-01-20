@@ -8,8 +8,8 @@
 (function () {
     SUNEDITOR.plugin.foreColor = {
         add: function (_this, targetElement) {
-            /** color picker */
-            var color_picker = eval(this.setSubmenu_foreColor());
+            /** set submenu */
+            var color_picker = eval(this.setSubmenu());
 
             /** add event listeners */
             color_picker.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(_this));
@@ -18,7 +18,7 @@
             targetElement.parentNode.appendChild(color_picker);
         },
 
-        setSubmenu_foreColor: function () {
+        setSubmenu: function () {
             var foreColor_div = document.createElement('DIV');
             foreColor_div.className = 'layer_editor layer_color';
             foreColor_div.setAttribute('data-command', 'foreColor');

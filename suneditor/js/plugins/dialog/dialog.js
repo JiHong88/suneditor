@@ -8,32 +8,26 @@
 (function () {
     SUNEDITOR.plugin.dialog = {
         add : function(_this) {
-            var dialog_div = null;
             var context = _this.context;
 
             /** dialog */
-            if(!context.dialog) {
-                context.dialog = {};
-                dialog_div = document.createElement("DIV");
-                dialog_div.className = "sun-editor-id-dialogBox";
+            var dialog_div = document.createElement("DIV");
+            dialog_div.className = "sun-editor-id-dialogBox";
 
-                var dialog_back = document.createElement("DIV");
-                dialog_back.className = "modal-dialog-background sun-editor-id-dialog-back";
-                dialog_back.style.display = "none";
+            var dialog_back = document.createElement("DIV");
+            dialog_back.className = "modal-dialog-background sun-editor-id-dialog-back";
+            dialog_back.style.display = "none";
 
-                var dialog_area = document.createElement("DIV");
-                dialog_area.className = "modal-dialog sun-editor-id-dialog-modal";
-                dialog_area.style.display = "none";
+            var dialog_area = document.createElement("DIV");
+            dialog_area.className = "modal-dialog sun-editor-id-dialog-modal";
+            dialog_area.style.display = "none";
 
-                dialog_div.appendChild(dialog_back);
-                dialog_div.appendChild(dialog_area);
+            dialog_div.appendChild(dialog_back);
+            dialog_div.appendChild(dialog_area);
 
-                context.dialog.modalArea = dialog_div;
-                context.dialog.back = dialog_back;
-                context.dialog.modal = dialog_area;
-            } else {
-                dialog_div = context.dialog.modalArea;
-            }
+            context.dialog.modalArea = dialog_div;
+            context.dialog.back = dialog_back;
+            context.dialog.modal = dialog_area;
 
             /** add event listeners */
             context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.dialog.onClick_dialog.bind(_this));
