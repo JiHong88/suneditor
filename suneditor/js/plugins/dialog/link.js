@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 (function () {
     SUNEDITOR.plugin.link = {
         add : function(_this) {
@@ -12,20 +19,20 @@
             context.dialog.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
 
             /** link button */
-            var link_button = eval(this.setSubmenu_LinkBtn());
+            var link_button = eval(this.setController_LinkBtn());
             context.link.linkBtn = link_button;
             context.link._linkAnchor = null;
 
-            /** set event **/
+            /** add event listeners */
             context.link.linkBtn.addEventListener('click', SUNEDITOR.plugin.link.onClick_linkBtn.bind(_this));
             context.dialog.link.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.link.submit_dialog.bind(_this));
 
-            /** append **/
+            /** append html */
             context.dialog.modal.appendChild(link_dialog);
             context.element.relative.appendChild(link_button);
         },
 
-        /** dialog **/
+        /** dialog */
         setDialog : function() {
             var lang = SUNEDITOR.lang;
             var dialog = document.createElement('DIV');
@@ -111,8 +118,8 @@
             linkBtn = null;
         },
 
-        /** button **/
-        setSubmenu_LinkBtn : function() {
+        /** button */
+        setController_LinkBtn : function() {
             var lang = SUNEDITOR.lang;
             var link_btn = document.createElement("DIV");
             link_btn.className = "sun-editor-id-link-btn";

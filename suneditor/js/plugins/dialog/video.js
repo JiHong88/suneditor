@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 (function () {
     SUNEDITOR.plugin.video = {
         add : function(_this) {
@@ -11,18 +18,18 @@
             context.dialog.video_x = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
             context.dialog.video_y = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
 
-            /** set user option value **/
+            /** set user option value */
             video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
             video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
-            /** set event **/
+            /** add event listeners */
             context.dialog.video.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.video.submit_dialog.bind(_this));
 
-            /** append **/
+            /** append html */
             context.dialog.modal.appendChild(video_dialog);
         },
 
-        /** dialog **/
+        /** dialog */
         setDialog : function() {
             var lang = SUNEDITOR.lang;
             var dialog = document.createElement('DIV');

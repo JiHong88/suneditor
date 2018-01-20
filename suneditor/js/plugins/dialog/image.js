@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 (function () {
     SUNEDITOR.plugin.image = {
         add : function(_this) {
@@ -20,27 +27,27 @@
             context.dialog.imgInputUrl = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
 
             /** image resize controller, button */
-            var resize_img_div = eval(this.setSubmenu_ImageResizeController());
+            var resize_img_div = eval(this.setController_ImageResizeController());
             context.image.imageResizeDiv = resize_img_div;
             context.image.imageResizeController = resize_img_div.getElementsByClassName('sun-editor-img-controller')[0];
             context.image.imageResizeDisplay = resize_img_div.getElementsByClassName('sun-editor-id-img-display')[0];
 
-            var resize_img_button = eval(this.setSubmenu_ImageButton());
+            var resize_img_button = eval(this.setController_ImageButton());
             context.image.imageResizeBtn = resize_img_button;
 
-            /** set event **/
+            /** add event listeners */
             context.dialog.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(_this));
             context.dialog.image.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
             context.image.imageResizeController.addEventListener('mousedown', SUNEDITOR.plugin.image.onMouseDown_image_ctrl.bind(_this));
             context.image.imageResizeBtn.addEventListener('click', SUNEDITOR.plugin.image.onClick_imageResizeBtn.bind(_this));
 
-            /** append **/
+            /** append html */
             context.dialog.modal.appendChild(image_dialog);
             context.element.relative.appendChild(resize_img_div);
             context.element.relative.appendChild(resize_img_button);
         },
 
-        /** dialog **/
+        /** dialog */
         setDialog : function() {
             var lang = SUNEDITOR.lang;
             var dialog = document.createElement('DIV');
@@ -186,8 +193,8 @@
             return false;
         },
 
-        /** image resize controller, button**/
-        setSubmenu_ImageResizeController : function() {
+        /** image resize controller, button*/
+        setController_ImageResizeController : function() {
             var resize_img_div = document.createElement("DIV");
             resize_img_div.className = "modal-image-resize";
             resize_img_div.innerHTML = ''+
@@ -200,7 +207,7 @@
             return resize_img_div;
         },
 
-        setSubmenu_ImageButton : function() {
+        setController_ImageButton : function() {
             var lang = SUNEDITOR.lang;
             var resize_img_button = document.createElement("DIV");
             resize_img_button.className = "image-resize-btn";

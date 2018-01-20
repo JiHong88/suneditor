@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
 /** default language english */
@@ -68,13 +75,6 @@ SUNEDITOR.defaultLang = {
     }
 };
 
-/**
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 JiHong Lee.
- * MIT license.
- */
 (function(SUNEDITOR){
     'use strict';
 
@@ -273,7 +273,8 @@ SUNEDITOR.defaultLang = {
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     var core = function(context, dom, func){
-        /** 배열 관련 */
+
+        /** commandMap, fontList */
         var list = (function(context){
             var commandMap = {
                 'FONT': context.tool.fontFamily,
@@ -284,7 +285,6 @@ SUNEDITOR.defaultLang = {
                 'SIZE' : context.tool.fontSize
             };
 
-            /** 글꼴 목록 가져오기 */
             var fontFamilyMap = {};
             if(!!context.tool.list_fontFamily) {
                 var list_fontFamily = context.tool.list_fontFamily.children;
@@ -309,57 +309,43 @@ SUNEDITOR.defaultLang = {
             };
         })(context);
 
-        /** 에디터 */
-        var editor = {
+        /** Practical editor function
+         * This function is 'this' used by other plugins */
+        var editor = SUNEDITOR.editor = {
             context : context,
-
-            plugin : {
-                dialog : false,
-                image : false,
-                link : false,
-                video : false
-            },
-
-            subMenu : null,
+            pluginLoad : {},
+            submenu : null,
             originSub : null,
             modalForm : null,
             editLink : null,
             tabSize : 4,
             fontSizeUnit : "pt",
 
-            /** 모듈 추가 **/
-            setScriptHead : function(moduleName, callBackFunction) {
-                if(this.plugin[moduleName] === undefined) return false;
-
-                var returnValue = true;
-
-                var callBack_moduleAdd = function() {
-                    SUNEDITOR.plugin[moduleName].add(this);
-                    this.plugin[moduleName] = true;
+            /** 모듈 추가 */
+            setScriptHead : function(directory, moduleName, callBackFunction, targetElement) {
+                var callBack_moduleAdd = function(targetElement) {
+                    SUNEDITOR.plugin[moduleName].add(this, targetElement);
+                    this.pluginLoad[moduleName] = true;
                     callBackFunction();
-                    returnValue = false;
-                }.bind(this);
+                }.bind(this, targetElement);
 
                 if(!SUNEDITOR.plugin[moduleName]) {
-                    var script = document.createElement("script");
-                    script.type = "text/javascript";
-                    script.src = func.getBasePath + 'plugins/' + moduleName + '/' + moduleName + '.js';
-                    script.onload = callBack_moduleAdd;
+                    var scriptFile = document.createElement("script");
+                    scriptFile.type = "text/javascript";
+                    scriptFile.src = func.getBasePath+'plugins/'+directory+'/'+moduleName+'.js';
+                    scriptFile.onload = callBack_moduleAdd;
 
-                    document.getElementsByTagName("head")[0].appendChild(script);
-                    returnValue = false;
+                    document.getElementsByTagName("head")[0].appendChild(scriptFile);
                 }
-                else if(!this.plugin[moduleName]) {
+                else if(!this.pluginLoad[moduleName]) {
                     callBack_moduleAdd();
                 }
                 else {
                     callBackFunction();
                 }
-
-                return returnValue;
             },
 
-            /** selection 관련 **/
+            /** selection 관련 */
             focus : function(){
                 this.context.element.wysiwygWindow.document.body.focus();
             },
@@ -409,7 +395,7 @@ SUNEDITOR.defaultLang = {
                 selection.addRange(range);
             },
 
-            /** 에디터 동작 **/
+            /** 에디터 동작 */
             pure_execCommand : function(command, showDefaultUI, value) {
                 this.context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
             },
@@ -428,10 +414,16 @@ SUNEDITOR.defaultLang = {
                 dom.changeTxt(this.context.tool.tableDisplay, "1 x 1");
             },
 
+            subOn : function(element) {
+                editor.submenu = element.nextElementSibling;
+                editor.submenu.style.display = "block";
+                editor.originSub = editor.submenu.previousElementSibling;
+            },
+
             subOff : function() {
-                if(!!this.subMenu) {
-                    this.subMenu.style.display = "none";
-                    this.subMenu = null;
+                if(!!this.submenu) {
+                    this.submenu.style.display = "none";
+                    this.submenu = null;
                     this.cancel_table_picker();
                 }
                 if(!!this.context.image && !!this.context.image._imageElement) {
@@ -898,7 +890,7 @@ SUNEDITOR.defaultLang = {
             }
         };
 
-        /** 이벤트 */
+        /** event function */
         var event = {
             resize_window : function() {
                 // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
@@ -928,7 +920,7 @@ SUNEDITOR.defaultLang = {
                 var command = targetElement.getAttribute("data-command");
                 var className = targetElement.className;
 
-                while(!command && !display && !/layer_color|layer_url|editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
+                while(!command && !display && !/layer_|editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
                     targetElement = targetElement.parentNode;
                     command = targetElement.getAttribute("data-command");
                     display = targetElement.getAttribute("data-display");
@@ -947,27 +939,18 @@ SUNEDITOR.defaultLang = {
 
                 /** 서브메뉴 보이기 */
                 if(!!display || /^BODY$/i.test(targetElement.tagName)) {
-                    var nextSibling = editor.subMenu;
                     editor.subOff();
 
-                    if(targetElement.nextElementSibling !== null && targetElement.nextElementSibling !== nextSibling){
-                        editor.subMenu = targetElement.nextElementSibling;
-                        editor.subMenu.style.display = "block";
-                        editor.originSub = editor.subMenu.previousElementSibling;
+                    if(/submenu/.test(display)){
+                        editor.setScriptHead('submenu', command, function(){editor.subOn(targetElement)}, targetElement);
                     }
                     else if(/modal/.test(display)) {
-                        editor.setScriptHead('dialog', function(){
-                            editor.setScriptHead(command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command));
+                        editor.setScriptHead('dialog', 'dialog', function(){
+                            editor.setScriptHead('dialog', command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command));
                         });
                     }
 
-                    nextSibling = null;
-
                     return;
-                }
-
-                if(/layer_color/.test(className) && /^BUTTON$/i.test(e.target.tagName)) {
-                    value = e.target.textContent;
                 }
 
                 /** 커멘드 명령어 실행 */
@@ -1005,8 +988,6 @@ SUNEDITOR.defaultLang = {
                             editor.pure_execCommand(command, false);
                             break;
                         case 'formatBlock':
-                        case 'foreColor':
-                        case 'hiliteColor':
                             editor.pure_execCommand(command, false, value);
                             break;
                         default :
@@ -1026,7 +1007,7 @@ SUNEDITOR.defaultLang = {
                 editor.subOff();
 
                 if(/^IMG$/i.test(targetElement.nodeName)) {
-                    editor.setScriptHead('image', SUNEDITOR.plugin.image.call_image_resize_controller.bind(editor, targetElement));
+                    editor.setScriptHead('dialog', 'image', SUNEDITOR.plugin.image.call_image_resize_controller.bind(editor, targetElement));
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
@@ -1058,7 +1039,7 @@ SUNEDITOR.defaultLang = {
 
                     /** A */
                     if(findA && /^A$/i.test(selectionParent.nodeName) && context.link && editor.editLink !== context.link.linkBtn) {
-                        editor.setScriptHead('link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent));
+                        editor.setScriptHead('dialog', 'link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent));
                         findA = false;
                     } else if(findA && editor.editLink) {
                         context.link.linkBtn.style.display = "none";
@@ -1258,7 +1239,7 @@ SUNEDITOR.defaultLang = {
             }
         };
 
-        /** 이벤트 등록 */
+        /** add event listeners */
         window.onresize = function(){event.resize_window()};
 
         context.tool.bar.addEventListener('click', event.onClick_toolbar);
@@ -1273,7 +1254,7 @@ SUNEDITOR.defaultLang = {
 
         if(!!context.tool.tablePicker) context.tool.tablePicker.addEventListener('mousemove', event.onMouseMove_tablePicker);
 
-        /** 유저 사용 함수 */
+        /** User function */
         return {
             save : function() {
                 if(context.argument._wysiwygActive) {
@@ -1347,9 +1328,8 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * create Dom
-     * @param options
-     * @returns {{toolBar: toolBar, dialogBox: dialogBox, imgDiv: imgDIv, imgBtn: imgBtn, linkBtn: linkBtn}}
+     * Create editor HTML
+     * @param options - user option
      */
     var createEditor = function (options){
         var lang = SUNEDITOR.lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
@@ -1362,7 +1342,7 @@ SUNEDITOR.defaultLang = {
             if(options.showFont) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-display="submenu">'+
                     '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor" style="display: none;">'+
@@ -1395,7 +1375,7 @@ SUNEDITOR.defaultLang = {
             if(options.showFormats) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-display="submenu">'+
                     '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_size">'+
@@ -1416,7 +1396,7 @@ SUNEDITOR.defaultLang = {
             if(options.showFontSize) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="submenu">'+
                     '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_size">'+
@@ -1480,109 +1460,23 @@ SUNEDITOR.defaultLang = {
             if(options.showFontColor) {
                 html += ''+
                     '        <li>'+
-                    '            <div class="box_color" data-display="sub">'+
-                    '                <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
-                    '                <button type="button" class="btn_editor" title="'+lang.toolbar.fontColor+'">'+
-                    '                    <div class="ico_fcolor">'+
-                    '                        <em class="color_font" style="background-color:#1f92fe"></em>'+
-                    '                    </div>'+
-                    '                </button>'+
-                    '            </div>'+
-                    '            <div class="layer_editor layer_color" data-command="foreColor">'+
-                    '                <div class="inner_layer">'+
-                    '                    <div class="pallet_bgcolor">'+
-                    '                        <ul class="list_color list_bgcolor">'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ff0000;">#ff0000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ff5e00;">#ff5e00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffe400;">#ffe400<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#abf200;">#abf200<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#00d8ff;">#00d8ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#0055ff;">#0055ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#6600ff;">#6600ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ff00dd;">#ff00dd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#000000;">#000000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffd8d8;">#ffd8d8<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#fae0d4;">#fae0d4<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#faf4c0;">#faf4c0<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#e4f7ba;">#e4f7ba<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#d4f4fa;">#d4f4fa<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#d9e5ff;">#d9e5ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#e8d9ff;">#e8d9ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffd9fa;">#ffd9fa<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffffff;">#ffffff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffa7a7;">#ffa7a7<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffc19e;">#ffc19e<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#faed7d;">#faed7d<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#cef279;">#cef279<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#b2ebf4;">#b2ebf4<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#b2ccff;">#b2ccff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#d1b2ff;">#d1b2ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#ffb2f5;">#ffb2f5<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#bdbdbd;">#bdbdbd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#f15f5f;">#f15f5f<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#f29661;">#f29661<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#e5d85c;">#e5d85c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#bce55c;">#bce55c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#5cd1e5;">#5cd1e5<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#6699ff;">#6699ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#a366ff;">#a366ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#f261df;">#f261df<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#8c8c8c;">#8c8c8c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#980000;">#980000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#993800;">#993800<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#998a00;">#998a00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#6b9900;">#6b9900<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#008299;">#008299<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#003399;">#003399<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#3d0099;">#3d0099<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#990085;">#990085<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#353535;">#353535<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#670000;">#670000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#662500;">#662500<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#665c00;">#665c00<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#476600;">#476600<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#005766;">#005766<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#002266;">#002266<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#290066;">#290066<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="background-color:#660058;">#660058<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li class="compact_color"><button type="button" class="btn_color" style="background-color:#222222;">#222222<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                        </ul>'+
-                    '                    </div>'+
+                    '            <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
+                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.fontColor+'" data-command="foreColor" data-display="submenu">'+
+                    '                <div class="ico_fcolor">'+
+                    '                    <em class="color_font" style="background-color:#1f92fe"></em>'+
                     '                </div>'+
-                    '            </div>'+
+                    '            </button>'+
                     '        </li>';
             }
             if(options.showHiliteColor) {
                 html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.hiliteColor+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_fbgcolor" title="'+lang.toolbar.hiliteColor+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_fbgcolor" title="'+lang.toolbar.hiliteColor+'" data-command="hiliteColor" data-display="submenu">'+
                     '                <div class="img_editor ico_fcolor_w">'+
                     '                    <em class="color_font" style="background-color:#1f92fe"></em>'+
                     '                </div>'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_color" data-command="hiliteColor">'+
-                    '                <div class="inner_layer">'+
-                    '                    <div class="pallet_bgcolor pallet_text">'+
-                    '                        <ul class="list_color list_bgcolor">'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#1e9af9;">#1e9af9<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#00b8c6;">#00b8c6<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#6cce02;">#6cce02<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff9702;">#ff9702<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff0000;">#ff0000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#ff00dd;">#ff00dd<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#6600ff;">#6600ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#000;background-color:#cce9ff;">#cce9ff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#000;background-color:#fcfd4c;">#fcfd4c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color color_white" style="color:#000;background-color:#ffffff;">#ffffff<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#000;background-color:#dfdede;">#dfdede<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#8c8c8c;">#8c8c8c<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li><button type="button" class="btn_color" style="color:#fff;background-color:#000000;">#000000<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                            <li class="compact_color"><button type="button" class="btn_color" style="background-color:#222222;">#222222<span class="bg_check"></span><span class="bg_btnframe"></span></button></li>'+
-                    '                        </ul>'+
-                    '                    </div>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>';
             }
             html +='</ul>'+
@@ -1612,7 +1506,7 @@ SUNEDITOR.defaultLang = {
                 html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.align+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-display="submenu">'+
                     '                <span class="img_editor ico_align_l">'+lang.toolbar.alignLeft+'</span>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_align">'+
@@ -1630,7 +1524,7 @@ SUNEDITOR.defaultLang = {
             if(options.showList) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-display="submenu">'+
                     '                <div class="img_editor ico_list ico_list_num"></div>'+
                     '            </button>'+
                     '            <div class="layer_editor layer_list">'+
@@ -1647,7 +1541,7 @@ SUNEDITOR.defaultLang = {
                 html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="sub">'+
+                    '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="submenu">'+
                     '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
@@ -1682,7 +1576,7 @@ SUNEDITOR.defaultLang = {
             if(options.showTable) {
                 html += ''+
                     '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.table+'" data-display="sub" data-command="table">'+
+                    '            <button class="btn_editor" title="'+lang.toolbar.table+'" data-display="submenu" data-command="table">'+
                     '                <div class="img_editor ico_table"></div>'+
                     '            </button>'+
                     '            <div class="table-content" style="display: none;">'+
@@ -1769,7 +1663,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * document create
+     * document create - call [createEditor]
      * @param element
      * @param options
      * @returns {{constructed: Element, options: *}}
@@ -1813,21 +1707,23 @@ SUNEDITOR.defaultLang = {
         options.showRedo = options.showRedo !== undefined? options.showRedo: true;
 
         var doc = document;
-        /** 최상위 div */
+
+        /** suneditor div */
         var top_div = doc.createElement("DIV");
         top_div.className = "sun-editor";
         top_div.id = "suneditor_" + element.id;
         top_div.style.width = options.width;
+
         /** relative div */
         var relative = doc.createElement("DIV");
         relative.className = "sun-editor-container";
 
-        /** 툴바 */
+        /** tool bar */
         var tool_bar = doc.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
         tool_bar.innerHTML = createEditor(options);
 
-        /** 에디터 */
+        /** inner editor div */
         var editor_div = doc.createElement("DIV");
         editor_div.className = "sun-editor-id-editorArea";
         editor_div.style.height = options.height;
@@ -1839,7 +1735,7 @@ SUNEDITOR.defaultLang = {
         iframe.className = "input_editor sun-editor-id-wysiwyg";
         iframe.style.display = "block";
 
-        /** textarea */
+        /** textarea for source view */
         var textarea = doc.createElement("TEXTAREA");
         textarea.className = "input_editor html sun-editor-id-source";
         textarea.style.display = "none";
@@ -1862,20 +1758,20 @@ SUNEDITOR.defaultLang = {
             }
         });
 
-        /** 리사이즈바 */
+        /** resize bar */
         var resize_bar = doc.createElement("DIV");
         resize_bar.className = "sun-editor-id-resizeBar";
 
-        /** 로딩 박스 */
+        /** loading box */
         var loading_box = doc.createElement("DIV");
         loading_box.className = "sun-editor-id-loading";
         loading_box.innerHTML = "<div class=\"ico-loading\"></div>";
 
-        /** resize 동작시 background */
+        /** resize operation background */
         var resize_back = doc.createElement("DIV");
         resize_back.className = "sun-editor-id-resize-background";
 
-        /** append */
+        /** append html */
         editor_div.appendChild(iframe);
         editor_div.appendChild(textarea);
         relative.appendChild(tool_bar);
@@ -1900,14 +1796,14 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * option and module define
+     * @param element
      * @param cons
      * @param options
-     * @returns {...}
+     * @returns Elements of the editor
      * @constructor
      */
     var Context = function(element, cons, options) {
-        /** iframe 태그 **/
+        /** iframe 태그 */
         var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
 
         /** 내부 옵션값 초기화 */
