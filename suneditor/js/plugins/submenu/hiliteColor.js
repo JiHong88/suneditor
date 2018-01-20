@@ -9,7 +9,7 @@
     SUNEDITOR.plugin.hiliteColor = {
         add: function (_this, targetElement) {
             /** set submenu */
-            var color_picker = eval(this.setSubmenu_hiliteColor());
+            var color_picker = eval(this.setSubmenu());
 
             /** add event listeners */
             color_picker.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(_this));
