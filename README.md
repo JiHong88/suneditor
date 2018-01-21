@@ -51,7 +51,7 @@ var suneditor = SUNEDITOR.create('sample',{
 ## Options
 
 ```properties
-addFont         : Add a new font (ex) [{value:'Times New Roman,Times,serif', text:'Times New Roman'},{value:'Trebuchet MS,Helvetica,sans-serif', text:'Trebuchet MS'}]
+addFont         : Add a new font (ex) ['Times New Roman,Times,serif', 'Trebuchet MS,Helvetica,sans-serif']
 width           : The width size of the editor (ex) '100%' /default - textarea.style.width or textarea.offsetWidth
 height          : The height size of the editor (ex) '300px' /default - textarea.offsetHeight
 display         : The display property to be applied when calling ".show ()" when rendered with target <textarea style:"display:none"> /default - 'block'
