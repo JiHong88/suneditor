@@ -16,7 +16,6 @@
 
 .sun-editor .btn_align .img_editor {display: inline-block; width:14px; height:13px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
 .sun-editor .layer_line .img_editor {display: inline-block; width:138px; height:1px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
-.sun-editor .screen_out {overflow:hidden; position:absolute; width:0; height:0; line-height:0; text-indent:-9999px;}
 
 /* 컨테이너 */
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}

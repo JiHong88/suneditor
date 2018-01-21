@@ -1,4 +1,11 @@
-if(typeof window.SUNEDITOR === 'undefined') window.SUNEDITOR = {};
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
+if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
 SUNEDITOR.lang = {
     toolbar : {
