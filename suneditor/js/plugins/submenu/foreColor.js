@@ -9,20 +9,19 @@
     SUNEDITOR.plugin.foreColor = {
         add: function (_this, targetElement) {
             /** set submenu */
-            var color_picker = eval(this.setSubmenu());
+            var listDiv = eval(this.setSubmenu());
 
             /** add event listeners */
-            color_picker.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(_this));
+            listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(_this));
 
             /** append html */
-            targetElement.parentNode.appendChild(color_picker);
+            targetElement.parentNode.appendChild(listDiv);
         },
 
         setSubmenu: function () {
-            var foreColor_div = document.createElement('DIV');
-            foreColor_div.className = 'layer_editor layer_color';
-            foreColor_div.setAttribute('data-command', 'foreColor');
-            foreColor_div.style.display = 'none';
+            var listDiv = document.createElement('DIV');
+            listDiv.className = 'layer_editor layer_color';
+            listDiv.style.display = 'none';
 
             var colorList = ['#ff0000','#ff5e00','#ffe400','#abf200','#00d8ff','#0055ff','#6600ff','#ff00dd','#000000','#ffd8d8','#fae0d4','#faf4c0','#e4f7ba','#d4f4fa','#d9e5ff','#e8d9ff','#ffd9fa',
                 '#ffffff','#ffa7a7','#ffc19e','#faed7d','#cef279','#b2ebf4','#b2ccff','#d1b2ff','#ffb2f5','#bdbdbd','#f15f5f','#f29661','#e5d85c','#bce55c','#5cd1e5','#6699ff','#a366ff','#f261df','#8c8c8c',
@@ -31,28 +30,26 @@
             var list = '<div class="inner_layer">'+
                        '   <div class="pallet_bgcolor">'+
                        '       <ul class="list_color list_bgcolor">';
-
             for(var i=0; i<colorList.length; i++) {
                 var color = colorList[i];
                 list += '<li>' +
-                        '   <button type="button" class="btn_color" data-value="'+color+'" style="background-color:'+color+';">'+color+'' +
+                        '   <button type="button" class="btn_edit'+(/ffffff/.test(color)? ' color_white': '')+'" data-value="'+color+'" style="background-color:'+color+';">'+color+'' +
                         '       <span class="bg_check"></span>' +
                         '       <span class="bg_btnframe"></span>' +
                         '   </button>' +
                         '</li>';
             }
-
             list += '       </ul>'+
                     '   </div>'+
                     '</div>';
 
-            foreColor_div.innerHTML = list;
+            listDiv.innerHTML = list;
 
-            return foreColor_div;
+            return listDiv;
         },
 
-        colorPick : function (e) {
-            if(!/btn_color/.test(e.target.className)) {
+        pickUp : function (e) {
+            if(!/btn_edit/.test(e.target.className)) {
                 return false;
             }
 
@@ -60,7 +57,7 @@
             e.stopPropagation();
 
             this.focus();
-            this.pure_execCommand('foreColor', false, e.target.getAttribute('data-value'));
+            this.execCommand('foreColor', false, e.target.getAttribute('data-value'));
             this.subOff();
         }
     }

@@ -78,13 +78,10 @@ SUNEDITOR.defaultLang = {
 (function(SUNEDITOR){
     'use strict';
 
-    var ELEMENT_NODE = 1;
-    var TEXT_NODE = 3;
-
     /**
      * utile func
      */
-    SUNEDITOR.func = {
+    var func = SUNEDITOR.func = {
         returnTrue : function() {
             return true;
         },
@@ -134,7 +131,7 @@ SUNEDITOR.defaultLang = {
     /**
      * document func
      */
-    SUNEDITOR.dom = {
+    var dom = SUNEDITOR.dom = {
         getArrayIndex : function(array, element) {
             var idx = -1;
             var len = array.length;
@@ -313,7 +310,7 @@ SUNEDITOR.defaultLang = {
          * This function is 'this' used by other plugins */
         var editor = SUNEDITOR.editor = {
             context : context,
-            pluginLoad : {},
+            loadedPlugins : {},
             submenu : null,
             originSub : null,
             modalForm : null,
@@ -325,7 +322,7 @@ SUNEDITOR.defaultLang = {
             setScriptHead : function(directory, moduleName, callBackFunction, targetElement) {
                 var callBack_moduleAdd = function(targetElement) {
                     SUNEDITOR.plugin[moduleName].add(this, targetElement);
-                    this.pluginLoad[moduleName] = true;
+                    this.loadedPlugins[moduleName] = true;
                     callBackFunction();
                 }.bind(this, targetElement);
 
@@ -337,7 +334,7 @@ SUNEDITOR.defaultLang = {
 
                     document.getElementsByTagName("head")[0].appendChild(scriptFile);
                 }
-                else if(!this.pluginLoad[moduleName]) {
+                else if(!this.loadedPlugins[moduleName]) {
                     callBack_moduleAdd();
                 }
                 else {
@@ -395,12 +392,9 @@ SUNEDITOR.defaultLang = {
                 selection.addRange(range);
             },
 
-            /** 에디터 동작 */
-            pure_execCommand : function(command, showDefaultUI, value) {
+            execCommand : function(command, showDefaultUI, value) {
                 context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
             },
-
-
 
             subOn : function(element) {
                 editor.submenu = element.nextElementSibling;
@@ -469,32 +463,6 @@ SUNEDITOR.defaultLang = {
                 context.argument._isFullScreen = !context.argument._isFullScreen;
             },
 
-            appendHr : function(value) {
-                var borderStyle = "";
-                switch(value) {
-                    case 'hr1':
-                        borderStyle = "black 1px solid";
-                        break;
-                    case 'hr2':
-                        borderStyle = "black 1px dotted";
-                        break;
-                    case 'hr3':
-                        borderStyle = "black 1px dashed";
-                        break;
-                }
-
-                var oHr = document.createElement("HR");
-                oHr.style.border = "black 0px none";
-                oHr.style.borderTop = borderStyle;
-                oHr.style.height = "1px";
-
-                var pNode = context.argument._selectionNode.parentNode;
-                if(/body/i.test(pNode)) pNode = context.argument._selectionNode;
-
-                pNode.appendChild(oHr);
-                editor.appendP(oHr);
-            },
-
             appendP : function(element) {
                 var oP = document.createElement("P");
                 oP.innerHTML = '&#65279';
@@ -510,6 +478,8 @@ SUNEDITOR.defaultLang = {
             },
 
             removeNode : function() {
+                var ELEMENT_NODE = 1;
+                var TEXT_NODE = 3;
                 var nativeRng = this.getRange();
 
                 var startCon = nativeRng.startContainer;
@@ -653,197 +623,6 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            appendSpan : function(fontsize) {
-                fontsize = fontsize + editor.fontSizeUnit;
-                var nativeRng = this.getRange();
-
-                var startCon = nativeRng.startContainer;
-                var startOff = nativeRng.startOffset;
-                var endCon = nativeRng.endContainer;
-                var endOff = nativeRng.endOffset;
-                var commonCon = nativeRng.commonAncestorContainer;
-
-                var spanNode = null;
-                var beforeNode = null;
-                var afterNode = null;
-
-                /** 같은 노드안에서 선택 */
-                if(startCon === endCon) {
-                    if(startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
-                        startCon.style.fontSize = fontsize;
-                    }
-                    else {
-                        var afterNodeStandardPosition;
-                        beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
-
-                        spanNode = document.createElement("SPAN");
-                        spanNode.style.fontSize = fontsize;
-
-                        if(startOff === endOff) {
-                            spanNode.innerHTML = "&nbsp;";
-                            afterNodeStandardPosition = spanNode.nextSibling;
-                        } else {
-                            spanNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-
-                            try {
-                                afterNodeStandardPosition = startCon.nextSibling.nextSibling;
-                            } catch(e) {
-                                afterNodeStandardPosition = startCon.nextSibling;
-                            }
-                        }
-
-                        startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
-
-                        if(beforeNode.data.length > 0) {
-                            startCon.data = beforeNode.data;
-                        } else {
-                            startCon.data = startCon.substringData(0, startOff);
-                        }
-
-                        if(afterNode.data.length > 0) {
-                            startCon.parentNode.insertBefore(afterNode, afterNodeStandardPosition);
-                        }
-
-                        startCon = spanNode;
-                        startOff = 0;
-                        endCon = spanNode;
-                        endOff = 1;
-                    }
-                }
-                /** 여러개의 노드 선택 */
-                else {
-                    var childNodes = dom.getListChildNodes(commonCon);
-                    var startIndex = dom.getArrayIndex(childNodes, startCon);
-                    var endIndex = dom.getArrayIndex(childNodes, endCon);
-
-                    var startNode = startCon;
-                    for(var i=startIndex+1; i>=0; i--) {
-                        if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
-                            startIndex = i;
-                            startNode = startNode.parentNode;
-                        }
-                    }
-
-                    var endNode = endCon;
-                    for(var i=endIndex-1; i>startIndex; i--) {
-                        if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
-                            childNodes.splice(i, 1);
-                            endNode = endNode.parentNode;
-                            --endIndex;
-                        }
-                    }
-
-                    for(var i=startIndex; i<=endIndex; i++) {
-                        var item = childNodes[i];
-                        var parentNode = item.parentNode;
-
-                        if(item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
-                            dom.removeItem(item);
-                            continue;
-                        }
-
-                        if(item === startCon) {
-                            if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                                if(/^SPAN$/i.test(item.nodeName)) {
-                                    item.style.fontSize = fontsize;
-                                }
-                                continue;
-                            }
-
-                            spanNode = document.createElement("SPAN");
-                            spanNode.style.fontSize = fontsize;
-
-                            if(startCon.nodeType === ELEMENT_NODE) {
-                                beforeNode = document.createTextNode(startCon.textContent);
-                                spanNode.innerHTML = startCon.innerHTML;
-                            } else {
-                                beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                                spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
-                            }
-
-                            startCon.parentNode.insertBefore(spanNode, item.nextSibling);
-
-                            if(beforeNode.length > 0) {
-                                startCon.data = beforeNode.data;
-                            } else {
-                                dom.removeItem(startCon);
-                            }
-
-                            startCon = spanNode.firstChild;
-                            startOff = 0;
-
-                            continue;
-                        }
-
-                        if(item === endCon) {
-                            if(parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                                if(/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
-                                    item.style.fontSize = fontsize;
-                                }
-                                continue;
-                            }
-
-                            spanNode = document.createElement("SPAN");
-                            spanNode.style.fontSize = fontsize;
-
-                            if(endCon.nodeType === ELEMENT_NODE) {
-                                afterNode = document.createTextNode(endCon.textContent);
-                                spanNode.innerHTML = endCon.innerHTML;
-                            } else {
-                                afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                                spanNode.innerText = endCon.substringData(0, endOff);
-                            }
-
-                            endCon.parentNode.insertBefore(spanNode, endCon);
-
-                            if(afterNode.length > 0) {
-                                endCon.data = afterNode.data;
-                            } else {
-                                dom.removeItem(endCon);
-                            }
-
-                            endCon = spanNode.firstChild;
-                            endOff = spanNode.textContent.length;
-
-                            continue;
-                        }
-
-                        if(parentNode.nodeType === ELEMENT_NODE) {
-                            if(parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
-                                var textNode = document.createTextNode(item.textContent);
-                                parentNode.insertBefore(textNode, item);
-                                dom.removeItem(item);
-                                continue;
-                            }
-                            else if(/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
-                                item.style.fontSize = fontsize;
-                                continue;
-                            }
-                        }
-
-                        if(/^SPAN$/i.test(item.nodeName)) {
-                            item.style.fontSize = fontsize;
-                            continue;
-                        }
-
-                        spanNode = document.createElement("SPAN");
-                        spanNode.style.fontSize = fontsize;
-
-                        if(item.nodeType === ELEMENT_NODE) {
-                            spanNode.innerHTML = item.innerHTML;
-                        } else {
-                            spanNode.innerText = item.data;
-                        }
-
-                        item.parentNode.insertBefore(spanNode, item);
-                        dom.removeItem(item);
-                    }
-                }
-
-                this.setRange(startCon, startOff, endCon, endOff);
-            },
-
             resize_editor : function(e) {
                 var resizeInterval = (e.clientY - context.argument._resizeClientY);
 
@@ -892,17 +671,14 @@ SUNEDITOR.defaultLang = {
                     className = targetElement.className;
                 }
 
-                if(!command && !display) return;
+                if(!command && !display) return true;
 
                 e.preventDefault();
                 e.stopPropagation();
 
                 editor.focus();
 
-                var value = targetElement.getAttribute("data-value");
-                var txt = targetElement.getAttribute("data-txt");
-
-                /** 서브메뉴 보이기 */
+                /** Dialog, Submenu */
                 if(!!display || /^BODY$/i.test(targetElement.tagName)) {
                     editor.subOff();
 
@@ -918,18 +694,15 @@ SUNEDITOR.defaultLang = {
                     return;
                 }
 
-                /** 커멘드 명령어 실행 */
+                /** default command */
                 if(!!command) {
+                    var value = targetElement.getAttribute("data-value");
+                    var txt = targetElement.getAttribute("data-txt");
+
                     switch(command) {
                         case 'fontName':
                             dom.changeTxt(editor.originSub.firstElementChild, txt);
-                            editor.pure_execCommand(command, false, value);
-                            break;
-                        case 'fontSize':
-                            editor.appendSpan(value);
-                            break;
-                        case 'horizontalRules':
-                            editor.appendHr(value);
+                            editor.execCommand(command, false, value);
                             break;
                         case 'sorceFrame':
                             editor.toggleFrame();
@@ -939,27 +712,19 @@ SUNEDITOR.defaultLang = {
                             editor.toggleFullScreen(targetElement);
                             dom.toggleClass(targetElement, "on");
                             break;
-                        case 'justifyleft':
-                        case 'justifyright':
-                        case 'justifycenter':
-                        case 'justifyfull':
                         case 'indent':
                         case 'outdent':
                         case 'redo':
                         case 'undo':
-                            editor.pure_execCommand(command, false);
-                            break;
-                        case 'formatBlock':
-                            editor.pure_execCommand(command, false, value);
+                            editor.execCommand(command, false);
                             break;
                         default :
-                            editor.pure_execCommand(command, false, value);
+                            editor.execCommand(command, false, value);
                             dom.toggleClass(targetElement, "on");
                     }
 
                     editor.subOff();
                 }
-
             },
 
             onMouseDown_wysiwyg : function(e) {
@@ -990,7 +755,7 @@ SUNEDITOR.defaultLang = {
                 while(!/^P$|^BODY$|^HTML$|^DIV$/i.test(selectionParent.nodeName)) {
                     var nodeName = (/^STRONG$/.test(selectionParent.nodeName)? 'B': (/^EM/.test(selectionParent.nodeName)? 'I': selectionParent.nodeName));
 
-                    /** 폰트 */
+                    /** Font */
                     if(findFont && (/^FONT$/i.test(nodeName) && selectionParent.face.length > 0)) {
                         var selectFont = list.fontFamilyMap[selectionParent.face.replace(/\s*/g,"")];
                         dom.changeTxt(list.commandMap[nodeName], selectFont);
@@ -1057,26 +822,26 @@ SUNEDITOR.defaultLang = {
                     switch(keyCode) {
                         case 66: /** B */
                             e.preventDefault();
-                            editor.pure_execCommand('bold', false);
+                            editor.execCommand('bold', false);
                             nodeName = 'B';
                             break;
                         case 85: /** U */
                             e.preventDefault();
-                            editor.pure_execCommand('underline', false);
+                            editor.execCommand('underline', false);
                             nodeName = 'U';
                             break;
                         case 73: /** I */
                             e.preventDefault();
-                            editor.pure_execCommand('italic', false);
+                            editor.execCommand('italic', false);
                             nodeName = 'I';
                             break;
                         case 89: /** Y */
                             e.preventDefault();
-                            editor.pure_execCommand('redo', false);
+                            editor.execCommand('redo', false);
                             break;
                         case 90: /** Z */
                             e.preventDefault();
-                            editor.pure_execCommand('undo', false);
+                            editor.execCommand('undo', false);
                     }
 
                     if(!!nodeName) {
@@ -1089,7 +854,7 @@ SUNEDITOR.defaultLang = {
                 /** ctrl + shift + S */
                 if(ctrl && shift && keyCode === 83) {
                     e.preventDefault();
-                    editor.pure_execCommand('strikethrough', false);
+                    editor.execCommand('strikethrough', false);
                     dom.toggleClass(list.commandMap['STRIKE'], "on");
 
                     return;
@@ -1184,10 +949,10 @@ SUNEDITOR.defaultLang = {
 
         /** add event listeners */
         window.onresize = function(){event.resize_window()};
-        context.tool.bar.addEventListener('click', event.onClick_toolbar);
         context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
         context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
         context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
+        context.tool.bar.addEventListener('click', event.onClick_toolbar);
         context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
@@ -1315,52 +1080,17 @@ SUNEDITOR.defaultLang = {
             if(options.showFormats) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-display="submenu">'+
+                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-command="formatBlock" data-display="submenu">'+
                     '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_size">'+
-                    '                <div class="inner_layer">'+
-                    '                    <ul class="list_editor format_list">'+
-                    '                        <li><button type="button" class="btn_edit" style="height:30px;" data-command="formatBlock" data-value="P"><p style="font-size:13pt;">Normal</p></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:45px;" data-command="formatBlock" data-value="h1"><h1>Header 1</h1></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:34px;" data-command="formatBlock" data-value="h2"><h2>Header 2</h2></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:26px;" data-command="formatBlock" data-value="h3"><h3>Header 3</h3></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:23px;" data-command="formatBlock" data-value="h4"><h4>Header 4</h4></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:19px;" data-command="formatBlock" data-value="h5"><h5>Header 5</h5></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" style="height:15px;" data-command="formatBlock" data-value="h6"><h6>Header 6</h6></button></li>'+
-                    '                    </ul>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>' ;
             }
             if(options.showFontSize) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-display="submenu">'+
+                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-command="fontSize" data-display="submenu">'+
                     '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_size">'+
-                    '                <div class="inner_layer">'+
-                    '                    <ul class="list_editor font_size_list">'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="8"><span style="font-size:8pt;">8</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="9"><span style="font-size:9pt;">9</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="10"><span style="font-size:10pt;">10</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="11"><span style="font-size:11pt;">11</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="12"><span style="font-size:12pt;">12</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="14"><span style="font-size:14pt;">14</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="16"><span style="font-size:16pt;">16</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="18"><span style="font-size:18pt;">18</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="20"><span style="font-size:20pt;">20</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="22"><span style="font-size:22pt;">22</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="24"><span style="font-size:24pt;">24</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="26"><span style="font-size:26pt;">26</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="28"><span style="font-size:28pt;">28</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="36"><span style="font-size:36pt;">36</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="48"><span style="font-size:48pt;">48</span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="fontSize" data-value="72"><span style="font-size:72pt;">72</span></button></li>'+
-                    '                    </ul>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>' ;
             }
             html += '</ul>'+
@@ -1446,66 +1176,28 @@ SUNEDITOR.defaultLang = {
                 html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.align+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-display="submenu">'+
+                    '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-command="align" data-display="submenu">'+
                     '                <span class="img_editor ico_align_l">'+lang.toolbar.alignLeft+'</span>'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_align">'+
-                    '                <div class="inner_layer inner_layer_type2">'+
-                    '                    <ul class="list_editor">'+
-                    '                        <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" title="'+lang.toolbar.alignLeft+'"><span class="img_editor ico_align_l"></span>'+lang.toolbar.left+'</button></li>'+
-                    '                        <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" title="'+lang.toolbar.alignCenter+'"><span class="img_editor ico_align_c"></span>'+lang.toolbar.center+'</button></li>'+
-                    '                        <li><button type="button" class="btn_edit btn_align" data-command="justifyright" title="'+lang.toolbar.alignRight+'"><span class="img_editor ico_align_r"></span>'+lang.toolbar.right+'</button></li>'+
-                    '                        <li><button type="button" class="btn_edit btn_align" data-command="justifyfull" title="'+lang.toolbar.justifyFull+'"><span class="img_editor ico_align_f"></span>'+lang.toolbar.bothSide+'</button></li>'+
-                    '                    </ul>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>';
             }
             if(options.showList) {
                 html += ''+
                     '        <li>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-display="submenu">'+
+                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-command="list" data-display="submenu">'+
                     '                <div class="img_editor ico_list ico_list_num"></div>'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_list">'+
-                    '                <div class="inner_layer inner_layer_type2">'+
-                    '                    <ul class="list_editor">'+
-                    '                        <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="DECIMAL" title="'+lang.toolbar.orderList+'"><span class="img_editor ico_list ico_list_num"></span></button></li>'+
-                    '                        <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="DISC" title="'+lang.toolbar.unorderList+'"><span class="img_editor ico_list ico_list_square"></span></button></li>'+
-                    '                    </ul>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>';
             }
             if(options.showLine) {
                 html += ''+
                     '        <li>'+
                     '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-display="submenu">'+
+                    '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-command="horizontalRules" data-display="submenu">'+
                     '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
                     '            </button>'+
-                    '            <div class="layer_editor layer_line">'+
-                    '                <div class="inner_layer inner_layer_type2">'+
-                    '                    <ul class="list_editor">'+
-                    '                        <li><button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr1">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '                            </button>'+
-                    '                        </li>'+
-                    '                        <li>'+
-                    '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr2">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '                            </button>'+
-                    '                        </li>'+
-                    '                        <li>'+
-                    '                            <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="hr3">'+
-                    '                                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '                            </button>'+
-                    '                        </li>'+
-                    '                    </ul>'+
-                    '                </div>'+
-                    '            </div>'+
                     '        </li>';
             }
             html +='</ul>'+
@@ -1789,15 +1481,14 @@ SUNEDITOR.defaultLang = {
                 fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0],
                 default_fontSize : (cons._toolBar.getElementsByClassName('sun-editor-font-size').length>0? cons._toolBar.getElementsByClassName('sun-editor-font-size')[0].textContent: undefined)
             },
-            dialog : {},
-            submenu : {},
-            command : {},
             user : {
                 videoX : options.videoX,
                 videoY : options.videoY,
                 imageSize : options.imageSize,
                 imageUploadUrl : options.imageUploadUrl
-            }
+            },
+            dialog : {},
+            submenu : {}
         }
     };
 
@@ -1824,7 +1515,7 @@ SUNEDITOR.defaultLang = {
             cons.constructed._top.style.display = "none";
         }
 
-        /** 형제 노드로 생성 후 숨김 */
+        /** Create to sibling node */
         if(typeof element.nextElementSibling === 'object') {
             element.parentNode.insertBefore(cons.constructed._top, element.nextElementSibling);
         } else {
@@ -1833,7 +1524,7 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        return core(Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.func);
+        return core(Context(element, cons.constructed, cons.options), dom, func);
     };
 
     /**

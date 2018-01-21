@@ -9,48 +9,45 @@
     SUNEDITOR.plugin.hiliteColor = {
         add: function (_this, targetElement) {
             /** set submenu */
-            var color_picker = eval(this.setSubmenu());
+            var listDiv = eval(this.setSubmenu());
 
             /** add event listeners */
-            color_picker.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(_this));
+            listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(_this));
 
             /** append html */
-            targetElement.parentNode.appendChild(color_picker);
+            targetElement.parentNode.appendChild(listDiv);
         },
 
         setSubmenu: function () {
-            var foreColor_div = document.createElement('DIV');
-            foreColor_div.className = 'layer_editor layer_color';
-            foreColor_div.setAttribute('data-command', 'foreColor');
-            foreColor_div.style.display = 'none';
+            var listDiv = document.createElement('DIV');
+            listDiv.className = 'layer_editor layer_color';
+            listDiv.style.display = 'none';
 
             var colorList = ['#1e9af9','#00b8c6','#6cce02','#ff9702','#ff0000','#ff00dd','#6600ff','#cce9ff','#fcfd4c','#ffffff','#dfdede','#8c8c8c','#000000','#222222'];
 
             var list = '<div class="inner_layer">'+
                        '   <div class="pallet_bgcolor pallet_text">'+
                        '       <ul class="list_color list_bgcolor">';
-
             for(var i=0; i<colorList.length; i++) {
                 var color = colorList[i];
                 list += '<li>' +
-                        '   <button type="button" class="btn_color'+(/ffffff/.test(color)? ' color_white': '')+'" data-value="'+color+'" style="background-color:'+color+';">'+color+'' +
+                        '   <button type="button" class="btn_edit'+(/ffffff/.test(color)? ' color_white': '')+'" data-value="'+color+'" style="background-color:'+color+';">'+color+'' +
                         '       <span class="bg_check"></span>' +
                         '       <span class="bg_btnframe"></span>' +
                         '   </button>' +
                         '</li>';
             }
-
             list += '       </ul>'+
                     '   </div>'+
                     '</div>';
 
-            foreColor_div.innerHTML = list;
+            listDiv.innerHTML = list;
 
-            return foreColor_div;
+            return listDiv;
         },
 
         colorPick : function (e) {
-            if(!/btn_color/.test(e.target.className)) {
+            if(!/btn_edit/.test(e.target.className)) {
                 return false;
             }
 
@@ -58,7 +55,7 @@
             e.stopPropagation();
 
             this.focus();
-            this.pure_execCommand('hiliteColor', false, e.target.getAttribute('data-value'));
+            this.execCommand('hiliteColor', false, e.target.getAttribute('data-value'));
             this.subOff();
         }
     }

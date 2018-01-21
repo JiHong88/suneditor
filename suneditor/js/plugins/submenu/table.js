@@ -11,11 +11,11 @@
             var context = _this.context;
 
             /** set submenu */
-            var table_picker = eval(this.setSubmenu());
-            context.submenu.tablePicker = table_picker.getElementsByClassName('sun-editor-id-table-picker')[0];
-            context.submenu.tableHighlight = table_picker.getElementsByClassName('sun-editor-id-table-highlighted')[0];
-            context.submenu.tableUnHighlight = table_picker.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
-            context.submenu.tableDisplay = table_picker.getElementsByClassName('sun-editor-table-display')[0];
+            var listDiv = eval(this.setSubmenu());
+            context.submenu.tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
+            context.submenu.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
+            context.submenu.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
+            context.submenu.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
             context.submenu._tableXY = [];
 
             /** add event listeners */
@@ -23,22 +23,23 @@
             context.submenu.tablePicker.addEventListener('click', this.appendTable.bind(_this));
 
             /** append html */
-            targetElement.parentNode.appendChild(table_picker);
+            targetElement.parentNode.appendChild(listDiv);
         },
 
         setSubmenu: function () {
-            var tablePicker_div = document.createElement('DIV');
-            tablePicker_div.className = 'table-content';
-            tablePicker_div.style.display = 'none';
+            var listDiv = document.createElement('DIV');
+            listDiv.className = 'table-content';
+            listDiv.style.display = 'none';
 
-            tablePicker_div.innerHTML = '<div class="table-data-form">'+
-                                        '   <div class="table-picker sun-editor-id-table-picker" data-command="table"></div>'+
-                                        '   <div class="table-highlighted sun-editor-id-table-highlighted"></div>'+
-                                        '   <div class="table-unhighlighted sun-editor-id-table-unhighlighted"></div>'+
-                                        '</div>'+
-                                        '<div class="table-display sun-editor-table-display">1 x 1</div>';
+            listDiv.innerHTML = ''+
+                '<div class="table-data-form">'+
+                '   <div class="table-picker sun-editor-id-table-picker"></div>'+
+                '   <div class="table-highlighted sun-editor-id-table-highlighted"></div>'+
+                '   <div class="table-unhighlighted sun-editor-id-table-unhighlighted"></div>'+
+                '</div>'+
+                '<div class="table-display sun-editor-table-display">1 x 1</div>';
 
-            return tablePicker_div;
+            return listDiv;
         },
 
         appendTable : function() {
