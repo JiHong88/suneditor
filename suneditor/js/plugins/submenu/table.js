@@ -99,5 +99,6 @@ SUNEDITOR.plugin.table = {
         unHighlight.height = "5em";
 
         SUNEDITOR.dom.changeTxt(this.context.submenu.tableDisplay, "1 x 1");
+        this.submenuOff();
     }
 };

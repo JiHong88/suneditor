@@ -38,15 +38,18 @@ SUNEDITOR.plugin.formatBlock = {
     },
 
     pickUp : function (e) {
-        if(!/BUTTON/i.test(e.target.tagName)) {
-            return false;
+        var target = e.target;
+        var value = null;
+        while (!value && !/UL/.test(target.tagName)) {
+            value = target.getAttribute('data-value')
+            target = target.parentNode;
         }
 
         e.preventDefault();
         e.stopPropagation();
 
         this.focus();
-        this.execCommand('formatBlock', false, e.target.getAttribute('data-value'));
+        this.execCommand('formatBlock', false, value);
         this.submenuOff();
     }
 };

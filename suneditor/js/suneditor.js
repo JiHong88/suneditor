@@ -318,12 +318,14 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /** Inable submenu  */
             submenuOn : function(element) {
                 editor.submenu = element.nextElementSibling;
                 editor.submenu.style.display = "block";
                 editor.originSub = editor.submenu.previousElementSibling;
             },
 
+            /** Disable submenu  */
             submenuOff : function() {
                 if(!!this.submenu) {
                     this.submenu.style.display = "none";
@@ -342,11 +344,12 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /** javascript execCommand **/
             execCommand : function(command, showDefaultUI, value) {
                 context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
             },
 
-            /** focus to wysiwyg area */
+            /** Focus to wysiwyg area */
             focus : function(){
                 context.element.wysiwygWindow.document.body.focus();
             },
@@ -505,7 +508,7 @@ SUNEDITOR.defaultLang = {
 
                 var rightNode = null;
 
-                /** 범위선택 없을때 */
+                /** Select within the same node */
                 if(startCon === endCon && startOff === endOff) {
                     if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
                         rightNode = selection.focusNode.splitText(endOff);
@@ -518,7 +521,7 @@ SUNEDITOR.defaultLang = {
                         parentNode.appendChild(oNode);
                     }
                 }
-                /** 범위선택 했을때 */
+                /** Select multiple nodes */
                 else {
                     var removeNode = startCon;
                     var isSameContainer = startCon === endCon;
@@ -639,7 +642,7 @@ SUNEDITOR.defaultLang = {
                 var command = targetElement.getAttribute("data-command");
                 var className = targetElement.className;
 
-                while(!command && !display && !/editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
+                while(!command && !/editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
                     targetElement = targetElement.parentNode;
                     command = targetElement.getAttribute("data-command");
                     display = targetElement.getAttribute("data-display");
@@ -1006,233 +1009,178 @@ SUNEDITOR.defaultLang = {
      * Create editor HTML
      * @param options - user option
      */
-    var createEditor = function (options){
+    var createToolBar = function (options){
         var lang = SUNEDITOR.lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
+        var html = '<div class="sun-editor-id-toolbar-cover"></div>';
+        var moduleHtml = '';
 
-        return (function() {
-            var html = '<div class="sun-editor-id-toolbar-cover"></div>'+
-                /** 글꼴, 포멧 */
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showFont) {
-                html += ''+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor btn_font" title="'+lang.toolbar.fontFamily+'" data-command="fontFamily" data-display="submenu">'+
-                    '                <span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'+
-                    '            </button>'+
-                    '       </li>';
-            }
-            if(options.showFormats) {
-                html += ''+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor btn_format" title="'+lang.toolbar.formats+'" data-command="formatBlock" data-display="submenu">'+
-                    '                <span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'+
-                    '            </button>'+
-                    '        </li>' ;
-            }
-            if(options.showFontSize) {
-                html += ''+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor btn_size" title="'+lang.toolbar.fontSize+'" data-command="fontSize" data-display="submenu">'+
-                    '                <span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'+
-                    '            </button>'+
-                    '        </li>' ;
-            }
-            html += '</ul>'+
-                '</div>'+
-                /** 굵게, 밑줄 등 */
-                '<div class="tool_module">'+
-                '   <ul class="editor_tool">';
-            if(options.showBold) {
-                html += ''+
-                    '       <li>'+
-                    '           <button type="button" class="btn_editor sun-editor-id-bold" title="'+lang.toolbar.bold+' (Ctrl+B)" data-command="bold"><div class="ico_bold"></div></button>'+
-                    '       </li>';
-            }
-            if(options.showUnderline) {
-                html += ''+
-                    '       <li>'+
-                    '           <button type="button" class="btn_editor sun-editor-id-underline" title="'+lang.toolbar.underline+' (Ctrl+U)" data-command="underline"><div class="ico_underline"></div></button>'+
-                    '       </li>';
-            }
-            if(options.showItalic) {
-                html += ''+
-                    '       <li>'+
-                    '           <button type="button" class="btn_editor sun-editor-id-italic" title="'+lang.toolbar.italic+' (Ctrl+I)" data-command="italic"><div class="ico_italic"></div></button>'+
-                    '       </li>';
-            }
-            if(options.showStrike) {
-                html += ''+
-                    '       <li>'+
-                    '           <button type="button" class="btn_editor sun-editor-id-strike" title="'+lang.toolbar.strike+' (Ctrl+SHIFT+S)" data-command="strikethrough"><div class="ico_strike"></div></button>'+
-                    '       </li>';
-            }
-            html +='</ul>'+
-                '</div>'+
-                /** 색상 선택 */
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showFontColor) {
-                html += ''+
-                    '        <li>'+
-                    '            <strong class="screen_out">'+lang.toolbar.fontColor+'</strong>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.fontColor+'" data-command="foreColor" data-display="submenu">'+
-                    '                <div class="ico_fcolor">'+
-                    '                    <em class="color_font" style="background-color:#1f92fe"></em>'+
-                    '                </div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showHiliteColor) {
-                html += ''+
-                    '        <li>'+
-                    '            <strong class="screen_out">'+lang.toolbar.hiliteColor+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_fbgcolor" title="'+lang.toolbar.hiliteColor+'" data-command="hiliteColor" data-display="submenu">'+
-                    '                <div class="img_editor ico_fcolor_w">'+
-                    '                    <em class="color_font" style="background-color:#1f92fe"></em>'+
-                    '                </div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            html +='</ul>'+
-                '</div>';
-            /** 들여쓰기, 내어쓰기 */
-            if(options.showInOutDent) {
-                html += ''+
-                    '<div class="tool_module">'+
-                    '    <ul class="editor_tool">'+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.indent+'" data-command="indent">'+
-                    '                <div class="img_editor ico_indnet"></div>'+
-                    '            </button>'+
-                    '        </li>'+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.outdent+'" data-command="outdent">'+
-                    '                <div class="img_editor ico_outdent"></div>'+
-                    '            </button>'+
-                    '        </li>'+
-                    '    </ul>'+
-                    '</div>';
-            }
-            /** 정렬, 구분선 상자 */
-            html += '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showAlign) {
-                html += ''+
-                    '        <li>'+
-                    '            <strong class="screen_out">'+lang.toolbar.align+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_align" title="'+lang.toolbar.align+'" data-command="align" data-display="submenu">'+
-                    '                <span class="img_editor ico_align_l">'+lang.toolbar.alignLeft+'</span>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showList) {
-                html += ''+
-                    '        <li>'+
-                    '            <button type="button" class="btn_editor" title="'+lang.toolbar.list+'" data-command="list" data-display="submenu">'+
-                    '                <div class="img_editor ico_list ico_list_num"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showLine) {
-                html += ''+
-                    '        <li>'+
-                    '            <strong class="screen_out">'+lang.toolbar.line+'</strong>'+
-                    '            <button type="button" class="btn_editor btn_line" title="'+lang.toolbar.line+'" data-command="horizontalRules" data-display="submenu">'+
-                    '                <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '                <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '                <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            html +='</ul>'+
-                '</div>'+
-                /** 테이블, 링크, 사진 */
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showTable) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.table+'" data-display="submenu" data-command="table">'+
-                    '                <div class="img_editor ico_table"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showLink) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.link+'" data-display="dialog" data-command="link">'+
-                    '                <div class="img_editor ico_url"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showImage) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.image+'" data-display="dialog" data-command="image">'+
-                    '                <div class="img_editor ico_picture"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            html += '</ul>'+
-                '</div>'+
-                /** 동영상, 전체화면, 소스편집 */
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showVideo) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.video+'" data-display="dialog" data-command="video">'+
-                    '                <div class="img_editor ico_video"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showFullScreen) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.fullScreen+'" data-command="fullScreen">'+
-                    '                <div class="img_editor ico_full_screen_e"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showCodeView) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.htmlEditor+'" data-command="sorceFrame">'+
-                    '                <div class="img_editor ico_html"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            html += '</ul>'+
-                '</div>'+
-                /** 실행취소 관련 */
-                '<div class="tool_module">'+
-                '    <ul class="editor_tool">';
-            if(options.showUndo) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.undo+' (Ctrl+Z)" data-command="undo">'+
-                    '                <div class="img_editor ico_undo"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            if(options.showRedo) {
-                html += ''+
-                    '        <li>'+
-                    '            <button class="btn_editor" title="'+lang.toolbar.redo+' (Ctrl+Y)" data-command="redo">'+
-                    '                <div class="img_editor ico_redo"></div>'+
-                    '            </button>'+
-                    '        </li>';
-            }
-            html += '</ul>'+
-                '</div>';
+        function createModuleGroup(innerHTML) {
+            if(!innerHTML) return '';
+            return '<div class="tool_module"><ul class="editor_tool">'+innerHTML+'</ul></div>';
+        }
 
-            return html;
-        })();
+        function createButton(buttonClass, title, dataCommand, dataDisplay, innerHTML) {
+            var buttonHtml = ''+
+                '<li>'+
+                '   <button type="button" class="btn_editor '+buttonClass+'" title="'+title+'" data-command="'+dataCommand+'" '+(!!dataDisplay? 'data-display="'+dataDisplay+'"': '')+'>'+
+                        innerHTML+
+                '   </button>'+
+                '</li>';
+            return buttonHtml;
+        }
+        
+        /** FontFamily, Formats, FontSize */
+        if(options.showFont) {
+            moduleHtml += createButton('btn_font', lang.toolbar.fontFamily, 'fontFamily', 'submenu',
+                '<span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'
+            );
+        }
+        if(options.showFormats) {
+            moduleHtml += createButton('btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
+                '<span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'
+            );
+        }
+        if(options.showFontSize) {
+            moduleHtml += createButton('btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
+                '<span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** Bold, underline, italic, strikethrough */
+        if(options.showBold) {
+            moduleHtml += createButton('sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', null,
+                '<div class="ico_bold"></div>'
+            );
+        }
+        if(options.showUnderline) {
+            moduleHtml += createButton('sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', null,
+                '<div class="ico_underline"></div>'
+            );
+        }
+        if(options.showItalic) {
+            moduleHtml += createButton('sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', null,
+                '<div class="ico_italic"></div>'
+            );
+        }
+        if(options.showStrike) {
+            moduleHtml += createButton('sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', null,
+                '<div class="ico_strike"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** foreColor, hiliteColor */
+        if(options.showFontColor) {
+            moduleHtml += createButton('', lang.toolbar.fontColor, 'foreColor', 'submenu',
+                '<div class="img_editor ico_fcolor_w">'+
+                '   <em class="color_font" style="background-color:#1f92fe"></em>'+
+                '</div>'
+            );
+        }
+        if(options.showHiliteColor) {
+            moduleHtml += createButton('', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
+                '<div class="ico_fcolor">'+
+                '   <em class="color_font" style="background-color:#1f92fe"></em>'+
+                '</div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** Indent, Outdent */
+        if(options.showInOutDent) {
+            moduleHtml += createButton('', lang.toolbar.indent, 'indent', null,
+                '<div class="img_editor ico_indnet"></div>'
+            );
+            moduleHtml += createButton('', lang.toolbar.outdent, 'outdent', null,
+                '<div class="img_editor ico_outdent"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** align, list, HR */
+        if(options.showAlign) {
+            moduleHtml += createButton('btn_align', lang.toolbar.align, 'align', 'submenu',
+                '<div class="img_editor ico_align_l"></div>'
+            );
+        }
+        if(options.showList) {
+            moduleHtml += createButton('', lang.toolbar.list, 'list', 'submenu',
+                '<div class="img_editor ico_list ico_list_num"></div>'
+            );
+        }
+        if(options.showLine) {
+            moduleHtml += createButton('btn_line', lang.toolbar.line, 'horizontalRules', 'submenu',
+                '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
+                '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
+                '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
+            );
+        }
+        if(options.showTable) {
+            moduleHtml += createButton('', lang.toolbar.table, 'table', 'submenu',
+                '<div class="img_editor ico_table"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** Dialog : link, image, video */
+        if(options.showLink) {
+            moduleHtml += createButton('', lang.toolbar.link, 'link', 'dialog',
+                '<div class="img_editor ico_url"></div>'
+            );
+        }
+        if(options.showImage) {
+            moduleHtml += createButton('', lang.toolbar.image, 'image', 'dialog',
+                '<div class="img_editor ico_picture"></div>'
+            );
+        }
+        if(options.showVideo) {
+            moduleHtml += createButton('', lang.toolbar.video, 'video', 'dialog',
+                '<div class="img_editor ico_video"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        /** Full screen, toggle source frame */
+        if(options.showFullScreen) {
+            moduleHtml += createButton('', lang.toolbar.fullScreen, 'fullScreen', null,
+                '<div class="img_editor ico_full_screen_e"></div>'
+            );
+        }
+        if(options.showCodeView) {
+            moduleHtml += createButton('', lang.toolbar.htmlEditor, 'sorceFrame', null,
+                '<div class="img_editor ico_html"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+
+        /** Undo, redo */
+        if(options.showUndo) {
+            moduleHtml += createButton('', lang.toolbar.undo+' (Ctrl+Z)', 'undo', null,
+                '<div class="img_editor ico_undo"></div>'
+            );
+        }
+        if(options.showRedo) {
+            moduleHtml += createButton('', lang.toolbar.redo+' (Ctrl+Y)', 'redo', null,
+                '<div class="img_editor ico_redo"></div>'
+            );
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
+        return html;
     };
 
     /**
-     * document create - call [createEditor]
+     * document create - call [createToolBar]
      * @param element
      * @param options
      * @returns {{constructed: Element, options: *}}
@@ -1241,7 +1189,7 @@ SUNEDITOR.defaultLang = {
     var Constructor = function(element, options) {
         if(!(typeof options === "object")) options = {};
 
-        /** 사용자 옵션 초기화 */
+        /** user options */
         options.addFont = options.addFont || null;
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
@@ -1252,7 +1200,7 @@ SUNEDITOR.defaultLang = {
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.editorIframeFont = options.editorIframeFont || 'inherit';
 
-        /** 툴바 버튼 보이기 설정 */
+        /** Show toolbar button settings */
         options.showFont = options.showFont !== undefined? options.showFont: true;
         options.showFormats = options.showFormats !== undefined? options.showFormats: true;
         options.showFontSize = options.showFontSize !== undefined? options.showFontSize: true;
@@ -1290,7 +1238,7 @@ SUNEDITOR.defaultLang = {
         /** tool bar */
         var tool_bar = doc.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
-        tool_bar.innerHTML = createEditor(options);
+        tool_bar.innerHTML = createToolBar(options);
 
         /** inner editor div */
         var editor_div = doc.createElement("DIV");
@@ -1372,13 +1320,12 @@ SUNEDITOR.defaultLang = {
      * @constructor
      */
     var Context = function(element, cons, options) {
-        /** iframe 태그 */
         var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
 
-        /** 내부 옵션값 초기화 */
+        /** Save initial user option values */
         var styleTmp = document.createElement("div");
-
         styleTmp.style.cssText = cons._top.style.cssText;
+
         if(/none/i.test(styleTmp.style.display)) {
             styleTmp.style.display = options.display;
         }
