@@ -10,6 +10,7 @@
     <title>Suneditor</title>
     <!-- bootstrap -->
     <link rel="stylesheet" href="../bootstrap/bootstrap.css" media="all">
+    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script type="text/javascript" src="../bootstrap/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="../bootstrap/bootstrap.min.js"></script>
     <!-- main css -->
@@ -54,7 +55,42 @@
 </nav>
 
 <div class="content">
-    Working...
+    <div role="tabpanel">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist" id="myTab">
+            <li role="presentation" class="active">
+                <a href="#dialog" id="dialog-tab" role="tab" data-toggle="tab" aria-controls="dialog" aria-expanded="true">Dialog</a>
+            </li>
+            <li role="presentation">
+                <a href="#submenu" id="submenu-tab" role="tab" data-toggle="tab" aria-controls="submenu" aria-expanded="false">Submenu</a>
+            </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="dialog" aria-labelledby="dialog-tab">
+                <div class="highlight highlight-source-js">
+                    <pre>
+                        Dialog
+                    </pre>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="submenu" aria-labelledby="submenu-tab">
+                <div class="highlight highlight-source-js">
+                    <pre>
+                        Submenu
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    $('#myTab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+</script>
+
 </body>
 </html>
