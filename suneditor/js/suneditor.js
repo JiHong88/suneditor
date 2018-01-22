@@ -7,7 +7,7 @@
  */
 if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
-/** default language english */
+/** default language (english) */
 SUNEDITOR.defaultLang = {
     toolbar : {
         fontFamily : 'Font',
@@ -79,7 +79,7 @@ SUNEDITOR.defaultLang = {
     'use strict';
 
     /**
-     * utile func
+     * @summary utile function
      */
     var func = SUNEDITOR.func = {
         returnTrue : function() {
@@ -87,7 +87,7 @@ SUNEDITOR.defaultLang = {
         },
 
         getXMLHttpRequest : function() {
-            /** 익스플로러 */
+            /** IE */
             if(window.ActiveXObject){
                 try{
                     return new ActiveXObject("Msxml2.XMLHTTP");
@@ -99,11 +99,11 @@ SUNEDITOR.defaultLang = {
                     }
                 }
             }
-            /** 네스케이프 */
+            /** netscape */
             else if(window.XMLHttpRequest){
                 return new XMLHttpRequest();
             }
-            /** 브라우저 식별 실패 */
+            /** fail */
             else {
                 return null;
             }
@@ -129,9 +129,15 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * document func
+     * @summary document function
      */
     var dom = SUNEDITOR.dom = {
+        /**
+         * @description Get the index of the argument value in the element array
+         * @param array
+         * @param element
+         * @returns {number}
+         */
         getArrayIndex : function(array, element) {
             var idx = -1;
             var len = array.length;
@@ -146,6 +152,12 @@ SUNEDITOR.defaultLang = {
             return idx;
         },
 
+        /**
+         * @description Get the next index of the argument value in the element array
+         * @param array
+         * @param item
+         * @returns {number}
+         */
         nextIdx : function(array, item) {
             var idx = this.getArrayIndex(array, item);
             if (idx === -1) return -1;
@@ -153,6 +165,12 @@ SUNEDITOR.defaultLang = {
             return idx + 1;
         },
 
+        /**
+         * @description Get the previous index of the argument value in the element array
+         * @param array
+         * @param item
+         * @returns {number}
+         */
         prevIdx : function(array, item) {
             var idx = this.getArrayIndex(array, item);
             if (idx === -1) return -1;
@@ -160,10 +178,21 @@ SUNEDITOR.defaultLang = {
             return idx - 1;
         },
 
+        /**
+         * @description Gets whether the cell is a table
+         * @param node
+         * @returns {*|boolean}
+         */
         isCell : function(node) {
             return node && /^TD$|^TH$/i.test(node.nodeName);
         },
 
+        /**
+         * @description Get all child nodes of the argument value element (Without text node)
+         * @param element
+         * @param validation
+         * @returns {Array}
+         */
         getListChildren : function(element, validation) {
             var children = [];
             validation = validation || func.returnTrue;
@@ -182,6 +211,12 @@ SUNEDITOR.defaultLang = {
             return children;
         },
 
+        /**
+         * @description Get all child nodes of the argument value element (Include text nodes)
+         * @param element
+         * @param validation
+         * @returns {Array}
+         */
         getListChildNodes : function(element, validation) {
             var children = [];
             validation = validation || func.returnTrue;
@@ -200,6 +235,12 @@ SUNEDITOR.defaultLang = {
             return children;
         },
 
+        /**
+         * @description Argument value The argument value of the parent node of the element. Get the tag name if it exists.
+         * @param element
+         * @param tagName
+         * @returns {*}
+         */
         getParentNode : function(element, tagName) {
             var check = new RegExp("^"+tagName+"$", "i");
 
@@ -210,14 +251,29 @@ SUNEDITOR.defaultLang = {
             return element;
         },
 
+        /**
+         * @description Set the text content value of the argument value element
+         * @param element
+         * @param txt
+         */
         changeTxt : function(element, txt) {
             element.textContent = txt;
         },
 
+        /**
+         * @description Set the className value of the argument value element
+         * @param element
+         * @param className
+         */
         changeClass : function(element, className) {
             element.className = className;
         },
 
+        /**
+         * @description Append the className value of the argument value element
+         * @param element
+         * @param className
+         */
         addClass : function(element, className) {
             if(!element) return;
 
@@ -227,6 +283,11 @@ SUNEDITOR.defaultLang = {
             element.className += " " + className;
         },
 
+        /**
+         * @description Delete the className value of the argument value element
+         * @param element
+         * @param className
+         */
         removeClass : function(element, className) {
             if(!element) return;
 
@@ -234,6 +295,11 @@ SUNEDITOR.defaultLang = {
             element.className = element.className.replace(check, " ").trim();
         },
 
+        /**
+         * @description Argument value If there is no class name, insert it and delete the class name if it exists
+         * @param element
+         * @param className
+         */
         toggleClass : function(element, className) {
             var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
 
@@ -245,6 +311,10 @@ SUNEDITOR.defaultLang = {
             }
         },
 
+        /**
+         * @description Delete argumenu value element
+         * @param item
+         */
         removeItem : function(item) {
             try {
                 item.remove();
@@ -253,6 +323,11 @@ SUNEDITOR.defaultLang = {
             }
         },
 
+        /**
+         * @description Copies object
+         * @param obj
+         * @returns {object}
+         */
         copyObj : function(obj) {
             var copy = {};
             for (var attr in obj) {
@@ -263,15 +338,17 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * SunEditor core closure
+     * @summary SunEditor core closure
      * @param context
      * @param dom
      * @param func
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     var core = function(context, dom, func){
-        /** Practical editor function
-         * This function is 'this' used by other plugins */
+        /**
+         * @summary Practical editor function
+         * This function is 'this' used by other plugins
+         */
         var editor = SUNEDITOR.editor = {
             context : context,
             loadedPlugins : {},
@@ -282,7 +359,9 @@ SUNEDITOR.defaultLang = {
             tabSize : 4,
             fontSizeUnit : "pt",
 
-            /** Elements that need to change text or className for each selection change */
+            /**
+             * @description Elements that need to change text or className for each selection change
+             */
             commandMap : {
                 'FONT': context.tool.fontFamily,
                 'B' : context.tool.bold,
@@ -292,7 +371,13 @@ SUNEDITOR.defaultLang = {
                 'SIZE' : context.tool.fontSize
             },
 
-            /** Add module script File */
+            /**
+             * @description Add module script File
+             * @param directory - The directory(plugin/{directory}) of the js file to call
+             * @param moduleName - The name of the js file to call
+             * @param callBackFunction - Function to be executed immediately after module call
+             * @param targetElement - If this is element, the element is inserted into the sibling node (submenu)
+             */
             setScriptHead : function(directory, moduleName, callBackFunction, targetElement) {
                 var callBack_moduleAdd = function(targetElement) {
                     if(!this.context[directory]) this.context[directory] = {};
@@ -318,14 +403,19 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            /** Inable submenu  */
+            /**
+             * @description Enabled submenu
+             * @param element - Submenu element to call
+             */
             submenuOn : function(element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = "block";
                 this.originSub = this.submenu.previousElementSibling;
             },
 
-            /** Disable submenu  */
+            /**
+             * @description Disable submenu
+             */
             submenuOff : function() {
                 if(!!this.submenu) {
                     this.submenu.style.display = "none";
@@ -344,32 +434,57 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            /** javascript execCommand **/
+            /**
+             * @description javascript execCommand
+             * @param command
+             * @param showDefaultUI
+             * @param value
+             */
             execCommand : function(command, showDefaultUI, value) {
                 context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
             },
 
-            /** Focus to wysiwyg area */
+            /**
+             * @description Focus to wysiwyg area
+             */
             focus : function(){
                 context.element.wysiwygWindow.document.body.focus();
             },
 
+            /**
+             * @description Determine if this node is the last offset
+             * @param container
+             * @param offset
+             * @returns {boolean}
+             */
             isEdgePoint : function(container, offset) {
                 return (offset === 0) || (offset === container.nodeValue.length);
             },
 
+            /**
+             * @description Create range object
+             */
             createRange : function() {
                 return context.element.wysiwygWindow.document.createRange();
             },
 
+            /**
+             * @description Get current selection object
+             */
             getSelection : function() {
                 return context.element.wysiwygWindow.getSelection();
             },
 
+            /**
+             * @description Get current select node
+             */
             getSelectionNode : function() {
                 return this.getSelection().extentNode || this.getSelection().anchorNode;
             },
 
+            /**
+             * @description Get current range object
+             */
             getRange : function() {
                 var selection = this.getSelection();
                 var nativeRng = null;
@@ -387,6 +502,13 @@ SUNEDITOR.defaultLang = {
                 return nativeRng;
             },
 
+            /**
+             * @description Set range object
+             * @param startCon
+             * @param startOff
+             * @param endCon
+             * @param endOff
+             */
             setRange : function(startCon, startOff, endCon, endOff) {
                 var range = this.createRange();
                 range.setStart(startCon, startOff);
@@ -399,14 +521,25 @@ SUNEDITOR.defaultLang = {
                 selection.addRange(range);
             },
 
+            /**
+             * @description Show loading box
+             */
             showLoading : function() {
                 context.element.loading.style.display = "block";
             },
 
+            /**
+             * @description Close loading box
+             */
             closeLoading : function() {
                 context.element.loading.style.display = "none";
             },
 
+            /**
+             * @description Get node of current line (P,Table..)
+             * @param element
+             * @returns element
+             */
             getLineElement : function(element) {
                 while(!/^BODY$/i.test(element.parentNode.tagName)) {
                     element = element.parentNode;
@@ -415,6 +548,10 @@ SUNEDITOR.defaultLang = {
                 return element;
             },
 
+            /**
+             * @description Append P tag to current line next
+             * @param element - Insert as siblings of that element
+             */
             appendP : function(element) {
                 element = this.getLineElement(element);
                 var oP = document.createElement("P");
@@ -422,6 +559,87 @@ SUNEDITOR.defaultLang = {
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
             },
 
+            /**
+             * @description Delete selected node and insert argument value node
+             * @param oNode - Node to be inserted
+             * @param rightNode - If the node exists, it is inserted after the node
+             */
+            insertNode : function(oNode, rightNode) {
+                var parentNode = null;
+                if(!rightNode) {
+                    var selection = this.getSelection();
+                    var nativeRng = this.getRange();
+
+                    var startCon = nativeRng.startContainer;
+                    var startOff = nativeRng.startOffset;
+                    var endCon = nativeRng.endContainer;
+                    var endOff = nativeRng.endOffset;
+
+                    parentNode = startCon;
+                    if (/^#text$/i.test(startCon.nodeName)) {
+                        parentNode = startCon.parentNode;
+                    }
+
+                    /** Select within the same node */
+                    if (startCon === endCon && startOff === endOff) {
+                        if (!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
+                            rightNode = selection.focusNode.splitText(endOff);
+                            parentNode.insertBefore(oNode, rightNode);
+                        }
+                        else {
+                            if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
+                                parentNode.removeChild(parentNode.lastChild);
+                            }
+                            parentNode.appendChild(oNode);
+                        }
+                    }
+                    /** Select multiple nodes */
+                    else {
+                        var removeNode = startCon;
+                        var isSameContainer = startCon === endCon;
+                        var endLen = endCon.data.length;
+
+                        if (isSameContainer) {
+                            if (!this.isEdgePoint(endCon, endOff)) {
+                                rightNode = endCon.splitText(endOff);
+                            }
+
+                            if (!this.isEdgePoint(startCon, startOff)) {
+                                removeNode = startCon.splitText(startOff);
+                            }
+
+                            parentNode.removeChild(removeNode);
+                        }
+                        else {
+                            try {
+                                selection.deleteFromDocument();
+                            } catch (e) {
+                                this.removeNode();
+                            }
+
+                            if (endLen === endCon.data.length) rightNode = endCon.nextSibling;
+                            else rightNode = endCon;
+                        }
+                    }
+                }
+                else {
+                    parentNode = rightNode.parentNode;
+                    rightNode = rightNode.nextSibling;
+                }
+
+                try {
+                    parentNode.insertBefore(oNode, rightNode);
+                } catch(e) {
+                    parentNode.appendChild(oNode);
+                }
+
+                this.setRange(oNode, 0, oNode, 0);
+
+            },
+
+            /**
+             * @description Delete the currently selected node
+             */
             removeNode : function() {
                 var ELEMENT_NODE = 1;
                 var TEXT_NODE = 3;
@@ -501,79 +719,9 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            insertNode : function(oNode, rightNode) {
-                var parentNode = null;
-                if(!rightNode) {
-                    var selection = this.getSelection();
-                    var nativeRng = this.getRange();
-
-                    var startCon = nativeRng.startContainer;
-                    var startOff = nativeRng.startOffset;
-                    var endCon = nativeRng.endContainer;
-                    var endOff = nativeRng.endOffset;
-
-                    parentNode = startCon;
-                    if (/^#text$/i.test(startCon.nodeName)) {
-                        parentNode = startCon.parentNode;
-                    }
-
-                    /** Select within the same node */
-                    if (startCon === endCon && startOff === endOff) {
-                        if (!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
-                            rightNode = selection.focusNode.splitText(endOff);
-                            parentNode.insertBefore(oNode, rightNode);
-                        }
-                        else {
-                            if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
-                                parentNode.removeChild(parentNode.lastChild);
-                            }
-                            parentNode.appendChild(oNode);
-                        }
-                    }
-                    /** Select multiple nodes */
-                    else {
-                        var removeNode = startCon;
-                        var isSameContainer = startCon === endCon;
-                        var endLen = endCon.data.length;
-
-                        if (isSameContainer) {
-                            if (!this.isEdgePoint(endCon, endOff)) {
-                                rightNode = endCon.splitText(endOff);
-                            }
-
-                            if (!this.isEdgePoint(startCon, startOff)) {
-                                removeNode = startCon.splitText(startOff);
-                            }
-
-                            parentNode.removeChild(removeNode);
-                        }
-                        else {
-                            try {
-                                selection.deleteFromDocument();
-                            } catch (e) {
-                                this.removeNode();
-                            }
-
-                            if (endLen === endCon.data.length) rightNode = endCon.nextSibling;
-                            else rightNode = endCon;
-                        }
-                    }
-                }
-                else {
-                    parentNode = rightNode.parentNode;
-                    rightNode = rightNode.nextSibling;
-                }
-
-                try {
-                    parentNode.insertBefore(oNode, rightNode);
-                } catch(e) {
-                    parentNode.appendChild(oNode);
-                }
-
-                this.setRange(oNode, 0, oNode, 0);
-
-            },
-
+            /**
+             * @description Changes to source view or wysiwyg view
+             */
             toggleFrame : function() {
                 if(!context.argument._wysiwygActive) {
                     var ec = {"&amp;":"&","&nbsp;":"\u00A0","&quot;":"\"","&lt;":"<","&gt;":">"};
@@ -592,6 +740,10 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /**
+             * @description Changes to full screen or default screen
+             * @param element - full screen button
+             */
             toggleFullScreen : function(element) {
                 if(!context.argument._isFullScreen) {
                     context.element.topArea.style.position = "fixed";
@@ -617,6 +769,9 @@ SUNEDITOR.defaultLang = {
                 context.argument._isFullScreen = !context.argument._isFullScreen;
             },
 
+            /**
+             * @description Resizing the editor
+             */
             resize_editor : function(e) {
                 var resizeInterval = (e.clientY - context.argument._resizeClientY);
 
@@ -628,7 +783,9 @@ SUNEDITOR.defaultLang = {
             }
         };
 
-        /** event function */
+        /**
+         * @summary event function
+         */
         var event = {
             resize_window : function() {
                 // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
@@ -950,6 +1107,9 @@ SUNEDITOR.defaultLang = {
 
         /** User function */
         return {
+            /**
+             * @description Copying the contents of the editor to the original textarea
+             */
             save : function() {
                 if(context.argument._wysiwygActive) {
                     context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
@@ -958,6 +1118,10 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /**
+             * @description Gets the contents of the suneditor
+             * @returns {string}
+             */
             getContent : function() {
                 var content = "";
                 if(context.argument._wysiwygActive) {
@@ -968,6 +1132,10 @@ SUNEDITOR.defaultLang = {
                 return content;
             },
 
+            /**
+             * @description Change the contents of the suneditor
+             * @param content
+             */
             setContent : function(content) {
                 if(context.argument._wysiwygActive) {
                     context.element.wysiwygWindow.document.body.innerHTML = content;
@@ -976,6 +1144,10 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /**
+             * @description Add content to the suneditor
+             * @param content
+             */
             appendContent : function(content) {
                 if(context.argument._wysiwygActive) {
                     var oP = document.createElement("P");
@@ -986,24 +1158,39 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            /**
+             * @description Disable the suneditor
+             */
             disabled : function() {
                 context.tool.cover.style.display = "block";
                 context.element.wysiwygWindow.document.body.setAttribute("contenteditable", false);
             },
 
+            /**
+             * @description Enabled the suneditor
+             */
             enabled : function() {
                 context.tool.cover.style.display = "none";
                 context.element.wysiwygWindow.document.body.setAttribute("contenteditable", true);
             },
 
+            /**
+             * @description Show the suneditor
+             */
             show : function() {
                 context.element.topArea.style.cssText = context.argument._originCssText;
             },
 
+            /**
+             * @description Hide the suneditor
+             */
             hide : function() {
                 context.element.topArea.style.display = "none";
             },
 
+            /**
+             * @description Destroy the suneditor
+             */
             destroy : function() {
                 context.element.topArea.parentNode.removeChild(context.element.topArea);
                 context.element.textElement.style.display = "";
@@ -1022,7 +1209,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * Create editor HTML
+     * @summary Create editor HTML
      * @param options - user option
      */
     var createToolBar = function (options){
@@ -1030,11 +1217,25 @@ SUNEDITOR.defaultLang = {
         var html = '<div class="sun-editor-id-toolbar-cover"></div>';
         var moduleHtml = '';
 
+        /**
+         * @description Create a group div containing each module
+         * @param innerHTML - module button html
+         * @returns {string}
+         */
         function createModuleGroup(innerHTML) {
             if(!innerHTML) return '';
             return '<div class="tool_module"><ul class="editor_tool">'+innerHTML+'</ul></div>';
         }
 
+        /**
+         *
+         * @param buttonClass
+         * @param title
+         * @param dataCommand
+         * @param dataDisplay
+         * @param innerHTML - Html in button
+         * @returns {string}
+         */
         function createButton(buttonClass, title, dataCommand, dataDisplay, innerHTML) {
             var buttonHtml = ''+
                 '<li>'+
@@ -1196,8 +1397,8 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * document create - call [createToolBar]
-     * @param element
+     * @description document create - call createToolBar()
+     * @param element - textarea
      * @param options
      * @returns {{constructed: Element, options: *}}
      * @constructor
@@ -1329,10 +1530,11 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
+     * @description Elements and variables you should have
      * @param element
      * @param cons
      * @param options
-     * @returns Elements of the editor
+     * @returns Elements, variables of the editor
      * @constructor
      */
     var Context = function(element, cons, options) {
@@ -1398,7 +1600,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * create Suneditor
+     * @summary create Suneditor
      * @param elementId
      * @param options
      * @returns {{save, getContent, setContent, appendContent, disabled, enabled, show, hide, destroy}}
@@ -1433,7 +1635,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * destroy Suneditor
+     * @summary destroy Suneditor
      * @param elementId
      */
     SUNEDITOR.destroy = function(elementId) {

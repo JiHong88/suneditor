@@ -99,7 +99,7 @@ SUNEDITOR.plugin.image = {
                     }
 
                     xmlHttp = SUNEDITOR.func.getXMLHttpRequest();
-                    xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.imgUpload_collBack.bind(this);
+                    xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this);
                     xmlHttp.open("post", imageUploadUrl, true);
                     xmlHttp.send(formData);
                 } else {
@@ -137,7 +137,7 @@ SUNEDITOR.plugin.image = {
         reader.readAsDataURL(file);
     },
 
-    imgUpload_collBack : function() {
+    callBack_imgUpload : function() {
         var xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
         if(xmlHttp.readyState === 4){
             if(xmlHttp.status === 200){
