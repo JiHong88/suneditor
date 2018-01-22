@@ -53,15 +53,15 @@ SUNEDITOR.plugin.horizontalRules = {
         oHr.style.borderTop = borderStyle;
         oHr.style.height = "1px";
 
-        var pNode = this.context.argument._selectionNode.parentNode;
-        if(/body/i.test(pNode)) pNode = this.context.argument._selectionNode;
+        this.focus();
 
+        var pNode = this.getLineElement(this.context.argument._selectionNode);
         pNode.appendChild(oHr);
         this.appendP(oHr);
     },
 
     horizontalRulesPick : function (e) {
-        if(!/BUTTON/i.test(e.target.tagName)) {
+        if(!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
 

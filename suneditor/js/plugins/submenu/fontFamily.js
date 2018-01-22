@@ -64,7 +64,7 @@ SUNEDITOR.plugin.fontFamily = {
     },
 
     pickup : function (e) {
-        if(!/BUTTON/i.test(e.target.tagName)) {
+        if(!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
 

@@ -46,7 +46,7 @@ SUNEDITOR.plugin.hiliteColor = {
     },
 
     colorPick : function (e) {
-        if(!/BUTTON/i.test(e.target.tagName)) {
+        if(!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
 

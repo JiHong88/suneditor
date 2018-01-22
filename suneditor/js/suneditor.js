@@ -408,12 +408,11 @@ SUNEDITOR.defaultLang = {
             },
 
             getLineElement : function(element) {
-                var lineElement = element;
-                while(!/BODY/i.test(lineElement.parentNode.tagName)) {
-                    lineElement = element.parentNode;
+                while(!/^BODY$/i.test(element.parentNode.tagName)) {
+                    element = element.parentNode;
                 }
 
-                return lineElement;
+                return element;
             },
 
             appendP : function(element) {
