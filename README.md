@@ -104,9 +104,7 @@ destroy()              : Destroy the suneditor
 
 ## Customize
 
-```properties
-http://suneditor.com/sample/html/customize.html
-```
+**<a href="http://suneditor.com/sample/html/customize.html" target="_blank">http://suneditor.com/sample/html/customize.html</a>**
 
 ## Image upload to server
 
