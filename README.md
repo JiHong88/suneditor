@@ -32,7 +32,7 @@ Download source and run
 #### 2. target a element
 
 ```html
-<textarea id="sample">Hello World!</textarea>
+<textarea id="sample">Hi</textarea>
 ```
 
 #### 3. create
@@ -51,6 +51,8 @@ var suneditor = SUNEDITOR.create('sample',{
 ## Options
 
 ```properties
+fontSizeList    : Change default font-size List (ex) [8, 10, 14, 18, 24, 36]
+fontList        : Change default font-family List (ex) ['Arial', 'tahoma', 'Courier New,Courier']
 addFont         : Add a new font (ex) ['Times New Roman,Times,serif', 'Trebuchet MS,Helvetica,sans-serif']
 width           : The width size of the editor (ex) '100%' /default - textarea.style.width or textarea.offsetWidth
 height          : The height size of the editor (ex) '300px' /default - textarea.offsetHeight
@@ -86,7 +88,7 @@ showUndo        : Display Undo module /default - true
 showRedo        : Display Redo module /default - true
 ```
     
-## Function
+## User Function
 
 ```properties
 save()                 : Copies the contents of the suneditor into a [textarea]
@@ -98,6 +100,12 @@ enabled()              : Enabled the suneditor
 hide()                 : Hide the suneditor
 show()                 : Show the suneditor
 destroy()              : Destroy the suneditor
+```
+
+## Customize
+
+```properties
+http://suneditor.com/sample/html/customize.html
 ```
 
 ## Image upload to server
