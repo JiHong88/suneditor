@@ -1413,7 +1413,7 @@ SUNEDITOR.defaultLang = {
         options.imageSize = options.imageSize || '350px';
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
-        options.fontSizeList = options.fontList || null;
+        options.fontSizeList = options.fontSizeList || null;
 
         /** editor seting options */
         options.height = /^\d+/.test(options.height)?  (/^\d+$/.test(options.height)? options.height+"px": options.height): element.clientHeight+"px";
