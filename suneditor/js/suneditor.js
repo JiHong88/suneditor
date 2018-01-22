@@ -399,18 +399,28 @@ SUNEDITOR.defaultLang = {
                 selection.addRange(range);
             },
 
-            appendP : function(element) {
-                var oP = document.createElement("P");
-                oP.innerHTML = '&#65279';
-                element.parentNode.insertBefore(oP, element.nextElementSibling);
-            },
-
             showLoading : function() {
                 context.element.loading.style.display = "block";
             },
 
             closeLoading : function() {
                 context.element.loading.style.display = "none";
+            },
+
+            getLineElement : function(element) {
+                var lineElement = element;
+                while(!/BODY/i.test(lineElement.parentNode.tagName)) {
+                    lineElement = element.parentNode;
+                }
+
+                return lineElement;
+            },
+
+            appendP : function(element) {
+                element = this.getLineElement(element);
+                var oP = document.createElement("P");
+                oP.innerHTML = '&#65279';
+                element.parentNode.insertBefore(oP, element.nextElementSibling);
             },
 
             removeNode : function() {
@@ -492,71 +502,77 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            insertNode : function(oNode) {
-                var selection = this.getSelection();
-                var nativeRng = this.getRange();
+            insertNode : function(oNode, rightNode) {
+                var parentNode = null;
+                if(!rightNode) {
+                    var selection = this.getSelection();
+                    var nativeRng = this.getRange();
 
-                var startCon = nativeRng.startContainer;
-                var startOff = nativeRng.startOffset;
-                var endCon = nativeRng.endContainer;
-                var endOff = nativeRng.endOffset;
+                    var startCon = nativeRng.startContainer;
+                    var startOff = nativeRng.startOffset;
+                    var endCon = nativeRng.endContainer;
+                    var endOff = nativeRng.endOffset;
 
-                var parentNode = startCon;
-                if(/^#text$/i.test(startCon.nodeName)) {
-                    parentNode = startCon.parentNode;
-                }
-
-                var rightNode = null;
-
-                /** Select within the same node */
-                if(startCon === endCon && startOff === endOff) {
-                    if(!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
-                        rightNode = selection.focusNode.splitText(endOff);
-                        parentNode.insertBefore(oNode, rightNode);
+                    parentNode = startCon;
+                    if (/^#text$/i.test(startCon.nodeName)) {
+                        parentNode = startCon.parentNode;
                     }
-                    else {
-                        if(parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
-                            parentNode.removeChild(parentNode.lastChild);
+
+                    /** Select within the same node */
+                    if (startCon === endCon && startOff === endOff) {
+                        if (!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
+                            rightNode = selection.focusNode.splitText(endOff);
+                            parentNode.insertBefore(oNode, rightNode);
                         }
-                        parentNode.appendChild(oNode);
+                        else {
+                            if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
+                                parentNode.removeChild(parentNode.lastChild);
+                            }
+                            parentNode.appendChild(oNode);
+                        }
+                    }
+                    /** Select multiple nodes */
+                    else {
+                        var removeNode = startCon;
+                        var isSameContainer = startCon === endCon;
+                        var endLen = endCon.data.length;
+
+                        if (isSameContainer) {
+                            if (!this.isEdgePoint(endCon, endOff)) {
+                                rightNode = endCon.splitText(endOff);
+                            }
+
+                            if (!this.isEdgePoint(startCon, startOff)) {
+                                removeNode = startCon.splitText(startOff);
+                            }
+
+                            parentNode.removeChild(removeNode);
+                        }
+                        else {
+                            try {
+                                selection.deleteFromDocument();
+                            } catch (e) {
+                                this.removeNode();
+                            }
+
+                            if (endLen === endCon.data.length) rightNode = endCon.nextSibling;
+                            else rightNode = endCon;
+                        }
                     }
                 }
-                /** Select multiple nodes */
                 else {
-                    var removeNode = startCon;
-                    var isSameContainer = startCon === endCon;
-                    var endLen = endCon.data.length;
-
-                    if(isSameContainer) {
-                        if(!this.isEdgePoint(endCon, endOff)) {
-                            rightNode = endCon.splitText(endOff);
-                        }
-
-                        if(!this.isEdgePoint(startCon, startOff)) {
-                            removeNode = startCon.splitText(startOff);
-                        }
-
-                        parentNode.removeChild(removeNode);
-                    }
-                    else {
-                        try {
-                            selection.deleteFromDocument();
-                        } catch(e) {
-                            this.removeNode();
-                        }
-
-                        if(endLen === endCon.data.length) rightNode = endCon.nextSibling;
-                        else rightNode = endCon;
-                    }
-
-                    try {
-                        parentNode.insertBefore(oNode, rightNode);
-                    } catch(e) {
-                        parentNode.appendChild(oNode);
-                    }
-
-                    this.setRange(oNode, 0, oNode, 0);
+                    parentNode = rightNode.parentNode;
+                    rightNode = rightNode.nextSibling;
                 }
+
+                try {
+                    parentNode.insertBefore(oNode, rightNode);
+                } catch(e) {
+                    parentNode.appendChild(oNode);
+                }
+
+                this.setRange(oNode, 0, oNode, 0);
+
             },
 
             toggleFrame : function() {

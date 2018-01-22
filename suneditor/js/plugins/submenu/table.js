@@ -62,7 +62,7 @@ SUNEDITOR.plugin.table = {
 
         oTable.innerHTML = tableHTML;
 
-        this.insertNode(oTable);
+        this.insertNode(oTable, this.getLineElement(this.getSelectionNode()));
         this.appendP(oTable);
 
         SUNEDITOR.plugin.table.reset_table_picker.call(this);
