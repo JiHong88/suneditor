@@ -320,9 +320,9 @@ SUNEDITOR.defaultLang = {
 
             /** Inable submenu  */
             submenuOn : function(element) {
-                editor.submenu = element.nextElementSibling;
-                editor.submenu.style.display = "block";
-                editor.originSub = editor.submenu.previousElementSibling;
+                this.submenu = element.nextElementSibling;
+                this.submenu.style.display = "block";
+                this.originSub = this.submenu.previousElementSibling;
             },
 
             /** Disable submenu  */
@@ -658,9 +658,10 @@ SUNEDITOR.defaultLang = {
 
                 /** Dialog, Submenu */
                 if(!!display || /^BODY$/i.test(targetElement.tagName)) {
+                    var prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
-                    if(/submenu/.test(display)){
+                    if(/submenu/.test(display) && (targetElement.nextElementSibling === null || targetElement.nextElementSibling !== prevSubmenu)){
                         editor.setScriptHead('submenu', command, function(){editor.submenuOn(targetElement)}, targetElement);
                     }
                     else if(/dialog/.test(display)) {
