@@ -1411,10 +1411,14 @@ SUNEDITOR.defaultLang = {
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
         options.imageSize = options.imageSize || '350px';
+        options.imageUploadUrl = options.imageUploadUrl || null;
+        options.fontList = options.fontList || null;
+        options.fontSizeList = options.fontList || null;
+
+        /** editor seting options */
         options.height = /^\d+/.test(options.height)?  (/^\d+$/.test(options.height)? options.height+"px": options.height): element.clientHeight+"px";
         options.width = /^\d+/.test(options.width)?  (/^\d+$/.test(options.width)? options.width+"px": options.width): (/%|auto/.test(element.style.width)? element.style.width: element.clientWidth+"px");
         options.display = options.display || 'block';
-        options.imageUploadUrl = options.imageUploadUrl || null;
         options.editorIframeFont = options.editorIframeFont || 'inherit';
 
         /** Show toolbar button settings */
@@ -1594,7 +1598,9 @@ SUNEDITOR.defaultLang = {
                 videoY : options.videoY,
                 imageSize : options.imageSize,
                 imageUploadUrl : options.imageUploadUrl,
-                addFont : options.addFont
+                addFont : options.addFont,
+                fontList : options.fontList,
+                fontSizeList : options.fontSizeList
             }
         }
     };
