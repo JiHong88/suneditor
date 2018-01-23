@@ -326,7 +326,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Copies object
          * @param obj
-         * @returns {object}
+         * @returns {Object}
          */
         copyObj : function(obj) {
             var copy = {};
@@ -342,7 +342,7 @@ SUNEDITOR.defaultLang = {
      * @param context
      * @param dom
      * @param func
-     * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+     * @returns {save, getContent, setContent, appendContent, disabled, enabled, show, hide, destroy}
      */
     var core = function(context, dom, func){
         /**
@@ -838,8 +838,8 @@ SUNEDITOR.defaultLang = {
                     }
                     else if(/dialog/.test(display)) {
                         editor.setScriptHead('dialog', 'dialog', function(){
-                            editor.setScriptHead('dialog', command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command));
-                        });
+                            editor.setScriptHead('dialog', command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command), null);
+                        }, null);
                     }
 
                     return;
@@ -861,7 +861,7 @@ SUNEDITOR.defaultLang = {
                         case 'outdent':
                         case 'redo':
                         case 'undo':
-                            editor.execCommand(command, false);
+                            editor.execCommand(command, false, null);
                             break;
                         default :
                             editor.execCommand(command, false, value);
@@ -879,7 +879,7 @@ SUNEDITOR.defaultLang = {
                 editor.submenuOff();
 
                 if(/^IMG$/i.test(targetElement.nodeName)) {
-                    editor.setScriptHead('dialog', 'image', SUNEDITOR.plugin.image.call_image_resize_controller.bind(editor, targetElement));
+                    editor.setScriptHead('dialog', 'image', SUNEDITOR.plugin.image.call_image_resize_controller.bind(editor, targetElement), null);
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
@@ -912,7 +912,7 @@ SUNEDITOR.defaultLang = {
 
                     /** A */
                     if(findA && /^A$/i.test(selectionParent.nodeName) && context.link && editor.editLink !== context.link.linkBtn) {
-                        editor.setScriptHead('dialog', 'link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent));
+                        editor.setScriptHead('dialog', 'link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent), null);
                         findA = false;
                     } else if(findA && editor.editLink) {
                         context.link.linkBtn.style.display = "none";
@@ -968,26 +968,26 @@ SUNEDITOR.defaultLang = {
                     switch(keyCode) {
                         case 66: /** B */
                             e.preventDefault();
-                            editor.execCommand('bold', false);
+                            editor.execCommand('bold', false, null);
                             nodeName = 'B';
                             break;
                         case 85: /** U */
                             e.preventDefault();
-                            editor.execCommand('underline', false);
+                            editor.execCommand('underline', false, null);
                             nodeName = 'U';
                             break;
                         case 73: /** I */
                             e.preventDefault();
-                            editor.execCommand('italic', false);
+                            editor.execCommand('italic', false, null);
                             nodeName = 'I';
                             break;
                         case 89: /** Y */
                             e.preventDefault();
-                            editor.execCommand('redo', false);
+                            editor.execCommand('redo', false, null);
                             break;
                         case 90: /** Z */
                             e.preventDefault();
-                            editor.execCommand('undo', false);
+                            editor.execCommand('undo', false, null);
                     }
 
                     if(!!nodeName) {
@@ -1000,7 +1000,7 @@ SUNEDITOR.defaultLang = {
                 /** ctrl + shift + S */
                 if(ctrl && shift && keyCode === 83) {
                     e.preventDefault();
-                    editor.execCommand('strikethrough', false);
+                    editor.execCommand('strikethrough', false, null);
                     dom.toggleClass(editor.commandMap['STRIKE'], "on");
 
                     return;
@@ -1050,7 +1050,7 @@ SUNEDITOR.defaultLang = {
                         if(shift) break;
 
                         var tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor.tabSize + 1).join("\u00A0"));
-                        editor.insertNode(tabText);
+                        editor.insertNode(tabText, null);
 
                         var selection = editor.getSelection();
                         var rng = editor.createRange();
@@ -1319,7 +1319,7 @@ SUNEDITOR.defaultLang = {
         html += createModuleGroup(moduleHtml);
         moduleHtml = null;
 
-        /** align, list, HR */
+        /** align, list, HR, Table */
         if(options.showAlign) {
             moduleHtml += createButton('btn_align', lang.toolbar.align, 'align', 'submenu',
                 '<div class="img_editor ico_align_l"></div>'
@@ -1380,12 +1380,10 @@ SUNEDITOR.defaultLang = {
 
 
         /** Undo, redo */
-        if(options.showUndo) {
+        if(options.showUndoRedo) {
             moduleHtml += createButton('', lang.toolbar.undo+' (Ctrl+Z)', 'undo', null,
                 '<div class="img_editor ico_undo"></div>'
             );
-        }
-        if(options.showRedo) {
             moduleHtml += createButton('', lang.toolbar.redo+' (Ctrl+Y)', 'redo', null,
                 '<div class="img_editor ico_redo"></div>'
             );
@@ -1400,7 +1398,7 @@ SUNEDITOR.defaultLang = {
      * @description document create - call createToolBar()
      * @param element - textarea
      * @param options
-     * @returns {{constructed: Element, options: *}}
+     * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
      * @constructor
      */
     var Constructor = function(element, options) {
@@ -1441,8 +1439,7 @@ SUNEDITOR.defaultLang = {
         options.showVideo = options.showVideo !== undefined? options.showVideo: true;
         options.showFullScreen = options.showFullScreen !== undefined? options.showFullScreen: true;
         options.showCodeView = options.showCodeView !== undefined? options.showCodeView: true;
-        options.showUndo = options.showUndo !== undefined? options.showUndo: true;
-        options.showRedo = options.showRedo !== undefined? options.showRedo: true;
+        options.showUndoRedo = options.showUndoRedo !== undefined? options.showUndoRedo: true;
 
         var doc = document;
 
@@ -1609,7 +1606,7 @@ SUNEDITOR.defaultLang = {
      * @summary create Suneditor
      * @param elementId
      * @param options
-     * @returns {{save, getContent, setContent, appendContent, disabled, enabled, show, hide, destroy}}
+     * @returns {save|getContent|setContent|appendContent|disabled|enabled|show|hide|destroy}
      */
     SUNEDITOR.create = function (elementId, options) {
         var element = document.getElementById(elementId);
