@@ -12,10 +12,10 @@ SUNEDITOR.plugin.link = {
 
         /** link dialog */
         var link_dialog = eval(this.setDialog());
-        context.dialog.link = link_dialog;
-        context.dialog.linkText = link_dialog.getElementsByClassName('sun-editor-id-linkurl')[0];
-        context.dialog.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-linktext')[0];
-        context.dialog.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
+        context.link.modal = link_dialog;
+        context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-linkurl')[0];
+        context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-linktext')[0];
+        context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
 
         /** link button */
         var link_button = eval(this.setController_LinkBtn());
@@ -23,8 +23,8 @@ SUNEDITOR.plugin.link = {
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        context.link.linkBtn.addEventListener('click', SUNEDITOR.plugin.link.onClick_linkBtn.bind(_this));
-        context.dialog.link.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.link.submit_dialog.bind(_this));
+        link_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.link.submit_dialog.bind(_this));
+        link_button.addEventListener('click', SUNEDITOR.plugin.link.onClick_linkBtn.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
@@ -70,32 +70,38 @@ SUNEDITOR.plugin.link = {
         e.stopPropagation();
 
         function submitAction() {
-            if(this.context.dialog.linkText.value.trim().length === 0) return false;
+            if(this.context.link.focusElement.value.trim().length === 0) return false;
 
-            var url = /^https?:\/\//.test(this.context.dialog.linkText.value)? this.context.dialog.linkText.value: "http://" +  this.context.dialog.linkText.value;
-            var anchor = this.context.dialog.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
+            var url = /^https?:\/\//.test(this.context.link.focusElement.value)? this.context.link.focusElement.value: "http://" +  this.context.link.focusElement.value;
+            var anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
             var anchorText = anchor.value.length === 0? url: anchor.value;
 
             if(this.context.link._linkAnchor === null) {
                 var oA = document.createElement("A");
                 oA.href = url;
                 oA.textContent = anchorText;
-                oA.target = (this.context.dialog.linkNewWindowCheck.checked? "_blank": "");
+                oA.target = (this.context.link.linkNewWindowCheck.checked? "_blank": "");
 
                 this.insertNode(oA);
             } else {
                 this.context.link._linkAnchor.href = url;
                 this.context.link._linkAnchor.textContent = anchorText;
-                this.context.link._linkAnchor.target = (this.context.dialog.linkNewWindowCheck.checked? "_blank": "");
+                this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked? "_blank": "");
             }
 
-            this.context.dialog.linkText.value = "";
-            this.context.dialog.linkAnchorText.value = "";
+            this.context.link.focusElement.value = "";
+            this.context.link.linkAnchorText.value = "";
         }
 
         try {
             submitAction.call(this);
         } finally {
+            this.context.link.linkBtn.style.display = "none";
+            this.context.link._linkAnchor = null;
+            this.context.link.focusElement.value = "";
+            this.context.link.linkAnchorText.value = "";
+            this.context.link.linkNewWindowCheck.checked = false;
+
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
             this.closeLoading();
         }
@@ -113,11 +119,26 @@ SUNEDITOR.plugin.link = {
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
             '   <div class="btn-group">'+
             '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
-            '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">X</button>'+
+            '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">x</button>'+
             '   </div>'+
             '</div>';
 
         return link_btn;
+    },
+
+    call_controller_linkButton : function(selectionATag) {
+        this.editLink = this.context.link._linkAnchor = selectionATag;
+        var linkBtn = this.context.link.linkBtn;
+
+        linkBtn.getElementsByTagName("A")[0].href = selectionATag.href;
+        linkBtn.getElementsByTagName("A")[0].textContent = selectionATag.textContent;
+
+        linkBtn.style.left = selectionATag.offsetLeft + "px";
+        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10) + "px";
+        linkBtn.style.display = "block";
+
+        this.context.controllerArray = [linkBtn];
+        linkBtn = null;
     },
 
     onClick_linkBtn : function(e) {
@@ -129,9 +150,9 @@ SUNEDITOR.plugin.link = {
         e.preventDefault();
 
         if(/update/.test(command)) {
-            this.context.dialog.linkText.value = this.context.link._linkAnchor.href;
-            this.context.dialog.linkAnchorText.value = this.context.link._linkAnchor.textContent;
-            this.context.dialog.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target)? true: false);
+            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
+            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
+            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target)? true: false);
             SUNEDITOR.plugin.dialog.openDialog.call(this, 'link');
         }
         else { /** delete */
@@ -141,19 +162,5 @@ SUNEDITOR.plugin.link = {
         }
 
         this.context.link.linkBtn.style.display = "none";
-    },
-
-    call_link_button : function(selectionParent) {
-        this.editLink = this.context.link._linkAnchor = selectionParent;
-        var linkBtn = this.context.link.linkBtn;
-
-        linkBtn.getElementsByTagName("A")[0].href = selectionParent.href;
-        linkBtn.getElementsByTagName("A")[0].textContent = selectionParent.textContent;
-
-        linkBtn.style.left = selectionParent.offsetLeft + "px";
-        linkBtn.style.top = (selectionParent.offsetTop + selectionParent.offsetHeight + this.context.tool.bar.offsetHeight + 10) + "px";
-        linkBtn.style.display = "block";
-
-        linkBtn = null;
     }
 };

@@ -41,38 +41,22 @@ SUNEDITOR.plugin.dialog = {
         }
     },
 
-    closeDialog : function() {
-        this.modalForm.style.display = "none";
-        this.context.dialog.back.style.display = "none";
-        this.context.dialog.modalArea.style.display = "none";
-        this.modalForm = null;
-    },
-
     openDialog : function(kind) {
-        var focusText = null;
-
-        switch(kind) {
-            case 'link':
-                this.modalForm = this.context.dialog.link;
-                focusText = this.context.dialog.linkText;
-                break;
-            case 'image':
-                this.modalForm = this.context.dialog.image;
-                focusText = this.context.dialog.imgInputUrl;
-                break;
-            case 'video':
-                this.modalForm = this.context.dialog.video;
-                focusText = this.context.dialog.videoInputUrl;
-                break;
-        }
+        this.modalForm = this.context[kind].modal;
+        var focusElement = this.context[kind].focusElement;
 
         this.context.dialog.modalArea.style.display = "block";
         this.context.dialog.back.style.display = "block";
         this.context.dialog.modal.style.display = "block";
         this.modalForm.style.display = "block";
 
-        this.subMenu = this.context.dialog.modal;
+        if(focusElement) focusElement.focus();
+    },
 
-        focusText.focus();
+    closeDialog : function() {
+        this.modalForm.style.display = "none";
+        this.context.dialog.back.style.display = "none";
+        this.context.dialog.modalArea.style.display = "none";
+        this.modalForm = null;
     }
 };

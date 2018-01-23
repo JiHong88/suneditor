@@ -12,17 +12,17 @@ SUNEDITOR.plugin.video = {
 
         /** video dialog */
         var video_dialog = eval(this.setDialog());
-        context.dialog.video = video_dialog;
-        context.dialog.videoInputUrl = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
-        context.dialog.video_x = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
-        context.dialog.video_y = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.modal = video_dialog;
+        context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
+        context.video.video_x = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
+        context.video.video_y = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
 
         /** set user option value */
         video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
         video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
         /** add event listeners */
-        context.dialog.video.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.video.submit_dialog.bind(_this));
+        video_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.video.submit_dialog.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
@@ -38,7 +38,7 @@ SUNEDITOR.plugin.video = {
             '<form class="editor_video">'+
             '   <div class="modal-header">'+
             '       <button type="button" data-command="close" class="close" aria-label="Close">'+
-            '           <span aria-hidden="true" data-command="close">×</span>'+
+            '           <span aria-hidden="true" data-command="close">x</span>'+
             '       </button>'+
             '       <h5 class="modal-title">'+lang.dialogBox.videoBox.title+'</h5>'+
             '   </div>'+
@@ -67,12 +67,12 @@ SUNEDITOR.plugin.video = {
         e.stopPropagation();
 
         function submitAction() {
-            if(this.context.dialog.videoInputUrl.value.trim().length === 0) return false;
+            if(this.context.video.focusElement.value.trim().length === 0) return false;
 
-            var url = this.context.dialog.videoInputUrl.value.replace(/^https?:/, '');
+            var url = this.context.video.focusElement.value.replace(/^https?:/, '');
             var oIframe = document.createElement("IFRAME");
-            var x_v = this.context.dialog.video_x.value;
-            var y_v = this.context.dialog.video_y.value;
+            var x_v = this.context.video.video_x.value;
+            var y_v = this.context.video.video_y.value;
 
             /** youtube */
             if(/youtu\.?be/.test(url)) {
@@ -92,9 +92,9 @@ SUNEDITOR.plugin.video = {
             this.insertNode(oIframe);
             this.appendP(oIframe);
 
-            this.context.dialog.videoInputUrl.value = "";
-            this.context.dialog.video_x.value = this.context.user.videoX;
-            this.context.dialog.video_y.value = this.context.user.videoY;
+            this.context.video.focusElement.value = "";
+            this.context.video.video_x.value = this.context.user.videoX;
+            this.context.video.video_y.value = this.context.user.videoY;
         }
 
         try {

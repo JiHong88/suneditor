@@ -52,7 +52,7 @@ SUNEDITOR.plugin.fontSize = {
     },
 
     appendSpan : function(fontsize) {
-        fontsize = fontsize + this.fontSizeUnit;
+        fontsize = fontsize + "pt";
 
         var ELEMENT_NODE = 1;
         var TEXT_NODE = 3;
@@ -244,4 +244,4 @@ SUNEDITOR.plugin.fontSize = {
 
         this.setRange(startCon, startOff, endCon, endOff);
     }
-}
+};

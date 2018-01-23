@@ -82,10 +82,18 @@ SUNEDITOR.defaultLang = {
      * @summary utile function
      */
     var func = SUNEDITOR.func = {
+        /**
+         * @description A function that returns a value of true.
+         * @returns {boolean}
+         */
         returnTrue : function() {
             return true;
         },
 
+        /**
+         * @description Gets XMLHttpRequest object
+         * @returns {Object}
+         */
         getXMLHttpRequest : function() {
             /** IE */
             if(window.ActiveXObject){
@@ -109,6 +117,9 @@ SUNEDITOR.defaultLang = {
             }
         },
 
+        /**
+         * @description Get suneditor's default path
+         */
         getBasePath : (function() {
             var path = SUNEDITOR.SUNEDITOR_BASEPATH || "";
             if(!path) {
@@ -125,7 +136,22 @@ SUNEDITOR.defaultLang = {
             if (!path) throw '[SUNEDITOR.func.getBasePath.fail] The SUNEDITOR installation path could not be automatically detected. Please set the global variable "SUNEDITOR_BASEPATH" before creating editor instances.';
 
             return path;
-        })()
+        })(),
+
+        /**
+         * @description Add script File
+         * @param directory - The directory(plugin/{directory}) of the js file to call
+         * @param moduleName - The name of the js file to call
+         * @param callBack - Function to be executed immediately after module call
+         */
+        setScriptHead : function(directory, moduleName, callBack) {
+            var scriptFile = document.createElement("script");
+            scriptFile.type = "text/javascript";
+            scriptFile.src = this.getBasePath+'plugins/'+directory+'/'+moduleName+'.js';
+            scriptFile.onload = callBack;
+
+            document.getElementsByTagName("head")[0].appendChild(scriptFile);
+        }
     };
 
     /**
@@ -350,14 +376,17 @@ SUNEDITOR.defaultLang = {
          * This function is 'this' used by other plugins
          */
         var editor = SUNEDITOR.editor = {
+            /** editor elements and loaded plugins */
             context : context,
             loadedPlugins : {},
-            submenu : null,
-            originSub : null,
+
+            /** dialog element, submenu element, controller array (image resize area, link modified button) */
             dialogForm : null,
-            editLink : null,
+            submenu : null,
+            controllerArray : [],
+
+            /** Number of blank characters to be entered when tab key is operated */
             tabSize : 4,
-            fontSizeUnit : "pt",
 
             /**
              * @description Elements that need to change text or className for each selection change
@@ -372,35 +401,43 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
-             * @description Add module script File
+             * @description Call the module
              * @param directory - The directory(plugin/{directory}) of the js file to call
              * @param moduleName - The name of the js file to call
-             * @param callBackFunction - Function to be executed immediately after module call
              * @param targetElement - If this is element, the element is inserted into the sibling node (submenu)
+             * @param callBackFunction - Function to be executed immediately after module call
              */
-            setScriptHead : function(directory, moduleName, callBackFunction, targetElement) {
-                var callBack_moduleAdd = function(targetElement) {
-                    if(!this.context[directory]) this.context[directory] = {};
-
-                    SUNEDITOR.plugin[moduleName].add(this, targetElement);
-                    this.loadedPlugins[moduleName] = true;
-                    callBackFunction();
-                }.bind(this, targetElement);
+            callModule : function(directory, moduleName, targetElement, callBackFunction) {
+                /** dialog */
+                if(directory === 'dialog' && !SUNEDITOR.plugin.dialog) {
+                    func.setScriptHead('dialog', 'dialog', this.callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction)));
+                    return;
+                }
 
                 if(!SUNEDITOR.plugin[moduleName]) {
-                    var scriptFile = document.createElement("script");
-                    scriptFile.type = "text/javascript";
-                    scriptFile.src = func.getBasePath+'plugins/'+directory+'/'+moduleName+'.js';
-                    scriptFile.onload = callBack_moduleAdd;
-
-                    document.getElementsByTagName("head")[0].appendChild(scriptFile);
+                    func.setScriptHead(directory, moduleName, this.callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
                 }
                 else if(!this.loadedPlugins[moduleName]) {
-                    callBack_moduleAdd();
+                    this.callBack_addModule(directory, moduleName, targetElement, callBackFunction);
                 }
                 else {
                     callBackFunction();
                 }
+            },
+
+            /**
+             * @description After the module is added, call the main function and the callback function
+             * @param directory - The directory(plugin/{directory}) of the js file to call
+             * @param moduleName - The name of the js file to call
+             * @param targetElement - If this is element, the element is inserted into the sibling node (submenu)
+             * @param callBackFunction - Function to be executed immediately after module call
+             */
+            callBack_addModule : function(directory, moduleName, targetElement, callBackFunction) {
+                if(!this.context[directory]) this.context[directory] = {};
+
+                SUNEDITOR.plugin[moduleName].add(this, targetElement);
+                this.loadedPlugins[moduleName] = true;
+                callBackFunction();
             },
 
             /**
@@ -410,7 +447,6 @@ SUNEDITOR.defaultLang = {
             submenuOn : function(element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = "block";
-                this.originSub = this.submenu.previousElementSibling;
             },
 
             /**
@@ -421,16 +457,17 @@ SUNEDITOR.defaultLang = {
                     this.submenu.style.display = "none";
                     this.submenu = null;
                 }
-                if(!!context.image && !!context.image._imageElement) {
-                    SUNEDITOR.plugin.image.cancel_resize_image.call(this);
-                }
-                if(!!this.editLink) {
-                    context.link.linkBtn.style.display = "none";
-                    context.link._linkAnchor = null;
-                    context.dialog.linkText.value = "";
-                    context.dialog.linkAnchorText.value = "";
-                    context.dialog.linkNewWindowCheck.checked = false;
-                    this.editLink = null;
+
+                this.controllersOff();
+            },
+
+            controllersOff : function() {
+                var len = this.controllerArray.length;
+                if(len > 0) {
+                    for(var i=0; i<len; i++) {
+                        this.controllerArray[i].style.display = "none";
+                    }
+                    this.controllerArray = [];
                 }
             },
 
@@ -834,12 +871,10 @@ SUNEDITOR.defaultLang = {
                     editor.submenuOff();
 
                     if(/submenu/.test(display) && (targetElement.nextElementSibling === null || targetElement.nextElementSibling !== prevSubmenu)){
-                        editor.setScriptHead('submenu', command, function(){editor.submenuOn(targetElement)}, targetElement);
+                        editor.callModule('submenu', command, targetElement, function(){editor.submenuOn(targetElement)});
                     }
                     else if(/dialog/.test(display)) {
-                        editor.setScriptHead('dialog', 'dialog', function(){
-                            editor.setScriptHead('dialog', command, SUNEDITOR.plugin.dialog.openDialog.bind(editor, command), null);
-                        }, null);
+                        editor.callModule('dialog', command, null, function(){SUNEDITOR.plugin.dialog.openDialog.call(editor, command);});
                     }
 
                     return;
@@ -879,7 +914,7 @@ SUNEDITOR.defaultLang = {
                 editor.submenuOff();
 
                 if(/^IMG$/i.test(targetElement.nodeName)) {
-                    editor.setScriptHead('dialog', 'image', SUNEDITOR.plugin.image.call_image_resize_controller.bind(editor, targetElement), null);
+                    editor.callModule('dialog', 'image', null, function(){SUNEDITOR.plugin.image.call_controller_imageResize_.call(editor, targetElement);});
                 }
                 else if(/^HTML$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
@@ -911,12 +946,11 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** A */
-                    if(findA && /^A$/i.test(selectionParent.nodeName) && context.link && editor.editLink !== context.link.linkBtn) {
-                        editor.setScriptHead('dialog', 'link', SUNEDITOR.plugin.link.call_link_button.bind(editor, selectionParent), null);
+                    if(findA && /^A$/i.test(selectionParent.nodeName) && context.link && editor.controllerArray[0] !== context.link.linkBtn) {
+                        editor.callModule('dialog', 'link', null, function(){SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionParent);});
                         findA = false;
-                    } else if(findA && editor.editLink) {
-                        context.link.linkBtn.style.display = "none";
-                        editor.submenuOff();
+                    } else if(findA && editor.controllerArray.length === 0) {
+                        editor.controllersOff();
                     }
 
                     /** span (font size) */
@@ -1046,7 +1080,7 @@ SUNEDITOR.defaultLang = {
                             break;
                         }
 
-                        /** P 노드일때 */
+                        /** if P Tag */
                         if(shift) break;
 
                         var tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor.tabSize + 1).join("\u00A0"));
@@ -1069,11 +1103,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onScroll_wysiwyg : function() {
-                if(!!context.image && !!context.image._imageElement) {
-                    context.image.imageResizeDiv.style.display = "none";
-                    context.image.imageResizeBtn.style.display = "none";
-                    context.image._imageElement = null;
-                }
+                editor.controllersOff();
             },
 
             onMouseDown_resizeBar : function(e) {
