@@ -59,7 +59,34 @@
         <h4>1. Add new function module</h4>
         <div class="highlight highlight-text-html-basic">
             <pre>
-                
+1. dialog, submenu 두개의 폴더로 구분합니다.
+    - dialog : dialog 형태의 모듈입니다.
+    - submenu : subMenu 형태의 모듈입니다.
+
+2. 모듈 js 작성 방법
+    1) dialog 또는 submenu 폴더에 추가하고자 하는 모둘 이름의 js 파일을 만듭니다.
+    2) SUNEDITOR.plugin.{moduleName} 의 Object를 선언하고 이 Object안에서 HTML tag 추가, 모듈의 기능 및 이벤트를 정의 합니다.
+    3) 공통적으로 모든 모듈 객체는 add 라는 이름의 함수가 꼭 선언되어있어야 합니다.
+        - add 함수는 SUNEDITOR.editor Object(_this) 와 클릭한 버튼의 element(targetElement) 를 인자값으로 받습니다.
+            - dialog 모듈의 인자값  : SUNEDITOR.editor Object
+            - submenu 모듈의 인자값 : SUNEDITOR.editor Object, 클릭한 버튼의 element
+            - SUNEDITOR.editor 객체에는 공통적으로 사용가능한 function 및 변수가 들어있습니다.
+            - SUNEDITOR.editor.context 에는 해당 editor 에서 필요한 값을 기억해야할 element 및 변수가 들어있습니다.
+            - 만약 SUNEDITOR.editor.context 에 값을 저장해야 한다면 SUNEDITOR.editor.context.{moduleName} 의 오브젝트를 선언 후 사용하세요.
+            - 만약 모듈안의 함수에서 SUNEDITOR.editor Object 를 사용해야 한다면 해당의 this값을 SUNEDITOR.editor Object 로 바꿔서 호출하여 사용해야 합니다.
+
+3. add function 정의
+    - 모듈 js 파일 호출시 딱한번 실행되는 함수 입니다.
+    - 이 함수는 첫번째 인자값으로 SUNEDITOR.editor Object 를 받고 submenu 안의 모듈이라면 추가로 클릭한 버튼 element 를 인자값으로 받습니다. (_this, targetElement)
+    - 이 함수 내에서 HTML 코드를 만들어 _this.context.dialog.modal Object에 append 하고 이벤트를 등록 해줍니다.
+    - 가억해야할 element 및 변수값들은 SUNEDITOR.editor.context.{moduleName} 오브젝트를 선언하여 사용합니다.
+
+4. dialog module 추가시 추가 정의 사항
+    1) Add module : dialog
+        - dialog 폴더내의 모듈은 add 함수에서 SUNEDITOR.editor Object 만을 인자값으로 받습니다.
+        - tag element 생성 시
+            SUNEDITOR.editor.context.{moduleName}.modal 에 생성된 엘리먼트를 넣어주세요.
+            만약 Dialog 창이 뜬 후 곧바로 포커싱을 주고싶다면 SUNEDITOR.editor.context.{moduleName}.focusElement 에 포커싱되야할 엘리먼트를 넣어주면 됩니다.
             </pre>
         </div>
 
