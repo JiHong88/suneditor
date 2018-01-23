@@ -195,6 +195,7 @@ SUNEDITOR.plugin.image = {
     setController_ImageResizeController : function() {
         var resize_img_div = document.createElement("DIV");
         resize_img_div.className = "modal-image-resize";
+        resize_img_div.style.display = "none";
         resize_img_div.innerHTML = ''+
             '<div class="image-resize-dot tl"></div>'+
             '<div class="image-resize-dot tr"></div>'+
@@ -209,6 +210,7 @@ SUNEDITOR.plugin.image = {
         var lang = SUNEDITOR.lang;
         var resize_img_button = document.createElement("DIV");
         resize_img_button.className = "image-resize-btn";
+        resize_img_button.style.display = "none";
         resize_img_button.innerHTML = ''+
             '<div class="btn-group">'+
             '   <button type="button" data-command="100" title="'+lang.dialogBox.imageBox.resize100+'"><span class="note-fontsize-10">100%</span></button>'+

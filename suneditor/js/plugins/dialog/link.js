@@ -114,6 +114,7 @@ SUNEDITOR.plugin.link = {
         var lang = SUNEDITOR.lang;
         var link_btn = document.createElement("DIV");
         link_btn.className = "sun-editor-id-link-btn";
+        link_btn.style.display = "none";
         link_btn.innerHTML = ''+
             '<div class="arrow"></div>'+
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
