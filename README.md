@@ -84,8 +84,7 @@ showImage       : Display image module /default - true
 showVideo       : Display video module /default - true
 showFullScreen  : Display full screen module /default - true
 showCodeView    : Display code view module /default - true
-showUndo        : Display Undo module /default - true
-showRedo        : Display Redo module /default - true
+showUndoRedo    : Display Undo, Redo module /default - true
 ```
     
 ## User Function
