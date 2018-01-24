@@ -61,47 +61,59 @@
             <pre>
 <span class="pl-ent">1) dialog, submenu 두개의 폴더로 구분합니다.</span>
 <ol>
-    <li class="pl-s">dialog : dialog 형태의 모듈입니다.
+    <li class="pl-0">dialog : dialog 형태의 모듈입니다.
         <img src="../img/example_dialog.png" width="400px" height="200px"></li>
-    <li class="pl-s">submenu : subMenu 형태의 모듈입니다.
+    <li class="pl-0">submenu : subMenu 형태의 모듈입니다.
         <img src="../img/example_submenu.png" width="400px" height="200px"></li>
 </ol>
 
 
 <span class="pl-ent">2) 모듈 js 작성 방법</span>
 <ol>
-    <li class="pl-s">dialog 또는 submenu 폴더에 추가하고자 하는 모듈과 같은 이름으로 js 파일을 만듭니다.</li>
-    <li class="pl-s">SUNEDITOR.plugin.{moduleName} 의 Object를 선언하고 이 Object안에서 HTML tag 추가, 모듈의 기능 및 이벤트를 정의 합니다.</li>
-    <li class="pl-s">공통적으로 모든 모듈 객체는 add 라는 이름의 함수가 꼭 선언되어있어야 합니다.</li><ul>
-        <li class="pl-0">add 함수는 SUNEDITOR.editor Object 와 클릭한 버튼의 element 를 인자값으로 받습니다.</li>
-        <li class="pl-0">dialog 모듈의 인자값  : SUNEDITOR.editor Object</li>
-        <li class="pl-0">submenu 모듈의 인자값 : SUNEDITOR.editor Object, 클릭한 버튼의 element</li>
-        <li class="pl-0">SUNEDITOR.editor 객체에는 공통적으로 사용가능한 function 및 변수가 들어있습니다.</li>
-        <li class="pl-0">SUNEDITOR.editor.context 에는 해당 editor 에서 필요한 값을 기억해야할 element 및 변수가 들어있습니다.</li>
-        <li class="pl-0">만약 SUNEDITOR.editor.context 에 값을 저장해야 한다면
-SUNEDITOR.editor.context.{moduleName} 의 오브젝트를 선언 후 사용하세요.</li>
-        <li class="pl-0">만약 모듈안의 함수에서 SUNEDITOR.editor Object 를 사용해야 한다면
-해당의 this값을 SUNEDITOR.editor Object 로 바꿔서 호출하여 사용해야 합니다.</li></ul>
+    <li class="pl-0">dialog 또는 submenu 폴더에 추가하고자 하는 모듈과 같은 이름으로 js 파일을 만듭니다.</li>
+    <li class="pl-0"><span class="pl-k">SUNEDITOR.plugin.{moduleName}</span> 의 Object를 선언하고 이 Object 안에서
+<span class="pl-c1">element</span> 추가, 모듈의 기능 <span class="pl-en">function</span> 추가, <span class="pl-s">event</span> 등록등의 모든 동작을 정의합니다.</li>
+    <li class="pl-0">공통적으로 모든 모듈 객체는 add 라는 이름의 함수가 꼭 선언되어있어야 합니다.</li><ul>
+    <li class="pl-0">add 함수는 <span class="pl-k">SUNEDITOR.editor</span> Object 와 클릭한 버튼의 <span class="pl-c1">element</span> 를 인자값으로 받습니다.</li>
+    <li class="pl-0">dialog 모듈의 인자값  : <span class="pl-k">SUNEDITOR.editor Object</span></li>
+    <li class="pl-0">submenu 모듈의 인자값 : <span class="pl-k">SUNEDITOR.editor</span> Object, 클릭한 버튼의 <span class="pl-c1">element</span></li>
+    <li class="pl-0"><span class="pl-k">SUNEDITOR.editor</span> 객체에는 공통적으로 사용가능한 <span class="pl-en">function, 변수값, element</span> 가 들어있는 <span class="pl-k">context</span> Object 가 들어있습니다.</li>
+    <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context</span> 에는 해당 editor 에서 필요한 값을 기억해야할 <span class="pl-c1">element</span> 및 <span class="pl-c1">변수값</span>이 들어있습니다.</li>
+    <li class="pl-0">만약 <span class="pl-k">SUNEDITOR.editor.context</span> 에 값을 저장해야 한다면
+    <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> 의 오브젝트를 선언 후 사용하세요.</li>
+<li class="pl-0">만약 모듈안의 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 를 사용해야 한다면
+<span class="pl-en">call</span> 함수를 이용하여 해당 함수의 <span class="pl-k">this</span> 값을 <span class="pl-k">SUNEDITOR.editor</span> Object 로 바꿔서 호출해주세요.
+* 모듈안에서 add 함수를 제외한 모든 함수들의 this 값은 <span class="pl-k">SUNEDITOR.editor</span> 로 바꿔서 호출하는게 좋습니다.</li></ul>
 </ol>
 
 
 <span class="pl-ent">3) add function 정의</span>
 <ul>
     <li class="pl-0">모듈 js 파일 호출시 최초 한번 실행되는 함수 입니다.</li>
-    <li class="pl-0">이 함수는 첫번째 인자값으로 SUNEDITOR.editor Object 를 받습니다.</li>
-    <li class="pl-0">만약 submenu 안의 모듈이라면 추가로 클릭한 버튼 element 를 두번째 인자값으로 받습니다.</li>
-    <li class="pl-0">이 함수 내에서 HTML 코드를 만들어 _this.context.dialog.modal Object에 append 하고 이벤트를 등록 해줍니다.</li>
-    <li class="pl-0">기억해야할 element 및 변수값들은 SUNEDITOR.editor.context.{moduleName} 오브젝트를 선언하여 해당 오브젝트를 사용합니다.</li>
+    <li class="pl-0">이 함수는 첫번째 인자값으로 <span class="pl-k">SUNEDITOR.editor</span> Object 를 받습니다.</li>
+    <li class="pl-0">만약 submenu 안의 모듈이라면 추가로 클릭한 버튼의 element 를 두번째 인자값으로 받습니다.</li>
+    <li class="pl-0">이 함수 안에서 <span class="pl-c1">element</span> 생성 및 <span class="pl-s">event</span> 등록 에디터 <span class="pl-c1">Dom</span>에 삽입 하는 동작까지 정의 합니다.</li>
+    <li class="pl-0">만약 dialog 안의 모듈이라면 생성한 <span class="pl-c1">element</span> 를 <span class="pl-k">SUNEDITOR.context.dialog.modal</span> 에 넣어주어야 합니다.</li>
+    <li class="pl-0">기억해야할 <span class="pl-c1">element</span> 및 <span class="pl-c1">변수값</span>들은 <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> 오브젝트를 선언하여 해당 오브젝트를 사용합니다.</li>
 </ul>
 
 
-<span class="pl-ent">4) dialog module 추가시 정의 사항</span>
+<span class="pl-ent">4-1) dialog module 추가시</span>
     <ol>
-        <li class="pl-s">dialog 폴더내의 모듈은 add 함수에서 SUNEDITOR.editor Object 만 을 인자값으로 받습니다.</li>
-        <li class="pl-s">tag element 생성 시</li><ul>
-            <li class="pl-0">SUNEDITOR.editor.context.{moduleName}.modal 에 생성된 엘리먼트를 넣어주세요.</li></ul>
-        <li class="pl-s">Dialog 창이 뜬 후 곧바로 포커싱을 줘야할때</li><ul>
-            <li class="pl-0">SUNEDITOR.editor.context.{moduleName}.focusElement 에 포커싱되야할 엘리먼트를 넣어주세요.</li></ul>
+        <li class="pl-0">dialog 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 만 을 인자값으로 받습니다.</li>
+        <li class="pl-0">tag element 생성 시</li><ul>
+        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.modal</span> 에 생성된 엘리먼트를 넣어주세요.</li></ul>
+        <li class="pl-0">Dialog 창이 뜬 후 곧바로 포커싱을 줘야할때</li><ul>
+        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span> 에 포커싱되야할 엘리먼트를 넣어주세요.</li></ul>
+        <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 엘리먼트를 context.dialog.modal 에 appendChaild 함수를 이용하여 삽입하면 끝납니다.</li>
+    </ol>
+
+
+<span class="pl-ent">4-2) submenu module 추가시</span>
+    <ol>
+        <li class="pl-0">dialog 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object, 클릭한 버튼의 <span class="pl-c1">element</span>(<span class="pl-k">targetElement</span>) 를 인자값으로 받습니다.</li>
+        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span> 에 포커싱 돼야할 <span class="pl-c1">element</span>를 넣어주세요.</li></ul>
+        <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 <span class="pl-c1">element</span> 를 <span class="pl-k">targetElement</span><span class="pl-c1">.parentNode</span> 에 <span class="pl-en">appendChaild</span> 함수를 이용하여 삽입하면 끝납니다.</li>
     </ol>
             </pre>
         </div>
