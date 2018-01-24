@@ -7,7 +7,9 @@
  */
 if(typeof window.SUNEDITOR === 'undefined') {window.SUNEDITOR = {}; SUNEDITOR.plugin = {};}
 
-/** default language (english) */
+/**
+ * @description default language (english)
+ */
 SUNEDITOR.defaultLang = {
     toolbar : {
         fontFamily : 'Font',
@@ -79,7 +81,7 @@ SUNEDITOR.defaultLang = {
     'use strict';
 
     /**
-     * @summary utile function
+     * @description utile function
      */
     var func = SUNEDITOR.func = {
         /**
@@ -155,7 +157,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @summary document function
+     * @description document function
      */
     var dom = SUNEDITOR.dom = {
         /**
@@ -364,25 +366,38 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @summary SunEditor core closure
+     * @description SunEditor core closure
      * @param context
      * @param dom
      * @param func
-     * @returns {save, getContent, setContent, appendContent, disabled, enabled, show, hide, destroy}
+     * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     var core = function(context, dom, func){
         /**
-         * @summary Practical editor function
+         * @description Practical editor function
          * This function is 'this' used by other plugins
          */
         var editor = SUNEDITOR.editor = {
-            /** editor elements and loaded plugins */
+            /**
+             * @description editor elements
+             */
             context : context,
+            /**
+             * @description loaded plugins
+             */
             loadedPlugins : {},
 
-            /** dialog element, submenu element, controller array (image resize area, link modified button) */
+            /**
+             * @description dialog element
+             */
             dialogForm : null,
+            /**
+             * @description submenu element
+             */
             submenu : null,
+            /**
+             * @description controllers array (image resize area, link modified button)
+             */
             controllerArray : [],
 
             /** Number of blank characters to be entered when tab key is operated */
@@ -461,6 +476,9 @@ SUNEDITOR.defaultLang = {
                 this.controllersOff();
             },
 
+            /**
+             * @description Disable controller in editor area (link button, image resize button)
+             */
             controllersOff : function() {
                 var len = this.controllerArray.length;
                 if(len > 0) {
@@ -821,7 +839,7 @@ SUNEDITOR.defaultLang = {
         };
 
         /**
-         * @summary event function
+         * @description event function
          */
         var event = {
             resize_window : function() {
@@ -1239,7 +1257,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @summary Create editor HTML
+     * @description Create editor HTML
      * @param options - user option
      */
     var createToolBar = function (options){
@@ -1633,7 +1651,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @summary create Suneditor
+     * @description create Suneditor
      * @param elementId
      * @param options
      * @returns {save|getContent|setContent|appendContent|disabled|enabled|show|hide|destroy}
@@ -1668,7 +1686,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @summary destroy Suneditor
+     * @description destroy Suneditor
      * @param elementId
      */
     SUNEDITOR.destroy = function(elementId) {
