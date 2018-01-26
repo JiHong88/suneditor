@@ -40,8 +40,8 @@ SUNEDITOR.plugin.formatBlock = {
     pickUp : function (e) {
         var target = e.target;
         var value = null;
-        while (!value && !/UL/.test(target.tagName)) {
-            value = target.getAttribute('data-value')
+        while (!value && !/UL/i.test(target.tagName)) {
+            value = target.getAttribute('data-value');
             target = target.parentNode;
         }
 

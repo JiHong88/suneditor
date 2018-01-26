@@ -51,6 +51,7 @@ var suneditor = SUNEDITOR.create('sample',{
 ## Options
 
 ```properties
+// User Options
 fontSizeList    : Change default font-size List (ex) [8, 10, 14, 18, 24, 36]
 fontList        : Change default font-family List (ex) ['Arial', 'tahoma', 'Courier New,Courier']
 addFont         : Add a new font (ex) ['Times New Roman,Times,serif', 'Trebuchet MS,Helvetica,sans-serif']
@@ -65,6 +66,16 @@ imageUploadUrl  : he image upload to server mapping address when append Img tag 
                   return type : JsonArray (ex) [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
                                                 {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
 editorIframeFont: Change iframe font of the suneditor /default - "inherit"
+addModuleButtons: Add an array button attributes to call the module added by the user
+                  (ex) [{
+                        buttonClass:'', // className to be added to the button
+                        title:'Test', // title property
+                        dataCommand:'test', // The js file name of the added module
+                        dataDisplay:'submenu', // The directory location under the plugins folder of the added module
+                        innerHTML:'<div class="img_editor ico_test"></div>' // The source into the button's innerHTML
+                       }]
+
+// Show, Hied
 showFont        : Display font module /default - true
 showFormats     : Display formats module /default - true
 showFontSize    : Display font size module /default - true

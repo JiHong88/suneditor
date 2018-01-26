@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../suneditor/js/suneditor.min.js"></script>
+    <script src="../../suneditor/js/suneditor.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -57,18 +57,23 @@
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
         <h4>1. Add new function module</h4>
+            <p></p>
+
+        <h4>1-1. dialog, submenu 두개의 폴더로 구분됩니다.</h4>
         <div class="highlight highlight-text-html-basic">
             <pre>
-<span class="pl-ent">1) dialog, submenu 두개의 폴더로 구분합니다.</span>
 <ol>
     <li class="pl-0">dialog : dialog 형태의 모듈입니다.
         <img src="../img/example_dialog.png" width="400px" height="200px"></li>
     <li class="pl-0">submenu : subMenu 형태의 모듈입니다.
         <img src="../img/example_submenu.png" width="400px" height="200px"></li>
 </ol>
+            </pre>
+        </div>
 
-
-<span class="pl-ent">2) 모듈 js 작성 방법</span>
+        <h4>1-2. 모듈 js 작성 방법</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>
 <ol>
     <li class="pl-0">dialog 또는 submenu 폴더에 추가하고자 하는 모듈과 같은 이름으로 js 파일을 만듭니다.</li>
     <li class="pl-0"><span class="pl-k">SUNEDITOR.plugin.{moduleName}</span> 의 Object를 선언하고 이 Object 안에서
@@ -85,9 +90,12 @@
 <span class="pl-en">call</span> 함수를 이용하여 해당 함수의 <span class="pl-k">this</span> 값을 <span class="pl-k">SUNEDITOR.editor</span> Object 로 바꿔서 호출해주세요.
 * 모듈안에서 add 함수를 제외한 모든 함수들의 this 값은 <span class="pl-k">SUNEDITOR.editor</span> 로 바꿔서 호출하는게 좋습니다.</li></ul>
 </ol>
+            </pre>
+        </div>
 
-
-<span class="pl-ent">3) add function 정의</span>
+        <h4>1-3. add function 정의</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>
 <ul>
     <li class="pl-0">모듈 js 파일 호출시 최초 한번 실행되는 함수 입니다.</li>
     <li class="pl-0">이 함수는 첫번째 인자값으로 <span class="pl-k">SUNEDITOR.editor</span> Object 를 받습니다.</li>
@@ -96,9 +104,12 @@
     <li class="pl-0">만약 dialog 안의 모듈이라면 생성한 <span class="pl-c1">element</span> 를 <span class="pl-k">SUNEDITOR.context.dialog.modal</span> 에 넣어주어야 합니다.</li>
     <li class="pl-0">기억해야할 <span class="pl-c1">element</span> 및 <span class="pl-c1">변수값</span>들은 <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> 오브젝트를 선언하여 해당 오브젝트를 사용합니다.</li>
 </ul>
+            </pre>
+        </div>
 
-
-<span class="pl-ent">4-1) dialog module 추가시</span>
+        <h4>1-4. dialog module 추가시</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>
     <ol>
         <li class="pl-0">dialog 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 만 을 인자값으로 받습니다.</li>
         <li class="pl-0">tag element 생성 시</li><ul>
@@ -107,17 +118,41 @@
         <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span> 에 포커싱되야할 엘리먼트를 넣어주세요.</li></ul>
         <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 엘리먼트를 context.dialog.modal 에 appendChaild 함수를 이용하여 삽입하면 끝납니다.</li>
     </ol>
+            </pre>
+        </div>
 
-
-<span class="pl-ent">4-2) submenu module 추가시</span>
+        <h4>1-5. submenu module 추가시</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>
     <ol>
-        <li class="pl-0">dialog 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object, 클릭한 버튼의 <span class="pl-c1">element</span>(<span class="pl-k">targetElement</span>) 를 인자값으로 받습니다.</li>
-        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span> 에 포커싱 돼야할 <span class="pl-c1">element</span>를 넣어주세요.</li></ul>
+        <li class="pl-0">submenu element 가 들어있는 최상위 div는 <span class="pl-ent">layer_editor</span> 가 클래스 이름에 포함되어 있어야 합니다.</li>
         <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 <span class="pl-c1">element</span> 를 <span class="pl-k">targetElement</span><span class="pl-c1">.parentNode</span> 에 <span class="pl-en">appendChaild</span> 함수를 이용하여 삽입하면 끝납니다.</li>
     </ol>
             </pre>
         </div>
+
+        <h4>1-6. Suneditor 생성시 addModuleButtons 옵션 추가</h4>
+        <div class="highlight highlight-text-html-basic">
+            <pre>
+<ul>
+    <li class="pl-0">옵션의 addModuleButtons 속성에 버튼 정보를 추가해줍니다.
+
+    <span class="pl-s">addModuleButtons</span><span class="pl-k">: <span class="pl-c1">[{</span><span class="pl-c1">
+        buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// className to be added to the button</span>
+        title:<span class="pl-ent">'Smile'</span>, <span class="pl-c">// title property</span>
+        dataCommand:<span class="pl-ent">'smile'</span>, <span class="pl-c">// The js file name of the added module</span>
+        dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module</span>
+        innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_smile"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML</span>
+     }]
+</span></span></li>
+    <li class="pl-0">버튼 옵션을 추가하고 위치를 원하는 곳으로 조정하고 싶다면 createToolBar 함수를 참고하십시오</li>
+</ul>
+            </pre>
+        </div>
     </article>
+
+    <p></p>
+    <textarea id="moduleSample"></textarea>
 
     <footer>
         <p>Suneditor v0.9 create by JiHong.Lee</p>
@@ -127,6 +162,5 @@
             suneditor</a></p>
     </footer>
 </div>
-
 </body>
 </html>

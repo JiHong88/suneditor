@@ -285,6 +285,7 @@ SUNEDITOR.defaultLang = {
          * @param txt
          */
         changeTxt : function(element, txt) {
+            if(!element || !txt) return;
             element.textContent = txt;
         },
 
@@ -294,6 +295,7 @@ SUNEDITOR.defaultLang = {
          * @param className
          */
         changeClass : function(element, className) {
+            if(!element || !className) return;
             element.className = className;
         },
 
@@ -688,7 +690,7 @@ SUNEDITOR.defaultLang = {
                     parentNode.appendChild(oNode);
                 }
 
-                this.setRange(oNode, 0, oNode, 0);
+                // this.setRange(oNode, 0, oNode, 0);
 
             },
 
@@ -1412,6 +1414,17 @@ SUNEDITOR.defaultLang = {
         html += createModuleGroup(moduleHtml);
         moduleHtml = null;
 
+        /** Users modules */
+        if(options.addModuleButtons) {
+            var moduleArray = options.addModuleButtons;
+            for(var i=0; i<moduleArray.length; i++) {
+                var module = moduleArray[i];
+                moduleHtml += createButton(module.buttonClass, module.title, module.dataCommand, module.dataDisplay, module.innerHTML);
+            }
+        }
+        html += createModuleGroup(moduleHtml);
+        moduleHtml = null;
+
         /** Full screen, toggle source frame */
         if(options.showFullScreen) {
             moduleHtml += createButton('', lang.toolbar.fullScreen, 'fullScreen', null,
@@ -1460,6 +1473,7 @@ SUNEDITOR.defaultLang = {
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;
+        options.addModuleButtons = options.addModuleButtons || [];
 
         /** editor seting options */
         options.height = /^\d+/.test(options.height)?  (/^\d+$/.test(options.height)? options.height+"px": options.height): element.clientHeight+"px";
@@ -1634,9 +1648,9 @@ SUNEDITOR.defaultLang = {
                 italic : cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
                 strike : cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
                 fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
-                default_fontText : (cons._toolBar.getElementsByClassName('sun-editor-font-family').length>0? cons._toolBar.getElementsByClassName('sun-editor-font-family')[0].textContent: undefined),
+                default_fontText : SUNEDITOR.lang.toolbar.fontFamily,
                 fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0],
-                default_fontSize : (cons._toolBar.getElementsByClassName('sun-editor-font-size').length>0? cons._toolBar.getElementsByClassName('sun-editor-font-size')[0].textContent: undefined)
+                default_fontSize : SUNEDITOR.lang.toolbar.fontSize
             },
             user : {
                 videoX : options.videoX,

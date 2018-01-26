@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../suneditor/js/suneditor.min.js"></script>
+    <script src="../../suneditor/js/suneditor.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -59,6 +59,7 @@
         <h4>1. Options Setting</h4>
         <div class="highlight highlight-source-js">
 <pre>
+<span class="pl-c">// User Options</span>
 <span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List              <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
 <span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List            <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
 <span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                             <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
@@ -75,6 +76,16 @@
 <span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">              </span>          <span class="pl-c1"> {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]</span>
 <span class="pl-s"></span><span class="pl-k">                  </span>When not used, it enters base64 data
 <span class="pl-s">editorIframeFont</span><span class="pl-k">: </span>Change iframe font of the suneditor        <span class="pl-ent">[default : </span><span class="pl-c1">"inherit"</span><span class="pl-ent">]</span>
+<span class="pl-s">addModuleButtons</span><span class="pl-k">: </span>Add an array button attributes to call the module added by the user : <span class="pl-ent">[default : </span><span class="pl-c1">[]</span><span class="pl-ent">]</span><span class="pl-c1"> (ex)</span>
+<span class="pl-c1">                 [{
+                    buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// className to be added to the button</span>
+                    title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title property</span>
+                    dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// The js file name of the added module</span>
+                    dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module</span>
+                    innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML</span>
+                 }]
+</span>
+<span class="pl-c">// Show, Hied</span>
 <span class="pl-s">showFont</span><span class="pl-k">        : </span>Display font module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
 <span class="pl-s">showFormats</span><span class="pl-k">     : </span>Display formats module                     <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
 <span class="pl-s">showFontSize</span><span class="pl-k">    : </span>Display font size module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
