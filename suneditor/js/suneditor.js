@@ -142,9 +142,9 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Add script File
-         * @param directory - The directory(plugin/{directory}) of the js file to call
-         * @param moduleName - The name of the js file to call
-         * @param callBack - Function to be executed immediately after module call
+         * @param {string} directory - The directory(plugin/{directory}) of the js file to call
+         * @param {string} moduleName - The name of the js file to call
+         * @param {function} callBack - Function to be executed immediately after module call
          */
         setScriptHead : function(directory, moduleName, callBack) {
             var scriptFile = document.createElement("script");
@@ -162,8 +162,8 @@ SUNEDITOR.defaultLang = {
     var dom = SUNEDITOR.dom = {
         /**
          * @description Get the index of the argument value in the element array
-         * @param array
-         * @param element
+         * @param {array} array - element array
+         * @param {element} element - Element to find index
          * @returns {number}
          */
         getArrayIndex : function(array, element) {
@@ -182,8 +182,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Get the next index of the argument value in the element array
-         * @param array
-         * @param item
+         * @param {array} array - element array
+         * @param {element} element - Element to find index
          * @returns {number}
          */
         nextIdx : function(array, item) {
@@ -195,8 +195,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Get the previous index of the argument value in the element array
-         * @param array
-         * @param item
+         * @param {array} array - element array
+         * @param {element} element - Element to find index
          * @returns {number}
          */
         prevIdx : function(array, item) {
@@ -208,7 +208,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Gets whether the cell is a table
-         * @param node
+         * @param {element} node - Nodes to scan
          * @returns {*|boolean}
          */
         isCell : function(node) {
@@ -217,8 +217,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Get all child nodes of the argument value element (Without text node)
-         * @param element
-         * @param validation
+         * @param {element} element - element to get child node
+         * @param {(functon|null)} validation - Conditional function
          * @returns {Array}
          */
         getListChildren : function(element, validation) {
@@ -241,8 +241,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Get all child nodes of the argument value element (Include text nodes)
-         * @param element
-         * @param validation
+         * @param {element} element - element to get child node
+         * @param {(functon|null)} validation - Conditional function
          * @returns {Array}
          */
         getListChildNodes : function(element, validation) {
@@ -265,9 +265,9 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Argument value The argument value of the parent node of the element. Get the tag name if it exists.
-         * @param element
-         * @param tagName
-         * @returns {*}
+         * @param {element} element - Reference element
+         * @param {string} tagName - Tag name to find
+         * @returns {element}
          */
         getParentNode : function(element, tagName) {
             var check = new RegExp("^"+tagName+"$", "i");
@@ -281,8 +281,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Set the text content value of the argument value element
-         * @param element
-         * @param txt
+         * @param {element} element - Elements to replace text content
+         * @param {string} txt - Text to be applied
          */
         changeTxt : function(element, txt) {
             if(!element || !txt) return;
@@ -291,8 +291,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Set the className value of the argument value element
-         * @param element
-         * @param className
+         * @param {element} element - Elements to replace class name
+         * @param {string} className - Class name to be change
          */
         changeClass : function(element, className) {
             if(!element || !className) return;
@@ -301,8 +301,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Append the className value of the argument value element
-         * @param element
-         * @param className
+         ** @param {element} element - Elements to add class name
+         * @param {string} className - Class name to be add
          */
         addClass : function(element, className) {
             if(!element) return;
@@ -315,8 +315,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Delete the className value of the argument value element
-         * @param element
-         * @param className
+         * @param {element} element - Elements to remove class name
+         * @param {string} className - Class name to be remove
          */
         removeClass : function(element, className) {
             if(!element) return;
@@ -327,8 +327,8 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Argument value If there is no class name, insert it and delete the class name if it exists
-         * @param element
-         * @param className
+         * @param {element} element - Elements to replace class name
+         * @param {string} className - Class name to be change
          */
         toggleClass : function(element, className) {
             var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
@@ -343,7 +343,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Delete argumenu value element
-         * @param item
+         * @param {element} item - Element to be remove
          */
         removeItem : function(item) {
             try {
@@ -355,7 +355,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Copies object
-         * @param obj
+         * @param {Object} obj - Object to be copy
          * @returns {Object}
          */
         copyObj : function(obj) {
@@ -419,10 +419,10 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Call the module
-             * @param directory - The directory(plugin/{directory}) of the js file to call
-             * @param moduleName - The name of the js file to call
-             * @param targetElement - If this is element, the element is inserted into the sibling node (submenu)
-             * @param callBackFunction - Function to be executed immediately after module call
+             * @param {string} directory - The directory(plugin/{directory}) of the js file to call
+             * @param {string} moduleName - The name of the js file to call
+             * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
+             * @param {function} callBackFunction - Function to be executed immediately after module call
              */
             callModule : function(directory, moduleName, targetElement, callBackFunction) {
                 /** dialog */
@@ -443,11 +443,12 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
+             * @callback
              * @description After the module is added, call the main function and the callback function
-             * @param directory - The directory(plugin/{directory}) of the js file to call
-             * @param moduleName - The name of the js file to call
-             * @param targetElement - If this is element, the element is inserted into the sibling node (submenu)
-             * @param callBackFunction - Function to be executed immediately after module call
+             * @param {string} directory - The directory(plugin/{directory}) of the js file to call
+             * @param {string} moduleName - The name of the js file to call
+             * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
+             * @param {function} callBackFunction - Function to be executed immediately after module call
              */
             callBack_addModule : function(directory, moduleName, targetElement, callBackFunction) {
                 if(!this.context[directory]) this.context[directory] = {};
@@ -459,7 +460,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Enabled submenu
-             * @param element - Submenu element to call
+             * @param {element} element - Submenu element to call
              */
             submenuOn : function(element) {
                 this.submenu = element.nextElementSibling;
@@ -493,9 +494,9 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description javascript execCommand
-             * @param command
-             * @param showDefaultUI
-             * @param value
+             * @param {string} command - javascript execCommand function property
+             * @param {boolean} showDefaultUI - javascript execCommand function property
+             * @param {string} value - javascript execCommand function property
              */
             execCommand : function(command, showDefaultUI, value) {
                 context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
@@ -510,8 +511,8 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Determine if this node is the last offset
-             * @param container
-             * @param offset
+             * @param {object} container - The container property of the selection object.
+             * @param {number} offset - The offset property of the selection object.
              * @returns {boolean}
              */
             isEdgePoint : function(container, offset) {
@@ -561,10 +562,10 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Set range object
-             * @param startCon
-             * @param startOff
-             * @param endCon
-             * @param endOff
+             * @param {object} startCon - The startContainer property of the selection object.
+             * @param {number} startOff - The startOffset property of the selection object.
+             * @param {object} endCon - The endContainer property of the selection object.
+             * @param {number} endOff - The endOffset property of the selection object.
              */
             setRange : function(startCon, startOff, endCon, endOff) {
                 var range = this.createRange();
@@ -594,7 +595,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Get node of current line (P,Table..)
-             * @param element
+             * @param {element} element - Reference element
              * @returns element
              */
             getLineElement : function(element) {
@@ -607,7 +608,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Append P tag to current line next
-             * @param element - Insert as siblings of that element
+             * @param {element} element - Insert as siblings of that element
              */
             appendP : function(element) {
                 element = this.getLineElement(element);
@@ -618,8 +619,8 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Delete selected node and insert argument value node
-             * @param oNode - Node to be inserted
-             * @param rightNode - If the node exists, it is inserted after the node
+             * @param {element} oNode - Node to be inserted
+             * @param {(element|null)} rightNode - If the node exists, it is inserted after the node
              */
             insertNode : function(oNode, rightNode) {
                 var parentNode = null;
@@ -799,7 +800,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Changes to full screen or default screen
-             * @param element - full screen button
+             * @param {element} element - full screen button
              */
             toggleFullScreen : function(element) {
                 if(!context.argument._isFullScreen) {
@@ -1184,7 +1185,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Change the contents of the suneditor
-             * @param content
+             * @param {string} content - Content to Input
              */
             setContent : function(content) {
                 if(context.argument._wysiwygActive) {
@@ -1196,7 +1197,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Add content to the suneditor
-             * @param content
+             * @param {string} content - to Input
              */
             appendContent : function(content) {
                 if(context.argument._wysiwygActive) {
@@ -1260,7 +1261,7 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description Create editor HTML
-     * @param options - user option
+     * @param {jsonArray} options - user option
      */
     var createToolBar = function (options){
         var lang = SUNEDITOR.lang = SUNEDITOR.lang? SUNEDITOR.lang: SUNEDITOR.defaultLang;
@@ -1269,7 +1270,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Create a group div containing each module
-         * @param innerHTML - module button html
+         * @param {string} innerHTML - module button html
          * @returns {string}
          */
         function createModuleGroup(innerHTML) {
@@ -1278,12 +1279,12 @@ SUNEDITOR.defaultLang = {
         }
 
         /**
-         *
-         * @param buttonClass
-         * @param title
-         * @param dataCommand
-         * @param dataDisplay
-         * @param innerHTML - Html in button
+         * @description Create a button element
+         * @param {string} buttonClass - className in button
+         * @param {string} title - Title in button
+         * @param {string} dataCommand - The data-command property of the button
+         * @param {string} dataDisplay - The data-display property of the button
+         * @param {string} innerHTML - Html in button
          * @returns {string}
          */
         function createButton(buttonClass, title, dataCommand, dataDisplay, innerHTML) {
@@ -1457,8 +1458,8 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description document create - call createToolBar()
-     * @param element - textarea
-     * @param options
+     * @param {element} element - textarea
+     * @param {jsonArray} options - user options
      * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
      * @constructor
      */
@@ -1594,9 +1595,9 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description Elements and variables you should have
-     * @param element
-     * @param cons
-     * @param options
+     * @param {element} element - textarea element
+     * @param {object} cons - Toolbar element you created
+     * @param {jsonArray} options - user options
      * @returns Elements, variables of the editor
      * @constructor
      */
@@ -1666,8 +1667,8 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description create Suneditor
-     * @param elementId
-     * @param options
+     * @param {string} elementId - textarea Id
+     * @param {jsonArray} options - user options
      * @returns {save|getContent|setContent|appendContent|disabled|enabled|show|hide|destroy}
      */
     SUNEDITOR.create = function (elementId, options) {
@@ -1701,7 +1702,7 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description destroy Suneditor
-     * @param elementId
+     * @param {string} elementId - textarea Id
      */
     SUNEDITOR.destroy = function(elementId) {
         var element = document.getElementById('suneditor_' + elementId);
