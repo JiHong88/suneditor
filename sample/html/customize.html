@@ -58,8 +58,8 @@
     <div role="tabpanel">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="tablinks active"><a href="javascript:openTab(event, 'english');">English</a></li>
-            <li role="presentation" class="tablinks"><a href="javascript:openTab(event, 'korea');">한국어</a></li>
+            <li role="presentation" class="tablinks active" id="english_tab"><a href="javascript:openTab('english');">English</a></li>
+            <li role="presentation" class="tablinks" id="korea_tab"><a href="javascript:openTab('korea');">한국어</a></li>
         </ul>
         <!-- Tab panes -->
         <div class="tab-content">
@@ -280,7 +280,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
 </div>
 
 <script>
-    function openTab(evt, lang) {
+    function openTab(lang) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
         for (i = 0; i < tabcontent.length; i++) {
@@ -291,7 +291,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
         document.getElementById(lang).style.display = "block";
-        evt.currentTarget.className += " active";
+        document.getElementById(lang + "_tab").className += " active";
     }
 </script>
 </body>
