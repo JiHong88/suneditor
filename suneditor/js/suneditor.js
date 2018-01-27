@@ -120,6 +120,19 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
+         * @description Copies object
+         * @param {Object} obj - Object to be copy
+         * @returns {Object}
+         */
+        copyObj : function(obj) {
+            var copy = {};
+            for (var attr in obj) {
+                copy[attr] = obj[attr];
+            }
+            return copy;
+        },
+
+        /**
          * @description Get suneditor's default path
          */
         getBasePath : (function() {
@@ -142,14 +155,15 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Add script File
-         * @param {string} directory - The directory(plugin/{directory}) of the js file to call
+         * @param {string} fileType - File type ("text/javascript")
+         * @param {string} fullUrl - The full url of the js file to call
          * @param {string} moduleName - The name of the js file to call
          * @param {function} callBack - Function to be executed immediately after module call
          */
-        setScriptHead : function(directory, moduleName, callBack) {
+        includeFile : function(fileType, fullUrl, callBack) {
             var scriptFile = document.createElement("script");
-            scriptFile.type = "text/javascript";
-            scriptFile.src = this.getBasePath+'plugins/'+directory+'/'+moduleName+'.js';
+            scriptFile.type = fileType;
+            scriptFile.src = fullUrl;
             scriptFile.onload = callBack;
 
             document.getElementsByTagName("head")[0].appendChild(scriptFile);
@@ -351,19 +365,6 @@ SUNEDITOR.defaultLang = {
             } catch(e) {
                 item.removeNode();
             }
-        },
-
-        /**
-         * @description Copies object
-         * @param {Object} obj - Object to be copy
-         * @returns {Object}
-         */
-        copyObj : function(obj) {
-            var copy = {};
-            for (var attr in obj) {
-                copy[attr] = obj[attr];
-            }
-            return copy;
         }
     };
 
@@ -425,14 +426,17 @@ SUNEDITOR.defaultLang = {
              * @param {function} callBackFunction - Function to be executed immediately after module call
              */
             callModule : function(directory, moduleName, targetElement, callBackFunction) {
+                var fullDirectory = func.getBasePath + 'plugins/' + directory;
+                var fileType = "text/javascript";
+
                 /** dialog */
                 if(directory === 'dialog' && !SUNEDITOR.plugin.dialog) {
-                    func.setScriptHead('dialog', 'dialog', this.callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction)));
+                    func.includeFile(fileType, (fullDirectory + '/dialog.js'), this.callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction)));
                     return;
                 }
 
                 if(!SUNEDITOR.plugin[moduleName]) {
-                    func.setScriptHead(directory, moduleName, this.callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+                    func.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this.callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
                 }
                 else if(!this.loadedPlugins[moduleName]) {
                     this.callBack_addModule(directory, moduleName, targetElement, callBackFunction);
