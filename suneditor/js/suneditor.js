@@ -139,7 +139,7 @@ SUNEDITOR.defaultLang = {
             var path = SUNEDITOR.SUNEDITOR_BASEPATH || "";
             if(!path) {
                 for(var c = document.getElementsByTagName("script"), i = 0; i < c.length; i++) {
-                    var editorTag = c[i].src.match(/(^|.*[\\\/])suneditor\.js(?:\?.*|;.*)?$/i);
+                    var editorTag = c[i].src.match(/(^|.*[\\\/])suneditor(?:\.min)\.js(?:\?.*|;.*)?$/i);
                     if(editorTag) {
                         path = editorTag[1];
                         break
