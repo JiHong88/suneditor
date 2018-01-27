@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Suneditor</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    <!--<h1 class="page-title">Global</h1>-->
+    <section>
+        <header>
+            <h2></h2>
+        </header>
+        <article>
+            <div class="container-overview">
+                <dl class="details">
+                </dl>
+            </div>
+            <h3 class="subsection-title">Methods</h3>
+
+            <h4 class="name" id="getArrayIndex"><span class="type-signature"></span>getArrayIndex<span
+                    class="signature">(array, element)</span><span class="type-signature"> &rarr; {number}</span></h4>
+            <div class="description">
+                Get the index of the argument value in the element array
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">element array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element to find index</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="nextIdx"><span class="type-signature"></span>nextIdx<span class="signature">(array, element)</span><span
+                    class="type-signature"> &rarr; {number}</span></h4>
+            <div class="description">
+                Get the next index of the argument value in the element array
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">element array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element to find index</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="prevIdx"><span class="type-signature"></span>prevIdx<span class="signature">(array, element)</span><span
+                    class="type-signature"> &rarr; {number}</span></h4>
+            <div class="description">
+                Get the previous index of the argument value in the element array
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">element array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element to find index</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isCell"><span class="type-signature"></span>isCell<span class="signature">(node)</span><span
+                    class="type-signature"> &rarr; {*|boolean}</span></h4>
+            <div class="description">
+                Gets whether the cell is a table
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>node</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Nodes to scan</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getListChildren"><span class="type-signature"></span>getListChildren<span
+                    class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Array}</span>
+            </h4>
+            <div class="description">
+                Get all child nodes of the argument value element (Without text node)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">element to get child node</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">functon</span>
+                        |
+                        <span class="param-type">null</span>
+                    </td>
+                    <td class="description last">Conditional function</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getListChildNodes"><span class="type-signature"></span>getListChildNodes<span
+                    class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Array}</span>
+            </h4>
+            <div class="description">
+                Get all child nodes of the argument value element (Include text nodes)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">element to get child node</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">functon</span>
+                        |
+                        <span class="param-type">null</span>
+                    </td>
+                    <td class="description last">Conditional function</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getParentNode"><span class="type-signature"></span>getParentNode<span
+                    class="signature">(element, tagName)</span><span class="type-signature"> &rarr; {element}</span>
+            </h4>
+            <div class="description">
+                Argument value The argument value of the parent node of the element. Get the tag name if it exists.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Reference element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>tagName</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Tag name to find</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="changeTxt"><span class="type-signature"></span>changeTxt<span class="signature">(element, txt)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Set the text content value of the argument value element
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Elements to replace text content</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>txt</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Text to be applied</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="changeClass"><span class="type-signature"></span>changeClass<span class="signature">(element, className)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Set the className value of the argument value element
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Elements to replace class name</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>className</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Class name to be change</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="addClass"><span class="type-signature"></span>addClass<span class="signature">(className)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Append the className value of the argument value element
+                * @param {element} element - Elements to add class name
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>className</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Class name to be add</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="removeClass"><span class="type-signature"></span>removeClass<span class="signature">(element, className)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Delete the className value of the argument value element
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Elements to remove class name</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>className</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Class name to be remove</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="toggleClass"><span class="type-signature"></span>toggleClass<span class="signature">(element, className)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Argument value If there is no class name, insert it and delete the class name if it exists
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Elements to replace class name</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>className</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">Class name to be change</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="removeItem"><span class="type-signature"></span>removeItem<span class="signature">(item)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Delete argumenu value element
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>item</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element to be remove</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+            
+        </article>
+    </section>
+</div>
+
+<nav>
+    <h2><a href="../../index.html">Suneditor</a></h2>
+    <h3><a href="index.html">Index</a></h3>
+    <h3>SUNEDITOR.dom</h3>
+    <ul>
+        <li><a href="document-dom.html#getArrayIndex">getArrayIndex</a></li>
+        <li><a href="document-dom.html#nextIdx">nextIdx</a></li>
+        <li><a href="document-dom.html#prevIdx">prevIdx</a></li>
+        <li><a href="document-dom.html#isCell">isCell</a></li>
+        <li><a href="document-dom.html#getListChildren">getListChildren</a></li>
+        <li><a href="document-dom.html#getListChildNodes">getListChildNodes</a></li>
+        <li><a href="document-dom.html#getParentNode">getParentNode</a></li>
+        <li><a href="document-dom.html#changeTxt">changeTxt</a></li>
+        <li><a href="document-dom.html#changeClass">changeClass</a></li>
+        <li><a href="document-dom.html#addClass">addClass</a></li>
+        <li><a href="document-dom.html#removeClass">removeClass</a></li>
+        <li><a href="document-dom.html#toggleClass">toggleClass</a></li>
+        <li><a href="document-dom.html#removeItem">removeItem</a></li>
+    </ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 28 2018 01:58:16
+    GMT+0900 (대한민국 표준시)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
