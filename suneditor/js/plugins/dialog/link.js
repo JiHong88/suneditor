@@ -138,7 +138,7 @@ SUNEDITOR.plugin.link = {
         linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10) + "px";
         linkBtn.style.display = "block";
 
-        this.context.controllerArray = [linkBtn];
+        this.controllerArray = [linkBtn];
         linkBtn = null;
     },
 

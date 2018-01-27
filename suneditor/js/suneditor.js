@@ -86,7 +86,7 @@ SUNEDITOR.defaultLang = {
     var func = SUNEDITOR.func = {
         /**
          * @description A function that returns a value of true.
-         * @returns {boolean}
+         * @returns {Boolean}
          */
         returnTrue : function() {
             return true;
@@ -178,7 +178,7 @@ SUNEDITOR.defaultLang = {
          * @description Get the index of the argument value in the element array
          * @param {array} array - element array
          * @param {element} element - Element to find index
-         * @returns {number}
+         * @returns {Number}
          */
         getArrayIndex : function(array, element) {
             var idx = -1;
@@ -198,7 +198,7 @@ SUNEDITOR.defaultLang = {
          * @description Get the next index of the argument value in the element array
          * @param {array} array - element array
          * @param {element} element - Element to find index
-         * @returns {number}
+         * @returns {Number}
          */
         nextIdx : function(array, item) {
             var idx = this.getArrayIndex(array, item);
@@ -211,7 +211,7 @@ SUNEDITOR.defaultLang = {
          * @description Get the previous index of the argument value in the element array
          * @param {array} array - element array
          * @param {element} element - Element to find index
-         * @returns {number}
+         * @returns {Number}
          */
         prevIdx : function(array, item) {
             var idx = this.getArrayIndex(array, item);
@@ -223,7 +223,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Gets whether the cell is a table
          * @param {element} node - Nodes to scan
-         * @returns {*|boolean}
+         * @returns {Boolean}
          */
         isCell : function(node) {
             return node && /^TD$|^TH$/i.test(node.nodeName);
@@ -281,7 +281,7 @@ SUNEDITOR.defaultLang = {
          * @description Argument value The argument value of the parent node of the element. Get the tag name if it exists.
          * @param {element} element - Reference element
          * @param {string} tagName - Tag name to find
-         * @returns {element}
+         * @returns {Element}
          */
         getParentNode : function(element, tagName) {
             var check = new RegExp("^"+tagName+"$", "i");
@@ -296,7 +296,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Set the text content value of the argument value element
          * @param {element} element - Elements to replace text content
-         * @param {string} txt - Text to be applied
+         * @param {String}
          */
         changeTxt : function(element, txt) {
             if(!element || !txt) return;
@@ -403,7 +403,7 @@ SUNEDITOR.defaultLang = {
              */
             controllerArray : [],
 
-            /** Number of blank characters to be entered when tab key is operated */
+            /** @description Number of blank characters to be entered when tab key is operated */
             tabSize : 4,
 
             /**
@@ -525,6 +525,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Create range object
+             * @returns {Range}
              */
             createRange : function() {
                 return context.element.wysiwygWindow.document.createRange();
@@ -532,6 +533,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Get current selection object
+             * @returns {Selection}
              */
             getSelection : function() {
                 return context.element.wysiwygWindow.getSelection();
@@ -539,6 +541,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Get current select node
+             * @returns {Node}
              */
             getSelectionNode : function() {
                 return this.getSelection().extentNode || this.getSelection().anchorNode;
@@ -546,6 +549,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Get current range object
+             * @returns {Range}
              */
             getRange : function() {
                 var selection = this.getSelection();
@@ -600,7 +604,7 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Get node of current line (P,Table..)
              * @param {element} element - Reference element
-             * @returns element
+             * @returns {Element}
              */
             getLineElement : function(element) {
                 while(!/^BODY$/i.test(element.parentNode.tagName)) {
@@ -971,10 +975,11 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** A */
-                    if(findA && /^A$/i.test(selectionParent.nodeName) && context.link && editor.controllerArray[0] !== context.link.linkBtn) {
-                        editor.callModule('dialog', 'link', null, function(){SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionParent);});
+                    if(findA && /^A$/i.test(selectionParent.nodeName) && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
+                        var selectionATag = selectionParent;
+                        editor.callModule('dialog', 'link', null, function(){SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);});
                         findA = false;
-                    } else if(findA && editor.controllerArray.length === 0) {
+                    } else if(findA && editor.controllerArray.length > 0) {
                         editor.controllersOff();
                     }
 
@@ -1175,7 +1180,7 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Gets the contents of the suneditor
-             * @returns {string}
+             * @returns {String}
              */
             getContent : function() {
                 var content = "";
@@ -1466,7 +1471,6 @@ SUNEDITOR.defaultLang = {
      * @param {element} element - textarea
      * @param {jsonArray} options - user options
      * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
-     * @constructor
      */
     var Constructor = function(element, options) {
         if(!(typeof options === "object")) options = {};
@@ -1604,7 +1608,6 @@ SUNEDITOR.defaultLang = {
      * @param {object} cons - Toolbar element you created
      * @param {jsonArray} options - user options
      * @returns Elements, variables of the editor
-     * @constructor
      */
     var Context = function(element, cons, options) {
         var sun_wysiwyg = cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0];
