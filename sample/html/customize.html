@@ -156,10 +156,12 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
 
     <span class="pl-s">addModuleButtons</span><span class="pl-k">: <span class="pl-c1">[{</span><span class="pl-c1">
         buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// className to be added to the button</span>
-        title:<span class="pl-ent">'Smile'</span>, <span class="pl-c">// title property</span>
-        dataCommand:<span class="pl-ent">'smile'</span>, <span class="pl-c">// The js file name of the added module</span>
-        dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module</span>
-        innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_smile"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML</span>
+        title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title property</span>
+        dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// The js file name of the added module</span>
+        dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
+        dataOption:<span class="pl-ent">''</span>, <span class="pl-c">// Options for whether the range of the dialog is inside the editor or for the entire screen</span>
+                       <span class="pl-c">// If set to 'full', the entire screen will be used ('', 'full')</span>
+        innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML</span>
      }]
 </span></span></li>
     <li class="pl-0">If you want to add button options and adjust the position to where you want, see the createToolBar function</li>
@@ -257,10 +259,12 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
 
     <span class="pl-s">addModuleButtons</span><span class="pl-k">: <span class="pl-c1">[{</span><span class="pl-c1">
         buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// 버튼에 추가할 클래스명</span>
-        title:<span class="pl-ent">'Smile'</span>, <span class="pl-c">// title 속성</span>
-        dataCommand:<span class="pl-ent">'smile'</span>, <span class="pl-c">// 추가한 모듈의 js 파일이름</span>
-        dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// 추가한 모듈의 폴더 이름</span>
-        innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_smile"&gt;&lt;/div&gt;'</span> <span class="pl-c">// 버튼안에 들어갈 innerHTML 코드</span>
+        title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title 속성</span>
+        dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// 추가한 모듈의 js 파일이름</span>
+        dataDisplay:<span class="pl-ent">'dialog'</span>, <span class="pl-c">// 추가한 모듈의 폴더 이름 ('dialog', 'submenu')</span>
+        dataOption:<span class="pl-ent">''</span>, <span class="pl-c">// dialog 형태의 모듈일때 dialog의 범위가 에디터 안쪽인지 화면 전체로 설정할지 에 대한 옵션</span>
+                       <span class="pl-c">// 'full'로 설정하면 화면 전체를 사용합니다 ('', 'full')</span>
+        innerHTML:<span class="pl-ent">'&lt;div class="img_editor ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// 버튼안에 들어갈 innerHTML 코드</span>
      }]
 </span></span></li>
     <li class="pl-0">버튼 옵션을 추가하고 위치를 원하는 곳으로 조정하고 싶다면 createToolBar 함수를 참고하십시오</li>

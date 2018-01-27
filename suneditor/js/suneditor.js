@@ -876,7 +876,7 @@ SUNEDITOR.defaultLang = {
                 var command = targetElement.getAttribute("data-command");
                 var className = targetElement.className;
 
-                while(!command && !/editor_tool/.test(className) && !/^BODY$/i.test(targetElement.tagName)){
+                while(!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)){
                     targetElement = targetElement.parentNode;
                     command = targetElement.getAttribute("data-command");
                     display = targetElement.getAttribute("data-display");
@@ -891,7 +891,7 @@ SUNEDITOR.defaultLang = {
                 editor.focus();
 
                 /** Dialog, Submenu */
-                if(!!display || /^BODY$/i.test(targetElement.tagName)) {
+                if(!!display) {
                     var prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
@@ -899,7 +899,7 @@ SUNEDITOR.defaultLang = {
                         editor.callModule('submenu', command, targetElement, function(){editor.submenuOn(targetElement)});
                     }
                     else if(/dialog/.test(display)) {
-                        editor.callModule('dialog', command, null, function(){SUNEDITOR.plugin.dialog.openDialog.call(editor, command);});
+                        editor.callModule('dialog', command, null, function(){SUNEDITOR.plugin.dialog.openDialog.call(editor, command, targetElement.getAttribute('data-option'));});
                     }
 
                     return;
@@ -1287,14 +1287,15 @@ SUNEDITOR.defaultLang = {
          * @param {string} buttonClass - className in button
          * @param {string} title - Title in button
          * @param {string} dataCommand - The data-command property of the button
-         * @param {string} dataDisplay - The data-display property of the button
+         * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
+         * @param {string} dataOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
          * @param {string} innerHTML - Html in button
          * @returns {string}
          */
-        function createButton(buttonClass, title, dataCommand, dataDisplay, innerHTML) {
+        function createButton(buttonClass, title, dataCommand, dataDisplay, dataOption, innerHTML) {
             var buttonHtml = ''+
                 '<li>'+
-                '   <button type="button" class="btn_editor '+buttonClass+'" title="'+title+'" data-command="'+dataCommand+'" '+(!!dataDisplay? 'data-display="'+dataDisplay+'"': '')+'>'+
+                '   <button type="button" class="btn_editor '+buttonClass+'" title="'+title+'" data-command="'+dataCommand+'" data-display="'+dataDisplay+'" data-option="'+dataOption+'">'+
                         innerHTML+
                 '   </button>'+
                 '</li>';
@@ -1303,17 +1304,17 @@ SUNEDITOR.defaultLang = {
         
         /** FontFamily, Formats, FontSize */
         if(options.showFont) {
-            moduleHtml += createButton('btn_font', lang.toolbar.fontFamily, 'fontFamily', 'submenu',
+            moduleHtml += createButton('btn_font', lang.toolbar.fontFamily, 'fontFamily', 'submenu', '',
                 '<span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'
             );
         }
         if(options.showFormats) {
-            moduleHtml += createButton('btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
+            moduleHtml += createButton('btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
                 '<span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'
             );
         }
         if(options.showFontSize) {
-            moduleHtml += createButton('btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
+            moduleHtml += createButton('btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
                 '<span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'
             );
         }
@@ -1322,22 +1323,22 @@ SUNEDITOR.defaultLang = {
 
         /** Bold, underline, italic, strikethrough */
         if(options.showBold) {
-            moduleHtml += createButton('sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', null,
+            moduleHtml += createButton('sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
                 '<div class="ico_bold"></div>'
             );
         }
         if(options.showUnderline) {
-            moduleHtml += createButton('sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', null,
+            moduleHtml += createButton('sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
                 '<div class="ico_underline"></div>'
             );
         }
         if(options.showItalic) {
-            moduleHtml += createButton('sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', null,
+            moduleHtml += createButton('sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
                 '<div class="ico_italic"></div>'
             );
         }
         if(options.showStrike) {
-            moduleHtml += createButton('sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', null,
+            moduleHtml += createButton('sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
                 '<div class="ico_strike"></div>'
             );
         }
@@ -1346,14 +1347,14 @@ SUNEDITOR.defaultLang = {
 
         /** foreColor, hiliteColor */
         if(options.showFontColor) {
-            moduleHtml += createButton('', lang.toolbar.fontColor, 'foreColor', 'submenu',
+            moduleHtml += createButton('', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
                 '<div class="img_editor ico_fcolor_w">'+
                 '   <em class="color_font" style="background-color:#1f92fe"></em>'+
                 '</div>'
             );
         }
         if(options.showHiliteColor) {
-            moduleHtml += createButton('', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
+            moduleHtml += createButton('', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
                 '<div class="ico_fcolor">'+
                 '   <em class="color_font" style="background-color:#1f92fe"></em>'+
                 '</div>'
@@ -1364,10 +1365,10 @@ SUNEDITOR.defaultLang = {
 
         /** Indent, Outdent */
         if(options.showInOutDent) {
-            moduleHtml += createButton('', lang.toolbar.indent, 'indent', null,
+            moduleHtml += createButton('', lang.toolbar.indent, 'indent', '', '',
                 '<div class="img_editor ico_indnet"></div>'
             );
-            moduleHtml += createButton('', lang.toolbar.outdent, 'outdent', null,
+            moduleHtml += createButton('', lang.toolbar.outdent, 'outdent', '', '',
                 '<div class="img_editor ico_outdent"></div>'
             );
         }
@@ -1376,24 +1377,24 @@ SUNEDITOR.defaultLang = {
 
         /** align, list, HR, Table */
         if(options.showAlign) {
-            moduleHtml += createButton('btn_align', lang.toolbar.align, 'align', 'submenu',
+            moduleHtml += createButton('btn_align', lang.toolbar.align, 'align', 'submenu', '',
                 '<div class="img_editor ico_align_l"></div>'
             );
         }
         if(options.showList) {
-            moduleHtml += createButton('', lang.toolbar.list, 'list', 'submenu',
+            moduleHtml += createButton('', lang.toolbar.list, 'list', 'submenu', '',
                 '<div class="img_editor ico_list ico_list_num"></div>'
             );
         }
         if(options.showLine) {
-            moduleHtml += createButton('btn_line', lang.toolbar.line, 'horizontalRules', 'submenu',
+            moduleHtml += createButton('btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
                 '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
                 '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
                 '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
             );
         }
         if(options.showTable) {
-            moduleHtml += createButton('', lang.toolbar.table, 'table', 'submenu',
+            moduleHtml += createButton('', lang.toolbar.table, 'table', 'submenu', '',
                 '<div class="img_editor ico_table"></div>'
             );
         }
@@ -1402,17 +1403,17 @@ SUNEDITOR.defaultLang = {
 
         /** Dialog : link, image, video */
         if(options.showLink) {
-            moduleHtml += createButton('', lang.toolbar.link, 'link', 'dialog',
+            moduleHtml += createButton('', lang.toolbar.link, 'link', 'dialog', '',
                 '<div class="img_editor ico_url"></div>'
             );
         }
         if(options.showImage) {
-            moduleHtml += createButton('', lang.toolbar.image, 'image', 'dialog',
+            moduleHtml += createButton('', lang.toolbar.image, 'image', 'dialog', '',
                 '<div class="img_editor ico_picture"></div>'
             );
         }
         if(options.showVideo) {
-            moduleHtml += createButton('', lang.toolbar.video, 'video', 'dialog',
+            moduleHtml += createButton('', lang.toolbar.video, 'video', 'dialog', '',
                 '<div class="img_editor ico_video"></div>'
             );
         }
@@ -1424,7 +1425,7 @@ SUNEDITOR.defaultLang = {
             var moduleArray = options.addModuleButtons;
             for(var i=0; i<moduleArray.length; i++) {
                 var module = moduleArray[i];
-                moduleHtml += createButton(module.buttonClass, module.title, module.dataCommand, module.dataDisplay, module.innerHTML);
+                moduleHtml += createButton(module.buttonClass, module.title, module.dataCommand, module.dataDisplay, module.option, module.innerHTML);
             }
         }
         html += createModuleGroup(moduleHtml);
@@ -1432,12 +1433,12 @@ SUNEDITOR.defaultLang = {
 
         /** Full screen, toggle source frame */
         if(options.showFullScreen) {
-            moduleHtml += createButton('', lang.toolbar.fullScreen, 'fullScreen', null,
+            moduleHtml += createButton('', lang.toolbar.fullScreen, 'fullScreen', '', '',
                 '<div class="img_editor ico_full_screen_e"></div>'
             );
         }
         if(options.showCodeView) {
-            moduleHtml += createButton('', lang.toolbar.htmlEditor, 'sorceFrame', null,
+            moduleHtml += createButton('', lang.toolbar.htmlEditor, 'sorceFrame', '', '',
                 '<div class="img_editor ico_html"></div>'
             );
         }
@@ -1447,10 +1448,10 @@ SUNEDITOR.defaultLang = {
 
         /** Undo, redo */
         if(options.showUndoRedo) {
-            moduleHtml += createButton('', lang.toolbar.undo+' (Ctrl+Z)', 'undo', null,
+            moduleHtml += createButton('', lang.toolbar.undo+' (Ctrl+Z)', 'undo', '', '',
                 '<div class="img_editor ico_undo"></div>'
             );
-            moduleHtml += createButton('', lang.toolbar.redo+' (Ctrl+Y)', 'redo', null,
+            moduleHtml += createButton('', lang.toolbar.redo+' (Ctrl+Y)', 'redo', '', '',
                 '<div class="img_editor ico_redo"></div>'
             );
         }

@@ -41,7 +41,13 @@ SUNEDITOR.plugin.dialog = {
         }
     },
 
-    openDialog : function(kind) {
+    openDialog : function(kind, option) {
+        if(option === 'full') {
+            this.context.dialog.modalArea.style.position = "fixed";
+        } else {
+            this.context.dialog.modalArea.style.position = "absolute";
+        }
+
         this.modalForm = this.context[kind].modal;
         var focusElement = this.context[kind].focusElement;
 

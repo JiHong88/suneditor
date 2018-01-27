@@ -71,7 +71,9 @@ addModuleButtons: Add an array button attributes to call the module added by the
                         buttonClass:'', // className to be added to the button
                         title:'Test', // title property
                         dataCommand:'test', // The js file name of the added module
-                        dataDisplay:'submenu', // The directory location under the plugins folder of the added module
+                        dataDisplay:'dialog', // The directory location under the plugins folder of the added module ('dialog', 'submenu')
+                        dataOption: '', // Options for whether the range of the dialog is inside the editor or for the entire screen
+                                        // If set to 'full', the entire screen will be used ('', 'full')
                         innerHTML:'<div class="img_editor ico_test"></div>' // The source into the button's innerHTML
                        }]
 
