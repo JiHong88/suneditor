@@ -833,19 +833,6 @@ SUNEDITOR.defaultLang = {
                 }
 
                 context.argument._isFullScreen = !context.argument._isFullScreen;
-            },
-
-            /**
-             * @description Resizing the editor
-             */
-            resize_editor : function(e) {
-                var resizeInterval = (e.clientY - context.argument._resizeClientY);
-
-                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
-
-                context.argument._innerHeight = (context.element.editorArea.offsetHeight + resizeInterval);
-
-                context.argument._resizeClientY = e.clientY;
             }
         };
 
@@ -1144,12 +1131,22 @@ SUNEDITOR.defaultLang = {
 
                 function closureFunc() {
                     context.element.resizeBackground.style.display = "none";
-                    document.removeEventListener('mousemove', editor.resize_editor);
+                    document.removeEventListener('mousemove', event.resize_editor);
                     document.removeEventListener('mouseup', closureFunc);
                 }
 
-                document.addEventListener('mousemove', editor.resize_editor);
+                document.addEventListener('mousemove', event.resize_editor);
                 document.addEventListener('mouseup', closureFunc);
+            },
+
+            resize_editor : function(e) {
+                var resizeInterval = (e.clientY - context.argument._resizeClientY);
+
+                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
+
+                context.argument._innerHeight = (context.element.editorArea.offsetHeight + resizeInterval);
+
+                context.argument._resizeClientY = e.clientY;
             }
         };
 
