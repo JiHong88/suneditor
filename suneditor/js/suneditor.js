@@ -948,7 +948,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onSelectionChange_wysiwyg : function() {
-                context.argument._copySelection = dom.copyObj(editor.getSelection());
+                context.argument._copySelection = func.copyObj(editor.getSelection());
                 context.argument._selectionNode = editor.getSelectionNode();
 
                 var selectionParent = context.argument._selectionNode;
