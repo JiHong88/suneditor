@@ -954,7 +954,7 @@ SUNEDITOR.defaultLang = {
                     /** Font */
                     if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.fontFamily.length > 0)) {
                         nodeName = 'FONT';
-                        var selectFont = (selectionParent.face || selectionParent.style.fontFamily || context.tool.default_fontText);
+                        var selectFont = (selectionParent.face || selectionParent.style.fontFamily || SUNEDITOR.lang.toolbar.fontFamily);
                         dom.changeTxt(editor.commandMap[nodeName], selectFont);
                         findFont = false;
                         map = map.replace(nodeName + "|", "");
@@ -993,10 +993,10 @@ SUNEDITOR.defaultLang = {
                 var mapLen = map.length - 1;
                 for(var i=0; i<mapLen; i++) {
                     if(/^FONT$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], context.tool.default_fontText);
+                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontFamily);
                     }
                     else if(/^SIZE$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], context.tool.default_fontSize);
+                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
                         dom.removeClass(editor.commandMap[map[i]], "on");
@@ -1654,9 +1654,7 @@ SUNEDITOR.defaultLang = {
                 italic : cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
                 strike : cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
                 fontFamily : cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
-                default_fontText : SUNEDITOR.lang.toolbar.fontFamily,
-                fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0],
-                default_fontSize : SUNEDITOR.lang.toolbar.fontSize
+                fontSize : cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
             },
             user : {
                 videoX : options.videoX,
