@@ -25,13 +25,13 @@ SUNEDITOR.plugin.fontSize = {
         var sizeList = !user.fontSizeList? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]: user.fontSizeList;
 
         var list = '<div class="inner_layer">'+
-                   '   <ul class="list_editor font_size_list">';
+            '   <ul class="list_editor font_size_list">';
         for(var i=0; i<sizeList.length; i++) {
             var size = sizeList[i];
             list += '<li><button type="button" class="btn_edit" data-value="'+size+'" style="font-size:'+size+'pt;">'+size+'</button></li>';
         }
         list += '   </ul>'+
-                '</div>';
+            '</div>';
 
         listDiv.innerHTML = list;
 
@@ -101,13 +101,13 @@ SUNEDITOR.plugin.fontSize = {
         }
         /** Select multiple nodes */
         else {
-            var childNodes = SUNEDITOR.dom.getListChildNodes(commonCon);
+            var childNodes = SUNEDITOR.dom.getListChildNodes(commonCon, function(current){return current.nodeType === 3;});
             var startIndex = SUNEDITOR.dom.getArrayIndex(childNodes, startCon);
             var endIndex = SUNEDITOR.dom.getArrayIndex(childNodes, endCon);
 
             var startNode = startCon;
             for(var i=startIndex+1; i>=0; i--) {
-                if(childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
+                if(childNodes[i] === startNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
                     startIndex = i;
                     startNode = startNode.parentNode;
                 }
@@ -115,7 +115,7 @@ SUNEDITOR.plugin.fontSize = {
 
             var endNode = endCon;
             for(var i=endIndex-1; i>startIndex; i--) {
-                if(childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
+                if(childNodes[i] === endNode && childNodes[i].nodeType === ELEMENT_NODE) {
                     childNodes.splice(i, 1);
                     endNode = endNode.parentNode;
                     --endIndex;
