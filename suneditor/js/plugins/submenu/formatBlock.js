@@ -38,15 +38,15 @@ SUNEDITOR.plugin.formatBlock = {
     },
 
     pickUp : function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         var target = e.target;
         var value = null;
         while (!value && !/UL/i.test(target.tagName)) {
             value = target.getAttribute('data-value');
             target = target.parentNode;
         }
-
-        e.preventDefault();
-        e.stopPropagation();
 
         this.focus();
         this.execCommand('formatBlock', false, value);

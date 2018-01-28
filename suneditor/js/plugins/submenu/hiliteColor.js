@@ -46,12 +46,12 @@ SUNEDITOR.plugin.hiliteColor = {
     },
 
     colorPick : function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         if(!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
-
-        e.preventDefault();
-        e.stopPropagation();
 
         this.focus();
         this.execCommand('hiliteColor', false, e.target.getAttribute('data-value'));

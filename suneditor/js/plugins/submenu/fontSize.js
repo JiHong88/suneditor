@@ -28,7 +28,7 @@ SUNEDITOR.plugin.fontSize = {
                    '   <ul class="list_editor font_size_list">';
         for(var i=0; i<sizeList.length; i++) {
             var size = sizeList[i];
-            list += '<li><button type="button" class="btn_edit" data-value="'+size+'"><span style="font-size:'+size+'pt;">'+size+'</span></button></li>';
+            list += '<li><button type="button" class="btn_edit" data-value="'+size+'" style="font-size:'+size+'pt;">'+size+'</button></li>';
         }
         list += '   </ul>'+
                 '</div>';
@@ -36,19 +36,6 @@ SUNEDITOR.plugin.fontSize = {
         listDiv.innerHTML = list;
 
         return listDiv;
-    },
-
-    pickup : function (e) {
-        if(!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        this.focus();
-        SUNEDITOR.plugin.fontSize.appendSpan.call(this, e.target.getAttribute('data-value'));
-        this.submenuOff();
     },
 
     appendSpan : function(fontsize) {
@@ -243,5 +230,18 @@ SUNEDITOR.plugin.fontSize = {
         }
 
         this.setRange(startCon, startOff, endCon, endOff);
+    },
+
+    pickup : function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if(!/^BUTTON$/i.test(e.target.tagName)) {
+            return false;
+        }
+
+        this.focus();
+        SUNEDITOR.plugin.fontSize.appendSpan.call(this, e.target.getAttribute('data-value'));
+        this.submenuOff();
     }
 };

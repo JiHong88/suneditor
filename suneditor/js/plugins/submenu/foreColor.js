@@ -48,12 +48,12 @@ SUNEDITOR.plugin.foreColor = {
     },
 
     pickUp : function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         if(!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
-
-        e.preventDefault();
-        e.stopPropagation();
 
         this.focus();
         this.execCommand('foreColor', false, e.target.getAttribute('data-value'));

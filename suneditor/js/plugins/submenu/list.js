@@ -35,15 +35,18 @@ SUNEDITOR.plugin.list = {
     },
 
     pickup : function (e) {
-        if(!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
         e.preventDefault();
         e.stopPropagation();
 
+        var target = e.target;
+        var value = null;
+        while (!value && !/UL/i.test(target.tagName)) {
+            value = target.getAttribute('data-value');
+            target = target.parentNode;
+        }
+
         this.focus();
-        this.execCommand(e.target.getAttribute('data-command'), false, e.target.getAttribute('data-value'));
+        this.execCommand(e.target.getAttribute('data-command'), false, value);
         this.submenuOff();
     }
 };
