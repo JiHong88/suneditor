@@ -61,15 +61,18 @@ SUNEDITOR.plugin.horizontalRules = {
     },
 
     horizontalRulesPick : function (e) {
-        if(!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
         e.preventDefault();
         e.stopPropagation();
 
+        var target = e.target;
+        var value = null;
+        while (!value && !/UL/i.test(target.tagName)) {
+            value = target.getAttribute('data-value');
+            target = target.parentNode;
+        }
+
         this.focus();
-        SUNEDITOR.plugin.horizontalRules.appendHr.call(this, 'black', '1px', e.target.getAttribute('data-value'));
+        SUNEDITOR.plugin.horizontalRules.appendHr.call(this, 'black', '1px', value);
         this.submenuOff();
     }
 };

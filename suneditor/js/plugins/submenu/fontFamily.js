@@ -76,7 +76,7 @@ SUNEDITOR.plugin.fontFamily = {
         var target = e.target;
 
         this.focus();
-        SUNEDITOR.dom.changeTxt(this.originSub.firstElementChild, target.getAttribute('data-txt'));
+        SUNEDITOR.dom.changeTxt(this.context.tool.fontFamily, target.getAttribute('data-txt'));
         this.execCommand('fontName', false, target.getAttribute('data-value'));
         this.submenuOff();
     }
