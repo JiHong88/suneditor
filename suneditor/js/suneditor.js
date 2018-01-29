@@ -29,10 +29,6 @@ SUNEDITOR.defaultLang = {
         alignRight : 'Align right',
         alignCenter : 'Align center',
         justifyFull : 'Justify full',
-        left : 'Left',
-        right : 'Right',
-        center : 'Center',
-        bothSide : 'Justify full',
         list : 'list',
         orderList : 'Ordered list',
         unorderList : 'Unordered list',
@@ -1307,17 +1303,17 @@ SUNEDITOR.defaultLang = {
         /** FontFamily, Formats, FontSize */
         if(options.showFont) {
             moduleHtml += createButton('btn_font', lang.toolbar.fontFamily, 'fontFamily', 'submenu', '',
-                '<span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="img_editor ico_more"></span>'
+                '<span class="txt sun-editor-font-family">'+lang.toolbar.fontFamily+'</span><span class="ico_more"></span>'
             );
         }
         if(options.showFormats) {
             moduleHtml += createButton('btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-                '<span class="txt">'+lang.toolbar.formats+'</span><span class="img_editor ico_more"></span>'
+                '<span class="txt">'+lang.toolbar.formats+'</span><span class="ico_more"></span>'
             );
         }
         if(options.showFontSize) {
             moduleHtml += createButton('btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-                '<span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="img_editor ico_more"></span>'
+                '<span class="txt sun-editor-font-size">'+lang.toolbar.fontSize+'</span><span class="ico_more"></span>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1350,16 +1346,12 @@ SUNEDITOR.defaultLang = {
         /** foreColor, hiliteColor */
         if(options.showFontColor) {
             moduleHtml += createButton('', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
-                '<div class="img_editor ico_fcolor_w">'+
-                '   <em class="color_font" style="background-color:#1f92fe"></em>'+
-                '</div>'
+                '<div class="ico_foreColor"></div>'
             );
         }
         if(options.showHiliteColor) {
             moduleHtml += createButton('', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
-                '<div class="ico_fcolor">'+
-                '   <em class="color_font" style="background-color:#1f92fe"></em>'+
-                '</div>'
+                '<div class="ico_hiliteColor"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1368,10 +1360,10 @@ SUNEDITOR.defaultLang = {
         /** Indent, Outdent */
         if(options.showInOutDent) {
             moduleHtml += createButton('', lang.toolbar.indent, 'indent', '', '',
-                '<div class="img_editor ico_indnet"></div>'
+                '<div class="ico_indnet"></div>'
             );
             moduleHtml += createButton('', lang.toolbar.outdent, 'outdent', '', '',
-                '<div class="img_editor ico_outdent"></div>'
+                '<div class="ico_outdent"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1380,12 +1372,12 @@ SUNEDITOR.defaultLang = {
         /** align, list, HR, Table */
         if(options.showAlign) {
             moduleHtml += createButton('btn_align', lang.toolbar.align, 'align', 'submenu', '',
-                '<div class="img_editor ico_align_l"></div>'
+                '<div class="ico_align"></div>'
             );
         }
         if(options.showList) {
             moduleHtml += createButton('', lang.toolbar.list, 'list', 'submenu', '',
-                '<div class="img_editor ico_list ico_list_num"></div>'
+                '<div class="ico_list_num"></div>'
             );
         }
         if(options.showLine) {
@@ -1397,7 +1389,7 @@ SUNEDITOR.defaultLang = {
         }
         if(options.showTable) {
             moduleHtml += createButton('', lang.toolbar.table, 'table', 'submenu', '',
-                '<div class="img_editor ico_table"></div>'
+                '<div class="ico_table"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1406,17 +1398,17 @@ SUNEDITOR.defaultLang = {
         /** Dialog : link, image, video */
         if(options.showLink) {
             moduleHtml += createButton('', lang.toolbar.link, 'link', 'dialog', '',
-                '<div class="img_editor ico_url"></div>'
+                '<div class="ico_url"></div>'
             );
         }
         if(options.showImage) {
             moduleHtml += createButton('', lang.toolbar.image, 'image', 'dialog', '',
-                '<div class="img_editor ico_picture"></div>'
+                '<div class="ico_picture"></div>'
             );
         }
         if(options.showVideo) {
             moduleHtml += createButton('', lang.toolbar.video, 'video', 'dialog', '',
-                '<div class="img_editor ico_video"></div>'
+                '<div class="ico_video"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1436,12 +1428,12 @@ SUNEDITOR.defaultLang = {
         /** Full screen, toggle source frame */
         if(options.showFullScreen) {
             moduleHtml += createButton('', lang.toolbar.fullScreen, 'fullScreen', '', '',
-                '<div class="img_editor ico_full_screen_e"></div>'
+                '<div class="ico_full_screen_e"></div>'
             );
         }
         if(options.showCodeView) {
             moduleHtml += createButton('', lang.toolbar.htmlEditor, 'sorceFrame', '', '',
-                '<div class="img_editor ico_html"></div>'
+                '<div class="ico_html"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
@@ -1451,10 +1443,10 @@ SUNEDITOR.defaultLang = {
         /** Undo, redo */
         if(options.showUndoRedo) {
             moduleHtml += createButton('', lang.toolbar.undo+' (Ctrl+Z)', 'undo', '', '',
-                '<div class="img_editor ico_undo"></div>'
+                '<div class="ico_undo"></div>'
             );
             moduleHtml += createButton('', lang.toolbar.redo+' (Ctrl+Y)', 'redo', '', '',
-                '<div class="img_editor ico_redo"></div>'
+                '<div class="ico_redo"></div>'
             );
         }
         html += createModuleGroup(moduleHtml);
