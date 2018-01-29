@@ -26,10 +26,10 @@ SUNEDITOR.plugin.align = {
         listDiv.innerHTML = ''+
             '<div class="inner_layer">'+
             '   <ul class="list_editor">'+
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" title="'+lang.toolbar.alignLeft+'"><span class="img_editor ico_align_l"></span>'+lang.toolbar.left+'</button></li>'+
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" title="'+lang.toolbar.alignCenter+'"><span class="img_editor ico_align_c"></span>'+lang.toolbar.center+'</button></li>'+
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyright" title="'+lang.toolbar.alignRight+'"><span class="img_editor ico_align_r"></span>'+lang.toolbar.right+'</button></li>'+
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyfull" title="'+lang.toolbar.justifyFull+'"><span class="img_editor ico_align_f"></span>'+lang.toolbar.bothSide+'</button></li>'+
+            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" title="'+lang.toolbar.alignLeft+'"><span class="img_editor ico_align_l"></span>'+lang.toolbar.alignLeft+'</button></li>'+
+            '       <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" title="'+lang.toolbar.alignCenter+'"><span class="img_editor ico_align_c"></span>'+lang.toolbar.alignCenter+'</button></li>'+
+            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyright" title="'+lang.toolbar.alignRight+'"><span class="img_editor ico_align_r"></span>'+lang.toolbar.alignRight+'</button></li>'+
+            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyfull" title="'+lang.toolbar.justifyFull+'"><span class="img_editor ico_align_f"></span>'+lang.toolbar.justifyFull+'</button></li>'+
             '   </ul>'+
             '</div>';
 

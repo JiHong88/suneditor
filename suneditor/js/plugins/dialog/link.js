@@ -119,7 +119,7 @@ SUNEDITOR.plugin.link = {
             '<div class="arrow"></div>'+
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>'+
             '   <div class="btn-group">'+
-            '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="img_editor ico_url"></div></button>'+
+            '     <button type="button" data-command="update" tabindex="-1" title="'+lang.editLink.edit+'"><div class="ico_url"></div></button>'+
             '     <button type="button" data-command="delete" tabindex="-1" title="'+lang.editLink.remove+'">x</button>'+
             '   </div>'+
             '</div>';

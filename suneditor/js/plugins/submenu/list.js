@@ -26,8 +26,8 @@ SUNEDITOR.plugin.list = {
         listDiv.innerHTML = ''+
             '<div class="inner_layer">'+
             '   <ul class="list_editor">'+
-            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="DECIMAL" title="'+lang.toolbar.orderList+'"><span class="img_editor ico_list ico_list_num"></span></button></li>'+
-            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="DISC" title="'+lang.toolbar.unorderList+'"><span class="img_editor ico_list ico_list_square"></span></button></li>'+
+            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="DECIMAL" title="'+lang.toolbar.orderList+'"><div class="ico_list_num"></div></button></li>'+
+            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="DISC" title="'+lang.toolbar.unorderList+'"><div class="ico_list_square"></div></button></li>'+
             '   </ul>'+
             '</div>';
 
