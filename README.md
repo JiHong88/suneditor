@@ -50,12 +50,12 @@ var suneditor = SUNEDITOR.create('sample',{
 ## Examples
 **<a href="http://suneditor.com/sample/html/examples.html" target="_blank">examples</a>**
 
-## Document
-**<a href="http://suneditor.com/sample/html/document.html" target="_blank">document</a>**
-    
 ## Customize
 **<a href="http://suneditor.com/sample/html/customize.html" target="_blank">customize</a>**
 
-
+## Document
+**<a href="http://suneditor.com/sample/html/document.html" target="_blank">document</a>**
+    
+    
 ### License
 Suneditor may be freely distributed under the MIT license.
