@@ -182,7 +182,7 @@ SUNEDITOR.plugin.image = {
         }
 
         try {
-            submitAction();
+            submitAction.call(this);
         } finally {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
             this.closeLoading();
