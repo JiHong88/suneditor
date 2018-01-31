@@ -425,12 +425,22 @@ SUNEDITOR.defaultLang = {
                 var fullDirectory = func.getBasePath + 'plugins/' + directory;
                 var fileType = "text/javascript";
 
-                /** dialog */
-                if(directory === 'dialog' && !SUNEDITOR.plugin.dialog) {
-                    func.includeFile(fileType, (fullDirectory + '/dialog.js'), this.callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction)));
-                    return;
+                /** Dialog first call */
+                if(directory === 'dialog') {
+                    var dialogCallback = this.callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+
+                    if(!SUNEDITOR.plugin.dialog) {
+                        func.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
+                        return;
+                    }
+                    else if(!this.loadedPlugins['dialog']) {
+                        dialogCallback();
+                        return;
+                    }
+                    dialogCallback = null;
                 }
 
+                /** etc */
                 if(!SUNEDITOR.plugin[moduleName]) {
                     func.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this.callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
                 }
@@ -438,7 +448,7 @@ SUNEDITOR.defaultLang = {
                     this.callBack_addModule(directory, moduleName, targetElement, callBackFunction);
                 }
                 else {
-                    callBackFunction();
+                    if(typeof callBackFunction === 'function') callBackFunction();
                 }
             },
 
@@ -455,7 +465,8 @@ SUNEDITOR.defaultLang = {
 
                 SUNEDITOR.plugin[moduleName].add(this, targetElement);
                 this.loadedPlugins[moduleName] = true;
-                callBackFunction();
+
+                if(typeof callBackFunction === 'function') callBackFunction();
             },
 
             /**
