@@ -38,7 +38,7 @@ SUNEDITOR.lang = {
         image: 'Picture',
         video: 'Video',
         fullScreen: 'Full Screen',
-        htmlEditor: 'Code View',
+        codeView: 'Code View',
         undo: 'Undo',
         redo: 'Redo'
     },

@@ -210,12 +210,67 @@
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_create()">Create</button>
         </form>
 
-        <h4>3. Image upload to server</h4>
+        <h4>3. options.buttonList</h4>
+        <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleButtonList<span class="pl-pds">'</span></span>, {
+    buttonList<span class="pl-k">:</span> [
+        [
+            <span class="pl-s"><span class="pl-pds">'</span>fontFamily<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>
+        ],
+        [
+            <span class="pl-s"><span class="pl-pds">'</span>undoRedo<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>,
+            {
+                <span class="pl-s"><span class="pl-pds">'</span>addModuleButtons<span class="pl-pds">'</span></span><span class="pl-k">:</span> [
+                    {
+                        buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Test1<span class="pl-pds">'</span></span>,
+                        dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>test1<span class="pl-pds">'</span></span>,
+                        dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
+                        dataOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_test1"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+                    }
+                ]
+            }
+        ],
+        [
+            {
+                <span class="pl-s"><span class="pl-pds">'</span>addModuleButtons<span class="pl-pds">'</span></span><span class="pl-k">:</span> [
+                    {
+                        buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Test2<span class="pl-pds">'</span></span>,
+                        dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>test2<span class="pl-pds">'</span></span>,
+                        dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
+                        dataOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_test2"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+                    },
+                    {
+                        buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Test3<span class="pl-pds">'</span></span>,
+                        dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>test3<span class="pl-pds">'</span></span>,
+                        dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+                        dataOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                        innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_test3"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+                    }
+                ]
+            },
+            <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>line<span class="pl-pds">'</span></span>
+        ]
+    ],
+
+    showFontFamily<span class="pl-k">:</span> <span class="pl-c1">false</span>
+});</pre></div>
+        <p></p>
+        <textarea id="exampleButtonList" style="width:100%; height:250px;">ButtonList</textarea>
+
+        <h4>4. Image upload to server</h4>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
     imageUploadUrl<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
 });</pre></div>
 
-        <h4>3-1. Sample) Java</h4>
+        <h4>4-1. Sample) Java</h4>
         <div class="highlight highlight-source-java"><pre><span class="pl-k">package</span> <span class="pl-smi">suneditor.test.controller</span>;
 
 <span class="pl-k">import</span> <span class="pl-smi">org.json.simple.JSONArray</span>;
@@ -330,9 +385,7 @@
         showCodeView : false
     });
 
-    var suneditor = SUNEDITOR.create('exampleFunction',{
-
-    });
+    var suneditor = SUNEDITOR.create('exampleFunction');
 
     function sun_save() {
         suneditor.save();
@@ -375,6 +428,58 @@
     function sun_create() {
         suneditor = SUNEDITOR.create('exampleFunction');
     }
+
+    SUNEDITOR.create('exampleButtonList', {
+        buttonList: [
+            [
+                'fontFamily',
+                'fontColor',
+                'image'
+            ],
+            [
+                'undoRedo',
+                'table',
+                {
+                    'addModuleButtons': [
+                        {
+                            buttonClass:'',
+                            title:'Test1',
+                            dataCommand:'test1',
+                            dataDisplay:'submenu',
+                            dataOption:'',
+                            innerHTML:'<div class="ico_test1"></div>'
+                        }
+                    ]
+                }
+            ],
+            [
+                {
+                    'addModuleButtons': [
+                        {
+                            buttonClass:'',
+                            title:'Test2',
+                            dataCommand:'test2',
+                            dataDisplay:'submenu',
+                            dataOption:'',
+                            innerHTML:'<div class="ico_test2"></div>'
+                        },
+                        {
+                            buttonClass:'',
+                            title:'Test3',
+                            dataCommand:'test3',
+                            dataDisplay:'dialog',
+                            dataOption:'',
+                            innerHTML:'<div class="ico_test3"></div>'
+                        }
+                    ]
+                },
+                'link',
+                'line'
+            ]
+        ],
+
+        showFontFamily: false
+    });
 </script>
 </body>
 </html>
