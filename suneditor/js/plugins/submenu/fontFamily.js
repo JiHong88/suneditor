@@ -6,7 +6,7 @@
  * MIT license.
  */
 SUNEDITOR.plugin.fontFamily = {
-    add : function (_this, targetElement) {
+    add: function (_this, targetElement) {
         /** set submenu */
         var listDiv = eval(this.setSubmenu(_this.context.user));
 
@@ -17,26 +17,26 @@ SUNEDITOR.plugin.fontFamily = {
         targetElement.parentNode.appendChild(listDiv);
     },
 
-    setSubmenu : function (user) {
+    setSubmenu: function (user) {
         var lang = SUNEDITOR.lang;
         var listDiv = document.createElement('DIV');
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         function createFontFamilyList(fontList) {
-            if(!fontList) return;
+            if (!fontList) return;
 
             var list = '';
-            for(var i=0; i<fontList.length; i++) {
+            for (var i = 0; i < fontList.length; i++) {
                 var font = fontList[i];
                 var text = font.split(',')[0];
-                list += '<li><button type="button" class="btn_edit" data-value="'+font+'" data-txt="'+text+'" style="font-family:'+font+';">'+text+'</button></li>';
+                list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
             }
 
             return list;
         }
 
-        var defaultFontList = !user.fontList?
+        var defaultFontList = !user.fontList ?
             [
                 'Arial',
                 'Comic Sans MS',
@@ -45,15 +45,15 @@ SUNEDITOR.plugin.fontFamily = {
                 'tahoma',
                 'Trebuchet MS,Helvetica',
                 'Verdana'
-            ]:
+            ] :
             user.fontList;
 
-        var list = '<div class="inner_layer list_family">'+
-                   '   <ul class="list_editor sun-editor-list-font-family">'+
-                   '       <li><button type="button" class="btn_edit default" data-value="inherit" data-txt="'+lang.toolbar.fontFamily+'" style="font-family:inherit;">'+lang.toolbar.fontFamilyDelete+'</button></li>';
+        var list = '<div class="inner_layer list_family">' +
+            '   <ul class="list_editor sun-editor-list-font-family">' +
+            '       <li><button type="button" class="btn_edit default" data-value="inherit" data-txt="' + lang.toolbar.fontFamily + '" style="font-family:inherit;">' + lang.toolbar.fontFamilyDelete + '</button></li>';
         list += createFontFamilyList(defaultFontList);
         list += '   </ul>';
-        if(user.addFont) {
+        if (user.addFont) {
             list += '<ul class="list_editor list_family_add sun-editor-list-font-family-add">';
             list += createFontFamilyList(user.addFont);
             list += '</ul>';
@@ -65,8 +65,8 @@ SUNEDITOR.plugin.fontFamily = {
         return listDiv;
     },
 
-    pickup : function (e) {
-        if(!/^BUTTON$/i.test(e.target.tagName)) {
+    pickup: function (e) {
+        if (!/^BUTTON$/i.test(e.target.tagName)) {
             return false;
         }
 

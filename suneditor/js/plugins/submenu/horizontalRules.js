@@ -22,32 +22,32 @@ SUNEDITOR.plugin.horizontalRules = {
         listDiv.className = 'layer_editor layer_line';
         listDiv.style.display = 'none';
 
-        listDiv.innerHTML = ''+
-            '<div class="inner_layer inner_layer_type2">'+
-            '   <ul class="list_editor">'+
-            '       <li>'+
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="solid">'+
-            '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />'+
-            '           </button>'+
-            '       </li>'+
-            '       <li>'+
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dotted">'+
-            '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />'+
-            '           </button>'+
-            '       </li>'+
-            '       <li>'+
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dashed">'+
-            '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'+
-            '           </button>'+
-            '       </li>'+
-            '   </ul>'+
+        listDiv.innerHTML = '' +
+            '<div class="inner_layer inner_layer_type2">' +
+            '   <ul class="list_editor">' +
+            '       <li>' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="solid">' +
+            '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '           </button>' +
+            '       </li>' +
+            '       <li>' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dotted">' +
+            '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '           </button>' +
+            '       </li>' +
+            '       <li>' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dashed">' +
+            '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '           </button>' +
+            '       </li>' +
+            '   </ul>' +
             '</div>';
 
         return listDiv;
     },
 
-    appendHr : function(color, px, value) {
-        var borderStyle = color + " " + px + " " +value;
+    appendHr: function (color, px, value) {
+        var borderStyle = color + " " + px + " " + value;
         var oHr = document.createElement("HR");
         oHr.style.border = "black 0px none";
         oHr.style.borderTop = borderStyle;
@@ -55,12 +55,12 @@ SUNEDITOR.plugin.horizontalRules = {
 
         this.focus();
 
-        var pNode = this.getLineElement(this.context.argument._selectionNode);
+        var pNode = this.getLineElement(this._variable.selectionNode);
         pNode.appendChild(oHr);
         this.appendP(oHr);
     },
 
-    horizontalRulesPick : function (e) {
+    horizontalRulesPick: function (e) {
         e.preventDefault();
         e.stopPropagation();
 

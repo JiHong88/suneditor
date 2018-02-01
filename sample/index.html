@@ -58,6 +58,8 @@
 <div class="content">
     <form name="frm">
         <textarea id="editor" style="width:100%; height:400px;">Hi</textarea>
+        <textarea id="editor1" style="width:100%; height:400px; display: none;">Hi</textarea>
+        <button type="button" onclick="aa();">fdsafd</button>
     </form>
     <div class="intro">
         <p>The Suneditor is based on pure JavaScript</p>
@@ -76,6 +78,12 @@
 
 <script>
     SUNEDITOR.create('editor');
+    var a = SUNEDITOR.create('editor1', {
+        height: 400
+    });
+    function aa() {
+        a.show();
+    }
 </script>
 </body>
 </html>
