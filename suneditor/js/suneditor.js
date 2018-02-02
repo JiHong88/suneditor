@@ -334,6 +334,8 @@ SUNEDITOR.defaultLang = {
          * @param {string} className - Class name to be change
          */
         toggleClass: function (element, className) {
+            if (!element) return;
+
             var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
 
             if (check.test(element.className)) {
@@ -871,6 +873,17 @@ SUNEDITOR.defaultLang = {
          * @description event function
          */
         var event = {
+            _shortcutKeyCode : {
+                66: ['bold', 'B'],
+                83: ['strikethrough', 'STRIKE'],
+                85: ['underline', 'U'],
+                73: ['italic', 'I'],
+                89: ['redo'],
+                90: ['undo'],
+                219: ['outdent'],
+                221: ['indent']
+            },
+
             resize_window: function () {
                 if (editor._variable.isFullScreen) {
                     editor._variable.innerHeight_fullScreen += (window.innerHeight - context.tool.bar.offsetHeight) - editor._variable.innerHeight_fullScreen;
@@ -954,11 +967,13 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            onMouseDown_wysiwyg: function (e) {
+            onMouseUp_wysiwyg: function (e) {
                 e.stopPropagation();
 
                 var targetElement = e.target;
                 editor.submenuOff();
+
+                event.onkeyUp_wysiwyg(e);
 
                 if (/^IMG$/i.test(targetElement.nodeName)) {
                     editor.callModule('dialog', 'image', null, function () {
@@ -971,7 +986,101 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            onSelectionChange_wysiwyg: function () {
+            onKeyDown_wysiwyg: function (e) {
+                var target = e.target;
+                var keyCode = e.keyCode;
+                var shift = e.shiftKey;
+                var ctrl = e.ctrlKey;
+                var alt = e.altKey;
+
+                function shortcutCommand (keyCode) {
+                    var key = event._shortcutKeyCode[keyCode];
+                    if (!key) return false;
+
+                    editor.execCommand(key[0], false, null);
+                    dom.toggleClass(editor.commandMap[key[1]], "on");
+
+                    return true;
+                }
+
+                e.stopPropagation();
+
+                /** Shortcuts */
+                if (ctrl && keyCode !== 17 && keyCode !== 18) {
+                    if (shortcutCommand(keyCode)) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return;
+                    }
+                }
+
+                /** default key action */
+                switch (keyCode) {
+                    case 8: /**backspace key*/
+                        if (target.childElementCount === 1 && target.children[0].innerHTML === "<br/>") {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            return false;
+                        }
+                        break;
+                    case 9:
+                        /**tab key*/
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        if (ctrl || alt) break;
+
+                        var currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
+                        while (!/^TD$/i.test(currentNode.tagName) && !/^BODY$/i.test(currentNode.tagName)) {
+                            currentNode = currentNode.parentNode;
+                        }
+
+                        if (!!currentNode && /^TD$/i.test(currentNode.tagName)) {
+                            var table = dom.getParentNode(currentNode, "table");
+                            var cells = dom.getListChildren(table, dom.isCell);
+                            var idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
+
+                            if (idx === cells.length && !shift) idx = 0;
+                            if (idx === -1 && shift) idx = cells.length - 1;
+
+                            var moveCell = cells[idx];
+                            if (!moveCell) return false;
+
+                            var range = editor.createRange();
+                            range.setStart(moveCell, 0);
+                            range.setEnd(moveCell, 0);
+
+                            var selection = editor.getSelection();
+                            if (selection.rangeCount > 0) {
+                                selection.removeAllRanges();
+                            }
+                            selection.addRange(range);
+
+                            break;
+                        }
+
+                        /** if P Tag */
+                        if (shift) break;
+
+                        var tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor._variable.tabSize + 1).join("\u00A0"));
+                        editor.insertNode(tabText, null);
+
+                        var selection = editor.getSelection();
+                        var rng = editor.createRange();
+
+                        rng.setStart(tabText, editor._variable.tabSize);
+                        rng.setEnd(tabText, editor._variable.tabSize);
+
+                        if (selection.rangeCount > 0) {
+                            selection.removeAllRanges();
+                        }
+
+                        selection.addRange(rng);
+
+                        break;
+                }
+            },
+
+            onkeyUp_wysiwyg: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
                 editor._variable.selectionNode = editor.getSelectionNode();
 
@@ -1039,138 +1148,6 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            onKeyDown_wysiwyg: function (e) {
-                e.stopPropagation();
-
-                var target = e.target;
-                var keyCode = e.keyCode;
-                var shift = e.shiftKey;
-                var ctrl = e.ctrlKey;
-                var alt = e.altKey;
-
-                if (ctrl && !shift) {
-                    var nodeName = "";
-
-                    switch (keyCode) {
-                        case 66:
-                            /** B */
-                            e.preventDefault();
-                            editor.execCommand('bold', false, null);
-                            nodeName = 'B';
-                            break;
-                        case 85:
-                            /** U */
-                            e.preventDefault();
-                            editor.execCommand('underline', false, null);
-                            nodeName = 'U';
-                            break;
-                        case 73:
-                            /** I */
-                            e.preventDefault();
-                            editor.execCommand('italic', false, null);
-                            nodeName = 'I';
-                            break;
-                        case 89:
-                            /** Y */
-                            e.preventDefault();
-                            editor.execCommand('redo', false, null);
-                            break;
-                        case 90:
-                            /** Z */
-                            e.preventDefault();
-                            editor.execCommand('undo', false, null);
-                            break;
-                        case 219:
-                            /** "[" outdent */
-                            e.preventDefault();
-                            editor.execCommand('outdent', false, null);
-                            break;
-                        case 221:
-                            /** "]" indent */
-                            e.preventDefault();
-                            editor.execCommand('indent', false, null);
-                            break;
-                    }
-
-                    if (!!nodeName) {
-                        dom.toggleClass(editor.commandMap[nodeName], "on");
-                    }
-
-                    return;
-                }
-
-                /** ctrl + shift + S */
-                if (ctrl && shift && keyCode === 83) {
-                    e.preventDefault();
-                    editor.execCommand('strikethrough', false, null);
-                    dom.toggleClass(editor.commandMap['STRIKE'], "on");
-
-                    return;
-                }
-
-                switch (keyCode) {
-                    case 8: /**backspace key*/
-                        if (target.childElementCount === 1 && target.children[0].innerHTML === "<br/>") {
-                            e.preventDefault();
-                            return false;
-                        }
-                        break;
-                    case 9:
-                        /**tab key*/
-                        e.preventDefault();
-                        if (ctrl || alt) break;
-
-                        var currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
-                        while (!/^TD$/i.test(currentNode.tagName) && !/^BODY$/i.test(currentNode.tagName)) {
-                            currentNode = currentNode.parentNode;
-                        }
-
-                        if (!!currentNode && /^TD$/i.test(currentNode.tagName)) {
-                            var table = dom.getParentNode(currentNode, "table");
-                            var cells = dom.getListChildren(table, dom.isCell);
-                            var idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
-
-                            if (idx === cells.length && !shift) idx = 0;
-                            if (idx === -1 && shift) idx = cells.length - 1;
-
-                            var moveCell = cells[idx];
-                            if (!moveCell) return false;
-
-                            var range = editor.createRange();
-                            range.setStart(moveCell, 0);
-                            range.setEnd(moveCell, 0);
-
-                            var selection = editor.getSelection();
-                            if (selection.rangeCount > 0) {
-                                selection.removeAllRanges();
-                            }
-                            selection.addRange(range);
-
-                            break;
-                        }
-
-                        /** if P Tag */
-                        if (shift) break;
-
-                        var tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor._variable.tabSize + 1).join("\u00A0"));
-                        editor.insertNode(tabText, null);
-
-                        var selection = editor.getSelection();
-                        var rng = editor.createRange();
-
-                        rng.setStart(tabText, editor._variable.tabSize);
-                        rng.setEnd(tabText, editor._variable.tabSize);
-
-                        if (selection.rangeCount > 0) {
-                            selection.removeAllRanges();
-                        }
-
-                        selection.addRange(rng);
-
-                        break;
-                }
-            },
-
             onScroll_wysiwyg: function () {
                 editor.controllersOff();
             },
@@ -1206,14 +1183,17 @@ SUNEDITOR.defaultLang = {
         window.onresize = function () {
             event.resize_window()
         };
+        /** tool bar event */
         context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
         context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
         context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
         context.tool.bar.addEventListener('click', event.onClick_toolbar);
-        context.element.wysiwygWindow.addEventListener('mousedown', event.onMouseDown_wysiwyg);
+        /** editor area */
+        context.element.wysiwygWindow.addEventListener('mouseup', event.onMouseUp_wysiwyg);
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
+        context.element.wysiwygWindow.addEventListener('keyup', event.onkeyUp_wysiwyg);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
-        context.element.wysiwygWindow.document.addEventListener('selectionchange', event.onSelectionChange_wysiwyg);
+        /** resize bar */
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
 
         /** User function */
