@@ -57,7 +57,6 @@
 </nav>
 
 <div class="content">
-    <div role="tabpanel">
         <article class="markdown-body entry-content" itemprop="text">
                 <h4><span style="color: #f42424;">Add new module object</span></h4>
                     <p></p>
@@ -122,7 +121,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
         <li class="pl-0">After creating a tag element</li><ul>
         <li class="pl-0">Insert the element created in <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.modal</span></li></ul>
         <li class="pl-0">When you need to focus immediately after the Dialog window appears</li><ul>
-        <li class="pl-0"><span class="pl-k">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
+        <li class="pl-0">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
         <li class="pl-0"><span class="pl-c1">element</span> creation, <span class="pl-s">event</span> registration, and insert the created <span class="pl-c1">element</span> into <span class="pl-k">context.dialog.modal</span> using <span class="pl-en">appendChaild</span> function</li>
     </ol>
             </pre>
@@ -194,15 +193,16 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
                 displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
                 innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_dialog"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
             },
-            <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>
         ]
     ]
 });</pre></div></li>
 <li>To add a module as the suneditor's default button, refer suneditor.js:_createToolBar function</li>
 </ul>
             </pre>
-        </div>
+                    </div>
     </article>
+</div>
         <p></p>
         <textarea id="exampleButtonList" style="width:100%; height:200px;">Create button list</textarea>
 
@@ -253,7 +253,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
                     displayOption:'full',
                     innerHTML:'<div class="ico_dialog"></div>'
                 },
-                'image',
+                'image'
             ]
         ]
     });
