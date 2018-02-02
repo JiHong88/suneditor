@@ -431,7 +431,6 @@ SUNEDITOR.defaultLang = {
              * @property {number} tabSize - Indented size when tab button clicked (4)
              * @property {element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
              * @property {number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
-             * @property {number} windowHeight - Size of current window (Used for editor resizing operation)
              * @property {boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
              */
             _variable: {
@@ -444,7 +443,6 @@ SUNEDITOR.defaultLang = {
                 tabSize: 4,
                 originCssText: context.element.topArea.style.cssText,
                 editorHeight: context.user.height,
-                windowHeight: window.innerHeight,
                 isTouchMove: false
             },
 
@@ -884,14 +882,10 @@ SUNEDITOR.defaultLang = {
          */
         var event = {
             resize_window: function () {
-                // if(context.tool.barHeight == context.tool.bar.offsetHeight) return;
                 if (editor._variable.isFullScreen) {
-                    editor._variable.innerHeight_fullScreen += ((context.tool.barHeight - context.tool.bar.offsetHeight) + (this.innerHeight - editor._variable.windowHeight));
+                    editor._variable.innerHeight_fullScreen += (window.innerHeight - context.tool.bar.offsetHeight) - editor._variable.innerHeight_fullScreen;
                     context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + "px";
                 }
-
-                context.tool.barHeight = context.tool.bar.offsetHeight;
-                editor._variable.windowHeight = this.innerHeight;
             },
 
             touchstart_toolbar: function () {
@@ -1698,7 +1692,6 @@ SUNEDITOR.defaultLang = {
             },
             tool: {
                 bar: cons._toolBar,
-                barHeight: cons._toolBar.offsetHeight,
                 cover: cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
                 bold: cons._toolBar.getElementsByClassName('sun-editor-id-bold')[0],
                 underline: cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
