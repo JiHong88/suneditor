@@ -39,14 +39,16 @@ SUNEDITOR.plugin.list = {
         e.stopPropagation();
 
         var target = e.target;
+        var command = null;
         var value = null;
         while (!value && !/UL/i.test(target.tagName)) {
+            command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');
             target = target.parentNode;
         }
 
         this.focus();
-        this.execCommand(e.target.getAttribute('data-command'), false, value);
+        this.execCommand(command, false, value);
         this.submenuOff();
     }
 };

@@ -12,8 +12,8 @@ if (typeof window.SUNEDITOR === 'undefined') {
 
 SUNEDITOR.lang = {
     toolbar: {
-        fontFamily: 'Font',
-        fontFamilyDelete: 'Remove Font Family',
+        font: 'Font',
+        fontDelete: 'Remove Font Family',
         formats: 'Formats',
         fontSize: 'Size',
         bold: 'Bold',
@@ -21,7 +21,7 @@ SUNEDITOR.lang = {
         italic: 'Italic',
         strike: 'Strike',
         fontColor: 'Font Color',
-        hiliteColor: 'Background Color',
+        hiliteColor: 'Hilite Color',
         indent: 'Indent',
         outdent: 'Outdent',
         align: 'Align',

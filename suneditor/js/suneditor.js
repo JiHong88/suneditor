@@ -15,8 +15,8 @@ if (typeof window.SUNEDITOR === 'undefined') {
  */
 SUNEDITOR.defaultLang = {
     toolbar: {
-        fontFamily: 'Font',
-        fontFamilyDelete: 'Remove Font Family',
+        font: 'Font',
+        fontDelete: 'Remove Font Family',
         formats: 'Formats',
         fontSize: 'Size',
         bold: 'Bold',
@@ -24,7 +24,7 @@ SUNEDITOR.defaultLang = {
         italic: 'Italic',
         strike: 'Strike',
         fontColor: 'Font Color',
-        hiliteColor: 'Background Color',
+        hiliteColor: 'Hilite Color',
         indent: 'Indent',
         outdent: 'Outdent',
         align: 'Align',
@@ -412,7 +412,7 @@ SUNEDITOR.defaultLang = {
              * @property {element} SIZE - font size button
              */
             commandMap: {
-                FONT: context.tool.fontFamily,
+                FONT: context.tool.font,
                 B: context.tool.bold,
                 U: context.tool.underline,
                 I: context.tool.italic,
@@ -1001,9 +1001,9 @@ SUNEDITOR.defaultLang = {
                     var nodeName = (/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName));
 
                     /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.fontFamily.length > 0)) {
+                    if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.font.length > 0)) {
                         nodeName = 'FONT';
-                        var selectFont = (selectionParent.face || selectionParent.style.fontFamily || SUNEDITOR.lang.toolbar.fontFamily);
+                        var selectFont = (selectionParent.face || selectionParent.style.font || SUNEDITOR.lang.toolbar.font);
                         dom.changeTxt(editor.commandMap[nodeName], selectFont);
                         findFont = false;
                         map = map.replace(nodeName + "|", "");
@@ -1044,7 +1044,7 @@ SUNEDITOR.defaultLang = {
                 var mapLen = map.length - 1;
                 for (var i = 0; i < mapLen; i++) {
                     if (/^FONT$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontFamily);
+                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
                     }
                     else if (/^SIZE$/i.test(map[i])) {
                         dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
@@ -1342,40 +1342,10 @@ SUNEDITOR.defaultLang = {
      */
     var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
 
-    /**
-     * @description Create a group div containing each module
-     * @param {string} innerHTML - module button html
-     * @returns {string}
-     */
-    function _createModuleGroup(innerHTML) {
-        if (!innerHTML) return '';
-        return '<div class="tool_module"><ul class="editor_tool">' + innerHTML + '</ul></div>';
-    }
-
-    /**
-     * @description Create a button element
-     * @param {string} buttonClass - className in button
-     * @param {string} title - Title in button
-     * @param {string} dataCommand - The data-command property of the button
-     * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
-     * @param {string} dataOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
-     * @param {string} innerHTML - Html in button
-     * @returns {string}
-     */
-    function _createButton(buttonClass, title, dataCommand, dataDisplay, dataOption, innerHTML) {
-        var buttonHtml = '' +
-            '<li>' +
-            '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + dataOption + '">' +
-            innerHTML +
-            '   </button>' +
-            '</li>';
-        return buttonHtml;
-    }
-
     var _createButtonsList = {
-        fontFamily: function () {
-            return _createButton('btn_font', lang.toolbar.fontFamily, 'fontFamily', 'submenu', '',
-                    '<span class="txt sun-editor-font-family">' + lang.toolbar.fontFamily + '</span><span class="ico_more"></span>'
+        font: function () {
+            return _createButton('btn_font', lang.toolbar.font, 'font', 'submenu', '',
+                    '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
                 );
         },
 
@@ -1427,12 +1397,14 @@ SUNEDITOR.defaultLang = {
                 );
         },
 
-        inOutDent: function () {
+        indent: function () {
             return _createButton('', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
                     '<div class="ico_indnet"></div>'
-                )
-                +
-                _createButton('', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
+                );
+        },
+
+        outdent: function () {
+            return _createButton('', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
                     '<div class="ico_outdent"></div>'
                 );
         },
@@ -1493,17 +1465,19 @@ SUNEDITOR.defaultLang = {
             );
         },
 
-        undoRedo: function () {
+        undo: function () {
             return _createButton('', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
                     '<div class="ico_undo"></div>'
-                )
-                +
-                _createButton('', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+                );
+        },
+
+        redo: function () {
+            return _createButton('', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
                     '<div class="ico_redo"></div>'
                 );
         },
 
-        addModuleButtons: function (addModuleButtons) {
+        customModule: function (addModuleButtons) {
             var moduleHtml = '';
             for (var i = 0; i < addModuleButtons.length; i++) {
                 var module = addModuleButtons[i];
@@ -1514,145 +1488,68 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @description Create editor HTML
-     * @param {jsonArray} options - user option
+     * @description Create a group div containing each module
+     * @param {string} innerHTML - module button html
+     * @returns {string}
      */
-    function _createToolBar (options) {
+    function _createModuleGroup(innerHTML) {
+        if (!innerHTML) return '';
+        return '<div class="tool_module"><ul class="editor_tool">' + innerHTML + '</ul></div>';
+    }
+
+    /**
+     * @description Create a button element
+     * @param {string} buttonClass - className in button
+     * @param {string} title - Title in button
+     * @param {string} dataCommand - The data-command property of the button
+     * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
+     * @param {string} dataOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
+     * @param {string} innerHTML - Html in button
+     * @returns {string}
+     */
+    function _createButton(buttonClass, title, dataCommand, dataDisplay, dataOption, innerHTML) {
+        return '' +
+            '<li>' +
+            '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + dataOption + '">' +
+                    innerHTML +
+            '   </button>' +
+            '</li>';
+    }
+
+    /**
+     * @description Create editor HTML
+     * @param {jsonArray} buttonList - option.buttonList
+     */
+    function _createToolBar (buttonList) {
         var html = '<div class="sun-editor-id-toolbar-cover"></div>';
         var moduleHtml = null;
 
         /** create button list */
-        if(options.buttonList.length > 0) {
-            var button = null;
-            var value = null;
+        var button = null;
+        var value = null;
 
-            var buttonList = options.buttonList;
-            for (var i = 0; i < buttonList.length; i++) {
+        for (var i = 0; i < buttonList.length; i++) {
 
-                var buttonGroup = buttonList[i];
-                for (var j = 0; j < buttonGroup.length; j++) {
+            var buttonGroup = buttonList[i];
+            for (var j = 0; j < buttonGroup.length; j++) {
 
-                    if (typeof buttonGroup[j] === 'object') {
-                        button = 'addModuleButtons';
-                        value = buttonGroup[j][button];
-                    } else {
-                        button = buttonGroup[j];
-                        value = null;
-                    }
-
-                    moduleHtml += _createButtonsList[button](value);
+                if (typeof buttonGroup[j] === 'object') {
+                    button = 'customModule';
+                    value = buttonGroup[j][button];
+                } else {
+                    button = buttonGroup[j];
+                    value = null;
                 }
 
-                html += _createModuleGroup(moduleHtml);
-                moduleHtml = null;
+                moduleHtml += _createButtonsList[button](value);
             }
 
-            return html;
+            html += _createModuleGroup(moduleHtml);
+            moduleHtml = null;
         }
-
-        /** create default options */
-        /** FontFamily, Formats, FontSize */
-        if (options.showFont) {
-            moduleHtml += _createButtonsList.fontFamily();
-        }
-        if (options.showFormats) {
-            moduleHtml += _createButtonsList.formats();
-        }
-        if (options.showFontSize) {
-            moduleHtml += _createButtonsList.fontSize();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** Bold, underline, italic, strikethrough */
-        if (options.showBold) {
-            moduleHtml += _createButtonsList.bold();
-        }
-        if (options.showUnderline) {
-            moduleHtml += _createButtonsList.underline();
-        }
-        if (options.showItalic) {
-            moduleHtml += _createButtonsList.italic();
-        }
-        if (options.showStrike) {
-            moduleHtml += _createButtonsList.strike();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** foreColor, hiliteColor */
-        if (options.showFontColor) {
-            moduleHtml += _createButtonsList.fontColor();
-        }
-        if (options.showHiliteColor) {
-            moduleHtml += _createButtonsList.hiliteColor();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** Indent, Outdent */
-        if (options.showInOutDent) {
-            moduleHtml += _createButtonsList.inOutDent();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** align, list, HR, Table */
-        if (options.showAlign) {
-            moduleHtml += _createButtonsList.align();
-        }
-        if (options.showList) {
-            moduleHtml += _createButtonsList.list();
-        }
-        if (options.showLine) {
-            moduleHtml += _createButtonsList.line();
-        }
-        if (options.showTable) {
-            moduleHtml += _createButtonsList.table();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** Dialog : link, image, video */
-        if (options.showLink) {
-            moduleHtml += _createButtonsList.link();
-        }
-        if (options.showImage) {
-            moduleHtml += _createButtonsList.image();
-        }
-        if (options.showVideo) {
-            moduleHtml += _createButtonsList.video();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** Users modules */
-        if (options.addModuleButtons) {
-            moduleHtml += _createButtonsList.addModuleButtons(options.addModuleButtons);
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-        /** Full screen, toggle code view */
-        if (options.showFullScreen) {
-            moduleHtml += _createButtonsList.fullScreen();
-        }
-        if (options.showCodeView) {
-            moduleHtml += _createButtonsList.codeView();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
-
-
-        /** Undo, redo */
-        if (options.showUndoRedo) {
-            moduleHtml += _createButtonsList.undoRedo();
-        }
-        html += _createModuleGroup(moduleHtml);
-        moduleHtml = null;
 
         return html;
-    };
+    }
 
     /**
      * @description document create - call _createToolBar()
@@ -1671,36 +1568,22 @@ SUNEDITOR.defaultLang = {
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;
-        options.addModuleButtons = options.addModuleButtons || [];
         options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + "px" : options.height) : element.clientHeight + "px";
-        options.buttonList = options.buttonList || [];
+        options.buttonList = options.buttonList || [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formats'],
+            ['bold', 'underline', 'italic', 'strike'],
+            ['fontColor', 'hiliteColor'],
+            ['indent', 'outdent'],
+            ['align', 'line', 'list', 'table'],
+            ['link', 'image', 'video'],
+            ['fullScreen', 'codeView']
+        ];
 
         /** editor seting options */
         options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + "px" : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + "px");
         options.display = options.display || element.style.display || 'block';
         options.editorIframeFont = options.editorIframeFont || 'inherit';
-
-        /** Show toolbar button settings */
-        options.showFont = options.showFont !== undefined ? options.showFont : true;
-        options.showFormats = options.showFormats !== undefined ? options.showFormats : true;
-        options.showFontSize = options.showFontSize !== undefined ? options.showFontSize : true;
-        options.showBold = options.showBold !== undefined ? options.showBold : true;
-        options.showUnderline = options.showUnderline !== undefined ? options.showUnderline : true;
-        options.showItalic = options.showItalic !== undefined ? options.showItalic : true;
-        options.showStrike = options.showStrike !== undefined ? options.showStrike : true;
-        options.showFontColor = options.showFontColor !== undefined ? options.showFontColor : true;
-        options.showHiliteColor = options.showHiliteColor !== undefined ? options.showHiliteColor : true;
-        options.showInOutDent = options.showInOutDent !== undefined ? options.showInOutDent : true;
-        options.showAlign = options.showAlign !== undefined ? options.showAlign : true;
-        options.showList = options.showList !== undefined ? options.showList : true;
-        options.showLine = options.showLine !== undefined ? options.showLine : true;
-        options.showTable = options.showTable !== undefined ? options.showTable : true;
-        options.showLink = options.showLink !== undefined ? options.showLink : true;
-        options.showImage = options.showImage !== undefined ? options.showImage : true;
-        options.showVideo = options.showVideo !== undefined ? options.showVideo : true;
-        options.showFullScreen = options.showFullScreen !== undefined ? options.showFullScreen : true;
-        options.showCodeView = options.showCodeView !== undefined ? options.showCodeView : true;
-        options.showUndoRedo = options.showUndoRedo !== undefined ? options.showUndoRedo : true;
 
         var doc = document;
 
@@ -1718,7 +1601,7 @@ SUNEDITOR.defaultLang = {
         /** tool bar */
         var tool_bar = doc.createElement("DIV");
         tool_bar.className = "sun-editor-id-toolbar";
-        tool_bar.innerHTML = _createToolBar(options);
+        tool_bar.innerHTML = _createToolBar(options.buttonList);
 
         /** inner editor div */
         var editor_div = doc.createElement("DIV");
@@ -1790,11 +1673,11 @@ SUNEDITOR.defaultLang = {
             },
             options: options
         };
-    };
+    }
 
     /**
      * @description Elements and variables you should have
-     * @param {element} element - textarea element
+     * @param {HTMLElement} element - textarea element
      * @param {object} cons - Toolbar element you created
      * @param {jsonArray} options - user options
      * @returns Elements, variables of the editor
@@ -1821,7 +1704,7 @@ SUNEDITOR.defaultLang = {
                 underline: cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
                 italic: cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
                 strike: cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
-                fontFamily: cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
+                font: cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
                 fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
             },
             user: {
@@ -1834,8 +1717,8 @@ SUNEDITOR.defaultLang = {
                 fontSizeList: options.fontSizeList,
                 height: options.height.match(/\d+/)[0]
             }
-        }
-    };
+        };
+    }
 
     /**
      * @description create Suneditor

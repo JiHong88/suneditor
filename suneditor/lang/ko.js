@@ -12,8 +12,8 @@ if (typeof window.SUNEDITOR === 'undefined') {
 
 SUNEDITOR.lang = {
     toolbar: {
-        fontFamily: '글꼴',
-        fontFamilyDelete: '글꼴 제거',
+        font: '글꼴',
+        fontDelete: '글꼴 제거',
         formats: '포맷',
         fontSize: '크기',
         bold: '굵게',
