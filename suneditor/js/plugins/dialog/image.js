@@ -243,10 +243,10 @@ SUNEDITOR.plugin.image = {
             parentL += (parentElement.offsetLeft + +parentElement.clientLeft);
             parentElement = parentElement.offsetParent;
         }
-        this.context.argument._imageResize_parent_t = (this.context.tool.bar.offsetHeight + parentT);
+        this.context.image._imageResize_parent_t = (this.context.tool.bar.offsetHeight + parentT);
         this.context._imageResize_parent_l = parentL;
 
-        var t = (targetElement.offsetTop + this.context.argument._imageResize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
+        var t = (targetElement.offsetTop + this.context.image._imageResize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
         var l = (targetElement.offsetLeft + parentL);
 
         resizeDiv.style.top = t + "px";
@@ -302,7 +302,7 @@ SUNEDITOR.plugin.image = {
         e.stopPropagation();
         e.preventDefault();
 
-        this.context.argument._imageClientX = e.clientX;
+        this.context.image._imageClientX = e.clientX;
         this.context.element.resizeBackground.style.display = "block";
         this.context.image.imageResizeBtn.style.display = "none";
 
@@ -320,7 +320,7 @@ SUNEDITOR.plugin.image = {
     },
 
     resize_image: function (e) {
-        var w = this.context.image._imageElement_w + (e.clientX - this.context.argument._imageClientX);
+        var w = this.context.image._imageElement_w + (e.clientX - this.context.image._imageClientX);
         var h = ((this.context.image._imageElement_h / this.context.image._imageElement_w) * w);
 
         this.context.image._imageElement.style.width = w + "px";
@@ -335,7 +335,7 @@ SUNEDITOR.plugin.image = {
             parentElement = parentElement.offsetParent;
         }
 
-        var t = (this.context.image._imageElement.offsetTop + this.context.argument._imageResize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
+        var t = (this.context.image._imageElement.offsetTop + this.context.image._imageResize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
         var l = (this.context.image._imageElement.offsetLeft + parentL);
 
         this.context.image.imageResizeDiv.style.top = t + "px";
