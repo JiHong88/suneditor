@@ -1306,149 +1306,95 @@ SUNEDITOR.defaultLang = {
      */
     var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
 
-    var _createButtonsList = {
-        font: function () {
-            return _createButton('btn_font', lang.toolbar.font, 'font', 'submenu', '',
-                    '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
-                );
-        },
+    var _defaultButtonsList = {
+        font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
+            '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
+        ],
+        formats: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
+            '<span class="txt">' + lang.toolbar.formats + '</span><span class="ico_more"></span>'
+        ],
 
-        formats: function () {
-            return _createButton('btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-                    '<span class="txt">' + lang.toolbar.formats + '</span><span class="ico_more"></span>'
-                );
-        },
+        fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
+            '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="ico_more"></span>'
+        ],
 
-        fontSize: function () {
-            return _createButton('btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-                    '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="ico_more"></span>'
-                );
-        },
+        bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
+            '<div class="ico_bold"></div>'
+        ],
 
-        bold: function () {
-            return _createButton('sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
-                    '<div class="ico_bold"></div>'
-                );
-        },
+        underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
+            '<div class="ico_underline"></div>'
+        ],
 
-        underline: function () {
-            return _createButton('sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
-                    '<div class="ico_underline"></div>'
-                );
-        },
+        italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
+            '<div class="ico_italic"></div>'
+        ],
 
-        italic: function () {
-            return _createButton('sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
-                    '<div class="ico_italic"></div>'
-                );
-        },
+        strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
+            '<div class="ico_strike"></div>'
+        ],
 
-        strike: function () {
-            return _createButton('sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
-                    '<div class="ico_strike"></div>'
-                );
-        },
+        fontColor: ['', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
+            '<div class="ico_foreColor"></div>'
+        ],
 
-        fontColor: function () {
-            return _createButton('', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
-                    '<div class="ico_foreColor"></div>'
-                );
-        },
+        hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
+            '<div class="ico_hiliteColor"></div>'
+        ],
 
-        hiliteColor: function () {
-            return _createButton('', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
-                    '<div class="ico_hiliteColor"></div>'
-                );
-        },
+        indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
+            '<div class="ico_indnet"></div>'
+        ],
 
-        indent: function () {
-            return _createButton('', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
-                    '<div class="ico_indnet"></div>'
-                );
-        },
+        outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
+            '<div class="ico_outdent"></div>'
+        ],
 
-        outdent: function () {
-            return _createButton('', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
-                    '<div class="ico_outdent"></div>'
-                );
-        },
+        align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
+            '<div class="ico_align"></div>'
+        ],
 
-        align: function () {
-            return _createButton('btn_align', lang.toolbar.align, 'align', 'submenu', '',
-                    '<div class="ico_align"></div>'
-                );
-        },
+        list: ['', lang.toolbar.list, 'list', 'submenu', '',
+            '<div class="ico_list_num"></div>'
+        ],
 
-        list: function () {
-            return _createButton('', lang.toolbar.list, 'list', 'submenu', '',
-                    '<div class="ico_list_num"></div>'
-                );
-        },
+        line: ['btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
+            '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
+        ],
 
-        line: function () {
-            return _createButton('btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
-                    '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-                    '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-                    '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
-                );
-        },
+        table: ['', lang.toolbar.table, 'table', 'submenu', '',
+            '<div class="ico_table"></div>'
+        ],
 
-        table: function () {
-            return _createButton('', lang.toolbar.table, 'table', 'submenu', '',
-                    '<div class="ico_table"></div>'
-                );
-        },
+        link: ['', lang.toolbar.link, 'link', 'dialog', '',
+            '<div class="ico_url"></div>'
+        ],
 
-        link: function () {
-            return _createButton('', lang.toolbar.link, 'link', 'dialog', '',
-                    '<div class="ico_url"></div>'
-                );
-        },
+        image: ['', lang.toolbar.image, 'image', 'dialog', '',
+            '<div class="ico_picture"></div>'
+        ],
 
-        image: function () {
-            return _createButton('', lang.toolbar.image, 'image', 'dialog', '',
-                    '<div class="ico_picture"></div>'
-                );
-        },
+        video: ['', lang.toolbar.video, 'video', 'dialog', '',
+            '<div class="ico_video"></div>'
+        ],
 
-        video: function () {
-            return _createButton('', lang.toolbar.video, 'video', 'dialog', '',
-                    '<div class="ico_video"></div>'
-                );
-        },
+        fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
+            '<div class="ico_full_screen_e"></div>'
+        ],
 
-        fullScreen: function () {
-            return _createButton('', lang.toolbar.fullScreen, 'fullScreen', '', '',
-                    '<div class="ico_full_screen_e"></div>'
-                );
-        },
+        codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
+            '<div class="ico_html"></div>'
+        ],
 
-        codeView: function () {
-            return _createButton('', lang.toolbar.codeView, 'codeView', '', '',
-                '<div class="ico_html"></div>'
-            );
-        },
+        undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
+            '<div class="ico_undo"></div>'
+        ],
 
-        undo: function () {
-            return _createButton('', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
-                    '<div class="ico_undo"></div>'
-                );
-        },
-
-        redo: function () {
-            return _createButton('', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
-                    '<div class="ico_redo"></div>'
-                );
-        },
-
-        customModule: function (addModuleButtons) {
-            var moduleHtml = '';
-            for (var i = 0; i < addModuleButtons.length; i++) {
-                var module = addModuleButtons[i];
-                moduleHtml += _createButton(module.buttonClass, module.title, module.dataCommand, module.dataDisplay, module.option, module.innerHTML);
-            }
-            return moduleHtml;
-        }
+        redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+            '<div class="ico_redo"></div>'
+        ]
     };
 
     /**
@@ -1467,14 +1413,14 @@ SUNEDITOR.defaultLang = {
      * @param {string} title - Title in button
      * @param {string} dataCommand - The data-command property of the button
      * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
-     * @param {string} dataOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
+     * @param {string} displayOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
      * @param {string} innerHTML - Html in button
      * @returns {string}
      */
-    function _createButton(buttonClass, title, dataCommand, dataDisplay, dataOption, innerHTML) {
+    function _createButton(buttonClass, title, dataCommand, dataDisplay, displayOption, innerHTML) {
         return '' +
             '<li>' +
-            '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + dataOption + '">' +
+            '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + displayOption + '">' +
                     innerHTML +
             '   </button>' +
             '</li>';
@@ -1490,22 +1436,21 @@ SUNEDITOR.defaultLang = {
 
         /** create button list */
         var button = null;
-        var value = null;
+        var module = null;
 
         for (var i = 0; i < buttonList.length; i++) {
 
             var buttonGroup = buttonList[i];
             for (var j = 0; j < buttonGroup.length; j++) {
 
-                if (typeof buttonGroup[j] === 'object') {
-                    button = 'customModule';
-                    value = buttonGroup[j][button];
+                button = buttonGroup[j];
+                if (typeof button === 'object') {
+                    module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                 } else {
-                    button = buttonGroup[j];
-                    value = null;
+                    module = _defaultButtonsList[button];
                 }
 
-                moduleHtml += _createButtonsList[button](value);
+                moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
             }
 
             html += _createModuleGroup(moduleHtml);
