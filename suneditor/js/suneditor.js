@@ -303,16 +303,6 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
-         * @description Set the className value of the argument value element
-         * @param {element} element - Elements to replace class name
-         * @param {string} className - Class name to be change
-         */
-        changeClass: function (element, className) {
-            if (!element || !className) return;
-            element.className = className;
-        },
-
-        /**
          * @description Append the className value of the argument value element
          ** @param {element} element - Elements to add class name
          * @param {string} className - Class name to be add
