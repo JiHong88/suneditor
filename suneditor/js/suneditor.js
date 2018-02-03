@@ -973,17 +973,20 @@ SUNEDITOR.defaultLang = {
                 var targetElement = e.target;
                 editor.submenuOff();
 
-                event.onkeyUp_wysiwyg(e);
+
+                if (/^HTML$/i.test(targetElement.nodeName)) {
+                    e.preventDefault();
+                    editor.focus();
+                    return;
+                }
 
                 if (/^IMG$/i.test(targetElement.nodeName)) {
                     editor.callModule('dialog', 'image', null, function () {
                         SUNEDITOR.plugin.image.call_controller_imageResize_.call(editor, targetElement);
                     });
                 }
-                else if (/^HTML$/i.test(targetElement.nodeName)) {
-                    e.preventDefault();
-                    editor.focus();
-                }
+
+                event.onKeyUp_wysiwyg(e);
             },
 
             onKeyDown_wysiwyg: function (e) {
@@ -992,6 +995,7 @@ SUNEDITOR.defaultLang = {
                 var shift = e.shiftKey;
                 var ctrl = e.ctrlKey;
                 var alt = e.altKey;
+                e.stopPropagation();
 
                 function shortcutCommand (keyCode) {
                     var key = event._shortcutKeyCode[keyCode];
@@ -1002,8 +1006,6 @@ SUNEDITOR.defaultLang = {
 
                     return true;
                 }
-
-                e.stopPropagation();
 
                 /** Shortcuts */
                 if (ctrl && keyCode !== 17 && keyCode !== 18) {
@@ -1077,7 +1079,7 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            onkeyUp_wysiwyg: function () {
+            onKeyUp_wysiwyg: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
                 editor._variable.selectionNode = editor.getSelectionNode();
 
@@ -1188,7 +1190,7 @@ SUNEDITOR.defaultLang = {
         /** editor area */
         context.element.wysiwygWindow.addEventListener('mouseup', event.onMouseUp_wysiwyg);
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
-        context.element.wysiwygWindow.addEventListener('keyup', event.onkeyUp_wysiwyg);
+        context.element.wysiwygWindow.addEventListener('keyup', event.onKeyUp_wysiwyg);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
         /** resize bar */
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
