@@ -135,7 +135,7 @@ SUNEDITOR.plugin.link = {
         linkBtn.getElementsByTagName("A")[0].textContent = selectionATag.textContent;
 
         linkBtn.style.left = selectionATag.offsetLeft + "px";
-        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10 - this.context.element.wysiwygWindow.scrollY) + "px";
+        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10 - this.context.element.wysiwygWindow.pageYOffset) + "px";
         linkBtn.style.display = "block";
 
         this.controllerArray = [linkBtn];
