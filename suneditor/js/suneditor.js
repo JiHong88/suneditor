@@ -885,7 +885,7 @@ SUNEDITOR.defaultLang = {
                 221: ['indent']
             },
 
-            _directionKeyKeycode: new RegExp('33|34|35|36|37|38|39|40|98|100|102|104'),
+            _directionKeyKeycode: new RegExp('8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104'),
 
             _findButtonEffectTag: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
