@@ -57,18 +57,8 @@
 </nav>
 
 <div class="content">
-    <div role="tabpanel">
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="tablinks active" id="english_tab"><a href="javascript:openTab('english');">English</a></li>
-            <li role="presentation" class="tablinks" id="korea_tab"><a href="javascript:openTab('korea');">한국어</a></li>
-        </ul>
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <br>
-            <div class="tabcontent" style="display:block;" id="english">
-                <article class="markdown-body entry-content" itemprop="text">
-                    <h4>Add new module object</h4>
+        <article class="markdown-body entry-content" itemprop="text">
+                <h4><span style="color: #f42424;">Add new module object</span></h4>
                     <p></p>
 
                     <h4>1. It is divided into two folders dialog and submenu</h4>
@@ -131,7 +121,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
         <li class="pl-0">After creating a tag element</li><ul>
         <li class="pl-0">Insert the element created in <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.modal</span></li></ul>
         <li class="pl-0">When you need to focus immediately after the Dialog window appears</li><ul>
-        <li class="pl-0"><span class="pl-k">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
+        <li class="pl-0">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
         <li class="pl-0"><span class="pl-c1">element</span> creation, <span class="pl-s">event</span> registration, and insert the created <span class="pl-c1">element</span> into <span class="pl-k">context.dialog.modal</span> using <span class="pl-en">appendChaild</span> function</li>
     </ol>
             </pre>
@@ -148,133 +138,73 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
             </pre>
                     </div>
 
-                    <h4>6. Added addModuleButtons option when creating Suneditor</h4>
+                    <h4>6. Add module button in buttonList property of options when creating suneditor</h4>
                     <div class="highlight highlight-text-html-basic">
             <pre>
 <ul>
-    <li class="pl-0">Add button information to the optional addModuleButtons property
+    <li class="pl-0">create example
 
-    <span class="pl-s">addModuleButtons</span><span class="pl-k">: <span class="pl-c1">[{</span><span class="pl-c1">
-        buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// className to be added to the button</span>
-        title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title property</span>
-        dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// The js file name of the added module</span>
-        dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
-        dataOption:<span class="pl-ent">''</span>, <span class="pl-c">// Options for whether the range of the dialog is inside the editor or for the entire screen</span>
-                       <span class="pl-c">// If set to 'full', the entire screen will be used ('', 'full')</span>
-        innerHTML:<span class="pl-ent">'&lt;div class="ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML (icon image)</span>
-     }]
-</span></span></li>
-    <li class="pl-0">If you want to add button options and adjust the position to where you want, see the createToolBar function</li>
+    <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleButtonList<span class="pl-pds">'</span></span>, {
+    <span class="pl-c"><span class="pl-c">/**</span> The default setting is all buttons display <span class="pl-c">*/</span></span>
+    <span class="pl-c"><span class="pl-c">//</span> Defines button list to array</span>
+    buttonList<span class="pl-k">:</span> [
+        <span class="pl-c"><span class="pl-c">//</span> Create a group of buttons as an array </span>
+        <span class="pl-c"><span class="pl-c">//</span> All buttons must be included in the button group</span>
+ &nbsp; &nbsp; &nbsp; &nbsp;<span class="pl-c"><span class="pl-c">//</span> button group 1</span>
+ &nbsp; &nbsp; &nbsp; &nbsp;[
+            <span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>
+        ],
+        <span class="pl-c"><span class="pl-c">//</span> button group 2</span>
+        [
+            <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>
+        ],
+        <span class="pl-c"><span class="pl-c">//</span> button group 3</span>
+        [
+            <span class="pl-s"><span class="pl-pds">'</span>line<span class="pl-pds">'</span></span>
+        ],
+        <span class="pl-c"><span class="pl-c">//</span> button group 4</span>
+        <span class="pl-c"><span class="pl-c">//</span> It is a way to insert a user defined module button</span>
+ &nbsp; &nbsp; &nbsp; &nbsp;<span class="pl-c"><span class="pl-c">//</span> Define json in an array of button group</span>
+ &nbsp; &nbsp; &nbsp; &nbsp;[
+            {
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> className to be added to the button</span>
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> title property</span>
+                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> The js file name of the added module</span>
+                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,  <span class="pl-c"><span class="pl-c">//</span> The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
+                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Options for whether the range of the dialog is inside the editor or for the entire screen</span>
+                                  <span class="pl-c"><span class="pl-c">//</span> If set to 'full', the entire screen will be used ('', 'full')</span>
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_submenu"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">//</span> The source into the button's innerHTML (icon image)</span>
+            },
+            {
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Dialog<span class="pl-pds">'</span></span>,
+                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_dialog<span class="pl-pds">'</span></span>,
+                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_dialog"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+            },
+            {
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>FullDialog<span class="pl-pds">'</span></span>,
+                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_fullDialog<span class="pl-pds">'</span></span>,
+                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_dialog"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+            },
+            <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>
+        ]
+    ]
+});</pre></div></li>
+<li>To add a module as the suneditor's default button, refer suneditor.js: _createToolBar (function), _defaultButtonsList (object) </li>
 </ul>
             </pre>
                     </div>
-                </article>
-            </div>
-            <div class="tabcontent" style="display:none;" id="korea">
-                <article class="markdown-body entry-content" itemprop="text">
-                    <h4>모듈 추가</h4>
-                    <p></p>
+    </article>
 
-                    <h4>1. dialog, submenu 두개의 폴더로 구분됩니다.</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ol>
-    <li class="pl-0">dialog : dialog 형태의 모듈입니다.
-        plugins/dialog/ 경로 에 <span class="pl-k">{moduleName}.js</span> 파일을 추가합니다.
-        <img src="../img/example_dialog.png" width="400px" height="200px"></li>
-    <li class="pl-0">submenu : subMenu 형태의 모듈입니다.
-         plugins/submenu/ 경로 에 <span class="pl-k">{moduleName}.js</span> 파일을 추가합니다.
-        <img src="../img/example_submenu.png" width="400px" height="200px"></li>
-</ol>
-            </pre>
-                    </div>
-
-                    <h4>2. {moduleName}.js 작성 방법</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ol>
-    <li class="pl-0">dialog 또는 submenu 폴더에 추가하고자 하는 모듈과 같은 이름으로 <span class="pl-k">{moduleName}.js</span> 파일을 만듭니다.</li>
-    <li class="pl-0"><span class="pl-k">SUNEDITOR.plugin.{moduleName}</span> Object를 선언하고 이 Object 안에서
-<span class="pl-c1">element</span> 추가, 모듈의 기능 <span class="pl-en">function</span> 추가, <span class="pl-s">event</span> 등록등의 모든 동작을 정의합니다.</li>
-    <li class="pl-0">공통적으로 모든 모듈 객체는 add 라는 이름의 함수가 꼭 선언되어있어야 합니다.</li><ul>
-    <li class="pl-0">add 함수는 <span class="pl-k">SUNEDITOR.editor</span> Object 와 모듈 버튼의 <span class="pl-c1">element</span> 를 인자값으로 받습니다.</li>
-    <li class="pl-0">dialog 모듈의 인자값  : <span class="pl-k">SUNEDITOR.editor</span> Object</li>
-    <li class="pl-0">submenu 모듈의 인자값 : <span class="pl-k">SUNEDITOR.editor</span> Object, 모듈 버튼의 <span class="pl-c1">element</span></li>
-    <li class="pl-0"><span class="pl-k">SUNEDITOR.editor</span> 객체에는 공통적으로 사용가능한 <span class="pl-en">function</span> 및 <span class="pl-en">변수값</span>
-그리고 suneditor 의 <span class="pl-c1">element</span> 가 들어있는 <span class="pl-k">context</span> Object 가 있습니다.</li>
-    <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context</span> 에는 해당 editor 에서 필요한 값을 저장해야 하는 <span class="pl-c1">element</span> 및 <span class="pl-c1">변수값</span>이 들어있습니다.</li>
-    <li class="pl-0">만약 <span class="pl-k">SUNEDITOR.editor.context</span> 에 값을 저장해야 한다면
-    <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> 의 Object 를 선언 후 사용하세요.</li>
-<li class="pl-0">만약 모듈안의 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 를 사용해야 한다면
-<span class="pl-en">call</span> 함수를 이용하여 해당 함수의 <span class="pl-k">this</span> 값을 <span class="pl-k">SUNEDITOR.editor</span> Object 로 바꿔서 호출해주세요.
-* 모듈안에서 add 함수를 제외한 모든 함수들의 this 값은 <span class="pl-k">SUNEDITOR.editor</span> 로 유지하는게 좋습니다.</li></ul>
-</ol>
-            </pre>
-                    </div>
-
-                    <h4>3. add function 정의</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ul>
-    <li class="pl-0">모듈 버튼이 처음 클릭됐을때 <span class="pl-k">{moduleName}.js</span> 파일을 include 합니다.</li>
-    <li class="pl-0">모듈 파일이 로드 됐을때 최초 한번만 실행되는 함수 입니다.</li>
-    <li class="pl-0">이 함수는 첫번째 인자값으로 <span class="pl-k">SUNEDITOR.editor</span> Object 를 가집니다.</li>
-    <li class="pl-0">만약 submenu 안의 모듈이라면 추가로 모듈 버튼의 <span class="pl-c1">element</span> 를 두번째 인자값으로 가집니다.</li>
-    <li class="pl-0">이 함수 안에서 <span class="pl-c1">element</span> 생성 및 <span class="pl-s">event</span> 등록 에디터 <span class="pl-c1">Dom</span>에 삽입 하는 동작까지 정의 합니다.</li>
-    <li class="pl-0">저장해야 하는 <span class="pl-c1">element</span> 및 <span class="pl-c1">변수값</span>들은 <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> Object 를 선언하여 해당 오브젝트를 사용합니다.</li>
-</ul>
-            </pre>
-                    </div>
-
-                    <h4>4. dialog module 추가시</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-    <ol>
-        <li class="pl-0">dialog 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 만 을 인자값으로 받습니다.</li>
-        <li class="pl-0">tag element 생성 후</li><ul>
-        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.modal</span> 에 생성된 엘리먼트를 넣어주세요.</li></ul>
-        <li class="pl-0">Dialog 창이 뜬 후 곧바로 포커싱을 줘야할때</li><ul>
-        <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span> 에 포커스가 가야할 엘리먼트를 넣어주세요.</li></ul>
-        <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 <span class="pl-c1">element</span> 를 context.dialog.modal 에 <span class="pl-en">appendChaild</span> 함수를 이용하여 삽입 합니다.</li>
-    </ol>
-            </pre>
-                    </div>
-
-                    <h4>5. submenu module 추가시</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-    <ol>
-        <li class="pl-0">submenu 폴더내의 모듈은 <span class="pl-en">add</span> 함수에서 <span class="pl-k">SUNEDITOR.editor</span> Object 와 모듈 버튼 element 를 인자값으로 받습니다</li>
-        <li class="pl-0">submenu <span class="pl-c1">element</span> 가 들어있는 최상위 div는 <span class="pl-ent">layer_editor</span> 가 클래스 이름에 포함되어 있어야 합니다.</li>
-        <li class="pl-0"><span class="pl-c1">element</span> 생성, <span class="pl-s">event</span> 등록 후 생성한 <span class="pl-c1">element</span> 를 <span class="pl-k">targetElement</span><span class="pl-c1">.parentNode</span> 에 <span class="pl-en">appendChaild</span> 함수를 이용하여 삽입하면 끝납니다.</li>
-    </ol>
-            </pre>
-                    </div>
-
-                    <h4>6. Suneditor 생성시 addModuleButtons 옵션 추가</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ul>
-    <li class="pl-0">옵션의 addModuleButtons 속성에 버튼 정보를 추가해줍니다.
-
-    <span class="pl-s">addModuleButtons</span><span class="pl-k">: <span class="pl-c1">[{</span><span class="pl-c1">
-        buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// 버튼에 추가할 클래스명</span>
-        title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title 속성</span>
-        dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// 추가한 모듈의 js 파일이름</span>
-        dataDisplay:<span class="pl-ent">'dialog'</span>, <span class="pl-c">// 추가한 모듈의 폴더 이름 ('dialog', 'submenu')</span>
-        dataOption:<span class="pl-ent">''</span>, <span class="pl-c">// dialog 형태의 모듈일때 dialog의 범위가 에디터 안쪽인지 화면 전체로 설정할지 에 대한 옵션</span>
-                       <span class="pl-c">// 'full'로 설정하면 화면 전체를 사용합니다 ('', 'full')</span>
-        innerHTML:<span class="pl-ent">'&lt;div class="ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// 버튼안에 들어갈 innerHTML 코드 (아이콘)</span>
-     }]
-</span></span></li>
-    <li class="pl-0">버튼 옵션을 추가하고 위치를 원하는 곳으로 조정하고 싶다면 createToolBar 함수를 참고하십시오</li>
-</ul>
-            </pre>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </div>
+    <p></p>
+    <textarea id="exampleButtonList" style="width:100%; height:200px;">Create button list</textarea>
 
     <footer>
         <p>Suneditor v0.9 create by JiHong.Lee</p>
@@ -286,19 +216,48 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
 </div>
 
 <script>
-    function openTab(lang) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(lang).style.display = "block";
-        document.getElementById(lang + "_tab").className += " active";
-    }
+    SUNEDITOR.create('exampleButtonList', {
+        buttonList: [
+            [
+                'undo',
+                'redo'
+            ],
+            [
+                'font',
+                'fontColor'
+            ],
+            [
+                'line'
+            ],
+            [
+                {
+                    buttonClass:'',
+                    title:'Submenu',
+                    dataCommand:'sample_submenu',
+                    dataDisplay:'submenu',
+                    displayOption:'',
+                    innerHTML:'<div class="ico_submenu"></div>'
+                },
+                {
+                    buttonClass:'',
+                    title:'Dialog',
+                    dataCommand:'sample_dialog',
+                    dataDisplay:'dialog',
+                    displayOption:'',
+                    innerHTML:'<div class="ico_dialog"></div>'
+                },
+                {
+                    buttonClass:'',
+                    title:'FullDialog',
+                    dataCommand:'sample_fullDialog',
+                    dataDisplay:'dialog',
+                    displayOption:'full',
+                    innerHTML:'<div class="ico_dialog"></div>'
+                },
+                'image'
+            ]
+        ]
+    });
 </script>
 </body>
 </html>

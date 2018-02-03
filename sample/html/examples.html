@@ -62,54 +62,31 @@
         <div class="highlight highlight-source-js">
 <pre>
 <span class="pl-c">// User Options</span>
-<span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List              <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
-<span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List            <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
-<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                             <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor               <span class="pl-ent">[default : </span><span class="pl-c1">(textarea.offsetHeight)</span><span class="pl-ent">]</span>
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor              <span class="pl-ent">[default : </span><span class="pl-c1">(textarea.style.width || textarea.offsetWidth)</span><span class="pl-ent">]</span>
-<span class="pl-s">display</span><span class="pl-k">         : </span>The display property to be applied when calling ".show ()"
-<span class="pl-s"></span><span class="pl-k">                  </span>when rendered with target textarea 'display:none'<span class="pl-ent"> [default : </span><span class="pl-c1">'block'</span><span class="pl-ent">]</span>
-<span class="pl-s">videoX</span><span class="pl-k">          : </span>The default width size of the video frame  <span class="pl-ent">[default : </span><span class="pl-c1">560</span><span class="pl-ent">]</span>
-<span class="pl-s">videoY</span><span class="pl-k">          : </span>The default heigth size of the video frame <span class="pl-ent">[default : </span><span class="pl-c1">315</span><span class="pl-ent">]</span>
-<span class="pl-s">imageSize</span><span class="pl-k">       : </span>The default width size of the image frame  <span class="pl-ent">[default : </span><span class="pl-c1">'350px'</span><span class="pl-ent">]</span>
-<span class="pl-s">imageUploadUrl</span><span class="pl-k">  : </span>The image upload to server mapping address <span class="pl-ent">[default : </span><span class="pl-c1">null</span><span class="pl-ent">]</span>
+<span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List              <span class="pl-ent">default : </span><span class="pl-c1">null</span><span class="pl-ent"></span>
+<span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List            <span class="pl-ent">default : </span><span class="pl-c1">null</span><span class="pl-ent"></span>
+<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                             <span class="pl-ent">default : </span><span class="pl-c1">null</span><span class="pl-ent"></span>
+<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor               <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span><span class="pl-ent"></span>
+<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor              <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width || textarea.offsetWidth</span><span class="pl-ent"></span>
+<span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor          <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.display || 'block'</span><span class="pl-ent"></span>
+<span class="pl-s">videoX</span><span class="pl-k">          : </span>The default width size of the video frame  <span class="pl-ent">default : </span><span class="pl-c1">560</span><span class="pl-ent"></span>
+<span class="pl-s">videoY</span><span class="pl-k">          : </span>The default heigth size of the video frame <span class="pl-ent">default : </span><span class="pl-c1">315</span><span class="pl-ent"></span>
+<span class="pl-s">imageSize</span><span class="pl-k">       : </span>The default width size of the image frame  <span class="pl-ent">default : </span><span class="pl-c1">'350px'</span><span class="pl-ent"></span>
+<span class="pl-s">imageUploadUrl</span><span class="pl-k">  : </span>The image upload to server mapping address <span class="pl-ent">default : </span><span class="pl-c1">null</span><span class="pl-ent"></span>
 <span class="pl-s"></span><span class="pl-k">                  </span>when append Img tag <span class="pl-c1">    (ex) "/editor/uploadImage.ajax"</span>
 <span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">return type : </span>JSONArray<span class="pl-c1"> [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},</span>
 <span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">              </span>          <span class="pl-c1"> {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]</span>
 <span class="pl-s"></span><span class="pl-k">                  </span>When not used, it enters base64 data
-<span class="pl-s">editorIframeFont</span><span class="pl-k">: </span>Change iframe font of the suneditor        <span class="pl-ent">[default : </span><span class="pl-c1">"inherit"</span><span class="pl-ent">]</span>
-<span class="pl-s">addModuleButtons</span><span class="pl-k">: </span>Add an array button attributes to call the module added by the user : <span class="pl-ent">[default : </span><span class="pl-c1">[]</span><span class="pl-ent">]</span><span class="pl-c1"> (ex)</span>
-<span class="pl-c1">                 [{
-                    buttonClass:<span class="pl-ent">''</span>, <span class="pl-c">// className to be added to the button</span>
-                    title:<span class="pl-ent">'Test'</span>, <span class="pl-c">// title property</span>
-                    dataCommand:<span class="pl-ent">'test'</span>, <span class="pl-c">// The js file name of the added module</span>
-                    dataDisplay:<span class="pl-ent">'submenu'</span>, <span class="pl-c">// The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
-                    dataOption:<span class="pl-ent">''</span>, <span class="pl-c">// Options for whether the range of the dialog is inside the editor or for the entire screen</span>
-                                   <span class="pl-c">// If set to 'full', the entire screen will be used ('', 'full')</span>
-                    innerHTML:<span class="pl-ent">'&lt;div class="ico_test"&gt;&lt;/div&gt;'</span> <span class="pl-c">// The source into the button's innerHTML (icon image)</span>
-                 }]
-</span>
-<span class="pl-c">// Show, Hied</span>
-<span class="pl-s">showFont</span><span class="pl-k">        : </span>Display font module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFormats</span><span class="pl-k">     : </span>Display formats module                     <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFontSize</span><span class="pl-k">    : </span>Display font size module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showBold</span><span class="pl-k">        : </span>Display bold module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showUnderline</span><span class="pl-k">   : </span>Display underline module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showItalic</span><span class="pl-k">      : </span>Display italic module                      <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showStrike</span><span class="pl-k">      : </span>Display strike module                      <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFontColor</span><span class="pl-k">   : </span>Display font color module                  <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showHiliteColor</span><span class="pl-k"> : </span>Display hilite color module                <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showInOutDent</span><span class="pl-k">   : </span>Display indent, outdent module             <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showAlign</span><span class="pl-k">       : </span>Display align module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showList</span><span class="pl-k">        : </span>Display list module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showLine</span><span class="pl-k">        : </span>Display line module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showTable</span><span class="pl-k">       : </span>Display table module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showLink</span><span class="pl-k">        : </span>Display link module                        <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showImage</span><span class="pl-k">       : </span>Display image module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showVideo</span><span class="pl-k">       : </span>Display video module                       <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showFullScreen</span><span class="pl-k">  : </span>Display full screen module                 <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showCodeView</span><span class="pl-k">    : </span>Display code view module                   <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
-<span class="pl-s">showUndoRedo</span><span class="pl-k">    : </span>Display Undo, Redo module                  <span class="pl-ent">[default : </span><span class="pl-c1">true</span><span class="pl-ent">]</span>
+<span class="pl-s">editorIframeFont</span><span class="pl-k">: </span>Change iframe font of the suneditor        <span class="pl-ent">default : </span><span class="pl-c1">"inherit"</span><span class="pl-ent"></span>
+<span class="pl-s">buttonList</span><span class="pl-k">      : </span>Defines button list to array               <span class="pl-ent">default :</span> [
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formats<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>line<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
+                                                                           [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>]
+                                                                       ]
 </pre>
         </div>
 
@@ -127,15 +104,16 @@
                 <span class="pl-s"><span class="pl-pds">'</span>Times New Roman,Times,serif<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>Trebuchet MS,Helvetica,sans-serif<span class="pl-pds">'</span></span>
             ],
+            width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>450px<span class="pl-pds">'</span></span>,
+            height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
             videoX <span class="pl-k">:</span> <span class="pl-c1">360</span>,
             videoY <span class="pl-k">:</span> <span class="pl-c1">115</span>,
-            height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
-            width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>450px<span class="pl-pds">'</span></span>,
-            showUnderline <span class="pl-k">:</span> <span class="pl-c1">false</span>,
-            showItalic <span class="pl-k">:</span> <span class="pl-c1">false</span>,
-            showInOutDent <span class="pl-k">:</span> <span class="pl-c1">false</span>,
-            showLink <span class="pl-k">:</span> <span class="pl-c1">false</span>,
-            showCodeView <span class="pl-k">:</span> <span class="pl-c1">false</span>
+            imageSize <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>50%<span class="pl-pds">'</span></span>,
+            editorIframeFont <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Comic Sans MS<span class="pl-pds">'</span></span>,
+            buttonList <span class="pl-k">:</span> [
+                [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
+                [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>]
+            ]
         });</pre>
         </div>
         <p></p>
@@ -209,6 +187,7 @@
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_destroy()">Destroy</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_create()">Create</button>
         </form>
+        <p></p>
 
         <h4>3. Image upload to server</h4>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
@@ -318,21 +297,19 @@
             'Times New Roman,Times,serif',
             'Trebuchet MS,Helvetica,sans-serif'
         ],
+        width : '100%',
+        height : '150px',
         videoX : 360,
         videoY : 115,
         imageSize : '50%',
-        height : '150px',
-        width : '100%',
-        showUnderline : false,
-        showItalic : false,
-        showInOutDent : false,
-        showLink : false,
-        showCodeView : false
+        editorIframeFont : 'Comic Sans MS',
+        buttonList : [
+            ['font', 'fontSize'],
+            ['image', 'video']
+        ]
     });
 
-    var suneditor = SUNEDITOR.create('exampleFunction',{
-
-    });
+    var suneditor = SUNEDITOR.create('exampleFunction');
 
     function sun_save() {
         suneditor.save();

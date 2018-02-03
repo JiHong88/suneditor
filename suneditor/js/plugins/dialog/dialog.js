@@ -6,7 +6,7 @@
  * MIT license.
  */
 SUNEDITOR.plugin.dialog = {
-    add : function(_this) {
+    add: function (_this) {
         var context = _this.context;
 
         /** dialog */
@@ -33,16 +33,16 @@ SUNEDITOR.plugin.dialog = {
         context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
     },
 
-    onClick_dialog : function(e) {
+    onClick_dialog: function (e) {
         e.stopPropagation();
 
-        if(/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
+        if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
         }
     },
 
-    openDialog : function(kind, option) {
-        if(option === 'full') {
+    openDialog: function (kind, option) {
+        if (option === 'full') {
             this.context.dialog.modalArea.style.position = "fixed";
         } else {
             this.context.dialog.modalArea.style.position = "absolute";
@@ -56,10 +56,10 @@ SUNEDITOR.plugin.dialog = {
         this.context.dialog.modal.style.display = "block";
         this.modalForm.style.display = "block";
 
-        if(focusElement) focusElement.focus();
+        if (focusElement) focusElement.focus();
     },
 
-    closeDialog : function() {
+    closeDialog: function () {
         this.modalForm.style.display = "none";
         this.context.dialog.back.style.display = "none";
         this.context.dialog.modalArea.style.display = "none";

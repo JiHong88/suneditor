@@ -8,8 +8,7 @@ The Suneditor is based on pure JavaScript
 Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications
 
 Supported Browser -
-Chrome, Safari, Opera, Edge, IE 10+, Android,
-IOS(not fully : table picker, selection, cursor), Firefox(not fully : Button effect when changing selection)
+Chrome, Safari, Opera, Edge, IE 10+, Mobile web
 ```
 
 ## Sample

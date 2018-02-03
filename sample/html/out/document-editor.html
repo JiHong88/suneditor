@@ -4,14 +4,11 @@
     <meta charset="utf-8">
     <title>JSDoc: Suneditor</title>
 
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
     <link rel="stylesheet" href="../../css/github.css">
     <link rel="stylesheet" href="../../css/github-frameworks.css">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
 
@@ -30,68 +27,228 @@
             </div>
             <h3 class="subsection-title">Members</h3>
 
-            <h4 class="name" id="context"><span class="type-signature"></span>context<span
+            <h4 class="name" id="context"><span class="type-signature"></span>context {JsonObject}<span
                     class="type-signature"></span></h4>
-            <div class="description">
-                editor elements
-            </div>
-            <dl class="details" style="padding-left:10px;">
-                <div class="highlight highlight-source-js"><pre>context {
-  <span class="pl-c"><span class="pl-c">//</span> Internal variables</span>
-  argument <span class="pl-k">:</span> {
-      _copySelection <span class="pl-k">:</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> The selection object is copied</span>
-      _selectionNode <span class="pl-k">:</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> Contains selection node</span>
- &nbsp; &nbsp; &nbsp;_wysiwygActive <span class="pl-k">:</span> <span class="pl-c1">true</span>, <span class="pl-c"><span class="pl-c">//</span> The wysiwyg frame or Source view state</span>
- &nbsp; &nbsp; &nbsp;_isFullScreen <span class="pl-k">:</span> <span class="pl-c1">false</span>, <span class="pl-c"><span class="pl-c">//</span> State of full screen</span>
-      _innerHeight_fullScreen <span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c"><span class="pl-c">//</span> InnerHeight in editor when in full screen</span>
-      _resizeClientY <span class="pl-k">:</span> <span class="pl-c1">0</span>, <span class="pl-c"><span class="pl-c">//</span> Remember the vertical size of the editor before resizing the editor</span>
-                          <span class="pl-c"><span class="pl-c">//</span> (Used when calculating during resize operation)</span>
- &nbsp; &nbsp; &nbsp;_originCssText <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">_originCssText</span>, <span class="pl-c"><span class="pl-c">//</span> Remember the CSS of the editor before full screen</span>
-                                               <span class="pl-c"><span class="pl-c">//</span> (Used when returning to original size again)</span>
-      _innerHeight <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">_innerHeight</span>, <span class="pl-c"><span class="pl-c">//</span> Remember the size of the editor before full screen</span>
-                                           <span class="pl-c"><span class="pl-c">//</span> (Used when returning to original size again)</span>
-      _windowHeight <span class="pl-k">:</span> <span class="pl-c1">window</span>.<span class="pl-c1">innerHeight</span>, <span class="pl-c"><span class="pl-c">//</span> Size of current window (Used for editor resizing operation)</span>
-      _isTouchMove <span class="pl-k">:</span> <span class="pl-c1">false</span> <span class="pl-c"><span class="pl-c">//</span> Check if mobile has moved after touching (Allowing scrolling in the toolbar area)</span>
-  },
-  <span class="pl-c"><span class="pl-c">//</span> editor elements</span>
-  element <span class="pl-k">:</span> {
-      textElement<span class="pl-k">:</span> element, <span class="pl-c"><span class="pl-c">//</span> "textarea" before creating the editor</span>
-      topArea<span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_top</span>, <span class="pl-c"><span class="pl-c">//</span> The top-level element of the editor</span>
-      relative<span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_relative</span>, <span class="pl-c"><span class="pl-c">//</span> Element below top-level element in editor (class="sun-editor-container")</span>
-                                <span class="pl-c"><span class="pl-c">//</span> It wraps all other div tags</span>
- &nbsp; &nbsp; &nbsp;resizebar<span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_resizeBar</span>, <span class="pl-c"><span class="pl-c">//</span> Element of the resize bar</span>
- &nbsp; &nbsp; &nbsp;editorArea<span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_editorArea</span>, <span class="pl-c"><span class="pl-c">//</span> Element containing an iframe</span>
-      wysiwygWindow<span class="pl-k">:</span> <span class="pl-smi">sun_wysiwyg</span>.<span class="pl-smi">contentWindow</span>, <span class="pl-c"><span class="pl-c">//</span> Editing area in iframe contentWindow object</span>
- &nbsp; &nbsp; &nbsp;wysiwygElement<span class="pl-k">:</span> sun_wysiwyg, <span class="pl-c"><span class="pl-c">//</span> // Iframe (editing area)</span>
- &nbsp; &nbsp; &nbsp;source<span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_editorArea</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-source<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span>textarea element used in source view mode</span>
-      loading <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_loading</span>, <span class="pl-c"><span class="pl-c">//</span> The loding box</span>
-      resizeBackground <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_resizeBack</span> <span class="pl-c"><span class="pl-c">//</span> Background div used when resize behavior</span>
-  },
-  <span class="pl-c"><span class="pl-c">//</span> tool bar elements</span>
-  tool <span class="pl-k">:</span> {
-      bar <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>, <span class="pl-c"><span class="pl-c">//</span> Toolbar element</span>
-      barHeight <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-smi">offsetHeight</span>, <span class="pl-c"><span class="pl-c">//</span> Toolbar height</span>
-      cover <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-toolbar-cover<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> Div that covers the toolbar when the button is "disable"</span>
-
-      bold <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-bold<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> bold button element</span>
-      underline <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-underline<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> underline button element</span>
-      italic <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-italic<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> italic button element</span>
-      strike <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-id-strike<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> strike button element</span>
-      fontFamily <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-font-family<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>], <span class="pl-c"><span class="pl-c">//</span> font family submenu button element</span>
-      fontSize <span class="pl-k">:</span> <span class="pl-smi">cons</span>.<span class="pl-smi">_toolBar</span>.<span class="pl-c1">getElementsByClassName</span>(<span class="pl-s"><span class="pl-pds">'</span>sun-editor-font-size<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>] <span class="pl-c"><span class="pl-c">//</span> font size submenu button element</span>
-  },
-  <span class="pl-c"><span class="pl-c">//</span> user options</span>
-  user <span class="pl-k">:</span> {
-      videoX <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">videoX</span>, <span class="pl-c"><span class="pl-c">//</span> video width</span>
-      videoY <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">videoY</span>, <span class="pl-c"><span class="pl-c">//</span> video height</span>
-      imageSize <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">imageSize</span>, <span class="pl-c"><span class="pl-c">//</span> image size</span>
-      imageUploadUrl <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">imageUploadUrl</span>, <span class="pl-c"><span class="pl-c">//</span> image upload url</span>
- &nbsp; &nbsp; &nbsp;addFont <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">addFont</span>, <span class="pl-c"><span class="pl-c">//</span> Font added at the bottom of submenu&nbsp;</span>
- &nbsp; &nbsp; &nbsp;fontList <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">fontList</span>, <span class="pl-c"><span class="pl-c">//</span> Font list of submenu</span>
-      fontSizeList <span class="pl-k">:</span> <span class="pl-smi">options</span>.<span class="pl-smi">fontSizeList</span> <span class="pl-c"><span class="pl-c">//</span> Font size list of submenu</span>
-  }
-}</pre></div>
-            </dl>
+            <h5 class="subsection-title">Properties:</h5>
+            <table class="props">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr style="color:#f42424;">
+                    <td class="name"><code style="color:#f42424;">element</code></td>
+                    <td class="type">
+                        <span class="param-type">Json</span>
+                    </td>
+                    <td class="description last">editor elements (Contains sub-options)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;textElement</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">"textarea" before creating the editor</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;topArea</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">The top-level element of the editor</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;relative</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element below top-level element in editor
+                        (class="sun-editor-container") It wraps all other div tags
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;resizebar</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element of the resize bar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;editorArea</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element containing an iframe</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;wysiwygWindow</code></td>
+                    <td class="type">
+                        <span class="param-type">window</span>
+                    </td>
+                    <td class="description last">Editing area in iframe contentWindow object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;wysiwygElement</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Iframe (editing area)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;code</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">textarea element used in code view mode</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;loading</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">The loding box</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;resizeBackground</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Background div used when resize behavior</td>
+                </tr>
+                <tr style="color:#f42424;">
+                    <td class="name"><code style="color:#f42424;">tool</code></td>
+                    <td class="type">
+                        <span class="param-type">Json</span>
+                    </td>
+                    <td class="description last">tool bar elements (Contains sub-options)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;bar</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Toolbar element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;cover</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Div that covers the toolbar when the button is "disable"</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;bold</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">bold button element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;underline</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">underline button element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;italic</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">italic button element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;strike</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">strike button element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontFamily</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">font family button element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSize</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">font size button element</td>
+                </tr>
+                <tr style="color:#f42424;">
+                    <td class="name"><code style="color:#f42424;">user</code></td>
+                    <td class="type">
+                        <span class="param-type">Json</span>
+                    </td>
+                    <td class="description last">user options (Contains sub-options)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoX</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">video default width</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoY</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">video default height</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageSize</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">image default size</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageUploadUrl</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">image upload url</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;addFont</code></td>
+                    <td class="type">
+                        <span class="param-type">JsonArray</span>
+                    </td>
+                    <td class="description last">Font added at the bottom of submenu</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontList</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">Font list of submenu</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSizeList</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">Font size list of submenu</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;height</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">The height value entered by the user or the height value of the
+                        "textarea" when the suneditor is created
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
 
 
             <h4 class="name" id="loadedPlugins"><span class="type-signature"></span>loadedPlugins<span
@@ -139,6 +296,154 @@
             <div class="description">
                 Elements that need to change text or className for each selection change
             </div>
+            <h5 class="subsection-title">Properties:</h5>
+            <table class="props">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>FONT</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">font family button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>B</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">bold button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>U</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">underline button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>I</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">italic button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>STRIKE</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">strike button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>SIZE</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">font size button</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="_variable"><span class="type-signature"></span>_variable<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Variables used internally in editor operation
+            </div>
+            <h5 class="subsection-title">Properties:</h5>
+            <table class="props">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>selectionNode</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span> | <span class="param-type">null</span>
+                    </td>
+                    <td class="description last">Contains selection node</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>copySelection</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span> | <span class="param-type">null</span>
+                    </td>
+                    <td class="description last">The selection object is copied</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>wysiwygActive</code></td>
+                    <td class="type">
+                        <span class="param-type">boolean</span>
+                    </td>
+                    <td class="description last">The wysiwyg frame or code view state</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>isFullScreen</code></td>
+                    <td class="type">
+                        <span class="param-type">boolean</span>
+                    </td>
+                    <td class="description last">State of full screen</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>innerHeight_fullScreen</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">InnerHeight in editor when in full screen</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>resizeClientY</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">Remember the vertical size of the editor before resizing the editor<br>(Used when calculating during resize operation)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>tabSize</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">Indented size when tab button clicked (4)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>originCssText</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Remembered the CSS of the editor before full screen (Used when returning to original size again)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>editorHeight</code></td>
+                    <td class="type">
+                        <span class="param-type">number</span>
+                    </td>
+                    <td class="description last">The height value entered by the user or the height value of the "textarea" when the suneditor is created
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>isTouchMove</code></td>
+                    <td class="type">
+                        <span class="param-type">boolean</span>
+                    </td>
+                    <td class="description last">Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <dl class="details"></dl>
 
 
@@ -195,7 +500,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="callBack_addModule"><span class="type-signature"></span>callBack_addModule<span
+            <h4 class="name" id="_callBack_addModule"><span class="type-signature"></span>_callBack_addModule<span
                     class="signature">(directory, moduleName, targetElement, callBackFunction)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -569,7 +874,7 @@
             <h4 class="name" id="toggleFrame"><span class="type-signature"></span>toggleFrame<span
                     class="signature">()</span><span class="type-signature"></span></h4>
             <div class="description">
-                Changes to source view or wysiwyg view
+                Changes to code view or wysiwyg view
             </div>
             <dl class="details"></dl>
 
@@ -599,7 +904,7 @@
                 </tbody>
             </table>
             <dl class="details"></dl>
-            
+
         </article>
     </section>
 </div>
@@ -610,7 +915,7 @@
     <h3>SUNEDITOR.editor</h3>
     <ul>
         <li><a href="document-editor.html#callModule">callModule</a></li>
-        <li><a href="document-editor.html#callBack_addModule">callBack_addModule</a></li>
+        <li><a href="document-editor.html#_callBack_addModule">_callBack_addModule</a></li>
         <li><a href="document-editor.html#submenuOn">submenuOn</a></li>
         <li><a href="document-editor.html#submenuOff">submenuOff</a></li>
         <li><a href="document-editor.html#controllersOff">controllersOff</a></li>
@@ -640,7 +945,5 @@
     GMT+0900 (대한민국 표준시)
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"></script>
 </body>
 </html>
