@@ -1009,7 +1009,6 @@ SUNEDITOR.defaultLang = {
                 if (ctrl && keyCode !== 17 && keyCode !== 18) {
                     if (shortcutCommand(keyCode)) {
                         e.preventDefault();
-                        e.stopImmediatePropagation();
                         return;
                     }
                 }
@@ -1019,14 +1018,12 @@ SUNEDITOR.defaultLang = {
                     case 8: /**backspace key*/
                         if (target.childElementCount === 1 && target.children[0].innerHTML === "<br/>") {
                             e.preventDefault();
-                            e.stopImmediatePropagation();
                             return false;
                         }
                         break;
                     case 9:
                         /**tab key*/
                         e.preventDefault();
-                        e.stopImmediatePropagation();
                         if (ctrl || alt) break;
 
                         var currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
@@ -1491,7 +1488,7 @@ SUNEDITOR.defaultLang = {
 
         /** editor seting options */
         options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + "px" : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + "px");
-        options.display = options.display || element.style.display || 'block';
+        options.display = options.display || (element.style.display ==='none' || !element.style.display ? 'block' : element.style.display);
         options.editorIframeFont = options.editorIframeFont || 'inherit';
 
         var doc = document;
