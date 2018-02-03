@@ -170,7 +170,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
  &nbsp; &nbsp; &nbsp; &nbsp;[
             {
                 buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> className to be added to the button</span>
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> title property</span>
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> title property</span>
                 dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> The js file name of the added module</span>
                 dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,  <span class="pl-c"><span class="pl-c">//</span> The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
                 displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Options for whether the range of the dialog is inside the editor or for the entire screen</span>
@@ -179,7 +179,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
             },
             {
                 buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Dialog<span class="pl-pds">'</span></span>,
                 dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_dialog<span class="pl-pds">'</span></span>,
                 dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
                 displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
@@ -187,7 +187,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
             },
             {
                 buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>fullDialog<span class="pl-pds">'</span></span>,
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>FullDialog<span class="pl-pds">'</span></span>,
                 dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_fullDialog<span class="pl-pds">'</span></span>,
                 dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
                 displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
@@ -197,14 +197,14 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
         ]
     ]
 });</pre></div></li>
-<li>To add a module as the suneditor's default button, refer suneditor.js:_createToolBar function</li>
+<li>To add a module as the suneditor's default button, refer suneditor.js: _createToolBar (function), _defaultButtonsList (object) </li>
 </ul>
             </pre>
                     </div>
     </article>
-</div>
-        <p></p>
-        <textarea id="exampleButtonList" style="width:100%; height:200px;">Create button list</textarea>
+
+    <p></p>
+    <textarea id="exampleButtonList" style="width:100%; height:200px;">Create button list</textarea>
 
     <footer>
         <p>Suneditor v0.9 create by JiHong.Lee</p>
@@ -213,6 +213,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
         <p><a href="https://github.com/JiHong88/SunEditor" target="_blank" style="color:#f4b124;">go to GitHub
             suneditor</a></p>
     </footer>
+</div>
 
 <script>
     SUNEDITOR.create('exampleButtonList', {
@@ -231,7 +232,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
             [
                 {
                     buttonClass:'',
-                    title:'submenu',
+                    title:'Submenu',
                     dataCommand:'sample_submenu',
                     dataDisplay:'submenu',
                     displayOption:'',
@@ -239,7 +240,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
                 },
                 {
                     buttonClass:'',
-                    title:'dialog',
+                    title:'Dialog',
                     dataCommand:'sample_dialog',
                     dataDisplay:'dialog',
                     displayOption:'',
@@ -247,7 +248,7 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
                 },
                 {
                     buttonClass:'',
-                    title:'fullDialog',
+                    title:'FullDialog',
                     dataCommand:'sample_fullDialog',
                     dataDisplay:'dialog',
                     displayOption:'full',
