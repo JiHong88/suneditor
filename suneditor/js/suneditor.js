@@ -873,7 +873,7 @@ SUNEDITOR.defaultLang = {
          * @description event function
          */
         var event = {
-            _shortcutKeyCode : {
+            _shortcutKeyCode: {
                 66: ['bold', 'B'],
                 83: ['strikethrough', 'STRIKE'],
                 85: ['underline', 'U'],
@@ -882,6 +882,76 @@ SUNEDITOR.defaultLang = {
                 90: ['undo'],
                 219: ['outdent'],
                 221: ['indent']
+            },
+
+            _directionKeyKeycode: new RegExp('37|38|39|40|98|100|102|104'),
+
+            _findButtonEffectTag: function () {
+                editor._variable.copySelection = func.copyObj(editor.getSelection());
+                editor._variable.selectionNode = editor.getSelectionNode();
+
+                var selectionParent = editor._variable.selectionNode;
+                var findFont = true;
+                var findSize = true;
+                var findA = true;
+                var map = "B|U|I|STRIKE|FONT|SIZE|";
+                var check = new RegExp(map, "i");
+                while (!/^P$|^BODY$|^HTML$|^DIV$/i.test(selectionParent.nodeName)) {
+                    var nodeName = (/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName));
+
+                    /** Font */
+                    if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.font.length > 0)) {
+                        nodeName = 'FONT';
+                        var selectFont = (selectionParent.face || selectionParent.style.font || SUNEDITOR.lang.toolbar.font);
+                        dom.changeTxt(editor.commandMap[nodeName], selectFont);
+                        findFont = false;
+                        map = map.replace(nodeName + "|", "");
+                        check = new RegExp(map, "i");
+                    }
+
+                    /** A */
+                    if (findA && /^A$/i.test(selectionParent.nodeName) && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
+                        var selectionATag = selectionParent;
+                        editor.callModule('dialog', 'link', null, function () {
+                            SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
+                        });
+                        findA = false;
+                    } else if (findA && editor.controllerArray.length > 0) {
+                        editor.controllersOff();
+                    }
+
+                    /** span (font size) */
+                    if (findSize && /^SPAN$/i.test(nodeName) && selectionParent.style.fontSize.length > 0) {
+                        dom.changeTxt(editor.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        findSize = false;
+                        map = map.replace("SIZE|", "");
+                        check = new RegExp(map, "i");
+                    }
+
+                    /** command */
+                    if (check.test(nodeName)) {
+                        dom.addClass(editor.commandMap[nodeName], "on");
+                        map = map.replace(nodeName + "|", "");
+                        check = new RegExp(map, "i");
+                    }
+
+                    selectionParent = selectionParent.parentNode;
+                }
+
+                /** remove */
+                map = map.split("|");
+                var mapLen = map.length - 1;
+                for (var i = 0; i < mapLen; i++) {
+                    if (/^FONT$/i.test(map[i])) {
+                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
+                    }
+                    else if (/^SIZE$/i.test(map[i])) {
+                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
+                    }
+                    else {
+                        dom.removeClass(editor.commandMap[map[i]], "on");
+                    }
+                }
             },
 
             resize_window: function () {
@@ -986,7 +1056,7 @@ SUNEDITOR.defaultLang = {
                     });
                 }
 
-                event.onKeyUp_wysiwyg(e);
+                event._findButtonEffectTag();
             },
 
             onKeyDown_wysiwyg: function (e) {
@@ -997,7 +1067,7 @@ SUNEDITOR.defaultLang = {
                 var alt = e.altKey;
                 e.stopPropagation();
 
-                function shortcutCommand (keyCode) {
+                function shortcutCommand(keyCode) {
                     var key = event._shortcutKeyCode[keyCode];
                     if (!key) return false;
 
@@ -1079,71 +1149,9 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            onKeyUp_wysiwyg: function () {
-                editor._variable.copySelection = func.copyObj(editor.getSelection());
-                editor._variable.selectionNode = editor.getSelectionNode();
-
-                var selectionParent = editor._variable.selectionNode;
-                var findFont = true;
-                var findSize = true;
-                var findA = true;
-                var map = "B|U|I|STRIKE|FONT|SIZE|";
-                var check = new RegExp(map, "i");
-                while (!/^P$|^BODY$|^HTML$|^DIV$/i.test(selectionParent.nodeName)) {
-                    var nodeName = (/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName));
-
-                    /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.font.length > 0)) {
-                        nodeName = 'FONT';
-                        var selectFont = (selectionParent.face || selectionParent.style.font || SUNEDITOR.lang.toolbar.font);
-                        dom.changeTxt(editor.commandMap[nodeName], selectFont);
-                        findFont = false;
-                        map = map.replace(nodeName + "|", "");
-                        check = new RegExp(map, "i");
-                    }
-
-                    /** A */
-                    if (findA && /^A$/i.test(selectionParent.nodeName) && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
-                        var selectionATag = selectionParent;
-                        editor.callModule('dialog', 'link', null, function () {
-                            SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
-                        });
-                        findA = false;
-                    } else if (findA && editor.controllerArray.length > 0) {
-                        editor.controllersOff();
-                    }
-
-                    /** span (font size) */
-                    if (findSize && /^SPAN$/i.test(nodeName) && selectionParent.style.fontSize.length > 0) {
-                        dom.changeTxt(editor.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
-                        findSize = false;
-                        map = map.replace("SIZE|", "");
-                        check = new RegExp(map, "i");
-                    }
-
-                    /** command */
-                    if (check.test(nodeName)) {
-                        dom.addClass(editor.commandMap[nodeName], "on");
-                        map = map.replace(nodeName + "|", "");
-                        check = new RegExp(map, "i");
-                    }
-
-                    selectionParent = selectionParent.parentNode;
-                }
-
-                /** remove */
-                map = map.split("|");
-                var mapLen = map.length - 1;
-                for (var i = 0; i < mapLen; i++) {
-                    if (/^FONT$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
-                    }
-                    else if (/^SIZE$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
-                    }
-                    else {
-                        dom.removeClass(editor.commandMap[map[i]], "on");
-                    }
+            onKeyUp_wysiwyg: function (e) {
+                if (event._directionKeyKeycode.test(e.keyCode)) {
+                    event._findButtonEffectTag();
                 }
             },
 
@@ -1270,7 +1278,7 @@ SUNEDITOR.defaultLang = {
             show: function () {
                 var topAreaStyle = context.element.topArea.style;
                 topAreaStyle.cssText = editor._variable.originCssText;
-                if(topAreaStyle.display === "none") topAreaStyle.display = "block";
+                if (topAreaStyle.display === "none") topAreaStyle.display = "block";
             },
 
             /**
@@ -1420,7 +1428,7 @@ SUNEDITOR.defaultLang = {
         return '' +
             '<li>' +
             '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + displayOption + '">' +
-                    innerHTML +
+            innerHTML +
             '   </button>' +
             '</li>';
     }
@@ -1429,7 +1437,7 @@ SUNEDITOR.defaultLang = {
      * @description Create editor HTML
      * @param {jsonArray} buttonList - option.buttonList
      */
-    function _createToolBar (buttonList) {
+    function _createToolBar(buttonList) {
         var html = '<div class="sun-editor-id-toolbar-cover"></div>';
         var moduleHtml = null;
 
@@ -1465,7 +1473,7 @@ SUNEDITOR.defaultLang = {
      * @param {jsonArray} options - user options
      * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
      */
-    function _Constructor (element, options) {
+    function _Constructor(element, options) {
         if (!(typeof options === "object")) options = {};
 
         /** user options */
@@ -1490,7 +1498,7 @@ SUNEDITOR.defaultLang = {
 
         /** editor seting options */
         options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + "px" : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + "px");
-        options.display = options.display || (element.style.display ==='none' || !element.style.display ? 'block' : element.style.display);
+        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
         options.editorIframeFont = options.editorIframeFont || 'inherit';
 
         var doc = document;
@@ -1590,7 +1598,7 @@ SUNEDITOR.defaultLang = {
      * @param {jsonArray} options - user options
      * @returns Elements, variables of the editor
      */
-    function _Context (element, cons, options) {
+    function _Context(element, cons, options) {
         return {
             element: {
                 textElement: element,
