@@ -695,7 +695,6 @@ SUNEDITOR.defaultLang = {
                     else {
                         var removeNode = startCon;
                         var isSameContainer = startCon === endCon;
-                        var endLen = endCon.data.length;
 
                         if (isSameContainer) {
                             if (!this.isEdgePoint(endCon, endOff)) {
@@ -709,14 +708,14 @@ SUNEDITOR.defaultLang = {
                             parentNode.removeChild(removeNode);
                         }
                         else {
-                            try {
-                                selection.deleteFromDocument();
-                            } catch (e) {
-                                this.removeNode();
-                            }
+                            if (selection.deleteFromDocument) selection.deleteFromDocument();
+                            else this.removeNode();
 
-                            if (endLen === endCon.data.length) rightNode = endCon.nextSibling;
-                            else rightNode = endCon;
+                            rightNode = endCon;
+
+                            while (rightNode.nodeType !== 1) {
+                                rightNode = rightNode.parentNode;
+                            }
                         }
                     }
                 }
@@ -732,7 +731,6 @@ SUNEDITOR.defaultLang = {
                 }
 
                 // this.setRange(oNode, 0, oNode, 0);
-
             },
 
             /**
@@ -923,7 +921,7 @@ SUNEDITOR.defaultLang = {
                             SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
                         });
                         findA = false;
-                    } else if (findA && editor.controllerArray.length > 0) {
+                    } else if (findA && context.link && editor.controllerArray[0] === context.link.linkBtn) {
                         editor.controllersOff();
                     }
 
@@ -1061,6 +1059,7 @@ SUNEDITOR.defaultLang = {
                     editor.callModule('dialog', 'image', null, function () {
                         SUNEDITOR.plugin.image.call_controller_imageResize_.call(editor, targetElement);
                     });
+                    return;
                 }
 
                 event._findButtonEffectTag();
