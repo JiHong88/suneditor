@@ -156,7 +156,6 @@ SUNEDITOR.defaultLang = {
          * @description Add script File
          * @param {string} fileType - File type ("text/javascript")
          * @param {string} fullUrl - The full url of the js file to call
-         * @param {string} moduleName - The name of the js file to call
          * @param {function} callBack - Function to be executed immediately after module call
          */
         includeFile: function (fileType, fullUrl, callBack) {
@@ -196,7 +195,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Get the next index of the argument value in the element array
          * @param {array} array - element array
-         * @param {element} element - Element to find index
+         * @param {element} item - Element to find index
          * @returns {Number}
          */
         nextIdx: function (array, item) {
@@ -209,7 +208,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Get the previous index of the argument value in the element array
          * @param {array} array - element array
-         * @param {element} element - Element to find index
+         * @param {element} item - Element to find index
          * @returns {Number}
          */
         prevIdx: function (array, item) {
@@ -231,7 +230,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Get all child nodes of the argument value element (Without text node)
          * @param {element} element - element to get child node
-         * @param {(functon|null)} validation - Conditional function
+         * @param {(function|null)} validation - Conditional function
          * @returns {Array}
          */
         getListChildren: function (element, validation) {
@@ -255,7 +254,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Get all child nodes of the argument value element (Include text nodes)
          * @param {element} element - element to get child node
-         * @param {(functon|null)} validation - Conditional function
+         * @param {(function|null)} validation - Conditional function
          * @returns {Array}
          */
         getListChildNodes: function (element, validation) {
@@ -295,7 +294,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Set the text content value of the argument value element
          * @param {element} element - Elements to replace text content
-         * @param {String}
+         * @param {String} txt - Text to be applied
          */
         changeTxt: function (element, txt) {
             if (!element || !txt) return;
@@ -1319,6 +1318,10 @@ SUNEDITOR.defaultLang = {
      */
     var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
 
+    /**
+     * @description Suneditor's Default button list
+     * @private
+     */
     var _defaultButtonsList = {
         font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
             '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
@@ -1414,6 +1417,7 @@ SUNEDITOR.defaultLang = {
      * @description Create a group div containing each module
      * @param {string} innerHTML - module button html
      * @returns {string}
+     * @private
      */
     function _createModuleGroup(innerHTML) {
         if (!innerHTML) return '';
@@ -1429,6 +1433,7 @@ SUNEDITOR.defaultLang = {
      * @param {string} displayOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
      * @param {string} innerHTML - Html in button
      * @returns {string}
+     * @private
      */
     function _createButton(buttonClass, title, dataCommand, dataDisplay, displayOption, innerHTML) {
         return '' +
@@ -1441,7 +1446,8 @@ SUNEDITOR.defaultLang = {
 
     /**
      * @description Create editor HTML
-     * @param {jsonArray} buttonList - option.buttonList
+     * @param {array} buttonList - option.buttonList
+     * @private
      */
     function _createToolBar(buttonList) {
         var html = '<div class="sun-editor-id-toolbar-cover"></div>';
@@ -1476,8 +1482,9 @@ SUNEDITOR.defaultLang = {
     /**
      * @description document create - call _createToolBar()
      * @param {element} element - textarea
-     * @param {jsonArray} options - user options
+     * @param {json} options - user options
      * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
+     * @private
      */
     function _Constructor(element, options) {
         if (!(typeof options === "object")) options = {};
@@ -1601,8 +1608,9 @@ SUNEDITOR.defaultLang = {
      * @description Elements and variables you should have
      * @param {HTMLElement} element - textarea element
      * @param {object} cons - Toolbar element you created
-     * @param {jsonArray} options - user options
+     * @param {json} options - user options
      * @returns Elements, variables of the editor
+     * @private
      */
     function _Context(element, cons, options) {
         return {
@@ -1642,9 +1650,9 @@ SUNEDITOR.defaultLang = {
     }
 
     /**
-     * @description create Suneditor
+     * @description Create the suneditor
      * @param {string} elementId - textarea Id
-     * @param {jsonArray} options - user options
+     * @param {json} options - user options
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     SUNEDITOR.create = function (elementId, options) {
@@ -1673,7 +1681,7 @@ SUNEDITOR.defaultLang = {
     };
 
     /**
-     * @description destroy Suneditor
+     * @description Destroy the suneditor
      * @param {string} elementId - textarea Id
      */
     SUNEDITOR.destroy = function (elementId) {
