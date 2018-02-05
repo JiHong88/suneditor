@@ -1068,7 +1068,7 @@ SUNEDITOR.defaultLang = {
                 var target = e.target;
                 var keyCode = e.keyCode;
                 var shift = e.shiftKey;
-                var ctrl = e.ctrlKey;
+                var ctrl = e.ctrlKey || e.metaKey;
                 var alt = e.altKey;
                 e.stopPropagation();
 
@@ -1156,7 +1156,6 @@ SUNEDITOR.defaultLang = {
 
             onKeyUp_wysiwyg: function (e) {
                 if (event._directionKeyKeycode.test(e.keyCode)) {
-                    console.log(e.keyCode);
                     event._findButtonEffectTag();
                 }
             },
