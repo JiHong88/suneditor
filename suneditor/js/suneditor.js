@@ -84,14 +84,6 @@ SUNEDITOR.defaultLang = {
      */
     var func = SUNEDITOR.func = {
         /**
-         * @description A function that returns a value of true.
-         * @returns {Boolean}
-         */
-        returnTrue: function () {
-            return true;
-        },
-
-        /**
          * @description Gets XMLHttpRequest object
          * @returns {Object}
          */
@@ -235,7 +227,7 @@ SUNEDITOR.defaultLang = {
          */
         getListChildren: function (element, validation) {
             var children = [];
-            validation = validation || func.returnTrue;
+            validation = validation || function () { return true; };
 
             (function recursionFunc(current) {
                 if (element !== current && validation(current)) {
@@ -259,7 +251,7 @@ SUNEDITOR.defaultLang = {
          */
         getListChildNodes: function (element, validation) {
             var children = [];
-            validation = validation || func.returnTrue;
+            validation = validation || function () { return true; };
 
             (function recursionFunc(current) {
                 if (validation(current)) {
