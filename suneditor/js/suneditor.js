@@ -882,7 +882,7 @@ SUNEDITOR.defaultLang = {
                 221: ['indent']
             },
 
-            _directionKeyKeycode: new RegExp('8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104'),
+            _directionKeyKeycode: new RegExp('^8$|^13$|^32$|^46$|^33$|^34$|^35$|^36$|^37$|^38$|^39$|^40$|^98$|^100$|^102$|^104$'),
 
             _findButtonEffectTag: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
@@ -1083,8 +1083,8 @@ SUNEDITOR.defaultLang = {
                 }
 
                 /** Shortcuts */
-                if (ctrl && keyCode !== 17 && keyCode !== 18) {
-                    if (shortcutCommand(keyCode)) {
+                if (ctrl && !/^16$|^17$|^18$/.test(keyCode)) {
+                    if (!(shift && keyCode !== 83) && shortcutCommand(keyCode)) {
                         e.preventDefault();
                         return;
                     }
@@ -1156,6 +1156,7 @@ SUNEDITOR.defaultLang = {
 
             onKeyUp_wysiwyg: function (e) {
                 if (event._directionKeyKeycode.test(e.keyCode)) {
+                    console.log(e.keyCode);
                     event._findButtonEffectTag();
                 }
             },
