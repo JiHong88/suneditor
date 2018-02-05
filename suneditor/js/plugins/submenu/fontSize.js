@@ -54,11 +54,24 @@ SUNEDITOR.plugin.fontSize = {
         var spanNode = null;
         var beforeNode = null;
         var afterNode = null;
+        var i;
 
         /** Select within the same node */
         if (startCon === endCon) {
             if (startCon.nodeType === ELEMENT_NODE && /^SPAN$/i.test(startCon.nodeName)) {
                 startCon.style.fontSize = fontsize;
+            }
+            else if (startOff === endOff) {
+                spanNode = document.createElement("SPAN");
+                spanNode.style.fontSize = fontsize;
+                spanNode.innerHTML = "&nbsp;";
+
+                startCon.parentNode.insertBefore(spanNode, startCon.nextSibling);
+
+                startCon = spanNode;
+                startOff = 0;
+                endCon = spanNode;
+                endOff = 1;
             }
             else {
                 var afterNodeStandardPosition;
@@ -108,7 +121,7 @@ SUNEDITOR.plugin.fontSize = {
             var endIndex = SUNEDITOR.dom.getArrayIndex(childNodes, endCon);
 
             var startNode = startCon;
-            for (var i = startIndex + 1; i >= 0; i--) {
+            for (i = startIndex + 1; i >= 0; i--) {
                 if (childNodes[i] === startNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
                     startIndex = i;
                     startNode = startNode.parentNode;
@@ -116,7 +129,7 @@ SUNEDITOR.plugin.fontSize = {
             }
 
             var endNode = endCon;
-            for (var i = endIndex - 1; i > startIndex; i--) {
+            for (i = endIndex - 1; i > startIndex; i--) {
                 if (childNodes[i] === endNode && childNodes[i].nodeType === ELEMENT_NODE) {
                     childNodes.splice(i, 1);
                     endNode = endNode.parentNode;
@@ -124,7 +137,7 @@ SUNEDITOR.plugin.fontSize = {
                 }
             }
 
-            for (var i = startIndex; i <= endIndex; i++) {
+            for (i = startIndex; i <= endIndex; i++) {
                 var item = childNodes[i];
                 var parentNode = item.parentNode;
 
@@ -199,20 +212,19 @@ SUNEDITOR.plugin.fontSize = {
                     continue;
                 }
 
-                if (parentNode.nodeType === ELEMENT_NODE) {
-                    if (parentNode.style.fontSize === fontsize && /^SPAN$/i.test(item.nodeName)) {
-                        var textNode = document.createTextNode(item.textContent);
-                        parentNode.insertBefore(textNode, item);
-                        SUNEDITOR.dom.removeItem(item);
-                        continue;
+                if (/^SPAN$/i.test(parentNode.nodeName)) {
+                    if (parentNode.style.fontSize !== fontsize) {
+                        parentNode.style.fontSize = fontsize;
                     }
-                    else if (/^SPAN$/i.test(item.nodeName) && item.style.fontSize !== fontsize) {
-                        item.style.fontSize = fontsize;
-                        continue;
-                    }
-                }
 
-                if (/^SPAN$/i.test(item.nodeName)) {
+                    if (/^SPAN$/i.test(item.nodeName)) {
+                        item.parentNode.insertBefore(SUNEDITOR.func.copyObj(item), item);
+                        SUNEDITOR.dom.removeItem(item);
+                    }
+
+                    continue;
+                }
+                else if (/^SPAN$/i.test(item.nodeName)) {
                     item.style.fontSize = fontsize;
                     continue;
                 }
