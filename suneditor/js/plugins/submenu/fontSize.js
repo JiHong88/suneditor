@@ -54,6 +54,8 @@ SUNEDITOR.plugin.fontSize = {
         var spanNode = null;
         var beforeNode = null;
         var afterNode = null;
+
+        var item;
         var i;
 
         /** Select within the same node */
@@ -114,132 +116,86 @@ SUNEDITOR.plugin.fontSize = {
         }
         /** Select multiple nodes */
         else {
-            var childNodes = SUNEDITOR.dom.getListChildNodes(commonCon, function (current) {
-                return current.nodeType === 3;
-            });
-            var startIndex = SUNEDITOR.dom.getArrayIndex(childNodes, startCon);
-            var endIndex = SUNEDITOR.dom.getArrayIndex(childNodes, endCon);
+            // line varibles
+            var lineNodesP = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /BODY/i.test(current.parentNode.nodeName); });
+            var textNodes;
+            var textNodesLen;
+            var findNode;
+            var n;
+            var s;
+            // textNodes varibles
+            var textNodeParent;
+            var text;
 
-            var startNode = startCon;
-            for (i = startIndex + 1; i >= 0; i--) {
-                if (childNodes[i] === startNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
-                    startIndex = i;
-                    startNode = startNode.parentNode;
-                }
-            }
+            /** each */
+            for (i = 0; i < lineNodesP.length; i++) {
+                textNodes = SUNEDITOR.dom.getListChildNodes(lineNodesP[i], function (current) { return current.nodeType === 3; });
+                textNodesLen = textNodes.length;
+                s = 0;
 
-            var endNode = endCon;
-            for (i = endIndex - 1; i > startIndex; i--) {
-                if (childNodes[i] === endNode && childNodes[i].nodeType === ELEMENT_NODE) {
-                    childNodes.splice(i, 1);
-                    endNode = endNode.parentNode;
-                    --endIndex;
-                }
-            }
-
-            for (i = startIndex; i <= endIndex; i++) {
-                var item = childNodes[i];
-                var parentNode = item.parentNode;
-
-                if (item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
-                    SUNEDITOR.dom.removeItem(item);
-                    continue;
-                }
-
-                if (item === startCon) {
-                    if (parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                        if (/^SPAN$/i.test(item.nodeName)) {
-                            item.style.fontSize = fontsize;
+                // find start index
+                if (i === 0) {
+                    findNode = startCon;
+                    for (s = SUNEDITOR.dom.getArrayIndex(textNodes, startCon) + 1; s >= 0; s--) {
+                        if (textNodes[s] === findNode && /^SPAN$/i.test(textNodes[s].nodeName) && textNodes[s].firstChild === findNode && startOff === 0) {
+                            n = s;
+                            findNode = findNode.parentNode;
                         }
-                        continue;
                     }
-
-                    spanNode = document.createElement("SPAN");
-                    spanNode.style.fontSize = fontsize;
-
-                    if (startCon.nodeType === ELEMENT_NODE) {
-                        beforeNode = document.createTextNode(startCon.textContent);
-                        spanNode.innerHTML = startCon.innerHTML;
-                    } else {
-                        beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        spanNode.innerText = startCon.substringData(startOff, (startCon.length - startOff));
-                    }
-
-                    startCon.parentNode.insertBefore(spanNode, item.nextSibling);
-
-                    if (beforeNode.length > 0) {
-                        startCon.data = beforeNode.data;
-                    } else {
-                        SUNEDITOR.dom.removeItem(startCon);
-                    }
-
-                    startCon = spanNode.firstChild;
-                    startOff = 0;
-
-                    continue;
                 }
 
-                if (item === endCon) {
-                    if (parentNode.nodeType === ELEMENT_NODE && parentNode.style.fontSize === fontsize) {
-                        if (/^SPAN$/i.test(item.nodeName) && endCon.data.length === item.textContent.length) {
-                            item.style.fontSize = fontsize;
+                // find end index
+                if (i === lineNodesP.length - 1) {
+                    findNode = endCon;
+                    for (s = SUNEDITOR.dom.getArrayIndex(textNodes, endCon) - 1; s > 0; s--) {
+                        if (textNodes[s] === findNode && textNodes[s].nodeType === ELEMENT_NODE) {
+                            textNodes.splice(s, 1);
+                            findNode = findNode.parentNode;
+                            --textNodesLen;
                         }
-                        continue;
                     }
-
-                    spanNode = document.createElement("SPAN");
-                    spanNode.style.fontSize = fontsize;
-
-                    if (endCon.nodeType === ELEMENT_NODE) {
-                        afterNode = document.createTextNode(endCon.textContent);
-                        spanNode.innerHTML = endCon.innerHTML;
-                    } else {
-                        afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                        spanNode.innerText = endCon.substringData(0, endOff);
-                    }
-
-                    endCon.parentNode.insertBefore(spanNode, endCon);
-
-                    if (afterNode.length > 0) {
-                        endCon.data = afterNode.data;
-                    } else {
-                        SUNEDITOR.dom.removeItem(endCon);
-                    }
-
-                    endCon = spanNode.firstChild;
-                    endOff = spanNode.textContent.length;
-
-                    continue;
                 }
 
-                if (/^SPAN$/i.test(parentNode.nodeName)) {
-                    if (parentNode.style.fontSize !== fontsize) {
-                        parentNode.style.fontSize = fontsize;
-                    }
+                // create textNode
+                text = document.createTextNode('');
+                for (n = s; n < textNodesLen; n++) {
+                    item = textNodes[n];
+                    textNodeParent = item.parentNode;
 
-                    if (/^SPAN$/i.test(item.nodeName)) {
-                        item.parentNode.insertBefore(SUNEDITOR.func.copyObj(item), item);
+                    // remove garbage node
+                    if (item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
                         SUNEDITOR.dom.removeItem(item);
+                        continue;
                     }
 
-                    continue;
-                }
-                else if (/^SPAN$/i.test(item.nodeName)) {
-                    item.style.fontSize = fontsize;
-                    continue;
-                }
+                    // startCon
+                    if (item === startCon) {
+                        if (startCon.nodeType === ELEMENT_NODE) {
+                            beforeNode = document.createTextNode(startCon.textContent);
+                            text.data = startCon.textContent;
+                        } else {
+                            beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                            text.data = startCon.substringData(startOff, (startCon.length - startOff));
+                        }
 
-                spanNode = document.createElement("SPAN");
-                spanNode.style.fontSize = fontsize;
+                        startCon.parentNode.insertBefore(text, item.nextSibling);
 
-                if (item.nodeType === ELEMENT_NODE) {
-                    spanNode.innerHTML = item.innerHTML;
-                } else {
-                    spanNode.innerText = item.data;
+                        if (beforeNode.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            SUNEDITOR.dom.removeItem(startCon);
+                        }
+
+                        startCon = text;
+                        startOff = 0;
+
+                        continue;
+                    }
+
+                    // endCon
+
+
                 }
-
-                item.parentNode.insertBefore(spanNode, item);
-                SUNEDITOR.dom.removeItem(item);
             }
         }
 
