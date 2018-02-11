@@ -58,7 +58,8 @@ SUNEDITOR.plugin.fontSize = {
             if(node.length > 0 && sNode !== node) sNode.appendChild(node);
         })(element, sNode);
 
-        return sNode;
+        element.innerHTML = '';
+        element.appendChild(sNode);
     },
 
     appendSpan: function (fontSize) {
@@ -77,9 +78,7 @@ SUNEDITOR.plugin.fontSize = {
 
         // mid
         for (var i = 1; i < lineNodes.length - 1; i++) {
-            var newNode = SUNEDITOR.plugin.fontSize.overlayFullLineNodes(lineNodes[i], 'SPAN', fontSize);
-            lineNodes[i].innerHTML = '';
-            lineNodes[i].appendChild(newNode);
+            SUNEDITOR.plugin.fontSize.overlayFullLineNodes(lineNodes[i], 'SPAN', fontSize);
         }
 
         // endCon
