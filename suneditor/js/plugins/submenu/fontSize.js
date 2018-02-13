@@ -49,9 +49,10 @@ SUNEDITOR.plugin.fontSize = {
                 if (child.nodeName !== nodeName) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
-                    if(child.nodeType === 1) node = cloneNode;
+                    if (child.nodeType === 1) node = cloneNode;
                 }
                 recursionFunc(child, node);
+                if (node !== sNode) node = node.parentNode;
             }
         })(element, sNode);
 
@@ -59,15 +60,15 @@ SUNEDITOR.plugin.fontSize = {
         element.appendChild(sNode);
     },
 
-    overlayFullLineNodes2: function (element, nodeName, fontSize, startCon, startOff) {
+    overlayFullLineNodesStart: function (element, nodeName, fontSize, startCon, startOff) {
         var pNode = document.createElement('P');
         var sNode = document.createElement(nodeName);
         sNode.style.fontSize = fontSize;
 
-        var passStart = false;
+        var passNode = false;
         var cloneNode;
 
-        (function recursionFunc(current, node) {
+        (function recursionFunc(current, node, newNode) {
             var childNodes = current.childNodes;
             var textNode = null;
 
@@ -75,7 +76,7 @@ SUNEDITOR.plugin.fontSize = {
                 var child = childNodes[i];
 
                 // startCon
-                if (!passStart && child === startCon) {
+                if (!passNode && child === startCon) {
                     var prevNode;
                     if (startCon.nodeType === 1) {
                         prevNode = document.createTextNode(startCon.textContent);
@@ -94,30 +95,124 @@ SUNEDITOR.plugin.fontSize = {
 
                     child = textNode;
                     pNode.appendChild(sNode);
-                    node = sNode;
-                    passStart = true;
+                    if (newNode) {
+                        sNode.appendChild(newNode);
+                        node = newNode;
+                    } else {
+                        node = sNode;
+                    }
+
+                    newNode = null;
+                    passNode = true;
                 }
 
-                if (passStart && child.nodeName !== nodeName) {
+                if (passNode && child.nodeName !== nodeName) {
                     cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
-                    if(child.nodeType === 1) node = cloneNode;
+                    if (child.nodeType === 1) node = cloneNode;
                 }
-                else if (!passStart) {
+                else if (!passNode) {
                     cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
-                    if(child.nodeType === 1) node = cloneNode;
+                    if (child.nodeType === 1) {
+                        node = cloneNode;
+                        if (child.nodeName !== nodeName) {
+                            newNode = child.cloneNode(false);
+                        }
+                    }
                 }
 
-                recursionFunc(child, node);
+                recursionFunc(child, node, newNode);
+
+                if (node !== sNode) {
+                    node = node.parentNode;
+                }
+
+                if (newNode !== pNode) {
+                    newNode = newNode.parentNode;
+                }
             }
-        })(element, pNode);
+        })(element, sNode, pNode);
 
         element.innerHTML = pNode.innerHTML;
 
         return {
-            con: startCon,
-            offset: startOff
+            startCon: startCon,
+            startOff: startOff
+        };
+    },
+
+    overlayFullLineNodesEnd: function (element, nodeName, fontSize, endCon, endOff) {
+        var pNode = document.createElement('P');
+        var sNode = document.createElement(nodeName);
+        sNode.style.fontSize = fontSize;
+
+        var passNode = false;
+        var cloneNode;
+        pNode.appendChild(sNode);
+
+        (function recursionFunc(current, node, newNode) {
+            var childNodes = current.childNodes;
+            var textNode = null;
+
+            for (var i = 0; i < childNodes.length; i++) {
+                var child = childNodes[i];
+
+                // endCon
+                if (!passNode && child === endCon) {
+                    var afterNode;
+                    if (endCon.nodeType === 1) {
+                        afterNode = document.createTextNode(endCon.textContent);
+                        textNode = document.createTextNode(endCon.innerHTML);
+                    } else {
+                        afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                        textNode = document.createTextNode(endCon.substringData(0, endOff));
+                    }
+
+                    endCon = textNode;
+                    endOff = textNode.data.length;
+
+                    child = textNode;
+                    node.appendChild(textNode);
+
+                    if (afterNode.data.length > 0) {
+                        newNode.appendChild(afterNode);
+                        pNode.appendChild(newNode);
+                    }
+
+                    if (childNodes.length - 1 === i) node = pNode;
+                    else node = newNode;
+
+                    newNode = null;
+                }
+
+                if (child.nodeName !== nodeName) {
+                    cloneNode = child.cloneNode(false);
+                    node.appendChild(cloneNode);
+                    if (child.nodeType === 1) node = cloneNode;
+                }
+
+                if (child.nodeType === 1) {
+                    newNode = child.cloneNode(false);
+                }
+
+                recursionFunc(child, node, newNode);
+
+                if (node !== sNode) {
+                    node = node.parentNode;
+                }
+
+                if (node !== pNode) {
+                    node = node.parentNode;
+                }
+            }
+        })(element, sNode, pNode);
+
+        element.innerHTML = pNode.innerHTML;
+
+        return {
+            endCon: endCon,
+            endOff: endOff
         };
     },
 
@@ -130,21 +225,19 @@ SUNEDITOR.plugin.fontSize = {
         var endCon = nativeRng.endContainer;
         var endOff = nativeRng.endOffset;
         var commonCon = nativeRng.commonAncestorContainer;
-        var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /P/i.test(current.nodeName) && current.childNodes.length > 0; });
+        var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /^P$/i.test(current.nodeName) && current.childNodes.length > 0; });
 
         // startCon
-        var start = SUNEDITOR.plugin.fontSize.overlayFullLineNodes2(lineNodes[0], 'SPAN', fontSize, startCon, startOff);
-
+        var start = SUNEDITOR.plugin.fontSize.overlayFullLineNodesStart(lineNodes[0], 'SPAN', fontSize, startCon, startOff);
         // mid
         for (var i = 1; i < lineNodes.length - 1; i++) {
             SUNEDITOR.plugin.fontSize.overlayFullLineNodes(lineNodes[i], 'SPAN', fontSize);
         }
-
         // endCon
-        // var end = SUNEDITOR.plugin.fontSize.overlayFullLineNodesStartCon(lineNodes[0], 'SPAN', fontSize, endCon, endOff);
+        var end = SUNEDITOR.plugin.fontSize.overlayFullLineNodesEnd(lineNodes[lineNodes.length - 1], 'SPAN', fontSize, endCon, endOff);
 
         // set range
-        this.setRange(start.con, start.offset, end.con, end.offset);
+        this.setRange(start.startCon, start.startOff, end.endCon, end.endOff);
     },
 
     pickup: function (e) {
