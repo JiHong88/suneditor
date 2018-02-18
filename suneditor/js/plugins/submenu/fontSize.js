@@ -46,12 +46,13 @@ SUNEDITOR.plugin.fontSize = {
             var childNodes = current.childNodes;
             for (var i = 0; i < childNodes.length; i++) {
                 var child = childNodes[i];
+                var coverNode = node;
                 if (child.nodeName !== nodeName) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
-                    if (child.nodeType === 1) node = cloneNode;
+                    if (child.nodeType === 1) coverNode = cloneNode;
                 }
-                recursionFunc(child, node);
+                recursionFunc(child, coverNode);
             }
         })(element, sNode);
 
@@ -65,21 +66,18 @@ SUNEDITOR.plugin.fontSize = {
         sNode.style.fontSize = fontSize;
 
         var passNode = false;
-        var cloneNode;
-        var newNode;
-        var textNode;
-        var prevNode;
 
-        (function recursionFunc(current, node, newNode) {
+        (function recursionFunc(current, node) {
+
             var childNodes = current.childNodes;
-
             for (var i = 0; i < childNodes.length; i++) {
                 var child = childNodes[i];
+                var coverNode = node;
 
                 // startCon
                 if (!passNode && child === startCon) {
-                    prevNode = document.createTextNode(startCon.substringData(0, startOff));
-                    textNode = document.createTextNode(startCon.substringData(startOff, (startCon.length - startOff)));
+                    var prevNode = document.createTextNode(startCon.substringData(0, startOff));
+                    var textNode = document.createTextNode(startCon.substringData(startOff, (startCon.length - startOff)));
 
                     if (prevNode.data.length > 0) {
                         node.appendChild(prevNode);
@@ -88,42 +86,46 @@ SUNEDITOR.plugin.fontSize = {
                     startCon = textNode;
                     startOff = 0;
 
-                    child = textNode;
-                    pNode.appendChild(sNode);
-                    if (newNode) {
-                        node = newNode;
+                    var newNode;
+                    if (!/^P$/i.test(current.nodeName)) {
+                        newNode = current.cloneNode(false);
+                        var appendNode = newNode;
+                        while (!/^P$/i.test(current.parentNode.nodeName)) {
+                            current = current.parentNode;
+                            appendNode = current.cloneNode(false).appendChild(newNode);
+                        }
+
+                        sNode.appendChild(appendNode);
                     } else {
-                        node = sNode;
+                        newNode = sNode;
                     }
 
-                    newNode = null;
+                    child = textNode;
+                    pNode.appendChild(sNode);
+
+                    node = newNode;
                     passNode = true;
                 }
 
-                if (passNode && child.nodeName !== nodeName) {
-                    cloneNode = child.cloneNode(false);
+                if (child.nodeName !== nodeName) {
+                    var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
                     if (child.nodeType === 1) node = cloneNode;
                 }
-                else if (!passNode) {
-                    cloneNode = child.cloneNode(false);
-                    node.appendChild(cloneNode);
-                    if (child.nodeType === 1) {
-                        node = cloneNode;
-                        if (child.nodeName !== nodeName) {
-                            newNode = child.cloneNode(false);
-                        }
-                    }
-                }
+                // else if (!passNode) {
+                //     cloneNode = child.cloneNode(false);
+                //     node.appendChild(cloneNode);
+                //     if (child.nodeType === 1) {
+                //         node = cloneNode;
+                //         if (child.nodeName !== nodeName) {
+                //             newNode = child.cloneNode(false);
+                //         }
+                //     }
+                // }
 
-                recursionFunc(child, node);
-                if (node !== sNode) node = node.parentNode;
-
-                if (newNode && newNode !== pNode) {
-                    newNode = newNode.parentNode;
-                }
+                recursionFunc(child, coverNode);
             }
-        })(element, sNode, newNode);
+        })(element, pNode);
 
         element.innerHTML = pNode.innerHTML;
 
