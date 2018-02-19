@@ -38,7 +38,7 @@ SUNEDITOR.plugin.fontSize = {
         return listDiv;
     },
 
-    overlayFullLineNodes: function (element, nodeName, fontSize) {
+    overlayLineNodes: function (element, nodeName, fontSize) {
         var sNode = document.createElement(nodeName);
         sNode.style.fontSize = fontSize;
 
@@ -60,12 +60,15 @@ SUNEDITOR.plugin.fontSize = {
         element.appendChild(sNode);
     },
 
-    overlayFullLineNodesStart: function (element, nodeName, fontSize, startCon, startOff) {
+    overlayLineNodesStart: function (element, nodeName, fontSize, startCon, startOff) {
         var pNode = document.createElement('P');
         var sNode = document.createElement(nodeName);
         sNode.style.fontSize = fontSize;
 
         var passNode = false;
+        var pCurrent;
+        var newNode;
+        var appendNode;
 
         (function recursionFunc(current, node) {
 
@@ -74,7 +77,6 @@ SUNEDITOR.plugin.fontSize = {
                 var child = childNodes[i];
                 var coverNode = node;
 
-                // startCon
                 if (!passNode && child === startCon) {
                     var prevNode = document.createTextNode(startCon.substringData(0, startOff));
                     var textNode = document.createTextNode(startCon.substringData(startOff, (startCon.length - startOff)));
@@ -86,13 +88,19 @@ SUNEDITOR.plugin.fontSize = {
                     startCon = textNode;
                     startOff = 0;
 
-                    var newNode;
                     if (!/^P$/i.test(current.nodeName)) {
-                        newNode = current.cloneNode(false);
-                        var appendNode = newNode;
-                        while (!/^P$/i.test(current.parentNode.nodeName)) {
+                        pCurrent = [];
+                        while (!/^P$|^BODY$/i.test(current.parentNode.nodeName)) {
+                            if (current.nodeName !== nodeName) {
+                                pCurrent.push(current.cloneNode(false));
+                            }
                             current = current.parentNode;
-                            appendNode = current.cloneNode(false).appendChild(newNode);
+                        }
+
+                        appendNode = newNode = pCurrent.pop();
+                        while (pCurrent.length > 0) {
+                            newNode = pCurrent.pop();
+                            appendNode.appendChild(newNode);
                         }
 
                         sNode.appendChild(appendNode);
@@ -101,27 +109,41 @@ SUNEDITOR.plugin.fontSize = {
                     }
 
                     child = textNode;
+                    node = newNode;
                     pNode.appendChild(sNode);
 
-                    node = newNode;
                     passNode = true;
                 }
 
-                if (child.nodeName !== nodeName) {
+                if (passNode) {
+                    if (!/^P$/i.test(current.nodeName)) {
+                        pCurrent = [];
+                        while (!/^SPAN$|^P$|^BODY$/i.test(current.parentNode.nodeName)) {
+                            if (current.nodeName !== nodeName) {
+                                pCurrent.push(current.cloneNode(false));
+                            }
+                            current = current.parentNode;
+                        }
+
+                        appendNode = newNode = pCurrent.length > 0 ? pCurrent.pop() : node;
+                        while (pCurrent.length > 0) {
+                            newNode = pCurrent.pop();
+                            appendNode.appendChild(newNode);
+                        }
+
+                        sNode.appendChild(appendNode);
+                    } else {
+                        newNode = sNode;
+                    }
+
+                    node = newNode;
+                }
+
+                if (!passNode || child.nodeName !== nodeName) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
-                    if (child.nodeType === 1) node = cloneNode;
+                    if (child.nodeType === 1) coverNode = cloneNode;
                 }
-                // else if (!passNode) {
-                //     cloneNode = child.cloneNode(false);
-                //     node.appendChild(cloneNode);
-                //     if (child.nodeType === 1) {
-                //         node = cloneNode;
-                //         if (child.nodeName !== nodeName) {
-                //             newNode = child.cloneNode(false);
-                //         }
-                //     }
-                // }
 
                 recursionFunc(child, coverNode);
             }
@@ -225,10 +247,10 @@ SUNEDITOR.plugin.fontSize = {
         var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /^P$/i.test(current.nodeName) && current.childNodes.length > 0; });
 
         // startCon
-        var start = SUNEDITOR.plugin.fontSize.overlayFullLineNodesStart(lineNodes[0], 'SPAN', fontSize, startCon, startOff);
+        var start = SUNEDITOR.plugin.fontSize.overlayLineNodesStart(lineNodes[0], 'SPAN', fontSize, startCon, startOff);
         // mid
         for (var i = 1; i < lineNodes.length - 1; i++) {
-            SUNEDITOR.plugin.fontSize.overlayFullLineNodes(lineNodes[i], 'SPAN', fontSize);
+            SUNEDITOR.plugin.fontSize.overlayLineNodes(lineNodes[i], 'SPAN', fontSize);
         }
         // endCon
         // var end = SUNEDITOR.plugin.fontSize.overlayFullLineNodesEnd(lineNodes[lineNodes.length - 1], 'SPAN', fontSize, endCon, endOff);
