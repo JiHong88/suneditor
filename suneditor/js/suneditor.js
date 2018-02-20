@@ -234,8 +234,7 @@ SUNEDITOR.defaultLang = {
                     children.push(current);
                 }
 
-                var childLen = current.children.length;
-                for (var i = 0, len = childLen; i < len; i++) {
+                for (var i = 0, len = current.children.length; i < len; i++) {
                     recursionFunc(current.children[i]);
                 }
             })(element);
@@ -258,8 +257,7 @@ SUNEDITOR.defaultLang = {
                     children.push(current);
                 }
 
-                var childLen = current.childNodes.length;
-                for (var i = 0, len = childLen; i < len; i++) {
+                for (var i = 0, len = current.childNodes.length; i < len; i++) {
                     recursionFunc(current.childNodes[i]);
                 }
             })(element);
