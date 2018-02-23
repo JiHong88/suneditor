@@ -38,32 +38,27 @@ SUNEDITOR.plugin.fontSize = {
         return listDiv;
     },
 
-    overlayLineNodes: function (element, nodeName, fontSize) {
-        var sNode = document.createElement(nodeName);
-        sNode.style.fontSize = fontSize;
-
+    overlayLineInnerNodes: function (element, newInnerNode, validation) {
         (function recursionFunc(current, node) {
             var childNodes = current.childNodes;
-            for (var i = 0; i < childNodes.length; i++) {
+            for (var i = 0, len = childNodes.length; i < len; i++) {
                 var child = childNodes[i];
                 var coverNode = node;
-                if (child.nodeName !== nodeName) {
+                if (validation(child)) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
                     if (child.nodeType === 1) coverNode = cloneNode;
                 }
                 recursionFunc(child, coverNode);
             }
-        })(element, sNode);
+        })(element, newInnerNode);
 
         element.innerHTML = '';
-        element.appendChild(sNode);
+        element.appendChild(newInnerNode);
     },
 
-    overlayLineNodesStart: function (element, nodeName, fontSize, startCon, startOff) {
+    overlayLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
         var pNode = document.createElement('P');
-        var sNode = document.createElement(nodeName);
-        sNode.style.fontSize = fontSize;
         var container = startCon;
         var offset = startOff;
 
@@ -74,16 +69,21 @@ SUNEDITOR.plugin.fontSize = {
 
         (function recursionFunc(current, node) {
             var childNodes = current.childNodes;
-            for (var i = 0; i < childNodes.length; i++) {
+            for (var i = 0, len = childNodes.length; i < len; i++) {
                 var child = childNodes[i];
                 var coverNode = node;
 
                 if (passNode) {
                     newNode = node;
-                    while (newNode !== sNode && newNode !== pNode) {
+                    while (newNode.parentNode !== newInnerNode && newNode.parentNode !== pNode && newNode.parentNode !== null) {
                         newNode = newNode.parentNode;
                     }
-                    if (newNode === pNode) node = sNode;
+                    if (newNode.parentNode === pNode) {
+                        newInnerNode.appendChild(newNode);
+                    }
+                    if (node === pNode) {
+                        node = newInnerNode;
+                    }
                 }
 
                 // startContainer
@@ -95,6 +95,24 @@ SUNEDITOR.plugin.fontSize = {
                         node.appendChild(prevNode);
                     }
 
+                    newNode = node;
+                    while (newNode.parentNode !== pNode && newNode !== null) {
+                        if (validation(newNode, true) && newNode.nodeType === 1) {
+                            pCurrent.push(newNode.cloneNode(false));
+                        }
+                        newNode = newNode.parentNode;
+                    }
+
+                    pNode.appendChild(newInnerNode);
+
+                    child = textNode;
+                    node = newNode;
+
+                    container = textNode;
+                    offset = 0;
+                    passNode = true;
+
+                    /////////////
                     container = textNode;
                     offset = 0;
 
@@ -102,31 +120,31 @@ SUNEDITOR.plugin.fontSize = {
                         pCurrent = [];
                         newNode = child;
                         while (!/^P$|^BODY$/i.test(newNode.parentNode.nodeName)) {
-                            if (newNode.nodeName !== nodeName && newNode.nodeType === 1) {
+                            if (validation(newNode, true) && newNode.nodeType === 1) {
                                 pCurrent.push(newNode.cloneNode(false));
                             }
                             newNode = newNode.parentNode;
                         }
 
-                        appendNode = newNode = pCurrent.pop() || sNode;
+                        appendNode = newNode = pCurrent.pop() || newNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
                         }
 
-                        if (appendNode !== sNode) sNode.appendChild(appendNode);
+                        if (appendNode !== newInnerNode) newInnerNode.appendChild(appendNode);
 
                     } else {
-                        newNode = sNode;
+                        newNode = newInnerNode;
                     }
 
-                    pNode.appendChild(sNode);
+                    pNode.appendChild(newInnerNode);
                     child = textNode;
                     node = newNode;
                     passNode = true;
                 }
 
-                if (!passNode || child.nodeName !== nodeName) {
+                if (validation(child, passNode)) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
                     if (child.nodeType === 1) coverNode = cloneNode;
@@ -153,21 +171,33 @@ SUNEDITOR.plugin.fontSize = {
         var offset = endOff;
 
         var passNode = false;
-        var pCurrent;
         var newNode;
+
+        var oNode = document.createElement('P');
 
         (function recursionFunc(current, node, originNode) {
             var childNodes = current.childNodes;
             for (var i = 0; i < childNodes.length; i++) {
                 var child = childNodes[i];
 
-                // if (passNode) {
-                //     newNode = node;
-                //     while (newNode !== sNode && newNode !== pNode) {
-                //         newNode = newNode.parentNode;
-                //     }
-                //     if (newNode === sNode) node = originNode;
-                // }
+                if (passNode) {
+                    newNode = node;
+                    while (newNode !== sNode && newNode !== pNode) {
+                        newNode = newNode.parentNode;
+                    }
+                    if (newNode === sNode) {
+                        if (originNode !== oNode) {
+                            node = originNode;
+                            while (originNode.parentNode !== oNode) {
+                                originNode = originNode.parentNode;
+                            }
+                            pNode.appendChild(originNode);
+                        }
+                        node = originNode;
+                    } else {
+                        node = sNode;
+                    }
+                }
 
                 // endContainer
                 if (!passNode && child === container) {
@@ -179,25 +209,15 @@ SUNEDITOR.plugin.fontSize = {
 
                     node.appendChild(textNode);
 
-                    pCurrent = [];
-                    // newNode = child;
-                    // while (newNode.parentNode !== lineNode) {
-                    //     if (newNode.nodeType === 1) {
-                    //         pCurrent.push(newNode.cloneNode(false));
-                    //     }
-                    //     newNode = newNode.parentNode;
-                    // }
-                    //
-                    // appendNode = newNode = pCurrent.pop() || pNode;
-                    // while (pCurrent.length > 0) {
-                    //     newNode = pCurrent.pop();
-                    //     appendNode.appendChild(newNode);
-                    // }
-
-                    if (originNode !== pNode) pNode.appendChild(originNode);
+                    if (originNode !== oNode) {
+                        node = newNode = originNode;
+                        while (newNode.parentNode !== oNode) {
+                            newNode = newNode.parentNode;
+                        }
+                        pNode.appendChild(newNode);
+                    }
 
                     child = afterNode;
-                    node = originNode;
                     passNode = true;
                 }
 
@@ -207,15 +227,15 @@ SUNEDITOR.plugin.fontSize = {
                     if (child.nodeType === 1) node = cloneNode;
                 }
 
-                if (!passNode && child.nodeType === 1) {
+                if (child.nodeType === 1) {
                     cloneNode = child.cloneNode(false);
                     originNode.appendChild(cloneNode);
-                    if (child.nodeType === 1) originNode = cloneNode;
+                    originNode = cloneNode;
                 }
 
                 recursionFunc(child, node, originNode);
             }
-        })(element, sNode, pNode);
+        })(element, sNode, oNode);
 
         element.innerHTML = pNode.innerHTML;
 
@@ -235,6 +255,7 @@ SUNEDITOR.plugin.fontSize = {
         var endOff = nativeRng.endOffset;
         var commonCon = nativeRng.commonAncestorContainer;
         var start = {}, end = {};
+        var newNode;
 
         /** Select within the same node */
         if (startCon === endCon) {
@@ -261,11 +282,26 @@ SUNEDITOR.plugin.fontSize = {
         else {
             // get Nodes
             var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /^P$/i.test(current.nodeName) && current.childNodes.length > 0; });
+
+            function checkFontSizeCss(vNode, passNode) {
+                passNode = passNode === undefined ? true : passNode;
+                if (!passNode || vNode.nodeType === 3) return true;
+
+                var style = '';
+                if (vNode.style.cssText.length > 0) {
+                    style = vNode.style.cssText = vNode.style.cssText.replace(/font-size\s?:\s?.+?\s?(?:;|$|\s)/, '').trim();
+                }
+
+                return vNode.nodeName !== 'SPAN' || style.length > 0;
+            }
+
             // startCon
-            start = SUNEDITOR.plugin.fontSize.overlayLineNodesStart(lineNodes[0], 'SPAN', fontSize, startCon, startOff);
+            newNode = document.createElement('SPAN'); newNode.style.fontSize = fontSize;
+            start = SUNEDITOR.plugin.fontSize.overlayLineNodesStart(lineNodes[0], newNode, checkFontSizeCss, startCon, startOff);
             // mid
             for (var i = 1; i < lineNodes.length - 1; i++) {
-                SUNEDITOR.plugin.fontSize.overlayLineNodes(lineNodes[i], 'SPAN', fontSize);
+                newNode = document.createElement('SPAN'); newNode.style.fontSize = fontSize;
+                SUNEDITOR.plugin.fontSize.overlayLineInnerNodes(lineNodes[i], newNode, checkFontSizeCss);
             }
             // endCon
             end = SUNEDITOR.plugin.fontSize.overlayFullLineNodesEnd(lineNodes[lineNodes.length - 1], 'SPAN', fontSize, endCon, endOff);
