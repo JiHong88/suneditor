@@ -95,7 +95,11 @@ SUNEDITOR.plugin.fontSize = {
                         node.appendChild(prevNode);
                     }
 
+                    container = textNode;
+                    offset = 0;
+
                     newNode = node;
+                    pCurrent = [];
                     while (newNode.parentNode !== pNode && newNode !== null) {
                         if (validation(newNode, true) && newNode.nodeType === 1) {
                             pCurrent.push(newNode.cloneNode(false));
@@ -103,48 +107,25 @@ SUNEDITOR.plugin.fontSize = {
                         newNode = newNode.parentNode;
                     }
 
-                    pNode.appendChild(newInnerNode);
+                    appendNode = newNode = pCurrent.pop() || newNode;
+                    while (pCurrent.length > 0) {
+                        newNode = pCurrent.pop();
+                        appendNode.appendChild(newNode);
+                    }
 
-                    child = textNode;
-                    node = newNode;
-
-                    container = textNode;
-                    offset = 0;
-                    passNode = true;
-
-                    /////////////
-                    container = textNode;
-                    offset = 0;
-
-                    if (!/^P$|^BODY$/i.test(child.parentNode.nodeName)) {
-                        pCurrent = [];
-                        newNode = child;
-                        while (!/^P$|^BODY$/i.test(newNode.parentNode.nodeName)) {
-                            if (validation(newNode, true) && newNode.nodeType === 1) {
-                                pCurrent.push(newNode.cloneNode(false));
-                            }
-                            newNode = newNode.parentNode;
-                        }
-
-                        appendNode = newNode = pCurrent.pop() || newNode;
-                        while (pCurrent.length > 0) {
-                            newNode = pCurrent.pop();
-                            appendNode.appendChild(newNode);
-                        }
-
-                        if (appendNode !== newInnerNode) newInnerNode.appendChild(appendNode);
-
+                    if (appendNode !== node) {
+                        newInnerNode.appendChild(appendNode);
+                        node = newNode;
                     } else {
-                        newNode = newInnerNode;
+                        node = newInnerNode;
                     }
 
                     pNode.appendChild(newInnerNode);
                     child = textNode;
-                    node = newNode;
                     passNode = true;
                 }
 
-                if (validation(child, passNode)) {
+                if (!passNode || validation(child)) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
                     if (child.nodeType === 1) coverNode = cloneNode;
@@ -283,9 +264,8 @@ SUNEDITOR.plugin.fontSize = {
             // get Nodes
             var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /^P$/i.test(current.nodeName) && current.childNodes.length > 0; });
 
-            function checkFontSizeCss(vNode, passNode) {
-                passNode = passNode === undefined ? true : passNode;
-                if (!passNode || vNode.nodeType === 3) return true;
+            function checkFontSizeCss(vNode) {
+                if (vNode.nodeType === 3) return true;
 
                 var style = '';
                 if (vNode.style.cssText.length > 0) {
