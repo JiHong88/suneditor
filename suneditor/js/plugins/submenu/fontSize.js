@@ -39,22 +39,72 @@ SUNEDITOR.plugin.fontSize = {
     },
 
     overlayLineNodeOne: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+        var el = element;
         var startContainer = startCon;
         var startOffset = startOff;
         var endContainer = endCon;
         var endOffset = endOff;
 
         var pNode = document.createElement('P');
-        var passNode = false;
+        var afterPNode = document.createElement('P');
+        var startPass = false;
+        var endPass = false;
         var pCurrent;
         var newNode;
         var appendNode;
 
-        (function recursionFunc(current, node) {
+        (function recursionFunc(current, node, after) {
             var childNodes = current.childNodes;
             for (var i = 0, len = childNodes.length; i < len; i++) {
                 var child = childNodes[i];
                 var coverNode = node;
+                var afterCoverNode = after;
+
+                if (startPass && child !== endContainer && child.nodeType === 3) {
+                    newNode = child;
+                    pCurrent = [];
+                    while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
+                        if (validation(newNode) && newNode.nodeType === 1) {
+                            pCurrent.push(newNode.cloneNode(false));
+                        }
+                        newNode = newNode.parentNode;
+                    }
+
+                    if (pCurrent.length > 0) {
+                        appendNode = newNode = pCurrent.pop();
+                        while (pCurrent.length > 0) {
+                            newNode = pCurrent.pop();
+                            appendNode.appendChild(newNode);
+                        }
+                        newInnerNode.appendChild(appendNode);
+                        node = newNode;
+                    } else {
+                        node = newInnerNode
+                    }
+                }
+
+                if (endPass && child.nodeType === 3) {
+                    newNode = child;
+                    pCurrent = [];
+                    while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
+                        if (validation(newNode) && newNode.nodeType === 1) {
+                            pCurrent.push(newNode.cloneNode(false));
+                        }
+                        newNode = newNode.parentNode;
+                    }
+
+                    if (pCurrent.length > 0) {
+                        appendNode = newNode = pCurrent.pop();
+                        while (pCurrent.length > 0) {
+                            newNode = pCurrent.pop();
+                            appendNode.appendChild(newNode);
+                        }
+                        pNode.appendChild(appendNode);
+                        node = newNode;
+                    } else {
+                        node = pNode
+                    }
+                }
 
                 // startContainer
                 if (child === startContainer) {
@@ -81,7 +131,7 @@ SUNEDITOR.plugin.fontSize = {
                     }
 
                     if (appendNode !== node) {
-                        pNode.appendChild(appendNode);
+                        newInnerNode.appendChild(appendNode);
                         node = newNode;
                     } else {
                         node = newInnerNode;
@@ -90,7 +140,7 @@ SUNEDITOR.plugin.fontSize = {
                     pNode.appendChild(newInnerNode);
                     child = startContainer = textNode;
                     startOffset = 0;
-                    passNode = true;
+                    startPass = true;
                 }
 
                 // endContainer
@@ -98,14 +148,14 @@ SUNEDITOR.plugin.fontSize = {
                     var afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                     var textNode = document.createTextNode(endContainer.substringData(0, endOffset));
 
-                    if (afterNode.data.length > 0) {
-                        node.appendChild(afterNode);
+                    if (textNode.data.length > 0) {
+                        node.appendChild(textNode);
                     }
 
-                    newNode = node;
+                    newNode = node = after;
                     pCurrent = [];
-                    while (newNode !== pNode && newNode !== null) {
-                        if (validation(newNode) && newNode.nodeType === 1) {
+                    while (newNode !== afterPNode && newNode !== null) {
+                        if (newNode.nodeType === 1) {
                             pCurrent.push(newNode.cloneNode(false));
                         }
                         newNode = newNode.parentNode;
@@ -121,32 +171,36 @@ SUNEDITOR.plugin.fontSize = {
                         pNode.appendChild(appendNode);
                         node = newNode;
                     } else {
-                        node = newInnerNode;
+                        node = pNode;
                     }
 
-                    pNode.appendChild(newInnerNode);
-                    child = textNode;
-                    // offset = 0;
-                    container.shift();
-                    offset.shift();
-                    passNode = true;
+                    child = endContainer = afterNode;
+                    endOffset = afterNode.length;
+                    startPass = false;
+                    endPass = true;
                 }
 
-                if (validation(child)) {
+                if (!startPass || validation(child)) {
                     var cloneNode = child.cloneNode(false);
                     node.appendChild(cloneNode);
                     if (child.nodeType === 1) coverNode = cloneNode;
+
+                    var afterCloneNode = child.cloneNode(false);
+                    after.appendChild(afterCloneNode);
+                    if (child.nodeType === 1) afterCoverNode = afterCloneNode;
                 }
 
-                recursionFunc(child, coverNode);
+                recursionFunc(child, coverNode, afterCoverNode);
             }
-        })(element, pNode);
+        })(element, pNode, afterPNode);
 
         element.innerHTML = pNode.innerHTML;
 
         return {
-            // container: container,
-            // offset: offset
+            startContainer: startContainer,
+            startOffset: startOffset,
+            endContainer: endContainer,
+            endOffset: endOffset
         };
     },
 
@@ -188,7 +242,7 @@ SUNEDITOR.plugin.fontSize = {
 
                 if (passNode) {
                     if (child.nodeType === 1) {
-                        recursionFunc(child, child.cloneNode(false));
+                        recursionFunc(child, child);
                         continue;
                     }
 
@@ -288,7 +342,7 @@ SUNEDITOR.plugin.fontSize = {
 
                 if (passNode) {
                     if (child.nodeType === 1) {
-                        recursionFunc(child, child.cloneNode(false));
+                        recursionFunc(child, child);
                         continue;
                     }
 
@@ -370,8 +424,6 @@ SUNEDITOR.plugin.fontSize = {
     },
 
     appendSpan: function (fontSize) {
-        fontSize = fontSize + 'pt';
-
         var nativeRng = this.getRange();
         var startCon = nativeRng.startContainer;
         var startOff = nativeRng.startOffset;
@@ -415,32 +467,37 @@ SUNEDITOR.plugin.fontSize = {
         }
         /** multiple nodes */
         else {
+            /** tag check */
+            var checkFontSizeCss = function (vNode) {
+                if (vNode.nodeType === 3) return true;
+
+                var style = '';
+                if (vNode.style.cssText.length > 0) {
+                    style = vNode.style.cssText.replace(/font-size\s?:\s?.+?\s?(?:;|$|\s)/, '').trim();
+                }
+
+                if (vNode.nodeName !== 'SPAN' || style.length > 0) {
+                    if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
+                    return true;
+                }
+
+                return false;
+            };
+
             /** one line */
             if (!/BODY/i.test(commonCon.nodeName)) {
                 newNode = document.createElement('SPAN'); newNode.style.fontSize = fontSize;
-                SUNEDITOR.plugin.fontSize.overlayLineNodeOne(commonCon, newNode, function () {return true;}, startCon, startOff, endCon, endOff);
+                var range = SUNEDITOR.plugin.fontSize.overlayLineNodeOne(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+
+                start.container = range.startContainer;
+                start.offset = range.startOffset;
+                end.container = range.endContainer;
+                end.offset = range.endOffset;
             }
             /** multi line */
             else {
                 // get line nodes
                 var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) { return /^P$/i.test(current.nodeName) && current.childNodes.length > 0; });
-
-                /** tag check */
-                var checkFontSizeCss = function (vNode) {
-                    if (vNode.nodeType === 3) return true;
-
-                    var style = '';
-                    if (vNode.style.cssText.length > 0) {
-                        style = vNode.style.cssText.replace(/font-size\s?:\s?.+?\s?(?:;|$|\s)/, '').trim();
-                    }
-
-                    if (vNode.nodeName !== 'SPAN' || style.length > 0) {
-                        if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
-                        return true;
-                    }
-
-                    return false;
-                };
 
                 // startCon
                 newNode = document.createElement('SPAN'); newNode.style.fontSize = fontSize;
@@ -470,7 +527,7 @@ SUNEDITOR.plugin.fontSize = {
         }
 
         this.focus();
-        SUNEDITOR.plugin.fontSize.appendSpan.call(this, e.target.getAttribute('data-value'));
+        SUNEDITOR.plugin.fontSize.appendSpan.call(this, e.target.getAttribute('data-value') + 'pt');
         this.submenuOff();
     }
 };
