@@ -43,16 +43,17 @@ SUNEDITOR.plugin.table = {
 
     appendTable: function () {
         var oTable = document.createElement("TABLE");
+        oTable.style.cssText = 'table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0; border-collapse:collapse;';
 
         var x = this.context.submenu._tableXY[0];
         var y = this.context.submenu._tableXY[1];
 
         var tableHTML = '<tbody>';
         while (y > 0) {
-            tableHTML += '<tr>';
+            tableHTML += '<tr style="border:1px solid #ccc;">';
             var tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td><p>&#65279</p></td>';
+                tableHTML += '<td style="border:1px solid #ccc; padding:8px;"><p>&#65279</p></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';

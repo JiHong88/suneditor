@@ -534,7 +534,7 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
-             * @description Determine if this node is the last offset
+             * @description Determine if this offset is the edge offset of container
              * @param {object} container - The container property of the selection object.
              * @param {number} offset - The offset property of the selection object.
              * @returns {boolean}
@@ -686,11 +686,11 @@ SUNEDITOR.defaultLang = {
                         var isSameContainer = startCon === endCon;
 
                         if (isSameContainer) {
-                            if (!this.isEdgePoint(endCon, endOff)) {
+                            if (!SUNEDITOR.dom.isEdgePoint(endCon, endOff)) {
                                 rightNode = endCon.splitText(endOff);
                             }
 
-                            if (!this.isEdgePoint(startCon, startOff)) {
+                            if (!SUNEDITOR.dom.isEdgePoint(startCon, startOff)) {
                                 removeNode = startCon.splitText(startOff);
                             }
 
@@ -742,9 +742,10 @@ SUNEDITOR.defaultLang = {
                 var childNodes = dom.getListChildNodes(commonCon);
                 var startIndex = dom.getArrayIndex(childNodes, startCon);
                 var endIndex = dom.getArrayIndex(childNodes, endCon);
+                var i;
 
                 var startNode = startCon;
-                for (var i = startIndex + 1; i >= 0; i--) {
+                for (i = startIndex + 1; i >= 0; i--) {
                     if (childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
                         startIndex = i;
                         startNode = startNode.parentNode;
@@ -752,7 +753,7 @@ SUNEDITOR.defaultLang = {
                 }
 
                 var endNode = endCon;
-                for (var i = endIndex - 1; i > startIndex; i--) {
+                for (i = endIndex - 1; i > startIndex; i--) {
                     if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
                         childNodes.splice(i, 1);
                         endNode = endNode.parentNode;
@@ -760,7 +761,7 @@ SUNEDITOR.defaultLang = {
                     }
                 }
 
-                for (var i = startIndex; i <= endIndex; i++) {
+                for (i = startIndex; i <= endIndex; i++) {
                     var item = childNodes[i];
 
                     if (item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
@@ -1544,10 +1545,7 @@ SUNEDITOR.defaultLang = {
             this.contentWindow.document.head.innerHTML = '' +
                 '<meta charset=\"utf-8\" />' +
                 '<style type=\"text/css\">' +
-                '   body {font-family:' + options.editorIframeFont + '; margin:15px; word-break:break-all;} p {margin:0; padding:0;} blockquote {margin-top:0; margin-bottom:0; margin-right:0;}' +
-                '   table {table-layout:auto; border:1px solid rgb(204, 204, 204); width:100%; max-width:100%; margin-bottom:20px; background-color:transparent; border-spacing:0; border-collapse:collapse;}' +
-                '   table tr {border:1px solid #ccc;}' +
-                '   table tr td {border:1px solid #ccc; padding:8px;}' +
+                '   body {font-family:' + options.editorIframeFont + '; margin:15px; word-break:break-all;}' +
                 '</style>';
             this.contentWindow.document.body.setAttribute("contenteditable", true);
             if (element.value.length > 0) {
