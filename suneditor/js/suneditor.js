@@ -1384,16 +1384,22 @@ SUNEDITOR.defaultLang = {
                 var findA = true;
                 var map = "B|U|I|STRIKE|FONT|SIZE|";
                 var check = new RegExp(map, "i");
+                var cssText, i;
                 while (!/^(?:P|BODY|HTML|DIV)$/i.test(selectionParent.nodeName)) {
-                    var nodeName = (/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName));
+                    if (selectionParent.nodeType === 3) {
+                        selectionParent = selectionParent.parentNode;
+                        continue;
+                    }
+
+                    var nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
 
                     /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (/^FONT$/i.test(nodeName) && selectionParent.face.length > 0))) {
-                        nodeName = 'FONT';
+                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (!!selectionParent.face && selectionParent.face.length > 0))) {
+                        nodeName.push('FONT');
                         var selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,"");
-                        dom.changeTxt(editor.commandMap[nodeName], selectFont);
+                        dom.changeTxt(editor.commandMap['FONT'], selectFont);
                         findFont = false;
-                        map = map.replace(nodeName + "|", "");
+                        map = map.replace('FONT' + "|", "");
                         check = new RegExp(map, "i");
                     }
 
@@ -1409,18 +1415,27 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** span (font size) */
-                    if (findSize && /^SPAN$/i.test(nodeName) && selectionParent.style.fontSize.length > 0) {
+                    if (findSize && selectionParent.style.fontSize.length > 0) {
                         dom.changeTxt(editor.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
                         map = map.replace("SIZE|", "");
                         check = new RegExp(map, "i");
                     }
 
+
                     /** command */
-                    if (check.test(nodeName)) {
-                        dom.addClass(editor.commandMap[nodeName], "on");
-                        map = map.replace(nodeName + "|", "");
-                        check = new RegExp(map, "i");
+                    cssText = selectionParent.style.cssText;
+                    if (/(?::|\s*)bold(?:;|\s)/.test(cssText)) nodeName.push('B');
+                    if (/(?::|\s*)underline(?:;|\s)/.test(cssText)) nodeName.push('U');
+                    if (/(?::|\s*)italic(?:;|\s)/.test(cssText)) nodeName.push('I');
+                    if (/(?::|\s*)line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
+
+                    for (i = 0; i < nodeName.length; i++) {
+                        if (check.test(nodeName[i])) {
+                            dom.addClass(editor.commandMap[nodeName[i]], "on");
+                            map = map.replace(nodeName[i] + "|", "");
+                            check = new RegExp(map, "i");
+                        }
                     }
 
                     selectionParent = selectionParent.parentNode;
