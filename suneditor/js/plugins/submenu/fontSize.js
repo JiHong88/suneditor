@@ -28,7 +28,7 @@ SUNEDITOR.plugin.fontSize = {
             '   <ul class="list_editor font_size_list">';
         for (var i = 0; i < sizeList.length; i++) {
             var size = sizeList[i];
-            list += '<li><button type="button" class="btn_edit" data-value="' + size + '" style="font-size:' + size + 'pt;">' + size + '</button></li>';
+            list += '<li><button type="button" class="btn_edit" data-value="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
         }
         list += '   </ul>' +
             '</div>';
@@ -50,7 +50,7 @@ SUNEDITOR.plugin.fontSize = {
 
         SUNEDITOR.dom.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
         var newNode = document.createElement('SPAN'); newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
-        this.appendTagToRange(newNode, 'font-size');
+        this.wrapRangeToTag(newNode, ['font-size']);
         this.submenuOff();
     }
 };

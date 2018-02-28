@@ -413,6 +413,7 @@ SUNEDITOR.defaultLang = {
              * @property {element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
              * @property {number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
              * @property {boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
+             * @private
              */
             _variable: {
                 selectionNode: null,
@@ -472,6 +473,7 @@ SUNEDITOR.defaultLang = {
              * @param {string} moduleName - The name of the js file to call
              * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
              * @param {function} callBackFunction - Function to be executed immediately after module call
+             * @private
              */
             _callBack_addModule: function (directory, moduleName, targetElement, callBackFunction) {
                 if (!this.context[directory]) this.context[directory] = {};
@@ -591,9 +593,9 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Set range object
-             * @param {object} startCon - The startContainer property of the selection object.
+             * @param {element} startCon - The startContainer property of the selection object.
              * @param {number} startOff - The startOffset property of the selection object.
-             * @param {object} endCon - The endContainer property of the selection object.
+             * @param {element} endCon - The endContainer property of the selection object.
              * @param {number} endOff - The endOffset property of the selection object.
              */
             setRange: function (startCon, startOff, endCon, endOff) {
@@ -806,13 +808,13 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
-             * @description Copies the node received with the argument value and wraps all selected text.
+             * @description Copies the node of the argument value and wraps all selected text.
              * 1. When there is the same node in the selection area, the tag is stripped.
-             * 2. If there is another css value other than 'checkCSSPropertyText' css attribute on the same node, remove only 'checkCSSPropertyText' css attribute.
+             * 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
              * @param {element} appendNode - The dom that will wrap the selected text area
-             * @param {string} checkCSSPropertyText - The css attribute name to check (font-size, font-family ...)
+             * @param {array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
              */
-            appendTagToRange: function (appendNode, checkCSSPropertyText) {
+            wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
                 var nativeRng = this.getRange();
                 var startCon = nativeRng.startContainer;
                 var startOff = nativeRng.startOffset;
@@ -821,6 +823,17 @@ SUNEDITOR.defaultLang = {
                 var commonCon = nativeRng.commonAncestorContainer;
                 var start = {}, end = {};
                 var newNode;
+
+                var regExp;
+                if (!!checkCSSPropertyArray) {
+                    regExp = '(?:;|^|\\s)(?:' + checkCSSPropertyArray[0];
+                    for (i = 1; i < checkCSSPropertyArray.length; i++) {
+                        regExp += '|' + checkCSSPropertyArray[i];
+                    }
+                    regExp += ')\\s*:[^;]*\\s*(?:;|$)';
+                    regExp = new RegExp(regExp, 'gi');
+                }
+
 
                 /** one node */
                 if (startCon === endCon) {
@@ -857,13 +870,12 @@ SUNEDITOR.defaultLang = {
                 }
                 /** multiple nodes */
                 else {
-                    /** tag check */
-                    var regExp = !!checkCSSPropertyText ? new RegExp(checkCSSPropertyText + '\s*:.*\s*(?:;|$|\s)'): false;
+                    /** tag check function*/
                     var checkFontSizeCss = function (vNode) {
                         if (vNode.nodeType === 3) return true;
 
                         var style = '';
-                        if (!regExp && vNode.style.cssText.length > 0) {
+                        if (!!regExp && vNode.style.cssText.length > 0) {
                             style = vNode.style.cssText.replace(regExp, '').trim();
                         }
 
@@ -923,6 +935,18 @@ SUNEDITOR.defaultLang = {
                 this.setRange(start.container, start.offset, end.container, end.offset);
             },
 
+            /**
+             * @description wraps text nodes of line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} startCon - The startContainer property of the selection object.
+             * @param {number} startOff - The startOffset property of the selection object.
+             * @param {element} endCon - The endContainer property of the selection object.
+             * @param {number} endOff - The endOffset property of the selection object.
+             * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
+             * @private
+             */
             _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
                 var el = element;
                 var startContainer = startCon;
@@ -1078,6 +1102,13 @@ SUNEDITOR.defaultLang = {
                 };
             },
 
+            /**
+             * @description wraps mid lines selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @private
+             */
             _wrapLineNodes: function (element, newInnerNode, validation) {
                 (function recursionFunc(current, node) {
                     var childNodes = current.childNodes;
@@ -1097,6 +1128,16 @@ SUNEDITOR.defaultLang = {
                 element.appendChild(newInnerNode);
             },
 
+            /**
+             * @description wraps first line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} startCon - The startContainer property of the selection object.
+             * @param {number} startOff - The startOffset property of the selection object.
+             * @returns {{container: *, offset: *}}
+             * @private
+             */
             _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
                 var el = element;
                 var container = startCon;
@@ -1201,6 +1242,16 @@ SUNEDITOR.defaultLang = {
                 };
             },
 
+            /**
+             * @description wraps last line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} endCon - The endContainer property of the selection object.
+             * @param {number} endOff - The endOffset property of the selection object.
+             * @returns {{container: *, offset: *}}
+             * @private
+             */
             _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
                 var el = element;
                 var container = endCon;
@@ -1432,10 +1483,10 @@ SUNEDITOR.defaultLang = {
 
                     /** command */
                     cssText = selectionParent.style.cssText;
-                    if (/(?::|\s*)bold(?:;|\s)/.test(cssText)) nodeName.push('B');
-                    if (/(?::|\s*)underline(?:;|\s)/.test(cssText)) nodeName.push('U');
-                    if (/(?::|\s*)italic(?:;|\s)/.test(cssText)) nodeName.push('I');
-                    if (/(?::|\s*)line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
+                    if (/:\s*bold(?:;|\s)/.test(cssText)) nodeName.push('B');
+                    if (/:\s*underline(?:;|\s)/.test(cssText)) nodeName.push('U');
+                    if (/:\s*italic(?:;|\s)/.test(cssText)) nodeName.push('I');
+                    if (/:\s*line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
 
                     for (i = 0; i < nodeName.length; i++) {
                         if (check.test(nodeName[i])) {

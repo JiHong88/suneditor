@@ -76,7 +76,7 @@ SUNEDITOR.plugin.font = {
 
         SUNEDITOR.dom.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         var newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
-        this.appendTagToRange(newNode, 'font-family');
+        this.wrapRangeToTag(newNode, ['font-family']);
         this.submenuOff();
     }
 };

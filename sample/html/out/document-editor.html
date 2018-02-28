@@ -500,57 +500,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="_callBack_addModule"><span class="type-signature"></span>_callBack_addModule<span
-                    class="signature">(directory, moduleName, targetElement, callBackFunction)</span><span
-                    class="type-signature"></span></h4>
-            <div class="description">
-                After the module is added, call the main function and the callback function
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>directory</code></td>
-                    <td class="type">
-                        <span class="param-type">string</span>
-                    </td>
-                    <td class="description last">The directory(plugin/{directory}) of the js file to call</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>moduleName</code></td>
-                    <td class="type">
-                        <span class="param-type">string</span>
-                    </td>
-                    <td class="description last">The name of the js file to call</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>targetElement</code></td>
-                    <td class="type">
-                        <span class="param-type">element</span>
-                    </td>
-                    <td class="description last">If this is element, the element is inserted into the sibling node
-                        (submenu)
-                    </td>
-                </tr>
-                <tr>
-                    <td class="name"><code>callBackFunction</code></td>
-                    <td class="type">
-                        <span class="param-type">function</span>
-                    </td>
-                    <td class="description last">Function to be executed immediately after module call</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"> </dl>
-
-
             <h4 class="name" id="submenuOn"><span class="type-signature"></span>submenuOn<span class="signature">(element)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -727,7 +676,7 @@
                 <tr>
                     <td class="name"><code>startCon</code></td>
                     <td class="type">
-                        <span class="param-type">object</span>
+                        <span class="param-type">element</span>
                     </td>
                     <td class="description last">The startContainer property of the selection object.</td>
                 </tr>
@@ -741,7 +690,7 @@
                 <tr>
                     <td class="name"><code>endCon</code></td>
                     <td class="type">
-                        <span class="param-type">object</span>
+                        <span class="param-type">element</span>
                     </td>
                     <td class="description last">The endContainer property of the selection object.</td>
                 </tr>
@@ -871,6 +820,42 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="wrapRangeToTag"><span class="type-signature"></span>wrapRangeToTag<span class="signature">(appendNode, checkCSSPropertyText)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Copies the node of the argument value and wraps all selected text.
+                1. When there is the same node in the selection area, the tag is stripped.
+                2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>appendNode</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">The dom that will wrap the selected text area</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>checkCSSPropertyArray</code></td>
+                    <td class="type">
+                        <span class="param-type">array</span>
+                    </td>
+                    <td class="description last">The css attribute name Array to check (['font-size'], ['font-family']...])</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="toggleFrame"><span class="type-signature"></span>toggleFrame<span
                     class="signature">()</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -915,7 +900,6 @@
     <h3>SUNEDITOR.editor</h3>
     <ul>
         <li><a href="document-editor.html#callModule">callModule</a></li>
-        <li><a href="document-editor.html#_callBack_addModule">_callBack_addModule</a></li>
         <li><a href="document-editor.html#submenuOn">submenuOn</a></li>
         <li><a href="document-editor.html#submenuOff">submenuOff</a></li>
         <li><a href="document-editor.html#controllersOff">controllersOff</a></li>
@@ -933,6 +917,7 @@
         <li><a href="document-editor.html#appendP">appendP</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
+        <li><a href="document-editor.html#wrapRangeToTag">wrapRangeToTag</a></li>
         <li><a href="document-editor.html#toggleFrame">toggleFrame</a></li>
         <li><a href="document-editor.html#toggleFullScreen">toggleFullScreen</a></li>
     </ul>
