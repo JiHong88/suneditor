@@ -56,7 +56,9 @@ SUNEDITOR.plugin.foreColor = {
         }
 
         this.focus();
-        this.execCommand('foreColor', false, e.target.getAttribute('data-value'));
+
+        var newNode = document.createElement('SPAN'); newNode.style.color = e.target.getAttribute('data-value');
+        this.appendTagToRange(newNode, 'color');
         this.submenuOff();
     }
 };

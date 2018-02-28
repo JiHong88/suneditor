@@ -23,20 +23,8 @@ SUNEDITOR.plugin.font = {
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
-        function createFontList(fontList) {
-            if (!fontList) return;
-
-            var list = '';
-            for (var i = 0; i < fontList.length; i++) {
-                var font = fontList[i];
-                var text = font.split(',')[0];
-                list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
-            }
-
-            return list;
-        }
-
-        var defaultFontList = !user.fontList ?
+        var font, text, i, len;
+        var fontList = !user.fontList ?
             [
                 'Arial',
                 'Comic Sans MS',
@@ -45,17 +33,26 @@ SUNEDITOR.plugin.font = {
                 'tahoma',
                 'Trebuchet MS,Helvetica',
                 'Verdana'
-            ] :
-            user.fontList;
+            ] : user.fontList;
 
         var list = '<div class="inner_layer list_family">' +
             '   <ul class="list_editor sun-editor-list-font-family">' +
             '       <li><button type="button" class="btn_edit default" data-value="inherit" data-txt="' + lang.toolbar.font + '" style="font-family:inherit;">' + lang.toolbar.fontDelete + '</button></li>';
-        list += createFontList(defaultFontList);
+        for (i = 0, len = fontList.length; i < len; i++) {
+            font = fontList[i];
+            text = font.split(',')[0];
+            list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+        }
         list += '   </ul>';
+
         if (user.addFont) {
+            fontList = user.addFont;
             list += '<ul class="list_editor list_family_add sun-editor-list-font-family-add">';
-            list += createFontList(user.addFont);
+            for (i = 0, len = fontList.length; i < len; i++) {
+                font = fontList[i];
+                text = font.split(',')[0];
+                list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+            }
             list += '</ul>';
         }
         list += '</div>';
@@ -76,8 +73,10 @@ SUNEDITOR.plugin.font = {
         var target = e.target;
 
         this.focus();
+
         SUNEDITOR.dom.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
-        this.execCommand('fontName', false, target.getAttribute('data-value'));
+        var newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
+        this.appendTagToRange(newNode, 'font-family');
         this.submenuOff();
     }
 };
