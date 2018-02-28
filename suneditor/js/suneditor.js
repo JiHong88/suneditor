@@ -805,7 +805,14 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
-            appendTagToRange: function (appendNode, cssPropertiText) {
+            /**
+             * @description Copies the node received with the argument value and wraps all selected text.
+             * 1. When there is the same node in the selection area, the tag is stripped.
+             * 2. If there is another css value other than 'checkCSSPropertyText' css attribute on the same node, remove only 'checkCSSPropertyText' css attribute.
+             * @param {element} appendNode - The dom that will wrap the selected text area
+             * @param {string} checkCSSPropertyText - The css attribute name to check (font-size, font-family ...)
+             */
+            appendTagToRange: function (appendNode, checkCSSPropertyText) {
                 var nativeRng = this.getRange();
                 var startCon = nativeRng.startContainer;
                 var startOff = nativeRng.startOffset;
@@ -851,12 +858,12 @@ SUNEDITOR.defaultLang = {
                 /** multiple nodes */
                 else {
                     /** tag check */
-                    var regExp = new RegExp(cssPropertiText + '\s*:.*\s*(?:;|$|\s)');
+                    var regExp = !!checkCSSPropertyText ? new RegExp(checkCSSPropertyText + '\s*:.*\s*(?:;|$|\s)'): false;
                     var checkFontSizeCss = function (vNode) {
                         if (vNode.nodeType === 3) return true;
 
                         var style = '';
-                        if (vNode.style.cssText.length > 0) {
+                        if (!regExp && vNode.style.cssText.length > 0) {
                             style = vNode.style.cssText.replace(regExp, '').trim();
                         }
 
@@ -871,7 +878,7 @@ SUNEDITOR.defaultLang = {
                     /** one line */
                     if (!/BODY/i.test(commonCon.nodeName)) {
                         newNode = appendNode.cloneNode(false);
-                        var range = this._insertToLineNode(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+                        var range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
 
                         start.container = range.startContainer;
                         start.offset = range.startOffset;
@@ -900,15 +907,15 @@ SUNEDITOR.defaultLang = {
 
                         // startCon
                         newNode = appendNode.cloneNode(false);
-                        start = this._overlayLineNodesStart(lineNodes[startLine], newNode, checkFontSizeCss, startCon, startOff);
+                        start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkFontSizeCss, startCon, startOff);
                         // mid
                         for (i = startLine + 1; i < endLine; i++) {
                             newNode = appendNode.cloneNode(false);
-                            this._overlayLineInnerNodes(lineNodes[i], newNode, checkFontSizeCss);
+                            this._wrapLineNodes(lineNodes[i], newNode, checkFontSizeCss);
                         }
                         // endCon
                         newNode = appendNode.cloneNode(false);
-                        end = this._overlayFullLineNodesEnd(lineNodes[endLine], newNode, checkFontSizeCss, endCon, endOff);
+                        end = this._wrapLineNodesEnd(lineNodes[endLine], newNode, checkFontSizeCss, endCon, endOff);
                     }
                 }
 
@@ -916,7 +923,7 @@ SUNEDITOR.defaultLang = {
                 this.setRange(start.container, start.offset, end.container, end.offset);
             },
 
-            _insertToLineNode: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+            _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
                 var el = element;
                 var startContainer = startCon;
                 var startOffset = startOff;
@@ -1071,7 +1078,7 @@ SUNEDITOR.defaultLang = {
                 };
             },
 
-            _overlayLineInnerNodes: function (element, newInnerNode, validation) {
+            _wrapLineNodes: function (element, newInnerNode, validation) {
                 (function recursionFunc(current, node) {
                     var childNodes = current.childNodes;
                     for (var i = 0, len = childNodes.length; i < len; i++) {
@@ -1090,7 +1097,7 @@ SUNEDITOR.defaultLang = {
                 element.appendChild(newInnerNode);
             },
 
-            _overlayLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
+            _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
                 var el = element;
                 var container = startCon;
                 var offset = startOff;
@@ -1194,7 +1201,7 @@ SUNEDITOR.defaultLang = {
                 };
             },
 
-            _overlayFullLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
+            _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
                 var el = element;
                 var container = endCon;
                 var offset = endOff;
@@ -1366,7 +1373,7 @@ SUNEDITOR.defaultLang = {
                 221: ['indent']
             },
 
-            _directionKeyKeycode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
+            _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
 
             _findButtonEffectTag: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
@@ -1444,7 +1451,7 @@ SUNEDITOR.defaultLang = {
                 /** remove */
                 map = map.split("|");
                 var mapLen = map.length - 1;
-                for (var i = 0; i < mapLen; i++) {
+                for (i = 0; i < mapLen; i++) {
                     if (/^FONT/i.test(map[i])) {
                         dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
                     }
@@ -1654,7 +1661,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyUp_wysiwyg: function (e) {
-                if (event._directionKeyKeycode.test(e.keyCode)) {
+                if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
                 }
             },
