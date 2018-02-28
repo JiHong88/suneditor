@@ -413,6 +413,7 @@ SUNEDITOR.defaultLang = {
              * @property {element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
              * @property {number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
              * @property {boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
+             * @private
              */
             _variable: {
                 selectionNode: null,
@@ -472,6 +473,7 @@ SUNEDITOR.defaultLang = {
              * @param {string} moduleName - The name of the js file to call
              * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
              * @param {function} callBackFunction - Function to be executed immediately after module call
+             * @private
              */
             _callBack_addModule: function (directory, moduleName, targetElement, callBackFunction) {
                 if (!this.context[directory]) this.context[directory] = {};
@@ -591,9 +593,9 @@ SUNEDITOR.defaultLang = {
 
             /**
              * @description Set range object
-             * @param {object} startCon - The startContainer property of the selection object.
+             * @param {element} startCon - The startContainer property of the selection object.
              * @param {number} startOff - The startOffset property of the selection object.
-             * @param {object} endCon - The endContainer property of the selection object.
+             * @param {element} endCon - The endContainer property of the selection object.
              * @param {number} endOff - The endOffset property of the selection object.
              */
             setRange: function (startCon, startOff, endCon, endOff) {
@@ -806,11 +808,560 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
+             * @description Copies the node of the argument value and wraps all selected text.
+             * 1. When there is the same node in the selection area, the tag is stripped.
+             * 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
+             * @param {element} appendNode - The dom that will wrap the selected text area
+             * @param {array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
+             */
+            wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
+                var nativeRng = this.getRange();
+                var startCon = nativeRng.startContainer;
+                var startOff = nativeRng.startOffset;
+                var endCon = nativeRng.endContainer;
+                var endOff = nativeRng.endOffset;
+                var commonCon = nativeRng.commonAncestorContainer;
+                var start = {}, end = {};
+                var newNode;
+
+                var regExp;
+                if (!!checkCSSPropertyArray) {
+                    regExp = '(?:;|^|\\s)(?:' + checkCSSPropertyArray[0];
+                    for (i = 1; i < checkCSSPropertyArray.length; i++) {
+                        regExp += '|' + checkCSSPropertyArray[i];
+                    }
+                    regExp += ')\\s*:[^;]*\\s*(?:;|$)';
+                    regExp = new RegExp(regExp, 'gi');
+                }
+
+
+                /** one node */
+                if (startCon === endCon) {
+                    newNode = appendNode.cloneNode(false);
+
+                    /** No node selected */
+                    if (startOff === endOff) {
+                        newNode.innerHTML = "&nbsp;";
+                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                    }
+                    /** Select within the same node */
+                    else {
+                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+
+                        newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+
+                        if (beforeNode.data.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            startCon.data = startCon.substringData(0, startOff);
+                        }
+
+                        if (afterNode.data.length > 0) {
+                            startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                        }
+                    }
+
+                    start.container = newNode;
+                    start.offset = 0;
+                    end.container = newNode;
+                    end.offset = 1;
+                }
+                /** multiple nodes */
+                else {
+                    /** tag check function*/
+                    var checkFontSizeCss = function (vNode) {
+                        if (vNode.nodeType === 3) return true;
+
+                        var style = '';
+                        if (!!regExp && vNode.style.cssText.length > 0) {
+                            style = vNode.style.cssText.replace(regExp, '').trim();
+                        }
+
+                        if (vNode.nodeName !== appendNode.nodeName || style.length > 0) {
+                            if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
+                            return true;
+                        }
+
+                        return false;
+                    };
+
+                    /** one line */
+                    if (!/BODY/i.test(commonCon.nodeName)) {
+                        newNode = appendNode.cloneNode(false);
+                        var range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+
+                        start.container = range.startContainer;
+                        start.offset = range.startOffset;
+                        end.container = range.endContainer;
+                        end.offset = range.endOffset;
+                    }
+                    /** multi line */
+                    else {
+                        // get line nodes
+                        var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) {
+                            return /^P$/i.test(current.nodeName);
+                        });
+                        var startLine = SUNEDITOR.dom.getParentNode(startCon, 'P');
+                        var endLine = SUNEDITOR.dom.getParentNode(endCon, 'P');
+
+                        for (var i = 0, len = lineNodes.length; i < len; i++) {
+                            if (startLine === lineNodes[i]) {
+                                startLine = i;
+                                continue;
+                            }
+                            if (endLine === lineNodes[i]) {
+                                endLine = i;
+                                break;
+                            }
+                        }
+
+                        // startCon
+                        newNode = appendNode.cloneNode(false);
+                        start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkFontSizeCss, startCon, startOff);
+                        // mid
+                        for (i = startLine + 1; i < endLine; i++) {
+                            newNode = appendNode.cloneNode(false);
+                            this._wrapLineNodes(lineNodes[i], newNode, checkFontSizeCss);
+                        }
+                        // endCon
+                        newNode = appendNode.cloneNode(false);
+                        end = this._wrapLineNodesEnd(lineNodes[endLine], newNode, checkFontSizeCss, endCon, endOff);
+                    }
+                }
+
+                // set range
+                this.setRange(start.container, start.offset, end.container, end.offset);
+            },
+
+            /**
+             * @description wraps text nodes of line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} startCon - The startContainer property of the selection object.
+             * @param {number} startOff - The startOffset property of the selection object.
+             * @param {element} endCon - The endContainer property of the selection object.
+             * @param {number} endOff - The endOffset property of the selection object.
+             * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
+             * @private
+             */
+            _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+                var el = element;
+                var startContainer = startCon;
+                var startOffset = startOff;
+                var endContainer = endCon;
+                var endOffset = endOff;
+
+                var startPass = false;
+                var endPass = false;
+                var pCurrent;
+                var newNode;
+                var appendNode;
+                var removeNode;
+                var removeNodeList = [];
+
+                (function recursionFunc(current, node) {
+                    var childNodes = current.childNodes;
+                    for (var i = 0, len = childNodes.length; i < len; i++) {
+                        if (endPass) break;
+                        var child = childNodes[i];
+
+                        if (startPass && child !== endContainer && child.nodeType === 3) {
+                            removeNode = newNode = child;
+                            pCurrent = [];
+                            while (newNode !== el && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                removeNode = newNode;
+                                newNode = newNode.parentNode;
+                            }
+
+                            if (pCurrent.length > 0) {
+                                appendNode = newNode = pCurrent.pop();
+                                while (pCurrent.length > 0) {
+                                    newNode = pCurrent.pop();
+                                    appendNode.appendChild(newNode);
+                                }
+                                newInnerNode.appendChild(appendNode);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode;
+                            }
+
+                            node.appendChild(child.cloneNode(false));
+                            removeNodeList.push(child);
+                        }
+
+                        // startContainer
+                        if (child === startContainer) {
+                            var prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
+                            var startNode = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+
+                            if (prevNode.length > 0) {
+                                startContainer.data = prevNode.data;
+                            } else {
+                                removeNodeList.push(startContainer);
+                            }
+
+                            newNode = child;
+                            pCurrent = [];
+                            while (newNode !== el && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            appendNode = newNode = pCurrent.pop() || child;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                            }
+
+                            if (appendNode !== child) {
+                                newInnerNode.appendChild(appendNode);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode;
+                            }
+
+                            startContainer = startNode;
+                            startOffset = 0;
+                            node.appendChild(startContainer);
+
+                            startPass = true;
+                            continue;
+                        }
+
+                        // endContainer
+                        if (child === endContainer) {
+                            var afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
+                            var endNode = document.createTextNode(endContainer.substringData(0, endOffset));
+                            var bofore = null;
+
+                            bofore = newNode = child;
+                            pCurrent = [];
+                            while (newNode !== el && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                bofore = newNode;
+                                newNode = newNode.parentNode;
+                            }
+
+                            appendNode = newNode = pCurrent.pop() || child;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                            }
+
+                            if (appendNode !== child) {
+                                newInnerNode.appendChild(appendNode);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode;
+                            }
+
+                            if (afterNode.length > 0) {
+                                endContainer.data = afterNode.data;
+                            } else {
+                                removeNodeList.push(endContainer);
+                            }
+
+                            endContainer = endNode;
+                            endOffset = endNode.length;
+                            node.appendChild(endContainer);
+                            el.insertBefore(newInnerNode, bofore);
+
+                            var pRemove;
+                            while (removeNodeList.length > 0) {
+                                pRemove = removeNodeList.pop();
+                                pRemove.data = '';
+                                while (!!pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
+                                    pRemove = pRemove.parentNode;
+                                }
+                                SUNEDITOR.dom.removeItem(pRemove);
+                            }
+
+                            endPass = true;
+                            break;
+                        }
+
+                        recursionFunc(child);
+                    }
+                })(element);
+
+                return {
+                    startContainer: startContainer,
+                    startOffset: startOffset,
+                    endContainer: endContainer,
+                    endOffset: endOffset
+                };
+            },
+
+            /**
+             * @description wraps mid lines selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @private
+             */
+            _wrapLineNodes: function (element, newInnerNode, validation) {
+                (function recursionFunc(current, node) {
+                    var childNodes = current.childNodes;
+                    for (var i = 0, len = childNodes.length; i < len; i++) {
+                        var child = childNodes[i];
+                        var coverNode = node;
+                        if (validation(child)) {
+                            var cloneNode = child.cloneNode(false);
+                            node.appendChild(cloneNode);
+                            if (child.nodeType === 1) coverNode = cloneNode;
+                        }
+                        recursionFunc(child, coverNode);
+                    }
+                })(element, newInnerNode);
+
+                element.innerHTML = '';
+                element.appendChild(newInnerNode);
+            },
+
+            /**
+             * @description wraps first line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} startCon - The startContainer property of the selection object.
+             * @param {number} startOff - The startOffset property of the selection object.
+             * @returns {{container: *, offset: *}}
+             * @private
+             */
+            _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
+                var el = element;
+                var container = startCon;
+                var offset = startOff;
+
+                var pNode = document.createElement('P');
+                var passNode = false;
+                var pCurrent;
+                var newNode;
+                var appendNode;
+
+                (function recursionFunc(current, node) {
+                    var childNodes = current.childNodes;
+                    for (var i = 0, len = childNodes.length; i < len; i++) {
+                        var child = childNodes[i];
+                        var coverNode = node;
+
+                        if (passNode) {
+                            if (child.nodeType === 1) {
+                                recursionFunc(child, child);
+                                continue;
+                            }
+
+                            newNode = child;
+                            pCurrent = [];
+                            while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            if (pCurrent.length > 0) {
+                                appendNode = newNode = pCurrent.pop();
+                                while (pCurrent.length > 0) {
+                                    newNode = pCurrent.pop();
+                                    appendNode.appendChild(newNode);
+                                }
+                                newInnerNode.appendChild(appendNode);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode
+                            }
+                        }
+
+                        // startContainer
+                        if (!passNode && child === container) {
+                            var prevNode = document.createTextNode(container.substringData(0, offset));
+                            var textNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
+
+                            if (prevNode.data.length > 0) {
+                                node.appendChild(prevNode);
+                            }
+
+                            newNode = node;
+                            pCurrent = [];
+                            while (newNode !== pNode && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            appendNode = newNode = pCurrent.pop() || node;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                            }
+
+                            if (appendNode !== node) {
+                                newInnerNode.appendChild(appendNode);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode;
+                            }
+
+                            pNode.appendChild(newInnerNode);
+                            container = textNode;
+                            offset = 0;
+                            passNode = true;
+
+                            node.appendChild(container);
+                            continue;
+                        }
+
+                        if (!passNode || validation(child)) {
+                            var cloneNode = child.cloneNode(false);
+                            node.appendChild(cloneNode);
+                            if (child.nodeType === 1) coverNode = cloneNode;
+                        }
+
+                        recursionFunc(child, coverNode);
+                    }
+                })(element, pNode);
+
+                element.parentNode.insertBefore(pNode, element);
+                SUNEDITOR.dom.removeItem(element);
+
+                return {
+                    container: container,
+                    offset: offset
+                };
+            },
+
+            /**
+             * @description wraps last line selected text.
+             * @param {element} element - The node of the line that contains the selected text node.
+             * @param {element} newInnerNode - The dom that will wrap the selected text area
+             * @param {function} validation - Check if the node should be stripped.
+             * @param {element} endCon - The endContainer property of the selection object.
+             * @param {number} endOff - The endOffset property of the selection object.
+             * @returns {{container: *, offset: *}}
+             * @private
+             */
+            _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
+                var el = element;
+                var container = endCon;
+                var offset = endOff;
+
+                var pNode = document.createElement('P');
+                var passNode = false;
+                var pCurrent;
+                var newNode;
+                var appendNode;
+
+                (function recursionFunc(current, node) {
+                    var childNodes = current.childNodes;
+                    for (var i = childNodes.length -1; 0 <= i; i--) {
+                        var child = childNodes[i];
+                        var coverNode = node;
+
+                        if (passNode) {
+                            if (child.nodeType === 1) {
+                                recursionFunc(child, child);
+                                continue;
+                            }
+
+                            newNode = child;
+                            pCurrent = [];
+                            while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            if (pCurrent.length > 0) {
+                                appendNode = newNode = pCurrent.pop();
+                                while (pCurrent.length > 0) {
+                                    newNode = pCurrent.pop();
+                                    appendNode.insertBefore(newNode, appendNode.firstChild);
+                                }
+                                newInnerNode.insertBefore(appendNode, newInnerNode.firstChild);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode
+                            }
+                        }
+
+                        // endContainer
+                        if (!passNode && child === container) {
+                            var afterNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
+                            var textNode = document.createTextNode(container.substringData(0, offset));
+
+                            if (afterNode.data.length > 0) {
+                                node.insertBefore(afterNode, node.firstChild);
+                            }
+
+                            newNode = node;
+                            pCurrent = [];
+                            while (newNode !== pNode && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            appendNode = newNode = pCurrent.pop() || node;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.insertBefore(newNode, appendNode.firstChild);
+                            }
+
+                            if (appendNode !== node) {
+                                newInnerNode.insertBefore(appendNode, newInnerNode.firstChild);
+                                node = newNode;
+                            } else {
+                                node = newInnerNode;
+                            }
+
+                            pNode.insertBefore(newInnerNode, pNode.firstChild);
+                            container = textNode;
+                            offset = textNode.data.length;
+                            passNode = true;
+
+                            node.insertBefore(container, node.firstChild);
+                            continue;
+                        }
+
+                        if (!passNode || validation(child)) {
+                            var cloneNode = child.cloneNode(false);
+                            node.insertBefore(cloneNode, node.firstChild);
+                            if (child.nodeType === 1) coverNode = cloneNode;
+                        }
+
+                        recursionFunc(child, coverNode);
+                    }
+                })(element, pNode);
+
+                element.parentNode.insertBefore(pNode, element);
+                SUNEDITOR.dom.removeItem(element);
+
+                return {
+                    container: container,
+                    offset: offset
+                };
+            },
+
+            /**
              * @description Changes to code view or wysiwyg view
              */
             toggleFrame: function () {
                 if (!this._variable.wysiwygActive) {
-                    var ec = {"&amp;": "&", "&nbsp;": "\u00A0", "&quot;": "\"", "&lt;": "<", "&gt;": ">"};
+                    var ec = {"&amp;": "&", "&nbsp;": "\u00A0", /*"&quot;": "\"", */"&lt;": "<", "&gt;": ">"};
                     var code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
                         return (typeof ec[m] === "string") ? ec[m] : m;
                     });
@@ -873,7 +1424,7 @@ SUNEDITOR.defaultLang = {
                 221: ['indent']
             },
 
-            _directionKeyKeycode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
+            _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
 
             _findButtonEffectTag: function () {
                 editor._variable.copySelection = func.copyObj(editor.getSelection());
@@ -891,16 +1442,22 @@ SUNEDITOR.defaultLang = {
                 var findA = true;
                 var map = "B|U|I|STRIKE|FONT|SIZE|";
                 var check = new RegExp(map, "i");
+                var cssText, i;
                 while (!/^(?:P|BODY|HTML|DIV)$/i.test(selectionParent.nodeName)) {
-                    var nodeName = (/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName));
+                    if (selectionParent.nodeType === 3) {
+                        selectionParent = selectionParent.parentNode;
+                        continue;
+                    }
+
+                    var nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
 
                     /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && ((/^FONT$/i.test(nodeName) && selectionParent.face.length > 0) || selectionParent.style.font.length > 0)) {
-                        nodeName = 'FONT';
-                        var selectFont = (selectionParent.face || selectionParent.style.font || SUNEDITOR.lang.toolbar.font);
-                        dom.changeTxt(editor.commandMap[nodeName], selectFont);
+                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (!!selectionParent.face && selectionParent.face.length > 0))) {
+                        nodeName.push('FONT');
+                        var selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,"");
+                        dom.changeTxt(editor.commandMap['FONT'], selectFont);
                         findFont = false;
-                        map = map.replace(nodeName + "|", "");
+                        map = map.replace('FONT' + "|", "");
                         check = new RegExp(map, "i");
                     }
 
@@ -916,18 +1473,27 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** span (font size) */
-                    if (findSize && /^SPAN$/i.test(nodeName) && selectionParent.style.fontSize.length > 0) {
+                    if (findSize && selectionParent.style.fontSize.length > 0) {
                         dom.changeTxt(editor.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
                         map = map.replace("SIZE|", "");
                         check = new RegExp(map, "i");
                     }
 
+
                     /** command */
-                    if (check.test(nodeName)) {
-                        dom.addClass(editor.commandMap[nodeName], "on");
-                        map = map.replace(nodeName + "|", "");
-                        check = new RegExp(map, "i");
+                    cssText = selectionParent.style.cssText;
+                    if (/:\s*bold(?:;|\s)/.test(cssText)) nodeName.push('B');
+                    if (/:\s*underline(?:;|\s)/.test(cssText)) nodeName.push('U');
+                    if (/:\s*italic(?:;|\s)/.test(cssText)) nodeName.push('I');
+                    if (/:\s*line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
+
+                    for (i = 0; i < nodeName.length; i++) {
+                        if (check.test(nodeName[i])) {
+                            dom.addClass(editor.commandMap[nodeName[i]], "on");
+                            map = map.replace(nodeName[i] + "|", "");
+                            check = new RegExp(map, "i");
+                        }
                     }
 
                     selectionParent = selectionParent.parentNode;
@@ -936,8 +1502,8 @@ SUNEDITOR.defaultLang = {
                 /** remove */
                 map = map.split("|");
                 var mapLen = map.length - 1;
-                for (var i = 0; i < mapLen; i++) {
-                    if (/^FONT$/i.test(map[i])) {
+                for (i = 0; i < mapLen; i++) {
+                    if (/^FONT/i.test(map[i])) {
                         dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
                     }
                     else if (/^SIZE$/i.test(map[i])) {
@@ -1146,7 +1712,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyUp_wysiwyg: function (e) {
-                if (event._directionKeyKeycode.test(e.keyCode)) {
+                if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
                 }
             },

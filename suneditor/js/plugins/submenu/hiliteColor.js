@@ -54,7 +54,9 @@ SUNEDITOR.plugin.hiliteColor = {
         }
 
         this.focus();
-        this.execCommand('hiliteColor', false, e.target.getAttribute('data-value'));
+
+        var newNode = document.createElement('SPAN'); newNode.style.backgroundColor = e.target.getAttribute('data-value');
+        this.wrapRangeToTag(newNode, ['background-color']);
         this.submenuOff();
     }
 };
