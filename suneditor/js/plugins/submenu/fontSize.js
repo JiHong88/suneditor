@@ -119,12 +119,11 @@ SUNEDITOR.plugin.fontSize = {
                         node = newInnerNode;
                     }
 
-                    node.appendChild(startNode);
-
-                    child = startContainer = startNode;
+                    startContainer = startNode;
                     startOffset = 0;
-                    startPass = true;
+                    node.appendChild(startContainer);
 
+                    startPass = true;
                     continue;
                 }
 
@@ -157,24 +156,28 @@ SUNEDITOR.plugin.fontSize = {
                         node = newInnerNode;
                     }
 
-                    while (removeNodeList.length > 0) {
-                        SUNEDITOR.dom.removeItem(removeNodeList.pop());
-                    }
-
                     if (afterNode.length > 0) {
                         endContainer.data = afterNode.data;
                     } else {
-                        SUNEDITOR.dom.removeItem(endContainer);
+                        removeNodeList.push(endContainer);
                     }
 
-                    node.appendChild(endNode);
-
-                    child = endContainer = endNode;
+                    endContainer = endNode;
                     endOffset = endNode.length;
-                    endPass = true;
-
+                    node.appendChild(endContainer);
                     el.insertBefore(newInnerNode, bofore);
 
+                    var pRemove;
+                    while (removeNodeList.length > 0) {
+                        pRemove = removeNodeList.pop();
+                        pRemove.data = '';
+                        while (pRemove.parentNode.innerText.length === 0) {
+                            pRemove = pRemove.parentNode;
+                        }
+                        SUNEDITOR.dom.removeItem(pRemove);
+                    }
+
+                    endPass = true;
                     break;
                 }
 
