@@ -665,13 +665,13 @@ SUNEDITOR.defaultLang = {
                     var endOff = nativeRng.endOffset;
 
                     parentNode = startCon;
-                    if (/^#text$/i.test(startCon.nodeName)) {
+                    if (startCon.nodeType === 3) {
                         parentNode = startCon.parentNode;
                     }
 
                     /** Select within the same node */
                     if (startCon === endCon && startOff === endOff) {
-                        if (!!selection.focusNode && /^#text$/i.test(selection.focusNode.nodeName)) {
+                        if (!!selection.focusNode && selection.focusNode.nodeType === 3) {
                             rightNode = selection.focusNode.splitText(endOff);
                             parentNode.insertBefore(oNode, rightNode);
                         }
@@ -748,7 +748,7 @@ SUNEDITOR.defaultLang = {
 
                 var startNode = startCon;
                 for (i = startIndex + 1; i >= 0; i--) {
-                    if (childNodes[i] === startNode.parentNode && /^SPAN$/i.test(childNodes[i].nodeName) && childNodes[i].firstChild === startNode && startOff === 0) {
+                    if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
                         startIndex = i;
                         startNode = startNode.parentNode;
                     }
