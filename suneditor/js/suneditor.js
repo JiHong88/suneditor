@@ -688,11 +688,11 @@ SUNEDITOR.defaultLang = {
                         var isSameContainer = startCon === endCon;
 
                         if (isSameContainer) {
-                            if (!SUNEDITOR.dom.isEdgePoint(endCon, endOff)) {
+                            if (!this.isEdgePoint(endCon, endOff)) {
                                 rightNode = endCon.splitText(endOff);
                             }
 
-                            if (!SUNEDITOR.dom.isEdgePoint(startCon, startOff)) {
+                            if (!this.isEdgePoint(startCon, startOff)) {
                                 removeNode = startCon.splitText(startOff);
                             }
 
