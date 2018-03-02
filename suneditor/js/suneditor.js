@@ -728,8 +728,6 @@ SUNEDITOR.defaultLang = {
              * @description Delete the currently selected node
              */
             removeNode: function () {
-                var ELEMENT_NODE = 1;
-                var TEXT_NODE = 3;
                 var nativeRng = this.getRange();
 
                 var startCon = nativeRng.startContainer;
@@ -756,7 +754,7 @@ SUNEDITOR.defaultLang = {
 
                 var endNode = endCon;
                 for (i = endIndex - 1; i > startIndex; i--) {
-                    if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === ELEMENT_NODE) {
+                    if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
                         childNodes.splice(i, 1);
                         endNode = endNode.parentNode;
                         --endIndex;
@@ -766,13 +764,13 @@ SUNEDITOR.defaultLang = {
                 for (i = startIndex; i <= endIndex; i++) {
                     var item = childNodes[i];
 
-                    if (item.length === 0 || (item.nodeType === TEXT_NODE && item.data === undefined)) {
+                    if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
                         dom.removeItem(item);
                         continue;
                     }
 
                     if (item === startCon) {
-                        if (startCon.nodeType === ELEMENT_NODE) {
+                        if (startCon.nodeType === 1) {
                             beforeNode = document.createTextNode(startCon.textContent);
                         } else {
                             beforeNode = document.createTextNode(startCon.substringData(0, startOff));
@@ -788,7 +786,7 @@ SUNEDITOR.defaultLang = {
                     }
 
                     if (item === endCon) {
-                        if (endCon.nodeType === ELEMENT_NODE) {
+                        if (endCon.nodeType === 1) {
                             afterNode = document.createTextNode(endCon.textContent);
                         } else {
                             afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
