@@ -88,7 +88,6 @@ SUNEDITOR.plugin.image = {
 
                 var imageUploadUrl = this.context.user.imageUploadUrl;
                 var filesLen = files.length;
-                var xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
                 var i;
 
                 if (imageUploadUrl !== null && imageUploadUrl.length > 0) {
@@ -98,10 +97,10 @@ SUNEDITOR.plugin.image = {
                         formData.append("file-" + i, files[i]);
                     }
 
-                    xmlHttp = SUNEDITOR.func.getXMLHttpRequest();
-                    xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this);
-                    xmlHttp.open("post", imageUploadUrl, true);
-                    xmlHttp.send(formData);
+                    SUNEDITOR.plugin.image.xmlHttp = SUNEDITOR.func.getXMLHttpRequest();
+                    SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this);
+                    SUNEDITOR.plugin.image.xmlHttp.open("post", imageUploadUrl, true);
+                    SUNEDITOR.plugin.image.xmlHttp.send(formData);
                 } else {
                     for (i = 0; i < filesLen; i++) {
                         SUNEDITOR.plugin.image.setup_reader.call(this, files[i])
