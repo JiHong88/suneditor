@@ -35,7 +35,7 @@ SUNEDITOR.lang = {
         line: 'Line',
         table: 'Table',
         link: 'Link',
-        image: 'Picture',
+        image: 'Image',
         video: 'Video',
         fullScreen: 'Full Screen',
         codeView: 'Code View',

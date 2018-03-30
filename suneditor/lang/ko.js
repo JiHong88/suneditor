@@ -35,7 +35,7 @@ SUNEDITOR.lang = {
         line: '구분선',
         table: '테이블',
         link: '링크',
-        image: '사진',
+        image: '이미지',
         video: '동영상',
         fullScreen: '전체화면',
         codeView: 'HTML 편집',

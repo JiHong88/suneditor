@@ -34,6 +34,7 @@ SUNEDITOR.plugin.image = {
         context.image.imageResizeBtn = resize_img_button;
 
         /** add event listeners */
+        resize_img_div.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', SUNEDITOR.plugin.image.openTab);
         context.image.imgInputFile.addEventListener('change', SUNEDITOR.plugin.image.onChange_imgInput.bind(_this));
         context.image.modal.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
         resize_img_div.getElementsByClassName('sun-editor-img-controller')[0].addEventListener('mousedown', SUNEDITOR.plugin.image.onMouseDown_image_ctrl.bind(_this));
@@ -52,29 +53,70 @@ SUNEDITOR.plugin.image = {
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
+			'<div class="modal-header">' +
+			'   <button type="button" data-command="close" class="close" aria-label="Close">' +
+			'       <span aria-hidden="true" data-command="close">x</span>' +
+			'   </button>' +
+			'   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
+			'</div>' +
+            '<div class="sun-editor-tab-button">' +
+            '   <button class="sun-editor-id-tab-link" data-tab-link="image">' + lang.toolbar.image + '</button>' +
+			'   <button class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+            '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
-            '   <div class="modal-header">' +
-            '       <button type="button" data-command="close" class="close" aria-label="Close">' +
-            '           <span aria-hidden="true" data-command="close">x</span>' +
-            '       </button>' +
-            '       <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
-            '   </div>' +
-            '   <div class="modal-body">' +
-            '       <div class="form-group">' +
-            '           <label>' + lang.dialogBox.imageBox.file + '</label>' +
-            '               <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />' +
+			'   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
+            '       <div class="modal-body">' +
+            '           <div class="form-group">' +
+            '               <label>' + lang.dialogBox.imageBox.file + '</label>' +
+            '                   <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />' +
+            '           </div>' +
+            '           <div class="form-group">' +
+            '               <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
+            '           </div>' +
             '       </div>' +
-            '       <div class="form-group">' +
-            '           <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="modal-footer">' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   </div>' +
+			'   </div>' +
+			'   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-url" style="display: none">' +
+			'       <div class="modal-body">' +
+			'           <div class="form-group">' +
+			'               <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
+			'           </div>' +
+			'       </div>' +
+			'   </div>' +
+			'   <div class="modal-footer">' +
+			'       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+			'   </div>' +
             '</form>';
 
         return dialog;
     },
+
+	openTab: function (e, tabUrl) {
+		if (!/^BUTTON$/i.test(e.target.tagName)) {
+			return false;
+		}
+
+		// Declare all variables
+		var i, tabcontent, tablinks;
+		var contentClassName = 'sun-editor-id-tab-content';
+
+		// Get all elements with class="tabcontent" and hide them
+		tabcontent = document.getElementsByClassName(contentClassName);
+		for (i = 0; i < tabcontent.length; i++) {
+			tabcontent[i].style.display = 'none';
+		}
+
+		// Get all elements with class="tablinks" and remove the class "active"
+		tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
+		for (i = 0; i < tablinks.length; i++) {
+			tablinks[i].className = tablinks[i].className.replace(' active', '');
+		}
+
+		// Show the current tab, and add an "active" class to the button that opened the tab
+		document.getElementsByClassName(contentClassName + '-' + e.target.getAttribute('data-tab-link'))[0].style.display = 'block';
+		e.currentTarget.className += ' active';
+
+		return false;
+	},
 
     xmlHttp: null,
 
