@@ -41,7 +41,9 @@ SUNEDITOR.plugin.dialog = {
         }
     },
 
-    openDialog: function (kind, option) {
+    openDialog: function (kind, option, update) {
+        this.context.dialog.updateModal = update;
+
         if (option === 'full') {
             this.context.dialog.modalArea.style.position = "fixed";
         } else {
@@ -64,5 +66,6 @@ SUNEDITOR.plugin.dialog = {
         this.context.dialog.back.style.display = "none";
         this.context.dialog.modalArea.style.display = "none";
         this.modalForm = null;
+        this.context.dialog.updateModal = false;
     }
 };

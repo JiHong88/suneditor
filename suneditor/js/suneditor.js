@@ -1460,7 +1460,7 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** A */
-                    if (findA && /^A$/i.test(selectionParent.nodeName) && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
+                    if (findA && /^A$/i.test(selectionParent.nodeName) && selectionParent.getAttribute('data-image-link') === null && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
                         var selectionATag = selectionParent;
                         editor.callModule('dialog', 'link', null, function () {
                             SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
