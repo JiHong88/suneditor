@@ -96,17 +96,19 @@ SUNEDITOR.plugin.link = {
         try {
             submitAction.call(this);
         } finally {
-            this.context.link.linkBtn.style.display = "none";
-            this.context.link._linkAnchor = null;
-            this.context.link.focusElement.value = "";
-            this.context.link.linkAnchorText.value = "";
-            this.context.link.linkNewWindowCheck.checked = false;
-
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
             this.closeLoading();
         }
 
         return false;
+    },
+
+    init: function () {
+        this.context.link.linkBtn.style.display = "none";
+        this.context.link._linkAnchor = null;
+        this.context.link.focusElement.value = "";
+        this.context.link.linkAnchorText.value = "";
+        this.context.link.linkNewWindowCheck.checked = false;
     },
 
     /** button */

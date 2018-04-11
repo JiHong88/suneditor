@@ -91,10 +91,6 @@ SUNEDITOR.plugin.video = {
 
             this.insertNode(oIframe);
             this.appendP(oIframe);
-
-            this.context.video.focusElement.value = "";
-            this.context.video.video_x.value = this.context.user.videoX;
-            this.context.video.video_y.value = this.context.user.videoY;
         }
 
         try {
@@ -105,5 +101,11 @@ SUNEDITOR.plugin.video = {
         }
 
         return false;
+    },
+
+    init: function () {
+        this.context.video.focusElement.value = "";
+        this.context.video.video_x.value = this.context.user.videoX;
+        this.context.video.video_y.value = this.context.user.videoY;
     }
 };
