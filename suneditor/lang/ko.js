@@ -35,7 +35,7 @@ SUNEDITOR.lang = {
         line: '구분선',
         table: '테이블',
         link: '링크',
-        image: '사진',
+        image: '이미지',
         video: '동영상',
         fullScreen: '전체화면',
         codeView: 'HTML 편집',
@@ -45,7 +45,7 @@ SUNEDITOR.lang = {
     dialogBox: {
         linkBox: {
             title: '링크 삽입',
-            url: '이동할 인터넷 주소',
+            url: '인터넷 주소',
             text: '화면 텍스트',
             newWindowCheck: '새창으로 열기'
         },

@@ -123,6 +123,9 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
         <li class="pl-0">When you need to focus immediately after the Dialog window appears</li><ul>
         <li class="pl-0">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
         <li class="pl-0"><span class="pl-c1">element</span> creation, <span class="pl-s">event</span> registration, and insert the created <span class="pl-c1">element</span> into <span class="pl-k">context.dialog.modal</span> using <span class="pl-en">appendChaild</span> function</li>
+        <li class="pl-0">All dialog modules must declare an <span class="pl-en">init</span> function.</li><ul>
+        <li class="pl-0">The <span class="pl-en">init</span> function is executed when the window is closed.</li>
+        <li class="pl-0">You can insert the code that initializes the <span class="pl-c1">elements</span> or <span class="pl-k">variables</span> you need.</li></ul>
     </ol>
             </pre>
                     </div>
