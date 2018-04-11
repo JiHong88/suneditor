@@ -63,8 +63,8 @@ SUNEDITOR.plugin.image = {
 			'   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
 			'</div>' +
             '<div class="sun-editor-tab-button">' +
-            '   <button class="sun-editor-id-tab-link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
-			'   <button class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+            '   <button type="button" class="sun-editor-id-tab-link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
+			'   <button type="button" class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
 			'   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
@@ -95,7 +95,9 @@ SUNEDITOR.plugin.image = {
     },
 
 	openTab: function (e) {
-		if (!/^BUTTON$/i.test(e.target.tagName)) {
+        var targetElement = (e === 'init' ? document.getElementsByClassName('sun-editor-id-tab-link')[0] : e.target);
+
+		if (!/^BUTTON$/i.test(targetElement.tagName)) {
 			return false;
 		}
 
@@ -112,11 +114,12 @@ SUNEDITOR.plugin.image = {
 		// Get all elements with class="tablinks" and remove the class "active"
 		tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
 		for (i = 0; i < tablinks.length; i++) {
-		    SUNEDITOR.dom.toggleClass(tablinks[i], 'active');
+		    SUNEDITOR.dom.removeClass(tablinks[i], 'active');
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
-		document.getElementsByClassName(contentClassName + '-' + e.target.getAttribute('data-tab-link'))[0].style.display = 'block';
+		document.getElementsByClassName(contentClassName + '-' + targetElement.getAttribute('data-tab-link'))[0].style.display = 'block';
+        SUNEDITOR.dom.addClass(targetElement, 'active');
 
 		return false;
 	},
@@ -204,7 +207,7 @@ SUNEDITOR.plugin.image = {
         function submitAction() {
             var oImg = document.createElement("IMG");
             oImg.src = this.context.image.focusElement.value;
-            oImg.style.width = "350px";
+            oImg.style.width = this.context.user.imageSize;
             oImg = SUNEDITOR.plugin.image.onRender_link(oImg, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked);
 
             this.insertNode(oImg);
@@ -290,17 +293,20 @@ SUNEDITOR.plugin.image = {
                 SUNEDITOR.plugin.image.onRender_imgInput.call(this);
                 SUNEDITOR.plugin.image.onRender_imgUrl.call(this);
             }
-
-            this.context.image.imgInputFile.value = "";
-            this.context.image.focusElement.value = "";
-            this.context.image.imgLink.value = "";
-            this.context.image.imgLinkNewWindowCheck.checked = false;
         } finally {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
             this.closeLoading();
         }
 
         return false;
+    },
+
+    init: function () {
+        this.context.image.imgInputFile.value = "";
+        this.context.image.focusElement.value = "";
+        this.context.image.imgLink.value = "";
+        this.context.image.imgLinkNewWindowCheck.checked = false;
+        SUNEDITOR.plugin.image.openTab('init');
     },
 
     /** image resize controller, button*/

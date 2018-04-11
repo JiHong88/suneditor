@@ -212,27 +212,11 @@
 .sun-editor .sun-editor-id-link-btn .btn-group button:hover, .sun-editor .sun-editor-id-link-btn .btn-group button:focus {background-color:#ffebc1 !important; border-color:#f4b124 !important; outline:0 none !important;}
 
 /* dialog inner tab */
-.sun-editor .sun-editor-tab-button {
-    width: 100%;
-    height: 20px;
-}
-
-.sun-editor .sun-editor-tab-button button {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 1px 13px;
-    transition: 0.3s;
-}
+.sun-editor .sun-editor-tab-button {width: 100%; height: 25px; border-bottom: 1px solid #e5e5e5;}
+.sun-editor .sun-editor-tab-button button {background-color: #e5e5e5; border-right: 1px solid #e5e5e5; float: left; outline: none; cursor: pointer; padding: 2px 13px; transition: 0.3s;}
 
 /* Change background color of buttons on hover */
-.sun-editor .sun-editor-tab-button button:hover {
-    background-color: #ddd;
-}
+.sun-editor .sun-editor-tab-button button:hover {background-color: #fff;}
 
 /* Create an active/current tablink class */
-.sun-editor .sun-editor-tab-button button.active {
-    background-color: #ccc;
-}
+.sun-editor .sun-editor-tab-button button.active {background-color: #fff; border-bottom: 0px;}
