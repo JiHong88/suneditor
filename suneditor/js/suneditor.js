@@ -416,7 +416,7 @@ SUNEDITOR.defaultLang = {
              * @private
              */
             _variable: {
-                selectionNode: null,
+                selectionNode: context.element.wysiwygWindow.document.body.firstChild,
                 copySelection: null,
                 wysiwygActive: true,
                 isFullScreen: false,
