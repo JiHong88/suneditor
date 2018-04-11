@@ -260,7 +260,7 @@ SUNEDITOR.plugin.image = {
                 contextImage._imageElement.setAttribute('data-image-link', linkValue);
             } else {
                 oImg = SUNEDITOR.plugin.image.onRender_link(contextImage._imageElement.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                SUNEDITOR.dom.removeItem(contextImage._imageElementLink ? contextImage._imageElementLink : contextImage._imageElement);
+                SUNEDITOR.dom.removeItem(contextImage._imageElement);
                 this.insertNode(oImg);
                 this.appendP(oImg);
             }
@@ -412,7 +412,7 @@ SUNEDITOR.plugin.image = {
         else if (/update/.test(command)) {
             this.context.image.focusElement.value = this.context.image._imageElement.src;
             this.context.image.imgLink.value = this.context.image._imageElementLink === null ? "" : this.context.image._imageElementLink.href;
-            this.context.image.imgLinkNewWindowCheck.checked = this.context.image._imageElementLink.target === "_blank";
+            this.context.image.imgLinkNewWindowCheck.checked = !this.context.image._imageElementLink || this.context.image._imageElementLink.target === "_blank";
 
             SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
         }
