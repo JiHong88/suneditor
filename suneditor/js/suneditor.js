@@ -1871,7 +1871,7 @@ SUNEDITOR.defaultLang = {
     /**
      * ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓
      */
-    var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
+    var lang = SUNEDITOR.lang = SUNEDITOR.lang || SUNEDITOR.defaultLang;
 
     /**
      * @description Suneditor's Default button list
