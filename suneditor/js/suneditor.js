@@ -1611,7 +1611,7 @@ SUNEDITOR.defaultLang = {
 
                 if (/^IMG$/i.test(targetElement.nodeName)) {
                     editor.callModule('dialog', 'image', null, function () {
-                        SUNEDITOR.plugin.image.call_controller_imageResize_.call(editor, targetElement);
+                        SUNEDITOR.plugin.image._call_controller_imageResize.call(editor, targetElement);
                     });
                     return;
                 }

@@ -344,7 +344,7 @@ SUNEDITOR.plugin.image = {
         return resize_img_button;
     },
 
-    call_controller_imageResize_: function (targetElement) {
+    _call_controller_imageResize: function (targetElement) {
         /** ie,firefox image resize handle : false*/
         targetElement.setAttribute('unselectable', 'on');
         targetElement.contentEditable = false;
