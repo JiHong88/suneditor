@@ -1747,9 +1747,6 @@ SUNEDITOR.defaultLang = {
         };
 
         /** add event listeners */
-        window.onresize = function () {
-            event.resize_window()
-        };
         /** tool bar event */
         context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
         context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
@@ -1762,6 +1759,8 @@ SUNEDITOR.defaultLang = {
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
         /** resize bar */
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
+        /** window resize event */
+        window.addEventListener('resize', event.resize_window);
 
         /** User function */
         return {
@@ -1855,15 +1854,15 @@ SUNEDITOR.defaultLang = {
                 context.element.topArea.parentNode.removeChild(context.element.topArea);
                 context.element.textElement.style.display = "";
 
-                delete this.save;
-                delete this.getContent;
-                delete this.setContent;
-                delete this.appendContent;
-                delete this.disabled;
-                delete this.enabled;
-                delete this.show;
-                delete this.hide;
-                delete this.destroy;
+                this.save = null;
+                this.getContent = null;
+                this.setContent = null;
+                this.appendContent = null;
+                this.disabled = null;
+                this.enabled = null;
+                this.show = null;
+                this.hide = null;
+                this.destroy = null;
             }
         };
     };
