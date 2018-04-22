@@ -43,6 +43,8 @@
 .sun-editor .ico_html {width:16px; height:16px; margin: 0 auto; background:url('../img/code_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_undo {width:16px; height:16px; margin: 0 auto; background:url('../img/undo-curve-arrow.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_redo {width:16px; height:16px; margin: 0 auto; background:url('../img/redo-curve-arrow.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_preview {width:16px; height:16px; margin: 0 auto; background:url('../img/preview_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_print {width:16px; height:16px; margin: 0 auto; background:url('../img/print-icon.svg') no-repeat; background-size:100%;}
 
 /* container */
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}

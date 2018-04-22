@@ -40,7 +40,9 @@ SUNEDITOR.lang = {
         fullScreen: 'Full Screen',
         codeView: 'Code View',
         undo: 'Undo',
-        redo: 'Redo'
+        redo: 'Redo',
+        preView: 'Pre view',
+        print: 'print'
     },
     dialogBox: {
         linkBox: {

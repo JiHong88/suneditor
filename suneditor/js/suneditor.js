@@ -43,7 +43,9 @@ SUNEDITOR.defaultLang = {
         fullScreen: 'Full Screen',
         codeView: 'Code View',
         undo: 'Undo',
-        redo: 'Redo'
+        redo: 'Redo',
+        preView: 'Pre View',
+        print: 'print'
     },
     dialogBox: {
         linkBox: {
@@ -1404,6 +1406,14 @@ SUNEDITOR.defaultLang = {
                 }
 
                 this._variable.isFullScreen = !this._variable.isFullScreen;
+            },
+
+            preView: function () {
+                var WindowObject = window.open('', '_blank');
+                WindowObject.document.title = lang.toolbar.preView;
+                WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
+                WindowObject.document.close();
+                WindowObject.focus();
             }
         };
 
@@ -1586,6 +1596,12 @@ SUNEDITOR.defaultLang = {
                         case 'redo':
                         case 'undo':
                             editor.execCommand(command, false, null);
+                            break;
+                        case 'preView':
+                            editor.preView();
+                            break;
+                        case 'print':
+                            context.element.wysiwygWindow.print();
                             break;
                         default :
                             editor.execCommand(command, false, value);
@@ -1964,6 +1980,14 @@ SUNEDITOR.defaultLang = {
 
         redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
             '<div class="ico_redo"></div>'
+        ],
+
+        preView: ['', lang.toolbar.preView, 'preView', '', '',
+            '<div class="ico_preview"></div>'
+        ],
+
+        print: ['', lang.toolbar.print, 'print', '', '',
+            '<div class="ico_print"></div>'
         ]
     };
 
@@ -2060,7 +2084,8 @@ SUNEDITOR.defaultLang = {
             ['indent', 'outdent'],
             ['align', 'line', 'list', 'table'],
             ['link', 'image', 'video'],
-            ['fullScreen', 'codeView']
+            ['fullScreen', 'codeView'],
+            ['preView', 'print']
         ];
 
         /** editor seting options */
@@ -2107,6 +2132,7 @@ SUNEDITOR.defaultLang = {
             this.setAttribute("scrolling", "auto");
             this.contentWindow.document.head.innerHTML = '' +
                 '<meta charset=\"utf-8\" />' +
+                '<title>SunEditor</title>' +
                 '<style type=\"text/css\">' +
                 '   body {font-family:' + options.editorIframeFont + '; margin:15px; word-break:break-all;}' +
                 '</style>';

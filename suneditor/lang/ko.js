@@ -40,7 +40,9 @@ SUNEDITOR.lang = {
         fullScreen: '전체화면',
         codeView: 'HTML 편집',
         undo: '실행 취소',
-        redo: '다시 실행'
+        redo: '다시 실행',
+        preView: '미리보기',
+        print: '인쇄'
     },
     dialogBox: {
         linkBox: {
