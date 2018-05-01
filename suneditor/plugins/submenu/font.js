@@ -36,8 +36,7 @@ SUNEDITOR.plugin.font = {
             ] : user.fontList;
 
         var list = '<div class="inner_layer list_family">' +
-            '   <ul class="list_editor sun-editor-list-font-family">' +
-            '       <li><button type="button" class="btn_edit default" data-value="inherit" data-txt="' + lang.toolbar.font + '" style="font-family:inherit;">' + lang.toolbar.fontDelete + '</button></li>';
+            '   <ul class="list_editor sun-editor-list-font-family">';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
             text = font.split(',')[0];

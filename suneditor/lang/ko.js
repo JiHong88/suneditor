@@ -13,13 +13,13 @@ if (typeof window.SUNEDITOR === 'undefined') {
 SUNEDITOR.lang = {
     toolbar: {
         font: '글꼴',
-        fontDelete: '글꼴 제거',
         formats: '포맷',
         fontSize: '크기',
         bold: '굵게',
         underline: '밑줄',
         italic: '기울임',
         strike: '취소선',
+        removeFormat: '형식 제거',
         fontColor: '글자색',
         hiliteColor: '글자 배경색',
         indent: '들여쓰기',
@@ -41,7 +41,7 @@ SUNEDITOR.lang = {
         codeView: 'HTML 편집',
         undo: '실행 취소',
         redo: '다시 실행',
-        preView: '미리보기',
+        preview: '미리보기',
         print: '인쇄'
     },
     dialogBox: {

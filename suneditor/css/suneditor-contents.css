@@ -1,0 +1,52 @@
+@CHARSET "UTF-8";
+
+/* body */
+body.sun-editor-editable {
+    margin: 20px;
+}
+
+.sun-editor-editable * {
+    font-family: Helvetica Neue, sans-serif;
+    font-size: 13px;
+    word-break: break-all;
+}
+
+/* hr */
+.sun-editor-editable hr {
+    border-width: 1px 0 0;
+    border-color: black;
+    border-image: initial;
+    height: 1px;
+}
+.sun-editor-editable hr.solid {
+    border-style: solid none none;
+}
+.sun-editor-editable hr.dotted {
+    border-style: dotted none none;
+}
+.sun-editor-editable hr.dashed {
+    border-style: dashed none none;
+}
+.sun-editor-editable img.inner-link {
+    padding: 1px;
+    margin: 1px;
+    outline: 1px solid #f4b124;
+}
+
+/* table */
+.sun-editor-editable table {
+    table-layout: auto;
+    border: 1px solid rgb(204, 204, 204);
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    background-color: transparent;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.sun-editor-editable table tr{
+    border: 1px solid #ccc;
+}
+.sun-editor-editable table td{
+    border: 1px solid #ccc; padding:8px;
+}

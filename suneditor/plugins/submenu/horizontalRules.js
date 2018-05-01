@@ -46,12 +46,9 @@ SUNEDITOR.plugin.horizontalRules = {
         return listDiv;
     },
 
-    appendHr: function (color, px, value) {
-        var borderStyle = color + " " + px + " " + value;
+    appendHr: function (className) {
         var oHr = document.createElement("HR");
-        oHr.style.border = "black 0px none";
-        oHr.style.borderTop = borderStyle;
-        oHr.style.height = "1px";
+        oHr.className = className;
 
         this.focus();
 
@@ -72,7 +69,7 @@ SUNEDITOR.plugin.horizontalRules = {
         }
 
         this.focus();
-        SUNEDITOR.plugin.horizontalRules.appendHr.call(this, 'black', '1px', value);
+        SUNEDITOR.plugin.horizontalRules.appendHr.call(this,value);
         this.submenuOff();
     }
 };

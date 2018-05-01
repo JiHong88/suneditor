@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../suneditor/js/suneditor.js"></script>
+    <script src="../../suneditor/suneditor.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -58,19 +58,19 @@
 
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
-        <h4>1. include JS/CSS</h4>
+        <h4>1. Include JS/CSS</h4>
         <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/css/suneditor.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/js/suneditor.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
 <span class="pl-c"><span class="pl-c">&lt;!--</span> Setting language (Default : English) <span class="pl-c">--&gt;</span></span>
 <span class="pl-c"><span class="pl-c">&lt;!--</span>&lt;script src="suneditor/lang/ko.js"&gt;&lt;/script&gt;<span class="pl-c">--&gt;</span></span></pre>
         </div>
-        <h4>2. target a element</h4>
+        <h4>2. Target a element</h4>
         <div class="highlight highlight-text-html-basic">
             <pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span
                     class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span
                     class="pl-ent">textarea</span>&gt;</pre>
         </div>
-        <h4>3. create</h4>
+        <h4>3. Create</h4>
         <div class="highlight highlight-source-js"><pre><span class="pl-ent">/**</span>
 <span class="pl-ent">* ID : 'suneditor_sample'</span>
 <span class="pl-ent">* ClassName : 'sun-eidtor'</span>
@@ -78,6 +78,15 @@
 <span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
     <span class="pl-c"><span class="pl-c">//</span> insert options</span>
 });</pre>
+        </div>
+        <h4>4. Contents display</h4>
+        <div class="highlight highlight-source-js"><pre>When you display a document created by <span class="pl-c1">suneditor</span>
+
+You need to load <span class="pl-s"><span class="pl-pds">suneditor-contents.css</span></span>.
+
+Then add <span class="pl-ent">"sun-editor-editable"</span> to the class name of the <span class="pl-k">Tag element</span> that displays the content.
+
+In <span class="pl-s"><span class="pl-pds">suneditor-contents.css</span></span>, you can define the style of all the tags created in <span class="pl-c1">suneditor</span>.</pre>
         </div>
     </article>
 
