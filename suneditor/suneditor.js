@@ -16,13 +16,13 @@ if (typeof window.SUNEDITOR === 'undefined') {
 SUNEDITOR.defaultLang = {
     toolbar: {
         font: 'Font',
-        fontDelete: 'Remove Font Family',
         formats: 'Formats',
         fontSize: 'Size',
         bold: 'Bold',
         underline: 'Underline',
         italic: 'Italic',
         strike: 'Strike',
+        removeFormat: 'Remove Format',
         fontColor: 'Font Color',
         hiliteColor: 'Hilite Color',
         indent: 'Indent',
@@ -43,7 +43,9 @@ SUNEDITOR.defaultLang = {
         fullScreen: 'Full Screen',
         codeView: 'Code View',
         undo: 'Undo',
-        redo: 'Redo'
+        redo: 'Redo',
+        preview: 'Preview',
+        print: 'print'
     },
     dialogBox: {
         linkBox: {
@@ -1404,6 +1406,20 @@ SUNEDITOR.defaultLang = {
                 }
 
                 this._variable.isFullScreen = !this._variable.isFullScreen;
+            },
+
+            /**
+             * @description Opens the preview window
+             */
+            preview: function () {
+                var WindowObject = window.open('', '_blank');
+                WindowObject.mimeType = 'text/html';
+                WindowObject.document.head.innerHTML = '' +
+                    '<meta charset=\"utf-8\" />' +
+                    '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
+                    '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.func.getBasePath + 'css/suneditor-contents.css">';
+                WindowObject.document.body.className = 'sun-editor-editable';
+                WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
             }
         };
 
@@ -1460,11 +1476,13 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** A */
-                    if (findA && /^A$/i.test(selectionParent.nodeName) && selectionParent.getAttribute('data-image-link') === null && (!context.link || editor.controllerArray[0] !== context.link.linkBtn)) {
-                        var selectionATag = selectionParent;
-                        editor.callModule('dialog', 'link', null, function () {
-                            SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
-                        });
+                    if (findA && /^A$/i.test(selectionParent.nodeName) && selectionParent.getAttribute('data-image-link') === null) {
+                        if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
+                            var selectionATag = selectionParent;
+                            editor.callModule('dialog', 'link', null, function () {
+                                SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
+                            });
+                        }
                         findA = false;
                     } else if (findA && context.link && editor.controllerArray[0] === context.link.linkBtn) {
                         editor.controllersOff();
@@ -1498,6 +1516,8 @@ SUNEDITOR.defaultLang = {
                 }
 
                 /** remove */
+                if (findA) editor.controllersOff();
+
                 map = map.split("|");
                 var mapLen = map.length - 1;
                 for (i = 0; i < mapLen; i++) {
@@ -1585,7 +1605,14 @@ SUNEDITOR.defaultLang = {
                         case 'outdent':
                         case 'redo':
                         case 'undo':
+                        case 'removeFormat':
                             editor.execCommand(command, false, null);
+                            break;
+                        case 'preview':
+                            editor.preview();
+                            break;
+                        case 'print':
+                            context.element.wysiwygWindow.print();
                             break;
                         default :
                             editor.execCommand(command, false, value);
@@ -1870,102 +1897,116 @@ SUNEDITOR.defaultLang = {
     /**
      * ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓
      */
-    var lang = SUNEDITOR.lang = SUNEDITOR.lang || SUNEDITOR.defaultLang;
-
     /**
      * @description Suneditor's Default button list
      * @private
      */
-    var _defaultButtonsList = {
-        font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
-            '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
-        ],
-        formats: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-            '<span class="txt">' + lang.toolbar.formats + '</span><span class="ico_more"></span>'
-        ],
+    function _defaultButtonsList () {
+        var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
 
-        fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-            '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="ico_more"></span>'
-        ],
+        return {
+            font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
+                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
+            ],
+            formats: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
+                '<span class="txt">' + lang.toolbar.formats + '</span><span class="ico_more"></span>'
+            ],
 
-        bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
-            '<div class="ico_bold"></div>'
-        ],
+            fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
+                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="ico_more"></span>'
+            ],
 
-        underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
-            '<div class="ico_underline"></div>'
-        ],
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
+                '<div class="ico_bold"></div>'
+            ],
 
-        italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
-            '<div class="ico_italic"></div>'
-        ],
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
+                '<div class="ico_underline"></div>'
+            ],
 
-        strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
-            '<div class="ico_strike"></div>'
-        ],
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
+                '<div class="ico_italic"></div>'
+            ],
 
-        fontColor: ['', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
-            '<div class="ico_foreColor"></div>'
-        ],
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
+                '<div class="ico_strike"></div>'
+            ],
 
-        hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
-            '<div class="ico_hiliteColor"></div>'
-        ],
+            removeFormat: ['', lang.toolbar.removeFormat + '', 'removeFormat', '', '',
+                '<div class="ico_erase"></div>'
+            ],
 
-        indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
-            '<div class="ico_indnet"></div>'
-        ],
+            fontColor: ['', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
+                '<div class="ico_foreColor"></div>'
+            ],
 
-        outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
-            '<div class="ico_outdent"></div>'
-        ],
+            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
+                '<div class="ico_hiliteColor"></div>'
+            ],
 
-        align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
-            '<div class="ico_align"></div>'
-        ],
+            indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
+                '<div class="ico_indnet"></div>'
+            ],
 
-        list: ['', lang.toolbar.list, 'list', 'submenu', '',
-            '<div class="ico_list_num"></div>'
-        ],
+            outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
+                '<div class="ico_outdent"></div>'
+            ],
 
-        line: ['btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
-            '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-            '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-            '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
-        ],
+            align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
+                '<div class="ico_align"></div>'
+            ],
 
-        table: ['', lang.toolbar.table, 'table', 'submenu', '',
-            '<div class="ico_table"></div>'
-        ],
+            list: ['', lang.toolbar.list, 'list', 'submenu', '',
+                '<div class="ico_list_num"></div>'
+            ],
 
-        link: ['', lang.toolbar.link, 'link', 'dialog', '',
-            '<div class="ico_url"></div>'
-        ],
+            line: ['btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
+                '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
+                '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
+                '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
+            ],
 
-        image: ['', lang.toolbar.image, 'image', 'dialog', '',
-            '<div class="ico_picture"></div>'
-        ],
+            table: ['', lang.toolbar.table, 'table', 'submenu', '',
+                '<div class="ico_table"></div>'
+            ],
 
-        video: ['', lang.toolbar.video, 'video', 'dialog', '',
-            '<div class="ico_video"></div>'
-        ],
+            link: ['', lang.toolbar.link, 'link', 'dialog', '',
+                '<div class="ico_url"></div>'
+            ],
 
-        fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
-            '<div class="ico_full_screen_e"></div>'
-        ],
+            image: ['', lang.toolbar.image, 'image', 'dialog', '',
+                '<div class="ico_picture"></div>'
+            ],
 
-        codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
-            '<div class="ico_html"></div>'
-        ],
+            video: ['', lang.toolbar.video, 'video', 'dialog', '',
+                '<div class="ico_video"></div>'
+            ],
 
-        undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
-            '<div class="ico_undo"></div>'
-        ],
+            fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
+                '<div class="ico_full_screen_e"></div>'
+            ],
 
-        redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
-            '<div class="ico_redo"></div>'
-        ]
-    };
+            codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
+                '<div class="ico_html"></div>'
+            ],
+
+            undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
+                '<div class="ico_undo"></div>'
+            ],
+
+            redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+                '<div class="ico_redo"></div>'
+            ],
+
+            preview: ['', lang.toolbar.preview, 'preview', '', '',
+                '<div class="ico_preview"></div>'
+            ],
+
+            print: ['', lang.toolbar.print, 'print', '', '',
+                '<div class="ico_print"></div>'
+            ]
+        }
+    }
 
     /**
      * @description Create a group div containing each module
@@ -2010,6 +2051,7 @@ SUNEDITOR.defaultLang = {
         /** create button list */
         var button = null;
         var module = null;
+        var defaultButtonList = _defaultButtonsList();
 
         for (var i = 0; i < buttonList.length; i++) {
 
@@ -2020,7 +2062,7 @@ SUNEDITOR.defaultLang = {
                 if (typeof button === 'object') {
                     module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                 } else {
-                    module = _defaultButtonsList[button];
+                    module = defaultButtonList[button];
                 }
 
                 moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
@@ -2055,18 +2097,18 @@ SUNEDITOR.defaultLang = {
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formats'],
-            ['bold', 'underline', 'italic', 'strike'],
+            ['bold', 'underline', 'italic', 'strike', 'removeFormat'],
             ['fontColor', 'hiliteColor'],
             ['indent', 'outdent'],
             ['align', 'line', 'list', 'table'],
             ['link', 'image', 'video'],
-            ['fullScreen', 'codeView']
+            ['fullScreen', 'codeView'],
+            ['preview', 'print']
         ];
 
         /** editor seting options */
         options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + "px" : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + "px");
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
-        options.editorIframeFont = options.editorIframeFont || 'inherit';
 
         var doc = document;
 
@@ -2107,9 +2149,9 @@ SUNEDITOR.defaultLang = {
             this.setAttribute("scrolling", "auto");
             this.contentWindow.document.head.innerHTML = '' +
                 '<meta charset=\"utf-8\" />' +
-                '<style type=\"text/css\">' +
-                '   body {font-family:' + options.editorIframeFont + '; margin:15px; word-break:break-all;}' +
-                '</style>';
+                '<title>SunEditor</title>' +
+                '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.func.getBasePath + 'css/suneditor-contents.css">';
+            this.contentWindow.document.body.className = "sun-editor-editable";
             this.contentWindow.document.body.setAttribute("contenteditable", true);
             if (element.value.length > 0) {
                 this.contentWindow.document.body.innerHTML = '<p>' + element.value + '</p>';

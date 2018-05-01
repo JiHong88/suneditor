@@ -2,7 +2,7 @@
 
 /* suneditor main */
 .sun-editor {width:auto; height:auto; font-family:inherit; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
-.sun-editor * {font-family:"inherit, Helvetica Neue";}
+.sun-editor * {font-family:Helvetica Neue, sans-serif;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
@@ -43,6 +43,9 @@
 .sun-editor .ico_html {width:16px; height:16px; margin: 0 auto; background:url('../img/code_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_undo {width:16px; height:16px; margin: 0 auto; background:url('../img/undo-curve-arrow.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_redo {width:16px; height:16px; margin: 0 auto; background:url('../img/redo-curve-arrow.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_preview {width:16px; height:16px; margin: 0 auto; background:url('../img/preview_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_print {width:16px; height:16px; margin: 0 auto; background:url('../img/print-icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_erase {width:16px; height:16px; margin: 0 auto; background:url('../img/erase_icon.svg') no-repeat; background-size:100%;}
 
 /* container */
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}

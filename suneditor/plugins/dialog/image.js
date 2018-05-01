@@ -193,8 +193,6 @@ SUNEDITOR.plugin.image = {
             } else {
                 var WindowObject = window.open('', "_blank");
                 WindowObject.document.writeln(xmlHttp.responseText);
-                WindowObject.document.close();
-                WindowObject.focus();
             }
 
             this.closeLoading();

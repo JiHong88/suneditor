@@ -13,13 +13,13 @@ if (typeof window.SUNEDITOR === 'undefined') {
 SUNEDITOR.lang = {
     toolbar: {
         font: 'Font',
-        fontDelete: 'Remove Font Family',
         formats: 'Formats',
         fontSize: 'Size',
         bold: 'Bold',
         underline: 'Underline',
         italic: 'Italic',
         strike: 'Strike',
+        removeFormat: 'Remove Format',
         fontColor: 'Font Color',
         hiliteColor: 'Hilite Color',
         indent: 'Indent',
@@ -40,7 +40,9 @@ SUNEDITOR.lang = {
         fullScreen: 'Full Screen',
         codeView: 'Code View',
         undo: 'Undo',
-        redo: 'Redo'
+        redo: 'Redo',
+        preview: 'Preview',
+        print: 'print'
     },
     dialogBox: {
         linkBox: {
