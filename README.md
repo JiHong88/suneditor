@@ -18,42 +18,16 @@ Download source and run
 ```
 
 ## Getting Started
-
-#### 1. include JS/CSS
-
-```html
-<link href="suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
-<script src="suneditor/js/suneditor.js"></script>
-<!-- Setting language (Default : English) -->
-<!--<script src="suneditor/lang/ko.js"></script>-->
-```
-
-#### 2. target a element
-
-```html
-<textarea id="sample">Hi</textarea>
-```
-
-#### 3. create
-
-```javascript
-/**
-* ID : 'suneditor_sample'
-* ClassName : 'sun-eidtor'
-*/
-var suneditor = SUNEDITOR.create('sample',{
-    // insert options
-});
-```
+**<a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>**
 
 ## Examples
-**<a href="http://suneditor.com/sample/html/examples.html" target="_blank">examples</a>**
+**<a href="http://suneditor.com/sample/html/examples.html" target="_blank">Examples</a>**
 
 ## Customize
-**<a href="http://suneditor.com/sample/html/customize.html" target="_blank">customize</a>**
+**<a href="http://suneditor.com/sample/html/customize.html" target="_blank">Customize</a>**
 
 ## Document
-**<a href="http://suneditor.com/sample/html/document.html" target="_blank">document</a>**
+**<a href="http://suneditor.com/sample/html/document.html" target="_blank">Document</a>**
     
     
 ### License
