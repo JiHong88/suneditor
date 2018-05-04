@@ -62,7 +62,11 @@ SUNEDITOR.defaultLang = {
             resize75: 'resize 75%',
             resize50: 'resize 50%',
             resize25: 'resize 25%',
-            remove: 'remove image'
+            remove: 'remove image',
+            basic: 'basic',
+            left: 'left',
+            right: 'right',
+            center: 'center'
         },
         videoBox: {
             title: 'Insert Video',
@@ -268,15 +272,34 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
-         * @description Argument value The argument value of the parent node of the element. Get the tag name if it exists.
+         * @description Argument value The argument value of the parent node of the element.
+         * A tag that satisfies the query condition is imported.
          * @param {element} element - Reference element
-         * @param {string} tagName - Tag name to find
+         * @param {string} query - Query String (tagName, .className, #ID, :name)
+         * Not use it like jquery.
+         * Only one condition can be entered at a time.
          * @returns {Element}
          */
-        getParentNode: function (element, tagName) {
-            var check = new RegExp("^" + tagName + "$", "i");
+        getParentNode: function (element, query) {
+            var attr;
+            
+            if (/\./.test(query)) {
+                attr = 'className';
+                query = query.split('.')[1];
+            } else if (/#/.test(query)) {
+                attr = 'id';
+                query = "^" + query.split('#')[1] + "$";
+            } else if (/:/.test(query)) {
+                attr = 'name';
+                query = "^" + query.split(':')[1] + "$";
+            } else {
+                attr = 'tagName';
+                query = "^" + query + "$";
+            }
 
-            while (!check.test(element.tagName)) {
+            var check = new RegExp(query, "i");
+
+            while (!check.test(element[attr]) && !/^BODY/i.test(element.tagName)) {
                 element = element.parentNode;
             }
 
@@ -285,7 +308,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Set the text content value of the argument value element
-         * @param {element} element - Elements to replace text content
+         * @param {element} element - Element to replace text content
          * @param {String} txt - Text to be applied
          */
         changeTxt: function (element, txt) {
@@ -295,7 +318,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Append the className value of the argument value element
-         ** @param {element} element - Elements to add class name
+         * @param {element} element - Elements to add class name
          * @param {string} className - Class name to be add
          */
         addClass: function (element, className) {

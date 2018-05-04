@@ -59,7 +59,11 @@ SUNEDITOR.lang = {
             resize75: 'resize 75%',
             resize50: 'resize 50%',
             resize25: 'resize 25%',
-            remove: 'remove image'
+            remove: 'remove image',
+            basic: 'basic',
+            left: 'left',
+            right: 'right',
+            center: 'center'
         },
         videoBox: {
             title: 'Insert Video',

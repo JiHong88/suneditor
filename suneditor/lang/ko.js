@@ -59,7 +59,11 @@ SUNEDITOR.lang = {
             resize75: '75% 크기',
             resize50: '50% 크기',
             resize25: '25% 크기',
-            remove: '이미지 삭제'
+            remove: '이미지 삭제',
+            basic: '기본',
+            left: '왼쪽',
+            right: '오른쪽',
+            center: '가운데'
         },
         videoBox: {
             title: '동영상 삽입',
