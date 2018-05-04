@@ -5,8 +5,11 @@ body.sun-editor-editable {
     margin: 20px;
 }
 
-.sun-editor-editable * {
+.sun-editor-editable p {
     font-family: Helvetica Neue, sans-serif;
+}
+
+.sun-editor-editable p {
     font-size: 13px;
     word-break: break-all;
 }
