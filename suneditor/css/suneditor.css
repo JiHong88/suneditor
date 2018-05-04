@@ -2,7 +2,7 @@
 
 /* suneditor main */
 .sun-editor {width:auto; height:auto; font-family:inherit; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
-.sun-editor * {font-family:Helvetica Neue, sans-serif;}
+.sun-editor * {font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
@@ -168,7 +168,7 @@
 .sun-editor .modal-dialog .modal-content .btn {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; cursor:pointer; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; background-image:none; border:1px solid transparent; border-radius:4px;}
 .sun-editor .modal-dialog .modal-content .btn:hover, .sun-editor .modal-dialog .modal-content .btn:focus {background-color: #f4a500;}
 .sun-editor .modal-dialog .modal-content input:focus {border-color:#f4b124; outline:0; -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6); box-shadow:inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(244, 177, 36, .6);}
-.sun-editor .modal-dialog .modal-body .label-check {cursor:pointer;}
+.sun-editor .modal-dialog .modal-radio {margin-left:12px; margin-right:5px;}
 
 /* loading box */
 .sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loadinfo.gif'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}

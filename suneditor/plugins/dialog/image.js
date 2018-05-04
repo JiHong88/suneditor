@@ -18,7 +18,8 @@ SUNEDITOR.plugin.image = {
             _imageClientX: 0,
             _imageResize_parent_t: 0,
             _imageResize_parent_l: 0,
-            _linkValue: ''
+            _linkValue: '',
+            _align: 'none'
         };
 
         /** image dialog */
@@ -83,10 +84,16 @@ SUNEDITOR.plugin.image = {
 			'           <div class="form-group">' +
 			'               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
 			'           </div>' +
-            '           <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '           <label><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
 			'       </div>' +
 			'   </div>' +
 			'   <div class="modal-footer">' +
+            '       <div style="float: left;">' +
+			'           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.imageBox.basic + '</label>' +
+			'           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.imageBox.left + '</label>' +
+            '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.imageBox.right + '</label>' +
+			'           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.imageBox.center + '</label>' +
+            '       </div>' +
 			'       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
 			'   </div>' +
             '</form>';
@@ -164,16 +171,37 @@ SUNEDITOR.plugin.image = {
         var reader = new FileReader();
 
         reader.onload = function () {
-            var oImg = document.createElement("IMG");
-            oImg.src = reader.result;
-            oImg.style.width = this.context.user.imageSize;
-            oImg = SUNEDITOR.plugin.image.onRender_link(oImg, imgLinkValue, newWindowCheck);
-
-            this.insertNode(oImg);
-            this.appendP(oImg);
+            SUNEDITOR.plugin.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.user.imageSize, this.context.image._align);
         }.bind(this);
 
         reader.readAsDataURL(file);
+    },
+
+    create_image: function (src, linkValue, linkNewWindow, width, align) {
+        var oImg = document.createElement("IMG");
+        var oSpan = document.createElement("SPAN");
+        var oDiv = document.createElement("DIV");
+
+        oImg.src = src;
+        oImg.style.width = width;
+        oImg.setAttribute('data-align', align);
+        oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
+
+        oSpan.className = 'sun-editor-image-span';
+        oSpan.appendChild(oImg);
+
+        oDiv.className = 'sun-editor-image-id-container';
+        oDiv.setAttribute('contenteditable', false);
+        oDiv.style.textAlign = 'center';
+        oDiv.appendChild(oSpan);
+
+        if ('center' !== align) {
+            oDiv.style.display = 'inline-block';
+            oDiv.style.float = align;
+        }
+
+        this.insertNode(oDiv);
+        this.appendP(oDiv);
     },
 
     callBack_imgUpload: function () {
@@ -202,18 +230,8 @@ SUNEDITOR.plugin.image = {
     onRender_imgUrl: function () {
         if (this.context.image.focusElement.value.trim().length === 0) return false;
 
-        function submitAction() {
-            var oImg = document.createElement("IMG");
-            oImg.src = this.context.image.focusElement.value;
-            oImg.style.width = this.context.user.imageSize;
-            oImg = SUNEDITOR.plugin.image.onRender_link(oImg, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-
-            this.insertNode(oImg);
-            this.appendP(oImg);
-        }
-
         try {
-            submitAction.call(this);
+            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.focusElement.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.user.imageSize, this.context.image._align);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.inseretImageUrl.fail] cause : "' + e.message + '"');
@@ -242,14 +260,26 @@ SUNEDITOR.plugin.image = {
     update_imageAttribute: function () {
         var contextImage = this.context.image;
         var linkValue = contextImage._linkValue;
-        var oImg;
+        var imageContainer = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-id-container');
+        var imageSpan = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-span');
+        var newEl;
 
         if (contextImage.focusElement.value.trim().length > 0) {
             contextImage._imageElement.src = contextImage.focusElement.value;
         } else {
-            SUNEDITOR.dom.removeItem(contextImage._imageElementLink ? contextImage._imageElementLink : contextImage._imageElement);
+            SUNEDITOR.dom.removeItem(imageContainer);
             return;
         }
+
+        if ('center' !== contextImage._align) {
+            imageContainer.style.display = 'inline-block';
+            imageContainer.style.float = contextImage._align;
+        } else {
+            imageContainer.style.display = '';
+            imageContainer.style.float = 'none';
+        }
+
+        contextImage._imageElement.setAttribute('data-align', contextImage._align);
 
         if (linkValue.trim().length > 0) {
             if (contextImage._imageElementLink !== null) {
@@ -257,12 +287,12 @@ SUNEDITOR.plugin.image = {
                 contextImage._imageElementLink.target = this.context.image.imgLinkNewWindowCheck.checked;
                 contextImage._imageElement.setAttribute('data-image-link', linkValue);
             } else {
-                oImg = SUNEDITOR.plugin.image.onRender_link(contextImage._imageElement.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                SUNEDITOR.dom.removeItem(contextImage._imageElement);
-                this.insertNode(oImg);
-                this.appendP(oImg);
+                newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._imageElement.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                imageSpan.innerHTML = '';
+                imageSpan.appendChild(newEl);
             }
-        } else if (contextImage._imageElementLink !== null) {
+        }
+        else if (contextImage._imageElementLink !== null) {
             var imageElement = contextImage._imageElement;
 
             imageElement.setAttribute('data-image-link', '');
@@ -270,10 +300,9 @@ SUNEDITOR.plugin.image = {
             imageElement.style.margin = '';
             imageElement.style.outline = '';
 
-            oImg = imageElement.cloneNode(true);
-            SUNEDITOR.dom.removeItem(contextImage._imageElementLink);
-            this.insertNode(oImg);
-            this.appendP(oImg);
+            newEl = imageElement.cloneNode(true);
+            imageSpan.innerHTML = '';
+            imageSpan.appendChild(newEl);
         }
     },
 
@@ -283,6 +312,8 @@ SUNEDITOR.plugin.image = {
 
         e.preventDefault();
         e.stopPropagation();
+
+        this.context.image._align = this.context.image.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
         try {
             if (this.context.dialog.updateModal) {
@@ -304,6 +335,7 @@ SUNEDITOR.plugin.image = {
         this.context.image.focusElement.value = "";
         this.context.image.imgLink.value = "";
         this.context.image.imgLinkNewWindowCheck.checked = false;
+        this.context.image.modal.querySelector('#suneditor_image_radio_none').checked = true;
         SUNEDITOR.plugin.image.openTab('init');
     },
 
@@ -403,19 +435,23 @@ SUNEDITOR.plugin.image = {
 
         e.preventDefault();
 
+        var contextImage = this.context.image;
+
         if (/^\d+$/.test(command)) {
-            this.context.image._imageElement.style.height = "";
-            this.context.image._imageElement.style.width = command + "%";
+            contextImage._imageElement.style.height = "";
+            contextImage._imageElement.style.width = command + "%";
         }
         else if (/update/.test(command)) {
-            this.context.image.focusElement.value = this.context.image._imageElement.src;
-            this.context.image.imgLink.value = this.context.image._imageElementLink === null ? "" : this.context.image._imageElementLink.href;
-            this.context.image.imgLinkNewWindowCheck.checked = !this.context.image._imageElementLink || this.context.image._imageElementLink.target === "_blank";
+            contextImage.focusElement.value = contextImage._imageElement.src;
+            contextImage.imgLink.value = contextImage._imageElementLink === null ? "" : contextImage._imageElementLink.href;
+            contextImage.imgLinkNewWindowCheck.checked = !contextImage._imageElementLink || contextImage._imageElementLink.target === "_blank";
+            contextImage.modal.querySelector('#suneditor_image_radio_' + contextImage._imageElement.getAttribute('data-align')).checked = true;
 
             SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
         }
         else if (/delete/.test(command)) {
-            SUNEDITOR.dom.removeItem(this.context.image._imageElementLink ? this.context.image._imageElementLink : this.context.image._imageElement);
+            var imageContainer = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-id-container');
+            SUNEDITOR.dom.removeItem(imageContainer);
         }
 
         this.submenuOff();
