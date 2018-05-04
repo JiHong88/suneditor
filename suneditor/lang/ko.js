@@ -63,7 +63,8 @@ SUNEDITOR.lang = {
             basic: '기본',
             left: '왼쪽',
             right: '오른쪽',
-            center: '가운데'
+            center: '가운데',
+            caption: '이미지 설명 넣기'
         },
         videoBox: {
             title: '동영상 삽입',

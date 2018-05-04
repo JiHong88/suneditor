@@ -52,7 +52,17 @@ body.sun-editor-editable {
 }
 
 /* image */
-.sun-editor-editable .sun-editor-image-span {
+.sun-editor-editable .sun-editor-id-image-container figcaption {
+    padding: 1em .5em;
+    font-size: 13px;
+    text-align: center;
+}
+.sun-editor-editable .sun-editor-id-image-container figcaption p{
+    line-height: 2;
+    margin: 0;
+}
+.sun-editor-editable .sun-editor-image-cover {
     outline: none;
     line-height: 0;
+    background-color: #f3f3f3;
 }

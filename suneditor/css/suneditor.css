@@ -156,6 +156,7 @@
 .sun-editor .modal-dialog button.close:hover, .sun-editor .modal-dialog button.close:focus {color:#f4b124 !important;}
 .sun-editor .modal-dialog .modal-body {position:relative; padding:15px;}
 .sun-editor .modal-dialog .form-group {margin-bottom:15px;}
+.sun-editor .modal-dialog .form-group-footer {margin-top:15px;}
 .sun-editor .modal-dialog .form-size .size-text {width:100%;}
 .sun-editor .modal-dialog .form-size .size-text .size-w {width:70px; text-align:center;}
 .sun-editor .modal-dialog .form-size .size-text .size-h {width:70px; text-align:center;}

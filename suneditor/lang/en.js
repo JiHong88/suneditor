@@ -63,7 +63,8 @@ SUNEDITOR.lang = {
             basic: 'Basic',
             left: 'Left',
             right: 'Right',
-            center: 'Center'
+            center: 'Center',
+            caption: 'Insert image description'
         },
         videoBox: {
             title: 'Insert Video',

@@ -18,6 +18,7 @@ SUNEDITOR.plugin.image = {
             _imageClientX: 0,
             _imageResize_parent_t: 0,
             _imageResize_parent_l: 0,
+            _imageCaption: null,
             _linkValue: '',
             _align: 'none'
         };
@@ -29,6 +30,7 @@ SUNEDITOR.plugin.image = {
         context.image.imgInputFile = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
+        context.image.caption = image_dialog.querySelector('#suneditor_image_check_caption');
 
         /** image resize controller, button */
         var resize_img_div = eval(this.setController_ImageResizeController());
@@ -74,8 +76,11 @@ SUNEDITOR.plugin.image = {
             '               <label>' + lang.dialogBox.imageBox.file + '</label>' +
             '                   <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />' +
             '           </div>' +
-            '           <div class="form-group">' +
+            '           <div>' +
             '               <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
+            '               <div class="form-group-footer">' +
+            '                   <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
+            '               </div>' +
             '           </div>' +
             '       </div>' +
 			'   </div>' +
@@ -179,29 +184,38 @@ SUNEDITOR.plugin.image = {
 
     create_image: function (src, linkValue, linkNewWindow, width, align) {
         var oImg = document.createElement("IMG");
-        var oSpan = document.createElement("SPAN");
-        var oDiv = document.createElement("DIV");
+        var cover = document.createElement("FIGURE");
+        var container = document.createElement("DIV");
 
         oImg.src = src;
         oImg.style.width = width;
         oImg.setAttribute('data-align', align);
         oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
 
-        oSpan.className = 'sun-editor-image-span';
-        oSpan.appendChild(oImg);
+        cover.className = 'sun-editor-image-cover';
+        cover.appendChild(oImg);
 
-        oDiv.className = 'sun-editor-image-id-container';
-        oDiv.setAttribute('contenteditable', false);
-        oDiv.style.textAlign = 'center';
-        oDiv.appendChild(oSpan);
-
-        if ('center' !== align) {
-            oDiv.style.display = 'inline-block';
-            oDiv.style.float = align;
+        // caption
+        if (this.context.image.caption.checked) {
+            var caption = document.createElement("FIGCAPTION");
+            caption.innerHTML = '<p>&#65279</p>';
+            caption.setAttribute('contenteditable', true);
+            cover.appendChild(caption);
         }
 
-        this.insertNode(oDiv);
-        this.appendP(oDiv);
+        container.className = 'sun-editor-id-image-container';
+        container.setAttribute('contenteditable', false);
+        container.style.textAlign = 'center';
+        container.appendChild(cover);
+
+        // align
+        if ('center' !== align) {
+            container.style.display = 'inline-block';
+            container.style.float = align;
+        }
+
+        this.insertNode(container);
+        this.appendP(container);
     },
 
     callBack_imgUpload: function () {
@@ -257,30 +271,46 @@ SUNEDITOR.plugin.image = {
         return imgTag;
     },
 
-    update_imageAttribute: function () {
+    update_image: function () {
         var contextImage = this.context.image;
         var linkValue = contextImage._linkValue;
-        var imageContainer = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-id-container');
-        var imageSpan = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-span');
+        var container = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-id-image-container');
+        var cover = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-cover');
         var newEl;
 
         if (contextImage.focusElement.value.trim().length > 0) {
             contextImage._imageElement.src = contextImage.focusElement.value;
         } else {
-            SUNEDITOR.dom.removeItem(imageContainer);
+            SUNEDITOR.dom.removeItem(container);
             return;
         }
 
-        if ('center' !== contextImage._align) {
-            imageContainer.style.display = 'inline-block';
-            imageContainer.style.float = contextImage._align;
+        // caption
+        if (contextImage.caption.checked ) {
+            if (contextImage._imageCaption === null) {
+                var caption = document.createElement("FIGCAPTION");
+                caption.innerHTML = '<p>&#65279</p>';
+                caption.setAttribute('contenteditable', true);
+                cover.appendChild(caption);
+            }
         } else {
-            imageContainer.style.display = '';
-            imageContainer.style.float = 'none';
+            if (!!contextImage._imageCaption) {
+                SUNEDITOR.dom.removeItem(contextImage._imageCaption);
+            }
+        }
+
+        // align
+        if ('center' !== contextImage._align) {
+            container.style.display = 'inline-block';
+            container.style.float = contextImage._align;
+        } else {
+            container.style.display = '';
+            container.style.float = 'none';
         }
 
         contextImage._imageElement.setAttribute('data-align', contextImage._align);
 
+        // link
         if (linkValue.trim().length > 0) {
             if (contextImage._imageElementLink !== null) {
                 contextImage._imageElementLink.href = linkValue;
@@ -288,8 +318,8 @@ SUNEDITOR.plugin.image = {
                 contextImage._imageElement.setAttribute('data-image-link', linkValue);
             } else {
                 newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._imageElement.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                imageSpan.innerHTML = '';
-                imageSpan.appendChild(newEl);
+                cover.innerHTML = '';
+                cover.appendChild(newEl);
             }
         }
         else if (contextImage._imageElementLink !== null) {
@@ -301,8 +331,8 @@ SUNEDITOR.plugin.image = {
             imageElement.style.outline = '';
 
             newEl = imageElement.cloneNode(true);
-            imageSpan.innerHTML = '';
-            imageSpan.appendChild(newEl);
+            cover.innerHTML = '';
+            cover.appendChild(newEl);
         }
     },
 
@@ -317,7 +347,7 @@ SUNEDITOR.plugin.image = {
 
         try {
             if (this.context.dialog.updateModal) {
-                SUNEDITOR.plugin.image.update_imageAttribute.call(this);
+                SUNEDITOR.plugin.image.update_image.call(this);
             } else {
                 SUNEDITOR.plugin.image.onRender_imgInput.call(this);
                 SUNEDITOR.plugin.image.onRender_imgUrl.call(this);
@@ -336,6 +366,7 @@ SUNEDITOR.plugin.image = {
         this.context.image.imgLink.value = "";
         this.context.image.imgLinkNewWindowCheck.checked = false;
         this.context.image.modal.querySelector('#suneditor_image_radio_none').checked = true;
+        this.context.image.caption.checked = false;
         SUNEDITOR.plugin.image.openTab('init');
     },
 
@@ -409,6 +440,7 @@ SUNEDITOR.plugin.image = {
 
         this.context.image._imageElementLink = /^A$/i.test(targetElement.parentNode.nodeName) ? targetElement.parentNode : null;
         this.context.image._imageElement = targetElement;
+        this.context.image._imageCaption = targetElement.nextSibling;
         this.context.image._imageElement_w = w;
         this.context.image._imageElement_h = h;
         this.context.image._imageElement_t = t;
@@ -446,11 +478,12 @@ SUNEDITOR.plugin.image = {
             contextImage.imgLink.value = contextImage._imageElementLink === null ? "" : contextImage._imageElementLink.href;
             contextImage.imgLinkNewWindowCheck.checked = !contextImage._imageElementLink || contextImage._imageElementLink.target === "_blank";
             contextImage.modal.querySelector('#suneditor_image_radio_' + contextImage._imageElement.getAttribute('data-align')).checked = true;
+            contextImage.caption.checked = !!contextImage._imageCaption;
 
             SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
         }
         else if (/delete/.test(command)) {
-            var imageContainer = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-id-container');
+            var imageContainer = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-id-image-container');
             SUNEDITOR.dom.removeItem(imageContainer);
         }
 

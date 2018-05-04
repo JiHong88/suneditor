@@ -66,7 +66,8 @@ SUNEDITOR.defaultLang = {
             basic: 'Basic',
             left: 'Left',
             right: 'Right',
-            center: 'Center'
+            center: 'Center',
+            caption: 'Insert image description'
         },
         videoBox: {
             title: 'Insert Video',
@@ -368,7 +369,7 @@ SUNEDITOR.defaultLang = {
             try {
                 item.remove();
             } catch (e) {
-                item.removeNode();
+                item.parentNode.removeChild(item);
             }
         }
     };
@@ -1574,16 +1575,16 @@ SUNEDITOR.defaultLang = {
             onClick_toolbar: function (e) {
                 if (editor._variable.isTouchMove) return true;
 
-                var targetElement = e.target;
-                var display = targetElement.getAttribute("data-display");
-                var command = targetElement.getAttribute("data-command");
-                var className = targetElement.className;
+                var target = e.target;
+                var display = target.getAttribute("data-display");
+                var command = target.getAttribute("data-command");
+                var className = target.className;
 
                 while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
-                    targetElement = targetElement.parentNode;
-                    command = targetElement.getAttribute("data-command");
-                    display = targetElement.getAttribute("data-display");
-                    className = targetElement.className;
+                    target = target.parentNode;
+                    command = target.getAttribute("data-command");
+                    display = target.getAttribute("data-display");
+                    className = target.className;
                 }
 
                 if (!command && !display) return true;
@@ -1598,14 +1599,14 @@ SUNEDITOR.defaultLang = {
                     var prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
-                    if (/submenu/.test(display) && (targetElement.nextElementSibling === null || targetElement.nextElementSibling !== prevSubmenu)) {
-                        editor.callModule('submenu', command, targetElement, function () {
-                            editor.submenuOn(targetElement)
+                    if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== prevSubmenu)) {
+                        editor.callModule('submenu', command, target, function () {
+                            editor.submenuOn(target)
                         });
                     }
                     else if (/dialog/.test(display)) {
                         editor.callModule('dialog', command, null, function () {
-                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, targetElement.getAttribute('data-option'));
+                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, target.getAttribute('data-option'));
                         });
                     }
 
@@ -1614,15 +1615,15 @@ SUNEDITOR.defaultLang = {
 
                 /** default command */
                 if (!!command) {
-                    var value = targetElement.getAttribute("data-value");
+                    var value = target.getAttribute("data-value");
                     switch (command) {
                         case 'codeView':
                             editor.toggleFrame();
-                            dom.toggleClass(targetElement, 'on');
+                            dom.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
-                            editor.toggleFullScreen(targetElement);
-                            dom.toggleClass(targetElement, "on");
+                            editor.toggleFullScreen(target);
+                            dom.toggleClass(target, "on");
                             break;
                         case 'indent':
                         case 'outdent':
@@ -1639,7 +1640,7 @@ SUNEDITOR.defaultLang = {
                             break;
                         default :
                             editor.execCommand(command, false, value);
-                            dom.toggleClass(targetElement, "on");
+                            dom.toggleClass(target, "on");
                     }
 
                     editor.submenuOff();
