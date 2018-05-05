@@ -59,15 +59,20 @@ SUNEDITOR.lang = {
             resize75: '75% 크기',
             resize50: '50% 크기',
             resize25: '25% 크기',
-            remove: '이미지 삭제'
+            remove: '이미지 삭제',
+            caption: '이미지 설명 넣기'
         },
         videoBox: {
             title: '동영상 삽입',
-            url: '미디어 임베드 주소, 유튜브',
-            width: '가로',
-            height: '세로'
+            url: '미디어 임베드 주소, 유튜브'
         },
-        submitButton: '확인'
+        submitButton: '확인',
+        basic: '기본',
+        left: '왼쪽',
+        right: '오른쪽',
+        center: '가운데',
+        width: '가로',
+        height: '세로'
     },
     editLink: {
         edit: '편집',

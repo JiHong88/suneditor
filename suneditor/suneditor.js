@@ -62,15 +62,20 @@ SUNEDITOR.defaultLang = {
             resize75: 'resize 75%',
             resize50: 'resize 50%',
             resize25: 'resize 25%',
-            remove: 'remove image'
+            remove: 'remove image',
+            caption: 'Insert image description'
         },
         videoBox: {
             title: 'Insert Video',
-            url: 'Media embed URL, YouTube',
-            width: 'Width',
-            height: 'Height'
+            url: 'Media embed URL, YouTube'
         },
-        submitButton: 'Submit'
+        submitButton: 'Submit',
+        width: 'Width',
+        height: 'Height',
+        basic: 'Basic',
+        left: 'Left',
+        right: 'Right',
+        center: 'Center'
     },
     editLink: {
         edit: 'Edit',
@@ -268,15 +273,34 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
-         * @description Argument value The argument value of the parent node of the element. Get the tag name if it exists.
+         * @description Argument value The argument value of the parent node of the element.
+         * A tag that satisfies the query condition is imported.
          * @param {element} element - Reference element
-         * @param {string} tagName - Tag name to find
+         * @param {string} query - Query String (tagName, .className, #ID, :name)
+         * Not use it like jquery.
+         * Only one condition can be entered at a time.
          * @returns {Element}
          */
-        getParentNode: function (element, tagName) {
-            var check = new RegExp("^" + tagName + "$", "i");
+        getParentNode: function (element, query) {
+            var attr;
+            
+            if (/\./.test(query)) {
+                attr = 'className';
+                query = query.split('.')[1];
+            } else if (/#/.test(query)) {
+                attr = 'id';
+                query = "^" + query.split('#')[1] + "$";
+            } else if (/:/.test(query)) {
+                attr = 'name';
+                query = "^" + query.split(':')[1] + "$";
+            } else {
+                attr = 'tagName';
+                query = "^" + query + "$";
+            }
 
-            while (!check.test(element.tagName)) {
+            var check = new RegExp(query, "i");
+
+            while (!!element && (element.nodeType === 3 || (!check.test(element[attr]) && !/^BODY/i.test(element.tagName)))) {
                 element = element.parentNode;
             }
 
@@ -285,7 +309,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Set the text content value of the argument value element
-         * @param {element} element - Elements to replace text content
+         * @param {element} element - Element to replace text content
          * @param {String} txt - Text to be applied
          */
         changeTxt: function (element, txt) {
@@ -295,7 +319,7 @@ SUNEDITOR.defaultLang = {
 
         /**
          * @description Append the className value of the argument value element
-         ** @param {element} element - Elements to add class name
+         * @param {element} element - Elements to add class name
          * @param {string} className - Class name to be add
          */
         addClass: function (element, className) {
@@ -345,7 +369,7 @@ SUNEDITOR.defaultLang = {
             try {
                 item.remove();
             } catch (e) {
-                item.removeNode();
+                item.parentNode.removeChild(item);
             }
         }
     };
@@ -534,7 +558,12 @@ SUNEDITOR.defaultLang = {
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                context.element.wysiwygWindow.document.body.focus();
+                var caption = SUNEDITOR.dom.getParentNode(this._variable.selectionNode, 'figcaption');
+                if (!!caption) {
+                    caption.focus();
+                } else {
+                    context.element.wysiwygWindow.document.body.focus();
+                }
             },
 
             /**
@@ -1551,16 +1580,16 @@ SUNEDITOR.defaultLang = {
             onClick_toolbar: function (e) {
                 if (editor._variable.isTouchMove) return true;
 
-                var targetElement = e.target;
-                var display = targetElement.getAttribute("data-display");
-                var command = targetElement.getAttribute("data-command");
-                var className = targetElement.className;
+                var target = e.target;
+                var display = target.getAttribute("data-display");
+                var command = target.getAttribute("data-command");
+                var className = target.className;
 
                 while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
-                    targetElement = targetElement.parentNode;
-                    command = targetElement.getAttribute("data-command");
-                    display = targetElement.getAttribute("data-display");
-                    className = targetElement.className;
+                    target = target.parentNode;
+                    command = target.getAttribute("data-command");
+                    display = target.getAttribute("data-display");
+                    className = target.className;
                 }
 
                 if (!command && !display) return true;
@@ -1575,14 +1604,14 @@ SUNEDITOR.defaultLang = {
                     var prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
-                    if (/submenu/.test(display) && (targetElement.nextElementSibling === null || targetElement.nextElementSibling !== prevSubmenu)) {
-                        editor.callModule('submenu', command, targetElement, function () {
-                            editor.submenuOn(targetElement)
+                    if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== prevSubmenu)) {
+                        editor.callModule('submenu', command, target, function () {
+                            editor.submenuOn(target)
                         });
                     }
                     else if (/dialog/.test(display)) {
                         editor.callModule('dialog', command, null, function () {
-                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, targetElement.getAttribute('data-option'));
+                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, target.getAttribute('data-option'));
                         });
                     }
 
@@ -1591,15 +1620,15 @@ SUNEDITOR.defaultLang = {
 
                 /** default command */
                 if (!!command) {
-                    var value = targetElement.getAttribute("data-value");
+                    var value = target.getAttribute("data-value");
                     switch (command) {
                         case 'codeView':
                             editor.toggleFrame();
-                            dom.toggleClass(targetElement, 'on');
+                            dom.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
-                            editor.toggleFullScreen(targetElement);
-                            dom.toggleClass(targetElement, "on");
+                            editor.toggleFullScreen(target);
+                            dom.toggleClass(target, "on");
                             break;
                         case 'indent':
                         case 'outdent':
@@ -1616,7 +1645,7 @@ SUNEDITOR.defaultLang = {
                             break;
                         default :
                             editor.execCommand(command, false, value);
-                            dom.toggleClass(targetElement, "on");
+                            dom.toggleClass(target, "on");
                     }
 
                     editor.submenuOff();
@@ -2089,7 +2118,7 @@ SUNEDITOR.defaultLang = {
         options.addFont = options.addFont || null;
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
-        options.imageSize = options.imageSize || '350px';
+        options.imageSize = options.imageSize || 350;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;

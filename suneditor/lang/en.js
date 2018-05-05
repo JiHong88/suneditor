@@ -59,15 +59,20 @@ SUNEDITOR.lang = {
             resize75: 'resize 75%',
             resize50: 'resize 50%',
             resize25: 'resize 25%',
-            remove: 'remove image'
+            remove: 'remove image',
+            caption: 'Insert image description'
         },
         videoBox: {
             title: 'Insert Video',
-            url: 'Media embed URL, YouTube',
-            width: 'Width',
-            height: 'Height'
+            url: 'Media embed URL, YouTube'
         },
-        submitButton: 'Submit'
+        submitButton: 'Submit',
+        width: 'Width',
+        height: 'Height',
+        basic: 'Basic',
+        left: 'Left',
+        right: 'Right',
+        center: 'Center'
     },
     editLink: {
         edit: 'Edit',

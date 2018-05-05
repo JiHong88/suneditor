@@ -227,10 +227,11 @@
 
 
             <h4 class="name" id="getParentNode"><span class="type-signature"></span>getParentNode<span
-                    class="signature">(element, tagName)</span><span class="type-signature"> &rarr; {element}</span>
+                    class="signature">(element, query)</span><span class="type-signature"> &rarr; {element}</span>
             </h4>
             <div class="description">
-                Argument value The argument value of the parent node of the element. Get the tag name if it exists.
+                Argument value The argument value of the parent node of the element.<br>
+                A tag that satisfies the query condition is imported.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -250,11 +251,13 @@
                     <td class="description last">Reference element</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>tagName</code></td>
+                    <td class="name"><code>query</code></td>
                     <td class="type">
                         <span class="param-type">string</span>
                     </td>
-                    <td class="description last">Tag name to find</td>
+                    <td class="description last">Query String (tagName, .className, #ID, :name)<br>
+                        Not use it like jquery.<br>
+                        Only one condition can be entered at a time.</td>
                 </tr>
                 </tbody>
             </table>
@@ -299,7 +302,6 @@
                     class="type-signature"></span></h4>
             <div class="description">
                 Append the className value of the argument value element
-                * @param {element} element - Elements to add class name
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -311,6 +313,13 @@
                 </tr>
                 </thead>
                 <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">element</span>
+                    </td>
+                    <td class="description last">Element to add class name</td>
+                </tr>
                 <tr>
                     <td class="name"><code>className</code></td>
                     <td class="type">

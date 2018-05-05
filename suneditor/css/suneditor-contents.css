@@ -5,8 +5,11 @@ body.sun-editor-editable {
     margin: 20px;
 }
 
-.sun-editor-editable * {
+.sun-editor-editable p {
     font-family: Helvetica Neue, sans-serif;
+}
+
+.sun-editor-editable p {
     font-size: 13px;
     word-break: break-all;
 }
@@ -44,9 +47,25 @@ body.sun-editor-editable {
     border-spacing: 0;
     border-collapse: collapse;
 }
-.sun-editor-editable table tr{
+.sun-editor-editable table tr {
     border: 1px solid #ccc;
 }
-.sun-editor-editable table td{
+.sun-editor-editable table td {
     border: 1px solid #ccc; padding:8px;
+}
+
+/* image */
+.sun-editor-editable .sun-editor-id-image-container figcaption {
+    padding: 1em .5em;
+    font-size: 13px;
+    text-align: center;
+}
+.sun-editor-editable .sun-editor-id-image-container figcaption p{
+    line-height: 2;
+    margin: 0;
+}
+.sun-editor-editable .sun-editor-image-cover {
+    outline: none;
+    line-height: 0;
+    background-color: #f3f3f3;
 }
