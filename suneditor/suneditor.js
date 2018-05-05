@@ -63,19 +63,19 @@ SUNEDITOR.defaultLang = {
             resize50: 'resize 50%',
             resize25: 'resize 25%',
             remove: 'remove image',
-            basic: 'Basic',
-            left: 'Left',
-            right: 'Right',
-            center: 'Center',
             caption: 'Insert image description'
         },
         videoBox: {
             title: 'Insert Video',
-            url: 'Media embed URL, YouTube',
-            width: 'Width',
-            height: 'Height'
+            url: 'Media embed URL, YouTube'
         },
-        submitButton: 'Submit'
+        submitButton: 'Submit',
+        width: 'Width',
+        height: 'Height',
+        basic: 'Basic',
+        left: 'Left',
+        right: 'Right',
+        center: 'Center'
     },
     editLink: {
         edit: 'Edit',
@@ -300,7 +300,7 @@ SUNEDITOR.defaultLang = {
 
             var check = new RegExp(query, "i");
 
-            while (element.nodeType === 3 || (!check.test(element[attr]) && !/^BODY/i.test(element.tagName))) {
+            while (!!element && (element.nodeType === 3 || (!check.test(element[attr]) && !/^BODY/i.test(element.tagName)))) {
                 element = element.parentNode;
             }
 
@@ -2118,7 +2118,7 @@ SUNEDITOR.defaultLang = {
         options.addFont = options.addFont || null;
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
-        options.imageSize = options.imageSize || '350px';
+        options.imageSize = options.imageSize || 350;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;

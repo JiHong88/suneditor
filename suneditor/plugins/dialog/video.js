@@ -14,15 +14,15 @@ SUNEDITOR.plugin.video = {
         var video_dialog = eval(this.setDialog());
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
-        context.video.video_x = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
-        context.video.video_y = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
+        context.video.videoY = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
 
         /** set user option value */
         video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
         video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
         /** add event listeners */
-        video_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.video.submit_dialog.bind(_this));
+        video_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
@@ -47,8 +47,8 @@ SUNEDITOR.plugin.video = {
             '           <label>' + lang.dialogBox.videoBox.url + '</label>' +
             '           <input class="form-control sun-editor-id-video-url" type="text" />' +
             '       </div>' +
-            '       <div class="form-group form-size">' +
-            '           <div class="size-text"><label class="size-w">' + lang.dialogBox.videoBox.width + '</label><label class="size-x"> </label><label class="size-h">' + lang.dialogBox.videoBox.height + '</label></div>' +
+            '       <div class="form-group">' +
+            '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '           <input type="text" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y" />' +
             '       </div>' +
             '   </div>' +
@@ -71,8 +71,8 @@ SUNEDITOR.plugin.video = {
 
             var url = this.context.video.focusElement.value.replace(/^https?:/, '');
             var oIframe = document.createElement("IFRAME");
-            var x_v = this.context.video.video_x.value;
-            var y_v = this.context.video.video_y.value;
+            var x_v = this.context.video.videoX.value;
+            var y_v = this.context.video.videoY.value;
 
             /** youtube */
             if (/youtu\.?be/.test(url)) {
@@ -105,7 +105,7 @@ SUNEDITOR.plugin.video = {
 
     init: function () {
         this.context.video.focusElement.value = "";
-        this.context.video.video_x.value = this.context.user.videoX;
-        this.context.video.video_y.value = this.context.user.videoY;
+        this.context.video.videoX.value = this.context.user.videoX;
+        this.context.video.videoY.value = this.context.user.videoY;
     }
 };

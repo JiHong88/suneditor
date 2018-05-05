@@ -29,7 +29,7 @@ SUNEDITOR.plugin.dialog = {
         context.dialog.modal = dialog_area;
 
         /** add event listeners */
-        context.dialog.modal.addEventListener('click', SUNEDITOR.plugin.dialog.onClick_dialog.bind(_this));
+        context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(_this));
         context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
     },
 

@@ -23,8 +23,8 @@ SUNEDITOR.plugin.link = {
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        link_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.link.submit_dialog.bind(_this));
-        link_button.addEventListener('click', SUNEDITOR.plugin.link.onClick_linkBtn.bind(_this));
+        link_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
+        link_button.addEventListener('click', this.onClick_linkBtn.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);

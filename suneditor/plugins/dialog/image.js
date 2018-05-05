@@ -11,8 +11,8 @@ SUNEDITOR.plugin.image = {
         context.image = {
             _imageElementLink: null,
             _imageElement: null,
-            _imageElement_w: 0,
-            _imageElement_h: 0,
+            _imageElement_w: 1,
+            _imageElement_h: 1,
             _imageElement_l: 0,
             _imageElement_t: 0,
             _imageClientX: 0,
@@ -32,6 +32,10 @@ SUNEDITOR.plugin.image = {
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
         context.image.caption = image_dialog.querySelector('#suneditor_image_check_caption');
+        context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
+        context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
+
+        context.image.imageX.value = _this.context.user.imageSize;
 
         /** image resize controller, button */
         var resize_img_div = eval(this.setController_ImageResizeController());
@@ -42,10 +46,12 @@ SUNEDITOR.plugin.image = {
         context.image.imageResizeBtn = resize_img_button;
 
         /** add event listeners */
-        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', SUNEDITOR.plugin.image.openTab);
-        context.image.modal.getElementsByClassName("btn-primary")[0].addEventListener('click', SUNEDITOR.plugin.image.submit_dialog.bind(_this));
-        resize_img_div.getElementsByClassName('sun-editor-img-controller')[0].addEventListener('mousedown', SUNEDITOR.plugin.image.onMouseDown_image_ctrl.bind(_this));
-        context.image.imageResizeBtn.addEventListener('click', SUNEDITOR.plugin.image.onClick_imageResizeBtn.bind(_this));
+        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab);
+        context.image.modal.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
+        resize_img_div.getElementsByClassName('sun-editor-img-controller')[0].addEventListener('mousedown', this.onMouseDown_image_ctrl.bind(_this));
+        context.image.imageResizeBtn.addEventListener('click', this.onClick_imageResizeBtn.bind(_this));
+        context.image.imageX.addEventListener('change', this.setImageSizeInput.bind(_this, 'x'));
+        context.image.imageY.addEventListener('change', this.setImageSizeInput.bind(_this, 'y'));
 
         /** append html */
         context.dialog.modal.appendChild(image_dialog);
@@ -77,11 +83,15 @@ SUNEDITOR.plugin.image = {
             '               <label>' + lang.dialogBox.imageBox.file + '</label>' +
             '                   <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />' +
             '           </div>' +
-            '           <div>' +
+            '           <div class="form-group">' +
             '               <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
-            '               <div class="form-group-footer">' +
-            '                   <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
-            '               </div>' +
+            '           </div>' +
+            '           <div class="form-group">' +
+            '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+            '               <input class="form-size-control sun-editor-id-image-x" type="number" min="1" /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
+            '           </div>' +
+            '           <div class="form-group-footer">' +
+            '               <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
             '           </div>' +
             '       </div>' +
 			'   </div>' +
@@ -95,10 +105,10 @@ SUNEDITOR.plugin.image = {
 			'   </div>' +
 			'   <div class="modal-footer">' +
             '       <div style="float: left;">' +
-			'           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.imageBox.basic + '</label>' +
-			'           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.imageBox.left + '</label>' +
-            '           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.imageBox.center + '</label>' +
-            '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.imageBox.right + '</label>' +
+			'           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.basic + '</label>' +
+			'           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.left + '</label>' +
+            '           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.center + '</label>' +
+            '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
 			'       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
 			'   </div>' +
@@ -154,7 +164,7 @@ SUNEDITOR.plugin.image = {
                     }
 
                     SUNEDITOR.plugin.image.xmlHttp = SUNEDITOR.func.getXMLHttpRequest();
-                    SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this);
+                    SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
                     SUNEDITOR.plugin.image.xmlHttp.open("post", imageUploadUrl, true);
                     SUNEDITOR.plugin.image.xmlHttp.send(formData);
                 } else {
@@ -177,13 +187,13 @@ SUNEDITOR.plugin.image = {
         var reader = new FileReader();
 
         reader.onload = function () {
-            SUNEDITOR.plugin.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.user.imageSize, this.context.image._align);
+            SUNEDITOR.plugin.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align);
         }.bind(this);
 
         reader.readAsDataURL(file);
     },
 
-    callBack_imgUpload: function () {
+    callBack_imgUpload: function (linkValue, linkNewWindow, width, align) {
         var xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
         if (xmlHttp.readyState === 4) {
             if (xmlHttp.status === 200) {
@@ -191,11 +201,7 @@ SUNEDITOR.plugin.image = {
                 var resultLen = result.length;
 
                 for (var i = 0; i < resultLen; i++) {
-                    var oImg = document.createElement("IMG");
-                    oImg.src = result[i].SUNEDITOR_IMAGE_SRC;
-                    oImg.style.width = this.context.user.imageSize;
-                    this.insertNode(oImg);
-                    this.appendP(oImg);
+                    SUNEDITOR.plugin.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align);
                 }
             } else {
                 var WindowObject = window.open('', "_blank");
@@ -210,7 +216,7 @@ SUNEDITOR.plugin.image = {
         if (this.context.image.focusElement.value.trim().length === 0) return false;
 
         try {
-            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.focusElement.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.user.imageSize, this.context.image._align);
+            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.focusElement.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.inseretImageUrl.fail] cause : "' + e.message + '"');
@@ -234,6 +240,16 @@ SUNEDITOR.plugin.image = {
         }
 
         return imgTag;
+    },
+
+    setImageSizeInput: function (xy) {
+        if (!this.context.dialog.updateModal) return;
+
+        if (xy === 'x') {
+            this.context.image.imageY.value = Math.round((this.context.image._imageElement_h / this.context.image._imageElement_w) * this.context.image.imageX.value);
+        } else {
+            this.context.image.imageX.value = Math.round((this.context.image._imageElement_w / this.context.image._imageElement_h) * this.context.image.imageY.value);
+        }
     },
 
     submit_dialog: function (e) {
@@ -304,12 +320,15 @@ SUNEDITOR.plugin.image = {
         var cover = SUNEDITOR.dom.getParentNode(contextImage._imageElement, '.sun-editor-image-cover');
         var newEl;
 
-        if (contextImage.focusElement.value.trim().length > 0) {
-            contextImage._imageElement.src = contextImage.focusElement.value;
-        } else {
+        if (contextImage.focusElement.value.trim().length === 0) {
             SUNEDITOR.dom.removeItem(container);
             return;
         }
+
+        // src, size
+        contextImage._imageElement.src = contextImage.focusElement.value;
+        contextImage._imageElement.style.width = contextImage.imageX.value + 'px';
+        contextImage._imageElement.style.height = contextImage.imageY.value + 'px';
 
         // caption
         if (contextImage._captionChecked) {
@@ -369,6 +388,9 @@ SUNEDITOR.plugin.image = {
         this.context.image.imgLinkNewWindowCheck.checked = false;
         this.context.image.modal.querySelector('#suneditor_image_radio_none').checked = true;
         this.context.image.caption.checked = false;
+        this.context.image.imageX.value = this.context.user.imageSize;
+        this.context.image.imageY.value = '';
+        this.context.image.imageY.disabled = true;
         SUNEDITOR.plugin.image.openTab('init');
     },
 
@@ -481,6 +503,9 @@ SUNEDITOR.plugin.image = {
             contextImage.imgLinkNewWindowCheck.checked = !contextImage._imageElementLink || contextImage._imageElementLink.target === "_blank";
             contextImage.modal.querySelector('#suneditor_image_radio_' + contextImage._imageElement.getAttribute('data-align')).checked = true;
             contextImage._captionChecked = contextImage.caption.checked = !!contextImage._imageCaption;
+            contextImage.imageX.value = contextImage._imageElement.offsetWidth;
+            contextImage.imageY.value = contextImage._imageElement.offsetHeight;
+            this.context.image.imageY.disabled = false;
 
             SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
         }
