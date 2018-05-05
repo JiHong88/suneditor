@@ -300,7 +300,7 @@ SUNEDITOR.defaultLang = {
 
             var check = new RegExp(query, "i");
 
-            while (!check.test(element[attr]) && !/^BODY/i.test(element.tagName)) {
+            while (element.nodeType === 3 || (!check.test(element[attr]) && !/^BODY/i.test(element.tagName))) {
                 element = element.parentNode;
             }
 
@@ -558,7 +558,12 @@ SUNEDITOR.defaultLang = {
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                context.element.wysiwygWindow.document.body.focus();
+                var caption = SUNEDITOR.dom.getParentNode(this._variable.selectionNode, 'figcaption');
+                if (!!caption) {
+                    caption.focus();
+                } else {
+                    context.element.wysiwygWindow.document.body.focus();
+                }
             },
 
             /**
