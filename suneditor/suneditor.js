@@ -405,6 +405,10 @@ SUNEDITOR.defaultLang = {
              */
             submenu: null,
             /**
+             * @description active button element in submenu
+             */
+            submenuActiveButton: null,
+            /**
              * @description controllers array (image resize area, link modified button)
              */
             controllerArray: [],
@@ -517,6 +521,8 @@ SUNEDITOR.defaultLang = {
             submenuOn: function (element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = "block";
+                SUNEDITOR.dom.addClass(element, 'on');
+                this.submenuActiveButton = element;
             },
 
             /**
@@ -526,6 +532,8 @@ SUNEDITOR.defaultLang = {
                 if (!!this.submenu) {
                     this.submenu.style.display = "none";
                     this.submenu = null;
+                    SUNEDITOR.dom.removeClass(this.submenuActiveButton, 'on');
+                    this.submenuActiveButton = null;
                 }
 
                 this.controllersOff();
@@ -1647,9 +1655,9 @@ SUNEDITOR.defaultLang = {
                             editor.execCommand(command, false, value);
                             dom.toggleClass(target, "on");
                     }
-
-                    editor.submenuOff();
                 }
+
+                editor.submenuOff();
             },
 
             onMouseUp_wysiwyg: function (e) {

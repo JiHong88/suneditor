@@ -99,7 +99,7 @@
 .sun-editor .sun-editor-id-toolbar .font_size_list li {padding:0px; width:100%;}
 
 .sun-editor .sun-editor-id-toolbar .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:1px solid #ccc; margin-left:2px; border-radius:2px; font-size:12px; line-height:27px; background-color:#FFF;}
-.sun-editor .sun-editor-id-toolbar .btn_editor.on {border-color:#f4b124; background-color:#ffebc1; -webkit-box-shadow: inset 0 3px 5px #f4b124; box-shadow: inset 0 3px 5px #f4b124;}
+.sun-editor .sun-editor-id-toolbar .btn_editor.on, .sun-editor .sun-editor-id-toolbar .btn_editor:active {border-color:#f4b124; background-color:#ffebc1; -webkit-box-shadow: inset 0 3px 5px #f4b124; box-shadow: inset 0 3px 5px #f4b124;}
 .sun-editor .sun-editor-id-toolbar .btn_editor:hover, .sun-editor .sun-editor-id-toolbar .btn_editor:focus {background-color: #ffebc1; border-color: #f4b124; outline: 0 none;}
 
 .sun-editor .sun-editor-id-toolbar .btn_edit {width:100%; height:28px; padding:0 14px; margin-left:0; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
