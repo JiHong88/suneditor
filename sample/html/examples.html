@@ -111,7 +111,18 @@
             imageSize <span class="pl-k">:</span> <span class="pl-s">150</span>,
             buttonList <span class="pl-k">:</span> [
                 [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
-                [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>]
+                [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
+                    <span class="pl-c">// Set the display attribute of the "image" module to "full"</span>
+                    {
+                        buttonClass:<span class="pl-s"><span class="pl-pds">''</span></span>,
+                        title:<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
+                        dataCommand:<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
+                        dataDisplay:<span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+                        displayOption:<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
+                        innerHTML:<span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_picture"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+                    },
+                    <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>
+                ]
             ]
         });</pre>
         </div>
@@ -303,7 +314,17 @@
         imageSize : 150,
         buttonList : [
             ['font', 'fontSize'],
-            ['image', 'video']
+            [
+                {
+                    buttonClass:'',
+                    title:'image',
+                    dataCommand:'image',
+                    dataDisplay:'dialog',
+                    displayOption:'full',
+                    innerHTML:'<div class="ico_picture"></div>'
+                },
+                'video'
+            ]
         ]
     });
 
