@@ -83,7 +83,7 @@ SUNEDITOR.defaultLang = {
     }
 };
 
-(function (SUNEDITOR) {
+(function () {
     'use strict';
 
     /**
@@ -300,7 +300,10 @@ SUNEDITOR.defaultLang = {
 
             var check = new RegExp(query, "i");
 
-            while (!!element && (element.nodeType === 3 || (!check.test(element[attr]) && !/^BODY/i.test(element.tagName)))) {
+            while (!!element && (element.nodeType === 3 || !check.test(element[attr]))) {
+                if (/^BODY$/i.test(element.tagName)) {
+                    return null;
+                }
                 element = element.parentNode;
             }
 
@@ -1394,6 +1397,27 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
+             * @description This function implements indentation.
+             * Set "margin-left" to "25px" in the top "P" tag of the parameter node.
+             * @param node {Node} - The node to indent (editor._variable.selectionNode)
+             * @param command {String} - Separator ("indent" or "outdent")
+             */
+            indent: function (node, command) {
+                var p = SUNEDITOR.dom.getParentNode(node, 'P');
+                if (!p) return;
+
+                var margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
+
+                if ('indent' === command) {
+                    margin += 25;
+                } else {
+                    margin -= 25;
+                }
+
+                p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
+            },
+
+            /**
              * @description Changes to code view or wysiwyg view
              */
             toggleFrame: function () {
@@ -1640,6 +1664,8 @@ SUNEDITOR.defaultLang = {
                             break;
                         case 'indent':
                         case 'outdent':
+                            editor.indent(editor._variable.selectionNode, command);
+                            break;
                         case 'redo':
                         case 'undo':
                         case 'removeFormat':
@@ -2320,4 +2346,4 @@ SUNEDITOR.defaultLang = {
         document.getElementById(elementId).style.display = "";
     };
 
-})(SUNEDITOR);
+})();
