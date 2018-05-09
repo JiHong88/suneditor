@@ -389,7 +389,7 @@ SUNEDITOR.defaultLang = {
          * @description Practical editor function
          * This function is 'this' used by other plugins
          */
-        var editor = SUNEDITOR.editor = {
+        var editor = {
             /**
              * @description Elements and user options parameters of the suneditor
              */
@@ -449,7 +449,7 @@ SUNEDITOR.defaultLang = {
              * @private
              */
             _variable: {
-                selectionNode: context.element.wysiwygWindow.document.body.firstChild,
+                selectionNode: null,
                 copySelection: null,
                 wysiwygActive: true,
                 isFullScreen: false,
@@ -578,7 +578,7 @@ SUNEDITOR.defaultLang = {
             },
 
             _setSelectionNode: function () {
-                // IE 10
+                // IE
                 this._variable.copySelection = func.copyObj(this.getSelection());
 
                 var range = this.getRange();
@@ -633,13 +633,20 @@ SUNEDITOR.defaultLang = {
 
                 if (selection.rangeCount > 0) {
                     nativeRng = selection.getRangeAt(0);
-                } else {
-                    // IE 10
+                }
+                // IE
+                else {
+                    nativeRng = this.createRange();
                     selection = this._variable.copySelection;
 
-                    nativeRng = this.createRange();
-                    nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
-                    nativeRng.setEnd(selection.focusNode, selection.focusOffset);
+                    if (!selection) {
+                        selection = this._variable.selectionNode || context.element.wysiwygWindow.document.body.firstChild;
+                        nativeRng.setStart(selection, 0);
+                        nativeRng.setEnd(selection, 0);
+                    } else {
+                        nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
+                        nativeRng.setEnd(selection.focusNode, selection.focusOffset);
+                    }
                 }
 
                 return nativeRng;
@@ -2222,6 +2229,7 @@ SUNEDITOR.defaultLang = {
                 '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.func.getBasePath + 'css/suneditor-contents.css">';
             this.contentWindow.document.body.className = "sun-editor-editable";
             this.contentWindow.document.body.setAttribute("contenteditable", true);
+
             if (element.value.length > 0) {
                 this.contentWindow.document.body.innerHTML = '<p>' + element.value + '</p>';
             } else {
