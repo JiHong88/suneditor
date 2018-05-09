@@ -577,6 +577,18 @@ SUNEDITOR.defaultLang = {
                 }
             },
 
+            _setSelectionNode: function () {
+                // IE 10
+                this._variable.copySelection = func.copyObj(this.getSelection());
+
+                var range = this.getRange();
+                if (range.startContainer !== range.endContainer) {
+                    this._variable.selectionNode = range.startContainer;
+                } else {
+                    this._variable.selectionNode = this.getSelectionNode();
+                }
+            },
+
             /**
              * @description Determine if this offset is the edge offset of container
              * @param {object} container - The container property of the selection object.
@@ -1678,10 +1690,10 @@ SUNEDITOR.defaultLang = {
 
             onMouseUp_wysiwyg: function (e) {
                 e.stopPropagation();
+                editor._setSelectionNode();
 
                 var targetElement = e.target;
                 editor.submenuOff();
-
 
                 if (/^HTML$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
@@ -1700,15 +1712,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyDown_wysiwyg: function (e) {
-                // IE 10
-                editor._variable.copySelection = func.copyObj(editor.getSelection());
-
-                var range = editor.getRange();
-                if (range.startContainer !== range.endContainer) {
-                    editor._variable.selectionNode = range.startContainer;
-                } else {
-                    editor._variable.selectionNode = editor.getSelectionNode();
-                }
+                editor._setSelectionNode();
 
                 var keyCode = e.keyCode;
                 var shift = e.shiftKey;
@@ -1799,6 +1803,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyUp_wysiwyg: function (e) {
+                editor._setSelectionNode();
                 if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
                 }
