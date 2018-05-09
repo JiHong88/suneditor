@@ -1738,7 +1738,7 @@ SUNEDITOR.defaultLang = {
                 /** default key action */
                 switch (keyCode) {
                     case 8: /**backspace key*/
-                        if (target.childElementCount === 1 && target.children[0].innerHTML === "<br/>") {
+                        if (/^P$/i.test(editor._variable.selectionNode.tagName) && editor._variable.selectionNode.previousSibling === null) {
                             e.preventDefault();
                             return false;
                         }
@@ -1960,12 +1960,14 @@ SUNEDITOR.defaultLang = {
     /**
      * ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓
      */
+    SUNEDITOR.lang = SUNEDITOR.lang || SUNEDITOR.defaultLang;
+
     /**
      * @description Suneditor's Default button list
      * @private
      */
     function _defaultButtonsList () {
-        var lang = SUNEDITOR.lang = SUNEDITOR.lang ? SUNEDITOR.lang : SUNEDITOR.defaultLang;
+        var lang = SUNEDITOR.lang;
 
         return {
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
