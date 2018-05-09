@@ -283,7 +283,7 @@ SUNEDITOR.defaultLang = {
          */
         getParentNode: function (element, query) {
             var attr;
-            
+
             if (/\./.test(query)) {
                 attr = 'className';
                 query = query.split('.')[1];
@@ -715,13 +715,12 @@ SUNEDITOR.defaultLang = {
                     if (startCon === endCon && startOff === endOff) {
                         if (!!selection.focusNode && selection.focusNode.nodeType === 3) {
                             rightNode = selection.focusNode.splitText(endOff);
-                            parentNode.insertBefore(oNode, rightNode);
                         }
                         else {
                             if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
                                 parentNode.removeChild(parentNode.lastChild);
                             }
-                            parentNode.appendChild(oNode);
+                            rightNode = null;
                         }
                     }
                     /** Select multiple nodes */
