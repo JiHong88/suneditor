@@ -1502,15 +1502,6 @@ SUNEDITOR.defaultLang = {
             _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
 
             _findButtonEffectTag: function () {
-                editor._variable.copySelection = func.copyObj(editor.getSelection());
-
-                var range = editor.getRange();
-                if (range.startContainer !== range.endContainer) {
-                    editor._variable.selectionNode = range.startContainer;
-                } else {
-                    editor._variable.selectionNode = editor.getSelectionNode();
-                }
-
                 var selectionParent = editor._variable.selectionNode;
                 var findFont = true;
                 var findSize = true;
@@ -1710,7 +1701,16 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyDown_wysiwyg: function (e) {
-                var target = e.target;
+                // IE 10
+                editor._variable.copySelection = func.copyObj(editor.getSelection());
+
+                var range = editor.getRange();
+                if (range.startContainer !== range.endContainer) {
+                    editor._variable.selectionNode = range.startContainer;
+                } else {
+                    editor._variable.selectionNode = editor.getSelectionNode();
+                }
+
                 var keyCode = e.keyCode;
                 var shift = e.shiftKey;
                 var ctrl = e.ctrlKey || e.metaKey;
