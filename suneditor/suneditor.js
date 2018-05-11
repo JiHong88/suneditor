@@ -89,7 +89,7 @@ SUNEDITOR.defaultLang = {
     /**
      * @description utile function
      */
-    var func = SUNEDITOR.func = {
+    SUNEDITOR.func = {
         /**
          * @description Gets XMLHttpRequest object
          * @returns {Object}
@@ -170,7 +170,7 @@ SUNEDITOR.defaultLang = {
     /**
      * @description document function
      */
-    var dom = SUNEDITOR.dom = {
+    SUNEDITOR.dom = {
         /**
          * @description Get the index of the argument value in the element array
          * @param {array} array - element array
@@ -524,7 +524,7 @@ SUNEDITOR.defaultLang = {
             submenuOn: function (element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = "block";
-                SUNEDITOR.dom.addClass(element, 'on');
+                dom.addClass(element, 'on');
                 this.submenuActiveButton = element;
             },
 
@@ -535,7 +535,7 @@ SUNEDITOR.defaultLang = {
                 if (!!this.submenu) {
                     this.submenu.style.display = "none";
                     this.submenu = null;
-                    SUNEDITOR.dom.removeClass(this.submenuActiveButton, 'on');
+                    dom.removeClass(this.submenuActiveButton, 'on');
                     this.submenuActiveButton = null;
                 }
 
@@ -569,7 +569,7 @@ SUNEDITOR.defaultLang = {
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                var caption = SUNEDITOR.dom.getParentNode(this._variable.selectionNode, 'figcaption');
+                var caption = dom.getParentNode(this._variable.selectionNode, 'figcaption');
                 if (!!caption) {
                     caption.focus();
                 } else {
@@ -958,11 +958,11 @@ SUNEDITOR.defaultLang = {
                     /** multi line */
                     else {
                         // get line nodes
-                        var lineNodes = SUNEDITOR.dom.getListChildren(commonCon, function (current) {
+                        var lineNodes = dom.getListChildren(commonCon, function (current) {
                             return /^P$/i.test(current.nodeName);
                         });
-                        var startLine = SUNEDITOR.dom.getParentNode(startCon, 'P');
-                        var endLine = SUNEDITOR.dom.getParentNode(endCon, 'P');
+                        var startLine = dom.getParentNode(startCon, 'P');
+                        var endLine = dom.getParentNode(endCon, 'P');
 
                         for (var i = 0, len = lineNodes.length; i < len; i++) {
                             if (startLine === lineNodes[i]) {
@@ -1141,7 +1141,7 @@ SUNEDITOR.defaultLang = {
                                 while (!!pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
                                     pRemove = pRemove.parentNode;
                                 }
-                                SUNEDITOR.dom.removeItem(pRemove);
+                                dom.removeItem(pRemove);
                             }
 
                             endPass = true;
@@ -1292,7 +1292,7 @@ SUNEDITOR.defaultLang = {
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                SUNEDITOR.dom.removeItem(element);
+                dom.removeItem(element);
 
                 return {
                     container: container,
@@ -1406,7 +1406,7 @@ SUNEDITOR.defaultLang = {
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                SUNEDITOR.dom.removeItem(element);
+                dom.removeItem(element);
 
                 return {
                     container: container,
@@ -1421,7 +1421,7 @@ SUNEDITOR.defaultLang = {
              * @param command {String} - Separator ("indent" or "outdent")
              */
             indent: function (node, command) {
-                var p = SUNEDITOR.dom.getParentNode(node, 'P');
+                var p = dom.getParentNode(node, 'P');
                 if (!p) return;
 
                 var margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1496,7 +1496,7 @@ SUNEDITOR.defaultLang = {
                 WindowObject.document.head.innerHTML = '' +
                     '<meta charset=\"utf-8\" />' +
                     '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
-                    '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.func.getBasePath + 'css/suneditor-contents.css">';
+                    '<link rel="stylesheet" type="text/css" href="' + func.getBasePath + 'css/suneditor-contents.css">';
                 WindowObject.document.body.className = 'sun-editor-editable';
                 WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
             }
@@ -2347,7 +2347,7 @@ SUNEDITOR.defaultLang = {
 
         element.style.display = "none";
 
-        return core(_Context(element, cons.constructed, cons.options), dom, func);
+        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.func);
     };
 
     /**
