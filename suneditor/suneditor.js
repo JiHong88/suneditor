@@ -1820,6 +1820,23 @@ SUNEDITOR.defaultLang = {
                 editor.controllersOff();
             },
 
+            onDrop_wysiwyg: function (e) {
+                var files = e.dataTransfer.files;
+
+                if (files.length === 0) return true;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                editor.focus();
+
+                editor.callModule('dialog', 'image', null, function () {
+                    editor.context.image.imgInputFile.files = files;
+                    SUNEDITOR.plugin.image.onRender_imgInput.call(editor);
+                    editor.context.image.imgInputFile.files = null;
+                });
+            },
+
             onMouseDown_resizeBar: function (e) {
                 e.stopPropagation();
 
@@ -1858,6 +1875,7 @@ SUNEDITOR.defaultLang = {
         context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
         context.element.wysiwygWindow.addEventListener('keyup', event.onKeyUp_wysiwyg);
         context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
+        context.element.wysiwygWindow.addEventListener('drop', event.onDrop_wysiwyg);
         /** resize bar */
         context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
         /** window resize event */
