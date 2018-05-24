@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="../css/github.css">
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
-    <link href="../../suneditor/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../suneditor/suneditor.js"></script>
+    <link href="../../src/css/suneditor.css" rel="stylesheet" type="text/css">
+    <script src="../../src/suneditor.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -54,10 +54,10 @@
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
         <h4>1. Include JS/CSS</h4>
-        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/css/suneditor.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>suneditor/js/suneditor.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>src/css/suneditor.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>src/js/suneditor.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
 <span class="pl-c"><span class="pl-c">&lt;!--</span> Setting language (Default : English) <span class="pl-c">--&gt;</span></span>
-<span class="pl-c"><span class="pl-c">&lt;!--</span>&lt;script src="suneditor/lang/ko.js"&gt;&lt;/script&gt;<span class="pl-c">--&gt;</span></span></pre>
+<span class="pl-c"><span class="pl-c">&lt;!--</span>&lt;script src="lang/ko.js"&gt;&lt;/script&gt;<span class="pl-c">--&gt;</span></span></pre>
         </div>
         <h4>2. Target a element</h4>
         <div class="highlight highlight-text-html-basic">

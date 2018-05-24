@@ -1,8 +1,8 @@
 {
-  "name": "sun-editor",
+  "name": "suneditor",
   "version": "1.2.0",
   "description": "Pure JavaScript based WYSIWYG web editor",
-  "main": "suneditor/suneditor.js",
+  "main": "src/suneditor.js",
   "keywords": [
     "wysiwyg",
     "editor",
