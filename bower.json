@@ -1,0 +1,36 @@
+{
+  "name": "sun-editor",
+  "version": "1.2.0",
+  "description": "Pure JavaScript based WYSIWYG web editor",
+  "main": "suneditor/suneditor.js",
+  "keywords": [
+    "wysiwyg",
+    "editor",
+    "javascript",
+    "suneditor",
+    "wysiwyg-eidtor",
+    "rich-text-editor",
+    "html-editor",
+    "contenteditable"
+  ],
+  "author": "JiHong.Lee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JiHong88/SunEditor/issues"
+  },
+  "homepage": "http://suneditor.com",
+  "repository": {
+    "type": "git",
+    "url": "git@https://github.com/JiHong88/SunEditor.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "authors": [
+    "JiHong.Lee"
+  ]
+}
