@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+
+# npm, bower
+node_modules/**
+bower_components/**
+
+.DS_Store
