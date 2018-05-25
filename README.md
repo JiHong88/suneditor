@@ -11,6 +11,18 @@ Supported Browser -
 Chrome, Safari, Opera, Firefox, Edge, IE 11, Mobile web
 ```
 
+#### npm
+
+``` sh
+$ npm install suneditor
+```
+
+#### bower
+
+``` sh
+$ bower install suneditor
+```
+
 ## Sample
 ```text
 Download source and run
