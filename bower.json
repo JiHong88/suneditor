@@ -1,6 +1,6 @@
 {
   "name": "suneditor",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
   "keywords": [
@@ -21,14 +21,12 @@
   "homepage": "http://suneditor.com",
   "repository": {
     "type": "git",
-    "url": "git@https://github.com/JiHong88/SunEditor.git"
+    "url": "https://github.com/JiHong88/SunEditor.git"
   },
   "ignore": [
     "**/.*",
     "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    "bower_components"
   ],
   "authors": [
     "JiHong.Lee"
