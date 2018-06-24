@@ -686,11 +686,12 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
-             * @description Get node of current line (P,Table..)
-             * @param {element} element - Reference element
+             * @description Get line node of the paramater node value (P,Table, H1, H2, H3, H4, H5, H6)
+             * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
              * @returns {Element}
              */
             getLineElement: function (element) {
+                element = element || this._variable.selectionNode;
                 while (!/^BODY$/i.test(element.parentNode.tagName)) {
                     element = element.parentNode;
                 }
@@ -701,12 +702,15 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Append P tag to current line next
              * @param {element} element - Insert as siblings of that element
+             * @returns {element}
              */
             appendP: function (element) {
                 element = this.getLineElement(element);
                 var oP = document.createElement("P");
                 oP.innerHTML = '&#65279';
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
+
+                return oP;
             },
 
             /**
@@ -1810,6 +1814,21 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyUp_wysiwyg: function (e) {
+                /** enter */
+                if (/^13$/.test(e.keyCode)) {
+                    e.preventDefault();
+
+                    var line = editor.getLineElement().nextSibling;
+                    if (line && !/^P$/i.test(line.tagName)) {
+                        var oP = document.createElement("P");
+                        oP.innerHTML = '&#65279';
+
+                        line.parentNode.replaceChild(oP, line);
+                    }
+
+                    return;
+                }
+
                 editor._setSelectionNode();
                 if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
@@ -2249,18 +2268,16 @@ SUNEDITOR.defaultLang = {
             this.contentWindow.document.body.setAttribute("contenteditable", true);
 
             if (element.value.length > 0) {
-                var tag, innerHTML = "";
-                var baseHTML = element.value.split("\n");
+                var tag, baseHtml, innerHTML = "";
+                tag = document.createRange().createContextualFragment(element.value).childNodes;
 
-                for (var i = 0, len = baseHTML.length; i < len; i++) {
-                    tag = document.createRange().createContextualFragment(baseHTML[i]);
-                    tag = (tag.children && tag.children.length > 0) ? tag.children : tag.childNodes;
-
-                    if (!/^P$/i.test(tag[0].tagName) && baseHTML[i].trim().length > 0) {
-                        baseHTML[i] = "<P>" + baseHTML[i].trim() + "</p>";
+                for (var i = 0, len = tag.length; i < len; i++) {
+                    baseHtml = tag[i].outerHTML || tag[i].textContent;
+                    if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
+                        innerHTML += "<P>" + baseHtml + "</p>";
+                    } else {
+                        innerHTML += baseHtml;
                     }
-
-                    innerHTML += baseHTML[i];
                 }
 
                 this.contentWindow.document.body.innerHTML = innerHTML;
