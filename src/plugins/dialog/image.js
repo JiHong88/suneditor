@@ -18,6 +18,7 @@ SUNEDITOR.plugin.image = {
             _imageClientX: 0,
             _imageResize_parent_t: 0,
             _imageResize_parent_l: 0,
+            _altText: '',
             _imageCaption: null,
             _linkValue: '',
             _align: 'none',
@@ -29,6 +30,7 @@ SUNEDITOR.plugin.image = {
         context.image.modal = image_dialog;
         context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
+        context.image.altText = image_dialog.getElementsByClassName('sun-editor-id-image-alt')[0];
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
         context.image.caption = image_dialog.querySelector('#suneditor_image_check_caption');
@@ -85,6 +87,9 @@ SUNEDITOR.plugin.image = {
             '           </div>' +
             '           <div class="form-group">' +
             '               <label>' + lang.dialogBox.imageBox.url + '</label><input class="form-control sun-editor-id-image-url" type="text" />' +
+            '           </div>' +
+            '           <div class="form-group">' +
+            '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="form-control sun-editor-id-image-alt" type="text" />' +
             '           </div>' +
             '           <div class="form-group">' +
             '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
@@ -254,11 +259,12 @@ SUNEDITOR.plugin.image = {
 
     submit_dialog: function (e) {
         this.showLoading();
-        this.context.image._linkValue = this.context.image.imgLink.value;
 
         e.preventDefault();
         e.stopPropagation();
 
+        this.context.image._linkValue = this.context.image.imgLink.value;
+        this.context.image._altText = this.context.image.altText.value;
         this.context.image._align = this.context.image.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         this.context.image._captionChecked = this.context.image.caption.checked;
 
@@ -285,6 +291,7 @@ SUNEDITOR.plugin.image = {
         oImg.src = src;
         oImg.style.width = width;
         oImg.setAttribute('data-align', align);
+        oImg.alt = this.context.image._altText;
         oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
 
         cover.className = 'sun-editor-image-cover';
@@ -327,6 +334,7 @@ SUNEDITOR.plugin.image = {
 
         // src, size
         contextImage._imageElement.src = contextImage.focusElement.value;
+        contextImage._imageElement.alt = contextImage._altText;
         contextImage._imageElement.style.width = contextImage.imageX.value + 'px';
         contextImage._imageElement.style.height = contextImage.imageY.value + 'px';
 
@@ -384,6 +392,7 @@ SUNEDITOR.plugin.image = {
     init: function () {
         this.context.image.imgInputFile.value = "";
         this.context.image.focusElement.value = "";
+        this.context.image.altText.value = "";
         this.context.image.imgLink.value = "";
         this.context.image.imgLinkNewWindowCheck.checked = false;
         this.context.image.modal.querySelector('#suneditor_image_radio_none').checked = true;
@@ -499,6 +508,7 @@ SUNEDITOR.plugin.image = {
         }
         else if (/update/.test(command)) {
             contextImage.focusElement.value = contextImage._imageElement.src;
+            contextImage.altText.value = contextImage._imageElement.alt;
             contextImage.imgLink.value = contextImage._imageElementLink === null ? "" : contextImage._imageElementLink.href;
             contextImage.imgLinkNewWindowCheck.checked = !contextImage._imageElementLink || contextImage._imageElementLink.target === "_blank";
             contextImage.modal.querySelector('#suneditor_image_radio_' + contextImage._imageElement.getAttribute('data-align')).checked = true;

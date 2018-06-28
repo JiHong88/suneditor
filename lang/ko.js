@@ -60,7 +60,8 @@ SUNEDITOR.lang = {
             resize50: '50% 크기',
             resize25: '25% 크기',
             remove: '이미지 삭제',
-            caption: '이미지 설명 넣기'
+            caption: '이미지 설명 넣기',
+            altText: '대체 문자열'
         },
         videoBox: {
             title: '동영상 삽입',

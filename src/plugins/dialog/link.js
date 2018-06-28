@@ -13,9 +13,9 @@ SUNEDITOR.plugin.link = {
         /** link dialog */
         var link_dialog = eval(this.setDialog());
         context.link.modal = link_dialog;
-        context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-linkurl')[0];
-        context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-linktext')[0];
-        context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
+        context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
+        context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
+        context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
         var link_button = eval(this.setController_LinkBtn());
@@ -48,12 +48,12 @@ SUNEDITOR.plugin.link = {
             '   <div class="modal-body">' +
             '       <div class="form-group">' +
             '           <label>' + lang.dialogBox.linkBox.url + '</label>' +
-            '           <input class="form-control sun-editor-id-linkurl" type="text" />' +
+            '           <input class="form-control sun-editor-id-link-url" type="text" />' +
             '       </div>' +
             '       <div class="form-group">' +
-            '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="form-control sun-editor-id-linktext" type="text" />' +
+            '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="form-control sun-editor-id-link-text" type="text" />' +
             '       </div>' +
-            '       <label class="label-check"><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       <label class="label-check"><input type="checkbox" class="sun-editor-id-link-check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '   </div>' +
             '   <div class="modal-footer">' +
             '       <button type="submit" class="btn btn-primary sun-editor-id-submit-link"><span>' + lang.dialogBox.submitButton + '</span></button>' +
