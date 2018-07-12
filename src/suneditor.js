@@ -1920,6 +1920,9 @@ SUNEDITOR.defaultLang = {
              */
             getContent: function () {
                 var content = "";
+
+                if (context.element.wysiwygWindow.document.body.innerText.trim().length === 0) return content;
+
                 if (editor._variable.wysiwygActive) {
                     content = context.element.wysiwygWindow.document.body.innerHTML;
                 } else {
@@ -1933,10 +1936,12 @@ SUNEDITOR.defaultLang = {
              * @param {string} content - Content to Input
              */
             setContent: function (content) {
+                var innerHTML = _convertContentForEditor(content);
+
                 if (editor._variable.wysiwygActive) {
-                    context.element.wysiwygWindow.document.body.innerHTML = content;
+                    context.element.wysiwygWindow.document.body.innerHTML = innerHTML;
                 } else {
-                    context.element.code.value = content;
+                    context.element.code.value = innerHTML;
                 }
             },
 
@@ -2010,6 +2015,30 @@ SUNEDITOR.defaultLang = {
      * ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓
      */
     SUNEDITOR.lang = SUNEDITOR.lang || SUNEDITOR.defaultLang;
+
+    /**
+     * @description Converts content into a format that can be placed in an editor
+     * @param content - content
+     * @returns {string}
+     * @private
+     */
+    function _convertContentForEditor(content) {
+        var tag, baseHtml, innerHTML = "";
+        tag = document.createRange().createContextualFragment(content.trim()).childNodes;
+
+        for (var i = 0, len = tag.length; i < len; i++) {
+            baseHtml = tag[i].outerHTML || tag[i].textContent;
+            if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
+                innerHTML += "<P>" + baseHtml + "</p>";
+            } else {
+                innerHTML += baseHtml;
+            }
+        }
+
+        if (innerHTML.length === 0) innerHTML = '<p>&#65279</p>';
+
+        return innerHTML;
+    }
 
     /**
      * @description Suneditor's Default button list
@@ -2268,23 +2297,7 @@ SUNEDITOR.defaultLang = {
             this.contentWindow.document.body.className = "sun-editor-editable";
             this.contentWindow.document.body.setAttribute("contenteditable", true);
 
-            if (element.value.length > 0) {
-                var tag, baseHtml, innerHTML = "";
-                tag = document.createRange().createContextualFragment(element.value).childNodes;
-
-                for (var i = 0, len = tag.length; i < len; i++) {
-                    baseHtml = tag[i].outerHTML || tag[i].textContent;
-                    if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
-                        innerHTML += "<P>" + baseHtml + "</p>";
-                    } else {
-                        innerHTML += baseHtml;
-                    }
-                }
-
-                this.contentWindow.document.body.innerHTML = innerHTML;
-            } else {
-                this.contentWindow.document.body.innerHTML = "<p>&#65279</p>";
-            }
+            this.contentWindow.document.body.innerHTML = _convertContentForEditor(element.value);
         });
 
         /** resize bar */
