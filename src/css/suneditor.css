@@ -12,7 +12,7 @@
 .sun-editor textarea {resize:none !important; border:0 !important;}
 .sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align: middle;}
-.sun-editor button .txt {display: block; margin-top: 0px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.sun-editor button .txt {display: block; margin-top: 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 /** align submenu */
 .sun-editor .btn_align .img_editor {display: inline-block; width:14px; height:13px; margin:-1px 10px 0 0; vertical-align:middle; text-indent:-9999px;}
@@ -51,14 +51,14 @@
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}
 
 /* tool bar */
-.sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; right:0; bottom:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:9;}
-.sun-editor .sun-editor-id-toolbar {overflow:visible; position:relative; height:auto; font-size:0pt; padding:3px 3px 3px 0px; background-color:#fafafa; border-bottom:1px solid #dadada; z-index:9;}
+.sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; right:0; bottom:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:1;}
+.sun-editor .sun-editor-id-toolbar {overflow:visible; position:relative; height:auto; font-size:0; padding:3px 3px 3px 0; background-color:#fafafa; border-bottom:1px solid #dadada;}
 
 .sun-editor .sun-editor-id-toolbar .tool_module {display:inline-block;}
 .sun-editor .sun-editor-id-toolbar .editor_tool {float: left;height: 32px;margin:5px 0 5px 5px;}
 .sun-editor .sun-editor-id-toolbar .editor_tool li {position:relative; float:left;}
 
-.sun-editor .sun-editor-id-toolbar .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:220px; overflow-y:auto; overflow-x:hidden; z-index:1; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .sun-editor-id-toolbar .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:220px; overflow-y:auto; overflow-x:hidden; z-index:10000; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .sun-editor-id-toolbar .layer_editor .write_place .inp_txt {float:left; width:100%; height:23px; margin-top:0; font-size:12px; text-indent:6px; border:0 none; outline:0 none;}
 .sun-editor .sun-editor-id-toolbar .layer_editor button {margin:0 !important; overflow: hidden; width:100%;}
 .sun-editor .sun-editor-id-toolbar .layer_editor button:hover, .sun-editor .editor_tool .layer_editor button:focus {background-color:#f4b124; border-color:#ffebc1; outline:0 none;}
@@ -95,8 +95,8 @@
 .sun-editor .sun-editor-id-toolbar .list_editor {overflow:hidden; width:100%; padding:6px 0;}
 .sun-editor .sun-editor-id-toolbar .list_editor li:first-child {padding-top:0;}
 .sun-editor .sun-editor-id-toolbar .list_editor li {padding-top:5px; width:100%;}
-.sun-editor .sun-editor-id-toolbar .format_list li {padding:0px; width:100%;}
-.sun-editor .sun-editor-id-toolbar .font_size_list li {padding:0px; width:100%;}
+.sun-editor .sun-editor-id-toolbar .format_list li {padding:0; width:100%;}
+.sun-editor .sun-editor-id-toolbar .font_size_list li {padding:0; width:100%;}
 
 .sun-editor .sun-editor-id-toolbar .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:1px solid #ccc; margin-left:2px; border-radius:2px; font-size:12px; line-height:27px; background-color:#FFF;}
 .sun-editor .sun-editor-id-toolbar .btn_editor.on, .sun-editor .sun-editor-id-toolbar .btn_editor:active {border-color:#f4b124; background-color:#ffebc1; -webkit-box-shadow: inset 0 3px 5px #f4b124; box-shadow: inset 0 3px 5px #f4b124;}
@@ -127,7 +127,7 @@
 .sun-editor .sun-editor-id-toolbar .layer_color .list_bgcolor .bg_btnframe {display:none; position:absolute; top:0; left:0; width:14px; height:14px; border:1px solid #000; border-radius:2px; opacity:.2; filter:alpha(opacity=20);}
 
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text {width:156px;}
-.sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor {position:relative; z-index:1; width:158px; height:25px; border-radius:2px; border-bottom:0 none; margin: -1px 0 0 -1px;}
+.sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor {position:relative; width:158px; height:25px; border-radius:2px; border-bottom:0 none; margin: -1px 0 0 -1px;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor .emph_txtbgcolor {display:block; width:147px; height:25px; padding-left:11px; font-size:12px; line-height:24px; color:#fff; -webkit-transition-property:background-color,color; -webkit-transition-duration:.2s; transition-property:background-color,color; transition-duration:.2s;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .ex_txtbgcolor .bg_frame {position:absolute; top:0; left:0; width:156px; height:24px; border:1px solid #000; border-bottom:0 none; opacity:.1; filter:alpha(opacity=10); -webkit-transition:opacity .2s;}
 .sun-editor .sun-editor-id-toolbar .layer_color .pallet_text .list_color {width:140px; height:44px; margin:8px 6px 0 10px; padding:0; border-top:0;}
@@ -143,7 +143,7 @@
 .sun-editor .sun-editor-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 
 /* dialog */
-.sun-editor .sun-editor-id-dialogBox {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:9999;}
+.sun-editor .sun-editor-id-dialogBox {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 .sun-editor .sun-editor-id-dialogBox label, .sun-editor .sun-editor-id-dialogBox input, .sun-editor .sun-editor-id-dialogBox button {font-size:14px; line-height:1.5; color:#111; margin:0;}
 .sun-editor .sun-editor-id-dialogBox .modal-dialog-background {position:absolute; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5; z-index:10;}
 
@@ -224,4 +224,4 @@
 .sun-editor .sun-editor-tab-button button:hover {background-color: #fff;}
 
 /* Create an active/current tablink class */
-.sun-editor .sun-editor-tab-button button.active {background-color: #fff; border-bottom: 0px;}
+.sun-editor .sun-editor-tab-button button.active {background-color: #fff; border-bottom: 0;}
