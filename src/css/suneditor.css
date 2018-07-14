@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 
 /* suneditor main */
-.sun-editor {width:auto; height:auto; font-family:inherit; border:1px solid #dadada; background-color:#FFF; z-index:10000;}
+.sun-editor {width:auto; height:auto; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor * {font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
