@@ -189,8 +189,8 @@
 .sun-editor .modal-image-resize .image-resize-dot {position:absolute; width:7px; height:7px; border:1px solid black;}
 .sun-editor .modal-image-resize .tl {top:-5px; left:-5px; border-right:0; border-bottom:0;}
 .sun-editor .modal-image-resize .tr {top:-5px; right:-5px; border-bottom:0; border-left:none;}
-.sun-editor .modal-image-resize .bl {bottom:-5px; left:-5px; border-top:0; border-right:0;}
-.sun-editor .modal-image-resize .br-controller {right:-5px; bottom:-5px; background-color:#F00; cursor:se-resize;}
+.sun-editor .modal-image-resize .bl {bottom:-5px; left:-5px; background-color:#F00; cursor:sw-resize;}
+.sun-editor .modal-image-resize .br {right:-5px; bottom:-5px; background-color:#F00; cursor:se-resize;}
 .sun-editor .modal-image-resize .image-size-display {position:absolute;	right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:#F00; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 
 /* image resize button */
