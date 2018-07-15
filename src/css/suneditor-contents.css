@@ -1,14 +1,11 @@
 @CHARSET "UTF-8";
 
-/* body */
+/* suneditor contents */
 body.sun-editor-editable {
-    margin: 20px;
-}
-
-.sun-editor-editable p {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     word-break: break-all;
+    margin: 20px;
 }
 
 /* hr */

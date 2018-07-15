@@ -18,19 +18,21 @@ SUNEDITOR.plugin.formatBlock = {
     },
 
     setSubmenu: function () {
+        var lang = SUNEDITOR.lang;
         var listDiv = document.createElement('DIV');
         listDiv.className = 'layer_editor layer_size';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
             '   <ul class="list_editor format_list">' +
-            '       <li><button type="button" class="btn_edit" style="height:30px;" data-value="P"><p style="font-size:13pt;">Normal</p></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:45px;" data-value="h1"><h1>Header 1</h1></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:34px;" data-value="h2"><h2>Header 2</h2></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:26px;" data-value="h3"><h3>Header 3</h3></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:23px;" data-value="h4"><h4>Header 4</h4></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:19px;" data-value="h5"><h5>Header 5</h5></button></li>' +
-            '       <li><button type="button" class="btn_edit" style="height:15px;" data-value="h6"><h6>Header 6</h6></button></li>' +
+            '       <li style="border-bottom:1px solid #dedede;"><button type="button" class="btn_edit" data-value="P" style="height:24px;"><span style="font-size:13px;">' + lang.toolbar.tag_p + '</span></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="DIV" style="height:24px; border-bottom:1px solid #dedede;"><span style="font-size:13px;">' + lang.toolbar.tag_div + '</span></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h1" style="height:45px;"><h1>' + lang.toolbar.tag_h + ' 1</h1></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h2" style="height:34px;"><h2>' + lang.toolbar.tag_h + ' 2</h2></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h3" style="height:26px;"><h3>' + lang.toolbar.tag_h + ' 3</h3></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h4" style="height:23px;"><h4>' + lang.toolbar.tag_h + ' 4</h4></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h5" style="height:19px;"><h5>' + lang.toolbar.tag_h + ' 5</h5></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-value="h6" style="height:15px;"><h6>' + lang.toolbar.tag_h + ' 6</h6></button></li>' +
             '   </ul>' +
             '</div>';
 

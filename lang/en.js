@@ -42,7 +42,10 @@ SUNEDITOR.lang = {
         undo: 'Undo',
         redo: 'Redo',
         preview: 'Preview',
-        print: 'print'
+        print: 'print',
+        tag_p: 'Paragraph',
+        tag_div: 'Normal (DIV)',
+        tag_h: 'Header'
     },
     dialogBox: {
         linkBox: {

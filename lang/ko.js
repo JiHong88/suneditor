@@ -13,7 +13,7 @@ if (typeof window.SUNEDITOR === 'undefined') {
 SUNEDITOR.lang = {
     toolbar: {
         font: '글꼴',
-        formats: '포맷',
+        formats: '문단 형식',
         fontSize: '크기',
         bold: '굵게',
         underline: '밑줄',
@@ -42,7 +42,10 @@ SUNEDITOR.lang = {
         undo: '실행 취소',
         redo: '다시 실행',
         preview: '미리보기',
-        print: '인쇄'
+        print: '인쇄',
+        tag_p: '본문',
+        tag_div: '기본 (DIV)',
+        tag_h: '제목'
     },
     dialogBox: {
         linkBox: {

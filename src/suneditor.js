@@ -45,7 +45,10 @@ SUNEDITOR.defaultLang = {
         undo: 'Undo',
         redo: 'Redo',
         preview: 'Preview',
-        print: 'print'
+        print: 'print',
+        tag_p: 'Paragraph',
+        tag_div: 'Normal (DIV)',
+        tag_h: 'Header'
     },
     dialogBox: {
         linkBox: {
@@ -1815,21 +1818,6 @@ SUNEDITOR.defaultLang = {
             },
 
             onKeyUp_wysiwyg: function (e) {
-                /** enter */
-                if (/^13$/.test(e.keyCode)) {
-                    e.preventDefault();
-
-                    var line = editor.getLineElement().nextSibling;
-                    if (line && !/^P$/i.test(line.tagName)) {
-                        var oP = document.createElement("P");
-                        oP.innerHTML = '&#65279';
-
-                        line.parentNode.replaceChild(oP, line);
-                    }
-
-                    return;
-                }
-
                 editor._setSelectionNode();
                 if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
