@@ -18,7 +18,6 @@ SUNEDITOR.plugin.font = {
     },
 
     setSubmenu: function (user) {
-        var lang = SUNEDITOR.lang;
         var listDiv = document.createElement('DIV');
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';

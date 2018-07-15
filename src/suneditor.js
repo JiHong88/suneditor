@@ -2214,12 +2214,14 @@ SUNEDITOR.defaultLang = {
      * @private
      */
     function _Constructor(element, options) {
-        if (!(typeof options === "object")) options = {};
+        if (typeof options !== "object") options = {};
 
         /** user options */
         options.addFont = options.addFont || null;
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
+        options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
+        options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageSize = options.imageSize || 350;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
@@ -2360,6 +2362,8 @@ SUNEDITOR.defaultLang = {
             user: {
                 videoX: options.videoX,
                 videoY: options.videoY,
+                imageFileInput: options.imageFileInput,
+                imageUrlInput: options.imageUrlInput,
                 imageSize: options.imageSize,
                 imageUploadUrl: options.imageUploadUrl,
                 addFont: options.addFont,
