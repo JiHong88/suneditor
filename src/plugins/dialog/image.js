@@ -48,7 +48,7 @@ SUNEDITOR.plugin.image = {
         context.image.imageResizeBtn = resize_img_button;
 
         /** add event listeners */
-        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab);
+        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(_this));
         context.image.modal.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
         resize_img_div.getElementsByClassName('sun-editor-img-controller')[0].addEventListener('mousedown', this.onMouseDown_image_ctrl.bind(_this, 'l'));
         resize_img_div.getElementsByClassName('sun-editor-img-controller')[1].addEventListener('mousedown', this.onMouseDown_image_ctrl.bind(_this, 'r'));
@@ -146,6 +146,7 @@ SUNEDITOR.plugin.image = {
 
 		// Declare all variables
 		var i, tabcontent, tablinks;
+        var tabName = targetElement.getAttribute('data-tab-link');
 		var contentClassName = 'sun-editor-id-tab-content';
 
 		// Get all elements with class="tabcontent" and hide them
@@ -161,8 +162,15 @@ SUNEDITOR.plugin.image = {
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
-		document.getElementsByClassName(contentClassName + '-' + targetElement.getAttribute('data-tab-link'))[0].style.display = 'block';
+        this.context.image.modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
         SUNEDITOR.dom.addClass(targetElement, 'active');
+
+        // focus
+        if (tabName === 'image') {
+            this.context.image.focusElement.focus();
+        } else if (tabName === 'url') {
+            this.context.image.imgLink.focus();
+        }
 
 		return false;
 	},
@@ -249,6 +257,7 @@ SUNEDITOR.plugin.image = {
             link.href = /^https?:\/\//.test(imgLinkValue) ? imgLinkValue : "http://" + imgLinkValue;
             link.target = (newWindowCheck ? "_blank" : "");
             link.setAttribute('data-image-link', 'image');
+            link.addEventListener('click', function (e) { e.preventDefault(); });
 
             imgTag.setAttribute('data-image-link', imgLinkValue);
             imgTag.style.padding = '1px';
@@ -336,7 +345,7 @@ SUNEDITOR.plugin.image = {
             container.style.float = align;
         }
 
-        this.insertNode(container);
+        this.insertNode(container, this.getLineElement(this.getSelectionNode()));
         this.appendP(container);
     },
 
@@ -423,7 +432,7 @@ SUNEDITOR.plugin.image = {
         this.context.image.imageX.value = this.context.user.imageSize;
         this.context.image.imageY.value = '';
         this.context.image.imageY.disabled = true;
-        SUNEDITOR.plugin.image.openTab('init');
+        SUNEDITOR.plugin.image.openTab.call(this, 'init');
     },
 
     /** image resize controller, button*/
@@ -461,7 +470,7 @@ SUNEDITOR.plugin.image = {
         return resize_img_button;
     },
 
-    _call_controller_imageResize: function (targetElement) {
+    call_controller_imageResize: function (targetElement) {
         /** ie,firefox image resize handle : false*/
         targetElement.setAttribute('unselectable', 'on');
         targetElement.contentEditable = false;

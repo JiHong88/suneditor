@@ -76,17 +76,19 @@ SUNEDITOR.plugin.link = {
             var anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
             var anchorText = anchor.value.length === 0 ? url : anchor.value;
 
-            if (this.context.link._linkAnchor === null) {
+            if (!this.context.dialog.updateModal) {
                 var oA = document.createElement("A");
                 oA.href = url;
                 oA.textContent = anchorText;
                 oA.target = (this.context.link.linkNewWindowCheck.checked ? "_blank" : "");
 
                 this.insertNode(oA);
+                this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
                 this.context.link._linkAnchor.href = url;
                 this.context.link._linkAnchor.textContent = anchorText;
                 this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked ? "_blank" : "");
+                this.setRange(this.context.link._linkAnchor.childNodes[0], 0, this.context.link._linkAnchor.childNodes[0], this.context.link._linkAnchor.textContent.length);
             }
 
             this.context.link.focusElement.value = "";
@@ -98,6 +100,7 @@ SUNEDITOR.plugin.link = {
         } finally {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
             this.closeLoading();
+            this.focus();
         }
 
         return false;
@@ -156,7 +159,7 @@ SUNEDITOR.plugin.link = {
             this.context.link.focusElement.value = this.context.link._linkAnchor.href;
             this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
             this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
-            SUNEDITOR.plugin.dialog.openDialog.call(this, 'link');
+            SUNEDITOR.plugin.dialog.openDialog.call(this, 'link', true);
         }
         else {
             /** delete */

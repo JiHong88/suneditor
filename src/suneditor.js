@@ -1717,8 +1717,9 @@ SUNEDITOR.defaultLang = {
                 }
 
                 if (/^IMG$/i.test(targetElement.nodeName)) {
+                    e.preventDefault();
                     editor.callModule('dialog', 'image', null, function () {
-                        SUNEDITOR.plugin.image._call_controller_imageResize.call(editor, targetElement);
+                        SUNEDITOR.plugin.image.call_controller_imageResize.call(editor, targetElement);
                     });
                     return;
                 }

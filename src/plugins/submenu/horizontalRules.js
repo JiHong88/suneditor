@@ -52,9 +52,9 @@ SUNEDITOR.plugin.horizontalRules = {
 
         this.focus();
 
-        var pNode = this.getLineElement(this._variable.selectionNode);
-        pNode.appendChild(oHr);
-        this.appendP(oHr);
+        this.insertNode(oHr, this.getLineElement(this.getSelectionNode()));
+        var oP = this.appendP(oHr);
+        this.setRange(oP, 0, oP, 0);
     },
 
     horizontalRulesPick: function (e) {
