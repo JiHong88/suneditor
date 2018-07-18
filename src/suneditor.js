@@ -1660,7 +1660,7 @@ SUNEDITOR.defaultLang = {
                     }
                     else if (/dialog/.test(display)) {
                         editor.callModule('dialog', command, null, function () {
-                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, target.getAttribute('data-option'));
+                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                         });
                     }
 
