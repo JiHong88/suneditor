@@ -7,23 +7,23 @@
  */
 SUNEDITOR.plugin.link = {
     add: function (_this) {
-        var context = _this.context;
+        const context = _this.context;
         context.link = {};
 
         /** link dialog */
-        var link_dialog = eval(this.setDialog());
+        const link_dialog = eval(this.setDialog());
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
         context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
         context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
-        var link_button = eval(this.setController_LinkBtn());
+        const link_button = eval(this.setController_LinkBtn());
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        link_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
+        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
         link_button.addEventListener('click', this.onClick_linkBtn.bind(_this));
 
         /** append html */
@@ -33,8 +33,9 @@ SUNEDITOR.plugin.link = {
 
     /** dialog */
     setDialog: function () {
-        var lang = SUNEDITOR.lang;
-        var dialog = document.createElement('DIV');
+        const lang = SUNEDITOR.lang;
+        const dialog = document.createElement('DIV');
+
         dialog.className = 'modal-content sun-editor-id-dialog-link';
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
@@ -72,27 +73,27 @@ SUNEDITOR.plugin.link = {
         function submitAction() {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
-            var url = /^https?:\/\//.test(this.context.link.focusElement.value) ? this.context.link.focusElement.value : "http://" + this.context.link.focusElement.value;
-            var anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
-            var anchorText = anchor.value.length === 0 ? url : anchor.value;
+            const url = /^https?:\/\//.test(this.context.link.focusElement.value) ? this.context.link.focusElement.value : "http://" + this.context.link.focusElement.value;
+            const anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
+            const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
             if (!this.context.dialog.updateModal) {
-                var oA = document.createElement("A");
+                const oA = document.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
-                oA.target = (this.context.link.linkNewWindowCheck.checked ? "_blank" : "");
+                oA.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
 
                 this.insertNode(oA);
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
                 this.context.link._linkAnchor.href = url;
                 this.context.link._linkAnchor.textContent = anchorText;
-                this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked ? "_blank" : "");
+                this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
                 this.setRange(this.context.link._linkAnchor.childNodes[0], 0, this.context.link._linkAnchor.childNodes[0], this.context.link._linkAnchor.textContent.length);
             }
 
-            this.context.link.focusElement.value = "";
-            this.context.link.linkAnchorText.value = "";
+            this.context.link.focusElement.value = '';
+            this.context.link.linkAnchorText.value = '';
         }
 
         try {
@@ -107,19 +108,20 @@ SUNEDITOR.plugin.link = {
     },
 
     init: function () {
-        this.context.link.linkBtn.style.display = "none";
+        this.context.link.linkBtn.style.display = 'none';
         this.context.link._linkAnchor = null;
-        this.context.link.focusElement.value = "";
-        this.context.link.linkAnchorText.value = "";
+        this.context.link.focusElement.value = '';
+        this.context.link.linkAnchorText.value = '';
         this.context.link.linkNewWindowCheck.checked = false;
     },
 
     /** button */
     setController_LinkBtn: function () {
-        var lang = SUNEDITOR.lang;
-        var link_btn = document.createElement("DIV");
-        link_btn.className = "sun-editor-id-link-btn";
-        link_btn.style.display = "none";
+        const lang = SUNEDITOR.lang;
+        const link_btn = document.createElement('DIV');
+
+        link_btn.className = 'sun-editor-id-link-btn';
+        link_btn.style.display = 'none';
         link_btn.innerHTML = '' +
             '<div class="arrow"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
@@ -134,7 +136,7 @@ SUNEDITOR.plugin.link = {
 
     call_controller_linkButton: function (selectionATag) {
         this.editLink = this.context.link._linkAnchor = selectionATag;
-        var linkBtn = this.context.link.linkBtn;
+        const linkBtn = this.context.link.linkBtn;
 
         linkBtn.getElementsByTagName("A")[0].href = selectionATag.href;
         linkBtn.getElementsByTagName("A")[0].textContent = selectionATag.textContent;
@@ -144,13 +146,12 @@ SUNEDITOR.plugin.link = {
         linkBtn.style.display = "block";
 
         this.controllerArray = [linkBtn];
-        linkBtn = null;
     },
 
     onClick_linkBtn: function (e) {
         e.stopPropagation();
 
-        var command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+        const command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
         if (!command) return;
 
         e.preventDefault();

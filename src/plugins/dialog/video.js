@@ -7,11 +7,11 @@
  */
 SUNEDITOR.plugin.video = {
     add: function (_this) {
-        var context = _this.context;
+        const context = _this.context;
         context.video = {};
 
         /** video dialog */
-        var video_dialog = eval(this.setDialog());
+        const video_dialog = eval(this.setDialog());
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
@@ -22,7 +22,7 @@ SUNEDITOR.plugin.video = {
         video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
         /** add event listeners */
-        video_dialog.getElementsByClassName("btn-primary")[0].addEventListener('click', this.submit_dialog.bind(_this));
+        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
@@ -30,8 +30,9 @@ SUNEDITOR.plugin.video = {
 
     /** dialog */
     setDialog: function () {
-        var lang = SUNEDITOR.lang;
-        var dialog = document.createElement('DIV');
+        const lang = SUNEDITOR.lang;
+        const dialog = document.createElement('DIV');
+
         dialog.className = 'modal-content sun-editor-id-dialog-video';
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
@@ -69,24 +70,23 @@ SUNEDITOR.plugin.video = {
         function submitAction() {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
-            var url = this.context.video.focusElement.value.replace(/^https?:/, '');
-            var oIframe = document.createElement("IFRAME");
-            var x_v = this.context.video.videoX.value;
-            var y_v = this.context.video.videoY.value;
+            let url = this.context.video.focusElement.value.replace(/^https?:/, '');
+            const oIframe = document.createElement('IFRAME');
+            const x_v = this.context.video.videoX.value;
+            const y_v = this.context.video.videoY.value;
 
             /** youtube */
             if (/youtu\.?be/.test(url)) {
                 url = url.replace('watch?v=', '');
                 if (!/^\/\/.+\/embed\//.test(url)) {
-                    var youtubeUrl = url.match(/^\/\/.+\//)[0];
-                    url = url.replace(youtubeUrl, '//www.youtube.com/embed/');
+                    url = url.replace(url.match(/^\/\/.+\//)[0], '//www.youtube.com/embed/');
                 }
             }
 
             oIframe.src = url;
             oIframe.width = (/^\d+$/.test(x_v) ? x_v : this.context.user.videoX);
             oIframe.height = (/^\d+$/.test(y_v) ? y_v : this.context.user.videoY);
-            oIframe.frameBorder = "0";
+            oIframe.frameBorder = '0';
             oIframe.allowFullscreen = true;
 
             this.insertNode(oIframe);
@@ -104,7 +104,7 @@ SUNEDITOR.plugin.video = {
     },
 
     init: function () {
-        this.context.video.focusElement.value = "";
+        this.context.video.focusElement.value = '';
         this.context.video.videoX.value = this.context.user.videoX;
         this.context.video.videoY.value = this.context.user.videoY;
     }

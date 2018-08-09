@@ -91,9 +91,9 @@ SUNEDITOR.defaultLang = {
     'use strict';
 
     /**
-     * @description utile function
+     * @description utility function
      */
-    SUNEDITOR.func = {
+    SUNEDITOR.util = {
         /**
          * @description Gets XMLHttpRequest object
          * @returns {Object}
@@ -102,10 +102,10 @@ SUNEDITOR.defaultLang = {
             /** IE */
             if (window.ActiveXObject) {
                 try {
-                    return new ActiveXObject("Msxml2.XMLHTTP");
+                    return new ActiveXObject('Msxml2.XMLHTTP');
                 } catch (e) {
                     try {
-                        return new ActiveXObject("Microsoft.XMLHTTP");
+                        return new ActiveXObject('Microsoft.XMLHTTP');
                     } catch (e1) {
                         return null;
                     }
@@ -122,35 +122,22 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
-         * @description Copies object
-         * @param {Object} obj - Object to be copy
-         * @returns {Object}
-         */
-        copyObj: function (obj) {
-            var copy = {};
-            for (var attr in obj) {
-                copy[attr] = obj[attr];
-            }
-            return copy;
-        },
-
-        /**
          * @description Get suneditor's default path
          */
         getBasePath: (function () {
-            var path = SUNEDITOR.SUNEDITOR_BASEPATH || "";
+            let path = SUNEDITOR.SUNEDITOR_BASEPATH || '';
             if (!path) {
-                for (var c = document.getElementsByTagName("script"), i = 0; i < c.length; i++) {
-                    var editorTag = c[i].src.match(/(^|.*[\\\/])suneditor(\.min)?\.js(?:\?.*|;.*)?$/i);
+                for (let c = document.getElementsByTagName('script'), i = 0; i < c.length; i++) {
+                    let editorTag = c[i].src.match(/(^|.*[\\\/])suneditor(\.min)?\.js(?:\?.*|;.*)?$/i);
                     if (editorTag) {
                         path = editorTag[1];
                         break
                     }
                 }
             }
-            -1 === path.indexOf(":/") && "//" !== path.slice(0, 2) && (path = 0 === path.indexOf("/") ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+            -1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
-            if (!path) throw '[SUNEDITOR.func.getBasePath.fail] The SUNEDITOR installation path could not be automatically detected. Please set the global variable "SUNEDITOR.SUNEDITOR_BASEPATH" before creating editor instances.';
+            if (!path) throw '[SUNEDITOR.util.getBasePath.fail] The SUNEDITOR installation path could not be automatically detected. Please set the global variable "SUNEDITOR.SUNEDITOR_BASEPATH" before creating editor instances.';
 
             return path;
         })(),
@@ -162,12 +149,12 @@ SUNEDITOR.defaultLang = {
          * @param {function} callBack - Function to be executed immediately after module call
          */
         includeFile: function (fileType, fullUrl, callBack) {
-            var scriptFile = document.createElement("script");
+            const scriptFile = document.createElement('script');
             scriptFile.type = fileType;
             scriptFile.src = fullUrl;
             scriptFile.onload = callBack;
 
-            document.getElementsByTagName("head")[0].appendChild(scriptFile);
+            document.getElementsByTagName('head')[0].appendChild(scriptFile);
         }
     };
 
@@ -182,10 +169,9 @@ SUNEDITOR.defaultLang = {
          * @returns {Number}
          */
         getArrayIndex: function (array, element) {
-            var idx = -1;
-            var len = array.length;
+            let idx = -1;
 
-            for (var i = 0; i < len; i++) {
+            for (let i = 0, len = array.length; i < len; i++) {
                 if (array[i] === element) {
                     idx = i;
                     break;
@@ -202,7 +188,8 @@ SUNEDITOR.defaultLang = {
          * @returns {Number}
          */
         nextIdx: function (array, item) {
-            var idx = this.getArrayIndex(array, item);
+            let idx = this.getArrayIndex(array, item);
+
             if (idx === -1) return -1;
 
             return idx + 1;
@@ -215,7 +202,8 @@ SUNEDITOR.defaultLang = {
          * @returns {Number}
          */
         prevIdx: function (array, item) {
-            var idx = this.getArrayIndex(array, item);
+            let idx = this.getArrayIndex(array, item);
+
             if (idx === -1) return -1;
 
             return idx - 1;
@@ -237,7 +225,7 @@ SUNEDITOR.defaultLang = {
          * @returns {Array}
          */
         getListChildren: function (element, validation) {
-            var children = [];
+            const children = [];
             validation = validation || function () { return true; };
 
             (function recursionFunc(current) {
@@ -245,7 +233,7 @@ SUNEDITOR.defaultLang = {
                     children.push(current);
                 }
 
-                for (var i = 0, len = current.children.length; i < len; i++) {
+                for (let i = 0, len = current.children.length; i < len; i++) {
                     recursionFunc(current.children[i]);
                 }
             })(element);
@@ -260,7 +248,7 @@ SUNEDITOR.defaultLang = {
          * @returns {Array}
          */
         getListChildNodes: function (element, validation) {
-            var children = [];
+            const children = [];
             validation = validation || function () { return true; };
 
             (function recursionFunc(current) {
@@ -268,7 +256,7 @@ SUNEDITOR.defaultLang = {
                     children.push(current);
                 }
 
-                for (var i = 0, len = current.childNodes.length; i < len; i++) {
+                for (let i = 0, len = current.childNodes.length; i < len; i++) {
                     recursionFunc(current.childNodes[i]);
                 }
             })(element);
@@ -279,30 +267,30 @@ SUNEDITOR.defaultLang = {
         /**
          * @description Argument value The argument value of the parent node of the element.
          * A tag that satisfies the query condition is imported.
-         * @param {element} element - Reference element
+         * @param {Node} element - Reference element
          * @param {string} query - Query String (tagName, .className, #ID, :name)
          * Not use it like jquery.
          * Only one condition can be entered at a time.
          * @returns {Element}
          */
         getParentNode: function (element, query) {
-            var attr;
+            let attr;
 
             if (/\./.test(query)) {
                 attr = 'className';
                 query = query.split('.')[1];
             } else if (/#/.test(query)) {
                 attr = 'id';
-                query = "^" + query.split('#')[1] + "$";
+                query = '^' + query.split('#')[1] + '$';
             } else if (/:/.test(query)) {
                 attr = 'name';
-                query = "^" + query.split(':')[1] + "$";
+                query = '^' + query.split(':')[1] + '$';
             } else {
                 attr = 'tagName';
-                query = "^" + query + "$";
+                query = '^' + query + '$';
             }
 
-            var check = new RegExp(query, "i");
+            const check = new RegExp(query, 'i');
 
             while (!!element && (element.nodeType === 3 || !check.test(element[attr]))) {
                 if (/^BODY$/i.test(element.tagName)) {
@@ -332,10 +320,10 @@ SUNEDITOR.defaultLang = {
         addClass: function (element, className) {
             if (!element) return;
 
-            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
             if (check.test(element.className)) return;
 
-            element.className += " " + className;
+            element.className += ' ' + className;
         },
 
         /**
@@ -346,8 +334,8 @@ SUNEDITOR.defaultLang = {
         removeClass: function (element, className) {
             if (!element) return;
 
-            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
-            element.className = element.className.replace(check, " ").trim();
+            const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+            element.className = element.className.replace(check, ' ').trim();
         },
 
         /**
@@ -358,13 +346,13 @@ SUNEDITOR.defaultLang = {
         toggleClass: function (element, className) {
             if (!element) return;
 
-            var check = new RegExp("(\\s|^)" + className + "(\\s|$)");
+            const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
 
             if (check.test(element.className)) {
-                element.className = element.className.replace(check, " ").trim();
+                element.className = element.className.replace(check, ' ').trim();
             }
             else {
-                element.className += " " + className;
+                element.className += ' ' + className;
             }
         },
 
@@ -385,15 +373,15 @@ SUNEDITOR.defaultLang = {
      * @description SunEditor core closure
      * @param context
      * @param dom
-     * @param func
+     * @param util
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    var core = function (context, dom, func) {
+    const core = function (context, dom, util) {
         /**
          * @description Practical editor function
          * This function is 'this' used by other plugins
          */
-        var editor = {
+        const editor = {
             /**
              * @description Elements and user options parameters of the suneditor
              */
@@ -441,7 +429,6 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Variables used internally in editor operation
              * @property {(element|null)} selectionNode - Contains selection node
-             * @property {(element|null)} copySelection - The selection object is copied
              * @property {boolean} wysiwygActive - The wysiwyg frame or code view state
              * @property {boolean} isFullScreen - State of full screen
              * @property {number} innerHeight_fullScreen - InnerHeight in editor when in full screen
@@ -454,7 +441,6 @@ SUNEDITOR.defaultLang = {
              */
             _variable: {
                 selectionNode: null,
-                copySelection: null,
                 wysiwygActive: true,
                 isFullScreen: false,
                 innerHeight_fullScreen: 0,
@@ -473,27 +459,26 @@ SUNEDITOR.defaultLang = {
              * @param {function} callBackFunction - Function to be executed immediately after module call
              */
             callModule: function (directory, moduleName, targetElement, callBackFunction) {
-                var fullDirectory = func.getBasePath + 'plugins/' + directory;
-                var fileType = "text/javascript";
+                const fullDirectory = util.getBasePath + 'plugins/' + directory;
+                const fileType = 'text/javascript';
 
                 /** Dialog first call */
                 if (directory === 'dialog') {
-                    var dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+                    const dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
 
                     if (!SUNEDITOR.plugin.dialog) {
-                        func.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
+                        util.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
                         return;
                     }
                     else if (!this.loadedPlugins['dialog']) {
                         dialogCallback();
                         return;
                     }
-                    dialogCallback = null;
                 }
 
                 /** etc */
                 if (!SUNEDITOR.plugin[moduleName]) {
-                    func.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+                    util.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
                 }
                 else if (!this.loadedPlugins[moduleName]) {
                     this._callBack_addModule(directory, moduleName, targetElement, callBackFunction);
@@ -527,7 +512,7 @@ SUNEDITOR.defaultLang = {
              */
             submenuOn: function (element) {
                 this.submenu = element.nextElementSibling;
-                this.submenu.style.display = "block";
+                this.submenu.style.display = 'block';
                 dom.addClass(element, 'on');
                 this.submenuActiveButton = element;
             },
@@ -537,7 +522,7 @@ SUNEDITOR.defaultLang = {
              */
             submenuOff: function () {
                 if (!!this.submenu) {
-                    this.submenu.style.display = "none";
+                    this.submenu.style.display = 'none';
                     this.submenu = null;
                     dom.removeClass(this.submenuActiveButton, 'on');
                     this.submenuActiveButton = null;
@@ -550,11 +535,13 @@ SUNEDITOR.defaultLang = {
              * @description Disable controller in editor area (link button, image resize button)
              */
             controllersOff: function () {
-                var len = this.controllerArray.length;
+                const len = this.controllerArray.length;
+
                 if (len > 0) {
-                    for (var i = 0; i < len; i++) {
-                        this.controllerArray[i].style.display = "none";
+                    for (let i = 0; i < len; i++) {
+                        this.controllerArray[i].style.display = 'none';
                     }
+
                     this.controllerArray = [];
                 }
             },
@@ -573,7 +560,7 @@ SUNEDITOR.defaultLang = {
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                var caption = dom.getParentNode(this._variable.selectionNode, 'figcaption');
+                const caption = dom.getParentNode(this._variable.selectionNode, 'figcaption');
                 if (!!caption) {
                     caption.focus();
                 } else {
@@ -582,10 +569,7 @@ SUNEDITOR.defaultLang = {
             },
 
             _setSelectionNode: function () {
-                // IE
-                this._variable.copySelection = func.copyObj(this.getSelection());
-
-                var range = this.getRange();
+                const range = this.getRange();
                 if (range.startContainer !== range.endContainer) {
                     this._variable.selectionNode = range.startContainer;
                 } else {
@@ -632,8 +616,8 @@ SUNEDITOR.defaultLang = {
              * @returns {Range}
              */
             getRange: function () {
-                var selection = this.getSelection();
-                var nativeRng = null;
+                let selection = this.getSelection();
+                let nativeRng = null;
 
                 if (selection.rangeCount > 0) {
                     nativeRng = selection.getRangeAt(0);
@@ -641,10 +625,10 @@ SUNEDITOR.defaultLang = {
                 // IE
                 else {
                     nativeRng = this.createRange();
-                    selection = this._variable.copySelection;
+                    selection = this._variable.selectionNode;
 
                     if (!selection) {
-                        selection = this._variable.selectionNode || context.element.wysiwygWindow.document.body.firstChild;
+                        selection = context.element.wysiwygWindow.document.body.firstChild;
                         nativeRng.setStart(selection, 0);
                         nativeRng.setEnd(selection, 0);
                     } else {
@@ -664,14 +648,16 @@ SUNEDITOR.defaultLang = {
              * @param {number} endOff - The endOffset property of the selection object.
              */
             setRange: function (startCon, startOff, endCon, endOff) {
-                var range = this.createRange();
+                const range = this.createRange();
                 range.setStart(startCon, startOff);
                 range.setEnd(endCon, endOff);
 
-                var selection = this.getSelection();
+                const selection = this.getSelection();
+
                 if (selection.rangeCount > 0) {
                     selection.removeAllRanges();
                 }
+
                 selection.addRange(range);
             },
 
@@ -679,14 +665,14 @@ SUNEDITOR.defaultLang = {
              * @description Show loading box
              */
             showLoading: function () {
-                context.element.loading.style.display = "block";
+                context.element.loading.style.display = 'block';
             },
 
             /**
              * @description Close loading box
              */
             closeLoading: function () {
-                context.element.loading.style.display = "none";
+                context.element.loading.style.display = 'none';
             },
 
             /**
@@ -696,8 +682,13 @@ SUNEDITOR.defaultLang = {
              */
             getLineElement: function (element) {
                 element = element || this._variable.selectionNode;
-                while (!/^BODY$/i.test(element.parentNode.tagName)) {
-                    element = element.parentNode;
+
+                if (!element) {
+                    element = context.element.wysiwygWindow.document.body.firstChild;
+                } else {
+                    while (!/^BODY$/i.test(element.parentNode.tagName)) {
+                        element = element.parentNode;
+                    }
                 }
 
                 return element;
@@ -709,9 +700,10 @@ SUNEDITOR.defaultLang = {
              * @returns {element}
              */
             appendP: function (element) {
-                element = this.getLineElement(element);
-                var oP = document.createElement("P");
+                const oP = document.createElement('P');
                 oP.innerHTML = '&#65279';
+
+                element = this.getLineElement(element);
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
 
                 return oP;
@@ -723,15 +715,16 @@ SUNEDITOR.defaultLang = {
              * @param {(element|null)} rightNode - If the node exists, it is inserted after the node
              */
             insertNode: function (oNode, rightNode) {
-                var parentNode = null;
-                if (!rightNode) {
-                    var selection = this.getSelection();
-                    var nativeRng = this.getRange();
+                let parentNode = null;
 
-                    var startCon = nativeRng.startContainer;
-                    var startOff = nativeRng.startOffset;
-                    var endCon = nativeRng.endContainer;
-                    var endOff = nativeRng.endOffset;
+                if (!rightNode) {
+                    const selection = this.getSelection();
+                    const nativeRng = this.getRange();
+
+                    const startCon = nativeRng.startContainer;
+                    const startOff = nativeRng.startOffset;
+                    const endCon = nativeRng.endContainer;
+                    const endOff = nativeRng.endOffset;
 
                     parentNode = startCon;
                     if (startCon.nodeType === 3) {
@@ -752,10 +745,11 @@ SUNEDITOR.defaultLang = {
                     }
                     /** Select multiple nodes */
                     else {
-                        var removeNode = startCon;
-                        var isSameContainer = startCon === endCon;
+                        const isSameContainer = startCon === endCon;
 
                         if (isSameContainer) {
+                            let removeNode = startCon;
+
                             if (!this.isEdgePoint(endCon, endOff)) {
                                 rightNode = endCon.splitText(endOff);
                             }
@@ -796,32 +790,29 @@ SUNEDITOR.defaultLang = {
              * @description Delete the currently selected node
              */
             removeNode: function () {
-                var nativeRng = this.getRange();
+                const nativeRng = this.getRange();
 
-                var startCon = nativeRng.startContainer;
-                var startOff = nativeRng.startOffset;
-                var endCon = nativeRng.endContainer;
-                var endOff = nativeRng.endOffset;
-                var commonCon = nativeRng.commonAncestorContainer;
+                const startCon = nativeRng.startContainer;
+                const startOff = nativeRng.startOffset;
+                const endCon = nativeRng.endContainer;
+                const endOff = nativeRng.endOffset;
+                const commonCon = nativeRng.commonAncestorContainer;
 
-                var beforeNode = null;
-                var afterNode = null;
+                let beforeNode = null;
+                let afterNode = null;
 
-                var childNodes = dom.getListChildNodes(commonCon);
-                var startIndex = dom.getArrayIndex(childNodes, startCon);
-                var endIndex = dom.getArrayIndex(childNodes, endCon);
-                var i;
+                const childNodes = dom.getListChildNodes(commonCon);
+                let startIndex = dom.getArrayIndex(childNodes, startCon);
+                let endIndex = dom.getArrayIndex(childNodes, endCon);
 
-                var startNode = startCon;
-                for (i = startIndex + 1; i >= 0; i--) {
+                for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
                     if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
                         startIndex = i;
                         startNode = startNode.parentNode;
                     }
                 }
 
-                var endNode = endCon;
-                for (i = endIndex - 1; i > startIndex; i--) {
+                for (let i = endIndex - 1, endNode = endCon; i > startIndex; i--) {
                     if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
                         childNodes.splice(i, 1);
                         endNode = endNode.parentNode;
@@ -829,8 +820,8 @@ SUNEDITOR.defaultLang = {
                     }
                 }
 
-                for (i = startIndex; i <= endIndex; i++) {
-                    var item = childNodes[i];
+                for (let i = startIndex; i <= endIndex; i++) {
+                    const item = childNodes[i];
 
                     if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
                         dom.removeItem(item);
@@ -881,25 +872,24 @@ SUNEDITOR.defaultLang = {
              * @param {array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
              */
             wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
-                var nativeRng = this.getRange();
-                var startCon = nativeRng.startContainer;
-                var startOff = nativeRng.startOffset;
-                var endCon = nativeRng.endContainer;
-                var endOff = nativeRng.endOffset;
-                var commonCon = nativeRng.commonAncestorContainer;
-                var start = {}, end = {};
-                var newNode;
+                const nativeRng = this.getRange();
+                const startCon = nativeRng.startContainer;
+                const startOff = nativeRng.startOffset;
+                const endCon = nativeRng.endContainer;
+                const endOff = nativeRng.endOffset;
+                const commonCon = nativeRng.commonAncestorContainer;
 
-                var regExp;
+                let start = {}, end = {};
+                let newNode, regExp;
+
                 if (!!checkCSSPropertyArray) {
                     regExp = '(?:;|^|\\s)(?:' + checkCSSPropertyArray[0];
-                    for (i = 1; i < checkCSSPropertyArray.length; i++) {
+                    for (let i = 1; i < checkCSSPropertyArray.length; i++) {
                         regExp += '|' + checkCSSPropertyArray[i];
                     }
                     regExp += ')\\s*:[^;]*\\s*(?:;|$)';
                     regExp = new RegExp(regExp, 'gi');
                 }
-
 
                 /** one node */
                 if (startCon === endCon) {
@@ -907,13 +897,13 @@ SUNEDITOR.defaultLang = {
 
                     /** No node selected */
                     if (startOff === endOff) {
-                        newNode.innerHTML = "&nbsp;";
+                        newNode.innerHTML = '&nbsp;';
                         startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
                     }
                     /** Select within the same node */
                     else {
-                        var beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        var afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+                        const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
                         newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
                         startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
@@ -937,10 +927,10 @@ SUNEDITOR.defaultLang = {
                 /** multiple nodes */
                 else {
                     /** tag check function*/
-                    var checkFontSizeCss = function (vNode) {
+                    const checkFontSizeCss = function (vNode) {
                         if (vNode.nodeType === 3) return true;
 
-                        var style = '';
+                        let style = '';
                         if (!!regExp && vNode.style.cssText.length > 0) {
                             style = vNode.style.cssText.replace(regExp, '').trim();
                         }
@@ -956,7 +946,7 @@ SUNEDITOR.defaultLang = {
                     /** one line */
                     if (!/BODY/i.test(commonCon.nodeName)) {
                         newNode = appendNode.cloneNode(false);
-                        var range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+                        const range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
 
                         start.container = range.startContainer;
                         start.offset = range.startOffset;
@@ -966,13 +956,14 @@ SUNEDITOR.defaultLang = {
                     /** multi line */
                     else {
                         // get line nodes
-                        var lineNodes = dom.getListChildren(commonCon, function (current) {
+                        const lineNodes = dom.getListChildren(commonCon, function (current) {
                             return /^P$/i.test(current.nodeName);
                         });
-                        var startLine = dom.getParentNode(startCon, 'P');
-                        var endLine = dom.getParentNode(endCon, 'P');
 
-                        for (var i = 0, len = lineNodes.length; i < len; i++) {
+                        let startLine = dom.getParentNode(startCon, 'P');
+                        let endLine = dom.getParentNode(endCon, 'P');
+
+                        for (let i = 0, len = lineNodes.length; i < len; i++) {
                             if (startLine === lineNodes[i]) {
                                 startLine = i;
                                 continue;
@@ -987,7 +978,7 @@ SUNEDITOR.defaultLang = {
                         newNode = appendNode.cloneNode(false);
                         start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkFontSizeCss, startCon, startOff);
                         // mid
-                        for (i = startLine + 1; i < endLine; i++) {
+                        for (let i = startLine + 1; i < endLine; i++) {
                             newNode = appendNode.cloneNode(false);
                             this._wrapLineNodes(lineNodes[i], newNode, checkFontSizeCss);
                         }
@@ -1014,25 +1005,23 @@ SUNEDITOR.defaultLang = {
              * @private
              */
             _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
-                var el = element;
-                var startContainer = startCon;
-                var startOffset = startOff;
-                var endContainer = endCon;
-                var endOffset = endOff;
+                const el = element;
+                const removeNodeList = [];
 
-                var startPass = false;
-                var endPass = false;
-                var pCurrent;
-                var newNode;
-                var appendNode;
-                var removeNode;
-                var removeNodeList = [];
+                let startContainer = startCon;
+                let startOffset = startOff;
+                let endContainer = endCon;
+                let endOffset = endOff;
+
+                let startPass = false;
+                let endPass = false;
+                let pCurrent, newNode, appendNode, removeNode;
 
                 (function recursionFunc(current, node) {
-                    var childNodes = current.childNodes;
-                    for (var i = 0, len = childNodes.length; i < len; i++) {
+                    const childNodes = current.childNodes;
+                    for (let i = 0, len = childNodes.length; i < len; i++) {
                         if (endPass) break;
-                        var child = childNodes[i];
+                        let child = childNodes[i];
 
                         if (startPass && child !== endContainer && child.nodeType === 3) {
                             removeNode = newNode = child;
@@ -1063,8 +1052,8 @@ SUNEDITOR.defaultLang = {
 
                         // startContainer
                         if (child === startContainer) {
-                            var prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
-                            var startNode = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+                            const prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
+                            const startNode = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
 
                             if (prevNode.length > 0) {
                                 startContainer.data = prevNode.data;
@@ -1104,17 +1093,17 @@ SUNEDITOR.defaultLang = {
 
                         // endContainer
                         if (child === endContainer) {
-                            var afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
-                            var endNode = document.createTextNode(endContainer.substringData(0, endOffset));
-                            var bofore = null;
+                            const afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
+                            const endNode = document.createTextNode(endContainer.substringData(0, endOffset));
+                            let before = null;
 
-                            bofore = newNode = child;
+                            before = newNode = child;
                             pCurrent = [];
                             while (newNode !== el && newNode !== null) {
                                 if (validation(newNode) && newNode.nodeType === 1) {
                                     pCurrent.push(newNode.cloneNode(false));
                                 }
-                                bofore = newNode;
+                                before = newNode;
                                 newNode = newNode.parentNode;
                             }
 
@@ -1140,9 +1129,9 @@ SUNEDITOR.defaultLang = {
                             endContainer = endNode;
                             endOffset = endNode.length;
                             node.appendChild(endContainer);
-                            el.insertBefore(newInnerNode, bofore);
+                            el.insertBefore(newInnerNode, before);
 
-                            var pRemove;
+                            let pRemove;
                             while (removeNodeList.length > 0) {
                                 pRemove = removeNodeList.pop();
                                 pRemove.data = '';
@@ -1177,12 +1166,13 @@ SUNEDITOR.defaultLang = {
              */
             _wrapLineNodes: function (element, newInnerNode, validation) {
                 (function recursionFunc(current, node) {
-                    var childNodes = current.childNodes;
-                    for (var i = 0, len = childNodes.length; i < len; i++) {
-                        var child = childNodes[i];
-                        var coverNode = node;
+                    const childNodes = current.childNodes;
+
+                    for (let i = 0, len = childNodes.length; i < len; i++) {
+                        let child = childNodes[i];
+                        let coverNode = node;
                         if (validation(child)) {
-                            var cloneNode = child.cloneNode(false);
+                            let cloneNode = child.cloneNode(false);
                             node.appendChild(cloneNode);
                             if (child.nodeType === 1) coverNode = cloneNode;
                         }
@@ -1205,21 +1195,19 @@ SUNEDITOR.defaultLang = {
              * @private
              */
             _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
-                var el = element;
-                var container = startCon;
-                var offset = startOff;
+                const el = element;
+                const pNode = document.createElement('P');
 
-                var pNode = document.createElement('P');
-                var passNode = false;
-                var pCurrent;
-                var newNode;
-                var appendNode;
+                let container = startCon;
+                let offset = startOff;
+                let passNode = false;
+                let pCurrent, newNode, appendNode;
 
                 (function recursionFunc(current, node) {
-                    var childNodes = current.childNodes;
-                    for (var i = 0, len = childNodes.length; i < len; i++) {
-                        var child = childNodes[i];
-                        var coverNode = node;
+                    const childNodes = current.childNodes;
+                    for (let i = 0, len = childNodes.length; i < len; i++) {
+                        const child = childNodes[i];
+                        let coverNode = node;
 
                         if (passNode) {
                             if (child.nodeType === 1) {
@@ -1251,8 +1239,8 @@ SUNEDITOR.defaultLang = {
 
                         // startContainer
                         if (!passNode && child === container) {
-                            var prevNode = document.createTextNode(container.substringData(0, offset));
-                            var textNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
+                            const prevNode = document.createTextNode(container.substringData(0, offset));
+                            const textNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
 
                             if (prevNode.data.length > 0) {
                                 node.appendChild(prevNode);
@@ -1290,7 +1278,7 @@ SUNEDITOR.defaultLang = {
                         }
 
                         if (!passNode || validation(child)) {
-                            var cloneNode = child.cloneNode(false);
+                            const cloneNode = child.cloneNode(false);
                             node.appendChild(cloneNode);
                             if (child.nodeType === 1) coverNode = cloneNode;
                         }
@@ -1319,21 +1307,19 @@ SUNEDITOR.defaultLang = {
              * @private
              */
             _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
-                var el = element;
-                var container = endCon;
-                var offset = endOff;
+                const el = element;
+                const pNode = document.createElement('P');
 
-                var pNode = document.createElement('P');
-                var passNode = false;
-                var pCurrent;
-                var newNode;
-                var appendNode;
+                let container = endCon;
+                let offset = endOff;
+                let passNode = false;
+                let pCurrent, newNode, appendNode;
 
                 (function recursionFunc(current, node) {
-                    var childNodes = current.childNodes;
-                    for (var i = childNodes.length -1; 0 <= i; i--) {
-                        var child = childNodes[i];
-                        var coverNode = node;
+                    const childNodes = current.childNodes;
+                    for (let i = childNodes.length -1; 0 <= i; i--) {
+                        const child = childNodes[i];
+                        let coverNode = node;
 
                         if (passNode) {
                             if (child.nodeType === 1) {
@@ -1365,8 +1351,8 @@ SUNEDITOR.defaultLang = {
 
                         // endContainer
                         if (!passNode && child === container) {
-                            var afterNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
-                            var textNode = document.createTextNode(container.substringData(0, offset));
+                            const afterNode = document.createTextNode(container.substringData(offset, (container.length - offset)));
+                            const textNode = document.createTextNode(container.substringData(0, offset));
 
                             if (afterNode.data.length > 0) {
                                 node.insertBefore(afterNode, node.firstChild);
@@ -1404,7 +1390,7 @@ SUNEDITOR.defaultLang = {
                         }
 
                         if (!passNode || validation(child)) {
-                            var cloneNode = child.cloneNode(false);
+                            const cloneNode = child.cloneNode(false);
                             node.insertBefore(cloneNode, node.firstChild);
                             if (child.nodeType === 1) coverNode = cloneNode;
                         }
@@ -1429,10 +1415,10 @@ SUNEDITOR.defaultLang = {
              * @param command {String} - Separator ("indent" or "outdent")
              */
             indent: function (node, command) {
-                var p = dom.getParentNode(node, 'P');
+                const p = dom.getParentNode(node, 'P');
                 if (!p) return;
 
-                var margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
+                let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
 
                 if ('indent' === command) {
                     margin += 25;
@@ -1448,20 +1434,20 @@ SUNEDITOR.defaultLang = {
              */
             toggleFrame: function () {
                 if (!this._variable.wysiwygActive) {
-                    var ec = {"&amp;": "&", "&nbsp;": "\u00A0", /*"&quot;": "\"", */"&lt;": "<", "&gt;": ">"};
-                    var code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
-                        return (typeof ec[m] === "string") ? ec[m] : m;
+                    const ec = {'&amp;': '&', '&nbsp;': '\u00A0', /*"&quot;": "\"", */'&lt;': '<', '&gt;': '>'};
+                    const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
+                        return (typeof ec[m] === 'string') ? ec[m] : m;
                     });
-                    context.element.wysiwygWindow.document.body.innerHTML = code_html.trim().length > 0 ? code_html : "<p>&#65279</p>";
+                    context.element.wysiwygWindow.document.body.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
                     context.element.wysiwygWindow.document.body.scrollTop = 0;
-                    context.element.code.style.display = "none";
-                    context.element.wysiwygElement.style.display = "block";
+                    context.element.code.style.display = 'none';
+                    context.element.wysiwygElement.style.display = 'block';
                     this._variable.wysiwygActive = true;
                 }
                 else {
-                    context.element.code.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, "<\/p>\n");
-                    context.element.wysiwygElement.style.display = "none";
-                    context.element.code.style.display = "block";
+                    context.element.code.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
+                    context.element.wysiwygElement.style.display = 'none';
+                    context.element.code.style.display = 'block';
                     this._variable.wysiwygActive = false;
                 }
             },
@@ -1472,21 +1458,21 @@ SUNEDITOR.defaultLang = {
              */
             toggleFullScreen: function (element) {
                 if (!this._variable.isFullScreen) {
-                    context.element.topArea.style.position = "fixed";
-                    context.element.topArea.style.top = "0";
-                    context.element.topArea.style.left = "0";
-                    context.element.topArea.style.width = "100%";
-                    context.element.topArea.style.height = "100%";
+                    context.element.topArea.style.position = 'fixed';
+                    context.element.topArea.style.top = '0';
+                    context.element.topArea.style.left = '0';
+                    context.element.topArea.style.width = '100%';
+                    context.element.topArea.style.height = '100%';
 
                     this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
-                    context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + "px";
+                    context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
                     dom.removeClass(element.firstElementChild, 'ico_full_screen_e');
                     dom.addClass(element.firstElementChild, 'ico_full_screen_i');
                 }
                 else {
                     context.element.topArea.style.cssText = this._variable.originCssText;
-                    context.element.editorArea.style.height = this._variable.editorHeight + "px";
+                    context.element.editorArea.style.height = this._variable.editorHeight + 'px';
 
                     dom.removeClass(element.firstElementChild, 'ico_full_screen_i');
                     dom.addClass(element.firstElementChild, 'ico_full_screen_e');
@@ -1499,12 +1485,12 @@ SUNEDITOR.defaultLang = {
              * @description Opens the preview window
              */
             preview: function () {
-                var WindowObject = window.open('', '_blank');
+                const WindowObject = window.open('', '_blank');
                 WindowObject.mimeType = 'text/html';
                 WindowObject.document.head.innerHTML = '' +
                     '<meta charset=\"utf-8\" />' +
                     '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
-                    '<link rel="stylesheet" type="text/css" href="' + func.getBasePath + 'css/suneditor-contents.css">';
+                    '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor-contents.css">';
                 WindowObject.document.body.className = 'sun-editor-editable';
                 WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
             }
@@ -1513,7 +1499,7 @@ SUNEDITOR.defaultLang = {
         /**
          * @description event function
          */
-        var event = {
+        const event = {
             _shortcutKeyCode: {
                 66: ['bold', 'B'],
                 83: ['strikethrough', 'STRIKE'],
@@ -1528,37 +1514,37 @@ SUNEDITOR.defaultLang = {
             _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
 
             _findButtonEffectTag: function () {
-                var selectionParent = editor._variable.selectionNode;
-                var findFont = true;
-                var findSize = true;
-                var findA = true;
-                var map = "B|U|I|STRIKE|FONT|SIZE|";
-                var check = new RegExp(map, "i");
-                var cssText, i;
+                let selectionParent = editor._variable.selectionNode;
+                let findFont = true;
+                let findSize = true;
+                let findA = true;
+                let map = 'B|U|I|STRIKE|FONT|SIZE|';
+                let check = new RegExp(map, 'i');
+                let cssText;
+
                 while (!/^(?:P|BODY|HTML|DIV)$/i.test(selectionParent.nodeName)) {
                     if (selectionParent.nodeType === 3) {
                         selectionParent = selectionParent.parentNode;
                         continue;
                     }
 
-                    var nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
+                    const nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
 
                     /** Font */
                     if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (!!selectionParent.face && selectionParent.face.length > 0))) {
                         nodeName.push('FONT');
-                        var selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,"");
+                        const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
                         dom.changeTxt(editor.commandMap['FONT'], selectFont);
                         findFont = false;
-                        map = map.replace('FONT' + "|", "");
-                        check = new RegExp(map, "i");
+                        map = map.replace('FONT' + '|', '');
+                        check = new RegExp(map, 'i');
                     }
 
                     /** A */
                     if (findA && /^A$/i.test(selectionParent.nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                         if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
-                            var selectionATag = selectionParent;
                             editor.callModule('dialog', 'link', null, function () {
-                                SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionATag);
+                                SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionParent);
                             });
                         }
                         findA = false;
@@ -1568,10 +1554,10 @@ SUNEDITOR.defaultLang = {
 
                     /** span (font size) */
                     if (findSize && selectionParent.style.fontSize.length > 0) {
-                        dom.changeTxt(editor.commandMap["SIZE"], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        dom.changeTxt(editor.commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
-                        map = map.replace("SIZE|", "");
-                        check = new RegExp(map, "i");
+                        map = map.replace('SIZE|', '');
+                        check = new RegExp(map, 'i');
                     }
 
 
@@ -1582,11 +1568,11 @@ SUNEDITOR.defaultLang = {
                     if (/:\s*italic(?:;|\s)/.test(cssText)) nodeName.push('I');
                     if (/:\s*line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
 
-                    for (i = 0; i < nodeName.length; i++) {
+                    for (let i = 0; i < nodeName.length; i++) {
                         if (check.test(nodeName[i])) {
-                            dom.addClass(editor.commandMap[nodeName[i]], "on");
-                            map = map.replace(nodeName[i] + "|", "");
-                            check = new RegExp(map, "i");
+                            dom.addClass(editor.commandMap[nodeName[i]], 'on');
+                            map = map.replace(nodeName[i] + '|', '');
+                            check = new RegExp(map, 'i');
                         }
                     }
 
@@ -1596,9 +1582,8 @@ SUNEDITOR.defaultLang = {
                 /** remove */
                 if (findA) editor.controllersOff();
 
-                map = map.split("|");
-                var mapLen = map.length - 1;
-                for (i = 0; i < mapLen; i++) {
+                map = map.split('|');
+                for (let i = 0, len = map.length - 1; i < len; i++) {
                     if (/^FONT/i.test(map[i])) {
                         dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
                     }
@@ -1606,7 +1591,7 @@ SUNEDITOR.defaultLang = {
                         dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
-                        dom.removeClass(editor.commandMap[map[i]], "on");
+                        dom.removeClass(editor.commandMap[map[i]], 'on');
                     }
                 }
             },
@@ -1614,7 +1599,7 @@ SUNEDITOR.defaultLang = {
             resize_window: function () {
                 if (editor._variable.isFullScreen) {
                     editor._variable.innerHeight_fullScreen += (window.innerHeight - context.tool.bar.offsetHeight) - editor._variable.innerHeight_fullScreen;
-                    context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + "px";
+                    context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
                 }
             },
 
@@ -1629,15 +1614,15 @@ SUNEDITOR.defaultLang = {
             onClick_toolbar: function (e) {
                 if (editor._variable.isTouchMove) return true;
 
-                var target = e.target;
-                var display = target.getAttribute("data-display");
-                var command = target.getAttribute("data-command");
-                var className = target.className;
+                let target = e.target;
+                let display = target.getAttribute('data-display');
+                let command = target.getAttribute('data-command');
+                let className = target.className;
 
                 while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
                     target = target.parentNode;
-                    command = target.getAttribute("data-command");
-                    display = target.getAttribute("data-display");
+                    command = target.getAttribute('data-command');
+                    display = target.getAttribute('data-display');
                     className = target.className;
                 }
 
@@ -1650,7 +1635,7 @@ SUNEDITOR.defaultLang = {
 
                 /** Dialog, Submenu */
                 if (!!display) {
-                    var prevSubmenu = editor.submenu;
+                    const prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
                     if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== prevSubmenu)) {
@@ -1669,7 +1654,6 @@ SUNEDITOR.defaultLang = {
 
                 /** default command */
                 if (!!command) {
-                    var value = target.getAttribute("data-value");
                     switch (command) {
                         case 'codeView':
                             editor.toggleFrame();
@@ -1677,7 +1661,7 @@ SUNEDITOR.defaultLang = {
                             break;
                         case 'fullScreen':
                             editor.toggleFullScreen(target);
-                            dom.toggleClass(target, "on");
+                            dom.toggleClass(target, 'on');
                             break;
                         case 'indent':
                         case 'outdent':
@@ -1695,8 +1679,8 @@ SUNEDITOR.defaultLang = {
                             context.element.wysiwygWindow.print();
                             break;
                         default :
-                            editor.execCommand(command, false, value);
-                            dom.toggleClass(target, "on");
+                            editor.execCommand(command, false, target.getAttribute('data-value'));
+                            dom.toggleClass(target, 'on');
                     }
                 }
 
@@ -1707,7 +1691,7 @@ SUNEDITOR.defaultLang = {
                 e.stopPropagation();
                 editor._setSelectionNode();
 
-                var targetElement = e.target;
+                const targetElement = e.target;
                 editor.submenuOff();
 
                 if (/^HTML$/i.test(targetElement.nodeName)) {
@@ -1730,18 +1714,18 @@ SUNEDITOR.defaultLang = {
             onKeyDown_wysiwyg: function (e) {
                 editor._setSelectionNode();
 
-                var keyCode = e.keyCode;
-                var shift = e.shiftKey;
-                var ctrl = e.ctrlKey || e.metaKey;
-                var alt = e.altKey;
+                const keyCode = e.keyCode;
+                const shift = e.shiftKey;
+                const ctrl = e.ctrlKey || e.metaKey;
+                const alt = e.altKey;
                 e.stopPropagation();
 
                 function shortcutCommand(keyCode) {
-                    var key = event._shortcutKeyCode[keyCode];
+                    const key = event._shortcutKeyCode[keyCode];
                     if (!key) return false;
 
                     editor.execCommand(key[0], false, null);
-                    dom.toggleClass(editor.commandMap[key[1]], "on");
+                    dom.toggleClass(editor.commandMap[key[1]], 'on');
 
                     return true;
                 }
@@ -1767,27 +1751,27 @@ SUNEDITOR.defaultLang = {
                         e.preventDefault();
                         if (ctrl || alt) break;
 
-                        var currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
+                        let currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
                         while (!/^TD$/i.test(currentNode.tagName) && !/^BODY$/i.test(currentNode.tagName)) {
                             currentNode = currentNode.parentNode;
                         }
 
                         if (!!currentNode && /^TD$/i.test(currentNode.tagName)) {
-                            var table = dom.getParentNode(currentNode, "table");
-                            var cells = dom.getListChildren(table, dom.isCell);
-                            var idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
+                            const table = dom.getParentNode(currentNode, 'table');
+                            const cells = dom.getListChildren(table, dom.isCell);
+                            let idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
 
                             if (idx === cells.length && !shift) idx = 0;
                             if (idx === -1 && shift) idx = cells.length - 1;
 
-                            var moveCell = cells[idx];
+                            const moveCell = cells[idx];
                             if (!moveCell) return false;
 
-                            var range = editor.createRange();
+                            const range = editor.createRange();
                             range.setStart(moveCell, 0);
                             range.setEnd(moveCell, 0);
 
-                            var selection = editor.getSelection();
+                            const selection = editor.getSelection();
                             if (selection.rangeCount > 0) {
                                 selection.removeAllRanges();
                             }
@@ -1799,11 +1783,11 @@ SUNEDITOR.defaultLang = {
                         /** if P Tag */
                         if (shift) break;
 
-                        var tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor._variable.tabSize + 1).join("\u00A0"));
+                        const tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
                         editor.insertNode(tabText, null);
 
-                        var selection = editor.getSelection();
-                        var rng = editor.createRange();
+                        const selection = editor.getSelection();
+                        const rng = editor.createRange();
 
                         rng.setStart(tabText, editor._variable.tabSize);
                         rng.setEnd(tabText, editor._variable.tabSize);
@@ -1830,7 +1814,7 @@ SUNEDITOR.defaultLang = {
             },
 
             onDrop_wysiwyg: function (e) {
-                var files = e.dataTransfer.files;
+                const files = e.dataTransfer.files;
 
                 if (files.length === 0) return true;
 
@@ -1850,10 +1834,10 @@ SUNEDITOR.defaultLang = {
                 e.stopPropagation();
 
                 editor._variable.resizeClientY = e.clientY;
-                context.element.resizeBackground.style.display = "block";
+                context.element.resizeBackground.style.display = 'block';
 
                 function closureFunc() {
-                    context.element.resizeBackground.style.display = "none";
+                    context.element.resizeBackground.style.display = 'none';
                     document.removeEventListener('mousemove', event.resize_editor);
                     document.removeEventListener('mouseup', closureFunc);
                 }
@@ -1863,10 +1847,9 @@ SUNEDITOR.defaultLang = {
             },
 
             resize_editor: function (e) {
-                var resizeInterval = (e.clientY - editor._variable.resizeClientY);
+                const resizeInterval = (e.clientY - editor._variable.resizeClientY);
 
-                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + "px";
-
+                context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
                 editor._variable.editorHeight = (context.element.editorArea.offsetHeight + resizeInterval);
 
                 editor._variable.resizeClientY = e.clientY;
@@ -1908,7 +1891,7 @@ SUNEDITOR.defaultLang = {
              * @returns {String}
              */
             getContent: function () {
-                var content = "";
+                let content = '';
 
                 if (context.element.wysiwygWindow.document.body.innerText.trim().length === 0) return content;
 
@@ -1925,7 +1908,7 @@ SUNEDITOR.defaultLang = {
              * @param {string} content - Content to Input
              */
             setContent: function (content) {
-                var innerHTML = _convertContentForEditor(content);
+                const innerHTML = _convertContentForEditor(content);
 
                 if (editor._variable.wysiwygActive) {
                     context.element.wysiwygWindow.document.body.innerHTML = innerHTML;
@@ -1940,7 +1923,7 @@ SUNEDITOR.defaultLang = {
              */
             appendContent: function (content) {
                 if (editor._variable.wysiwygActive) {
-                    var oP = document.createElement("P");
+                    const oP = document.createElement('P');
                     oP.innerHTML = content;
                     context.element.wysiwygWindow.document.body.appendChild(oP);
                 } else {
@@ -1952,32 +1935,32 @@ SUNEDITOR.defaultLang = {
              * @description Disable the suneditor
              */
             disabled: function () {
-                context.tool.cover.style.display = "block";
-                context.element.wysiwygWindow.document.body.setAttribute("contenteditable", false);
+                context.tool.cover.style.display = 'block';
+                context.element.wysiwygWindow.document.body.setAttribute('contenteditable', false);
             },
 
             /**
              * @description Enabled the suneditor
              */
             enabled: function () {
-                context.tool.cover.style.display = "none";
-                context.element.wysiwygWindow.document.body.setAttribute("contenteditable", true);
+                context.tool.cover.style.display = 'none';
+                context.element.wysiwygWindow.document.body.setAttribute('contenteditable', true);
             },
 
             /**
              * @description Show the suneditor
              */
             show: function () {
-                var topAreaStyle = context.element.topArea.style;
+                const topAreaStyle = context.element.topArea.style;
                 topAreaStyle.cssText = editor._variable.originCssText;
-                if (topAreaStyle.display === "none") topAreaStyle.display = "block";
+                if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
             },
 
             /**
              * @description Hide the suneditor
              */
             hide: function () {
-                context.element.topArea.style.display = "none";
+                context.element.topArea.style.display = 'none';
             },
 
             /**
@@ -1985,7 +1968,7 @@ SUNEDITOR.defaultLang = {
              */
             destroy: function () {
                 context.element.topArea.parentNode.removeChild(context.element.topArea);
-                context.element.textElement.style.display = "";
+                context.element.textElement.style.display = '';
 
                 this.save = null;
                 this.getContent = null;
@@ -2012,13 +1995,13 @@ SUNEDITOR.defaultLang = {
      * @private
      */
     function _convertContentForEditor(content) {
-        var tag, baseHtml, innerHTML = "";
+        let tag, baseHtml, innerHTML = '';
         tag = document.createRange().createContextualFragment(content.trim()).childNodes;
 
-        for (var i = 0, len = tag.length; i < len; i++) {
+        for (let i = 0, len = tag.length; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
             if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
-                innerHTML += "<P>" + baseHtml + "</p>";
+                innerHTML += '<P>' + baseHtml + '</p>';
             } else {
                 innerHTML += baseHtml;
             }
@@ -2034,7 +2017,7 @@ SUNEDITOR.defaultLang = {
      * @private
      */
     function _defaultButtonsList () {
-        var lang = SUNEDITOR.lang;
+        const lang = SUNEDITOR.lang;
 
         return {
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
@@ -2177,18 +2160,18 @@ SUNEDITOR.defaultLang = {
      * @private
      */
     function _createToolBar(buttonList) {
-        var html = '<div class="sun-editor-id-toolbar-cover"></div>';
-        var moduleHtml = null;
+        let html = '<div class="sun-editor-id-toolbar-cover"></div>';
+        let moduleHtml = null;
 
         /** create button list */
-        var button = null;
-        var module = null;
-        var defaultButtonList = _defaultButtonsList();
+        let button = null;
+        let module = null;
+        const defaultButtonList = _defaultButtonsList();
 
-        for (var i = 0; i < buttonList.length; i++) {
+        for (let i = 0; i < buttonList.length; i++) {
 
-            var buttonGroup = buttonList[i];
-            for (var j = 0; j < buttonGroup.length; j++) {
+            const buttonGroup = buttonList[i];
+            for (let j = 0; j < buttonGroup.length; j++) {
 
                 button = buttonGroup[j];
                 if (typeof button === 'object') {
@@ -2215,7 +2198,7 @@ SUNEDITOR.defaultLang = {
      * @private
      */
     function _Constructor(element, options) {
-        if (typeof options !== "object") options = {};
+        if (typeof options !== 'object') options = {};
 
         /** user options */
         options.addFont = options.addFont || null;
@@ -2227,7 +2210,7 @@ SUNEDITOR.defaultLang = {
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;
-        options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + "px" : options.height) : element.clientHeight + "px";
+        options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formats'],
@@ -2241,68 +2224,68 @@ SUNEDITOR.defaultLang = {
         ];
 
         /** editor seting options */
-        options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + "px" : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + "px");
+        options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + 'px');
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
 
-        var doc = document;
+        const doc = document;
 
         /** suneditor div */
-        var top_div = doc.createElement("DIV");
-        top_div.className = "sun-editor";
-        top_div.id = "suneditor_" + element.id;
+        const top_div = doc.createElement('DIV');
+        top_div.className = 'sun-editor';
+        top_div.id = 'suneditor_' + element.id;
         top_div.style.width = options.width;
         top_div.style.display = options.display;
 
         /** relative div */
-        var relative = doc.createElement("DIV");
-        relative.className = "sun-editor-container";
+        const relative = doc.createElement('DIV');
+        relative.className = 'sun-editor-container';
 
         /** tool bar */
-        var tool_bar = doc.createElement("DIV");
-        tool_bar.className = "sun-editor-id-toolbar";
+        const tool_bar = doc.createElement('DIV');
+        tool_bar.className = 'sun-editor-id-toolbar';
         tool_bar.innerHTML = _createToolBar(options.buttonList);
 
         /** inner editor div */
-        var editor_div = doc.createElement("DIV");
-        editor_div.className = "sun-editor-id-editorArea";
+        const editor_div = doc.createElement('DIV');
+        editor_div.className = 'sun-editor-id-editorArea';
         editor_div.style.height = options.height;
 
         /** iframe */
-        var iframe = doc.createElement("IFRAME");
+        const iframe = doc.createElement('IFRAME');
         iframe.allowFullscreen = true;
         iframe.frameBorder = 0;
-        iframe.className = "input_editor sun-editor-id-wysiwyg";
-        iframe.style.display = "block";
+        iframe.className = 'input_editor sun-editor-id-wysiwyg';
+        iframe.style.display = 'block';
 
         /** textarea for code view */
-        var textarea = doc.createElement("TEXTAREA");
-        textarea.className = "input_editor html sun-editor-id-code";
-        textarea.style.display = "none";
+        const textarea = doc.createElement('TEXTAREA');
+        textarea.className = 'input_editor html sun-editor-id-code';
+        textarea.style.display = 'none';
 
-        iframe.addEventListener("load", function () {
-            this.setAttribute("scrolling", "auto");
+        iframe.addEventListener('load', function () {
+            this.setAttribute('scrolling', 'auto');
             this.contentWindow.document.head.innerHTML = '' +
                 '<meta charset=\"utf-8\" />' +
                 '<title>SunEditor</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.func.getBasePath + 'css/suneditor-contents.css">';
-            this.contentWindow.document.body.className = "sun-editor-editable";
-            this.contentWindow.document.body.setAttribute("contenteditable", true);
+                '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.util.getBasePath + 'css/suneditor-contents.css">';
+            this.contentWindow.document.body.className = 'sun-editor-editable';
+            this.contentWindow.document.body.setAttribute('contenteditable', true);
 
             this.contentWindow.document.body.innerHTML = _convertContentForEditor(element.value);
         });
 
         /** resize bar */
-        var resize_bar = doc.createElement("DIV");
-        resize_bar.className = "sun-editor-id-resizeBar";
+        const resize_bar = doc.createElement('DIV');
+        resize_bar.className = 'sun-editor-id-resizeBar';
 
         /** loading box */
-        var loading_box = doc.createElement("DIV");
-        loading_box.className = "sun-editor-id-loading";
-        loading_box.innerHTML = "<div class=\"ico-loading\"></div>";
+        const loading_box = doc.createElement('DIV');
+        loading_box.className = 'sun-editor-id-loading';
+        loading_box.innerHTML = '<div class="ico-loading"></div>';
 
         /** resize operation background */
-        var resize_back = doc.createElement("DIV");
-        resize_back.className = "sun-editor-id-resize-background";
+        const resize_back = doc.createElement('DIV');
+        resize_back.className = 'sun-editor-id-resize-background';
 
         /** append html */
         editor_div.appendChild(iframe);
@@ -2382,19 +2365,19 @@ SUNEDITOR.defaultLang = {
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     SUNEDITOR.create = function (elementId, options) {
-        var element = document.getElementById(elementId);
+        const element = document.getElementById(elementId);
 
         if (element === null) {
             throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + elementId + '")');
         }
 
-        var cons = _Constructor(element, options);
+        const cons = _Constructor(element, options);
 
         if (!!document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
-        element.style.display = "none";
+        element.style.display = 'none';
 
         /** Create to sibling node */
         if (typeof element.nextElementSibling === 'object') {
@@ -2403,7 +2386,7 @@ SUNEDITOR.defaultLang = {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.func);
+        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.util);
     };
 
     /**
@@ -2411,9 +2394,9 @@ SUNEDITOR.defaultLang = {
      * @param {string} elementId - textarea Id
      */
     SUNEDITOR.destroy = function (elementId) {
-        var element = document.getElementById('suneditor_' + elementId);
+        const element = document.getElementById('suneditor_' + elementId);
         element.parentNode.removeChild(element);
-        document.getElementById(elementId).style.display = "";
+        document.getElementById(elementId).style.display = '';
     };
 
 })();

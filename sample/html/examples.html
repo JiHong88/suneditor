@@ -136,7 +136,7 @@
         <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting</textarea>
 
         <h4>2. User Function</h4>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
+        <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Copies the contents of the suneditor into a [textarea] */</span>
 <span class="pl-k">function</span> <span class="pl-en">sun_save</span>() {
@@ -146,8 +146,7 @@
 
 <span class="pl-c">/** Gets the contents of the suneditor */</span>
 <span class="pl-k">function</span> <span class="pl-en">sun_getContent</span>() {
-    <span class="pl-k">var</span> content <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">getContent</span>();
-    <span class="pl-en">alert</span>(content);
+    <span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContent</span>());
 };
 
 <span class="pl-c">/** Change the contents of the suneditor */</span>
@@ -206,7 +205,7 @@
         <p></p>
 
         <h4>3. Image upload to server</h4>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
+        <div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
     imageUploadUrl<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
 });</pre></div>
 
@@ -333,7 +332,7 @@
         ]
     });
 
-    var suneditor = SUNEDITOR.create('exampleFunction');
+    let suneditor = SUNEDITOR.create('exampleFunction');
 
     function sun_save() {
         suneditor.save();
@@ -341,8 +340,7 @@
     }
 
     function sun_getContent() {
-        var content = suneditor.getContent();
-        alert(content);
+        alert(suneditor.getContent());
     }
 
     function sun_setContent(content) {

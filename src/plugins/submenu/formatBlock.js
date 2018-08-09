@@ -8,7 +8,7 @@
 SUNEDITOR.plugin.formatBlock = {
     add: function (_this, targetElement) {
         /** set submenu */
-        var listDiv = eval(this.setSubmenu());
+        const listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(_this));
@@ -18,8 +18,9 @@ SUNEDITOR.plugin.formatBlock = {
     },
 
     setSubmenu: function () {
-        var lang = SUNEDITOR.lang;
-        var listDiv = document.createElement('DIV');
+        const lang = SUNEDITOR.lang;
+        const listDiv = document.createElement('DIV');
+
         listDiv.className = 'layer_editor layer_size';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
@@ -43,8 +44,9 @@ SUNEDITOR.plugin.formatBlock = {
         e.preventDefault();
         e.stopPropagation();
 
-        var target = e.target;
-        var value = null;
+        let target = e.target;
+        let value = null;
+        
         while (!value && !/UL/i.test(target.tagName)) {
             value = target.getAttribute('data-value');
             target = target.parentNode;

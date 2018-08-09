@@ -8,7 +8,7 @@
 SUNEDITOR.plugin.font = {
     add: function (_this, targetElement) {
         /** set submenu */
-        var listDiv = eval(this.setSubmenu(_this.context.user));
+        const listDiv = eval(this.setSubmenu(_this.context.user));
 
         /** add event listeners */
         listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(_this));
@@ -18,12 +18,12 @@ SUNEDITOR.plugin.font = {
     },
 
     setSubmenu: function (user) {
-        var listDiv = document.createElement('DIV');
+        const listDiv = document.createElement('DIV');
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
-        var font, text, i, len;
-        var fontList = !user.fontList ?
+        let font, text, i, len;
+        let fontList = !user.fontList ?
             [
                 'Arial',
                 'Comic Sans MS',
@@ -34,7 +34,7 @@ SUNEDITOR.plugin.font = {
                 'Verdana'
             ] : user.fontList;
 
-        var list = '<div class="inner_layer list_family">' +
+        let list = '<div class="inner_layer list_family">' +
             '   <ul class="list_editor sun-editor-list-font-family">';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
@@ -68,12 +68,12 @@ SUNEDITOR.plugin.font = {
         e.preventDefault();
         e.stopPropagation();
 
-        var target = e.target;
+        const target = e.target;
 
         this.focus();
 
         SUNEDITOR.dom.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
-        var newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
+        const newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['font-family']);
         this.submenuOff();
     }

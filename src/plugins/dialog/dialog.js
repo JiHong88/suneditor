@@ -7,19 +7,19 @@
  */
 SUNEDITOR.plugin.dialog = {
     add: function (_this) {
-        var context = _this.context;
+        const context = _this.context;
 
         /** dialog */
-        var dialog_div = document.createElement("DIV");
-        dialog_div.className = "sun-editor-id-dialogBox";
+        const dialog_div = document.createElement('DIV');
+        dialog_div.className = 'sun-editor-id-dialogBox';
 
-        var dialog_back = document.createElement("DIV");
-        dialog_back.className = "modal-dialog-background sun-editor-id-dialog-back";
-        dialog_back.style.display = "none";
+        const dialog_back = document.createElement('DIV');
+        dialog_back.className = 'modal-dialog-background sun-editor-id-dialog-back';
+        dialog_back.style.display = 'none';
 
-        var dialog_area = document.createElement("DIV");
-        dialog_area.className = "modal-dialog sun-editor-id-dialog-modal";
-        dialog_area.style.display = "none";
+        const dialog_area = document.createElement('DIV');
+        dialog_area.className = 'modal-dialog sun-editor-id-dialog-modal';
+        dialog_area.style.display = 'none';
 
         dialog_div.appendChild(dialog_back);
         dialog_div.appendChild(dialog_area);
@@ -36,7 +36,7 @@ SUNEDITOR.plugin.dialog = {
     onClick_dialog: function (e) {
         e.stopPropagation();
 
-        if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute("data-command"))) {
+        if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
         }
     },
@@ -47,27 +47,27 @@ SUNEDITOR.plugin.dialog = {
         this.context.dialog.updateModal = update;
 
         if (option === 'full') {
-            this.context.dialog.modalArea.style.position = "fixed";
+            this.context.dialog.modalArea.style.position = 'fixed';
         } else {
-            this.context.dialog.modalArea.style.position = "absolute";
+            this.context.dialog.modalArea.style.position = 'absolute';
         }
 
         this.context.dialog.kind = kind;
         this.modalForm = this.context[kind].modal;
-        var focusElement = this.context[kind].focusElement;
+        const focusElement = this.context[kind].focusElement;
 
-        this.context.dialog.modalArea.style.display = "block";
-        this.context.dialog.back.style.display = "block";
-        this.context.dialog.modal.style.display = "block";
-        this.modalForm.style.display = "block";
+        this.context.dialog.modalArea.style.display = 'block';
+        this.context.dialog.back.style.display = 'block';
+        this.context.dialog.modal.style.display = 'block';
+        this.modalForm.style.display = 'block';
 
         if (focusElement) focusElement.focus();
     },
 
     closeDialog: function () {
-        this.modalForm.style.display = "none";
-        this.context.dialog.back.style.display = "none";
-        this.context.dialog.modalArea.style.display = "none";
+        this.modalForm.style.display = 'none';
+        this.context.dialog.back.style.display = 'none';
+        this.context.dialog.modalArea.style.display = 'none';
         this.modalForm = null;
         this.context.dialog.updateModal = false;
         SUNEDITOR.plugin[this.context.dialog.kind].init.call(this);

@@ -8,7 +8,7 @@
 SUNEDITOR.plugin.foreColor = {
     add: function (_this, targetElement) {
         /** set submenu */
-        var listDiv = eval(this.setSubmenu());
+        const listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(_this));
@@ -18,19 +18,19 @@ SUNEDITOR.plugin.foreColor = {
     },
 
     setSubmenu: function () {
-        var listDiv = document.createElement('DIV');
+        const listDiv = document.createElement('DIV');
         listDiv.className = 'layer_editor layer_color';
         listDiv.style.display = 'none';
 
-        var colorList = ['#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000', '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa',
+        const colorList = ['#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000', '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa',
             '#ffffff', '#ffa7a7', '#ffc19e', '#faed7d', '#cef279', '#b2ebf4', '#b2ccff', '#d1b2ff', '#ffb2f5', '#bdbdbd', '#f15f5f', '#f29661', '#e5d85c', '#bce55c', '#5cd1e5', '#6699ff', '#a366ff', '#f261df', '#8c8c8c',
             '#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535', '#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222'];
 
-        var list = '<div class="inner_layer">' +
+        let list = '<div class="inner_layer">' +
             '   <div class="pallet_bgcolor">' +
             '       <ul class="list_color list_bgcolor">';
-        for (var i = 0; i < colorList.length; i++) {
-            var color = colorList[i];
+        for (let i = 0, len = colorList.length; i < len; i++) {
+            const color = colorList[i];
             list += '<li>' +
                 '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" style="background-color:' + color + ';">' + color + '' +
                 '       <span class="bg_check"></span>' +
@@ -57,7 +57,7 @@ SUNEDITOR.plugin.foreColor = {
 
         this.focus();
 
-        var newNode = document.createElement('SPAN'); newNode.style.color = e.target.getAttribute('data-value');
+        const newNode = document.createElement('SPAN'); newNode.style.color = e.target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['color']);
         this.submenuOff();
     }

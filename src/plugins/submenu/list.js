@@ -8,7 +8,7 @@
 SUNEDITOR.plugin.list = {
     add: function (_this, targetElement) {
         /** set submenu */
-        var listDiv = eval(this.setSubmenu());
+        const listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(_this));
@@ -18,11 +18,11 @@ SUNEDITOR.plugin.list = {
     },
 
     setSubmenu: function () {
-        var lang = SUNEDITOR.lang;
-        var listDiv = document.createElement('DIV');
+        const lang = SUNEDITOR.lang;
+        const listDiv = document.createElement('DIV');
+
         listDiv.className = 'layer_editor layer_list';
         listDiv.style.display = 'none';
-
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
@@ -38,9 +38,10 @@ SUNEDITOR.plugin.list = {
         e.preventDefault();
         e.stopPropagation();
 
-        var target = e.target;
-        var command = null;
-        var value = null;
+        let target = e.target;
+        let command = null;
+        let value = null;
+
         while (!value && !/UL/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');

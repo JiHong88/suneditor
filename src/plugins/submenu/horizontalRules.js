@@ -8,7 +8,7 @@
 SUNEDITOR.plugin.horizontalRules = {
     add: function (_this, targetElement) {
         /** set submenu */
-        var listDiv = eval(this.setSubmenu());
+        const listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulesPick.bind(_this));
@@ -18,10 +18,10 @@ SUNEDITOR.plugin.horizontalRules = {
     },
 
     setSubmenu: function () {
-        var listDiv = document.createElement('DIV');
+        const listDiv = document.createElement('DIV');
+
         listDiv.className = 'layer_editor layer_line';
         listDiv.style.display = 'none';
-
         listDiv.innerHTML = '' +
             '<div class="inner_layer inner_layer_type2">' +
             '   <ul class="list_editor">' +
@@ -47,13 +47,13 @@ SUNEDITOR.plugin.horizontalRules = {
     },
 
     appendHr: function (className) {
-        var oHr = document.createElement("HR");
+        const oHr = document.createElement("HR");
         oHr.className = className;
+        const oP = this.appendP(oHr);
 
         this.focus();
 
         this.insertNode(oHr, this.getLineElement(this.getSelectionNode()));
-        var oP = this.appendP(oHr);
         this.setRange(oP, 0, oP, 0);
     },
 
@@ -61,8 +61,9 @@ SUNEDITOR.plugin.horizontalRules = {
         e.preventDefault();
         e.stopPropagation();
 
-        var target = e.target;
-        var value = null;
+        let target = e.target;
+        let value = null;
+        
         while (!value && !/UL/i.test(target.tagName)) {
             value = target.getAttribute('data-value');
             target = target.parentNode;

@@ -7,11 +7,11 @@
  */
 SUNEDITOR.plugin.table = {
     add: function (_this, targetElement) {
-        var context = _this.context;
+        const context = _this.context;
 
         /** set submenu */
-        var listDiv = eval(this.setSubmenu());
-        var tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
+        const listDiv = eval(this.setSubmenu());
+        const tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
         context.submenu.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
         context.submenu.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
         context.submenu.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
@@ -26,7 +26,7 @@ SUNEDITOR.plugin.table = {
     },
 
     setSubmenu: function () {
-        var listDiv = document.createElement('DIV');
+        const listDiv = document.createElement('DIV');
         listDiv.className = 'table-content';
         listDiv.style.display = 'none';
 
@@ -42,15 +42,15 @@ SUNEDITOR.plugin.table = {
     },
 
     appendTable: function () {
-        var oTable = document.createElement("TABLE");
+        const oTable = document.createElement('TABLE');
 
-        var x = this.context.submenu._tableXY[0];
-        var y = this.context.submenu._tableXY[1];
+        let x = this.context.submenu._tableXY[0];
+        let y = this.context.submenu._tableXY[1];
+        let tableHTML = '<tbody>';
 
-        var tableHTML = '<tbody>';
         while (y > 0) {
             tableHTML += '<tr>';
-            var tdCnt = x;
+            let tdCnt = x;
             while (tdCnt > 0) {
                 tableHTML += '<td><p>&#65279</p></td>';
                 --tdCnt;
@@ -71,34 +71,34 @@ SUNEDITOR.plugin.table = {
     onMouseMove_tablePicker: function (e) {
         e.stopPropagation();
 
-        var x = Math.ceil(e.offsetX / 18);
-        var y = Math.ceil(e.offsetY / 18);
+        let x = Math.ceil(e.offsetX / 18);
+        let y = Math.ceil(e.offsetY / 18);
         x = x < 1 ? 1 : x;
         y = y < 1 ? 1 : y;
-        this.context.submenu.tableHighlight.style.width = x + "em";
-        this.context.submenu.tableHighlight.style.height = y + "em";
+        this.context.submenu.tableHighlight.style.width = x + 'em';
+        this.context.submenu.tableHighlight.style.height = y + 'em';
 
-        var x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
-        var y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
-        this.context.submenu.tableUnHighlight.style.width = x_u + "em";
-        this.context.submenu.tableUnHighlight.style.height = y_u + "em";
+        let x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
+        let y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
+        this.context.submenu.tableUnHighlight.style.width = x_u + 'em';
+        this.context.submenu.tableUnHighlight.style.height = y_u + 'em';
 
-        SUNEDITOR.dom.changeTxt(this.context.submenu.tableDisplay, x + " x " + y);
+        SUNEDITOR.dom.changeTxt(this.context.submenu.tableDisplay, x + ' x ' + y);
         this.context.submenu._tableXY = [x, y];
     },
 
     reset_table_picker: function () {
         if (!this.context.submenu.tableHighlight) return;
 
-        var highlight = this.context.submenu.tableHighlight.style;
-        var unHighlight = this.context.submenu.tableUnHighlight.style;
+        const highlight = this.context.submenu.tableHighlight.style;
+        const unHighlight = this.context.submenu.tableUnHighlight.style;
 
-        highlight.width = "1em";
-        highlight.height = "1em";
-        unHighlight.width = "5em";
-        unHighlight.height = "5em";
+        highlight.width = '1em';
+        highlight.height = '1em';
+        unHighlight.width = '5em';
+        unHighlight.height = '5em';
 
-        SUNEDITOR.dom.changeTxt(this.context.submenu.tableDisplay, "1 x 1");
+        SUNEDITOR.dom.changeTxt(this.context.submenu.tableDisplay, '1 x 1');
         this.submenuOff();
     }
 };
