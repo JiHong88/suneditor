@@ -122,6 +122,21 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
+         * @description Copies object
+         * @param {Object} obj - Object to be copy
+         * @returns {Object}
+         */
+        copyObj: function (obj) {
+            const copy = {};
+            
+            for (let attr in obj) {
+                copy[attr] = obj[attr];
+            }
+            
+            return copy;
+        },
+
+        /**
          * @description Get suneditor's default path
          */
         getBasePath: (function () {
@@ -429,6 +444,7 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Variables used internally in editor operation
              * @property {(element|null)} selectionNode - Contains selection node
+             * @property {(element|null)} copySelection - The selection object is copied
              * @property {boolean} wysiwygActive - The wysiwyg frame or code view state
              * @property {boolean} isFullScreen - State of full screen
              * @property {number} innerHeight_fullScreen - InnerHeight in editor when in full screen
@@ -441,6 +457,7 @@ SUNEDITOR.defaultLang = {
              */
             _variable: {
                 selectionNode: null,
+                copySelection: null,
                 wysiwygActive: true,
                 isFullScreen: false,
                 innerHeight_fullScreen: 0,
@@ -569,7 +586,11 @@ SUNEDITOR.defaultLang = {
             },
 
             _setSelectionNode: function () {
+                // IE
+                this._variable.copySelection = util.copyObj(this.getSelection());
+
                 const range = this.getRange();
+
                 if (range.startContainer !== range.endContainer) {
                     this._variable.selectionNode = range.startContainer;
                 } else {
@@ -625,7 +646,7 @@ SUNEDITOR.defaultLang = {
                 // IE
                 else {
                     nativeRng = this.createRange();
-                    selection = this._variable.selectionNode;
+                    selection = this._variable.copySelection;
 
                     if (!selection) {
                         selection = context.element.wysiwygWindow.document.body.firstChild;
