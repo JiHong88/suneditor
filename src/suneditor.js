@@ -148,7 +148,7 @@ SUNEDITOR.defaultLang = {
                     let editorTag = c[i].src.match(/(^|.*[\\\/])suneditor(\.min)?\.js(?:\?.*|;.*)?$/i);
                     if (editorTag) {
                         path = editorTag[1];
-                        break
+                        break;
                     }
                 }
             }
@@ -309,7 +309,7 @@ SUNEDITOR.defaultLang = {
 
             const check = new RegExp(query, 'i');
 
-            while (!!element && (element.nodeType === 3 || !check.test(element[attr]))) {
+            while (element && (element.nodeType === 3 || !check.test(element[attr]))) {
                 if (/^BODY$/i.test(element.tagName)) {
                     return null;
                 }
@@ -544,7 +544,7 @@ SUNEDITOR.defaultLang = {
              * @description Disable submenu
              */
             submenuOff: function () {
-                if (!!this.submenu) {
+                if (this.submenu) {
                     this.submenu.style.display = 'none';
                     this.submenu = null;
                     dom.removeClass(this.submenuActiveButton, 'on');
@@ -760,7 +760,7 @@ SUNEDITOR.defaultLang = {
 
                     /** Select within the same node */
                     if (startCon === endCon && startOff === endOff) {
-                        if (!!selection.focusNode && selection.focusNode.nodeType === 3) {
+                        if (selection.focusNode && selection.focusNode.nodeType === 3) {
                             rightNode = selection.focusNode.splitText(endOff);
                         }
                         else {
@@ -958,7 +958,7 @@ SUNEDITOR.defaultLang = {
                         if (vNode.nodeType === 3) return true;
 
                         let style = '';
-                        if (!!regExp && vNode.style.cssText.length > 0) {
+                        if (regExp && vNode.style.cssText.length > 0) {
                             style = vNode.style.cssText.replace(regExp, '').trim();
                         }
 
@@ -1160,7 +1160,7 @@ SUNEDITOR.defaultLang = {
                             while (removeNodeList.length > 0) {
                                 pRemove = removeNodeList.pop();
                                 pRemove.data = '';
-                                while (!!pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
+                                while (pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
                                     pRemove = pRemove.parentNode;
                                 }
                                 dom.removeItem(pRemove);
@@ -1557,7 +1557,7 @@ SUNEDITOR.defaultLang = {
                     const nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
 
                     /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (!!selectionParent.face && selectionParent.face.length > 0))) {
+                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                         nodeName.push('FONT');
                         const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
                         dom.changeTxt(editor.commandMap['FONT'], selectFont);
@@ -1666,7 +1666,7 @@ SUNEDITOR.defaultLang = {
 
                     if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== prevSubmenu)) {
                         editor.callModule('submenu', command, target, function () {
-                            editor.submenuOn(target)
+                            editor.submenuOn(target);
                         });
                     }
                     else if (/dialog/.test(display)) {
@@ -2156,7 +2156,7 @@ SUNEDITOR.defaultLang = {
             print: ['', lang.toolbar.print, 'print', '', '',
                 '<div class="ico_print"></div>'
             ]
-        }
+        };
     }
 
     /**
