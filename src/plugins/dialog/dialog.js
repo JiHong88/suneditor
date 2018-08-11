@@ -42,7 +42,7 @@ SUNEDITOR.plugin.dialog = {
     },
 
     openDialog: function (kind, option, update)  {
-        if (!!this.modalForm) return false;
+        if (this.modalForm) return false;
 
         this.context.dialog.updateModal = update;
 

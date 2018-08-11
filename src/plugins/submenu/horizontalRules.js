@@ -47,7 +47,7 @@ SUNEDITOR.plugin.horizontalRules = {
     },
 
     appendHr: function (className) {
-        const oHr = document.createElement("HR");
+        const oHr = document.createElement('HR');
         oHr.className = className;
         const oP = this.appendP(oHr);
 

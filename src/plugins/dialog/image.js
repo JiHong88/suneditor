@@ -376,7 +376,7 @@ SUNEDITOR.plugin.image = {
                 cover.appendChild(caption);
             }
         } else {
-            if (!!contextImage._imageCaption) {
+            if (contextImage._imageCaption) {
                 SUNEDITOR.dom.removeItem(contextImage._imageCaption);
             }
         }
@@ -588,10 +588,8 @@ SUNEDITOR.plugin.image = {
         this.context.image._imageElement.style.height = h + 'px';
 
         let parentElement = this.context.image._imageElement.offsetParent;
-        let parentT = 0;
         let parentL = 0;
         while (parentElement) {
-            parentT += (parentElement.offsetTop + parentElement.clientTop);
             parentL += (parentElement.offsetLeft + parentElement.clientLeft);
             parentElement = parentElement.offsetParent;
         }

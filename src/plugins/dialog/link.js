@@ -138,12 +138,12 @@ SUNEDITOR.plugin.link = {
         this.editLink = this.context.link._linkAnchor = selectionATag;
         const linkBtn = this.context.link.linkBtn;
 
-        linkBtn.getElementsByTagName("A")[0].href = selectionATag.href;
-        linkBtn.getElementsByTagName("A")[0].textContent = selectionATag.textContent;
+        linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
+        linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
-        linkBtn.style.left = selectionATag.offsetLeft + "px";
+        linkBtn.style.left = selectionATag.offsetLeft + 'px';
         linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10 - this.context.element.wysiwygWindow.pageYOffset) + "px";
-        linkBtn.style.display = "block";
+        linkBtn.style.display = 'block';
 
         this.controllerArray = [linkBtn];
     },
@@ -151,7 +151,7 @@ SUNEDITOR.plugin.link = {
     onClick_linkBtn: function (e) {
         e.stopPropagation();
 
-        const command = e.target.getAttribute("data-command") || e.target.parentNode.getAttribute("data-command");
+        const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
         if (!command) return;
 
         e.preventDefault();
@@ -169,6 +169,6 @@ SUNEDITOR.plugin.link = {
             this.focus();
         }
 
-        this.context.link.linkBtn.style.display = "none";
+        this.context.link.linkBtn.style.display = 'none';
     }
 };

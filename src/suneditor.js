@@ -578,7 +578,7 @@ SUNEDITOR.defaultLang = {
              */
             focus: function () {
                 const caption = dom.getParentNode(this._variable.selectionNode, 'figcaption');
-                if (!!caption) {
+                if (caption) {
                     caption.focus();
                 } else {
                     context.element.wysiwygWindow.document.body.focus();
@@ -903,7 +903,7 @@ SUNEDITOR.defaultLang = {
                 let start = {}, end = {};
                 let newNode, regExp;
 
-                if (!!checkCSSPropertyArray) {
+                if (checkCSSPropertyArray) {
                     regExp = '(?:;|^|\\s)(?:' + checkCSSPropertyArray[0];
                     for (let i = 1; i < checkCSSPropertyArray.length; i++) {
                         regExp += '|' + checkCSSPropertyArray[i];
@@ -1036,7 +1036,7 @@ SUNEDITOR.defaultLang = {
 
                 let startPass = false;
                 let endPass = false;
-                let pCurrent, newNode, appendNode, removeNode;
+                let pCurrent, newNode, appendNode;
 
                 (function recursionFunc(current, node) {
                     const childNodes = current.childNodes;
@@ -1045,13 +1045,11 @@ SUNEDITOR.defaultLang = {
                         let child = childNodes[i];
 
                         if (startPass && child !== endContainer && child.nodeType === 3) {
-                            removeNode = newNode = child;
                             pCurrent = [];
                             while (newNode !== el && newNode !== null) {
                                 if (validation(newNode) && newNode.nodeType === 1) {
                                     pCurrent.push(newNode.cloneNode(false));
                                 }
-                                removeNode = newNode;
                                 newNode = newNode.parentNode;
                             }
 
@@ -1254,7 +1252,7 @@ SUNEDITOR.defaultLang = {
                                 newInnerNode.appendChild(appendNode);
                                 node = newNode;
                             } else {
-                                node = newInnerNode
+                                node = newInnerNode;
                             }
                         }
 
@@ -1366,7 +1364,7 @@ SUNEDITOR.defaultLang = {
                                 newInnerNode.insertBefore(appendNode, newInnerNode.firstChild);
                                 node = newNode;
                             } else {
-                                node = newInnerNode
+                                node = newInnerNode;
                             }
                         }
 
@@ -1509,7 +1507,7 @@ SUNEDITOR.defaultLang = {
                 const WindowObject = window.open('', '_blank');
                 WindowObject.mimeType = 'text/html';
                 WindowObject.document.head.innerHTML = '' +
-                    '<meta charset=\"utf-8\" />' +
+                    '<meta charset="utf-8" />' +
                     '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
                     '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor-contents.css">';
                 WindowObject.document.body.className = 'sun-editor-editable';
@@ -1655,7 +1653,7 @@ SUNEDITOR.defaultLang = {
                 editor.focus();
 
                 /** Dialog, Submenu */
-                if (!!display) {
+                if (display) {
                     const prevSubmenu = editor.submenu;
                     editor.submenuOff();
 
@@ -1674,7 +1672,7 @@ SUNEDITOR.defaultLang = {
                 }
 
                 /** default command */
-                if (!!command) {
+                if (command) {
                     switch (command) {
                         case 'codeView':
                             editor.toggleFrame();
@@ -1777,7 +1775,7 @@ SUNEDITOR.defaultLang = {
                             currentNode = currentNode.parentNode;
                         }
 
-                        if (!!currentNode && /^TD$/i.test(currentNode.tagName)) {
+                        if (currentNode && /^TD$/i.test(currentNode.tagName)) {
                             const table = dom.getParentNode(currentNode, 'table');
                             const cells = dom.getListChildren(table, dom.isCell);
                             let idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
@@ -2394,7 +2392,7 @@ SUNEDITOR.defaultLang = {
 
         const cons = _Constructor(element, options);
 
-        if (!!document.getElementById(cons.constructed._top.id)) {
+        if (document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
