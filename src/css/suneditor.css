@@ -23,6 +23,8 @@
 .sun-editor .ico_underline {width:16px; height:16px; margin:0 auto; background:url('../img/font_underline_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_italic {width:16px; height:16px; margin:0 auto; background:url('../img/font_italic_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_strike {width:16px; height:16px; margin:0 auto; background:url('../img/font_strokethrough_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_subscript {width:16px; height:16px; margin:0 auto; background:url('../img/subscript_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_superscript {width:16px; height:16px; margin:0 auto; background:url('../img/superscript_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_foreColor {width:16px; height:16px; margin:0 auto; background:url('../img/foreColor_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_hiliteColor {width:16px; height:16px; margin:0 auto; background:url('../img/hiliteColor_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_align {width:16px; height:16px; margin:0 auto; background:url('../img/align_left.svg') no-repeat; background-size:100%;}
@@ -41,10 +43,10 @@
 .sun-editor .ico_full_screen_e {width:16px; height:16px; margin: 0 auto; background:url('../img/expand_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_full_screen_i {width:16px; height:16px; margin: 0 auto; background:url('../img/import_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_html {width:16px; height:16px; margin: 0 auto; background:url('../img/code_icon.svg') no-repeat; background-size:100%;}
-.sun-editor .ico_undo {width:16px; height:16px; margin: 0 auto; background:url('../img/undo-curve-arrow.svg') no-repeat; background-size:100%;}
-.sun-editor .ico_redo {width:16px; height:16px; margin: 0 auto; background:url('../img/redo-curve-arrow.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_undo {width:16px; height:16px; margin: 0 auto; background:url('../img/undo_curve_arrow_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_redo {width:16px; height:16px; margin: 0 auto; background:url('../img/redo_curve_arrow_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_preview {width:16px; height:16px; margin: 0 auto; background:url('../img/preview_icon.svg') no-repeat; background-size:100%;}
-.sun-editor .ico_print {width:16px; height:16px; margin: 0 auto; background:url('../img/print-icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_print {width:16px; height:16px; margin: 0 auto; background:url('../img/print_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_erase {width:16px; height:16px; margin: 0 auto; background:url('../img/erase_icon.svg') no-repeat; background-size:100%;}
 
 /* container */

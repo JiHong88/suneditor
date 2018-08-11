@@ -22,6 +22,8 @@ SUNEDITOR.defaultLang = {
         underline: 'Underline',
         italic: 'Italic',
         strike: 'Strike',
+        subscript: 'Subscript',
+        superscript: 'Superscript',
         removeFormat: 'Remove Format',
         fontColor: 'Font Color',
         hiliteColor: 'Hilite Color',
@@ -438,6 +440,8 @@ SUNEDITOR.defaultLang = {
                 U: context.tool.underline,
                 I: context.tool.italic,
                 STRIKE: context.tool.strike,
+                SUB: context.tool.subscript,
+                SUP: context.tool.superscript,
                 SIZE: context.tool.fontSize
             },
 
@@ -1537,7 +1541,7 @@ SUNEDITOR.defaultLang = {
                 let findFont = true;
                 let findSize = true;
                 let findA = true;
-                let map = 'B|U|I|STRIKE|FONT|SIZE|';
+                let map = 'B|U|I|STRIKE|FONT|SIZE|SUB|SUP|';
                 let check = new RegExp(map, 'i');
                 let cssText;
 
@@ -1700,6 +1704,8 @@ SUNEDITOR.defaultLang = {
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
                             dom.toggleClass(target, 'on');
+                            if (/^subscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.superscript, 'on');
+                            else if (/^superscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.subscript, 'on');
                     }
                 }
 
@@ -2062,11 +2068,19 @@ SUNEDITOR.defaultLang = {
                 '<div class="ico_italic"></div>'
             ],
 
+            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '', '',
+                '<div class="ico_subscript"></div>'
+            ],
+
+            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '', '',
+                '<div class="ico_superscript"></div>'
+            ],
+
             strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
                 '<div class="ico_strike"></div>'
             ],
 
-            removeFormat: ['', lang.toolbar.removeFormat + '', 'removeFormat', '', '',
+            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', '',
                 '<div class="ico_erase"></div>'
             ],
 
@@ -2234,6 +2248,7 @@ SUNEDITOR.defaultLang = {
             ['undo', 'redo'],
             ['font', 'fontSize', 'formats'],
             ['bold', 'underline', 'italic', 'strike', 'removeFormat'],
+            ['subscript', 'superscript'],
             ['fontColor', 'hiliteColor'],
             ['indent', 'outdent'],
             ['align', 'line', 'list', 'table'],
@@ -2284,7 +2299,7 @@ SUNEDITOR.defaultLang = {
         iframe.addEventListener('load', function () {
             this.setAttribute('scrolling', 'auto');
             this.contentWindow.document.head.innerHTML = '' +
-                '<meta charset=\"utf-8\" />' +
+                '<meta charset="utf-8" />' +
                 '<title>SunEditor</title>' +
                 '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.util.getBasePath + 'css/suneditor-contents.css">';
             this.contentWindow.document.body.className = 'sun-editor-editable';
@@ -2359,6 +2374,8 @@ SUNEDITOR.defaultLang = {
                 underline: cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
                 italic: cons._toolBar.getElementsByClassName('sun-editor-id-italic')[0],
                 strike: cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
+                subscript: cons._toolBar.getElementsByClassName('sun-editor-id-subscript')[0],
+                superscript: cons._toolBar.getElementsByClassName('sun-editor-id-superscript')[0],
                 font: cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
                 fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
             },
