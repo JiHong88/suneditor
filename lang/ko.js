@@ -19,6 +19,8 @@ SUNEDITOR.lang = {
         underline: '밑줄',
         italic: '기울임',
         strike: '취소선',
+        subscript: '아래 첨자',
+        superscript: '위 첨자',
         removeFormat: '형식 제거',
         fontColor: '글자색',
         hiliteColor: '글자 배경색',

@@ -432,6 +432,8 @@ SUNEDITOR.defaultLang = {
              * @property {element} U - underline button
              * @property {element} I - italic button
              * @property {element} STRIKE - strike button
+             * @property {element} SUB - subscript button
+             * @property {element} SUP - superscript button
              * @property {element} SIZE - font size button
              */
             commandMap: {
@@ -2068,16 +2070,16 @@ SUNEDITOR.defaultLang = {
                 '<div class="ico_italic"></div>'
             ],
 
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
+                '<div class="ico_strike"></div>'
+            ],
+
             subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '', '',
                 '<div class="ico_subscript"></div>'
             ],
 
             superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '', '',
                 '<div class="ico_superscript"></div>'
-            ],
-
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
-                '<div class="ico_strike"></div>'
             ],
 
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', '',
@@ -2204,20 +2206,28 @@ SUNEDITOR.defaultLang = {
         for (let i = 0; i < buttonList.length; i++) {
 
             const buttonGroup = buttonList[i];
-            for (let j = 0; j < buttonGroup.length; j++) {
 
-                button = buttonGroup[j];
-                if (typeof button === 'object') {
-                    module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
-                } else {
-                    module = defaultButtonList[button];
+            /** button object */
+            if (typeof buttonGroup === 'object') {
+                for (let j = 0; j < buttonGroup.length; j++) {
+    
+                    button = buttonGroup[j];
+                    if (typeof button === 'object') {
+                        module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
+                    } else {
+                        module = defaultButtonList[button];
+                    }
+    
+                    moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
                 }
-
-                moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
+    
+                html += _createModuleGroup(moduleHtml);
+                moduleHtml = null;
             }
-
-            html += _createModuleGroup(moduleHtml);
-            moduleHtml = null;
+            /** line break  */
+            else if (/^\/$/.test(buttonGroup)) {
+                html += '<div class="tool_module_enter"></div>';
+            }
         }
 
         return html;
@@ -2247,8 +2257,9 @@ SUNEDITOR.defaultLang = {
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formats'],
-            ['bold', 'underline', 'italic', 'strike', 'removeFormat'],
-            ['subscript', 'superscript'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+            ['removeFormat'],
+            '/',
             ['fontColor', 'hiliteColor'],
             ['indent', 'outdent'],
             ['align', 'line', 'list', 'table'],

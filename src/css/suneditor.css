@@ -57,6 +57,7 @@
 .sun-editor .sun-editor-id-toolbar {overflow:visible; position:relative; height:auto; font-size:0; padding:3px 3px 3px 0; background-color:#fafafa; border-bottom:1px solid #dadada;}
 
 .sun-editor .sun-editor-id-toolbar .tool_module {display:inline-block;}
+.sun-editor .sun-editor-id-toolbar .tool_module_enter {display:block; width:0; height:0;}
 .sun-editor .sun-editor-id-toolbar .editor_tool {float: left;height: 32px;margin:5px 0 5px 5px;}
 .sun-editor .sun-editor-id-toolbar .editor_tool li {position:relative; float:left;}
 

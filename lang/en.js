@@ -19,6 +19,8 @@ SUNEDITOR.lang = {
         underline: 'Underline',
         italic: 'Italic',
         strike: 'Strike',
+        subscript: 'Subscript',
+        superscript: 'Superscript',
         removeFormat: 'Remove Format',
         fontColor: 'Font Color',
         hiliteColor: 'Hilite Color',
