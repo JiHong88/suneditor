@@ -1514,6 +1514,7 @@ SUNEDITOR.defaultLang = {
                 WindowObject.mimeType = 'text/html';
                 WindowObject.document.head.innerHTML = '' +
                     '<meta charset="utf-8" />' +
+                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
                     '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor-contents.css">';
                 WindowObject.document.body.className = 'sun-editor-editable';
