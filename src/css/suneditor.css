@@ -42,6 +42,7 @@
 .sun-editor .ico_video {width:16px; height:16px; margin: 0 auto; background:url('../img/video_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_full_screen_e {width:16px; height:16px; margin: 0 auto; background:url('../img/expand_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_full_screen_i {width:16px; height:16px; margin: 0 auto; background:url('../img/import_icon.svg') no-repeat; background-size:100%;}
+.sun-editor .ico_showBlocks {width:16px; height:16px; margin: 0 auto; background:url('../img/showBlocks_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_html {width:16px; height:16px; margin: 0 auto; background:url('../img/code_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_undo {width:16px; height:16px; margin: 0 auto; background:url('../img/undo_curve_arrow_icon.svg') no-repeat; background-size:100%;}
 .sun-editor .ico_redo {width:16px; height:16px; margin: 0 auto; background:url('../img/redo_curve_arrow_icon.svg') no-repeat; background-size:100%;}

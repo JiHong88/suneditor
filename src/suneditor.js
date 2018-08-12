@@ -42,8 +42,9 @@ SUNEDITOR.defaultLang = {
         link: 'Link',
         image: 'Image',
         video: 'Video',
-        fullScreen: 'Full Screen',
-        codeView: 'Code View',
+        fullScreen: 'Full screen',
+        showBlocks: 'Show blocks',
+        codeView: 'Code view',
         undo: 'Undo',
         redo: 'Redo',
         preview: 'Preview',
@@ -60,7 +61,7 @@ SUNEDITOR.defaultLang = {
             newWindowCheck: 'Open in new window'
         },
         imageBox: {
-            title: 'Insert Image',
+            title: 'Insert image',
             file: 'Select from files',
             url: 'Image URL',
             resize100: 'resize 100%',
@@ -69,7 +70,7 @@ SUNEDITOR.defaultLang = {
             resize25: 'resize 25%',
             remove: 'remove image',
             caption: 'Insert image description',
-            altText: 'Alternative Text'
+            altText: 'Alternative text'
         },
         videoBox: {
             title: 'Insert Video',
@@ -710,7 +711,7 @@ SUNEDITOR.defaultLang = {
             getLineElement: function (element) {
                 element = element || this._variable.selectionNode;
 
-                if (!element) {
+                if (!element || /^HTML$/i.test(element.tagName)) {
                     element = context.element.wysiwygWindow.document.body.firstChild;
                 } else {
                     while (!/^BODY$/i.test(element.parentNode.tagName)) {
@@ -1455,9 +1456,16 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
+             * @description Add or remove the class name of "body" so that the code block is visible
+             */
+            showBlocks: function () {
+                SUNEDITOR.dom.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
+            },
+
+            /**
              * @description Changes to code view or wysiwyg view
              */
-            toggleFrame: function () {
+            showCodeView: function () {
                 if (!this._variable.wysiwygActive) {
                     const ec = {'&amp;': '&', '&nbsp;': '\u00A0', /*"&quot;": "\"", */'&lt;': '<', '&gt;': '>'};
                     const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
@@ -1682,7 +1690,7 @@ SUNEDITOR.defaultLang = {
                 if (command) {
                     switch (command) {
                         case 'codeView':
-                            editor.toggleFrame();
+                            editor.showCodeView();
                             dom.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
@@ -1703,6 +1711,10 @@ SUNEDITOR.defaultLang = {
                             break;
                         case 'print':
                             context.element.wysiwygWindow.print();
+                            break;
+                        case 'showBlocks':
+                            editor.showBlocks();
+                            dom.toggleClass(target, 'on');
                             break;
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
@@ -2137,6 +2149,10 @@ SUNEDITOR.defaultLang = {
                 '<div class="ico_full_screen_e"></div>'
             ],
 
+            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', '',
+                '<div class="ico_showBlocks"></div>'
+            ],
+
             codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
                 '<div class="ico_html"></div>'
             ],
@@ -2265,7 +2281,7 @@ SUNEDITOR.defaultLang = {
             ['indent', 'outdent'],
             ['align', 'line', 'list', 'table'],
             ['link', 'image', 'video'],
-            ['fullScreen', 'codeView'],
+            ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
 

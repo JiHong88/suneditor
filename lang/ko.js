@@ -40,6 +40,7 @@ SUNEDITOR.lang = {
         image: '이미지',
         video: '동영상',
         fullScreen: '전체화면',
+        showBlocks: '블록 보기',
         codeView: 'HTML 편집',
         undo: '실행 취소',
         redo: '다시 실행',

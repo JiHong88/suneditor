@@ -39,8 +39,9 @@ SUNEDITOR.lang = {
         link: 'Link',
         image: 'Image',
         video: 'Video',
-        fullScreen: 'Full Screen',
-        codeView: 'Code View',
+        fullScreen: 'Full screen',
+        showBlocks: 'Show blocks',
+        codeView: 'Code view',
         undo: 'Undo',
         redo: 'Redo',
         preview: 'Preview',
@@ -57,7 +58,7 @@ SUNEDITOR.lang = {
             newWindowCheck: 'Open in new window'
         },
         imageBox: {
-            title: 'Insert Image',
+            title: 'Insert image',
             file: 'Select from files',
             url: 'Image URL',
             resize100: 'resize 100%',
@@ -66,7 +67,7 @@ SUNEDITOR.lang = {
             resize25: 'resize 25%',
             remove: 'remove image',
             caption: 'Insert image description',
-            altText: 'Alternative Text'
+            altText: 'Alternative text'
         },
         videoBox: {
             title: 'Insert Video',
