@@ -8,6 +8,10 @@ body.sun-editor-editable {
     margin: 20px;
 }
 
+body.sun-editor-editable *[contentEditable=false] {
+    cursor: default;
+}
+
 /* hr */
 .sun-editor-editable hr {
     border-width: 1px 0 0;
@@ -64,6 +68,23 @@ body.sun-editor-editable {
     background-color: #f3f3f3;
 }
 
+
+/** video iframe tags */
+.sun-editor-editable .sun-editor-iframe-cover {
+    display: inline-block;
+    position: relative;
+    margin: 0 2px 0 2px;
+    line-height: 0;
+    padding: 0;
+    border: 1px solid #9e9e9e;
+}
+.sun-editor-editable .sun-editor-iframe-inner-cover {
+    position:absolute;
+    width:100%;
+    height:100%;
+    left:0px;
+    top:0px;
+}
 
 /** show blocks */
 .sun-editor-show-block p:not([contenteditable=false]), .sun-editor-show-block div:not([contenteditable=false]), .sun-editor-show-block h1:not([contenteditable=false]), .sun-editor-show-block h2:not([contenteditable=false]), .sun-editor-show-block h3:not([contenteditable=false]), .sun-editor-show-block h4:not([contenteditable=false]), .sun-editor-show-block h5:not([contenteditable=false]), .sun-editor-show-block h6:not([contenteditable=false]) {

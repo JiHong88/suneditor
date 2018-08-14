@@ -64,11 +64,6 @@ SUNEDITOR.defaultLang = {
             title: 'Insert image',
             file: 'Select from files',
             url: 'Image URL',
-            resize100: 'resize 100%',
-            resize75: 'resize 75%',
-            resize50: 'resize 50%',
-            resize25: 'resize 25%',
-            remove: 'remove image',
             caption: 'Insert image description',
             altText: 'Alternative text'
         },
@@ -76,6 +71,11 @@ SUNEDITOR.defaultLang = {
             title: 'Insert Video',
             url: 'Media embed URL, YouTube'
         },
+        resize100: 'resize 100%',
+        resize75: 'resize 75%',
+        resize50: 'resize 50%',
+        resize25: 'resize 25%',
+        remove: 'remove',
         submitButton: 'Submit',
         width: 'Width',
         height: 'Height',
@@ -131,11 +131,11 @@ SUNEDITOR.defaultLang = {
          */
         copyObj: function (obj) {
             const copy = {};
-            
+
             for (let attr in obj) {
                 copy[attr] = obj[attr];
             }
-            
+
             return copy;
         },
 
@@ -1743,7 +1743,8 @@ SUNEDITOR.defaultLang = {
                 if (/^IMG$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
                     editor.callModule('dialog', 'image', null, function () {
-                        SUNEDITOR.plugin.image.call_controller_imageResize.call(editor, targetElement);
+                        const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(editor, targetElement, 'image');
+                        SUNEDITOR.plugin.image.onModifyMode.call(editor, targetElement, size);
                     });
                     return;
                 }
@@ -2227,17 +2228,17 @@ SUNEDITOR.defaultLang = {
             /** button object */
             if (typeof buttonGroup === 'object') {
                 for (let j = 0; j < buttonGroup.length; j++) {
-    
+
                     button = buttonGroup[j];
                     if (typeof button === 'object') {
                         module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                     } else {
                         module = defaultButtonList[button];
                     }
-    
+
                     moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
                 }
-    
+
                 html += _createModuleGroup(moduleHtml);
                 moduleHtml = null;
             }
