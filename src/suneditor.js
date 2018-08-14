@@ -552,6 +552,10 @@ SUNEDITOR.defaultLang = {
                     this.submenuActiveButton = null;
                 }
 
+                if (context.image && context.image._onCaption) {
+                    SUNEDITOR.plugin.image.toggle_caption_contenteditable.call(editor, false);
+                }
+
                 this.controllersOff();
             },
 
@@ -1665,6 +1669,7 @@ SUNEDITOR.defaultLang = {
                 e.preventDefault();
                 e.stopPropagation();
 
+                editor.submenuOff();
                 editor.focus();
 
                 /** Dialog, Submenu */
@@ -1723,13 +1728,10 @@ SUNEDITOR.defaultLang = {
                             else if (/^superscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.subscript, 'on');
                     }
                 }
-
-                editor.submenuOff();
             },
 
             onMouseUp_wysiwyg: function (e) {
                 e.stopPropagation();
-                editor._setSelectionNode();
 
                 const targetElement = e.target;
                 editor.submenuOff();
@@ -1749,6 +1751,7 @@ SUNEDITOR.defaultLang = {
                     return;
                 }
 
+                editor._setSelectionNode();
                 event._findButtonEffectTag();
             },
 

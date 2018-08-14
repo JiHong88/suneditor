@@ -10,9 +10,12 @@ SUNEDITOR.plugin.dialog = {
         const context = _this.context;
         context.dialog = {
             _resizeClientX: 0,
+            _resizeClientY: 0,
             _resize_parent_t: 0,
             _resize_parent_l: 0,
-            _resize_plugin: ''
+            _resize_plugin: '',
+            _resize_w: 0,
+            _resize_h: 0
         };
 
         /** dialog */
@@ -35,9 +38,12 @@ SUNEDITOR.plugin.dialog = {
         context.dialog.modal = dialog_area;
 
         /** image resize controller, button */
-        const resize_div = eval(this.setController_resize());
-        context.dialog.resizeDiv = resize_div;
-        context.dialog.resizeDisplay = resize_div.getElementsByClassName('sun-editor-id-resize-display')[0];
+        const resize_div_container = eval(this.setController_resize());
+        context.dialog.resizeContainer = resize_div_container;
+
+        context.dialog.resizeDiv = resize_div_container.getElementsByClassName('modal-resize')[0];
+        context.dialog.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
+        context.dialog.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
 
         const resize_button = eval(this.setController_button());;
         context.dialog.resizeButton = resize_button;
@@ -45,12 +51,18 @@ SUNEDITOR.plugin.dialog = {
         /** add event listeners */
         context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(_this));
         context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
-        resize_div.getElementsByClassName('sun-editor-id-resize-controller')[0].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'l'));
-        resize_div.getElementsByClassName('sun-editor-id-resize-controller')[1].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'r'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[0].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'tl'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[1].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'tr'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[2].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'bl'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[3].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'br'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[4].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'lw'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[5].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'th'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[6].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'rw'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[7].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'bh'));
         resize_button.addEventListener('click', this.onClick_resizeButton.bind(_this));
 
         /** append html */
-        context.element.relative.appendChild(resize_div);
+        context.element.relative.appendChild(resize_div_container);
         context.element.relative.appendChild(resize_button);
     },
 
@@ -96,17 +108,25 @@ SUNEDITOR.plugin.dialog = {
 
     /** resize controller, button (image, iframe) */
     setController_resize: function () {
-        const resize_div = document.createElement('DIV');
-        resize_div.className = 'modal-image-resize';
-        resize_div.style.display = 'none';
-        resize_div.innerHTML = '' +
-            '<div class="image-resize-dot tl"></div>' +
-            '<div class="image-resize-dot tr"></div>' +
-            '<div class="image-resize-dot bl sun-editor-id-resize-controller"></div>' +
-            '<div class="image-resize-dot br sun-editor-id-resize-controller"></div>' +
-            '<div class="image-size-display sun-editor-id-resize-display"></div>';
+        const resize_container = document.createElement('DIV');
+        resize_container.className = 'modal-resize-container';
+        resize_container.style.display = 'none';
+        resize_container.innerHTML = '' +
+            '<div class="modal-resize">' +
+            '   <div class="size-display"></div>' +
+            '</div>' +
+            '<div class="resize-dot">' +
+            '   <div class="tl sun-editor-name-resize-controller"></div>' +
+            '   <div class="tr sun-editor-name-resize-controller"></div>' +
+            '   <div class="bl sun-editor-name-resize-controller"></div>' +
+            '   <div class="br sun-editor-name-resize-controller"></div>' +
+            '   <div class="lw sun-editor-name-resize-controller"></div>' +
+            '   <div class="th sun-editor-name-resize-controller"></div>' +
+            '   <div class="rw sun-editor-name-resize-controller"></div>' +
+            '   <div class="bh sun-editor-name-resize-controller"></div>' +
+            '</div>';
 
-        return resize_div;
+        return resize_container;
     },
 
     setController_button: function () {
@@ -135,6 +155,7 @@ SUNEDITOR.plugin.dialog = {
         targetElement.setAttribute('unselectable', 'on');
         targetElement.contentEditable = false;
 
+        const resizeContainer = this.context.dialog.resizeContainer;
         const resizeDiv = this.context.dialog.resizeDiv;
         const w = targetElement.offsetWidth;
         const h = targetElement.offsetHeight;
@@ -153,20 +174,29 @@ SUNEDITOR.plugin.dialog = {
         const t = (targetElement.offsetTop + this.context.dialog._resize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
         const l = (targetElement.offsetLeft + parentL);
 
-        resizeDiv.style.top = t + 'px';
-        resizeDiv.style.left = l + 'px';
-        resizeDiv.style.width = w + 'px';
-        resizeDiv.style.height = h + 'px';
+        resizeContainer.style.top = t + 'px';
+        resizeContainer.style.left = l + 'px';
+        resizeContainer.style.width = w + 'px';
+        resizeContainer.style.height = h + 'px';
+
+        resizeDiv.style.top = '0px';
+        resizeDiv.style.left = '0px';
+        resizeDiv.style.width =  w + 'px';
+        resizeDiv.style.height =  h + 'px';
 
         this.context.dialog.resizeButton.style.top = (h + t) + 'px';
         this.context.dialog.resizeButton.style.left = l + 'px';
 
         SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, w + ' x ' + h);
 
-        this.context.dialog.resizeDiv.style.display = 'block';
+        this.context.dialog.resizeContainer.style.display = 'block';
         this.context.dialog.resizeButton.style.display = 'block';
+        this.context.dialog.resizeDot.style.display = 'block';
 
-        this.controllerArray = [this.context.dialog.resizeDiv, this.context.dialog.resizeButton];
+        this.context.dialog._resize_w = w;
+        this.context.dialog._resize_h = h;
+
+        this.controllerArray = [this.context.dialog.resizeContainer, this.context.dialog.resizeButton];
 
         return {
             w: w,
@@ -177,8 +207,11 @@ SUNEDITOR.plugin.dialog = {
     },
 
     cancel_controller_resize: function () {
+        this.context[this.context.dialog._resize_plugin]._resize_element.style.width = this.context.dialog._resize_w + 'px';
+        this.context[this.context.dialog._resize_plugin]._resize_element.style.height =this.context.dialog._resize_h + 'px';
+
         this.context.element.resizeBackground.style.display = 'none';
-        this.context.dialog.resizeDiv.style.display = 'none';
+        this.context.dialog.resizeContainer.style.display = 'none';
         this.context.dialog.resizeButton.style.display = 'none';
         SUNEDITOR.plugin[this.context.dialog._resize_plugin].init.call(this);
     },
@@ -210,9 +243,12 @@ SUNEDITOR.plugin.dialog = {
         e.stopPropagation();
         e.preventDefault();
 
+        this.context.dialog.resizeDot.style.display = 'none';
         this.context.dialog._resizeClientX = e.clientX;
+        this.context.dialog._resizeClientY = e.clientY;
         this.context.element.resizeBackground.style.display = 'block';
         this.context.dialog.resizeButton.style.display = 'none';
+        this.context.dialog.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
         function closureFunc() {
             SUNEDITOR.plugin.dialog.cancel_controller_resize.call(this);
@@ -229,29 +265,32 @@ SUNEDITOR.plugin.dialog = {
 
     resize_element: function (direction) {
         const e = window.event;
+        const clientX = e.clientX;
+        const clientY = e.clientY;
         const plugin = this.context[this.context.dialog._resize_plugin];
 
-        const w = plugin._element_w + (direction === 'r' ? e.clientX - this.context.dialog._resizeClientX : this.context.dialog._resizeClientX - e.clientX);
-        const h = ((plugin._element_h / plugin._element_w) * w);
+        const w = plugin._element_w + (/r/.test(direction) ? clientX - this.context.dialog._resizeClientX : this.context.dialog._resizeClientX - clientX);
+        const h = plugin._element_h + (/b/.test(direction) ? clientY - this.context.dialog._resizeClientY : this.context.dialog._resizeClientY - clientY);
+        const wh = ((plugin._element_h / plugin._element_w) * w);
 
-        plugin._resize_element.style.width = w + 'px';
-        plugin._resize_element.style.height = h + 'px';
+        if (/t/.test(direction)) this.context.dialog.resizeDiv.style.top = (plugin._element_h - (/h/.test(direction) ? h : wh)) + 'px';
+        if (/l/.test(direction)) this.context.dialog.resizeDiv.style.left = (plugin._element_w - w) + 'px';
 
-        let parentElement = plugin._resize_element.offsetParent;
-        let parentL = 0;
-        while (parentElement) {
-            parentL += (parentElement.offsetLeft + parentElement.clientLeft);
-            parentElement = parentElement.offsetParent;
+        if (/r|l/.test(direction)) {
+            this.context.dialog.resizeDiv.style.width = w + 'px';
+            this.context.dialog._resize_w = w;
         }
 
-        // const t = (plugin._resize_element.offsetTop + this.context.dialog._resize_parent_t - this.context.element.wysiwygWindow.document.body.scrollTop);
-        // const l = (plugin._resize_element.offsetLeft + parentL);
+        if (/^(?:t|b)[^h]$/.test(direction)) {
+            this.context.dialog.resizeDiv.style.height = wh + 'px';
+            this.context.dialog._resize_h = wh;
+        }
 
-        // this.context.dialog.resizeDiv.style.top = t + 'px';
-        // this.context.dialog.resizeDiv.style.left = l + 'px';
-        this.context.dialog.resizeDiv.style.width = w + 'px';
-        this.context.dialog.resizeDiv.style.height = h + 'px';
+        if (/^(?:t|b)h$/.test(direction)) {
+            this.context.dialog.resizeDiv.style.height = h + 'px';
+            this.context.dialog._resize_h = h;
+        }
 
-        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(w) + ' x ' + Math.round(h));
+        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(w) + ' x ' + Math.round(wh));
     }
 };

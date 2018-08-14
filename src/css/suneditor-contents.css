@@ -65,6 +65,8 @@ body.sun-editor-editable *[contentEditable=false] {
 .sun-editor-editable .sun-editor-image-cover {
     outline: none;
     line-height: 0;
+}
+.sun-editor-editable .sun-editor-image-cover > figcaption:not([contenteditable=false]) {
     background-color: #f3f3f3;
 }
 

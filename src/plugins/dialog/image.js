@@ -20,14 +20,15 @@ SUNEDITOR.plugin.image = {
             _imageCaption: null,
             _linkValue: '',
             _align: 'none',
-            _captionChecked: false
+            _captionChecked: false,
+            _onCaption: false
         };
 
         /** image dialog */
         const image_dialog = eval(this.setDialog(_this.context.user));
         context.image.modal = image_dialog;
-        context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
-        context.image.imgInputFile = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
+        context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
+        context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
         context.image.altText = image_dialog.getElementsByClassName('sun-editor-id-image-alt')[0];
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
@@ -152,7 +153,7 @@ SUNEDITOR.plugin.image = {
 
         // focus
         if (tabName === 'image') {
-            this.context.image.focusElement.focus();
+            this.context.image.imgUrlFile.focus();
         } else if (tabName === 'url') {
             this.context.image.imgLink.focus();
         }
@@ -223,10 +224,10 @@ SUNEDITOR.plugin.image = {
     },
 
     onRender_imgUrl: function () {
-        if (this.context.image.focusElement.value.trim().length === 0) return false;
+        if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.focusElement.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
+            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.inseretImageUrl.fail] cause : "' + e.message + '"');
@@ -311,9 +312,11 @@ SUNEDITOR.plugin.image = {
         // caption
         if (this.context.image._captionChecked) {
             const caption = document.createElement('FIGCAPTION');
-            caption.innerHTML = '<p>&#65279</p>';
-            caption.setAttribute('contenteditable', true);
+            caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
+            // caption.setAttribute('contenteditable', true);
             cover.appendChild(caption);
+            caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+            this.context.image._imageCaption = caption;
         }
 
         container.className = 'sun-editor-id-image-container';
@@ -338,7 +341,7 @@ SUNEDITOR.plugin.image = {
         const cover = SUNEDITOR.dom.getParentNode(contextImage._element, '.sun-editor-image-cover');
         let newEl;
 
-        if (contextImage.imgInputFile.value.length === 0 && contextImage.focusElement.value.trim().length === 0) {
+        if (contextImage.imgInputFile.value.length === 0 && contextImage.imgUrlFile.value.trim().length === 0) {
             SUNEDITOR.dom.removeItem(container);
             return;
         }
@@ -347,7 +350,7 @@ SUNEDITOR.plugin.image = {
         SUNEDITOR.plugin.image.onRender_imgInput.call(this);
 
         // src, size
-        contextImage._element.src = contextImage.focusElement.value;
+        contextImage._element.src = contextImage.imgUrlFile.value;
         contextImage._element.alt = contextImage._altText;
         contextImage._element.style.width = contextImage.imageX.value + 'px';
         contextImage._element.style.height = contextImage.imageY.value + 'px';
@@ -356,9 +359,11 @@ SUNEDITOR.plugin.image = {
         if (contextImage._captionChecked) {
             if (contextImage._imageCaption === null) {
                 const caption = document.createElement('FIGCAPTION');
-                caption.innerHTML = '<p>&#65279</p>';
-                caption.setAttribute('contenteditable', true);
+                caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
+                // caption.setAttribute('contenteditable', true);
                 cover.appendChild(caption);
+                caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+                contextImage._imageCaption = caption;
             }
         } else {
             if (contextImage._imageCaption) {
@@ -403,6 +408,12 @@ SUNEDITOR.plugin.image = {
         }
     },
 
+    toggle_caption_contenteditable: function (on, e) {
+        this.context.image._onCaption = on;
+        this.context.image._imageCaption.setAttribute('contenteditable', on);
+        this.context.image._imageCaption.focus();
+    },
+
     onModifyMode: function (element, size) {
         this.context.image._elementLink = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         this.context.image._element = this.context.image._resize_element = element;
@@ -415,7 +426,7 @@ SUNEDITOR.plugin.image = {
 
     openModify: function () {
         const contextImage = this.context.image;
-        contextImage.focusElement.value = contextImage._element.src;
+        contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage.altText.value = contextImage._element.alt;
         contextImage.imgLink.value = contextImage._elementLink === null ? '' : contextImage._elementLink.href;
         contextImage.imgLinkNewWindowCheck.checked = !contextImage._elementLink || contextImage._elementLink.target === '_blank';
@@ -441,7 +452,7 @@ SUNEDITOR.plugin.image = {
 
     init: function () {
         this.context.image.imgInputFile.value = '';
-        this.context.image.focusElement.value = '';
+        this.context.image.imgUrlFile.value = '';
         this.context.image.altText.value = '';
         this.context.image.imgLink.value = '';
         this.context.image.imgLinkNewWindowCheck.checked = false;
