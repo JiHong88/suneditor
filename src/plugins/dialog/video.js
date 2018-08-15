@@ -16,6 +16,8 @@ SUNEDITOR.plugin.video = {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
+            _origin_w: 0,
+            _origin_h: 0,
             _innerCover: document.createElement('SPAN')
         };
 
@@ -40,6 +42,7 @@ SUNEDITOR.plugin.video = {
 
         /** add event listeners */
         video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
@@ -68,6 +71,7 @@ SUNEDITOR.plugin.video = {
             '       <div class="form-group">' +
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '           <input type="text" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y" />' +
+            '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
@@ -163,19 +167,36 @@ SUNEDITOR.plugin.video = {
         if (target === this.context.video._innerCover.parentNode) target.removeChild(this.context.video._innerCover);
     },
 
+    sizeRevert: function () {
+        const contextVideo = this.context.video;
+        if (contextVideo._origin_w) {
+            contextVideo.videoX.value = contextVideo._element_w = contextVideo._origin_w;
+            contextVideo.videoY.value = contextVideo._element_h = contextVideo._origin_h;
+        }
+    },
+
     onModifyMode: function (element, size) {
-        const pSpan = this.context.video._resize_element = this.context.video._coverElement;
-        const frame = this.context.video._element = element;
+        const videoContext = this.context.video;
+        const pSpan = videoContext._resize_element = videoContext._coverElement;
+        videoContext._element = element;
 
-        if (pSpan === this.context.video._innerCover.parentNode) pSpan.removeChild(this.context.video._innerCover);
+        if (pSpan === videoContext._innerCover.parentNode) pSpan.removeChild(videoContext._innerCover);
 
-        this.context.video._element_w = size.w;
-        this.context.video._element_h = size.h;
-        this.context.video._element_t = size.t;
-        this.context.video._element_l = size.l;
+        videoContext._element_w = size.w;
+        videoContext._element_h = size.h;
+        videoContext._element_t = size.t;
+        videoContext._element_l = size.l;
 
-        this.context.dialog.updateModal = true;
-        SUNEDITOR.plugin.dialog.call_controller_resize.call(this, frame, 'video');
+        let origin = videoContext._element.getAttribute('origin-size');
+        if (origin) {
+            origin = origin.split(',');
+            videoContext._origin_w = origin[0] * 1;
+            videoContext._origin_h = origin[1] * 1;
+        } else {
+            videoContext._origin_w = size.w;
+            videoContext._origin_h = size.h;
+            videoContext._element.setAttribute('origin-size', size.w + ',' + size.h);
+        }
     },
 
     openModify: function () {
@@ -196,6 +217,7 @@ SUNEDITOR.plugin.video = {
 
     destroy: function () {
         SUNEDITOR.dom.removeItem(this.context.video._coverElement);
+        SUNEDITOR.plugin.video.init.call(this);
     },
 
     init: function () {

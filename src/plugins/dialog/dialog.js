@@ -113,7 +113,7 @@ SUNEDITOR.plugin.dialog = {
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
             '<div class="modal-resize">' +
-            '   <div class="size-display"></div>' +
+            '   <div class="resize-display"></div>' +
             '</div>' +
             '<div class="resize-dot">' +
             '   <div class="tl sun-editor-name-resize-controller"></div>' +
@@ -269,6 +269,9 @@ SUNEDITOR.plugin.dialog = {
         const clientY = e.clientY;
         const plugin = this.context[this.context.dialog._resize_plugin];
 
+        let resultW = plugin._element_w;
+        let resultH = plugin._element_h;
+
         const w = plugin._element_w + (/r/.test(direction) ? clientX - this.context.dialog._resizeClientX : this.context.dialog._resizeClientX - clientX);
         const h = plugin._element_h + (/b/.test(direction) ? clientY - this.context.dialog._resizeClientY : this.context.dialog._resizeClientY - clientY);
         const wh = ((plugin._element_h / plugin._element_w) * w);
@@ -278,19 +281,20 @@ SUNEDITOR.plugin.dialog = {
 
         if (/r|l/.test(direction)) {
             this.context.dialog.resizeDiv.style.width = w + 'px';
-            this.context.dialog._resize_w = w;
+            resultW =w;
         }
 
         if (/^(?:t|b)[^h]$/.test(direction)) {
             this.context.dialog.resizeDiv.style.height = wh + 'px';
-            this.context.dialog._resize_h = wh;
+            resultH = wh;
         }
-
-        if (/^(?:t|b)h$/.test(direction)) {
+        else if (/^(?:t|b)h$/.test(direction)) {
             this.context.dialog.resizeDiv.style.height = h + 'px';
-            this.context.dialog._resize_h = h;
+            resultH = h;
         }
 
-        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(w) + ' x ' + Math.round(wh));
+        this.context.dialog._resize_w = resultW;
+        this.context.dialog._resize_h = resultH;
+        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

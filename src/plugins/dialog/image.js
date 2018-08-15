@@ -16,6 +16,8 @@ SUNEDITOR.plugin.image = {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
+            _origin_w: 0,
+            _origin_h: 0,
             _altText: '',
             _imageCaption: null,
             _linkValue: '',
@@ -43,6 +45,7 @@ SUNEDITOR.plugin.image = {
         context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
         context.image.imageX.addEventListener('change', this.setImageSizeInput.bind(_this, 'x'));
         context.image.imageY.addEventListener('change', this.setImageSizeInput.bind(_this, 'y'));
+        image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(image_dialog);
@@ -93,6 +96,7 @@ SUNEDITOR.plugin.image = {
             '           <div class="form-group">' +
             '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '               <input class="form-size-control sun-editor-id-image-x" type="number" min="1" /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
+            '               <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
             '           </div>' +
             '           <div class="form-group-footer">' +
             '               <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
@@ -312,11 +316,8 @@ SUNEDITOR.plugin.image = {
         // caption
         if (this.context.image._captionChecked) {
             const caption = document.createElement('FIGCAPTION');
-            caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
-            // caption.setAttribute('contenteditable', true);
-            cover.appendChild(caption);
-            caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
-            this.context.image._imageCaption = caption;
+            this.context.image._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+            cover.appendChild(this.context.image._imageCaption);
         }
 
         container.className = 'sun-editor-id-image-container';
@@ -358,12 +359,8 @@ SUNEDITOR.plugin.image = {
         // caption
         if (contextImage._captionChecked) {
             if (contextImage._imageCaption === null) {
-                const caption = document.createElement('FIGCAPTION');
-                caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
-                // caption.setAttribute('contenteditable', true);
-                cover.appendChild(caption);
-                caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
-                contextImage._imageCaption = caption;
+                contextImage._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+                cover.appendChild(contextImage._imageCaption);
             }
         } else {
             if (contextImage._imageCaption) {
@@ -408,20 +405,50 @@ SUNEDITOR.plugin.image = {
         }
     },
 
+    create_caption: function () {
+        const caption = document.createElement('FIGCAPTION');
+        
+        caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
+        caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+
+        return caption;
+    },
+
     toggle_caption_contenteditable: function (on, e) {
         this.context.image._onCaption = on;
         this.context.image._imageCaption.setAttribute('contenteditable', on);
         this.context.image._imageCaption.focus();
     },
 
+    sizeRevert: function () {
+        const contextImage = this.context.image;
+        if (contextImage._origin_w) {
+            contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
+            contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
+        }
+    },
+
     onModifyMode: function (element, size) {
-        this.context.image._elementLink = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
-        this.context.image._element = this.context.image._resize_element = element;
-        this.context.image._imageCaption = element.nextSibling;
-        this.context.image._element_w = size.w;
-        this.context.image._element_h = size.h;
-        this.context.image._element_t = size.t;
-        this.context.image._element_l = size.l;
+        const contextImage = this.context.image;
+        contextImage._elementLink = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
+        contextImage._element = contextImage._resize_element = element;
+        contextImage._imageCaption = element.nextSibling;
+
+        contextImage._element_w = size.w;
+        contextImage._element_h = size.h;
+        contextImage._element_t = size.t;
+        contextImage._element_l = size.l;
+
+        let origin = contextImage._element.getAttribute('origin-size');
+        if (origin) {
+            origin = origin.split(',');
+            contextImage._origin_w = origin[0] * 1;
+            contextImage._origin_h = origin[1] * 1;
+        } else {
+            contextImage._origin_w = size.w;
+            contextImage._origin_h = size.h;
+            contextImage._element.setAttribute('origin-size', size.w + ',' + size.h);
+        }
     },
 
     openModify: function () {
@@ -447,7 +474,7 @@ SUNEDITOR.plugin.image = {
     destroy: function () {
         const imageContainer = SUNEDITOR.dom.getParentNode(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
         SUNEDITOR.dom.removeItem(imageContainer);
-        SUNEDITOR.plugin.video.init.call(this);
+        SUNEDITOR.plugin.image.init.call(this);
     },
 
     init: function () {
