@@ -78,6 +78,7 @@ SUNEDITOR.defaultLang = {
         remove: 'remove',
         submitButton: 'Submit',
         revertButton: 'Revert',
+        proportion: 'constrain proportions',
         width: 'Width',
         height: 'Height',
         basic: 'Basic',

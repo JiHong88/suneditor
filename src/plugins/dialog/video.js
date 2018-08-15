@@ -16,8 +16,9 @@ SUNEDITOR.plugin.video = {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: 0,
-            _origin_h: 0,
+            _origin_w: context.user.videoX,
+            _origin_h: context.user.videoY,
+            _proportionChecked: false,
             _innerCover: document.createElement('SPAN')
         };
 
@@ -35,6 +36,7 @@ SUNEDITOR.plugin.video = {
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
         context.video.videoY = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.proportion = video_dialog.querySelector('#suneditor_video_check_proportion');
 
         /** set user option value */
         video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
@@ -42,6 +44,8 @@ SUNEDITOR.plugin.video = {
 
         /** add event listeners */
         video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        context.video.videoX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
+        context.video.videoY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
         video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
 
         /** append html */
@@ -70,7 +74,8 @@ SUNEDITOR.plugin.video = {
             '       </div>' +
             '       <div class="form-group">' +
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-            '           <input type="text" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y" />' +
+            '           <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
+            '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" disabled/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
             '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
             '       </div>' +
             '   </div>' +
@@ -80,6 +85,16 @@ SUNEDITOR.plugin.video = {
             '</form>';
 
         return dialog;
+    },
+
+    setInputSize: function (xy) {
+        if (this.context.video.proportion.checked) {
+            if (xy === 'x') {
+                this.context.video.videoY.value = Math.round((this.context.video._element_h / this.context.video._element_w) * this.context.video.videoX.value);
+            } else {
+                this.context.video.videoX.value = Math.round((this.context.video._element_w / this.context.video._element_h) * this.context.video.videoY.value);
+            }
+        }
     },
 
     submit_dialog: function (e) {
@@ -116,6 +131,7 @@ SUNEDITOR.plugin.video = {
             /** update */
             if (this.context.dialog.updateModal) {
                 this.context.video._element.src = oIframe.src;
+                this.context.video._element.setAttribute('data-proportion', this.context.video._proportionChecked);
                 this.context.video._coverElement.style.width = w + 'px';
                 this.context.video._coverElement.style.height = h + 'px';
                 return;
@@ -136,6 +152,7 @@ SUNEDITOR.plugin.video = {
             oIframe.height = '100%';
             oIframe.frameBorder = '0';
             oIframe.allowFullscreen = true;
+            oIframe.setAttribute('data-proportion', this.context.video._proportionChecked);
             oIframe.contentDocument;
 
             this.context.video._coverElement = coverSpan;
@@ -146,6 +163,7 @@ SUNEDITOR.plugin.video = {
         }
 
         try {
+            this.context.video._proportionChecked = this.context.video.proportion.checked;
             submitAction.call(this);
         } finally {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
@@ -187,7 +205,7 @@ SUNEDITOR.plugin.video = {
         videoContext._element_t = size.t;
         videoContext._element_l = size.l;
 
-        let origin = videoContext._element.getAttribute('origin-size');
+        let origin = videoContext._element.getAttribute('data-origin');
         if (origin) {
             origin = origin.split(',');
             videoContext._origin_w = origin[0] * 1;
@@ -195,17 +213,20 @@ SUNEDITOR.plugin.video = {
         } else {
             videoContext._origin_w = size.w;
             videoContext._origin_h = size.h;
-            videoContext._element.setAttribute('origin-size', size.w + ',' + size.h);
+            videoContext._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },
 
     openModify: function () {
-        const pSpan = this.context.video._coverElement;
+        const contextVideo = this.context.video;
+        const pSpan = contextVideo._coverElement;
         const frame = pSpan.children[0];
 
-        this.context.video.focusElement.value = frame.src;
-        this.context.video.videoX.value = pSpan.style.width.match(/\d+/)[0];
-        this.context.video.videoY.value = pSpan.style.height.match(/\d+/)[0];
+        contextVideo.focusElement.value = frame.src;
+        contextVideo.videoX.value = pSpan.style.width.match(/\d+/)[0];
+        contextVideo.videoY.value = pSpan.style.height.match(/\d+/)[0];
+        contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
+        contextVideo.proportion.disabled = false;
 
         SUNEDITOR.plugin.dialog.openDialog.call(this, 'video', null, true);
     },
@@ -224,5 +245,7 @@ SUNEDITOR.plugin.video = {
         this.context.video.focusElement.value = '';
         this.context.video.videoX.value = this.context.user.videoX;
         this.context.video.videoY.value = this.context.user.videoY;
+        this.context.video.proportion.checked = false;
+        this.context.video.proportion.disabled = true;
     }
 };

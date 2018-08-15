@@ -75,6 +75,7 @@ SUNEDITOR.lang = {
         remove: '삭제',
         submitButton: '확인',
         revertButton: '되돌리기',
+        proportion: '비율 맞춤',
         basic: '기본',
         left: '왼쪽',
         right: '오른쪽',
