@@ -8,7 +8,27 @@
 SUNEDITOR.plugin.video = {
     add: function (_this) {
         const context = _this.context;
-        context.video = {};
+        context.video = {
+            _coverElement: null,
+            _element: null,
+            _resize_element: null,
+            _element_w: 1,
+            _element_h: 1,
+            _element_l: 0,
+            _element_t: 0,
+            _origin_w: context.user.videoX,
+            _origin_h: context.user.videoY,
+            _proportionChecked: false,
+            _innerCover: document.createElement('SPAN')
+        };
+
+        /** Inner node needed to edit video iframe event */
+        context.video._innerCover.className = 'sun-editor-iframe-inner-cover';
+        context.video._innerCover.addEventListener('click', function (e) {
+            const pNode = e.target.parentNode;
+            const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(this, pNode, 'video');
+            SUNEDITOR.plugin.video.onModifyMode.call(_this, pNode.children[0], size);
+        }.bind(_this));
 
         /** video dialog */
         const video_dialog = eval(this.setDialog());
@@ -16,6 +36,7 @@ SUNEDITOR.plugin.video = {
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
         context.video.videoY = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.proportion = video_dialog.querySelector('#suneditor_video_check_proportion');
 
         /** set user option value */
         video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
@@ -23,6 +44,9 @@ SUNEDITOR.plugin.video = {
 
         /** add event listeners */
         video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        context.video.videoX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
+        context.video.videoY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
+        video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
@@ -50,7 +74,9 @@ SUNEDITOR.plugin.video = {
             '       </div>' +
             '       <div class="form-group">' +
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-            '           <input type="text" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="text" class="form-size-control sun-editor-id-video-y" />' +
+            '           <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
+            '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" disabled/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
+            '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
@@ -59,6 +85,16 @@ SUNEDITOR.plugin.video = {
             '</form>';
 
         return dialog;
+    },
+
+    setInputSize: function (xy) {
+        if (this.context.video.proportion.checked) {
+            if (xy === 'x') {
+                this.context.video.videoY.value = Math.round((this.context.video._element_h / this.context.video._element_w) * this.context.video.videoX.value);
+            } else {
+                this.context.video.videoX.value = Math.round((this.context.video._element_w / this.context.video._element_h) * this.context.video.videoY.value);
+            }
+        }
     },
 
     submit_dialog: function (e) {
@@ -70,30 +106,64 @@ SUNEDITOR.plugin.video = {
         function submitAction() {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
-            let url = this.context.video.focusElement.value.replace(/^https?:/, '');
-            const oIframe = document.createElement('IFRAME');
-            const x_v = this.context.video.videoX.value;
-            const y_v = this.context.video.videoY.value;
+            const w = (/^\d+$/.test(this.context.video.videoX.value) ? this.context.video.videoX.value : this.context.user.videoX);
+            const h = (/^\d+$/.test(this.context.video.videoY.value) ? this.context.video.videoY.value : this.context.user.videoY);
+            let oIframe = null;
+            let url = this.context.video.focusElement.value.trim();
 
-            /** youtube */
-            if (/youtu\.?be/.test(url)) {
-                url = url.replace('watch?v=', '');
-                if (!/^\/\/.+\/embed\//.test(url)) {
-                    url = url.replace(url.match(/^\/\/.+\//)[0], '//www.youtube.com/embed/');
+            /** iframe source */
+            if (/^\<iframe.*iframe\>$/.test(url)) {
+                oIframe = (new DOMParser()).parseFromString(url, 'text/html').getElementsByTagName('iframe')[0]
+            }
+            /** url */
+            else {
+                oIframe = document.createElement('IFRAME');
+                /** youtube */
+                if (/youtu\.?be/.test(url)) {
+                    url = url.replace('watch?v=', '');
+                    if (!/^\/\/.+\/embed\//.test(url)) {
+                        url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
+                    }
                 }
+                oIframe.src = url;
             }
 
-            oIframe.src = url;
-            oIframe.width = (/^\d+$/.test(x_v) ? x_v : this.context.user.videoX);
-            oIframe.height = (/^\d+$/.test(y_v) ? y_v : this.context.user.videoY);
+            /** update */
+            if (this.context.dialog.updateModal) {
+                this.context.video._element.src = oIframe.src;
+                this.context.video._element.setAttribute('data-proportion', this.context.video._proportionChecked);
+                this.context.video._coverElement.style.width = w + 'px';
+                this.context.video._coverElement.style.height = h + 'px';
+                return;
+            }
+
+            /** create */
+            const coverSpan = document.createElement('SPAN');
+            coverSpan.className = 'sun-editor-iframe-cover';
+            coverSpan.style.width = w + 'px';
+            coverSpan.style.height = h + 'px';
+            coverSpan.setAttribute('contentEditable', false);
+
+            /** cover event */
+            coverSpan.addEventListener('mouseenter', SUNEDITOR.plugin.video.onMouseEnter_cover.bind(this));
+            coverSpan.addEventListener('mouseleave', SUNEDITOR.plugin.video.onMouseLeave_cover.bind(this).bind(this));
+
+            oIframe.width = '100%';
+            oIframe.height = '100%';
             oIframe.frameBorder = '0';
             oIframe.allowFullscreen = true;
+            oIframe.setAttribute('data-proportion', this.context.video._proportionChecked);
+            oIframe.contentDocument;
 
-            this.insertNode(oIframe);
-            this.appendP(oIframe);
+            this.context.video._coverElement = coverSpan;
+            coverSpan.appendChild(oIframe);
+
+            this.insertNode(coverSpan);
+            this.appendP(coverSpan);
         }
 
         try {
+            this.context.video._proportionChecked = this.context.video.proportion.checked;
             submitAction.call(this);
         } finally {
             SUNEDITOR.plugin.dialog.closeDialog.call(this);
@@ -103,9 +173,79 @@ SUNEDITOR.plugin.video = {
         return false;
     },
 
+    onMouseEnter_cover: function (e) {
+        const target = e.target;
+        if (target === this.context.video._innerCover.parentNode) return;
+
+        target.appendChild(this.context.video._innerCover);
+    },
+
+    onMouseLeave_cover: function (e) {
+        const target = e.target;
+        if (target === this.context.video._innerCover.parentNode) target.removeChild(this.context.video._innerCover);
+    },
+
+    sizeRevert: function () {
+        const contextVideo = this.context.video;
+        if (contextVideo._origin_w) {
+            contextVideo.videoX.value = contextVideo._element_w = contextVideo._origin_w;
+            contextVideo.videoY.value = contextVideo._element_h = contextVideo._origin_h;
+        }
+    },
+
+    onModifyMode: function (element, size) {
+        const videoContext = this.context.video;
+        const pSpan = videoContext._resize_element = videoContext._coverElement;
+        videoContext._element = element;
+
+        if (pSpan === videoContext._innerCover.parentNode) pSpan.removeChild(videoContext._innerCover);
+
+        videoContext._element_w = size.w;
+        videoContext._element_h = size.h;
+        videoContext._element_t = size.t;
+        videoContext._element_l = size.l;
+
+        let origin = videoContext._element.getAttribute('data-origin');
+        if (origin) {
+            origin = origin.split(',');
+            videoContext._origin_w = origin[0] * 1;
+            videoContext._origin_h = origin[1] * 1;
+        } else {
+            videoContext._origin_w = size.w;
+            videoContext._origin_h = size.h;
+            videoContext._element.setAttribute('data-origin', size.w + ',' + size.h);
+        }
+    },
+
+    openModify: function () {
+        const contextVideo = this.context.video;
+        const pSpan = contextVideo._coverElement;
+        const frame = pSpan.children[0];
+
+        contextVideo.focusElement.value = frame.src;
+        contextVideo.videoX.value = pSpan.style.width.match(/\d+/)[0];
+        contextVideo.videoY.value = pSpan.style.height.match(/\d+/)[0];
+        contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
+        contextVideo.proportion.disabled = false;
+
+        SUNEDITOR.plugin.dialog.openDialog.call(this, 'video', null, true);
+    },
+
+    setSize: function (x, y) {
+        this.context.video._resize_element.style.width = x;
+        this.context.video._resize_element.style.height = y;
+    },
+
+    destroy: function () {
+        SUNEDITOR.dom.removeItem(this.context.video._coverElement);
+        SUNEDITOR.plugin.video.init.call(this);
+    },
+
     init: function () {
         this.context.video.focusElement.value = '';
         this.context.video.videoX.value = this.context.user.videoX;
         this.context.video.videoY.value = this.context.user.videoY;
+        this.context.video.proportion.checked = false;
+        this.context.video.proportion.disabled = true;
     }
 };
