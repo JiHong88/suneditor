@@ -16,7 +16,7 @@ SUNEDITOR.plugin.image = {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: this.context.user.imageSize,
+            _origin_w: context.user.imageSize,
             _origin_h: 0,
             _altText: '',
             _imageCaption: null,
