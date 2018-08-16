@@ -8,10 +8,6 @@ body.sun-editor-editable {
     margin: 20px;
 }
 
-body.sun-editor-editable *[contentEditable=false] {
-    cursor: default;
-}
-
 /* hr */
 .sun-editor-editable hr {
     border-width: 1px 0 0;

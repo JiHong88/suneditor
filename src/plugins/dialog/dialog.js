@@ -15,7 +15,8 @@ SUNEDITOR.plugin.dialog = {
             _resize_parent_l: 0,
             _resize_plugin: '',
             _resize_w: 0,
-            _resize_h: 0
+            _resize_h: 0,
+            _resize_direction: ''
         };
 
         /** dialog */
@@ -37,7 +38,7 @@ SUNEDITOR.plugin.dialog = {
         context.dialog.back = dialog_back;
         context.dialog.modal = dialog_area;
 
-        /** image resize controller, button */
+        /** resize controller, button */
         const resize_div_container = eval(this.setController_resize());
         context.dialog.resizeContainer = resize_div_container;
 
@@ -51,14 +52,14 @@ SUNEDITOR.plugin.dialog = {
         /** add event listeners */
         context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(_this));
         context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[0].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'tl'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[1].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'tr'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[2].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'bl'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[3].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'br'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[4].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'lw'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[5].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'th'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[6].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'rw'));
-        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[7].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this, 'bh'));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[0].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[1].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[2].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[3].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[4].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[5].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[6].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
+        resize_div_container.getElementsByClassName('sun-editor-name-resize-controller')[7].addEventListener('mousedown', this.onMouseDown_resize_ctrl.bind(_this));
         resize_button.addEventListener('click', this.onClick_resizeButton.bind(_this));
 
         /** append html */
@@ -238,8 +239,8 @@ SUNEDITOR.plugin.dialog = {
         this.focus();
     },
 
-    onMouseDown_resize_ctrl: function (direction) {
-        const e = window.event;
+    onMouseDown_resize_ctrl: function (e) {
+        const direction = this.context.dialog._resize_direction = e.target.classList[0];
         e.stopPropagation();
         e.preventDefault();
 
@@ -256,15 +257,15 @@ SUNEDITOR.plugin.dialog = {
             document.removeEventListener('mouseup', closureFunc_bind);
         }
 
-        const resize_element_bind = SUNEDITOR.plugin.dialog.resize_element.bind(this, direction);
+        const resize_element_bind = SUNEDITOR.plugin.dialog.resize_element.bind(this);
         const closureFunc_bind = closureFunc.bind(this);
 
         document.addEventListener('mousemove', resize_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
     },
 
-    resize_element: function (direction) {
-        const e = window.event;
+    resize_element: function (e) {
+        const direction = this.context.dialog._resize_direction;
         const clientX = e.clientX;
         const clientY = e.clientY;
         const plugin = this.context[this.context.dialog._resize_plugin];

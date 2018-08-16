@@ -717,7 +717,7 @@ SUNEDITOR.defaultLang = {
             getLineElement: function (element) {
                 element = element || this._variable.selectionNode;
 
-                if (!element || /^HTML$/i.test(element.tagName)) {
+                if (!element || /^(?:HTML|BODY)$/i.test(element.tagName)) {
                     element = context.element.wysiwygWindow.document.body.firstChild;
                 } else {
                     while (!/^BODY$/i.test(element.parentNode.tagName)) {
