@@ -179,7 +179,7 @@
 .sun-editor .modal-dialog .modal-radio {margin-left:12px; margin-right:5px;}
 
 /* loading box */
-.sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#191f26; background-image:url('../img/loadinfo.gif'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
+.sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#ffffff; background-image:url('../img/loading.gif'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
 .sun-editor .sun-editor-id-loading .ico-loading {display:none;}
 
 /* table selector */
