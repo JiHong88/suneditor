@@ -1449,14 +1449,14 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Add or remove the class name of "body" so that the code block is visible
              */
-            showBlocks: function () {
+            toggleDisplayBlocks: function () {
                 SUNEDITOR.dom.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
             },
 
             /**
              * @description Changes to code view or wysiwyg view
              */
-            showCodeView: function () {
+            toggleCodeView: function () {
                 if (!this._variable.wysiwygActive) {
                     const ec = {'&amp;': '&', '&nbsp;': '\u00A0', /*"&quot;": "\"", */'&lt;': '<', '&gt;': '>'};
                     const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
@@ -1508,7 +1508,7 @@ SUNEDITOR.defaultLang = {
             /**
              * @description Opens the preview window
              */
-            preview: function () {
+            openPreview: function () {
                 const WindowObject = window.open('', '_blank');
                 WindowObject.mimeType = 'text/html';
                 WindowObject.document.head.innerHTML = '' +
@@ -1682,7 +1682,7 @@ SUNEDITOR.defaultLang = {
                 if (command) {
                     switch (command) {
                         case 'codeView':
-                            editor.showCodeView();
+                            editor.toggleCodeView();
                             dom.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
@@ -1699,13 +1699,13 @@ SUNEDITOR.defaultLang = {
                             editor.execCommand(command, false, null);
                             break;
                         case 'preview':
-                            editor.preview();
+                            editor.openPreview();
                             break;
                         case 'print':
                             context.element.wysiwygWindow.print();
                             break;
                         case 'showBlocks':
-                            editor.showBlocks();
+                            editor.toggleDisplayBlocks();
                             dom.toggleClass(target, 'on');
                             break;
                         default :
