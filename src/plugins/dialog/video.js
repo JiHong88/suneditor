@@ -10,6 +10,7 @@ SUNEDITOR.plugin.video = {
         const context = _this.context;
         context.video = {
             _coverElement: null,
+            _coverElementInner: document.createElement('SPAN')
             _element: null,
             _resize_element: null,
             _element_w: 1,
@@ -18,17 +19,16 @@ SUNEDITOR.plugin.video = {
             _element_t: 0,
             _origin_w: context.user.videoX,
             _origin_h: context.user.videoY,
-            _proportionChecked: false,
-            _innerCover: document.createElement('SPAN')
+            _proportionChecked: false
         };
 
         /** Inner node needed to edit video iframe event */
-        context.video._innerCover.className = 'sun-editor-iframe-inner-cover';
-        context.video._innerCover.addEventListener('click', function (e) {
+        context.video._coverElementInner.className = 'sun-editor-iframe-inner-cover';
+        context.video._coverElementInner.addEventListener('click', function (e) {
             const pNode = e.target.parentNode;
-            const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(this, pNode, 'video');
+            const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(_this, pNode, 'video');
             SUNEDITOR.plugin.video.onModifyMode.call(_this, pNode.children[0], size);
-        }.bind(_this));
+        });
 
         /** video dialog */
         const video_dialog = eval(this.setDialog());
@@ -43,7 +43,7 @@ SUNEDITOR.plugin.video = {
         video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
         /** add event listeners */
-        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
         context.video.videoX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
         context.video.videoY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
         video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
@@ -97,7 +97,7 @@ SUNEDITOR.plugin.video = {
         }
     },
 
-    submit_dialog: function (e) {
+    submit: function (e) {
         this.showLoading();
 
         e.preventDefault();
@@ -175,14 +175,14 @@ SUNEDITOR.plugin.video = {
 
     onMouseEnter_cover: function (e) {
         const target = e.target;
-        if (target === this.context.video._innerCover.parentNode) return;
+        if (target === this.context.video._coverElementInner.parentNode) return;
 
-        target.appendChild(this.context.video._innerCover);
+        target.appendChild(this.context.video._coverElementInner);
     },
 
     onMouseLeave_cover: function (e) {
         const target = e.target;
-        if (target === this.context.video._innerCover.parentNode) target.removeChild(this.context.video._innerCover);
+        if (target === this.context.video._coverElementInner.parentNode) target.removeChild(this.context.video._coverElementInner);
     },
 
     sizeRevert: function () {
@@ -198,7 +198,7 @@ SUNEDITOR.plugin.video = {
         const pSpan = videoContext._resize_element = videoContext._coverElement;
         videoContext._element = element;
 
-        if (pSpan === videoContext._innerCover.parentNode) pSpan.removeChild(videoContext._innerCover);
+        if (pSpan === videoContext._coverElementInner.parentNode) pSpan.removeChild(videoContext._coverElementInner);
 
         videoContext._element_w = size.w;
         videoContext._element_h = size.h;

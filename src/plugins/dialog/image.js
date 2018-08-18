@@ -9,7 +9,7 @@ SUNEDITOR.plugin.image = {
     add: function (_this) {
         const context = _this.context;
         context.image = {
-            _elementLink: null,
+            _linkElement: null,
             _element: null,
             _resize_element: null,
             _element_w: 1,
@@ -44,7 +44,7 @@ SUNEDITOR.plugin.image = {
 
         /** add event listeners */
         context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(_this));
-        context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
         context.image.imageX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
         context.image.imageY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
         image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
@@ -273,7 +273,7 @@ SUNEDITOR.plugin.image = {
         }
     },
 
-    submit_dialog: function (e) {
+    submit: function (e) {
         this.showLoading();
 
         e.preventDefault();
@@ -389,9 +389,9 @@ SUNEDITOR.plugin.image = {
 
         // link
         if (linkValue.trim().length > 0) {
-            if (contextImage._elementLink !== null) {
-                contextImage._elementLink.href = linkValue;
-                contextImage._elementLink.target = this.context.image.imgLinkNewWindowCheck.checked;
+            if (contextImage._linkElement !== null) {
+                contextImage._linkElement.href = linkValue;
+                contextImage._linkElement.target = this.context.image.imgLinkNewWindowCheck.checked;
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
                 newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
@@ -399,7 +399,7 @@ SUNEDITOR.plugin.image = {
                 cover.appendChild(newEl);
             }
         }
-        else if (contextImage._elementLink !== null) {
+        else if (contextImage._linkElement !== null) {
             const imageElement = contextImage._element;
 
             imageElement.setAttribute('data-image-link', '');
@@ -438,7 +438,7 @@ SUNEDITOR.plugin.image = {
 
     onModifyMode: function (element, size) {
         const contextImage = this.context.image;
-        contextImage._elementLink = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
+        contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = contextImage._resize_element = element;
         contextImage._imageCaption = element.nextSibling;
 
@@ -463,8 +463,8 @@ SUNEDITOR.plugin.image = {
         const contextImage = this.context.image;
         contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage.altText.value = contextImage._element.alt;
-        contextImage.imgLink.value = contextImage._elementLink === null ? '' : contextImage._elementLink.href;
-        contextImage.imgLinkNewWindowCheck.checked = !contextImage._elementLink || contextImage._elementLink.target === '_blank';
+        contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
+        contextImage.imgLinkNewWindowCheck.checked = !contextImage._linkElement || contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('#suneditor_image_radio_' + (contextImage._element.getAttribute('data-align') || 'none')).checked = true;
         contextImage._captionChecked = contextImage.caption.checked = !!contextImage._imageCaption;
         contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';

@@ -190,7 +190,6 @@ SUNEDITOR.defaultLang = {
          */
         getArrayIndex: function (array, element) {
             let idx = -1;
-
             for (let i = 0, len = array.length; i < len; i++) {
                 if (array[i] === element) {
                     idx = i;
@@ -209,9 +208,7 @@ SUNEDITOR.defaultLang = {
          */
         nextIdx: function (array, item) {
             let idx = this.getArrayIndex(array, item);
-
             if (idx === -1) return -1;
-
             return idx + 1;
         },
 
@@ -223,9 +220,7 @@ SUNEDITOR.defaultLang = {
          */
         prevIdx: function (array, item) {
             let idx = this.getArrayIndex(array, item);
-
             if (idx === -1) return -1;
-
             return idx - 1;
         },
 
@@ -311,7 +306,6 @@ SUNEDITOR.defaultLang = {
             }
 
             const check = new RegExp(query, 'i');
-
             while (element && (element.nodeType === 3 || !check.test(element[attr]))) {
                 if (/^BODY$/i.test(element.tagName)) {
                     return null;
@@ -367,7 +361,6 @@ SUNEDITOR.defaultLang = {
             if (!element) return;
 
             const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
-
             if (check.test(element.className)) {
                 element.className = element.className.replace(check, ' ').trim();
             }
@@ -554,7 +547,7 @@ SUNEDITOR.defaultLang = {
                     this.submenuActiveButton = null;
                 }
 
-                if (context.image && context.image._onCaption) {
+                if (context.image && context.image._onCaption === true) {
                     SUNEDITOR.plugin.image.toggle_caption_contenteditable.call(editor, false);
                 }
 
@@ -571,7 +564,6 @@ SUNEDITOR.defaultLang = {
                     for (let i = 0; i < len; i++) {
                         this.controllerArray[i].style.display = 'none';
                     }
-
                     this.controllerArray = [];
                 }
             },
@@ -603,7 +595,6 @@ SUNEDITOR.defaultLang = {
                 this._variable.copySelection = util.copyObj(this.getSelection());
 
                 const range = this.getRange();
-
                 if (range.startContainer !== range.endContainer) {
                     this._variable.selectionNode = range.startContainer;
                 } else {
@@ -783,14 +774,8 @@ SUNEDITOR.defaultLang = {
 
                         if (isSameContainer) {
                             let removeNode = startCon;
-
-                            if (!this.isEdgePoint(endCon, endOff)) {
-                                rightNode = endCon.splitText(endOff);
-                            }
-
-                            if (!this.isEdgePoint(startCon, startOff)) {
-                                removeNode = startCon.splitText(startOff);
-                            }
+                            if (!this.isEdgePoint(endCon, endOff)) rightNode = endCon.splitText(endOff);
+                            if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
                             parentNode.removeChild(removeNode);
                         }

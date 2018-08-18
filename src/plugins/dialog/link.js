@@ -23,7 +23,7 @@ SUNEDITOR.plugin.link = {
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit_dialog.bind(_this));
+        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
         link_button.addEventListener('click', this.onClick_linkBtn.bind(_this));
 
         /** append html */
@@ -64,7 +64,26 @@ SUNEDITOR.plugin.link = {
         return dialog;
     },
 
-    submit_dialog: function (e) {
+    /** modify controller button */
+    setController_LinkBtn: function () {
+        const lang = SUNEDITOR.lang;
+        const link_btn = document.createElement('DIV');
+
+        link_btn.className = 'sun-editor-id-link-btn';
+        link_btn.style.display = 'none';
+        link_btn.innerHTML = '' +
+            '<div class="arrow"></div>' +
+            '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
+            '   <div class="btn-group">' +
+            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.editLink.edit + '"><div class="ico_url"></div></button>' +
+            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.editLink.remove + '">x</button>' +
+            '   </div>' +
+            '</div>';
+
+        return link_btn;
+    },
+
+    submit: function (e) {
         this.showLoading();
 
         e.preventDefault();
@@ -107,33 +126,6 @@ SUNEDITOR.plugin.link = {
         return false;
     },
 
-    init: function () {
-        this.context.link.linkBtn.style.display = 'none';
-        this.context.link._linkAnchor = null;
-        this.context.link.focusElement.value = '';
-        this.context.link.linkAnchorText.value = '';
-        this.context.link.linkNewWindowCheck.checked = false;
-    },
-
-    /** button */
-    setController_LinkBtn: function () {
-        const lang = SUNEDITOR.lang;
-        const link_btn = document.createElement('DIV');
-
-        link_btn.className = 'sun-editor-id-link-btn';
-        link_btn.style.display = 'none';
-        link_btn.innerHTML = '' +
-            '<div class="arrow"></div>' +
-            '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
-            '   <div class="btn-group">' +
-            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.editLink.edit + '"><div class="ico_url"></div></button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.editLink.remove + '">x</button>' +
-            '   </div>' +
-            '</div>';
-
-        return link_btn;
-    },
-
     call_controller_linkButton: function (selectionATag) {
         this.editLink = this.context.link._linkAnchor = selectionATag;
         const linkBtn = this.context.link.linkBtn;
@@ -170,5 +162,13 @@ SUNEDITOR.plugin.link = {
         }
 
         this.context.link.linkBtn.style.display = 'none';
+    },
+
+    init: function () {
+        this.context.link.linkBtn.style.display = 'none';
+        this.context.link._linkAnchor = null;
+        this.context.link.focusElement.value = '';
+        this.context.link.linkAnchorText.value = '';
+        this.context.link.linkNewWindowCheck.checked = false;
     }
 };
