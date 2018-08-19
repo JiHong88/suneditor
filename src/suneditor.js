@@ -1661,10 +1661,7 @@ SUNEDITOR.defaultLang = {
 
                 /** Dialog, Submenu */
                 if (display) {
-                    const prevSubmenu = editor.submenu;
-                    editor.submenuOff();
-
-                    if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== prevSubmenu)) {
+                    if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== editor.submenu)) {
                         editor.callModule('submenu', command, target, function () {
                             editor.submenuOn(target);
                         });
