@@ -10,7 +10,7 @@ SUNEDITOR.plugin.video = {
         const context = _this.context;
         context.video = {
             _coverElement: null,
-            _coverElementInner: document.createElement('SPAN')
+            _coverElementInner: document.createElement('SPAN'),
             _element: null,
             _resize_element: null,
             _element_w: 1,
