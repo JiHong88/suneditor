@@ -434,6 +434,7 @@ SUNEDITOR.defaultLang = {
              */
             commandMap: {
                 FONT: context.tool.font,
+                FORMAT: context.tool.format,
                 B: context.tool.bold,
                 U: context.tool.underline,
                 I: context.tool.italic,
@@ -1491,15 +1492,15 @@ SUNEDITOR.defaultLang = {
                     this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
                     context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
-                    dom.removeClass(element.firstElementChild, 'ico_full_screen_e');
-                    dom.addClass(element.firstElementChild, 'ico_full_screen_i');
+                    dom.removeClass(element.firstElementChild, 'icon-expansion');
+                    dom.addClass(element.firstElementChild, 'icon-reduction');
                 }
                 else {
                     context.element.topArea.style.cssText = this._variable.originCssText;
                     context.element.editorArea.style.height = this._variable.editorHeight + 'px';
 
-                    dom.removeClass(element.firstElementChild, 'ico_full_screen_i');
-                    dom.addClass(element.firstElementChild, 'ico_full_screen_e');
+                    dom.removeClass(element.firstElementChild, 'icon-reduction');
+                    dom.addClass(element.firstElementChild, 'icon-expansion');
                 }
 
                 this._variable.isFullScreen = !this._variable.isFullScreen;
@@ -1540,14 +1541,15 @@ SUNEDITOR.defaultLang = {
 
             _findButtonEffectTag: function () {
                 let selectionParent = editor._variable.selectionNode;
+                let findFormat = true;
                 let findFont = true;
                 let findSize = true;
                 let findA = true;
-                let map = 'B|U|I|STRIKE|FONT|SIZE|SUB|SUP|';
-                let check = new RegExp(map, 'i');
+                let classOnMap = 'B|U|I|STRIKE|SUB|SUP|';
+                let check = new RegExp(classOnMap, 'i');
                 let cssText;
 
-                while (!/^(?:P|BODY|HTML|DIV)$/i.test(selectionParent.nodeName)) {
+                while (!/^(?:BODY|HTML)$/i.test(selectionParent.nodeName)) {
                     if (selectionParent.nodeType === 3) {
                         selectionParent = selectionParent.parentNode;
                         continue;
@@ -1555,14 +1557,19 @@ SUNEDITOR.defaultLang = {
 
                     const nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
 
+                    /** Format */
+                    if (findFormat && selectionParent.nodeType === 1 && /^(?:P|DIV|H\d)$/i.test(selectionParent.nodeName)) {
+                        nodeName.push('FORMAT');
+                        dom.changeTxt(editor.commandMap['FORMAT'], selectionParent.nodeName.toUpperCase());
+                        findFormat = false;
+                    }
+
                     /** Font */
                     if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                         nodeName.push('FONT');
                         const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
                         dom.changeTxt(editor.commandMap['FONT'], selectFont);
                         findFont = false;
-                        map = map.replace('FONT' + '|', '');
-                        check = new RegExp(map, 'i');
                     }
 
                     /** A */
@@ -1577,16 +1584,16 @@ SUNEDITOR.defaultLang = {
                         editor.controllersOff();
                     }
 
-                    /** span (font size) */
-                    if (findSize && selectionParent.style.fontSize.length > 0) {
-                        dom.changeTxt(editor.commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
-                        findSize = false;
-                        map = map.replace('SIZE|', '');
-                        check = new RegExp(map, 'i');
+                    /** SPAN */
+                    if (findSize && /^SPAN$/i.test(selectionParent.nodeName)) {
+                        /** font size */
+                        if (selectionParent.style.fontSize.length > 0) {
+                            dom.changeTxt(editor.commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                            findSize = false;
+                        }
                     }
 
-
-                    /** command */
+                    /** command map */
                     cssText = selectionParent.style.cssText;
                     if (/:\s*bold(?:;|\s)/.test(cssText)) nodeName.push('B');
                     if (/:\s*underline(?:;|\s)/.test(cssText)) nodeName.push('U');
@@ -1596,8 +1603,8 @@ SUNEDITOR.defaultLang = {
                     for (let i = 0; i < nodeName.length; i++) {
                         if (check.test(nodeName[i])) {
                             dom.addClass(editor.commandMap[nodeName[i]], 'on');
-                            map = map.replace(nodeName[i] + '|', '');
-                            check = new RegExp(map, 'i');
+                            classOnMap = classOnMap.replace(nodeName[i] + '|', '');
+                            check = new RegExp(classOnMap, 'i');
                         }
                     }
 
@@ -1607,16 +1614,16 @@ SUNEDITOR.defaultLang = {
                 /** remove */
                 if (findA) editor.controllersOff();
 
-                map = map.split('|');
-                for (let i = 0, len = map.length - 1; i < len; i++) {
-                    if (/^FONT/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.font);
+                classOnMap = classOnMap.split('|');
+                for (let i = 0, len = classOnMap.length - 1; i < len; i++) {
+                    if (/^FONT/i.test(classOnMap[i])) {
+                        dom.changeTxt(editor.commandMap[classOnMap[i]], SUNEDITOR.lang.toolbar.font);
                     }
-                    else if (/^SIZE$/i.test(map[i])) {
-                        dom.changeTxt(editor.commandMap[map[i]], SUNEDITOR.lang.toolbar.fontSize);
+                    else if (/^SIZE$/i.test(classOnMap[i])) {
+                        dom.changeTxt(editor.commandMap[classOnMap[i]], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
-                        dom.removeClass(editor.commandMap[map[i]], 'on');
+                        dom.removeClass(editor.commandMap[classOnMap[i]], 'on');
                     }
                 }
             },
@@ -1708,6 +1715,7 @@ SUNEDITOR.defaultLang = {
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
                             dom.toggleClass(target, 'on');
+                            /** button effect */
                             if (/^subscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.superscript, 'on');
                             else if (/^superscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.subscript, 'on');
                     }
@@ -2049,66 +2057,66 @@ SUNEDITOR.defaultLang = {
 
         return {
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
-                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="ico_more"></span>'
+                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
             ],
             formats: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-                '<span class="txt">' + lang.toolbar.formats + '</span><span class="ico_more"></span>'
+                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="arrow-more-down"></span>'
             ],
 
             fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="ico_more"></span>'
+                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="arrow-more-down"></span>'
             ],
 
             bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
-                '<div class="ico_bold"></div>'
+                '<div class="icon-bold"></div>'
             ],
 
             underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
-                '<div class="ico_underline"></div>'
+                '<div class="icon-underline"></div>'
             ],
 
             italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
-                '<div class="ico_italic"></div>'
+                '<div class="icon-italic"></div>'
             ],
 
             strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
-                '<div class="ico_strike"></div>'
+                '<div class="icon-strokethrough"></div>'
             ],
 
             subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '', '',
-                '<div class="ico_subscript"></div>'
+                '<div class="icon-subscript"></div>'
             ],
 
             superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '', '',
-                '<div class="ico_superscript"></div>'
+                '<div class="icon-superscript"></div>'
             ],
 
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', '',
-                '<div class="ico_erase"></div>'
+                '<div class="icon-erase"></div>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
-                '<div class="ico_foreColor"></div>'
+                '<div class="icon-foreColor"></div>'
             ],
 
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
-                '<div class="ico_hiliteColor"></div>'
+                '<div class="icon-hiliteColor"></div>'
             ],
 
             indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
-                '<div class="ico_indnet"></div>'
+                '<div class="icon-indent-right"></div>'
             ],
 
             outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
-                '<div class="ico_outdent"></div>'
+                '<div class="icon-indent-left"></div>'
             ],
 
             align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
-                '<div class="ico_align"></div>'
+                '<div class="icon-align-left"></div>'
             ],
 
             list: ['', lang.toolbar.list, 'list', 'submenu', '',
-                '<div class="ico_list_num"></div>'
+                '<div class="icon-list-number"></div>'
             ],
 
             line: ['btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
@@ -2118,47 +2126,47 @@ SUNEDITOR.defaultLang = {
             ],
 
             table: ['', lang.toolbar.table, 'table', 'submenu', '',
-                '<div class="ico_table"></div>'
+                '<div class="icon-grid"></div>'
             ],
 
             link: ['', lang.toolbar.link, 'link', 'dialog', '',
-                '<div class="ico_url"></div>'
+                '<div class="icon-link"></div>'
             ],
 
             image: ['', lang.toolbar.image, 'image', 'dialog', '',
-                '<div class="ico_picture"></div>'
+                '<div class="icon-image"></div>'
             ],
 
             video: ['', lang.toolbar.video, 'video', 'dialog', '',
-                '<div class="ico_video"></div>'
+                '<div class="icon-video"></div>'
             ],
 
             fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
-                '<div class="ico_full_screen_e"></div>'
+                '<div class="icon-expansion"></div>'
             ],
 
             showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', '',
-                '<div class="ico_showBlocks"></div>'
+                '<div class="icon-showBlocks"></div>'
             ],
 
             codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
-                '<div class="ico_html"></div>'
+                '<div class="icon-code-view"></div>'
             ],
 
             undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
-                '<div class="ico_undo"></div>'
+                '<div class="icon-undo"></div>'
             ],
 
             redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
-                '<div class="ico_redo"></div>'
+                '<div class="icon-redo"></div>'
             ],
 
             preview: ['', lang.toolbar.preview, 'preview', '', '',
-                '<div class="ico_preview"></div>'
+                '<div class="icon-preview"></div>'
             ],
 
             print: ['', lang.toolbar.print, 'print', '', '',
-                '<div class="ico_print"></div>'
+                '<div class="icon-print"></div>'
             ]
         };
     }
@@ -2331,7 +2339,7 @@ SUNEDITOR.defaultLang = {
         /** loading box */
         const loading_box = doc.createElement('DIV');
         loading_box.className = 'sun-editor-id-loading';
-        loading_box.innerHTML = '<div class="ico-loading"></div>';
+        loading_box.innerHTML = '<div class="loading-effect"></div>';
 
         /** resize operation background */
         const resize_back = doc.createElement('DIV');
@@ -2393,6 +2401,7 @@ SUNEDITOR.defaultLang = {
                 subscript: cons._toolBar.getElementsByClassName('sun-editor-id-subscript')[0],
                 superscript: cons._toolBar.getElementsByClassName('sun-editor-id-superscript')[0],
                 font: cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
+                format: cons._toolBar.getElementsByClassName('sun-editor-font-format')[0],
                 fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
             },
             user: {

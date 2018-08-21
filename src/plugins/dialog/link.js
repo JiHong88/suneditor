@@ -11,14 +11,14 @@ SUNEDITOR.plugin.link = {
         context.link = {};
 
         /** link dialog */
-        const link_dialog = eval(this.setDialog());
+        let link_dialog = eval(this.setDialog());
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
         context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
         context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
-        const link_button = eval(this.setController_LinkBtn());
+        let link_button = eval(this.setController_LinkBtn());
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
 
@@ -29,6 +29,9 @@ SUNEDITOR.plugin.link = {
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
         context.element.relative.appendChild(link_button);
+
+        /** empty memory */
+        link_dialog = null, link_button = null;
     },
 
     /** dialog */
@@ -42,7 +45,7 @@ SUNEDITOR.plugin.link = {
             '<form class="editor_link">' +
             '   <div class="modal-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close">' +
-            '           <span aria-hidden="true" data-command="close">×</span>' +
+            '           <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.linkBox.title + '</h5>' +
             '   </div>' +
@@ -75,8 +78,8 @@ SUNEDITOR.plugin.link = {
             '<div class="arrow"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="btn-group">' +
-            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.editLink.edit + '"><div class="ico_url"></div></button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.editLink.remove + '">x</button>' +
+            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.editLink.edit + '"><div class="icon-link"></div></button>' +
+            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.editLink.remove + '"><div class="icon-cancel"></div></button>' +
             '   </div>' +
             '</div>';
 

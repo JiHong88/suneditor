@@ -31,7 +31,7 @@ SUNEDITOR.plugin.video = {
         });
 
         /** video dialog */
-        const video_dialog = eval(this.setDialog());
+        let video_dialog = eval(this.setDialog());
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
@@ -50,6 +50,9 @@ SUNEDITOR.plugin.video = {
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);
+
+        /** empty memory */
+        video_dialog = null;
     },
 
     /** dialog */
@@ -63,7 +66,7 @@ SUNEDITOR.plugin.video = {
             '<form class="editor_video">' +
             '   <div class="modal-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close">' +
-            '           <span aria-hidden="true" data-command="close">x</span>' +
+            '           <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.videoBox.title + '</h5>' +
             '   </div>' +
@@ -76,7 +79,7 @@ SUNEDITOR.plugin.video = {
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '           <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
             '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" disabled/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
-            '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
+            '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +

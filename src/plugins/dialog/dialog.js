@@ -18,14 +18,14 @@ SUNEDITOR.plugin.dialog = {
         };
 
         /** dialog */
-        const dialog_div = document.createElement('DIV');
+        let dialog_div = document.createElement('DIV');
         dialog_div.className = 'sun-editor-id-dialogBox';
 
-        const dialog_back = document.createElement('DIV');
+        let dialog_back = document.createElement('DIV');
         dialog_back.className = 'modal-dialog-background sun-editor-id-dialog-back';
         dialog_back.style.display = 'none';
 
-        const dialog_area = document.createElement('DIV');
+        let dialog_area = document.createElement('DIV');
         dialog_area.className = 'modal-dialog sun-editor-id-dialog-modal';
         dialog_area.style.display = 'none';
 
@@ -37,17 +37,17 @@ SUNEDITOR.plugin.dialog = {
         context.dialog.modal = dialog_area;
 
         /** resize controller, button */
-        const resize_div_container = eval(this.setController_resize());
+        let resize_div_container = eval(this.setController_resize());
         context.dialog.resizeContainer = resize_div_container;
 
         context.dialog.resizeDiv = resize_div_container.getElementsByClassName('modal-resize')[0];
         context.dialog.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
         context.dialog.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
 
-        const resize_button = eval(this.setController_button());;
+        let resize_button = eval(this.setController_button());;
         context.dialog.resizeButton = resize_button;
 
-        const resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
+        let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
 
         /** add event listeners */
         context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(_this));
@@ -65,6 +65,9 @@ SUNEDITOR.plugin.dialog = {
         /** append html */
         context.element.relative.appendChild(resize_div_container);
         context.element.relative.appendChild(resize_button);
+
+        /** empty memory */
+        dialog_div = null, dialog_back = null, dialog_area = null, resize_div_container = null, resize_button = null, resize_handles = null;
     },
 
     onClick_dialog: function (e) {
@@ -141,10 +144,10 @@ SUNEDITOR.plugin.dialog = {
             '   <button type="button" data-command="75" title="' + lang.dialogBox.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
             '   <button type="button" data-command="50" title="' + lang.dialogBox.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
             '   <button type="button" data-command="25" title="' + lang.dialogBox.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="update" title="' + lang.toolbar.image + '" style="padding: 6px 10px !important;"><div class="ico_modify"></div></button>' +
+            '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
             '</div>' +
             '<div class="btn-group remove">' +
-            '   <button type="button" data-command="delete" title="' + lang.dialogBox.remove + '"><span class="image_remove">x</span></button>' +
+            '   <button type="button" data-command="delete" title="' + lang.dialogBox.remove + '"><div aria-hidden="true" class="icon-cancel"></div></button>' +
             '</div>';
 
         return resize_button;

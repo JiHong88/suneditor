@@ -8,13 +8,16 @@
 SUNEDITOR.plugin.font = {
     add: function (_this, targetElement) {
         /** set submenu */
-        const listDiv = eval(this.setSubmenu(_this.context.user));
+        let listDiv = eval(this.setSubmenu(_this.context.user));
 
         /** add event listeners */
         listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(_this));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
+
+        /** empty memory */
+        listDiv = null;
     },
 
     setSubmenu: function (user) {

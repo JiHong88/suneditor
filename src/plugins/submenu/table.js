@@ -10,8 +10,9 @@ SUNEDITOR.plugin.table = {
         const context = _this.context;
 
         /** set submenu */
-        const listDiv = eval(this.setSubmenu());
-        const tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
+        let listDiv = eval(this.setSubmenu());
+        let tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
+
         context.submenu.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
         context.submenu.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
         context.submenu.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
@@ -23,6 +24,9 @@ SUNEDITOR.plugin.table = {
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
+
+        /** empty memory */
+        listDiv = null, tablePicker = null;
     },
 
     setSubmenu: function () {

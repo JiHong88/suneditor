@@ -28,7 +28,7 @@ SUNEDITOR.plugin.image = {
         };
 
         /** image dialog */
-        const image_dialog = eval(this.setDialog(_this.context.user));
+        let image_dialog = eval(this.setDialog(_this.context.user));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -51,6 +51,9 @@ SUNEDITOR.plugin.image = {
 
         /** append html */
         context.dialog.modal.appendChild(image_dialog);
+
+        /** empty memory */
+        image_dialog = null;
     },
 
     /** dialog */
@@ -63,7 +66,7 @@ SUNEDITOR.plugin.image = {
         let html = '' +
 			'<div class="modal-header">' +
 			'   <button type="button" data-command="close" class="close" aria-label="Close">' +
-			'       <span aria-hidden="true" data-command="close">x</span>' +
+			'       <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
 			'   </button>' +
 			'   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
 			'</div>' +
@@ -99,7 +102,7 @@ SUNEDITOR.plugin.image = {
             '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '               <input class="form-size-control sun-editor-id-image-x" type="number" min="1" /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
             '               <input type="checkbox" id="suneditor_image_check_proportion" style="margin-left: 20px;" checked disabled/><label for="suneditor_image_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
-            '               <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="ico_revert"></div></button>' +
+            '               <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '           </div>' +
             '           <div class="form-group-footer">' +
             '               <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +

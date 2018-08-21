@@ -8,13 +8,16 @@
 SUNEDITOR.plugin.horizontalRules = {
     add: function (_this, targetElement) {
         /** set submenu */
-        const listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulesPick.bind(_this));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
+
+        /** empty memory */
+        listDiv = null;
     },
 
     setSubmenu: function () {
