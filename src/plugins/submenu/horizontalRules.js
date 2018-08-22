@@ -26,7 +26,7 @@ SUNEDITOR.plugin.horizontalRules = {
         listDiv.className = 'layer_editor layer_line';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer inner_layer_type2">' +
+            '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
             '       <li>' +
             '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="solid">' +

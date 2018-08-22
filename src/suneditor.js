@@ -1539,41 +1539,39 @@ SUNEDITOR.defaultLang = {
 
             _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
 
-            _findButtonEffectTag: function () {
-                let selectionParent = editor._variable.selectionNode;
-                let findFormat = true;
-                let findFont = true;
-                let findSize = true;
-                let findA = true;
-                let classOnMap = 'B|U|I|STRIKE|SUB|SUP|';
-                let check = new RegExp(classOnMap, 'i');
-                let cssText;
+            _changeButtonClassTagCheck: new RegExp('^(?:B|U|I|STRIKE|SUB|SUP)$'),
 
-                while (!/^(?:BODY|HTML)$/i.test(selectionParent.nodeName)) {
-                    if (selectionParent.nodeType === 3) {
-                        selectionParent = selectionParent.parentNode;
+            _findButtonEffectTag: function () {
+                const commandMap = editor.commandMap;
+                const classOnCheck = this._changeButtonClassTagCheck;
+                const findNodeNames = [];
+
+                let findFormat = true, findFont = true, findSize = true, findA = true;
+                let findB = true, findI = true, findU = true, findS = true;
+                let cssText = '', nodeName = '';
+
+                for (let selectionParent = editor._variable.selectionNode; !/^(?:BODY|HTML)$/i.test(selectionParent.nodeName); selectionParent = selectionParent.parentNode) {
+                    if (selectionParent.nodeType !== 1) continue;
+                    nodeName = selectionParent.nodeName.toUpperCase();
+
+                    /** Format */
+                    if (findFormat && /^(?:P|DIV|H\d)$/.test(nodeName)) {
+                        findNodeNames.push('FORMAT');
+                        dom.changeTxt(commandMap['FORMAT'], nodeName);
+                        findFormat = false;
                         continue;
                     }
 
-                    const nodeName = [(/^STRONG$/.test(selectionParent.nodeName) ? 'B' : (/^EM/.test(selectionParent.nodeName) ? 'I' : selectionParent.nodeName))];
-
-                    /** Format */
-                    if (findFormat && selectionParent.nodeType === 1 && /^(?:P|DIV|H\d)$/i.test(selectionParent.nodeName)) {
-                        nodeName.push('FORMAT');
-                        dom.changeTxt(editor.commandMap['FORMAT'], selectionParent.nodeName.toUpperCase());
-                        findFormat = false;
-                    }
-
                     /** Font */
-                    if (findFont && selectionParent.nodeType === 1 && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
-                        nodeName.push('FONT');
+                    if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
+                        findNodeNames.push('FONT');
                         const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
-                        dom.changeTxt(editor.commandMap['FONT'], selectFont);
+                        dom.changeTxt(commandMap['FONT'], selectFont);
                         findFont = false;
                     }
 
                     /** A */
-                    if (findA && /^A$/i.test(selectionParent.nodeName) && selectionParent.getAttribute('data-image-link') === null) {
+                    if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                         if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
                             editor.callModule('dialog', 'link', null, function () {
                                 SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionParent);
@@ -1585,45 +1583,63 @@ SUNEDITOR.defaultLang = {
                     }
 
                     /** SPAN */
-                    if (findSize && /^SPAN$/i.test(selectionParent.nodeName)) {
+                    if (findSize && /^SPAN$/.test(nodeName)) {
                         /** font size */
                         if (selectionParent.style.fontSize.length > 0) {
-                            dom.changeTxt(editor.commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                            findNodeNames.push('SIZE');
+                            dom.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                             findSize = false;
                         }
                     }
 
                     /** command map */
                     cssText = selectionParent.style.cssText;
-                    if (/:\s*bold(?:;|\s)/.test(cssText)) nodeName.push('B');
-                    if (/:\s*underline(?:;|\s)/.test(cssText)) nodeName.push('U');
-                    if (/:\s*italic(?:;|\s)/.test(cssText)) nodeName.push('I');
-                    if (/:\s*line-through(?:;|\s)/.test(cssText)) nodeName.push('STRIKE');
-
-                    for (let i = 0; i < nodeName.length; i++) {
-                        if (check.test(nodeName[i])) {
-                            dom.addClass(editor.commandMap[nodeName[i]], 'on');
-                            classOnMap = classOnMap.replace(nodeName[i] + '|', '');
-                            check = new RegExp(classOnMap, 'i');
-                        }
+                    if (findB && /font\-weight\s*:\s*(?:\d+|bold|bolder)(?:;|\s|)/.test(cssText)) {
+                        findNodeNames.push('B');
+                        findB = false;
+                    }
+                    if (findI && /font\-style\s*:\s*(?:italic|oblique)(?:;|\s)/.test(cssText)) {
+                        findNodeNames.push('I');
+                        findI = false;
+                    }
+                    if (findU && /text\-decoration(?:\-line)?\s*:\s*underline(?:;|\s|)/.test(cssText)) {
+                        findNodeNames.push('U');
+                        findU = false;
+                    }
+                    if (findS && /text\-decoration(?:\-line)?\s*:\s*line-through(?:;|\s|)/.test(cssText)) {
+                        findNodeNames.push('STRIKE');
+                        findS = false;
                     }
 
-                    selectionParent = selectionParent.parentNode;
+                    findNodeNames.push((/^STRONG$/.test(nodeName) ? 'B' : /^EM$/.test(nodeName) ? 'I' : nodeName));
+                }
+
+                /** A Tag edit controller off */
+                if (findA) editor.controllersOff();
+
+                /** toggle class on */
+                for (let i = 0; i < findNodeNames.length; i++) {
+                    nodeName = findNodeNames[i];
+                    if (classOnCheck.test(nodeName)) {
+                        dom.addClass(commandMap[nodeName], 'on');
+                    }
                 }
 
                 /** remove */
-                if (findA) editor.controllersOff();
+                const commandKeys = Object.keys(commandMap);
+                let keyName = '';
+                for (let i = 0, len = commandKeys.length; i < len; i++) {
+                    keyName = commandKeys[i];
+                    if (findNodeNames.indexOf(keyName) > -1) continue;
 
-                classOnMap = classOnMap.split('|');
-                for (let i = 0, len = classOnMap.length - 1; i < len; i++) {
-                    if (/^FONT/i.test(classOnMap[i])) {
-                        dom.changeTxt(editor.commandMap[classOnMap[i]], SUNEDITOR.lang.toolbar.font);
+                    if (/^FONT/i.test(keyName)) {
+                        dom.changeTxt(commandMap[keyName], SUNEDITOR.lang.toolbar.font);
                     }
-                    else if (/^SIZE$/i.test(classOnMap[i])) {
-                        dom.changeTxt(editor.commandMap[classOnMap[i]], SUNEDITOR.lang.toolbar.fontSize);
+                    else if (/^SIZE$/i.test(keyName)) {
+                        dom.changeTxt(commandMap[keyName], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
-                        dom.removeClass(editor.commandMap[classOnMap[i]], 'on');
+                        dom.removeClass(commandMap[keyName], 'on');
                     }
                 }
             },
