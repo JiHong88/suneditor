@@ -327,6 +327,17 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
+         * @description Determine whether any of the matched elements are assigned the given class
+         * @param {element} element - Elements to search class name
+         * @param {string} className - Class name to search for
+         */
+        hasClass: function (element, className) {
+            if (!element) return;
+
+            return element.classList.contains(className.trim());
+        },
+
+        /**
          * @description Append the className value of the argument value element
          * @param {element} element - Elements to add class name
          * @param {string} className - Class name to be add
@@ -433,15 +444,15 @@ SUNEDITOR.defaultLang = {
              * @property {element} SIZE - font size button
              */
             commandMap: {
-                FONT: context.tool.font,
                 FORMAT: context.tool.format,
+                FONT: context.tool.font,
+                SIZE: context.tool.fontSize,
                 B: context.tool.bold,
                 U: context.tool.underline,
                 I: context.tool.italic,
                 STRIKE: context.tool.strike,
                 SUB: context.tool.subscript,
-                SUP: context.tool.superscript,
-                SIZE: context.tool.fontSize
+                SUP: context.tool.superscript
             },
 
             /**
@@ -1625,21 +1636,17 @@ SUNEDITOR.defaultLang = {
                     }
                 }
 
-                /** remove */
-                const commandKeys = Object.keys(commandMap);
-                let keyName = '';
-                for (let i = 0, len = commandKeys.length; i < len; i++) {
-                    keyName = commandKeys[i];
-                    if (findNodeNames.indexOf(keyName) > -1) continue;
-
-                    if (/^FONT/i.test(keyName)) {
-                        dom.changeTxt(commandMap[keyName], SUNEDITOR.lang.toolbar.font);
+                /** remove class, display text */
+                for (let key in commandMap) {
+                    if (findNodeNames.indexOf(key) > -1) continue;
+                    if (/^FONT/i.test(key)) {
+                        dom.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.font);
                     }
-                    else if (/^SIZE$/i.test(keyName)) {
-                        dom.changeTxt(commandMap[keyName], SUNEDITOR.lang.toolbar.fontSize);
+                    else if (/^SIZE$/i.test(key)) {
+                        dom.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
-                        dom.removeClass(commandMap[keyName], 'on');
+                        dom.removeClass(commandMap[key], 'on');
                     }
                 }
             },
@@ -1728,12 +1735,25 @@ SUNEDITOR.defaultLang = {
                             editor.toggleDisplayBlocks();
                             dom.toggleClass(target, 'on');
                             break;
+                        case 'subscript':
+                            if (dom.hasClass(context.tool.superscript, 'on')) {
+                                editor.execCommand('superscript', false, null);
+                                dom.removeClass(context.tool.superscript, 'on');
+                            }
+                            editor.execCommand(command, false, null);
+                            dom.toggleClass(target, 'on');
+                            break;
+                        case 'superscript':
+                            if (dom.hasClass(context.tool.subscript, 'on')) {
+                                editor.execCommand('subscript', false, null);
+                                dom.removeClass(context.tool.subscript, 'on');
+                            }
+                            editor.execCommand(command, false, null);
+                            dom.toggleClass(target, 'on');
+                            break;
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
                             dom.toggleClass(target, 'on');
-                            /** button effect */
-                            if (/^subscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.superscript, 'on');
-                            else if (/^superscript$/.test(command)) SUNEDITOR.dom.removeClass(context.tool.subscript, 'on');
                     }
                 }
             },
