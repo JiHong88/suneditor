@@ -173,7 +173,7 @@
 .sun-editor .sun-editor-id-editorArea {-webkit-overflow-scrolling:touch !important; overflow:auto !important;}
 
 /* resize bar */
-.sun-editor .sun-editor-id-resizeBar {width:100%; height:10px; border-top:1px solid #dadada; background-color:#fafafa; cursor:ns-resize;}
+.sun-editor .sun-editor-id-resizeBar {width:100%; height:17px; font-size:12px; font-weight:bold; line-height:1.4; border-top:1px solid #dadada; padding-left:10px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .sun-editor-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 
 /* dialog */

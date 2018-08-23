@@ -61,14 +61,15 @@
         <div class="highlight highlight-source-js">
 <pre>
 <span class="pl-c">// User Options</span>
-<span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List              <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List            <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                             <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor               <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span>
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor              <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width || textarea.offsetWidth</span>
-<span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor          <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.display || 'block'</span>
-<span class="pl-s">videoX</span><span class="pl-k">          : </span>The default width size of the video frame  <span class="pl-ent">default : </span><span class="pl-c1">560</span>
-<span class="pl-s">videoY</span><span class="pl-k">          : </span>The default heigth size of the video frame <span class="pl-ent">default : </span><span class="pl-c1">315</span>
+<span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                                    <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span>
+<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width || textarea.offsetWidth</span>
+<span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor                 <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.display || 'block'</span>
+<span class="pl-s">videoX</span><span class="pl-k">          : </span>The default width size of the video frame         <span class="pl-ent">default : </span><span class="pl-c1">560</span>
+<span class="pl-s">videoY</span><span class="pl-k">          : </span>The default heigth size of the video frame        <span class="pl-ent">default : </span><span class="pl-c1">315</span>
+<span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizebar  <span class="pl-ent">default : </span><span class="pl-c1">true</span>
 
 <span class="pl-k">imageFileInput</span><span class="pl-k">  : </span>Choose whether to create a file input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span>
 
@@ -148,6 +149,11 @@
     <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>frm<span class="pl-pds">'</span></span>).<span class="pl-c1">submit</span>();
 };
 
+<span class="pl-c">/** Gets the suneditor's context object. Contains settings, plugins, and cached element objects */</span>
+<span class="pl-k">function</span> <span class="pl-en">sun_getContext</span>() {
+    <span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContext</span>());
+};
+
 <span class="pl-c">/** Gets the contents of the suneditor */</span>
 <span class="pl-k">function</span> <span class="pl-en">sun_getContent</span>() {
     <span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContent</span>());
@@ -196,6 +202,7 @@
             <textarea id="exampleFunction" style="width:100%; height:150px;">User Function Test</textarea>
             <p></p>
             <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContent()">GetContent</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContent('set content')">SetContent</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContent('append content<br>')">AppendContent</button>
@@ -341,6 +348,10 @@
     function sun_save() {
         suneditor.save();
         document.getElementById('frm').submit();
+    }
+
+    function sun_getContext() {
+        console.log(suneditor.getContext());
     }
 
     function sun_getContent() {

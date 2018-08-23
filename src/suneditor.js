@@ -466,6 +466,7 @@ SUNEDITOR.defaultLang = {
              * @property {number} tabSize - Indented size when tab button clicked (4)
              * @property {element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
              * @property {number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
+             * @property {array} currentNodes -  An array of the current cursor's node structure
              * @property {boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
              * @private
              */
@@ -479,6 +480,7 @@ SUNEDITOR.defaultLang = {
                 tabSize: 4,
                 originCssText: context.element.topArea.style.cssText,
                 editorHeight: context.user.height,
+                currentNodes: [],
                 isTouchMove: false
             },
 
@@ -1555,7 +1557,8 @@ SUNEDITOR.defaultLang = {
             _findButtonEffectTag: function () {
                 const commandMap = editor.commandMap;
                 const classOnCheck = this._changeButtonClassTagCheck;
-                const findNodeNames = [];
+                const commandMapNodes = [];
+                const currentNodes = [];
 
                 let findFormat = true, findFont = true, findSize = true, findA = true;
                 let findB = true, findI = true, findU = true, findS = true;
@@ -1564,10 +1567,11 @@ SUNEDITOR.defaultLang = {
                 for (let selectionParent = editor._variable.selectionNode; !/^(?:BODY|HTML)$/i.test(selectionParent.nodeName); selectionParent = selectionParent.parentNode) {
                     if (selectionParent.nodeType !== 1) continue;
                     nodeName = selectionParent.nodeName.toUpperCase();
+                    currentNodes.push(nodeName);
 
                     /** Format */
                     if (findFormat && /^(?:P|DIV|H\d)$/.test(nodeName)) {
-                        findNodeNames.push('FORMAT');
+                        commandMapNodes.push('FORMAT');
                         dom.changeTxt(commandMap['FORMAT'], nodeName);
                         findFormat = false;
                         continue;
@@ -1575,7 +1579,7 @@ SUNEDITOR.defaultLang = {
 
                     /** Font */
                     if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
-                        findNodeNames.push('FONT');
+                        commandMapNodes.push('FONT');
                         const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
                         dom.changeTxt(commandMap['FONT'], selectFont);
                         findFont = false;
@@ -1597,7 +1601,7 @@ SUNEDITOR.defaultLang = {
                     if (findSize && /^SPAN$/.test(nodeName)) {
                         /** font size */
                         if (selectionParent.style.fontSize.length > 0) {
-                            findNodeNames.push('SIZE');
+                            commandMapNodes.push('SIZE');
                             dom.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                             findSize = false;
                         }
@@ -1606,31 +1610,31 @@ SUNEDITOR.defaultLang = {
                     /** command map */
                     cssText = selectionParent.style.cssText;
                     if (findB && /font\-weight\s*:\s*(?:\d+|bold|bolder)(?:;|\s|)/.test(cssText)) {
-                        findNodeNames.push('B');
+                        commandMapNodes.push('B');
                         findB = false;
                     }
                     if (findI && /font\-style\s*:\s*(?:italic|oblique)(?:;|\s)/.test(cssText)) {
-                        findNodeNames.push('I');
+                        commandMapNodes.push('I');
                         findI = false;
                     }
                     if (findU && /text\-decoration(?:\-line)?\s*:\s*underline(?:;|\s|)/.test(cssText)) {
-                        findNodeNames.push('U');
+                        commandMapNodes.push('U');
                         findU = false;
                     }
                     if (findS && /text\-decoration(?:\-line)?\s*:\s*line-through(?:;|\s|)/.test(cssText)) {
-                        findNodeNames.push('STRIKE');
+                        commandMapNodes.push('STRIKE');
                         findS = false;
                     }
 
-                    findNodeNames.push((/^STRONG$/.test(nodeName) ? 'B' : /^EM$/.test(nodeName) ? 'I' : nodeName));
+                    commandMapNodes.push((/^STRONG$/.test(nodeName) ? 'B' : /^EM$/.test(nodeName) ? 'I' : nodeName));
                 }
 
                 /** A Tag edit controller off */
                 if (findA) editor.controllersOff();
 
                 /** toggle class on */
-                for (let i = 0; i < findNodeNames.length; i++) {
-                    nodeName = findNodeNames[i];
+                for (let i = 0; i < commandMapNodes.length; i++) {
+                    nodeName = commandMapNodes[i];
                     if (classOnCheck.test(nodeName)) {
                         dom.addClass(commandMap[nodeName], 'on');
                     }
@@ -1638,7 +1642,7 @@ SUNEDITOR.defaultLang = {
 
                 /** remove class, display text */
                 for (let key in commandMap) {
-                    if (findNodeNames.indexOf(key) > -1) continue;
+                    if (commandMapNodes.indexOf(key) > -1) continue;
                     if (/^FONT/i.test(key)) {
                         dom.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.font);
                     }
@@ -1649,6 +1653,12 @@ SUNEDITOR.defaultLang = {
                         dom.removeClass(commandMap[key], 'on');
                     }
                 }
+
+                /** save current nodes */
+                editor._variable.currentNodes = currentNodes.reverse();
+
+                /**  Displays the current node structure to resizebar */
+                if (context.user.showPathLabel) context.element.resizebar.innerText = editor._variable.currentNodes.join(' > ');
             },
 
             resize_window: function () {
@@ -1956,6 +1966,14 @@ SUNEDITOR.defaultLang = {
                 } else {
                     context.element.textElement.innerHTML = context.element.code.value;
                 }
+            },
+
+            /**
+             * @description Gets the suneditor's context object. Contains settings, plugins, and cached element objects
+             * @returns {Object}
+             */
+            getContext: function () {
+                return context;
             },
 
             /**
@@ -2303,6 +2321,7 @@ SUNEDITOR.defaultLang = {
         options.fontList = options.fontList || null;
         options.fontSizeList = options.fontSizeList || null;
         options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
+        options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formats'],
@@ -2450,7 +2469,8 @@ SUNEDITOR.defaultLang = {
                 addFont: options.addFont,
                 fontList: options.fontList,
                 fontSizeList: options.fontSizeList,
-                height: options.height.match(/\d+/)[0]
+                height: options.height.match(/\d+/)[0],
+                showPathLabel: options.showPathLabel
             }
         };
     }
