@@ -485,6 +485,11 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
+             * @description Regular expression to check whether it is format tag
+             */
+            _isformatTagName: new RegExp('^(?:P|DIV|H\\d)$', 'i'),
+
+            /**
              * @description Call the module
              * @param {string} directory - The directory(plugin/{directory}) of the js file to call
              * @param {string} moduleName - The name of the js file to call
@@ -931,7 +936,11 @@ SUNEDITOR.defaultLang = {
                     /** No node selected */
                     if (startOff === endOff) {
                         newNode.innerHTML = '&nbsp;';
-                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                        if (this._isformatTagName.test(startCon.nodeName)) {
+                            startCon.appendChild(newNode);
+                        } else {
+                            startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                        }
                     }
                     /** Select within the same node */
                     else {
@@ -1570,7 +1579,7 @@ SUNEDITOR.defaultLang = {
                     currentNodes.push(nodeName);
 
                     /** Format */
-                    if (findFormat && /^(?:P|DIV|H\d)$/.test(nodeName)) {
+                    if (findFormat && editor._isformatTagName.test(nodeName)) {
                         commandMapNodes.push('FORMAT');
                         dom.changeTxt(commandMap['FORMAT'], nodeName);
                         findFormat = false;
@@ -1823,8 +1832,10 @@ SUNEDITOR.defaultLang = {
                 /** default key action */
                 switch (keyCode) {
                     case 8: /**backspace key*/
-                        if (/^P$/i.test(editor._variable.selectionNode.tagName) && editor._variable.selectionNode.previousSibling === null) {
+                        if (editor._isformatTagName.test(editor._variable.selectionNode.tagName) && editor._variable.selectionNode.previousSibling === null) {
                             e.preventDefault();
+                            e.stopPropagation();
+                            editor._variable.selectionNode.innerHTML = '&#65279';
                             return false;
                         }
                         break;
@@ -1886,6 +1897,19 @@ SUNEDITOR.defaultLang = {
 
             onKeyUp_wysiwyg: function (e) {
                 editor._setSelectionNode();
+
+                /** when format tag deleted */
+                if (e.keyCode === 8 && /^BODY$/i.test(editor._variable.selectionNode.tagName)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const oFormatTag = document.createElement(editor._variable.currentNodes[0]);
+                    oFormatTag.innerHTML = '&#65279';
+
+                    editor._variable.selectionNode.appendChild(oFormatTag);
+                    editor._variable.selectionNode = oFormatTag;
+                }
+
                 if (event._directionKeyKeyCode.test(e.keyCode)) {
                     event._findButtonEffectTag();
                 }
