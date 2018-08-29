@@ -957,6 +957,7 @@ SUNEDITOR.defaultLang = {
                         if (isElement) {
                             newNode.innerHTML = startCon.outerHTML;
                             startCon.parentNode.appendChild(newNode);
+                            dom.removeItem(startCon);
                         } else {
                             const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                             const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
@@ -1014,7 +1015,7 @@ SUNEDITOR.defaultLang = {
                     else {
                         // get line nodes
                         const lineNodes = dom.getListChildren(commonCon, function (current) {
-                            return /^P$/i.test(current.nodeName);
+                            return this._isformatTagName.test(current.nodeName);
                         });
 
                         let startLine = dom.getParentElement(startCon, 'P');
