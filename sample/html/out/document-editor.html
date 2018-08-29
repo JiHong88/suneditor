@@ -48,11 +48,18 @@
                     <td class="description last">editor elements (Contains sub-options)</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;textElement</code></td>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;originElement</code></td>
                     <td class="type">
                         <span class="param-type">element</span>
                     </td>
-                    <td class="description last">"textarea" before creating the editor</td>
+                    <td class="description last">"Textarea" to be the base of the editor</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;originElementDisplay</code></td>
+                    <td class="type">
+                        <span class="param-type">string</span>
+                    </td>
+                    <td class="description last">The display value of "originElement" style attribute</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;topArea</code></td>
@@ -678,33 +685,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="getLineElement"><span class="type-signature"></span>getLineElement<span
-                    class="signature">(element)</span><span class="type-signature"> &rarr; {element}</span></h4>
-            <div class="description">
-                Get line node of the paramater node value (P,Table, H1, H2, H3, H4, H5, H6)
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>element</code></td>
-                    <td class="type">
-                        <span class="param-type">element</span>
-                    </td>
-                    <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="appendP"><span class="type-signature"></span>appendP<span
                     class="signature">(element)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -920,7 +900,6 @@
         <li><a href="document-editor.html#setRange">setRange</a></li>
         <li><a href="document-editor.html#showLoading">showLoading</a></li>
         <li><a href="document-editor.html#closeLoading">closeLoading</a></li>
-        <li><a href="document-editor.html#getLineElement">getLineElement</a></li>
         <li><a href="document-editor.html#appendP">appendP</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>

@@ -303,6 +303,33 @@ SUNEDITOR.plugin.image = {
         return false;
     },
 
+    create_caption: function () {
+        const caption = document.createElement('FIGCAPTION');
+        
+        caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
+        caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+
+        return caption;
+    },
+
+    set_cover: function (imageElement) {
+        const cover = document.createElement('FIGURE');
+        cover.className = 'sun-editor-image-cover';
+        cover.appendChild(imageElement);
+
+        return cover;
+    },
+
+    set_container: function (cover) {
+        const container = document.createElement('DIV');
+        container.className = 'sun-editor-id-image-container';
+        container.setAttribute('contenteditable', false);
+        container.style.textAlign = 'center';
+        container.appendChild(cover);
+
+        return container;
+    },
+
     create_image: function (src, linkValue, linkNewWindow, width, align, update) {
         if (update) {
             this.context.image._element.src = src;
@@ -310,9 +337,6 @@ SUNEDITOR.plugin.image = {
         }
 
         let oImg = document.createElement('IMG');
-        const cover = document.createElement('FIGURE');
-        const container = document.createElement('DIV');
-
         oImg.src = src;
         oImg.style.width = width;
         oImg.setAttribute('data-align', align);
@@ -320,41 +344,43 @@ SUNEDITOR.plugin.image = {
         oImg.alt = this.context.image._altText;
         oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
 
-        cover.className = 'sun-editor-image-cover';
-        cover.appendChild(oImg);
+        const cover = SUNEDITOR.plugin.image.set_cover.call(this, oImg);
+        const container = SUNEDITOR.plugin.image.set_container.call(this, cover);
 
         // caption
         if (this.context.image._captionChecked) {
-            const caption = document.createElement('FIGCAPTION');
             this.context.image._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
             cover.appendChild(this.context.image._imageCaption);
         }
-
-        container.className = 'sun-editor-id-image-container';
-        container.setAttribute('contenteditable', false);
-        container.style.textAlign = 'center';
-        container.appendChild(cover);
-
+        
         // align
         if ('center' !== align) {
             container.style.display = 'inline-block';
             container.style.float = align;
         }
 
-        this.insertNode(container, this.getLineElement(this.getSelectionNode()));
+        this.insertNode(container, SUNEDITOR.dom.getFormatElement(this.getSelectionNode()));
         this.appendP(container);
     },
 
     update_image: function () {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
-        const container = SUNEDITOR.dom.getParentNode(contextImage._element, '.sun-editor-id-image-container') || contextImage._element;
-        const cover = SUNEDITOR.dom.getParentNode(contextImage._element, '.sun-editor-image-cover');
-        let newEl;
+        let cover = SUNEDITOR.dom.getParentElement(contextImage._element, '.sun-editor-image-cover');
+        let container = SUNEDITOR.dom.getParentElement(contextImage._element, '.sun-editor-id-image-container');
+        let isNewContainer = false;
 
-        if (contextImage.imgInputFile.value.length === 0 && contextImage.imgUrlFile.value.trim().length === 0) {
-            SUNEDITOR.dom.removeItem(container);
-            return;
+        if (cover === null) {
+            isNewContainer = true;
+            cover = SUNEDITOR.plugin.image.set_cover.call(this, contextImage._element.cloneNode(true));
+        }
+
+        if (container === null) {
+            isNewContainer = true;
+            container = SUNEDITOR.plugin.image.set_container.call(this, cover.cloneNode(true));
+        } else if (isNewContainer) {
+            container.innerHTML = '';
+            container.appendChild(cover);
         }
 
         // input update
@@ -397,7 +423,7 @@ SUNEDITOR.plugin.image = {
                 contextImage._linkElement.target = this.context.image.imgLinkNewWindowCheck.checked;
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
-                newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                let newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
                 cover.innerHTML = '';
                 cover.appendChild(newEl);
             }
@@ -410,19 +436,16 @@ SUNEDITOR.plugin.image = {
             imageElement.style.margin = '';
             imageElement.style.outline = '';
 
-            newEl = imageElement.cloneNode(true);
+            let newEl = imageElement.cloneNode(true);
             cover.innerHTML = '';
             cover.appendChild(newEl);
         }
-    },
 
-    create_caption: function () {
-        const caption = document.createElement('FIGCAPTION');
-        
-        caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
-        caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
-
-        return caption;
+        if (isNewContainer) {
+            const existElement = SUNEDITOR.dom.getFormatElement(contextImage._element);
+            existElement.parentNode.insertBefore(container, existElement);
+            SUNEDITOR.dom.removeItem(existElement);
+        }
     },
 
     toggle_caption_contenteditable: function (on, e) {
@@ -485,7 +508,7 @@ SUNEDITOR.plugin.image = {
     },
 
     destroy: function () {
-        const imageContainer = SUNEDITOR.dom.getParentNode(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
+        const imageContainer = SUNEDITOR.dom.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
         SUNEDITOR.dom.removeItem(imageContainer);
         SUNEDITOR.plugin.image.init.call(this);
     },

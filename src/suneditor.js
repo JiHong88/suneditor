@@ -280,15 +280,16 @@ SUNEDITOR.defaultLang = {
         },
 
         /**
-         * @description Argument value The argument value of the parent node of the element.
+         * @description Get the parent element of the argument value.
          * A tag that satisfies the query condition is imported.
+         * Returns null if not found.
          * @param {Node} element - Reference element
          * @param {string} query - Query String (tagName, .className, #ID, :name)
          * Not use it like jquery.
          * Only one condition can be entered at a time.
-         * @returns {Element}
+         * @returns {Element|null}
          */
-        getParentNode: function (element, query) {
+        getParentElement: function (element, query) {
             let attr;
 
             if (/\./.test(query)) {
@@ -311,6 +312,25 @@ SUNEDITOR.defaultLang = {
                     return null;
                 }
                 element = element.parentNode;
+            }
+
+            return element;
+        },
+
+        /**
+         * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...Tag whose parent is the "BODY")
+         * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
+         * @returns {Element}
+         */
+        getFormatElement: function (element) {
+            if (!element) return null;
+
+            if (!element || /^(?:HTML|BODY)$/i.test(element.tagName)) {
+                element = context.element.wysiwygWindow.document.body.firstChild;
+            } else {
+                while (!/^BODY$/i.test(element.parentNode.tagName)) {
+                    element = element.parentNode;
+                }
             }
 
             return element;
@@ -601,7 +621,7 @@ SUNEDITOR.defaultLang = {
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                const caption = dom.getParentNode(this._variable.selectionNode, 'figcaption');
+                const caption = dom.getParentElement(this._variable.selectionNode, 'figcaption');
                 if (caption) {
                     caption.focus();
                 } else {
@@ -720,25 +740,6 @@ SUNEDITOR.defaultLang = {
             },
 
             /**
-             * @description Get line node of the paramater node value (P,Table, H1, H2, H3, H4, H5, H6)
-             * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
-             * @returns {Element}
-             */
-            getLineElement: function (element) {
-                element = element || this._variable.selectionNode;
-
-                if (!element || /^(?:HTML|BODY)$/i.test(element.tagName)) {
-                    element = context.element.wysiwygWindow.document.body.firstChild;
-                } else {
-                    while (!/^BODY$/i.test(element.parentNode.tagName)) {
-                        element = element.parentNode;
-                    }
-                }
-
-                return element;
-            },
-
-            /**
              * @description Append P tag to current line next
              * @param {element} element - Insert as siblings of that element
              * @returns {element}
@@ -747,7 +748,7 @@ SUNEDITOR.defaultLang = {
                 const oP = document.createElement('P');
                 oP.innerHTML = '&#65279';
 
-                element = this.getLineElement(element);
+                element = dom.getFormatElement(element);
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
 
                 return oP;
@@ -1002,8 +1003,8 @@ SUNEDITOR.defaultLang = {
                             return /^P$/i.test(current.nodeName);
                         });
 
-                        let startLine = dom.getParentNode(startCon, 'P');
-                        let endLine = dom.getParentNode(endCon, 'P');
+                        let startLine = dom.getParentElement(startCon, 'P');
+                        let endLine = dom.getParentElement(endCon, 'P');
 
                         for (let i = 0, len = lineNodes.length; i < len; i++) {
                             if (startLine === lineNodes[i]) {
@@ -1455,7 +1456,7 @@ SUNEDITOR.defaultLang = {
              * @param command {String} - Separator ("indent" or "outdent")
              */
             indent: function (node, command) {
-                const p = dom.getParentNode(node, 'P');
+                const p = dom.getParentElement(node, 'P');
                 if (!p) return;
 
                 let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1850,7 +1851,7 @@ SUNEDITOR.defaultLang = {
                         }
 
                         if (currentNode && /^TD$/i.test(currentNode.tagName)) {
-                            const table = dom.getParentNode(currentNode, 'table');
+                            const table = dom.getParentElement(currentNode, 'table');
                             const cells = dom.getListChildren(table, dom.isCell);
                             let idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
 
@@ -1986,9 +1987,9 @@ SUNEDITOR.defaultLang = {
              */
             save: function () {
                 if (editor._variable.wysiwygActive) {
-                    context.element.textElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
+                    context.element.originElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
                 } else {
-                    context.element.textElement.innerHTML = context.element.code.value;
+                    context.element.originElement.innerHTML = context.element.code.value;
                 }
             },
 
@@ -2081,10 +2082,29 @@ SUNEDITOR.defaultLang = {
              * @description Destroy the suneditor
              */
             destroy: function () {
+                /** remove event listeners */
+                context.tool.bar.removeEventListener('touchstart', event.touchstart_toolbar);
+                context.tool.bar.removeEventListener('touchmove', event.touchmove_toolbar);
+                context.tool.bar.removeEventListener('touchend', event.onClick_toolbar);
+                context.tool.bar.removeEventListener('click', event.onClick_toolbar);
+                context.element.wysiwygWindow.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
+                context.element.wysiwygWindow.removeEventListener('keydown', event.onKeyDown_wysiwyg);
+                context.element.wysiwygWindow.removeEventListener('keyup', event.onKeyUp_wysiwyg);
+                context.element.wysiwygWindow.removeEventListener('scroll', event.onScroll_wysiwyg);
+                context.element.wysiwygWindow.removeEventListener('drop', event.onDrop_wysiwyg);
+                context.element.resizebar.removeEventListener('mousedown', event.onMouseDown_resizeBar);
+                window.removeEventListener('resize', event.resize_window);
+                
+                /** remove element */
                 context.element.topArea.parentNode.removeChild(context.element.topArea);
-                context.element.textElement.style.display = '';
+                context.element.originElement.style.display = context.element.originElementDisplay;
+
+                context = null;
+                dom = null;
+                util = null;
 
                 this.save = null;
+                this.getContext = null;
                 this.getContent = null;
                 this.setContent = null;
                 this.appendContent = null;
@@ -2436,6 +2456,7 @@ SUNEDITOR.defaultLang = {
 
         return {
             constructed: {
+                _originElementDisplay: window.getComputedStyle(element).display,
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar,
@@ -2459,7 +2480,8 @@ SUNEDITOR.defaultLang = {
     function _Context(element, cons, options) {
         return {
             element: {
-                textElement: element,
+                originElement: element,
+                originElementDisplay: cons._originElementDisplay,
                 topArea: cons._top,
                 relative: cons._relative,
                 resizebar: cons._resizeBar,
@@ -2519,6 +2541,7 @@ SUNEDITOR.defaultLang = {
         }
 
         element.style.display = 'none';
+        cons.constructed._top.style.display = cons.constructed._originElementDisplay;
 
         /** Create to sibling node */
         if (typeof element.nextElementSibling === 'object') {
