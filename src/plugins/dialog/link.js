@@ -159,7 +159,7 @@ SUNEDITOR.plugin.link = {
         }
         else {
             /** delete */
-            SUNEDITOR.dom.removeItem(this.context.link._linkAnchor);
+            this.dom.removeItem(this.context.link._linkAnchor);
             this.context.link._linkAnchor = null;
             this.focus();
         }

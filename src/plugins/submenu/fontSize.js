@@ -51,7 +51,7 @@ SUNEDITOR.plugin.fontSize = {
 
         this.focus();
 
-        SUNEDITOR.dom.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
+        this.dom.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
         const newNode = document.createElement('SPAN'); newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
         this.wrapRangeToTag(newNode, ['font-size']);
         this.submenuOff();

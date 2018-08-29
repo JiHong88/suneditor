@@ -431,6 +431,14 @@ SUNEDITOR.defaultLang = {
              */
             context: context,
             /**
+             * @description SUNEDITOR.dom
+             */
+            dom: dom,
+            /**
+             * @description SUNEDITOR.util
+             */
+            util: util,
+            /**
              * @description loaded plugins
              */
             loadedPlugins: {},
@@ -945,20 +953,26 @@ SUNEDITOR.defaultLang = {
                     }
                     /** Select within the same node */
                     else {
-                        const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
-
-                        newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
-
-                        if (beforeNode.data.length > 0) {
-                            startCon.data = beforeNode.data;
+                        const isElement = startCon.nodeType === 1;
+                        if (isElement) {
+                            newNode.innerHTML = startCon.outerHTML;
+                            startCon.parentNode.appendChild(newNode);
                         } else {
-                            startCon.data = startCon.substringData(0, startOff);
-                        }
-
-                        if (afterNode.data.length > 0) {
-                            startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                            const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                            const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+    
+                            newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+                            startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+    
+                            if (beforeNode.data.length > 0) {
+                                startCon.data = beforeNode.data;
+                            } else {
+                                startCon.data = startCon.substringData(0, startOff);
+                            }
+    
+                            if (afterNode.data.length > 0) {
+                                startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                            }
                         }
                     }
 
@@ -1474,7 +1488,7 @@ SUNEDITOR.defaultLang = {
              * @description Add or remove the class name of "body" so that the code block is visible
              */
             toggleDisplayBlocks: function () {
-                SUNEDITOR.dom.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
+                dom.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
             },
 
             /**

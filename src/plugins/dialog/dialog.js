@@ -188,7 +188,7 @@ SUNEDITOR.plugin.dialog = {
         this.context.dialog.resizeButton.style.top = (h + t) + 'px';
         this.context.dialog.resizeButton.style.left = l + 'px';
 
-        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, w + ' x ' + h);
+        this.dom.changeTxt(this.context.dialog.resizeDisplay, w + ' x ' + h);
 
         this.context.dialog.resizeContainer.style.display = 'block';
         this.context.dialog.resizeButton.style.display = 'block';
@@ -296,6 +296,6 @@ SUNEDITOR.plugin.dialog = {
 
         this.context.dialog._resize_w = resultW;
         this.context.dialog._resize_h = resultH;
-        SUNEDITOR.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        this.dom.changeTxt(this.context.dialog.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

@@ -154,12 +154,12 @@ SUNEDITOR.plugin.image = {
 		// Get all elements with class="tablinks" and remove the class "active"
 		tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
 		for (i = 0; i < tablinks.length; i++) {
-		    SUNEDITOR.dom.removeClass(tablinks[i], 'active');
+            this.dom.removeClass(tablinks[i], 'active');
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
         this.context.image.modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
-        SUNEDITOR.dom.addClass(targetElement, 'active');
+        this.dom.addClass(targetElement, 'active');
 
         // focus
         if (tabName === 'image') {
@@ -186,7 +186,7 @@ SUNEDITOR.plugin.image = {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    SUNEDITOR.plugin.image.xmlHttp = SUNEDITOR.util.getXMLHttpRequest();
+                    SUNEDITOR.plugin.image.xmlHttp = this.util.getXMLHttpRequest();
                     SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
                     SUNEDITOR.plugin.image.xmlHttp.open('post', imageUploadUrl, true);
                     SUNEDITOR.plugin.image.xmlHttp.send(formData);
@@ -359,15 +359,15 @@ SUNEDITOR.plugin.image = {
             container.style.float = align;
         }
 
-        this.insertNode(container, SUNEDITOR.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container, this.dom.getFormatElement(this.getSelectionNode()));
         this.appendP(container);
     },
 
     update_image: function () {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
-        let cover = SUNEDITOR.dom.getParentElement(contextImage._element, '.sun-editor-image-cover');
-        let container = SUNEDITOR.dom.getParentElement(contextImage._element, '.sun-editor-id-image-container');
+        let cover = this.dom.getParentElement(contextImage._element, '.sun-editor-image-cover');
+        let container = this.dom.getParentElement(contextImage._element, '.sun-editor-id-image-container');
         let isNewContainer = false;
 
         if (cover === null) {
@@ -401,7 +401,7 @@ SUNEDITOR.plugin.image = {
             }
         } else {
             if (contextImage._imageCaption) {
-                SUNEDITOR.dom.removeItem(contextImage._imageCaption);
+                this.dom.removeItem(contextImage._imageCaption);
             }
         }
 
@@ -442,9 +442,9 @@ SUNEDITOR.plugin.image = {
         }
 
         if (isNewContainer) {
-            const existElement = SUNEDITOR.dom.getFormatElement(contextImage._element);
+            const existElement = this.dom.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
-            SUNEDITOR.dom.removeItem(existElement);
+            this.dom.removeItem(existElement);
         }
     },
 
@@ -508,8 +508,8 @@ SUNEDITOR.plugin.image = {
     },
 
     destroy: function () {
-        const imageContainer = SUNEDITOR.dom.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
-        SUNEDITOR.dom.removeItem(imageContainer);
+        const imageContainer = this.dom.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
+        this.dom.removeItem(imageContainer);
         SUNEDITOR.plugin.image.init.call(this);
     },
 

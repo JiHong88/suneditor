@@ -54,7 +54,7 @@ SUNEDITOR.plugin.horizontalRules = {
         oHr.className = className;
 
         this.focus();
-        this.insertNode(oHr, SUNEDITOR.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(oHr, this.dom.getFormatElement(this.getSelectionNode()));
 
         const oP = this.appendP(oHr);
         this.setRange(oP, 0, oP, 0);
