@@ -2567,15 +2567,4 @@ SUNEDITOR.defaultLang = {
 
         return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.util);
     };
-
-    /**
-     * @description Destroy the suneditor
-     * @param {string} elementId - textarea Id
-     */
-    SUNEDITOR.destroy = function (elementId) {
-        const element = document.getElementById('suneditor_' + elementId);
-        element.parentNode.removeChild(element);
-        document.getElementById(elementId).style.display = '';
-    };
-
 })();
