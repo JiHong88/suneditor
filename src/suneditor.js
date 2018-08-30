@@ -1683,7 +1683,7 @@ SUNEDITOR.defaultLang = {
                 editor._variable.currentNodes = currentNodes.reverse();
 
                 /**  Displays the current node structure to resizebar */
-                if (context.user.showPathLabel) context.element.resizebar.innerText = editor._variable.currentNodes.join(' > ');
+                if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
             },
 
             resize_window: function () {
@@ -2112,7 +2112,7 @@ SUNEDITOR.defaultLang = {
                 
                 /** remove element */
                 context.element.topArea.parentNode.removeChild(context.element.topArea);
-                context.element.originElement.style.display = context.element.originElementDisplay;
+                context.element.originElement.style.display = 'block';
 
                 context = null;
                 dom = null;
@@ -2450,6 +2450,12 @@ SUNEDITOR.defaultLang = {
         const resize_bar = doc.createElement('DIV');
         resize_bar.className = 'sun-editor-id-resizeBar';
 
+        /** navigation */
+        const navigation = doc.createElement('SPAN');
+        navigation.className = 'sun-editor-id-navigation';
+        const caret = doc.createElement('SPAN');
+        caret.innerHTML = '&nbsp;';
+
         /** loading box */
         const loading_box = doc.createElement('DIV');
         loading_box.className = 'sun-editor-id-loading';
@@ -2462,6 +2468,8 @@ SUNEDITOR.defaultLang = {
         /** append html */
         editor_div.appendChild(iframe);
         editor_div.appendChild(textarea);
+        resize_bar.appendChild(caret);
+        resize_bar.appendChild(navigation);
         relative.appendChild(tool_bar);
         relative.appendChild(editor_div);
         relative.appendChild(resize_bar);
@@ -2471,12 +2479,12 @@ SUNEDITOR.defaultLang = {
 
         return {
             constructed: {
-                _originElementDisplay: window.getComputedStyle(element).display,
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar,
                 _editorArea: editor_div,
                 _resizeBar: resize_bar,
+                _navigation: navigation,
                 _loading: loading_box,
                 _resizeBack: resize_back
             },
@@ -2496,10 +2504,10 @@ SUNEDITOR.defaultLang = {
         return {
             element: {
                 originElement: element,
-                originElementDisplay: cons._originElementDisplay,
                 topArea: cons._top,
                 relative: cons._relative,
                 resizebar: cons._resizeBar,
+                navigation: cons._navigation,
                 editorArea: cons._editorArea,
                 wysiwygWindow: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0].contentWindow,
                 wysiwygElement: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0],
@@ -2556,7 +2564,7 @@ SUNEDITOR.defaultLang = {
         }
 
         element.style.display = 'none';
-        cons.constructed._top.style.display = cons.constructed._originElementDisplay;
+        cons.constructed._top.style.display = 'block';
 
         /** Create to sibling node */
         if (typeof element.nextElementSibling === 'object') {
