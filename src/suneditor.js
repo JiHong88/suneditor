@@ -2464,8 +2464,6 @@
         /** navigation */
         const navigation = doc.createElement('SPAN');
         navigation.className = 'sun-editor-id-navigation';
-        const caret = doc.createElement('SPAN');
-        caret.innerHTML = '&nbsp;';
 
         /** loading box */
         const loading_box = doc.createElement('DIV');
@@ -2479,7 +2477,6 @@
         /** append html */
         editor_div.appendChild(iframe);
         editor_div.appendChild(textarea);
-        resize_bar.appendChild(caret);
         resize_bar.appendChild(navigation);
         relative.appendChild(tool_bar);
         relative.appendChild(editor_div);

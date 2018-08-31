@@ -7,11 +7,9 @@ module.exports = {
 		rules: [
 			{
 				test: /\.css$/,
-
 				use: [
 					{
 						loader: 'style-loader',
-
 						options: {
 							sourceMap: true
 						}

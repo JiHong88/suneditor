@@ -1,8 +1,8 @@
 @charset "UTF-8";
 
 /* suneditor main */
-.sun-editor {width:auto; height:auto; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
-.sun-editor * {font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
+.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
+.sun-editor * {box-sizing:border-box; font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
 .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
 .sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
 .sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
@@ -173,7 +173,7 @@
 .sun-editor .sun-editor-id-editorArea {-webkit-overflow-scrolling:touch !important; overflow:auto !important;}
 
 /* resize bar */
-.sun-editor .sun-editor-id-resizeBar {width:100%; line-height:0.8; border-top:1px solid #dadada; padding:2px 8px 2px; background-color:#fafafa; cursor:ns-resize;}
+.sun-editor .sun-editor-id-resizeBar {width:auto; height:16px; line-height:0.8; border-top:1px solid #dadada; padding:2px 8px 2px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .sun-editor-id-resizeBar span {margin:0; padding:0;}
 .sun-editor .sun-editor-id-navigation {position:relative; width:auto; height:auto; font-size:12px; font-weight:bold;}
 .sun-editor .sun-editor-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
