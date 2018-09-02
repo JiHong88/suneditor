@@ -25,7 +25,7 @@ SUNEDITOR.plugin.fontSize = {
         listDiv.className = 'layer_editor layer_size';
         listDiv.style.display = 'none';
 
-        const sizeList = !user.fontSizeList ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : user.fontSizeList;
+        const sizeList = !user.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : user.fontSize;
 
         let list = '<div class="inner_layer">' +
             '   <ul class="list_editor font_size_list">';

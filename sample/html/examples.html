@@ -61,9 +61,8 @@
         <div class="highlight highlight-source-js">
 <pre>
 <span class="pl-c">// User Options</span>
-<span class="pl-s">fontSizeList</span><span class="pl-k">    : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">fontList</span><span class="pl-k">        : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">addFont</span><span class="pl-k">         : </span>Add a new font                                    <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">fontSize</span><span class="pl-k">    : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">font</span><span class="pl-k">        : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
 <span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span>
 <span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width || textarea.offsetWidth</span>
 <span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor                 <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.display || 'block'</span>
@@ -103,10 +102,10 @@
 
         <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
             <span class="pl-c"><span class="pl-c">//</span> insert options</span>
-            fontSizeList <span class="pl-k">:</span> [
+            fontSize <span class="pl-k">:</span> [
                 <span class="pl-c1">8</span>, <span class="pl-c1">10</span>, <span class="pl-c1">14</span>, <span class="pl-c1">18</span>, <span class="pl-c1">24</span>, <span class="pl-c1">36</span>
             ],
-            fontList <span class="pl-k">:</span> [
+            font <span class="pl-k">:</span> [
                 <span class="pl-s"><span class="pl-pds">'</span>Arial<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>tahoma<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>Courier New,Courier<span class="pl-pds">'</span></span>
@@ -310,10 +309,10 @@
 
 <script>
     SUNEDITOR.create('exampleOptions',{
-        fontSizeList : [
+        fontSize : [
             8, 10, 14, 18, 24, 36
         ],
-        fontList : [
+        font : [
             'Arial',
             'tahoma',
             'Courier New,Courier'
