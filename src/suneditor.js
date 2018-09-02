@@ -427,7 +427,7 @@
      * @param util
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    const core = function (context, util) {
+    const core = function (context, util, plugins) {
         /**
          * @description Practical editor function
          * This function is 'this' used by other plugins
@@ -446,7 +446,7 @@
             /**
              * @description loaded plugins
              */
-            loadedPlugins: {},
+            plugins: {},
 
             /**
              * @description dialog element
@@ -544,18 +544,19 @@
                         util.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
                         return;
                     }
-                    else if (!this.loadedPlugins['dialog']) {
+                    else if (!this.plugins['dialog']) {
                         dialogCallback();
                         return;
                     }
                 }
 
                 /** etc */
-                if (!SUNEDITOR.plugin[moduleName]) {
-                    util.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
-                }
-                else if (!this.loadedPlugins[moduleName]) {
-                    this._callBack_addModule(directory, moduleName, targetElement, callBackFunction);
+                if (!this.plugins[moduleName]) {
+                    if (!SUNEDITOR.plugin[moduleName]) {
+                        util.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+                    } else {
+                        this._callBack_addModule(directory, moduleName, targetElement, callBackFunction);
+                    }
                 }
                 else {
                     if (typeof callBackFunction === 'function') callBackFunction();
@@ -575,7 +576,7 @@
                 if (!this.context[directory]) this.context[directory] = {};
 
                 SUNEDITOR.plugin[moduleName].add(this, targetElement);
-                this.loadedPlugins[moduleName] = true;
+                this.plugins[moduleName] = true;
 
                 if (typeof callBackFunction === 'function') callBackFunction();
             },
@@ -2003,6 +2004,13 @@
         /** window resize event */
         window.addEventListener('resize', event.resize_window);
 
+        /** append plugins */
+        const pluginKeys = Object.keys(plugins);
+        for (let i = 0, len = pluginKeys.length; i < len; i++) {
+            plugins[pluginKeys[i]].add(editor, context.tool.font.parentNode);
+            editor.plugins[pluginKeys[i]] = plugins[pluginKeys[i]];
+        }
+
         /** User function */
         return {
             /**
@@ -2331,6 +2339,7 @@
     function _createToolBar(buttonList) {
         let html = '<div class="sun-editor-id-toolbar-cover"></div>';
         let moduleHtml = null;
+        const mergePlugins = {};
 
         /** create button list */
         let button = null;
@@ -2348,7 +2357,8 @@
                     button = buttonGroup[j];
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
-                            module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
+                            module = defaultButtonList[button.name];
+                            mergePlugins[button.name] = button;
                         } else {
                             module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                         }
@@ -2368,7 +2378,10 @@
             }
         }
 
-        return html;
+        return {
+            'html': html,
+            'mergePlugins': mergePlugins
+        };
     }
 
     /**
@@ -2423,10 +2436,13 @@
         const relative = doc.createElement('DIV');
         relative.className = 'sun-editor-container';
 
+        /** buttons */
+        const buttons = _createToolBar(options.buttonList);
+
         /** tool bar */
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'sun-editor-id-toolbar';
-        tool_bar.innerHTML = _createToolBar(options.buttonList);
+        tool_bar.innerHTML = buttons.html;
 
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -2496,7 +2512,8 @@
                 _loading: loading_box,
                 _resizeBack: resize_back
             },
-            options: options
+            options: options,
+            plugins: buttons.mergePlugins
         };
     }
 
@@ -2584,7 +2601,7 @@
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.util);
+        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.util, cons.plugins);
     };
 
     if ( typeof noGlobal === typeof undefined ) {
