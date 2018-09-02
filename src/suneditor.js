@@ -437,10 +437,12 @@
              * @description Elements and user options parameters of the suneditor
              */
             context: context,
+
             /**
              * @description SUNEDITOR.util
              */
             util: util,
+
             /**
              * @description loaded plugins
              */
@@ -450,14 +452,17 @@
              * @description dialog element
              */
             dialogForm: null,
+
             /**
              * @description submenu element
              */
             submenu: null,
+
             /**
              * @description active button element in submenu
              */
             submenuActiveButton: null,
+
             /**
              * @description controllers array (image resize area, link modified button)
              */
@@ -582,7 +587,7 @@
             submenuOn: function (element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = 'block';
-                dom.addClass(element, 'on');
+                util.addClass(element, 'on');
                 this.submenuActiveButton = element;
             },
 
@@ -593,7 +598,7 @@
                 if (this.submenu) {
                     this.submenu.style.display = 'none';
                     this.submenu = null;
-                    dom.removeClass(this.submenuActiveButton, 'on');
+                    util.removeClass(this.submenuActiveButton, 'on');
                     this.submenuActiveButton = null;
                 }
 
@@ -632,7 +637,7 @@
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                const caption = dom.getParentElement(this._variable.selectionNode, 'figcaption');
+                const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
                 if (caption) {
                     caption.focus();
                 } else {
@@ -759,7 +764,7 @@
                 const oP = document.createElement('P');
                 oP.innerHTML = '&#65279';
 
-                element = dom.getFormatElement(element);
+                element = util.getFormatElement(element);
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
 
                 return oP;
@@ -851,9 +856,9 @@
                 let beforeNode = null;
                 let afterNode = null;
 
-                const childNodes = dom.getListChildNodes(commonCon);
-                let startIndex = dom.getArrayIndex(childNodes, startCon);
-                let endIndex = dom.getArrayIndex(childNodes, endCon);
+                const childNodes = util.getListChildNodes(commonCon);
+                let startIndex = util.getArrayIndex(childNodes, startCon);
+                let endIndex = util.getArrayIndex(childNodes, endCon);
 
                 for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
                     if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
@@ -874,7 +879,7 @@
                     const item = childNodes[i];
 
                     if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                        dom.removeItem(item);
+                        util.removeItem(item);
                         continue;
                     }
 
@@ -888,7 +893,7 @@
                         if (beforeNode.length > 0) {
                             startCon.data = beforeNode.data;
                         } else {
-                            dom.removeItem(startCon);
+                            util.removeItem(startCon);
                         }
 
                         continue;
@@ -904,13 +909,13 @@
                         if (afterNode.length > 0) {
                             endCon.data = afterNode.data;
                         } else {
-                            dom.removeItem(endCon);
+                            util.removeItem(endCon);
                         }
 
                         continue;
                     }
 
-                    dom.removeItem(item);
+                    util.removeItem(item);
                 }
             },
 
@@ -960,7 +965,7 @@
                         if (isElement) {
                             newNode.innerHTML = startCon.outerHTML;
                             startCon.parentNode.appendChild(newNode);
-                            dom.removeItem(startCon);
+                            util.removeItem(startCon);
                         } else {
                             const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                             const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
@@ -1017,12 +1022,12 @@
                     /** multi line */
                     else {
                         // get line nodes
-                        const lineNodes = dom.getListChildren(commonCon, function (current) {
+                        const lineNodes = util.getListChildren(commonCon, function (current) {
                             return this._isformatTagName.test(current.nodeName);
                         });
 
-                        let startLine = dom.getParentElement(startCon, 'P');
-                        let endLine = dom.getParentElement(endCon, 'P');
+                        let startLine = util.getParentElement(startCon, 'P');
+                        let endLine = util.getParentElement(endCon, 'P');
 
                         for (let i = 0, len = lineNodes.length; i < len; i++) {
                             if (startLine === lineNodes[i]) {
@@ -1197,7 +1202,7 @@
                                 while (pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
                                     pRemove = pRemove.parentNode;
                                 }
-                                dom.removeItem(pRemove);
+                                util.removeItem(pRemove);
                             }
 
                             endPass = true;
@@ -1347,7 +1352,7 @@
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                dom.removeItem(element);
+                util.removeItem(element);
 
                 return {
                     container: container,
@@ -1459,7 +1464,7 @@
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                dom.removeItem(element);
+                util.removeItem(element);
 
                 return {
                     container: container,
@@ -1474,7 +1479,7 @@
              * @param command {String} - Separator ("indent" or "outdent")
              */
             indent: function (node, command) {
-                const p = dom.getParentElement(node, 'P');
+                const p = util.getParentElement(node, 'P');
                 if (!p) return;
 
                 let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1492,7 +1497,7 @@
              * @description Add or remove the class name of "body" so that the code block is visible
              */
             toggleDisplayBlocks: function () {
-                dom.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
+                util.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
             },
 
             /**
@@ -1533,15 +1538,15 @@
                     this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
                     context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
-                    dom.removeClass(element.firstElementChild, 'icon-expansion');
-                    dom.addClass(element.firstElementChild, 'icon-reduction');
+                    util.removeClass(element.firstElementChild, 'icon-expansion');
+                    util.addClass(element.firstElementChild, 'icon-reduction');
                 }
                 else {
                     context.element.topArea.style.cssText = this._variable.originCssText;
                     context.element.editorArea.style.height = this._variable.editorHeight + 'px';
 
-                    dom.removeClass(element.firstElementChild, 'icon-reduction');
-                    dom.addClass(element.firstElementChild, 'icon-expansion');
+                    util.removeClass(element.firstElementChild, 'icon-reduction');
+                    util.addClass(element.firstElementChild, 'icon-expansion');
                 }
 
                 this._variable.isFullScreen = !this._variable.isFullScreen;
@@ -1600,7 +1605,7 @@
                     /** Format */
                     if (findFormat && editor._isformatTagName.test(nodeName)) {
                         commandMapNodes.push('FORMAT');
-                        dom.changeTxt(commandMap['FORMAT'], nodeName);
+                        util.changeTxt(commandMap['FORMAT'], nodeName);
                         findFormat = false;
                         continue;
                     }
@@ -1609,7 +1614,7 @@
                     if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                         commandMapNodes.push('FONT');
                         const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
-                        dom.changeTxt(commandMap['FONT'], selectFont);
+                        util.changeTxt(commandMap['FONT'], selectFont);
                         findFont = false;
                     }
 
@@ -1630,7 +1635,7 @@
                         /** font size */
                         if (selectionParent.style.fontSize.length > 0) {
                             commandMapNodes.push('SIZE');
-                            dom.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                            util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                             findSize = false;
                         }
                     }
@@ -1664,7 +1669,7 @@
                 for (let i = 0; i < commandMapNodes.length; i++) {
                     nodeName = commandMapNodes[i];
                     if (classOnCheck.test(nodeName)) {
-                        dom.addClass(commandMap[nodeName], 'on');
+                        util.addClass(commandMap[nodeName], 'on');
                     }
                 }
 
@@ -1672,13 +1677,13 @@
                 for (let key in commandMap) {
                     if (commandMapNodes.indexOf(key) > -1) continue;
                     if (/^FONT/i.test(key)) {
-                        dom.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.font);
+                        util.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.font);
                     }
                     else if (/^SIZE$/i.test(key)) {
-                        dom.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.fontSize);
+                        util.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.fontSize);
                     }
                     else {
-                        dom.removeClass(commandMap[key], 'on');
+                        util.removeClass(commandMap[key], 'on');
                     }
                 }
 
@@ -1748,11 +1753,11 @@
                     switch (command) {
                         case 'codeView':
                             editor.toggleCodeView();
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
                             editor.toggleFullScreen(target);
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                             break;
                         case 'indent':
                         case 'outdent':
@@ -1771,27 +1776,27 @@
                             break;
                         case 'showBlocks':
                             editor.toggleDisplayBlocks();
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                             break;
                         case 'subscript':
-                            if (dom.hasClass(context.tool.superscript, 'on')) {
+                            if (util.hasClass(context.tool.superscript, 'on')) {
                                 editor.execCommand('superscript', false, null);
-                                dom.removeClass(context.tool.superscript, 'on');
+                                util.removeClass(context.tool.superscript, 'on');
                             }
                             editor.execCommand(command, false, null);
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                             break;
                         case 'superscript':
-                            if (dom.hasClass(context.tool.subscript, 'on')) {
+                            if (util.hasClass(context.tool.subscript, 'on')) {
                                 editor.execCommand('subscript', false, null);
-                                dom.removeClass(context.tool.subscript, 'on');
+                                util.removeClass(context.tool.subscript, 'on');
                             }
                             editor.execCommand(command, false, null);
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                             break;
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
-                            dom.toggleClass(target, 'on');
+                            util.toggleClass(target, 'on');
                     }
                 }
             },
@@ -1835,7 +1840,7 @@
                     if (!key) return false;
 
                     editor.execCommand(key[0], false, null);
-                    dom.toggleClass(editor.commandMap[key[1]], 'on');
+                    util.toggleClass(editor.commandMap[key[1]], 'on');
 
                     return true;
                 }
@@ -1869,9 +1874,9 @@
                         }
 
                         if (currentNode && /^TD$/i.test(currentNode.tagName)) {
-                            const table = dom.getParentElement(currentNode, 'table');
-                            const cells = dom.getListChildren(table, dom.isCell);
-                            let idx = shift ? dom.prevIdx(cells, currentNode) : dom.nextIdx(cells, currentNode);
+                            const table = util.getParentElement(currentNode, 'table');
+                            const cells = util.getListChildren(table, util.isCell);
+                            let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
 
                             if (idx === cells.length && !shift) idx = 0;
                             if (idx === -1 && shift) idx = cells.length - 1;
