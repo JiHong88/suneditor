@@ -175,7 +175,7 @@
             }
             else {
                 /** delete */
-                this.dom.removeItem(this.context.link._linkAnchor);
+                this.util.removeItem(this.context.link._linkAnchor);
                 this.context.link._linkAnchor = null;
                 this.focus();
             }

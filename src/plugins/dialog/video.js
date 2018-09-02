@@ -240,7 +240,7 @@ SUNEDITOR.plugin.video = {
     },
 
     destroy: function () {
-        this.dom.removeItem(this.context.video._coverElement);
+        this.util.removeItem(this.context.video._coverElement);
         SUNEDITOR.plugin.video.init.call(this);
     },
 

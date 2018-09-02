@@ -56,7 +56,7 @@ SUNEDITOR.plugin.formatBlock = {
         }
 
         this.focus();
-        this.dom.changeTxt(this.commandMap['FORMAT'], value);
+        this.util.changeTxt(this.commandMap['FORMAT'], value);
         this.execCommand('formatBlock', false, value);
         this.submenuOff();
     }

@@ -186,13 +186,8 @@
             scriptFile.onload = callBack;
 
             document.getElementsByTagName('head')[0].appendChild(scriptFile);
-        }
-    };
+        },
 
-    /**
-     * @description document function
-     */
-    SUNEDITOR.dom = {
         /**
          * @description Get the index of the argument value in the element array
          * @param {array} array - element array
@@ -424,6 +419,7 @@
         }
     };
 
+
     /**
      * @description SunEditor core closure
      * @param context
@@ -431,7 +427,7 @@
      * @param util
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    const core = function (context, dom, util) {
+    const core = function (context, util) {
         /**
          * @description Practical editor function
          * This function is 'this' used by other plugins
@@ -441,10 +437,6 @@
              * @description Elements and user options parameters of the suneditor
              */
             context: context,
-            /**
-             * @description SUNEDITOR.dom
-             */
-            dom: dom,
             /**
              * @description SUNEDITOR.util
              */
@@ -2585,7 +2577,7 @@
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.dom, SUNEDITOR.util);
+        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.util);
     };
 
     if ( typeof noGlobal === typeof undefined ) {

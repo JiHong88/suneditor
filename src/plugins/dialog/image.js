@@ -154,12 +154,12 @@ SUNEDITOR.plugin.image = {
 		// Get all elements with class="tablinks" and remove the class "active"
 		tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
 		for (i = 0; i < tablinks.length; i++) {
-            this.dom.removeClass(tablinks[i], 'active');
+            this.util.removeClass(tablinks[i], 'active');
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
         this.context.image.modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
-        this.dom.addClass(targetElement, 'active');
+        this.util.addClass(targetElement, 'active');
 
         // focus
         if (tabName === 'image') {
@@ -359,15 +359,15 @@ SUNEDITOR.plugin.image = {
             container.style.float = align;
         }
 
-        this.insertNode(container, this.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(container);
     },
 
     update_image: function () {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
-        let cover = this.dom.getParentElement(contextImage._element, '.sun-editor-image-cover');
-        let container = this.dom.getParentElement(contextImage._element, '.sun-editor-id-image-container');
+        let cover = this.util.getParentElement(contextImage._element, '.sun-editor-image-cover');
+        let container = this.util.getParentElement(contextImage._element, '.sun-editor-id-image-container');
         let isNewContainer = false;
 
         if (cover === null) {
@@ -401,7 +401,7 @@ SUNEDITOR.plugin.image = {
             }
         } else {
             if (contextImage._imageCaption) {
-                this.dom.removeItem(contextImage._imageCaption);
+                this.util.removeItem(contextImage._imageCaption);
             }
         }
 
@@ -442,9 +442,9 @@ SUNEDITOR.plugin.image = {
         }
 
         if (isNewContainer) {
-            const existElement = this.dom.getFormatElement(contextImage._element);
+            const existElement = this.util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
-            this.dom.removeItem(existElement);
+            this.util.removeItem(existElement);
         }
     },
 
@@ -508,8 +508,8 @@ SUNEDITOR.plugin.image = {
     },
 
     destroy: function () {
-        const imageContainer = this.dom.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
-        this.dom.removeItem(imageContainer);
+        const imageContainer = this.util.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
+        this.util.removeItem(imageContainer);
         SUNEDITOR.plugin.image.init.call(this);
     },
 
