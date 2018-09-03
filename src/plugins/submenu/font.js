@@ -88,8 +88,8 @@
     }
 
 
-    if ( typeof noGlobal === typeof undefined ) {
-        window.SUNEDITOR.plugin.font = font;
+    if (typeof noGlobal === typeof undefined) {
+        window.SUNEDITOR.plugins.font = font;
     }
 
     return font;

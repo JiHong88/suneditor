@@ -5,7 +5,7 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.image = {
+SUNEDITOR.plugins.image = {
     add: function (_this) {
         const context = _this.context;
         context.image = {
@@ -28,7 +28,7 @@ SUNEDITOR.plugin.image = {
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog(_this.context.user));
+        let image_dialog = eval(this.setDialog(_this.context.user, _this.lang));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -57,8 +57,7 @@ SUNEDITOR.plugin.image = {
     },
 
     /** dialog */
-    setDialog: function (user) {
-        const lang = SUNEDITOR.lang;
+    setDialog: function (user, lang) {
         const dialog = document.createElement('DIV');
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
@@ -186,13 +185,13 @@ SUNEDITOR.plugin.image = {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    SUNEDITOR.plugin.image.xmlHttp = this.util.getXMLHttpRequest();
-                    SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
-                    SUNEDITOR.plugin.image.xmlHttp.open('post', imageUploadUrl, true);
-                    SUNEDITOR.plugin.image.xmlHttp.send(formData);
+                    this.plugins.image.xmlHttp = this.util.getXMLHttpRequest();
+                    this.plugins.image.xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
+                    this.plugins.image.xmlHttp.open('post', imageUploadUrl, true);
+                    this.plugins.image.xmlHttp.send(formData);
                 } else {
                     for (let i = 0; i < filesLen; i++) {
-                        SUNEDITOR.plugin.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.dialog.updateModal);
+                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.dialog.updateModal);
                     }
                 }
             }
@@ -210,20 +209,20 @@ SUNEDITOR.plugin.image = {
         const reader = new FileReader();
 
         reader.onload = function (update) {
-            SUNEDITOR.plugin.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align, update);
+            this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align, update);
         }.bind(this, update);
 
         reader.readAsDataURL(file);
     },
 
     callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update) {
-        const xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
+        const xmlHttp = this.plugins.image.xmlHttp;
         if (xmlHttp.readyState === 4) {
             if (xmlHttp.status === 200) {
                 const result = eval(xmlHttp.responseText);
 
                 for (let i = 0, len = (update && result.length > 0 ? 1 : result.length); i < len; i++) {
-                    SUNEDITOR.plugin.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update);
+                    this.plugins.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update);
                 }
             } else {
                 window.open('', '_blank').document.writeln(xmlHttp.responseText);
@@ -290,13 +289,13 @@ SUNEDITOR.plugin.image = {
 
         try {
             if (this.context.dialog.updateModal) {
-                SUNEDITOR.plugin.image.update_image.call(this);
+                this.plugins.image.update_image.call(this);
             } else {
-                SUNEDITOR.plugin.image.onRender_imgInput.call(this);
-                SUNEDITOR.plugin.image.onRender_imgUrl.call(this);
+                this.plugins.image.onRender_imgInput.call(this);
+                this.plugins.image.onRender_imgUrl.call(this);
             }
         } finally {
-            SUNEDITOR.plugin.dialog.closeDialog.call(this);
+            this.plugins.dialog.closeDialog.call(this);
             this.closeLoading();
         }
 
@@ -306,8 +305,8 @@ SUNEDITOR.plugin.image = {
     create_caption: function () {
         const caption = document.createElement('FIGCAPTION');
         
-        caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
-        caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+        caption.innerHTML = '<p>' + this.lang.dialogBox.imageBox.caption + '</p>';
+        caption.addEventListener('click', this.plugins.image.toggle_caption_contenteditable.bind(this, true));
 
         return caption;
     },
@@ -342,14 +341,14 @@ SUNEDITOR.plugin.image = {
         oImg.setAttribute('data-align', align);
         oImg.setAttribute('data-proportion', this.context.image._proportionChecked);
         oImg.alt = this.context.image._altText;
-        oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
+        oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
 
-        const cover = SUNEDITOR.plugin.image.set_cover.call(this, oImg);
-        const container = SUNEDITOR.plugin.image.set_container.call(this, cover);
+        const cover = this.plugins.image.set_cover.call(this, oImg);
+        const container = this.plugins.image.set_container.call(this, cover);
 
         // caption
         if (this.context.image._captionChecked) {
-            this.context.image._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+            this.context.image._imageCaption = this.plugins.image.create_caption.call(this);
             cover.appendChild(this.context.image._imageCaption);
         }
         
@@ -372,19 +371,19 @@ SUNEDITOR.plugin.image = {
 
         if (cover === null) {
             isNewContainer = true;
-            cover = SUNEDITOR.plugin.image.set_cover.call(this, contextImage._element.cloneNode(true));
+            cover = this.plugins.image.set_cover.call(this, contextImage._element.cloneNode(true));
         }
 
         if (container === null) {
             isNewContainer = true;
-            container = SUNEDITOR.plugin.image.set_container.call(this, cover.cloneNode(true));
+            container = this.plugins.image.set_container.call(this, cover.cloneNode(true));
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
         }
 
         // input update
-        SUNEDITOR.plugin.image.onRender_imgInput.call(this);
+        this.plugins.image.onRender_imgInput.call(this);
 
         // src, size
         contextImage._element.src = contextImage.imgUrlFile.value;
@@ -396,7 +395,7 @@ SUNEDITOR.plugin.image = {
         // caption
         if (contextImage._captionChecked) {
             if (contextImage._imageCaption === null) {
-                contextImage._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+                contextImage._imageCaption = this.plugins.image.create_caption.call(this);
                 cover.appendChild(contextImage._imageCaption);
             }
         } else {
@@ -423,7 +422,7 @@ SUNEDITOR.plugin.image = {
                 contextImage._linkElement.target = this.context.image.imgLinkNewWindowCheck.checked;
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
-                let newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                let newEl = this.plugins.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
                 cover.innerHTML = '';
                 cover.appendChild(newEl);
             }
@@ -499,7 +498,7 @@ SUNEDITOR.plugin.image = {
         contextImage.imageY.disabled = false;
         contextImage.proportion.disabled = false;
 
-        SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
+        this.plugins.dialog.openDialog.call(this, 'image', null, true);
     },
 
     setSize: function (x, y) {
@@ -510,7 +509,7 @@ SUNEDITOR.plugin.image = {
     destroy: function () {
         const imageContainer = this.util.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
         this.util.removeItem(imageContainer);
-        SUNEDITOR.plugin.image.init.call(this);
+        this.plugins.image.init.call(this);
     },
 
     init: function () {
@@ -527,6 +526,6 @@ SUNEDITOR.plugin.image = {
         this.context.image.imageY.disabled = true;
         this.context.image.proportion.disabled = true;
         this.context.image._element = null;
-        SUNEDITOR.plugin.image.openTab.call(this, 'init');
+        this.plugins.image.openTab.call(this, 'init');
     }
 };

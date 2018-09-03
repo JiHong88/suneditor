@@ -55,7 +55,7 @@
 .sun-editor .icon-redo:before{content:'\004b';}
 .sun-editor .icon-undo:before{content:'\004c';}
 .sun-editor .icon-erase:before{content:'\004d';}
-.sun-editor .icon-foreColor:before{content:'\004e';}
+.sun-editor .icon-fontColor:before{content:'\004e';}
 .sun-editor .icon-hiliteColor:before{content:'\004f';}
 .sun-editor .icon-indent-left:before{content:'\0050';}
 .sun-editor .icon-indent-right:before{content:'\0051';}

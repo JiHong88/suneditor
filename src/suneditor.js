@@ -22,7 +22,7 @@
     'use strict';
 
     const SUNEDITOR = {};
-    SUNEDITOR.plugin = {};
+    SUNEDITOR.plugins = {};
 
     /**
      * @description default language (english)
@@ -51,7 +51,7 @@
             list: 'list',
             orderList: 'Ordered list',
             unorderList: 'Unordered list',
-            line: 'Line',
+            horizontalRule: 'horizontal line',
             table: 'Table',
             link: 'Link',
             image: 'Image',
@@ -427,7 +427,7 @@
      * @param util
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    const core = function (context, util, plugins) {
+    const core = function (context, plugins, lang) {
         /**
          * @description Practical editor function
          * This function is 'this' used by other plugins
@@ -439,14 +439,19 @@
             context: context,
 
             /**
-             * @description SUNEDITOR.util
-             */
-            util: util,
-
-            /**
              * @description loaded plugins
              */
             plugins: {},
+
+            /**
+             * @description language
+             */
+            lang: lang,
+
+            /**
+             * @description SUNEDITOR.util
+             */
+            util: SUNEDITOR.util,
 
             /**
              * @description dialog element
@@ -533,27 +538,28 @@
              * @param {function} callBackFunction - Function to be executed immediately after module call
              */
             callModule: function (directory, moduleName, targetElement, callBackFunction) {
-                const fullDirectory = util.getBasePath + 'plugins/' + directory;
+                const fullDirectory = this.util.getBasePath + 'plugins/' + directory;
                 const fileType = 'text/javascript';
 
                 /** Dialog first call */
                 if (directory === 'dialog') {
                     const dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
 
-                    if (!SUNEDITOR.plugin.dialog) {
-                        util.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
-                        return;
-                    }
-                    else if (!this.plugins['dialog']) {
-                        dialogCallback();
+                    if (!this.plugins['dialog']) {
+                        if (!SUNEDITOR.plugins.dialog) {
+                            this.util.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
+                        } else {
+                            dialogCallback();
+                        }
+
                         return;
                     }
                 }
 
                 /** etc */
                 if (!this.plugins[moduleName]) {
-                    if (!SUNEDITOR.plugin[moduleName]) {
-                        util.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+                    if (!SUNEDITOR.plugins[moduleName]) {
+                        this.util.includeFile(fileType, (fullDirectory + '/' + moduleName + '.js'), this._callBack_addModule.bind(this, directory, moduleName, targetElement, callBackFunction));
                     } else {
                         this._callBack_addModule(directory, moduleName, targetElement, callBackFunction);
                     }
@@ -573,10 +579,8 @@
              * @private
              */
             _callBack_addModule: function (directory, moduleName, targetElement, callBackFunction) {
-                if (!this.context[directory]) this.context[directory] = {};
-
-                SUNEDITOR.plugin[moduleName].add(this, targetElement);
-                this.plugins[moduleName] = true;
+                this.plugins[moduleName] = SUNEDITOR.plugin[moduleName];
+                this.plugins[moduleName].add(this, targetElement);
 
                 if (typeof callBackFunction === 'function') callBackFunction();
             },
@@ -588,7 +592,7 @@
             submenuOn: function (element) {
                 this.submenu = element.nextElementSibling;
                 this.submenu.style.display = 'block';
-                util.addClass(element, 'on');
+                this.util.addClass(element, 'on');
                 this.submenuActiveButton = element;
             },
 
@@ -599,12 +603,12 @@
                 if (this.submenu) {
                     this.submenu.style.display = 'none';
                     this.submenu = null;
-                    util.removeClass(this.submenuActiveButton, 'on');
+                    this.util.removeClass(this.submenuActiveButton, 'on');
                     this.submenuActiveButton = null;
                 }
 
                 if (context.image && context.image._onCaption === true) {
-                    SUNEDITOR.plugin.image.toggle_caption_contenteditable.call(editor, false);
+                    this.plugins.image.toggle_caption_contenteditable.call(editor, false);
                 }
 
                 this.controllersOff();
@@ -638,7 +642,7 @@
              * @description Focus to wysiwyg area
              */
             focus: function () {
-                const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
+                const caption = this.util.getParentElement(this._variable.selectionNode, 'figcaption');
                 if (caption) {
                     caption.focus();
                 } else {
@@ -648,7 +652,7 @@
 
             _setSelectionNode: function () {
                 // IE
-                this._variable.copySelection = util.copyObj(this.getSelection());
+                this._variable.copySelection = this.util.copyObj(this.getSelection());
 
                 const range = this.getRange();
                 if (range.startContainer !== range.endContainer) {
@@ -765,7 +769,7 @@
                 const oP = document.createElement('P');
                 oP.innerHTML = '&#65279';
 
-                element = util.getFormatElement(element);
+                element = this.util.getFormatElement(element);
                 element.parentNode.insertBefore(oP, element.nextElementSibling);
 
                 return oP;
@@ -857,9 +861,9 @@
                 let beforeNode = null;
                 let afterNode = null;
 
-                const childNodes = util.getListChildNodes(commonCon);
-                let startIndex = util.getArrayIndex(childNodes, startCon);
-                let endIndex = util.getArrayIndex(childNodes, endCon);
+                const childNodes = this.util.getListChildNodes(commonCon);
+                let startIndex = this.util.getArrayIndex(childNodes, startCon);
+                let endIndex = this.util.getArrayIndex(childNodes, endCon);
 
                 for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
                     if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
@@ -880,7 +884,7 @@
                     const item = childNodes[i];
 
                     if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                        util.removeItem(item);
+                        this.util.removeItem(item);
                         continue;
                     }
 
@@ -894,7 +898,7 @@
                         if (beforeNode.length > 0) {
                             startCon.data = beforeNode.data;
                         } else {
-                            util.removeItem(startCon);
+                            this.util.removeItem(startCon);
                         }
 
                         continue;
@@ -910,13 +914,13 @@
                         if (afterNode.length > 0) {
                             endCon.data = afterNode.data;
                         } else {
-                            util.removeItem(endCon);
+                            this.util.removeItem(endCon);
                         }
 
                         continue;
                     }
 
-                    util.removeItem(item);
+                    this.util.removeItem(item);
                 }
             },
 
@@ -966,7 +970,7 @@
                         if (isElement) {
                             newNode.innerHTML = startCon.outerHTML;
                             startCon.parentNode.appendChild(newNode);
-                            util.removeItem(startCon);
+                            this.util.removeItem(startCon);
                         } else {
                             const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                             const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
@@ -1023,12 +1027,12 @@
                     /** multi line */
                     else {
                         // get line nodes
-                        const lineNodes = util.getListChildren(commonCon, function (current) {
+                        const lineNodes = this.util.getListChildren(commonCon, function (current) {
                             return this._isformatTagName.test(current.nodeName);
                         });
 
-                        let startLine = util.getParentElement(startCon, 'P');
-                        let endLine = util.getParentElement(endCon, 'P');
+                        let startLine = this.util.getParentElement(startCon, 'P');
+                        let endLine = this.util.getParentElement(endCon, 'P');
 
                         for (let i = 0, len = lineNodes.length; i < len; i++) {
                             if (startLine === lineNodes[i]) {
@@ -1203,7 +1207,7 @@
                                 while (pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
                                     pRemove = pRemove.parentNode;
                                 }
-                                util.removeItem(pRemove);
+                                this.util.removeItem(pRemove);
                             }
 
                             endPass = true;
@@ -1353,7 +1357,7 @@
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                this.util.removeItem(element);
 
                 return {
                     container: container,
@@ -1465,7 +1469,7 @@
                 })(element, pNode);
 
                 element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                this.util.removeItem(element);
 
                 return {
                     container: container,
@@ -1480,7 +1484,7 @@
              * @param command {String} - Separator ("indent" or "outdent")
              */
             indent: function (node, command) {
-                const p = util.getParentElement(node, 'P');
+                const p = this.util.getParentElement(node, 'P');
                 if (!p) return;
 
                 let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1498,7 +1502,7 @@
              * @description Add or remove the class name of "body" so that the code block is visible
              */
             toggleDisplayBlocks: function () {
-                util.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
+                this.util.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
             },
 
             /**
@@ -1539,15 +1543,15 @@
                     this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
                     context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
-                    util.removeClass(element.firstElementChild, 'icon-expansion');
-                    util.addClass(element.firstElementChild, 'icon-reduction');
+                    this.util.removeClass(element.firstElementChild, 'icon-expansion');
+                    this.util.addClass(element.firstElementChild, 'icon-reduction');
                 }
                 else {
                     context.element.topArea.style.cssText = this._variable.originCssText;
                     context.element.editorArea.style.height = this._variable.editorHeight + 'px';
 
-                    util.removeClass(element.firstElementChild, 'icon-reduction');
-                    util.addClass(element.firstElementChild, 'icon-expansion');
+                    this.util.removeClass(element.firstElementChild, 'icon-reduction');
+                    this.util.addClass(element.firstElementChild, 'icon-expansion');
                 }
 
                 this._variable.isFullScreen = !this._variable.isFullScreen;
@@ -1562,8 +1566,8 @@
                 WindowObject.document.head.innerHTML = '' +
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                    '<title>' + SUNEDITOR.lang.toolbar.preview + '</title>' +
-                    '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor-contents.css">';
+                    '<title>' + this.lang.toolbar.preview + '</title>' +
+                    '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor-contents.css">';
                 WindowObject.document.body.className = 'sun-editor-editable';
                 WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
             }
@@ -1606,7 +1610,7 @@
                     /** Format */
                     if (findFormat && editor._isformatTagName.test(nodeName)) {
                         commandMapNodes.push('FORMAT');
-                        util.changeTxt(commandMap['FORMAT'], nodeName);
+                        editor.util.changeTxt(commandMap['FORMAT'], nodeName);
                         findFormat = false;
                         continue;
                     }
@@ -1614,8 +1618,8 @@
                     /** Font */
                     if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                         commandMapNodes.push('FONT');
-                        const selectFont = (selectionParent.style.fontFamily || selectionParent.face || SUNEDITOR.lang.toolbar.font).replace(/["']/g,'');
-                        util.changeTxt(commandMap['FONT'], selectFont);
+                        const selectFont = (selectionParent.style.fontFamily || selectionParent.face || editor.lang.toolbar.font).replace(/["']/g,'');
+                        editor.util.changeTxt(commandMap['FONT'], selectFont);
                         findFont = false;
                     }
 
@@ -1623,7 +1627,7 @@
                     if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                         if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
                             editor.callModule('dialog', 'link', null, function () {
-                                SUNEDITOR.plugin.link.call_controller_linkButton.call(editor, selectionParent);
+                                this.plugins.link.call_controller_linkButton.call(editor, selectionParent);
                             });
                         }
                         findA = false;
@@ -1636,7 +1640,7 @@
                         /** font size */
                         if (selectionParent.style.fontSize.length > 0) {
                             commandMapNodes.push('SIZE');
-                            util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                            editor.util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                             findSize = false;
                         }
                     }
@@ -1670,7 +1674,7 @@
                 for (let i = 0; i < commandMapNodes.length; i++) {
                     nodeName = commandMapNodes[i];
                     if (classOnCheck.test(nodeName)) {
-                        util.addClass(commandMap[nodeName], 'on');
+                        editor.util.addClass(commandMap[nodeName], 'on');
                     }
                 }
 
@@ -1678,13 +1682,13 @@
                 for (let key in commandMap) {
                     if (commandMapNodes.indexOf(key) > -1) continue;
                     if (/^FONT/i.test(key)) {
-                        util.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.font);
+                        editor.util.changeTxt(commandMap[key], editor.lang.toolbar.font);
                     }
                     else if (/^SIZE$/i.test(key)) {
-                        util.changeTxt(commandMap[key], SUNEDITOR.lang.toolbar.fontSize);
+                        editor.util.changeTxt(commandMap[key], editor.lang.toolbar.fontSize);
                     }
                     else {
-                        util.removeClass(commandMap[key], 'on');
+                        editor.util.removeClass(commandMap[key], 'on');
                     }
                 }
 
@@ -1742,7 +1746,7 @@
                     }
                     else if (/dialog/.test(display)) {
                         editor.callModule('dialog', command, null, function () {
-                            SUNEDITOR.plugin.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                            this.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                         });
                     }
 
@@ -1754,11 +1758,11 @@
                     switch (command) {
                         case 'codeView':
                             editor.toggleCodeView();
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                             break;
                         case 'fullScreen':
                             editor.toggleFullScreen(target);
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                             break;
                         case 'indent':
                         case 'outdent':
@@ -1777,27 +1781,27 @@
                             break;
                         case 'showBlocks':
                             editor.toggleDisplayBlocks();
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                             break;
                         case 'subscript':
-                            if (util.hasClass(context.tool.superscript, 'on')) {
+                            if (editor.util.hasClass(context.tool.superscript, 'on')) {
                                 editor.execCommand('superscript', false, null);
-                                util.removeClass(context.tool.superscript, 'on');
+                                editor.util.removeClass(context.tool.superscript, 'on');
                             }
                             editor.execCommand(command, false, null);
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                             break;
                         case 'superscript':
-                            if (util.hasClass(context.tool.subscript, 'on')) {
+                            if (editor.util.hasClass(context.tool.subscript, 'on')) {
                                 editor.execCommand('subscript', false, null);
-                                util.removeClass(context.tool.subscript, 'on');
+                                editor.util.removeClass(context.tool.subscript, 'on');
                             }
                             editor.execCommand(command, false, null);
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                             break;
                         default :
                             editor.execCommand(command, false, target.getAttribute('data-value'));
-                            util.toggleClass(target, 'on');
+                            editor.util.toggleClass(target, 'on');
                     }
                 }
             },
@@ -1817,8 +1821,8 @@
                 if (/^IMG$/i.test(targetElement.nodeName)) {
                     e.preventDefault();
                     editor.callModule('dialog', 'image', null, function () {
-                        const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(editor, targetElement, 'image');
-                        SUNEDITOR.plugin.image.onModifyMode.call(editor, targetElement, size);
+                        const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
+                        editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                     });
                     return;
                 }
@@ -1841,7 +1845,7 @@
                     if (!key) return false;
 
                     editor.execCommand(key[0], false, null);
-                    util.toggleClass(editor.commandMap[key[1]], 'on');
+                    editor.util.toggleClass(editor.commandMap[key[1]], 'on');
 
                     return true;
                 }
@@ -1875,9 +1879,9 @@
                         }
 
                         if (currentNode && /^TD$/i.test(currentNode.tagName)) {
-                            const table = util.getParentElement(currentNode, 'table');
-                            const cells = util.getListChildren(table, util.isCell);
-                            let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
+                            const table = editor.util.getParentElement(currentNode, 'table');
+                            const cells = editor.util.getListChildren(table, editor.util.isCell);
+                            let idx = shift ? editor.util.prevIdx(cells, currentNode) : editor.util.nextIdx(cells, currentNode);
 
                             if (idx === cells.length && !shift) idx = 0;
                             if (idx === -1 && shift) idx = cells.length - 1;
@@ -1956,7 +1960,7 @@
 
                 editor.callModule('dialog', 'image', null, function () {
                     editor.context.image.imgInputFile.files = files;
-                    SUNEDITOR.plugin.image.onRender_imgInput.call(editor);
+                    editor.plugins.image.onRender_imgInput.call(editor);
                     editor.context.image.imgInputFile.files = null;
                 });
             },
@@ -2005,11 +2009,16 @@
         window.addEventListener('resize', event.resize_window);
 
         /** append plugins */
-        const pluginKeys = Object.keys(plugins);
+        let pluginKeys = Object.keys(plugins);
+        let plugin = null;
+        
         for (let i = 0, len = pluginKeys.length; i < len; i++) {
-            plugins[pluginKeys[i]].add(editor, context.tool.font.parentNode);
-            editor.plugins[pluginKeys[i]] = plugins[pluginKeys[i]];
+            plugin = plugins[pluginKeys[i]];
+            plugin.add(editor, plugin.buttonElement);
+            editor.plugins[pluginKeys[i]] = plugin;
         }
+
+        pluginKeys = null, plugin = null;
 
         /** User function */
         return {
@@ -2148,11 +2157,7 @@
         };
     };
 
-    /**
-     * ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓
-     */
-    SUNEDITOR.lang = SUNEDITOR.lang || SUNEDITOR.defaultLang;
-
+    /*** ↓↓↓↓↓↓ Create Suneditor ↓↓↓↓↓↓ */
     /**
      * @description Converts content into a format that can be placed in an editor
      * @param content - content
@@ -2181,14 +2186,12 @@
      * @description Suneditor's Default button list
      * @private
      */
-    function _defaultButtonsList () {
-        const lang = SUNEDITOR.lang;
-
+    function _defaultButtons (lang) {
         return {
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
                 '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
             ],
-            formats: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
+            formatBlock: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
                 '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="arrow-more-down"></span>'
             ],
 
@@ -2224,8 +2227,8 @@
                 '<div class="icon-erase"></div>'
             ],
 
-            fontColor: ['', lang.toolbar.fontColor, 'foreColor', 'submenu', '',
-                '<div class="icon-foreColor"></div>'
+            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', '',
+                '<div class="icon-fontColor"></div>'
             ],
 
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
@@ -2248,7 +2251,7 @@
                 '<div class="icon-list-number"></div>'
             ],
 
-            line: ['btn_line', lang.toolbar.line, 'horizontalRules', 'submenu', '',
+            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', '',
                 '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
                 '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
                 '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
@@ -2302,13 +2305,21 @@
 
     /**
      * @description Create a group div containing each module
-     * @param {string} innerHTML - module button html
-     * @returns {string}
+     * @returns {Element}
      * @private
      */
-    function _createModuleGroup(innerHTML) {
-        if (!innerHTML) return '';
-        return '<div class="tool_module"><ul class="editor_tool">' + innerHTML + '</ul></div>';
+    function _createModuleGroup() {
+        const oDiv = document.createElement('DIV');
+        oDiv.className = 'tool_module';
+
+        const oUl = document.createElement('UL');
+        oUl.className = 'editor_tool';
+        oDiv.appendChild(oUl);
+
+        return {
+            'div': oDiv,
+            'ul': oUl
+        };
     }
 
     /**
@@ -2319,16 +2330,26 @@
      * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
      * @param {string} displayOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
      * @param {string} innerHTML - Html in button
-     * @returns {string}
+     * @returns {Element}
      * @private
      */
     function _createButton(buttonClass, title, dataCommand, dataDisplay, displayOption, innerHTML) {
-        return '' +
-            '<li>' +
-            '   <button type="button" class="btn_editor ' + buttonClass + '" title="' + title + '" data-command="' + dataCommand + '" data-display="' + dataDisplay + '" data-option="' + displayOption + '">' +
-            innerHTML +
-            '   </button>' +
-            '</li>';
+        const oLi = document.createElement('LI');
+        const oButton = document.createElement('BUTTON');
+
+        oButton.setAttribute('type', 'button');
+        oButton.setAttribute('class', 'btn_editor ' + buttonClass);
+        oButton.setAttribute('title', title);
+        oButton.setAttribute('data-command', dataCommand);
+        oButton.setAttribute('data-display', dataDisplay);
+        oButton.setAttribute('data-option', displayOption);
+        oButton.innerHTML = innerHTML;
+        oLi.appendChild(oButton);
+
+        return {
+            'li': oLi,
+            'button': oButton
+        };
     }
 
     /**
@@ -2336,19 +2357,26 @@
      * @param {array} buttonList - option.buttonList
      * @private
      */
-    function _createToolBar(buttonList) {
-        let html = '<div class="sun-editor-id-toolbar-cover"></div>';
-        let moduleHtml = null;
-        const mergePlugins = {};
+    function _createToolBar(doc, buttonList, lang) {
+        const tool_bar = doc.createElement('DIV');
+        tool_bar.className = 'sun-editor-id-toolbar';
+
+        const tool_cover = doc.createElement('DIV');
+        tool_cover.className = 'sun-editor-id-toolbar-cover';
 
         /** create button list */
-        let button = null;
+        const plugins = {};
+        const defaultButtonList = _defaultButtons(lang);
+
         let module = null;
-        const defaultButtonList = _defaultButtonsList();
+        let button = null;
+        let moduleElement = null;
+        let buttonElement = null;
 
         for (let i = 0; i < buttonList.length; i++) {
 
             const buttonGroup = buttonList[i];
+            moduleElement = _createModuleGroup();
 
             /** button object */
             if (typeof buttonGroup === 'object') {
@@ -2358,7 +2386,7 @@
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
                             module = defaultButtonList[button.name];
-                            mergePlugins[button.name] = button;
+                            plugins[button.name] = button;
                         } else {
                             module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                         }
@@ -2366,21 +2394,27 @@
                         module = defaultButtonList[button];
                     }
 
-                    moduleHtml += _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
+                    buttonElement = _createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
+                    moduleElement.ul.appendChild(buttonElement.li);
+
+                    if (plugins[button.name]) {
+                        plugins[button.name].buttonElement = buttonElement.button;
+                    }
                 }
 
-                html += _createModuleGroup(moduleHtml);
-                moduleHtml = null;
+                tool_bar.appendChild(moduleElement.div);
             }
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
-                html += '<div class="tool_module_enter"></div>';
+                const enterDiv = doc.createElement('DIV');
+                enterDiv.className = 'tool_module_enter';
+                tool_bar.appendChild(enterDiv);
             }
         }
 
         return {
-            'html': html,
-            'mergePlugins': mergePlugins
+            'element': tool_bar,
+            'plugins': plugins
         };
     }
 
@@ -2393,6 +2427,9 @@
      */
     function _Constructor(element, options) {
         if (typeof options !== 'object') options = {};
+
+        /** language setting */
+        const lang = options.lang || SUNEDITOR.defaultLang
 
         /** user options */
         options.videoX = options.videoX || 560;
@@ -2407,13 +2444,13 @@
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
-            ['font', 'fontSize', 'formats'],
+            ['font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
             '/',
             ['fontColor', 'hiliteColor'],
             ['indent', 'outdent'],
-            ['align', 'line', 'list', 'table'],
+            ['align', 'horizontalRule', 'list', 'table'],
             ['link', 'image', 'video'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
@@ -2436,13 +2473,8 @@
         const relative = doc.createElement('DIV');
         relative.className = 'sun-editor-container';
 
-        /** buttons */
-        const buttons = _createToolBar(options.buttonList);
-
         /** tool bar */
-        const tool_bar = doc.createElement('DIV');
-        tool_bar.className = 'sun-editor-id-toolbar';
-        tool_bar.innerHTML = buttons.html;
+        const tool_bar = _createToolBar(doc, options.buttonList, lang);
 
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -2494,7 +2526,7 @@
         editor_div.appendChild(iframe);
         editor_div.appendChild(textarea);
         resize_bar.appendChild(navigation);
-        relative.appendChild(tool_bar);
+        relative.appendChild(tool_bar.element);
         relative.appendChild(editor_div);
         relative.appendChild(resize_bar);
         relative.appendChild(resize_back);
@@ -2505,7 +2537,7 @@
             constructed: {
                 _top: top_div,
                 _relative: relative,
-                _toolBar: tool_bar,
+                _toolBar: tool_bar.element,
                 _editorArea: editor_div,
                 _resizeBar: resize_bar,
                 _navigation: navigation,
@@ -2513,7 +2545,8 @@
                 _resizeBack: resize_back
             },
             options: options,
-            plugins: buttons.mergePlugins
+            plugins: tool_bar.plugins,
+            lang: lang
         };
     }
 
@@ -2564,7 +2597,9 @@
                 fontSize: options.fontSize,
                 height: options.height.match(/\d+/)[0],
                 showPathLabel: options.showPathLabel
-            }
+            },
+            dialog: {},
+            submenu: {}
         };
     }
 
@@ -2601,10 +2636,10 @@
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), SUNEDITOR.util, cons.plugins);
+        return core(_Context(element, cons.constructed, cons.options), cons.plugins, cons.lang);
     };
 
-    if ( typeof noGlobal === typeof undefined ) {
+    if (typeof noGlobal === typeof undefined) {
         window.SUNEDITOR = SUNEDITOR;
     }
 

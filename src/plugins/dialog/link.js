@@ -22,19 +22,20 @@
     'use strict';
 
     const link = {
+        name: 'link',
         add: function (_this) {
             const context = _this.context;
             context.link = {};
     
             /** link dialog */
-            let link_dialog = eval(this.setDialog());
+            let link_dialog = eval(this.setDialog(_this.lang));
             context.link.modal = link_dialog;
             context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
             context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
             context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
     
             /** link button */
-            let link_button = eval(this.setController_LinkBtn());
+            let link_button = eval(this.setController_LinkBtn(_this.lang));
             context.link.linkBtn = link_button;
             context.link._linkAnchor = null;
     
@@ -51,8 +52,7 @@
         },
     
         /** dialog */
-        setDialog: function () {
-            const lang = SUNEDITOR.lang;
+        setDialog: function (lang) {
             const dialog = document.createElement('DIV');
     
             dialog.className = 'modal-content sun-editor-id-dialog-link';
@@ -84,8 +84,7 @@
         },
     
         /** modify controller button */
-        setController_LinkBtn: function () {
-            const lang = SUNEDITOR.lang;
+        setController_LinkBtn: function (lang) {
             const link_btn = document.createElement('DIV');
     
             link_btn.className = 'sun-editor-id-link-btn';
@@ -137,7 +136,7 @@
             try {
                 submitAction.call(this);
             } finally {
-                SUNEDITOR.plugin.dialog.closeDialog.call(this);
+                this.plugins.dialog.closeDialog.call(this);
                 this.closeLoading();
                 this.focus();
             }
@@ -171,7 +170,7 @@
                 this.context.link.focusElement.value = this.context.link._linkAnchor.href;
                 this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
                 this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
-                SUNEDITOR.plugin.dialog.openDialog.call(this, 'link', null, true);
+                this.plugins.dialog.openDialog.call(this, 'link', null, true);
             }
             else {
                 /** delete */
@@ -192,8 +191,8 @@
         }
     };
 
-    if ( typeof noGlobal === typeof undefined ) {
-        window.SUNEDITOR.plugin.link = link;
+    if (typeof noGlobal === typeof undefined) {
+        window.SUNEDITOR.plugins.link = link;
     }
 
     return link;

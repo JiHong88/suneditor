@@ -22,9 +22,9 @@ module.exports = {
 		]
 	},
 
-	entry: './src/index',
+	entry: './src/bundle',
 	output: {
-		filename: 'suneditor.build.js',
+		filename: 'suneditor.bundle.js',
 		path: path.resolve(__dirname, 'dist')
 	},
 

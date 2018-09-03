@@ -22,6 +22,7 @@
     'use strict';
 
     const dialog = {
+        name: 'dialog',
         add: function (_this) {
             const context = _this.context;
             context.dialog = {
@@ -60,7 +61,7 @@
             context.dialog.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
             context.dialog.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
     
-            let resize_button = eval(this.setController_button());;
+            let resize_button = eval(this.setController_button(_this.lang));;
             context.dialog.resizeButton = resize_button;
     
             let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
@@ -90,7 +91,7 @@
             e.stopPropagation();
     
             if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
-                SUNEDITOR.plugin.dialog.closeDialog.call(this);
+                this.plugins.dialog.closeDialog.call(this);
             }
         },
     
@@ -123,7 +124,7 @@
             this.context.dialog.modalArea.style.display = 'none';
             this.modalForm = null;
             this.context.dialog.updateModal = false;
-            SUNEDITOR.plugin[this.context.dialog.kind].init.call(this);
+            SUNEDITOR.plugins[this.context.dialog.kind].init.call(this);
         },
     
         /** resize controller, button (image, iframe) */
@@ -149,8 +150,7 @@
             return resize_container;
         },
     
-        setController_button: function () {
-            const lang = SUNEDITOR.lang;
+        setController_button: function (lang) {
             const resize_button = document.createElement("DIV");
             resize_button.className = "image-resize-btn";
             resize_button.style.display = "none";
@@ -230,7 +230,7 @@
             this.context.element.resizeBackground.style.display = 'none';
             this.context.dialog.resizeContainer.style.display = 'none';
             this.context.dialog.resizeButton.style.display = 'none';
-            SUNEDITOR.plugin[this.context.dialog._resize_plugin].init.call(this);
+            SUNEDITOR.plugins[this.context.dialog._resize_plugin].init.call(this);
         },
     
         onClick_resizeButton: function (e) {
@@ -242,13 +242,13 @@
             e.preventDefault();
     
             if (/^\d+$/.test(command)) {
-                SUNEDITOR.plugin[this.context.dialog._resize_plugin].setSize.call(this, command + '%', '');
+                SUNEDITOR.plugins[this.context.dialog._resize_plugin].setSize.call(this, command + '%', '');
             }
             else if (/update/.test(command)) {
-                SUNEDITOR.plugin[this.context.dialog._resize_plugin].openModify.call(this);
+                SUNEDITOR.plugins[this.context.dialog._resize_plugin].openModify.call(this);
             }
             else if (/delete/.test(command)) {
-                SUNEDITOR.plugin[this.context.dialog._resize_plugin].destroy.call(this);
+                SUNEDITOR.plugins[this.context.dialog._resize_plugin].destroy.call(this);
             }
     
             this.submenuOff();
@@ -268,12 +268,12 @@
             this.context.dialog.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
     
             function closureFunc() {
-                SUNEDITOR.plugin.dialog.cancel_controller_resize.call(this);
+                this.plugins.dialog.cancel_controller_resize.call(this);
                 document.removeEventListener('mousemove', resizing_element_bind);
                 document.removeEventListener('mouseup', closureFunc_bind);
             }
     
-            const resizing_element_bind = SUNEDITOR.plugin.dialog.resizing_element.bind(this);
+            const resizing_element_bind = this.plugins.dialog.resizing_element.bind(this);
             const closureFunc_bind = closureFunc.bind(this);
     
             document.addEventListener('mousemove', resizing_element_bind);
@@ -316,8 +316,8 @@
         }
     };
 
-    if ( typeof noGlobal === typeof undefined ) {
-        window.SUNEDITOR.plugin.dialog = dialog;
+    if (typeof noGlobal === typeof undefined) {
+        window.SUNEDITOR.plugins.dialog = dialog;
     }
 
     return dialog;

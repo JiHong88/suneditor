@@ -7,7 +7,7 @@
  */
 if (typeof window.SUNEDITOR === 'undefined') {
     window.SUNEDITOR = {};
-    SUNEDITOR.plugin = {};
+    SUNEDITOR.plugins = {};
 }
 
 SUNEDITOR.lang = {
@@ -34,7 +34,7 @@ SUNEDITOR.lang = {
         list: '리스트',
         orderList: '숫자형 불릿',
         unorderList: '원형 불릿',
-        line: '구분선',
+        horizontalRule: '가로 줄 삽입',
         table: '테이블',
         link: '링크',
         image: '이미지',

@@ -5,7 +5,7 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.video = {
+SUNEDITOR.plugins.video = {
     add: function (_this) {
         const context = _this.context;
         context.video = {
@@ -26,12 +26,12 @@ SUNEDITOR.plugin.video = {
         context.video._coverElementInner.className = 'sun-editor-iframe-inner-cover';
         context.video._coverElementInner.addEventListener('click', function (e) {
             const pNode = e.target.parentNode;
-            const size = SUNEDITOR.plugin.dialog.call_controller_resize.call(_this, pNode, 'video');
-            SUNEDITOR.plugin.video.onModifyMode.call(_this, pNode.children[0], size);
+            const size = _this.plugins.dialog.call_controller_resize.call(_this, pNode, 'video');
+            _this.plugins.video.onModifyMode.call(_this, pNode.children[0], size);
         });
 
         /** video dialog */
-        let video_dialog = eval(this.setDialog());
+        let video_dialog = eval(this.setDialog(_this.lang));
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
@@ -56,8 +56,7 @@ SUNEDITOR.plugin.video = {
     },
 
     /** dialog */
-    setDialog: function () {
-        const lang = SUNEDITOR.lang;
+    setDialog: function (lang) {
         const dialog = document.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-video';
@@ -148,8 +147,8 @@ SUNEDITOR.plugin.video = {
             coverSpan.setAttribute('contentEditable', false);
 
             /** cover event */
-            coverSpan.addEventListener('mouseenter', SUNEDITOR.plugin.video.onMouseEnter_cover.bind(this));
-            coverSpan.addEventListener('mouseleave', SUNEDITOR.plugin.video.onMouseLeave_cover.bind(this).bind(this));
+            coverSpan.addEventListener('mouseenter', this.plugins.video.onMouseEnter_cover.bind(this));
+            coverSpan.addEventListener('mouseleave', this.plugins.video.onMouseLeave_cover.bind(this).bind(this));
 
             oIframe.width = '100%';
             oIframe.height = '100%';
@@ -169,7 +168,7 @@ SUNEDITOR.plugin.video = {
             this.context.video._proportionChecked = this.context.video.proportion.checked;
             submitAction.call(this);
         } finally {
-            SUNEDITOR.plugin.dialog.closeDialog.call(this);
+            this.plugins.dialog.closeDialog.call(this);
             this.closeLoading();
         }
 
@@ -231,7 +230,7 @@ SUNEDITOR.plugin.video = {
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
 
-        SUNEDITOR.plugin.dialog.openDialog.call(this, 'video', null, true);
+        this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
     setSize: function (x, y) {
@@ -241,7 +240,7 @@ SUNEDITOR.plugin.video = {
 
     destroy: function () {
         this.util.removeItem(this.context.video._coverElement);
-        SUNEDITOR.plugin.video.init.call(this);
+        this.plugins.video.init.call(this);
     },
 
     init: function () {

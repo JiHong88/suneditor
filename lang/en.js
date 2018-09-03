@@ -7,7 +7,7 @@
  */
 if (typeof window.SUNEDITOR === 'undefined') {
     window.SUNEDITOR = {};
-    SUNEDITOR.plugin = {};
+    SUNEDITOR.plugins = {};
 }
 
 SUNEDITOR.lang = {
@@ -34,7 +34,7 @@ SUNEDITOR.lang = {
         list: 'list',
         orderList: 'Ordered list',
         unorderList: 'Unordered list',
-        line: 'Line',
+        horizontalRule: 'horizontal line',
         table: 'Table',
         link: 'Link',
         image: 'Image',
