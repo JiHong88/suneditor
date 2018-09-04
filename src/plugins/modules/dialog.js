@@ -124,7 +124,7 @@
             this.context.dialog.modalArea.style.display = 'none';
             this.modalForm = null;
             this.context.dialog.updateModal = false;
-            SUNEDITOR.plugins[this.context.dialog.kind].init.call(this);
+            this.plugins[this.context.dialog.kind].init.call(this);
         },
     
         /** resize controller, button (image, iframe) */
@@ -230,7 +230,7 @@
             this.context.element.resizeBackground.style.display = 'none';
             this.context.dialog.resizeContainer.style.display = 'none';
             this.context.dialog.resizeButton.style.display = 'none';
-            SUNEDITOR.plugins[this.context.dialog._resize_plugin].init.call(this);
+            this.plugins[this.context.dialog._resize_plugin].init.call(this);
         },
     
         onClick_resizeButton: function (e) {
@@ -242,13 +242,13 @@
             e.preventDefault();
     
             if (/^\d+$/.test(command)) {
-                SUNEDITOR.plugins[this.context.dialog._resize_plugin].setSize.call(this, command + '%', '');
+                this.plugins[this.context.dialog._resize_plugin].setSize.call(this, command + '%', '');
             }
             else if (/update/.test(command)) {
-                SUNEDITOR.plugins[this.context.dialog._resize_plugin].openModify.call(this);
+                this.plugins[this.context.dialog._resize_plugin].openModify.call(this);
             }
             else if (/delete/.test(command)) {
-                SUNEDITOR.plugins[this.context.dialog._resize_plugin].destroy.call(this);
+                this.plugins[this.context.dialog._resize_plugin].destroy.call(this);
             }
     
             this.submenuOff();
@@ -321,5 +321,4 @@
     }
 
     return dialog;
-
 }));

@@ -427,7 +427,7 @@
      * @param util
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    const core = function (context, plugins, lang) {
+    const core = function (context, modules, plugins, lang) {
         /**
          * @description Practical editor function
          * This function is 'this' used by other plugins
@@ -437,6 +437,11 @@
              * @description Elements and user options parameters of the suneditor
              */
             context: context,
+
+            /**
+             * @description loaded modules
+             */
+            modules: {},
 
             /**
              * @description loaded plugins
@@ -543,9 +548,9 @@
 
                 /** Dialog first call */
                 if (directory === 'dialog') {
-                    const dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
-
                     if (!this.plugins['dialog']) {
+                        const dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
+
                         if (!SUNEDITOR.plugins.dialog) {
                             this.util.includeFile(fileType, (fullDirectory + '/dialog.js'), dialogCallback);
                         } else {
@@ -579,7 +584,7 @@
              * @private
              */
             _callBack_addModule: function (directory, moduleName, targetElement, callBackFunction) {
-                this.plugins[moduleName] = SUNEDITOR.plugin[moduleName];
+                this.plugins[moduleName] = SUNEDITOR.plugins[moduleName];
                 this.plugins[moduleName].add(this, targetElement);
 
                 if (typeof callBackFunction === 'function') callBackFunction();
@@ -1746,7 +1751,7 @@
                     }
                     else if (/dialog/.test(display)) {
                         editor.callModule('dialog', command, null, function () {
-                            this.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                            editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                         });
                     }
 
@@ -2008,10 +2013,18 @@
         /** window resize event */
         window.addEventListener('resize', event.resize_window);
 
-        /** append plugins */
-        let pluginKeys = Object.keys(plugins);
+        /** add plugin and module to plugins object */
         let plugin = null;
-        
+
+        /** modules */
+        for (let i = 0, len = modules.length; i < len; i++) {
+            plugin = modules[i];
+            plugin.add(editor);
+            editor.plugins[plugin.name] = plugin;
+        }
+
+        /** plugins */
+        let pluginKeys = Object.keys(plugins);
         for (let i = 0, len = pluginKeys.length; i < len; i++) {
             plugin = plugins[pluginKeys[i]];
             plugin.add(editor, plugin.buttonElement);
@@ -2429,7 +2442,7 @@
         if (typeof options !== 'object') options = {};
 
         /** language setting */
-        const lang = options.lang || SUNEDITOR.defaultLang
+        const lang = options.lang || SUNEDITOR.lang || SUNEDITOR.defaultLang;
 
         /** user options */
         options.videoX = options.videoX || 560;
@@ -2546,6 +2559,7 @@
             },
             options: options,
             plugins: tool_bar.plugins,
+            modules: options.modules || [],
             lang: lang
         };
     }
@@ -2636,7 +2650,7 @@
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), cons.plugins, cons.lang);
+        return core(_Context(element, cons.constructed, cons.options), cons.modules, cons.plugins, cons.lang);
     };
 
     if (typeof noGlobal === typeof undefined) {
@@ -2644,5 +2658,4 @@
     }
 
     return SUNEDITOR;
-
 }));
