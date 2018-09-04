@@ -1,18 +1,21 @@
 import suneditor from './suneditor'
-import align from './plugins/submenu/align'
-import font from './plugins/submenu/font'
-import fontSize from './plugins/submenu/fontSize'
-import fontColor from './plugins/submenu/fontColor'
-import hiliteColor from './plugins/submenu/hiliteColor'
-import hr from './plugins/submenu/horizontalRule'
-import list from './plugins/submenu/list'
-import table from './plugins/submenu/table'
-import formatBlock from './plugins/submenu/formatBlock'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video, module_dialog} from './plugins/plugins_init'
 
 suneditor.create('editor', {
+    modules: [
+        module_dialog
+    ],
     buttonList: [
-        [align, font, 'bold', 'italic', fontSize, fontColor, hiliteColor],
+        ['undo', 'redo'],
+        [font, fontSize, formatBlock],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
         '/',
-        [hr, list, table, formatBlock]
+        [fontColor, hiliteColor],
+        ['indent', 'outdent'],
+        [align, horizontalRule, list, table],
+        [link, image, video],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
     ]
 })
