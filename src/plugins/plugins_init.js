@@ -12,6 +12,6 @@ import link from './dialog/link'
 import image from './dialog/image'
 import video from './dialog/video'
 
-import module_dialog from './modules/dialog'
+import dialog from './modules/dialog'
 
-export {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video, module_dialog}
+export {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video, dialog}

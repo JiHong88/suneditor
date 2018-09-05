@@ -1,9 +1,10 @@
 import suneditor from './suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video, module_dialog} from './plugins/plugins_init'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video, dialog} from './plugins/plugins_init'
+import lang from '../lang/ko.js'
 
-suneditor.create('editor', {
+suneditor.create(document.getElementById('editor'), {
     modules: [
-        module_dialog
+        dialog
     ],
     buttonList: [
         ['undo', 'redo'],
@@ -17,5 +18,6 @@ suneditor.create('editor', {
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
-    ]
+    ],
+    lang: lang
 })
