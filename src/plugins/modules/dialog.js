@@ -152,7 +152,7 @@
     
         setController_button: function (lang) {
             const resize_button = document.createElement("DIV");
-            resize_button.className = "image-resize-btn";
+            resize_button.className = "resize-btn";
             resize_button.style.display = "none";
             resize_button.innerHTML = '' +
                 '<div class="btn-group">' +

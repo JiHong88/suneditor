@@ -1,5 +1,6 @@
 {
   "name": "suneditor",
+  "sideEffects": false,
   "version": "1.11.3",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
@@ -30,16 +31,16 @@
   ],
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "7.0.0",
     "@webpack-cli/init": "^0.1.0",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "css-loader": "^1.0.0",
-    "style-loader": "^0.23.0",
-    "uglifyjs-webpack-plugin": "^1.3.0",
     "webpack": "^4.17.1",
-    "webpack-cli": "^3.1.0"
+    "webpack-cli": "^3.1.0",
+    "babel-loader": "^8.0.2",
+    "css-loader": "^1.0.0",
+    "mini-css-extract-plugin": "^0.4.2"
   },
   "scripts": {
-    "build": "webpack --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
