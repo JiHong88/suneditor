@@ -1,5 +1,5 @@
-// require('./css/suneditor.css')
-// require('./css/suneditor-contents.css')
+require('./css/suneditor.css')
+require('./css/suneditor-contents.css')
 
 import suneditor from './suneditor'
 import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from './plugins/plugins_init'

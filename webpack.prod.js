@@ -6,13 +6,13 @@ module.exports = {
 	mode: 'production',
 	entry: './src/suneditor_build',
 	output: {
-		filename: 'suneditor.bundle.js',
+		filename: 'suneditor.js',
 		path: path.resolve(__dirname, 'dist')
 	},
 
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'suneditor.bundle.css'
+			filename: 'suneditor.css'
 		})
 	],
 
@@ -29,6 +29,29 @@ module.exports = {
 					MiniCssExtractPlugin.loader,
 					'css-loader'
 				]
+			},
+			{
+				test: /\.(jpg|gif|png|ico)$/,
+				use: [{
+					loader: "url-loader",
+					options: {
+						//name: '../public/styles/img/[name].[ext]'
+						limit: 10000,
+						name: 'assets/[hash].[ext]'
+					}
+				}]
+			},
+			{
+				test: /\.(eot|svg|ttf|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+				use: [{
+					// loader: "url-loader",
+					loader: "file-loader",
+					options: {
+						name: 'fonts/[hash].[ext]',
+						//limit: 5000,
+						mimetype: 'application/font-woff'
+					}
+				}]
 			}
 		]
 	},

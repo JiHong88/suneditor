@@ -2494,7 +2494,7 @@
         editor_div.className = 'sun-editor-id-editorArea';
         editor_div.style.height = options.height;
 
-        /** iframe */
+        /** wysiwyg div */
         const iframe = doc.createElement('IFRAME');
         iframe.allowFullscreen = true;
         iframe.frameBorder = 0;
