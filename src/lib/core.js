@@ -84,7 +84,7 @@ const core = function (context, util, modules, plugins, lang) {
         /**
          * @description Variables used internally in editor operation
          * @property {(element|null)} selectionNode - Contains selection node
-         * @property {(element|null)} copySelection - The selection object is copied
+         * @property {(element|null)} selection - The current selection object
          * @property {boolean} wysiwygActive - The wysiwyg frame or code view state
          * @property {boolean} isFullScreen - State of full screen
          * @property {number} innerHeight_fullScreen - InnerHeight in editor when in full screen
@@ -98,7 +98,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         _variable: {
             selectionNode: null,
-            copySelection: null,
+            selection: null,
             wysiwygActive: true,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
@@ -205,7 +205,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {string} value - javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
-            context.element.wysiwygWindow.document.execCommand(command, showDefaultUI, value);
+            document.execCommand(command, showDefaultUI, value);
         },
 
         /**
@@ -216,15 +216,14 @@ const core = function (context, util, modules, plugins, lang) {
             if (caption) {
                 caption.focus();
             } else {
-                context.element.wysiwygWindow.document.body.focus();
+                context.element.wysiwyg.focus();
             }
         },
 
         _setSelectionNode: function () {
-            // IE
-            this._variable.copySelection = this.util.copyObj(this.getSelection());
-
+            this.setSelection();
             const range = this.getRange();
+
             if (range.startContainer !== range.endContainer) {
                 this._variable.selectionNode = range.startContainer;
             } else {
@@ -247,7 +246,15 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Range}
          */
         createRange: function () {
-            return context.element.wysiwygWindow.document.createRange();
+            return document.createRange();
+        },
+
+        /**
+         * @description Get current selection object
+         * @returns {Selection}
+         */
+        setSelection: function () {
+            this._variable.selection = window.getSelection();
         },
 
         /**
@@ -255,7 +262,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Selection}
          */
         getSelection: function () {
-            return context.element.wysiwygWindow.getSelection();
+            return this._variable.selection;
         },
 
         /**
@@ -277,20 +284,20 @@ const core = function (context, util, modules, plugins, lang) {
             if (selection.rangeCount > 0) {
                 nativeRng = selection.getRangeAt(0);
             }
-            // IE
-            else {
-                nativeRng = this.createRange();
-                selection = this._variable.copySelection;
+            // // IE
+            // else {
+            //     nativeRng = this.createRange();
+            //     selection = this._variable.copySelection;
 
-                if (!selection) {
-                    selection = context.element.wysiwygWindow.document.body.firstChild;
-                    nativeRng.setStart(selection, 0);
-                    nativeRng.setEnd(selection, 0);
-                } else {
-                    nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
-                    nativeRng.setEnd(selection.focusNode, selection.focusOffset);
-                }
-            }
+            //     if (!selection) {
+            //         selection = context.element.wysiwygWindow.document.body.firstChild;
+            //         nativeRng.setStart(selection, 0);
+            //         nativeRng.setEnd(selection, 0);
+            //     } else {
+            //         nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
+            //         nativeRng.setEnd(selection.focusNode, selection.focusOffset);
+            //     }
+            // }
 
             return nativeRng;
         },
@@ -1072,7 +1079,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Add or remove the class name of "body" so that the code block is visible
          */
         toggleDisplayBlocks: function () {
-            this.util.toggleClass(context.element.wysiwygWindow.document.body, 'sun-editor-show-block');
+            this.util.toggleClass(context.element.wysiwyg, 'sun-editor-show-block');
         },
 
         /**
@@ -1084,15 +1091,15 @@ const core = function (context, util, modules, plugins, lang) {
                 const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
                     return (typeof ec[m] === 'string') ? ec[m] : m;
                 });
-                context.element.wysiwygWindow.document.body.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
-                context.element.wysiwygWindow.document.body.scrollTop = 0;
+                context.element.wysiwyg.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
+                context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
-                context.element.wysiwygElement.style.display = 'block';
+                context.element.wysiwyg.style.display = 'block';
                 this._variable.wysiwygActive = true;
             }
             else {
-                context.element.code.value = context.element.wysiwygWindow.document.body.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
-                context.element.wysiwygElement.style.display = 'none';
+                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
+                context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
                 this._variable.wysiwygActive = false;
             }
@@ -1139,7 +1146,7 @@ const core = function (context, util, modules, plugins, lang) {
                 '<title>' + this.lang.toolbar.preview + '</title>' +
                 '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor-contents.css">';
             WindowObject.document.body.className = 'sun-editor-editable';
-            WindowObject.document.body.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
+            WindowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
         }
     };
 
@@ -1172,7 +1179,7 @@ const core = function (context, util, modules, plugins, lang) {
             let findB = true, findI = true, findU = true, findS = true;
             let cssText = '', nodeName = '';
 
-            for (let selectionParent = editor._variable.selectionNode; !/^(?:BODY|HTML)$/i.test(selectionParent.nodeName); selectionParent = selectionParent.parentNode) {
+            for (let selectionParent = editor._variable.selectionNode; !/sun\-editor\-id\-editorArea/i.test(selectionParent.className); selectionParent = selectionParent.parentNode) {
                 if (selectionParent.nodeType !== 1) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
@@ -1347,7 +1354,7 @@ const core = function (context, util, modules, plugins, lang) {
                         editor.openPreview();
                         break;
                     case 'print':
-                        context.element.wysiwygWindow.print();
+                        context.element.wysiwyg.print();
                         break;
                     case 'showBlocks':
                         editor.toggleDisplayBlocks();
@@ -1475,7 +1482,7 @@ const core = function (context, util, modules, plugins, lang) {
                     /** if P Tag */
                     if (shift) break;
 
-                    const tabText = context.element.wysiwygWindow.document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
+                    const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
                     editor.insertNode(tabText, null);
 
                     const selection = editor.getSelection();
@@ -1568,11 +1575,11 @@ const core = function (context, util, modules, plugins, lang) {
     context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
     context.tool.bar.addEventListener('click', event.onClick_toolbar);
     /** editor area */
-    context.element.wysiwygWindow.addEventListener('mouseup', event.onMouseUp_wysiwyg);
-    context.element.wysiwygWindow.addEventListener('keydown', event.onKeyDown_wysiwyg);
-    context.element.wysiwygWindow.addEventListener('keyup', event.onKeyUp_wysiwyg);
-    context.element.wysiwygWindow.addEventListener('scroll', event.onScroll_wysiwyg);
-    context.element.wysiwygWindow.addEventListener('drop', event.onDrop_wysiwyg);
+    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg);
+    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg);
+    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg);
+    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg);
+    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg);
     /** resize bar */
     context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
     /** window resize event */
@@ -1605,7 +1612,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         save: function () {
             if (editor._variable.wysiwygActive) {
-                context.element.originElement.innerHTML = context.element.wysiwygWindow.document.body.innerHTML;
+                context.element.originElement.innerHTML = context.element.wysiwyg.innerHTML;
             } else {
                 context.element.originElement.innerHTML = context.element.code.value;
             }
@@ -1626,10 +1633,10 @@ const core = function (context, util, modules, plugins, lang) {
         getContent: function () {
             let content = '';
 
-            if (context.element.wysiwygWindow.document.body.innerText.trim().length === 0) return content;
+            if (context.element.wysiwyg.innerText.trim().length === 0) return content;
 
             if (editor._variable.wysiwygActive) {
-                content = context.element.wysiwygWindow.document.body.innerHTML;
+                content = context.element.wysiwyg.innerHTML;
             } else {
                 content = context.element.code.value;
             }
@@ -1644,7 +1651,7 @@ const core = function (context, util, modules, plugins, lang) {
             const innerHTML = _convertContentForEditor(content);
 
             if (editor._variable.wysiwygActive) {
-                context.element.wysiwygWindow.document.body.innerHTML = innerHTML;
+                context.element.wysiwyg.innerHTML = innerHTML;
             } else {
                 context.element.code.value = innerHTML;
             }
@@ -1658,7 +1665,7 @@ const core = function (context, util, modules, plugins, lang) {
             if (editor._variable.wysiwygActive) {
                 const oP = document.createElement('P');
                 oP.innerHTML = content;
-                context.element.wysiwygWindow.document.body.appendChild(oP);
+                context.element.wysiwyg.appendChild(oP);
             } else {
                 context.element.code.value += content;
             }
@@ -1669,7 +1676,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         disabled: function () {
             context.tool.cover.style.display = 'block';
-            context.element.wysiwygWindow.document.body.setAttribute('contenteditable', false);
+            context.element.wysiwyg.setAttribute('contenteditable', false);
         },
 
         /**
@@ -1677,7 +1684,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         enabled: function () {
             context.tool.cover.style.display = 'none';
-            context.element.wysiwygWindow.document.body.setAttribute('contenteditable', true);
+            context.element.wysiwyg.setAttribute('contenteditable', true);
         },
 
         /**
@@ -1705,11 +1712,11 @@ const core = function (context, util, modules, plugins, lang) {
             context.tool.bar.removeEventListener('touchmove', event.touchmove_toolbar);
             context.tool.bar.removeEventListener('touchend', event.onClick_toolbar);
             context.tool.bar.removeEventListener('click', event.onClick_toolbar);
-            context.element.wysiwygWindow.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
-            context.element.wysiwygWindow.removeEventListener('keydown', event.onKeyDown_wysiwyg);
-            context.element.wysiwygWindow.removeEventListener('keyup', event.onKeyUp_wysiwyg);
-            context.element.wysiwygWindow.removeEventListener('scroll', event.onScroll_wysiwyg);
-            context.element.wysiwygWindow.removeEventListener('drop', event.onDrop_wysiwyg);
+            context.element.wysiwyg.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
+            context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
+            context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
+            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
+            context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             context.element.resizebar.removeEventListener('mousedown', event.onMouseDown_resizeBar);
             window.removeEventListener('resize', event.resize_window);
             

@@ -167,14 +167,14 @@
 
 /* editor area */
 .sun-editor .sun-editor-id-editorArea {width:100%;}
-.sun-editor .sun-editor-id-editorArea .input_editor {width:100%; height:100%; background-color:#FFF;}
+.sun-editor .sun-editor-id-editorArea .input_editor {width:auto; height:auto; background-color:#FFF;}
+.sun-editor .sun-editor-id-editorArea .input_editor:focus {outline: none;}
 .sun-editor .sun-editor-id-editorArea .input_editor.html {outline-style:none;}
 .sun-editor .sun-editor-id-editorArea {-webkit-overflow-scrolling:touch !important; overflow:auto !important;}
 
 /* resize bar */
-.sun-editor .sun-editor-id-resizeBar {width:auto; height:16px; line-height:0.8; border-top:1px solid #dadada; padding:2px 8px 2px; background-color:#fafafa; cursor:ns-resize;}
-.sun-editor .sun-editor-id-resizeBar span {margin:0; padding:0;}
-.sun-editor .sun-editor-id-navigation {position:relative; width:auto; height:auto; font-size:12px; font-weight:bold;}
+.sun-editor .sun-editor-id-resizeBar {width:auto; height:16px; border-top:1px solid #dadada; padding:2px 8px 2px; background-color:#fafafa; cursor:ns-resize;}
+.sun-editor .sun-editor-id-navigation {position:absolute; width:auto; height:auto; margin:0; padding:0; font-size:11px; font-weight:bold; line-height:1;}
 .sun-editor .sun-editor-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 
 /* dialog */
@@ -267,11 +267,20 @@
 .sun-editor .sun-editor-tab-button button.active {background-color: #fff; border-bottom: 0;}
 
 /* suneditor contents */
-body.sun-editor-editable {
+.sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     word-break: break-all;
-    margin: 20px;
+    margin: 20px !important;
+}
+
+/* p */
+.sun-editor-editable p {
+    display: block !important;
+    -webkit-margin-before: 1em !important;
+    -webkit-margin-after: 1em !important;
+    -webkit-margin-start: 0px !important;
+    -webkit-margin-end: 0px !important;
 }
 
 /* hr */

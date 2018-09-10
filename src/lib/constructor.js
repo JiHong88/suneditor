@@ -62,29 +62,17 @@ const _Constructor = {
         editor_div.style.height = options.height;
     
         /** wysiwyg div */
-        const iframe = doc.createElement('IFRAME');
-        iframe.allowFullscreen = true;
-        iframe.frameBorder = 0;
-        iframe.className = 'input_editor sun-editor-id-wysiwyg';
-        iframe.style.display = 'block';
+        const wysiwyg_div = doc.createElement('DIV');
+        wysiwyg_div.setAttribute('contenteditable', true);
+        wysiwyg_div.setAttribute('scrolling', 'auto');
+        wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
+        wysiwyg_div.style.display = 'block';
+        wysiwyg_div.innerHTML = this._convertContentForEditor(element.value);
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
         textarea.className = 'input_editor html sun-editor-id-code';
         textarea.style.display = 'none';
-    
-        iframe.addEventListener('load', function () {
-            this.setAttribute('scrolling', 'auto');
-            this.contentWindow.document.head.innerHTML = '' +
-                '<meta charset="utf-8" />' +
-                '<title>SunEditor</title>';// +
-                // '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
-            this.contentWindow.document.body.className = 'sun-editor-editable';
-            this.contentWindow.document.body.setAttribute('contenteditable', true);
-    
-            // this.contentWindow.document.body.innerHTML = this._convertContentForEditor(element.value);
-            this.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
-        });
     
         /** resize bar */
         const resize_bar = doc.createElement('DIV');
@@ -104,7 +92,7 @@ const _Constructor = {
         resize_back.className = 'sun-editor-id-resize-background';
     
         /** append html */
-        editor_div.appendChild(iframe);
+        editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         resize_bar.appendChild(navigation);
         relative.appendChild(tool_bar.element);

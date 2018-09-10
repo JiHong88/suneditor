@@ -1,9 +1,18 @@
 /* suneditor contents */
-body.sun-editor-editable {
+.sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     word-break: break-all;
-    margin: 20px;
+    margin: 20px !important;
+}
+
+/* p */
+.sun-editor-editable p {
+    display: block !important;
+    -webkit-margin-before: 1em !important;
+    -webkit-margin-after: 1em !important;
+    -webkit-margin-start: 0px !important;
+    -webkit-margin-end: 0px !important;
 }
 
 /* hr */

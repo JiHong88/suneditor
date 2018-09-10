@@ -32,21 +32,6 @@ const util = {
     },
 
     /**
-     * @description Copies object
-     * @param {Object} obj - Object to be copy
-     * @returns {Object}
-     */
-    copyObj: function (obj) {
-        const copy = {};
-
-        for (let attr in obj) {
-            copy[attr] = obj[attr];
-        }
-
-        return copy;
-    },
-
-    /**
      * @description Get suneditor's default path
      */
     getBasePath: (function () {
@@ -211,7 +196,7 @@ const util = {
         if (!element) return null;
 
         if (!element || /^(?:HTML|BODY)$/i.test(element.tagName)) {
-            element = context.element.wysiwygWindow.document.body.firstChild;
+            element = context.element.wysiwyg.firstChild;
         } else {
             while (!/^BODY$/i.test(element.parentNode.tagName)) {
                 element = element.parentNode;

@@ -173,7 +173,7 @@ const dialog = {
             parentElement = parentElement.offsetParent;
         }
 
-        const t = (targetElement.offsetTop + this.context.tool.bar.offsetHeight + parentT - this.context.element.wysiwygWindow.document.body.scrollTop);
+        const t = (targetElement.offsetTop + this.context.tool.bar.offsetHeight + parentT - this.context.element.wysiwyg.scrollTop);
         const l = (targetElement.offsetLeft + parentL);
 
         resizeContainer.style.top = t + 'px';
