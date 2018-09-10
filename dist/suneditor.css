@@ -3,12 +3,12 @@
 /* suneditor main */
 .sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor * {box-sizing:border-box; font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
-.sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {font-size:14px; line-height:1.5; color:#111;}
-.sun-editor body, .sun-editor div, .sun-editor dl, .sun-editor dt, .sun-editor dd, .sun-editor ul, .sun-editor ol, .sun-editor li,
-.sun-editor h1, .sun-editor h2, .sun-editor h3, .sun-editor h4, .sun-editor h5, .sun-editor h6, .sun-editor pre, .sun-editor code, .sun-editor form, .sun-editor fieldset,
-.sun-editor legend, .sun-editor textarea, .sun-editor p, .sun-editor blockquote, .sun-editor th, .sun-editor td, .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {margin:0; padding:0; border:0; color:#000 !important;}
-.sun-editor dl, .sun-editor ul, .sun-editor ol, .sun-editor menu, .sun-editor li {list-style: none !important;}
-.sun-editor hr {margin:6px 0 6px 0 !important;}
+.sun-editor-common th, .sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5; color:#111;}
+.sun-editor-common body, .sun-editor-common div, .sun-editor-common dl, .sun-editor-common dt, .sun-editor-common dd, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common li,
+.sun-editor-common h1, .sun-editor-common h2, .sun-editor-common h3, .sun-editor-common h4, .sun-editor-common h5, .sun-editor-common h6, .sun-editor-common pre, .sun-editor-common code, .sun-editor-common form, .sun-editor-common fieldset,
+.sun-editor-common legend, .sun-editor-common textarea, .sun-editor-common p, .sun-editor-common blockquote, .sun-editor-common th, .sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0; color:#000 !important;}
+.sun-editor-common dl, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common menu, .sun-editor-common li {list-style: none !important;}
+.sun-editor-common hr {margin:6px 0 6px 0 !important;}
 .sun-editor textarea {resize:none !important; border:0 !important;}
 .sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align: middle;}
@@ -272,15 +272,6 @@
     font-size: 13px;
     word-break: break-all;
     margin: 20px !important;
-}
-
-/* p */
-.sun-editor-editable p {
-    display: block !important;
-    -webkit-margin-before: 1em !important;
-    -webkit-margin-after: 1em !important;
-    -webkit-margin-start: 0px !important;
-    -webkit-margin-end: 0px !important;
 }
 
 /* hr */

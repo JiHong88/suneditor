@@ -21,7 +21,7 @@ const dialog = {
 
         /** dialog */
         let dialog_div = document.createElement('DIV');
-        dialog_div.className = 'sun-editor-id-dialogBox';
+        dialog_div.className = 'sun-editor-id-dialogBox sun-editor-common';
 
         let dialog_back = document.createElement('DIV');
         dialog_back.className = 'modal-dialog-background sun-editor-id-dialog-back';

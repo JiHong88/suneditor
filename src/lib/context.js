@@ -17,8 +17,8 @@ const _Context = function (element, cons, options) {
             resizebar: cons._resizeBar,
             navigation: cons._navigation,
             editorArea: cons._editorArea,
-            wysiwyg: cons._editorArea.getElementsByClassName('sun-editor-id-wysiwyg')[0],
-            code: cons._editorArea.getElementsByClassName('sun-editor-id-code')[0],
+            wysiwyg: cons._wysiwygArea,
+            code: cons._codeArea,
             loading: cons._loading,
             resizeBackground: cons._resizeBack
         },

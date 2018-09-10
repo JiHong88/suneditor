@@ -111,11 +111,6 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         /**
-         * @description Regular expression to check whether it is format tag
-         */
-        _isformatTagName: new RegExp('^(?:P|DIV|H\\d)$', 'i'),
-
-        /**
          * @description Call the module
          * @param {string} directory - The directory(plugin/{directory}) of the js file to call
          * @param {string} moduleName - The name of the js file to call
@@ -254,7 +249,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Selection}
          */
         setSelection: function () {
-            this._variable.selection = window.getSelection();
+            this._variable.selection = util.copyObj(window.getSelection());
         },
 
         /**
@@ -535,7 +530,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** No node selected */
                 if (startOff === endOff) {
                     newNode.innerHTML = '&nbsp;';
-                    if (this._isformatTagName.test(startCon.nodeName)) {
+                    if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
                     } else {
                         startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
@@ -592,7 +587,7 @@ const core = function (context, util, modules, plugins, lang) {
                 };
 
                 /** one line */
-                if (!/BODY/i.test(commonCon.nodeName)) {
+                if (!util.isFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
                     const range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
 
@@ -605,7 +600,7 @@ const core = function (context, util, modules, plugins, lang) {
                 else {
                     // get line nodes
                     const lineNodes = this.util.getListChildren(commonCon, function (current) {
-                        return this._isformatTagName.test(current.nodeName);
+                        return util.isFormatElement(current);
                     });
 
                     let startLine = this.util.getParentElement(startCon, 'P');
@@ -1087,7 +1082,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         toggleCodeView: function () {
             if (!this._variable.wysiwygActive) {
-                const ec = {'&amp;': '&', '&nbsp;': '\u00A0', /*"&quot;": "\"", */'&lt;': '<', '&gt;': '>'};
+                const ec = {'&amp;': '&', '&nbsp;': '\u00A0', "&quot;": "'", '&lt;': '<', '&gt;': '>'};
                 const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
                     return (typeof ec[m] === 'string') ? ec[m] : m;
                 });
@@ -1144,7 +1139,7 @@ const core = function (context, util, modules, plugins, lang) {
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                 '<title>' + this.lang.toolbar.preview + '</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor-contents.css">';
+                '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
             WindowObject.document.body.className = 'sun-editor-editable';
             WindowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
         }
@@ -1179,13 +1174,13 @@ const core = function (context, util, modules, plugins, lang) {
             let findB = true, findI = true, findU = true, findS = true;
             let cssText = '', nodeName = '';
 
-            for (let selectionParent = editor._variable.selectionNode; !/sun\-editor\-id\-editorArea/i.test(selectionParent.className); selectionParent = selectionParent.parentNode) {
+            for (let selectionParent = editor._variable.selectionNode; !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
                 if (selectionParent.nodeType !== 1) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 
                 /** Format */
-                if (findFormat && editor._isformatTagName.test(nodeName)) {
+                if (findFormat && util.isFormatElement(selectionParent)) {
                     commandMapNodes.push('FORMAT');
                     editor.util.changeTxt(commandMap['FORMAT'], nodeName);
                     findFormat = false;
@@ -1438,7 +1433,7 @@ const core = function (context, util, modules, plugins, lang) {
             /** default key action */
             switch (keyCode) {
                 case 8: /**backspace key*/
-                    if (editor._isformatTagName.test(editor._variable.selectionNode.tagName) && editor._variable.selectionNode.previousSibling === null) {
+                    if (util.isFormatElement(editor._variable.selectionNode) && editor._variable.selectionNode.previousSibling === null) {
                         e.preventDefault();
                         e.stopPropagation();
                         editor._variable.selectionNode.innerHTML = '&#65279';
@@ -1451,7 +1446,7 @@ const core = function (context, util, modules, plugins, lang) {
                     if (ctrl || alt) break;
 
                     let currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
-                    while (!/^TD$/i.test(currentNode.tagName) && !/^BODY$/i.test(currentNode.tagName)) {
+                    while (!/^TD$/i.test(currentNode.tagName) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
 
@@ -1505,7 +1500,7 @@ const core = function (context, util, modules, plugins, lang) {
             editor._setSelectionNode();
 
             /** when format tag deleted */
-            if (e.keyCode === 8 && /^BODY$/i.test(editor._variable.selectionNode.tagName)) {
+            if (e.keyCode === 8 && util.isWysiwygDiv(editor._variable.selectionNode)) {
                 e.preventDefault();
                 e.stopPropagation();
 

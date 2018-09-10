@@ -53,6 +53,24 @@ const util = {
     })(),
 
     /**
+     * @description It is judged whether it is the edit region top div element.
+     * @returns {boolean}
+     */
+    isWysiwygDiv: function (element) {
+        if (element && element.nodeType === 1 && this.hasClass(element, 'sun-editor-id-wysiwyg')) return true;
+        return false;
+    },
+
+    /**
+     * @description It is judged whether it is the format element.
+     * @returns {boolean}
+     */
+    isFormatElement: function (element) {
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H\\d)$/i.test(element.tagName)) return true;
+        return false;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {array} array - element array
      * @param {element} element - Element to find index
@@ -178,7 +196,7 @@ const util = {
 
         const check = new RegExp(query, 'i');
         while (element && (element.nodeType === 3 || !check.test(element[attr]))) {
-            if (/^BODY$/i.test(element.tagName)) {
+            if (this.isWysiwygDiv(element)) {
                 return null;
             }
             element = element.parentNode;
@@ -195,10 +213,10 @@ const util = {
     getFormatElement: function (element) {
         if (!element) return null;
 
-        if (!element || /^(?:HTML|BODY)$/i.test(element.tagName)) {
+        if (!element || this.isWysiwygDiv(element)) {
             element = context.element.wysiwyg.firstChild;
         } else {
-            while (!/^BODY$/i.test(element.parentNode.tagName)) {
+            while (!this.isWysiwygDiv(element.parentNode)) {
                 element = element.parentNode;
             }
         }

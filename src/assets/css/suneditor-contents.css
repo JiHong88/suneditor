@@ -6,15 +6,6 @@
     margin: 20px !important;
 }
 
-/* p */
-.sun-editor-editable p {
-    display: block !important;
-    -webkit-margin-before: 1em !important;
-    -webkit-margin-after: 1em !important;
-    -webkit-margin-start: 0px !important;
-    -webkit-margin-end: 0px !important;
-}
-
 /* hr */
 .sun-editor-editable hr {
     border-width: 1px 0 0;

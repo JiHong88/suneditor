@@ -76,15 +76,15 @@ const _Constructor = {
     
         /** resize bar */
         const resize_bar = doc.createElement('DIV');
-        resize_bar.className = 'sun-editor-id-resizeBar';
+        resize_bar.className = 'sun-editor-id-resizeBar sun-editor-common';
     
         /** navigation */
         const navigation = doc.createElement('SPAN');
-        navigation.className = 'sun-editor-id-navigation';
+        navigation.className = 'sun-editor-id-navigation sun-editor-common';
     
         /** loading box */
         const loading_box = doc.createElement('DIV');
-        loading_box.className = 'sun-editor-id-loading';
+        loading_box.className = 'sun-editor-id-loading sun-editor-common';
         loading_box.innerHTML = '<div class="loading-effect"></div>';
     
         /** resize operation background */
@@ -108,6 +108,8 @@ const _Constructor = {
                 _relative: relative,
                 _toolBar: tool_bar.element,
                 _editorArea: editor_div,
+                _wysiwygArea: wysiwyg_div,
+                _codeArea: textarea,
                 _resizeBar: resize_bar,
                 _navigation: navigation,
                 _loading: loading_box,
@@ -321,7 +323,7 @@ const _Constructor = {
      */
     _createToolBar: function (doc, buttonList, lang) {
         const tool_bar = doc.createElement('DIV');
-        tool_bar.className = 'sun-editor-id-toolbar';
+        tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'sun-editor-id-toolbar-cover';
