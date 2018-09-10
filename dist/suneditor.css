@@ -266,8 +266,6 @@
 /* Create an active/current tablink class */
 .sun-editor .sun-editor-tab-button button.active {background-color: #fff; border-bottom: 0;}
 
-@charset "UTF-8";
-
 /* suneditor contents */
 body.sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;

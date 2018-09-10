@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default table = {
+const table = {
     name: 'table',
     add: function (_this, targetElement) {
         const context = _this.context;
@@ -108,3 +108,5 @@ export default table = {
         this.submenuOff();
     }
 };
+
+export default table;

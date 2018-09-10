@@ -1,4 +1,4 @@
-export default lang = {
+const lang = {
     toolbar: {
         font: '글꼴',
         formats: '문단 형식',
@@ -76,3 +76,5 @@ export default lang = {
         remove: '삭제'
     }
 };
+
+export default lang;

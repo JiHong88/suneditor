@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default image = {
+const image = {
     name: 'image',
     add: function (_this) {
         const context = _this.context;
@@ -531,3 +531,5 @@ export default image = {
         this.plugins.image.openTab.call(this, 'init');
     }
 };
+
+export default image;

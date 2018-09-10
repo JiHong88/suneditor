@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default video = {
+const video = {
     name: 'video',
     add: function (_this) {
         const context = _this.context;
@@ -253,3 +253,5 @@ export default video = {
         this.context.video.proportion.disabled = true;
     }
 };
+
+export default video;

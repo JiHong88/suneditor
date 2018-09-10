@@ -7,7 +7,7 @@
  * @returns {{constructed: {_top: HTMLElement, _relative: HTMLElement, _toolBar: HTMLElement, _editorArea: HTMLElement, _resizeBar: HTMLElement, _loading: HTMLElement, _resizeBack: HTMLElement}, options: *}}
  * @private
  */
-export default _Constructor = {
+const _Constructor = {
     init: function (element, options, lang) {
         if (typeof options !== 'object') options = {};
     
@@ -77,12 +77,13 @@ export default _Constructor = {
             this.setAttribute('scrolling', 'auto');
             this.contentWindow.document.head.innerHTML = '' +
                 '<meta charset="utf-8" />' +
-                '<title>SunEditor</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + SUNEDITOR.util.getBasePath + 'css/suneditor-contents.css">';
+                '<title>SunEditor</title>';// +
+                // '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
             this.contentWindow.document.body.className = 'sun-editor-editable';
             this.contentWindow.document.body.setAttribute('contenteditable', true);
     
-            this.contentWindow.document.body.innerHTML = this._convertContentForEditor(element.value);
+            // this.contentWindow.document.body.innerHTML = this._convertContentForEditor(element.value);
+            this.contentWindow.document.body.innerHTML = '<p>&#65279</p>';
         });
     
         /** resize bar */
@@ -391,3 +392,5 @@ export default _Constructor = {
         };
     }
 };
+
+export default _Constructor;

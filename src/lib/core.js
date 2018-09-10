@@ -7,7 +7,7 @@
  * @param util
  * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
-export default core = function (context, util, modules, plugins, lang) {
+const core = function (context, util, modules, plugins, lang) {
     /**
      * @description Practical editor function
      * This function is 'this' used by other plugins
@@ -1734,3 +1734,5 @@ export default core = function (context, util, modules, plugins, lang) {
         }
     };
 };
+
+export default core;

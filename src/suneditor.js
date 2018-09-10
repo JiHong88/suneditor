@@ -9,12 +9,17 @@
 
 import util from './lib/util';
 import core from './lib/core';
-import _Context from './lib/context';
 import _Constructor from './lib/constructor';
+import _Context from './lib/context';
 import _defaultLang from './lang/en'
 
 
-export default SUNEDITOR = {
+const SUNEDITOR = {
+    util,
+    core,
+    _Constructor,
+    _Context,
+    _defaultLang,
     /**
      * @description Create the suneditor
      * @param {string} elementId - textarea Id
@@ -32,7 +37,7 @@ export default SUNEDITOR = {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = _Constructor(element, options, (options.lang || _defaultLang));
+        const cons = this._Constructor.init(element, options, (options.lang || this._defaultLang));
 
         if (document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
@@ -48,6 +53,8 @@ export default SUNEDITOR = {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), util, cons.modules, cons.plugins, cons.lang);
+        return this.core(this._Context(element, cons.constructed, cons.options), this.util, cons.modules, cons.plugins, cons.lang);
     }
 };
+
+export default SUNEDITOR;

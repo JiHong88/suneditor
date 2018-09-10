@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default font = {
+const font = {
     name: 'font',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -71,3 +71,5 @@ export default font = {
         this.submenuOff();
     }
 };
+
+export default font;

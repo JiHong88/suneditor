@@ -8,7 +8,7 @@
  * @returns Elements, variables of the editor
  * @private
  */
-export default _Context = function (element, cons, options) {
+const _Context = function (element, cons, options) {
     return {
         element: {
             originElement: element,
@@ -52,3 +52,5 @@ export default _Context = function (element, cons, options) {
         submenu: {}
     };
 };
+
+export default _Context;

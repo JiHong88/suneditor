@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default dialog = {
+const dialog = {
     name: 'dialog',
     add: function (_this) {
         const context = _this.context;
@@ -300,3 +300,5 @@ export default dialog = {
         this.util.changeTxt(this.context.dialog.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };
+
+export default dialog;

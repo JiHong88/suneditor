@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default fontColor = {
+const fontColor = {
     name: 'fontColor',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -67,3 +67,5 @@ export default fontColor = {
         this.submenuOff();
     }
 };
+
+export default fontColor;

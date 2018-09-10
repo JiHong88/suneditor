@@ -3,7 +3,7 @@
 /**
  * @description utility function
  */
-export default util = {
+const util = {
     /**
      * @description Gets XMLHttpRequest object
      * @returns {Object}
@@ -297,3 +297,5 @@ export default util = {
         }
     }
 };
+
+export default util;

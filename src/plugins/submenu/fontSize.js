@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default fontSize = {
+const fontSize = {
     name: 'fontSize',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -59,3 +59,5 @@ export default fontSize = {
         this.submenuOff();
     }
 };
+
+export default fontSize;

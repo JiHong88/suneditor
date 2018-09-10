@@ -6,7 +6,7 @@
  * MIT license.
  */
 'use strict';
-export default list = {
+const list = {
     name: 'list',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -57,3 +57,5 @@ export default list = {
         this.submenuOff();
     }
 };
+
+export default list;
