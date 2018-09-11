@@ -14,7 +14,7 @@ module.exports = {
 
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'suneditor.css'
+			filename: 'css/suneditor.css'
 		})
 	],
 

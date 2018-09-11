@@ -71,6 +71,25 @@ const util = {
     },
 
     /**
+     * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...Tag whose parent is the "BODY")
+     * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
+     * @returns {Element}
+     */
+    getFormatElement: function (element) {
+        if (!element) return null;
+
+        if (!element || this.isWysiwygDiv(element)) {
+            element = context.element.wysiwyg.firstChild;
+        } else {
+            while (!this.isWysiwygDiv(element.parentNode)) {
+                element = element.parentNode;
+            }
+        }
+
+        return element;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {array} array - element array
      * @param {element} element - Element to find index
@@ -200,25 +219,6 @@ const util = {
                 return null;
             }
             element = element.parentNode;
-        }
-
-        return element;
-    },
-
-    /**
-     * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...Tag whose parent is the "BODY")
-     * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
-     * @returns {Element}
-     */
-    getFormatElement: function (element) {
-        if (!element) return null;
-
-        if (!element || this.isWysiwygDiv(element)) {
-            element = context.element.wysiwyg.firstChild;
-        } else {
-            while (!this.isWysiwygDiv(element.parentNode)) {
-                element = element.parentNode;
-            }
         }
 
         return element;

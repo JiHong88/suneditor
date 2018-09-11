@@ -112,42 +112,21 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Call the module
-         * @param {string} directory - The directory(plugin/{directory}) of the js file to call
          * @param {string} moduleName - The name of the js file to call
-         * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
-        callModule: function (directory, moduleName, targetElement, callBackFunction) {
-            /** Dialog first call */
-            if (directory === 'dialog') {
-                if (!this.plugins['dialog']) {
-                    const dialogCallback = this._callBack_addModule.bind(this, 'dialog', 'dialog', targetElement, this.callModule.bind(this, directory, moduleName, targetElement, callBackFunction));
-                    dialogCallback();
-                    return;
-                }
-            }
-
-            /** etc */
+        callModule: function (moduleName, callBackFunction) {
             if (!this.plugins[moduleName]) {
-                this._callBack_addModule(directory, moduleName, targetElement, callBackFunction);
-            }
-            else {
-                if (typeof callBackFunction === 'function') callBackFunction();
-            }
-        },
+                const plugin = plugins[moduleName];
+                if (!plugin) {
+                    throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (name:"' + moduleName + '")');
+                }
 
-        /**
-         * @callback
-         * @description After the module is added, call the main function and the callback function
-         * @param {string} directory - The directory(plugin/{directory}) of the js file to call
-         * @param {string} moduleName - The name of the js file to call
-         * @param {element} targetElement - If this is element, the element is inserted into the sibling node (submenu)
-         * @param {function} callBackFunction - Function to be executed immediately after module call
-         * @private
-         */
-        _callBack_addModule: function (directory, moduleName, targetElement, callBackFunction) {
-            this.plugins[moduleName].add(this, targetElement);
-            if (typeof callBackFunction === 'function') callBackFunction();
+                plugin.add(this, plugin.buttonElement)
+                this.plugins[moduleName] = plugin;
+            }
+                
+            callBackFunction();
         },
 
         /**
@@ -249,7 +228,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Selection}
          */
         setSelection: function () {
-            this._variable.selection = util.copyObj(window.getSelection());
+            this._variable.selection = window.getSelection();
         },
 
         /**
@@ -1198,7 +1177,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** A */
                 if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                     if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
-                        editor.callModule('dialog', 'link', null, function () {
+                        editor.callModule('link', function () {
                             this.plugins.link.call_controller_linkButton.call(editor, selectionParent);
                         });
                     }
@@ -1312,12 +1291,12 @@ const core = function (context, util, modules, plugins, lang) {
             /** Dialog, Submenu */
             if (display) {
                 if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== editor.submenu)) {
-                    editor.callModule('submenu', command, target, function () {
+                    editor.callModule(command, function () {
                         editor.submenuOn(target);
                     });
                 }
                 else if (/dialog/.test(display)) {
-                    editor.callModule('dialog', command, null, function () {
+                    editor.callModule(command, function () {
                         editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                     });
                 }
@@ -1392,7 +1371,7 @@ const core = function (context, util, modules, plugins, lang) {
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
-                editor.callModule('dialog', 'image', null, function () {
+                editor.callModule('image', function () {
                     const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
@@ -1530,7 +1509,7 @@ const core = function (context, util, modules, plugins, lang) {
 
             editor.focus();
 
-            editor.callModule('dialog', 'image', null, function () {
+            editor.callModule('image', function () {
                 editor.context.image.imgInputFile.files = files;
                 editor.plugins.image.onRender_imgInput.call(editor);
                 editor.context.image.imgInputFile.files = null;
@@ -1581,24 +1560,12 @@ const core = function (context, util, modules, plugins, lang) {
     window.addEventListener('resize', event.resize_window);
 
     /** add plugin and module to plugins object */
-    let plugin = null;
-
     /** modules */
-    for (let i = 0, len = modules.length; i < len; i++) {
+    for (let i = 0, len = modules.length, plugin; i < len; i++) {
         plugin = modules[i];
         plugin.add(editor);
         editor.plugins[plugin.name] = plugin;
     }
-
-    /** plugins */
-    let pluginKeys = Object.keys(plugins);
-    for (let i = 0, len = pluginKeys.length; i < len; i++) {
-        plugin = plugins[pluginKeys[i]];
-        plugin.add(editor, plugin.buttonElement);
-        editor.plugins[pluginKeys[i]] = plugin;
-    }
-
-    pluginKeys = null, plugin = null;
 
     /** User function */
     return {
