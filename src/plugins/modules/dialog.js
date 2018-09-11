@@ -161,20 +161,11 @@ const dialog = {
 
         const resizeContainer = this.context.dialog.resizeContainer;
         const resizeDiv = this.context.dialog.resizeDiv;
+
         const w = targetElement.offsetWidth;
         const h = targetElement.offsetHeight;
-
-        let parentElement = targetElement.offsetParent;
-        let parentT = 0;
-        let parentL = 0;
-        while (parentElement) {
-            parentT += (parentElement.offsetTop + parentElement.clientTop);
-            parentL += (parentElement.offsetLeft + +parentElement.clientLeft);
-            parentElement = parentElement.offsetParent;
-        }
-
-        const t = (targetElement.offsetTop + this.context.tool.bar.offsetHeight + parentT - this.context.element.wysiwyg.scrollTop);
-        const l = (targetElement.offsetLeft + parentL);
+        const t = (targetElement.offsetTop - this.context.element.editorArea.scrollTop);
+        const l = (targetElement.offsetLeft);
 
         resizeContainer.style.top = t + 'px';
         resizeContainer.style.left = l + 'px';

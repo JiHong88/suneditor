@@ -3,7 +3,8 @@
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     word-break: break-all;
-    margin: 20px !important;
+    padding: 20px !important;
+    margin: 0 !important;
 }
 
 /* hr */

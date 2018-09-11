@@ -1066,7 +1066,7 @@ const core = function (context, util, modules, plugins, lang) {
                     return (typeof ec[m] === 'string') ? ec[m] : m;
                 });
                 context.element.wysiwyg.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
-                context.element.wysiwyg.scrollTop = 0;
+                context.element.editorArea.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
                 this._variable.wysiwygActive = true;
@@ -1544,20 +1544,20 @@ const core = function (context, util, modules, plugins, lang) {
 
     /** add event listeners */
     /** tool bar event */
-    context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar);
-    context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar);
-    context.tool.bar.addEventListener('touchend', event.onClick_toolbar);
-    context.tool.bar.addEventListener('click', event.onClick_toolbar);
+    context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar, false);
+    context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar, false);
+    context.tool.bar.addEventListener('touchend', event.onClick_toolbar, false);
+    context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg);
-    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg);
-    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg);
-    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg);
-    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg);
+    context.element.editorArea.addEventListener('scroll', event.onScroll_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     /** resize bar */
-    context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar);
+    context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar, false);
     /** window resize event */
-    window.addEventListener('resize', event.resize_window);
+    window.addEventListener('resize', event.resize_window, false);
 
     /** add plugin and module to plugins object */
     /** modules */
