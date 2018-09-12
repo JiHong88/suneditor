@@ -152,7 +152,7 @@ const core = function (context, util, modules, plugins, lang) {
             }
 
             if (context.image && context.image._onCaption === true) {
-                plugins.image.toggle_caption_contenteditable.call(editor, false);
+                this.plugins.image.toggle_caption_contenteditable.call(editor, false);
             }
 
             this.controllersOff();
@@ -1173,7 +1173,7 @@ const core = function (context, util, modules, plugins, lang) {
                 if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                     if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
                         editor.callModule('link', function () {
-                            plugins.link.call_controller_linkButton.call(editor, selectionParent);
+                            editor.plugins.link.call_controller_linkButton.call(editor, selectionParent);
                         });
                     }
                     findA = false;
@@ -1292,7 +1292,7 @@ const core = function (context, util, modules, plugins, lang) {
                 }
                 else if (/dialog/.test(display)) {
                     editor.callModule(command, function () {
-                        plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                        editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                     });
                 }
 
@@ -1367,8 +1367,8 @@ const core = function (context, util, modules, plugins, lang) {
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callModule('image', function () {
-                    const size = plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
-                    plugins.image.onModifyMode.call(editor, targetElement, size);
+                    const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
+                    editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
                 return;
             }
@@ -1506,7 +1506,7 @@ const core = function (context, util, modules, plugins, lang) {
 
             editor.callModule('image', function () {
                 context.image.imgInputFile.files = files;
-                plugins.image.onRender_imgInput.call(editor);
+                editor.plugins.image.onRender_imgInput.call(editor);
                 context.image.imgInputFile.files = null;
             });
         },
