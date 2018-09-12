@@ -112,18 +112,18 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Call the module
-         * @param {string} moduleName - The name of the js file to call
+         * @param {string} pluginName - The name of the js file to call
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
-        callModule: function (moduleName, callBackFunction) {
-            if (!this.plugins[moduleName]) {
-                const plugin = plugins[moduleName];
+        callModule: function (pluginName, callBackFunction) {
+            if (!this.plugins[pluginName]) {
+                const plugin = plugins[pluginName];
                 if (!plugin) {
-                    throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (name:"' + moduleName + '")');
+                    throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
                 }
 
                 plugin.add(this, plugin.buttonElement)
-                this.plugins[moduleName] = plugin;
+                this.plugins[pluginName] = plugin;
             }
                 
             callBackFunction();
@@ -152,7 +152,7 @@ const core = function (context, util, modules, plugins, lang) {
             }
 
             if (context.image && context.image._onCaption === true) {
-                this.plugins.image.toggle_caption_contenteditable.call(editor, false);
+                plugins.image.toggle_caption_contenteditable.call(editor, false);
             }
 
             this.controllersOff();
@@ -195,7 +195,7 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         _setSelectionNode: function () {
-            this.setSelection();
+            this._variable.selection = window.getSelection();
             const range = this.getRange();
 
             if (range.startContainer !== range.endContainer) {
@@ -206,29 +206,15 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         /**
-         * @description Determine if this offset is the edge offset of container
-         * @param {object} container - The container property of the selection object.
-         * @param {number} offset - The offset property of the selection object.
-         * @returns {boolean}
+         * @description Get current select node
+         * @returns {Node}
          */
-        isEdgePoint: function (container, offset) {
-            return (offset === 0) || (offset === container.nodeValue.length);
-        },
+        getSelectionNode: function () {
+            if (this._variable.selection) {
+                return this._variable.selection.extentNode || this._variable.selection.anchorNode;
+            }
 
-        /**
-         * @description Create range object
-         * @returns {Range}
-         */
-        createRange: function () {
-            return document.createRange();
-        },
-
-        /**
-         * @description Get current selection object
-         * @returns {Selection}
-         */
-        setSelection: function () {
-            this._variable.selection = window.getSelection();
+            return context.element.wysiwyg.firstChild
         },
 
         /**
@@ -240,13 +226,13 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         /**
-         * @description Get current select node
-         * @returns {Node}
+         * @description Create range object
+         * @returns {Range}
          */
-        getSelectionNode: function () {
-            return this.getSelection().extentNode || this.getSelection().anchorNode;
+        createRange: function () {
+            return document.createRange();
         },
-
+        
         /**
          * @description Get current range object
          * @returns {Range}
@@ -258,20 +244,19 @@ const core = function (context, util, modules, plugins, lang) {
             if (selection.rangeCount > 0) {
                 nativeRng = selection.getRangeAt(0);
             }
-            // // IE
-            // else {
-            //     nativeRng = this.createRange();
-            //     selection = this._variable.copySelection;
+            else {
+                nativeRng = this.createRange();
+                selection = this._variable.selection;
 
-            //     if (!selection) {
-            //         selection = context.element.wysiwygWindow.document.body.firstChild;
-            //         nativeRng.setStart(selection, 0);
-            //         nativeRng.setEnd(selection, 0);
-            //     } else {
-            //         nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
-            //         nativeRng.setEnd(selection.focusNode, selection.focusOffset);
-            //     }
-            // }
+                if (!selection) {
+                    selection = context.element.wysiwyg.firstChild;
+                    nativeRng.setStart(selection, 0);
+                    nativeRng.setEnd(selection, 0);
+                } else {
+                    nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
+                    nativeRng.setEnd(selection.focusNode, selection.focusOffset);
+                }
+            }
 
             return nativeRng;
         },
@@ -295,6 +280,16 @@ const core = function (context, util, modules, plugins, lang) {
             }
 
             selection.addRange(range);
+        },
+
+        /**
+         * @description Determine if this offset is the edge offset of container
+         * @param {object} container - The container property of the selection object.
+         * @param {number} offset - The offset property of the selection object.
+         * @returns {boolean}
+         */
+        isEdgePoint: function (container, offset) {
+            return (offset === 0) || (offset === container.nodeValue.length);
         },
 
         /**
@@ -1117,7 +1112,7 @@ const core = function (context, util, modules, plugins, lang) {
             WindowObject.document.head.innerHTML = '' +
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<title>' + this.lang.toolbar.preview + '</title>' +
+                '<title>' + lang.toolbar.preview + '</title>' +
                 '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
             WindowObject.document.body.className = 'sun-editor-editable';
             WindowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
@@ -1169,7 +1164,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** Font */
                 if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                     commandMapNodes.push('FONT');
-                    const selectFont = (selectionParent.style.fontFamily || selectionParent.face || editor.lang.toolbar.font).replace(/["']/g,'');
+                    const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
                     editor.util.changeTxt(commandMap['FONT'], selectFont);
                     findFont = false;
                 }
@@ -1178,7 +1173,7 @@ const core = function (context, util, modules, plugins, lang) {
                 if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                     if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
                         editor.callModule('link', function () {
-                            this.plugins.link.call_controller_linkButton.call(editor, selectionParent);
+                            plugins.link.call_controller_linkButton.call(editor, selectionParent);
                         });
                     }
                     findA = false;
@@ -1233,10 +1228,10 @@ const core = function (context, util, modules, plugins, lang) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 if (/^FONT/i.test(key)) {
-                    editor.util.changeTxt(commandMap[key], editor.lang.toolbar.font);
+                    editor.util.changeTxt(commandMap[key], lang.toolbar.font);
                 }
                 else if (/^SIZE$/i.test(key)) {
-                    editor.util.changeTxt(commandMap[key], editor.lang.toolbar.fontSize);
+                    editor.util.changeTxt(commandMap[key], lang.toolbar.fontSize);
                 }
                 else {
                     editor.util.removeClass(commandMap[key], 'on');
@@ -1297,7 +1292,7 @@ const core = function (context, util, modules, plugins, lang) {
                 }
                 else if (/dialog/.test(display)) {
                     editor.callModule(command, function () {
-                        editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                        plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                     });
                 }
 
@@ -1372,8 +1367,8 @@ const core = function (context, util, modules, plugins, lang) {
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callModule('image', function () {
-                    const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
-                    editor.plugins.image.onModifyMode.call(editor, targetElement, size);
+                    const size = plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
+                    plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
                 return;
             }
@@ -1383,7 +1378,7 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         onKeyDown_wysiwyg: function (e) {
-            editor._setSelectionNode();
+            // editor._setSelectionNode();
 
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
@@ -1424,7 +1419,7 @@ const core = function (context, util, modules, plugins, lang) {
                     e.preventDefault();
                     if (ctrl || alt) break;
 
-                    let currentNode = editor._variable.selectionNode || editor.getSelection().anchorNode;
+                    let currentNode = editor._variable.selectionNode || editor.getSelectionNode();
                     while (!/^TD$/i.test(currentNode.tagName) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
@@ -1510,9 +1505,9 @@ const core = function (context, util, modules, plugins, lang) {
             editor.focus();
 
             editor.callModule('image', function () {
-                editor.context.image.imgInputFile.files = files;
-                editor.plugins.image.onRender_imgInput.call(editor);
-                editor.context.image.imgInputFile.files = null;
+                context.image.imgInputFile.files = files;
+                plugins.image.onRender_imgInput.call(editor);
+                context.image.imgInputFile.files = null;
             });
         },
 
