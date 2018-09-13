@@ -22,6 +22,7 @@ const _Constructor = {
         options.fontSize = options.fontSize || null;
         options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        options.popupDisplay = options.popupDisplay || '';
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formatBlock'],
@@ -54,7 +55,7 @@ const _Constructor = {
         relative.className = 'sun-editor-container';
     
         /** tool bar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, lang);
+        const tool_bar = this._createToolBar(doc, options.buttonList, lang, options.popupDisplay);
     
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -150,7 +151,7 @@ const _Constructor = {
      * @description Suneditor's Default button list
      * @private
      */
-    _defaultButtons: function (lang) {
+    _defaultButtons: function (lang, popupDisplay) {
         return {
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
                 '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
@@ -225,15 +226,15 @@ const _Constructor = {
                 '<div class="icon-grid"></div>'
             ],
 
-            link: ['', lang.toolbar.link, 'link', 'dialog', '',
+            link: ['', lang.toolbar.link, 'link', 'dialog', popupDisplay,
                 '<div class="icon-link"></div>'
             ],
 
-            image: ['', lang.toolbar.image, 'image', 'dialog', '',
+            image: ['', lang.toolbar.image, 'image', 'dialog', popupDisplay,
                 '<div class="icon-image"></div>'
             ],
 
-            video: ['', lang.toolbar.video, 'video', 'dialog', '',
+            video: ['', lang.toolbar.video, 'video', 'dialog', popupDisplay,
                 '<div class="icon-video"></div>'
             ],
 
@@ -321,7 +322,7 @@ const _Constructor = {
      * @param {array} buttonList - option.buttonList
      * @private
      */
-    _createToolBar: function (doc, buttonList, lang) {
+    _createToolBar: function (doc, buttonList, lang, popupDisplay) {
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
@@ -330,7 +331,7 @@ const _Constructor = {
 
         /** create button list */
         const plugins = {};
-        const defaultButtonList = this._defaultButtons(lang);
+        const defaultButtonList = this._defaultButtons(lang, popupDisplay);
 
         let module = null;
         let button = null;

@@ -3,8 +3,10 @@
 /**
  * @description SunEditor core closure
  * @param context
- * @param dom
  * @param util
+ * @param modules
+ * @param plugins
+ * @param lang
  * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
 const core = function (context, util, modules, plugins, lang) {
@@ -1588,7 +1590,7 @@ const core = function (context, util, modules, plugins, lang) {
                 oP.innerHTML = content;
                 context.element.wysiwyg.appendChild(oP);
             } else {
-                context.element.code.value += content;
+                context.element.code.value += oP.outerHTML;
             }
         },
 
@@ -1644,7 +1646,6 @@ const core = function (context, util, modules, plugins, lang) {
             
             /** remove element */
             context.element.topArea.parentNode.removeChild(context.element.topArea);
-            context.element.originElement.style.display = 'block';
 
             context = null;
             dom = null;

@@ -57,4 +57,6 @@ const SUNEDITOR = {
     }
 };
 
+window.SUNEDITOR = SUNEDITOR;
+
 export default SUNEDITOR;
