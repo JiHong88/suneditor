@@ -25,14 +25,9 @@ const _Constructor = {
         options.popupDisplay = options.popupDisplay || '';
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
-            '/',
-            ['fontColor', 'hiliteColor'],
             ['indent', 'outdent'],
-            ['align', 'horizontalRule', 'list', 'table'],
-            ['link', 'image', 'video'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
