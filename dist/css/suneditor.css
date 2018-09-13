@@ -90,6 +90,10 @@
 .sun-editor .editor_tool {float: left;height: 32px;margin:5px 0 5px 5px;}
 .sun-editor .editor_tool li {position:relative; float:left;}
 
+.sun-editor .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:1px solid #ccc; margin-left:2px; border-radius:2px; font-size:12px; line-height:27px; background-color:#FFF;}
+.sun-editor .btn_editor.on, .sun-editor .btn_editor:active {border-color:#f4b124; background-color:#ffebc1; -webkit-box-shadow: inset 0 3px 5px #f4b124; box-shadow: inset 0 3px 5px #f4b124;}
+.sun-editor .btn_editor:hover, .sun-editor .btn_editor:focus {background-color: #ffebc1; border-color: #f4b124; outline: 0 none;}
+
 .sun-editor .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:300px; overflow-y:auto; overflow-x:hidden; z-index:10000; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .layer_editor .write_place .inp_txt {float:left; width:100%; height:23px; margin-top:0; font-size:12px; text-indent:6px; border:0 none; outline:0 none;}
 .sun-editor .layer_editor button {margin:0 !important; overflow: hidden; width:100%;}
@@ -97,6 +101,7 @@
 .sun-editor .layer_editor .list_family {left:0; width:156px;}
 .sun-editor .layer_editor .list_family .default {border-bottom:1px solid #CCC;}
 .sun-editor .layer_editor .format_list {left:0; width:175px;}
+.sun-editor .layer_editor .format_list li {padding:0; width:100%;}
 .sun-editor .layer_editor .format_list .btn_edit {height:auto; margin:0 0 7px 0 !important; padding:2px 10px 5px; line-height:100%;}
 .sun-editor .layer_editor .format_list .txt_size18 {padding:1px 10px 6px}
 .sun-editor .layer_editor .format_list .txt_size24 {padding:3px 10px 11px; line-height:24px;}
@@ -107,18 +112,13 @@
 .sun-editor .layer_editor .layer_line {left:0; width:158px;}
 .sun-editor .layer_editor .write_place {overflow:hidden; float:left; position:relative; height:25px; border:1px solid #dadada;}
 
-.sun-editor .layer_editor .layer_color {left:0; display: none;}
 .sun-editor .layer_editor .pallet_hilite_color {width:195px; height:65px;}
 .sun-editor .layer_editor .pallet_font_color {width:247px; height:168px;}
 .sun-editor .layer_editor .list_color {width:100%; height:100%; padding:8px 4px 8px 8px;}
 .sun-editor .layer_editor .list_color li {float:left; position:relative; width:22px; height:22px; margin:0 4px 4px 0;}
 .sun-editor .layer_editor .list_color button {display:block; overflow:hidden; width:22px; height:22px; border-radius:2px; vertical-align:top; text-indent:-9999px;}
-.sun-editor .layer_color .list_color button.color_white {display:block; overflow:hidden; border:1px solid #d3d3d3; vertical-align:top; text-indent:-9999px;}
-.sun-editor .layer_color .list_color button:hover, .sun-editor .layer_color .list_color button:focus {border:1px solid #000; width:24px; height:24px;}
-.sun-editor .layer_editor .more_palette {display:none; width:176px; margin:0 10px; padding:8px 0 6px; border-top:1px solid #f3f3f3;}
-.sun-editor .layer_editor .box_codeinp {float:left; height:28px;}
-.sun-editor .layer_editor .more_palette .box_bgcolor {width:24px; margin-right:2px;}
-.sun-editor .layer_editor .inner_bgcolor {display:block; overflow:hidden; width:15px; height:15px; margin:0 auto; text-indent:-9999px;}
+.sun-editor .layer_editor .list_color button.color_white {display:block; overflow:hidden; border:1px solid #d3d3d3; vertical-align:top; text-indent:-9999px;}
+.sun-editor .layer_editor .list_color button:hover, .sun-editor .layer_editor .list_color button:focus {border:1px solid #000; width:24px; height:24px;}
 
 .sun-editor .layer_align {left:9px; width:125px;}
 .sun-editor .btn_align .img_editor {display: inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
@@ -126,29 +126,15 @@
 .sun-editor .list_editor {overflow:hidden; width:100%; padding:6px 0;}
 .sun-editor .list_editor li:first-child {padding-top:0;}
 .sun-editor .list_editor li {padding-top:5px; width:100%;}
-.sun-editor .format_list li {padding:0; width:100%;}
+
 .sun-editor .font_size_list li {padding:0; width:100%;}
 .sun-editor .layer_editor.layer_line {left:0; width:158px;}
-
-.sun-editor .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:1px solid #ccc; margin-left:2px; border-radius:2px; font-size:12px; line-height:27px; background-color:#FFF;}
-.sun-editor .btn_editor.on, .sun-editor .btn_editor:active {border-color:#f4b124; background-color:#ffebc1; -webkit-box-shadow: inset 0 3px 5px #f4b124; box-shadow: inset 0 3px 5px #f4b124;}
-.sun-editor .btn_editor:hover, .sun-editor .btn_editor:focus {background-color: #ffebc1; border-color: #f4b124; outline: 0 none;}
 
 .sun-editor .btn_edit {width:100%; height:28px; padding:0 14px; margin-left:0; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .btn_font {width:80px; text-align:left; text-indent:10px;}
 .sun-editor .btn_format {width:80px; text-align:left; text-indent:7px;}
 .sun-editor .btn_size {width:60px; text-align:left; text-indent:7px;}
 .sun-editor .btn_line {padding:0 5px 0 5px;}
-
-.sun-editor .img_line1 {height:2px; background-position:0 -30px;}
-.sun-editor .img_line2 {height:3px; background-position:0 -35px;}
-.sun-editor .img_line3 {height:6px; background-position:0 -40px;}
-
-.sun-editor .editor_link {padding:8px 5px 12px 15px;}
-.sun-editor .editor_link .write_place {height:79px; border:0; overflow:hidden; float:left; position:relative;}
-.sun-editor .editor_link .write_place .lab_url {position:absolute;top:0;left:0;width:228px;height:23px;font-size:12px;line-height:24px;color:#999; cursor:text;}
-.sun-editor .editor_link .write_place .inp_txt {height:23px; font-size:12px; line-height:24px; text-indent:0; margin-top:8px; border:1px solid #CCC}
-.sun-editor .editor_link .btn_apply_url {float:right; width:35px; height:69px;}
 
 /* editor area */
 .sun-editor .sun-editor-id-editorArea {width:100%; overflow: hidden;}

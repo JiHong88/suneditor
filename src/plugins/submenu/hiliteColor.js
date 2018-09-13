@@ -24,7 +24,7 @@ const hiliteColor = {
 
     setSubmenu: function () {
         const listDiv = document.createElement('DIV');
-        listDiv.className = 'layer_editor layer_color';
+        listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         const colorList = ['#1e9af9', '#00b8c6', '#6cce02', '#ff9702', '#ff0000', '#ff00dd', '#6600ff', '#cce9ff', '#fcfd4c', '#ffffff', '#dfdede', '#8c8c8c', '#000000', '#222222'];

@@ -24,7 +24,7 @@ const fontColor = {
 
     setSubmenu: function () {
         const listDiv = document.createElement('DIV');
-        listDiv.className = 'layer_editor layer_color';
+        listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         const colorList = ['#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000', '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa',

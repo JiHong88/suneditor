@@ -153,89 +153,41 @@ const _Constructor = {
      */
     _defaultButtons: function (lang, popupDisplay) {
         return {
-            font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
-                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
-            ],
-            formatBlock: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="arrow-more-down"></span>'
-            ],
-
-            fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="arrow-more-down"></span>'
-            ],
-
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
+            /** command */
+            bold: ['sun-editor-id-bold function-command', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
+            underline: ['sun-editor-id-underline function-command', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
                 '<div class="icon-underline"></div>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
+            italic: ['sun-editor-id-italic function-command', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
+            strike: ['sun-editor-id-strike function-command', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
-            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '', '',
+            subscript: ['sun-editor-id-subscript function-command', lang.toolbar.subscript, 'subscript', '', '',
                 '<div class="icon-subscript"></div>'
             ],
 
-            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '', '',
+            superscript: ['sun-editor-id-superscript function-command', lang.toolbar.superscript, 'superscript', '', '',
                 '<div class="icon-superscript"></div>'
             ],
 
-            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', '',
+            removeFormat: ['function-command', lang.toolbar.removeFormat, 'removeFormat', '', '',
                 '<div class="icon-erase"></div>'
             ],
 
-            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', '',
-                '<div class="icon-fontColor"></div>'
-            ],
-
-            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
-                '<div class="icon-hiliteColor"></div>'
-            ],
-
-            indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
+            indent: ['function-command', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
                 '<div class="icon-indent-right"></div>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
+            outdent: ['function-command', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
                 '<div class="icon-indent-left"></div>'
-            ],
-
-            align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
-                '<div class="icon-align-left"></div>'
-            ],
-
-            list: ['', lang.toolbar.list, 'list', 'submenu', '',
-                '<div class="icon-list-number"></div>'
-            ],
-
-            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', '',
-                '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-                '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-                '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
-            ],
-
-            table: ['', lang.toolbar.table, 'table', 'submenu', '',
-                '<div class="icon-grid"></div>'
-            ],
-
-            link: ['', lang.toolbar.link, 'link', 'dialog', popupDisplay,
-                '<div class="icon-link"></div>'
-            ],
-
-            image: ['', lang.toolbar.image, 'image', 'dialog', popupDisplay,
-                '<div class="icon-image"></div>'
-            ],
-
-            video: ['', lang.toolbar.video, 'video', 'dialog', popupDisplay,
-                '<div class="icon-video"></div>'
             ],
 
             fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
@@ -264,6 +216,57 @@ const _Constructor = {
 
             print: ['', lang.toolbar.print, 'print', '', '',
                 '<div class="icon-print"></div>'
+            ],
+
+            /** plugins - submenu */
+            font: ['btn_font function-submenu', lang.toolbar.font, 'font', 'submenu', '',
+                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
+            ],
+            formatBlock: ['btn_format function-submenu', lang.toolbar.formats, 'formatBlock', 'submenu', '',
+                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="arrow-more-down"></span>'
+            ],
+
+            fontSize: ['btn_size function-submenu', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
+                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="arrow-more-down"></span>'
+            ],
+
+            fontColor: ['function-submenu', lang.toolbar.fontColor, 'fontColor', 'submenu', '',
+                '<div class="icon-fontColor"></div>'
+            ],
+
+            hiliteColor: ['function-submenu', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
+                '<div class="icon-hiliteColor"></div>'
+            ],
+
+            align: ['btn_align function-submenu', lang.toolbar.align, 'align', 'submenu', '',
+                '<div class="icon-align-left"></div>'
+            ],
+
+            list: ['function-submenu', lang.toolbar.list, 'list', 'submenu', '',
+                '<div class="icon-list-number"></div>'
+            ],
+
+            horizontalRule: ['btn_line function-submenu', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', '',
+                '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
+                '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
+                '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
+            ],
+
+            table: ['function-submenu', lang.toolbar.table, 'table', 'submenu', '',
+                '<div class="icon-grid"></div>'
+            ],
+
+            /** plugins - dialog */
+            link: ['function-dialog', lang.toolbar.link, 'link', 'dialog', popupDisplay,
+                '<div class="icon-link"></div>'
+            ],
+
+            image: ['function-dialog', lang.toolbar.image, 'image', 'dialog', popupDisplay,
+                '<div class="icon-image"></div>'
+            ],
+
+            video: ['function-dialog', lang.toolbar.video, 'video', 'dialog', popupDisplay,
+                '<div class="icon-video"></div>'
             ]
         };
     },
