@@ -37,20 +37,20 @@ module.exports = {
 				use: [{
 					loader: "url-loader",
 					options: {
-						//name: '../public/styles/img/[name].[ext]'
-						limit: 10000,
-						name: 'assets/[hash].[ext]'
+						publicPath: '../',
+						name: 'img/[hash].[ext]',
+						limit: 10000
 					}
 				}]
 			},
 			{
 				test: /\.(eot|svg|ttf|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
 				use: [{
-					// loader: "url-loader",
 					loader: "file-loader",
 					options: {
+						publicPath: '../',
 						name: 'fonts/[hash].[ext]',
-						//limit: 5000,
+						limit: 5000,
 						mimetype: 'application/font-woff'
 					}
 				}]

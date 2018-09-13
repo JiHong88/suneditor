@@ -32,15 +32,12 @@ const fontColor = {
             '#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535', '#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222'];
 
         let list = '<div class="inner_layer">' +
-            '   <div class="pallet_bgcolor">' +
-            '       <ul class="list_color list_bgcolor">';
+            '   <div class="pallet_font_color">' +
+            '       <ul class="list_color">';
         for (let i = 0, len = colorList.length; i < len; i++) {
             const color = colorList[i];
             list += '<li>' +
-                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" style="background-color:' + color + ';">' + color + '' +
-                '       <span class="bg_check"></span>' +
-                '       <span class="bg_btnframe"></span>' +
-                '   </button>' +
+                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
                 '</li>';
         }
         list += '       </ul>' +
