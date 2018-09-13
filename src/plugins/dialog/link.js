@@ -137,7 +137,7 @@ const link = {
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
         linkBtn.style.left = selectionATag.offsetLeft + 'px';
-        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + this.context.tool.bar.offsetHeight + 10 - this.context.element.wysiwyg.pageYOffset) + "px";
+        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight - this.context.element.editorArea.scrollTop + 10) + 'px';
         linkBtn.style.display = 'block';
 
         this.controllerArray = [linkBtn];

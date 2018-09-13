@@ -84,7 +84,7 @@ const core = function (context, util, modules, plugins, lang) {
         /**
          * @description Variables used internally in editor operation
          * @property {(element|null)} selectionNode - Contains selection node
-         * @property {(element|null)} selection - The current selection object
+         * @property {(element|null)} range - The current range object
          * @property {boolean} wysiwygActive - The wysiwyg frame or code view state
          * @property {boolean} isFullScreen - State of full screen
          * @property {number} innerHeight_fullScreen - InnerHeight in editor when in full screen
@@ -98,7 +98,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         _variable: {
             selectionNode: null,
-            selection: null,
+            range: null,
             wysiwygActive: true,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
@@ -194,15 +194,55 @@ const core = function (context, util, modules, plugins, lang) {
             }
         },
 
-        _setSelectionNode: function () {
-            this._variable.selection = window.getSelection();
-            const range = this.getRange();
+        /**
+         * @description Saving the range object and the currently selected node of editor
+         */
+        _setEditorRange: function () {
+            const selection = window.getSelection();
+            let range = null;
 
-            if (range.startContainer !== range.endContainer) {
-                this._variable.selectionNode = range.startContainer;
-            } else {
-                this._variable.selectionNode = this.getSelectionNode();
+            if (selection.rangeCount > 0) {
+                range = selection.getRangeAt(0);
             }
+            else {
+                range = document.createRange();
+                range.setStart(context.element.wysiwyg.firstChild, 0);
+                range.setEnd(context.element.wysiwyg.firstChild, 0);
+            }
+
+            this._variable.range = range;
+
+            if (range.collapsed) {
+                this._variable.selectionNode = range.commonAncestorContainer;
+            } else {
+                this._variable.selectionNode = selection.extentNode || selection.anchorNode;
+            }
+        },
+
+        /**
+         * @description Set current editor's range object
+         */
+        setRange: function (startCon, startOff, endCon, endOff) {
+            const range = document.createRange();
+            range.setStart(startCon, startOff);
+            range.setEnd(endCon, endOff);
+
+            const selection = window.getSelection();
+
+            if (selection.rangeCount > 0) {
+                selection.removeAllRanges();
+            }
+
+            this._variable.range = range;
+            selection.addRange(range);
+        },
+
+        /**
+         * @description Get current editor's range object
+         * @returns {Object}
+         */
+        getRange: function () {
+            return this._variable.range;
         },
 
         /**
@@ -210,76 +250,11 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (this._variable.selection) {
-                return this._variable.selection.extentNode || this._variable.selection.anchorNode;
+            if (this._variable.selectionNode) {
+                return this._variable.selectionNode;
             }
 
             return context.element.wysiwyg.firstChild
-        },
-
-        /**
-         * @description Get current selection object
-         * @returns {Selection}
-         */
-        getSelection: function () {
-            return this._variable.selection;
-        },
-
-        /**
-         * @description Create range object
-         * @returns {Range}
-         */
-        createRange: function () {
-            return document.createRange();
-        },
-        
-        /**
-         * @description Get current range object
-         * @returns {Range}
-         */
-        getRange: function () {
-            let selection = this.getSelection();
-            let nativeRng = null;
-
-            if (selection.rangeCount > 0) {
-                nativeRng = selection.getRangeAt(0);
-            }
-            else {
-                nativeRng = this.createRange();
-                selection = this._variable.selection;
-
-                if (!selection) {
-                    selection = context.element.wysiwyg.firstChild;
-                    nativeRng.setStart(selection, 0);
-                    nativeRng.setEnd(selection, 0);
-                } else {
-                    nativeRng.setStart(selection.anchorNode, selection.anchorOffset);
-                    nativeRng.setEnd(selection.focusNode, selection.focusOffset);
-                }
-            }
-
-            return nativeRng;
-        },
-
-        /**
-         * @description Set range object
-         * @param {element} startCon - The startContainer property of the selection object.
-         * @param {number} startOff - The startOffset property of the selection object.
-         * @param {element} endCon - The endContainer property of the selection object.
-         * @param {number} endOff - The endOffset property of the selection object.
-         */
-        setRange: function (startCon, startOff, endCon, endOff) {
-            const range = this.createRange();
-            range.setStart(startCon, startOff);
-            range.setEnd(endCon, endOff);
-
-            const selection = this.getSelection();
-
-            if (selection.rangeCount > 0) {
-                selection.removeAllRanges();
-            }
-
-            selection.addRange(range);
         },
 
         /**
@@ -327,16 +302,15 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {(element|null)} rightNode - If the node exists, it is inserted after the node
          */
         insertNode: function (oNode, rightNode) {
+            const range = this.getRange();
             let parentNode = null;
 
             if (!rightNode) {
-                const selection = this.getSelection();
-                const nativeRng = this.getRange();
-
-                const startCon = nativeRng.startContainer;
-                const startOff = nativeRng.startOffset;
-                const endCon = nativeRng.endContainer;
-                const endOff = nativeRng.endOffset;
+                const startCon = range.startContainer;
+                const startOff = range.startOffset;
+                const endCon = range.endContainer;
+                const endOff = range.endOffset;
+                const commonCon = range.commonAncestorContainer;
 
                 parentNode = startCon;
                 if (startCon.nodeType === 3) {
@@ -344,9 +318,9 @@ const core = function (context, util, modules, plugins, lang) {
                 }
 
                 /** Select within the same node */
-                if (startCon === endCon && startOff === endOff) {
-                    if (selection.focusNode && selection.focusNode.nodeType === 3) {
-                        rightNode = selection.focusNode.splitText(endOff);
+                if (range.collapsed) {
+                    if (commonCon.nodeType === 3) {
+                        rightNode = commonCon.splitText(endOff);
                     }
                     else {
                         if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
@@ -367,9 +341,7 @@ const core = function (context, util, modules, plugins, lang) {
                         parentNode.removeChild(removeNode);
                     }
                     else {
-                        if (selection.deleteFromDocument) selection.deleteFromDocument();
-                        else this.removeNode();
-
+                        this.removeNode();
                         rightNode = endCon;
 
                         while (rightNode.nodeType !== 1) {
@@ -396,13 +368,18 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Delete the currently selected node
          */
         removeNode: function () {
-            const nativeRng = this.getRange();
+            const range = this.getRange();
 
-            const startCon = nativeRng.startContainer;
-            const startOff = nativeRng.startOffset;
-            const endCon = nativeRng.endContainer;
-            const endOff = nativeRng.endOffset;
-            const commonCon = nativeRng.commonAncestorContainer;
+            if (range.deleteContents) {
+                range.deleteContents();
+                return;
+            }
+
+            const startCon = range.startContainer;
+            const startOff = range.startOffset;
+            const endCon = range.endContainer;
+            const endOff = range.endOffset;
+            const commonCon = range.commonAncestorContainer;
 
             let beforeNode = null;
             let afterNode = null;
@@ -478,12 +455,12 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
          */
         wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
-            const nativeRng = this.getRange();
-            const startCon = nativeRng.startContainer;
-            const startOff = nativeRng.startOffset;
-            const endCon = nativeRng.endContainer;
-            const endOff = nativeRng.endOffset;
-            const commonCon = nativeRng.commonAncestorContainer;
+            const range = this.getRange();
+            const startCon = range.startContainer;
+            const startOff = range.startOffset;
+            const endCon = range.endContainer;
+            const endOff = range.endOffset;
+            const commonCon = range.commonAncestorContainer;
 
             let start = {}, end = {};
             let newNode, regExp;
@@ -563,12 +540,12 @@ const core = function (context, util, modules, plugins, lang) {
                 /** one line */
                 if (!util.isFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const range = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
 
-                    start.container = range.startContainer;
-                    start.offset = range.startOffset;
-                    end.container = range.endContainer;
-                    end.offset = range.endOffset;
+                    start.container = newRange.startContainer;
+                    start.offset = newRange.startOffset;
+                    end.container = newRange.endContainer;
+                    end.offset = newRange.endOffset;
                 }
                 /** multi line */
                 else {
@@ -1252,12 +1229,17 @@ const core = function (context, util, modules, plugins, lang) {
             }
         },
 
-        touchstart_toolbar: function () {
+        touchstart_toolbar: function (e) {
+            e.preventDefault();
             editor._variable.isTouchMove = false;
         },
 
         touchmove_toolbar: function () {
             editor._variable.isTouchMove = true;
+        },
+
+        onMouseDown_toolbar: function (e) {
+            e.preventDefault();
         },
 
         onClick_toolbar: function (e) {
@@ -1373,7 +1355,7 @@ const core = function (context, util, modules, plugins, lang) {
                 return;
             }
 
-            editor._setSelectionNode();
+            editor._setEditorRange();
             event._findButtonEffectTag();
         },
 
@@ -1435,15 +1417,7 @@ const core = function (context, util, modules, plugins, lang) {
                         const moveCell = cells[idx];
                         if (!moveCell) return false;
 
-                        const range = editor.createRange();
-                        range.setStart(moveCell, 0);
-                        range.setEnd(moveCell, 0);
-
-                        const selection = editor.getSelection();
-                        if (selection.rangeCount > 0) {
-                            selection.removeAllRanges();
-                        }
-                        selection.addRange(range);
+                        eidtor.setRange(moveCell, 0, moveCell, 0)
 
                         break;
                     }
@@ -1452,26 +1426,15 @@ const core = function (context, util, modules, plugins, lang) {
                     if (shift) break;
 
                     const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
-                    editor.insertNode(tabText, null);
-
-                    const selection = editor.getSelection();
-                    const rng = editor.createRange();
-
-                    rng.setStart(tabText, editor._variable.tabSize);
-                    rng.setEnd(tabText, editor._variable.tabSize);
-
-                    if (selection.rangeCount > 0) {
-                        selection.removeAllRanges();
-                    }
-
-                    selection.addRange(rng);
+                    editor.insertNode(tabText);
+                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize)
 
                     break;
             }
         },
 
         onKeyUp_wysiwyg: function (e) {
-            editor._setSelectionNode();
+            editor._setEditorRange();
 
             /** when format tag deleted */
             if (e.keyCode === 8 && util.isWysiwygDiv(editor._variable.selectionNode)) {
@@ -1542,6 +1505,7 @@ const core = function (context, util, modules, plugins, lang) {
     context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar, false);
     context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar, false);
     context.tool.bar.addEventListener('touchend', event.onClick_toolbar, false);
+    context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
     context.element.editorArea.addEventListener('scroll', event.onScroll_wysiwyg, false);
@@ -1668,6 +1632,7 @@ const core = function (context, util, modules, plugins, lang) {
             context.tool.bar.removeEventListener('touchstart', event.touchstart_toolbar);
             context.tool.bar.removeEventListener('touchmove', event.touchmove_toolbar);
             context.tool.bar.removeEventListener('touchend', event.onClick_toolbar);
+            context.tool.bar.removeEventListener('mousedown', event.onMouseDown_toolbar);
             context.tool.bar.removeEventListener('click', event.onClick_toolbar);
             context.element.wysiwyg.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
             context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);

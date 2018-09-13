@@ -360,7 +360,7 @@ const image = {
             container.style.float = align;
         }
 
-        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container);
         this.appendP(container);
     },
 
