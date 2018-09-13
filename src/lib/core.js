@@ -194,6 +194,8 @@ const core = function (context, util, modules, plugins, lang) {
             } else {
                 context.element.wysiwyg.focus();
             }
+
+            this._setEditorRange();
         },
 
         /**

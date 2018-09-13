@@ -190,31 +190,31 @@ const _Constructor = {
                 '<div class="icon-indent-left"></div>'
             ],
 
-            fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
+            fullScreen: ['function-command', lang.toolbar.fullScreen, 'fullScreen', '', '',
                 '<div class="icon-expansion"></div>'
             ],
 
-            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', '',
+            showBlocks: ['function-command', lang.toolbar.showBlocks, 'showBlocks', '', '',
                 '<div class="icon-showBlocks"></div>'
             ],
 
-            codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
+            codeView: ['function-command', lang.toolbar.codeView, 'codeView', '', '',
                 '<div class="icon-code-view"></div>'
             ],
 
-            undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
+            undo: ['function-command', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
                 '<div class="icon-undo"></div>'
             ],
 
-            redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+            redo: ['function-command', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
                 '<div class="icon-redo"></div>'
             ],
 
-            preview: ['', lang.toolbar.preview, 'preview', '', '',
+            preview: ['function-command', lang.toolbar.preview, 'preview', '', '',
                 '<div class="icon-preview"></div>'
             ],
 
-            print: ['', lang.toolbar.print, 'print', '', '',
+            print: ['function-command', lang.toolbar.print, 'print', '', '',
                 '<div class="icon-print"></div>'
             ],
 
