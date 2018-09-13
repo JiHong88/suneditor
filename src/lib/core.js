@@ -1042,7 +1042,7 @@ const core = function (context, util, modules, plugins, lang) {
                     return (typeof ec[m] === 'string') ? ec[m] : m;
                 });
                 context.element.wysiwyg.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
-                context.element.editorArea.scrollTop = 0;
+                context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
                 this._variable.wysiwygActive = true;
@@ -1097,6 +1097,13 @@ const core = function (context, util, modules, plugins, lang) {
                 '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
             WindowObject.document.body.className = 'sun-editor-editable';
             WindowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
+        },
+
+        /**
+         * @description Print the editor contents
+         */
+        print: function () {
+            //
         }
     };
 
@@ -1309,7 +1316,7 @@ const core = function (context, util, modules, plugins, lang) {
                         editor.openPreview();
                         break;
                     case 'print':
-                        context.element.wysiwyg.print();
+                        editor.print();
                         break;
                     case 'showBlocks':
                         editor.toggleDisplayBlocks();
@@ -1512,7 +1519,7 @@ const core = function (context, util, modules, plugins, lang) {
     context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    context.element.editorArea.addEventListener('scroll', event.onScroll_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);

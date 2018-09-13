@@ -164,7 +164,7 @@ const dialog = {
 
         const w = targetElement.offsetWidth;
         const h = targetElement.offsetHeight;
-        const t = (targetElement.offsetTop - this.context.element.editorArea.scrollTop);
+        const t = (targetElement.offsetTop - this.context.element.wysiwyg.scrollTop);
         const l = (targetElement.offsetLeft);
 
         resizeContainer.style.top = t + 'px';
