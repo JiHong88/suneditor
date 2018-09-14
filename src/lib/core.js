@@ -1087,25 +1087,23 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         /**
-         * @description Opens the preview window
+         * @description Open the preview window or open the print window
+         * @param {String} mode - 'preview' or 'print'
          */
-        openPreview: function () {
+        openWindowCopiedContents: function (mode) {
+            const isPrint = mode === 'print';
             const windowObject = window.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            windowObject.document.head.innerHTML = '' +
+            windowObject.document.write('' +
+                '<!doctype html><html>' +
+                '<head>' +
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<title>' + lang.toolbar.preview + '</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor.css">';
-            windowObject.document.body.className = 'sun-editor-editable';
-            windowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
-        },
-
-        /**
-         * @description Print the editor contents
-         */
-        print: function () {
-            //
+                '<title>' + (isPrint ? lang.toolbar.print : lang.toolbar.preview) + '</title>' +
+                '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath('suneditor', 'css') + '">' +
+                '</head>' +
+                '<body class="sun-editor-editable">' + context.element.wysiwyg.innerHTML + '</body>' +
+                '</body>' + (isPrint ? '<script>window.print();</script>' : '') + '</html>');
         }
     };
 
@@ -1315,10 +1313,8 @@ const core = function (context, util, modules, plugins, lang) {
                         editor.execCommand(command, false, null);
                         break;
                     case 'preview':
-                        editor.openPreview();
-                        break;
                     case 'print':
-                        editor.print();
+                        editor.openWindowCopiedContents(command);
                         break;
                     case 'showBlocks':
                         editor.toggleDisplayBlocks();
@@ -1477,14 +1473,16 @@ const core = function (context, util, modules, plugins, lang) {
 
             e.stopPropagation();
             e.preventDefault();
+            
+            if (plugins.image) {
+                editor.focus();
 
-            editor.focus();
-
-            editor.callModule('image', function () {
-                context.image.imgInputFile.files = files;
-                editor.plugins.image.onRender_imgInput.call(editor);
-                context.image.imgInputFile.files = null;
-            });
+                editor.callModule('image', function () {
+                    context.image.imgInputFile.files = files;
+                    editor.plugins.image.onRender_imgInput.call(editor);
+                    context.image.imgInputFile.files = null;
+                });
+            }
         },
 
         onMouseDown_resizeBar: function (e) {

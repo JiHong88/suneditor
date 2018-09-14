@@ -32,25 +32,32 @@ const util = {
     },
 
     /**
-     * @description Get suneditor's default path
+     * @description Get the the tag path of the arguments value
+     * @param {String} name - File name
+     * @param {String} extension - js, css
+     * @returns {String}
      */
-    getBasePath: (function () {
-        let path = '';//SUNEDITOR.SUNEDITOR_BASEPATH || '';
-        if (!path) {
-            for (let c = document.getElementsByTagName('script'), i = 0; i < c.length; i++) {
-                let editorTag = c[i].src.match(/(^|.*[\\\/])suneditor(\..+)?\.js(?:\?.*|;.*)?$/i);
-                if (editorTag) {
-                    path = editorTag[1];
-                    break;
-                }
+    getIncludePath: function (name, extension) {
+        let path = '';
+        const tagName = extension === 'js' ? 'script' : 'link';
+        const src = extension === 'js' ? 'src' : 'href';
+
+        const regExp = new RegExp('(^|.*[\\\\\/])' + name + '(\\..+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+            
+        for (let c = document.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
+            let editorTag = c[i][src].match(regExp);
+            if (editorTag) {
+                path = editorTag[0];
+                break;
             }
         }
+
         -1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
-        if (!path) throw '[SUNEDITOR.util.getBasePath.fail] The SUNEDITOR installation path could not be automatically detected. Please set the global variable "SUNEDITOR.SUNEDITOR_BASEPATH" before creating editor instances.';
+        if (!path) throw '[SUNEDITOR.util.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
 
         return path;
-    })(),
+    },
 
     /**
      * @description It is judged whether it is the edit region top div element.
