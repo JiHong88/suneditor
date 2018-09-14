@@ -40,7 +40,7 @@ const SUNEDITOR = {
      * @description Create the suneditor
      * @param {String|Element} elementId - textarea Id or textarea element
      * @param {Json} options - user options
-     * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+     * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     create: function (idOrElement, options) {
         if (typeof options !== 'object') options = {};
