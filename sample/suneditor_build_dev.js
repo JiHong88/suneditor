@@ -1,12 +1,12 @@
-import './assets/css/suneditor.css'
-import './assets/css/suneditor-contents.css'
+import '../src/assets/css/suneditor.css'
+import '../src/assets/css/suneditor-contents.css'
 
-import {dialog} from '../src/plugins/modules_init'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../src/plugins/plugins_init'
 import suneditor from '../src/suneditor'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../src/plugins/plugins_init'
+import {dialog} from '../src/plugins/modules_init'
 // import lang from './lang/ko'
 
-window.SUNEDITOR = suneditor.init({
+suneditor.create(document.getElementById('editor'), {
     modules: [
         dialog
     ],
@@ -24,4 +24,11 @@ window.SUNEDITOR = suneditor.init({
         ['preview', 'print']
     ],
     // lang: lang
+})
+
+
+const editor2 = suneditor.init({
+
 });
+
+editor2.create(document.getElementById('editor2'));

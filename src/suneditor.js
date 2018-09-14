@@ -23,14 +23,15 @@ const SUNEDITOR = {
 
     /**
      * @description Returns the create function with preset options.
-     * @param {json} options - user options
+     * When you use the create function, if you put the options value, it ignores the init function's options and use that options value.
+     * @param {Json} init_options - user options
      * @returns {function}
      */
-    init: function (options) {
+    init: function (init_options) {
         const self = this;
         return {
-            create: function (idOrElement) {
-                self.create.call(self, idOrElement, options);
+            create: function (idOrElement, options) {
+                self.create.call(self, idOrElement, (options || init_options));
             }
         }
     },
@@ -38,7 +39,7 @@ const SUNEDITOR = {
     /**
      * @description Create the suneditor
      * @param {String|Element} elementId - textarea Id or textarea element
-     * @param {json} options - user options
+     * @param {Json} options - user options
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     create: function (idOrElement, options) {
@@ -72,7 +73,5 @@ const SUNEDITOR = {
         return this.core(this._Context(element, cons.constructed, cons.options), this.util, cons.modules, cons.plugins, cons.lang);
     }
 };
-
-window.SUNEDITOR = SUNEDITOR;
 
 export default SUNEDITOR;

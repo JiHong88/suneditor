@@ -1066,6 +1066,7 @@ const core = function (context, util, modules, plugins, lang) {
                 context.element.topArea.style.left = '0';
                 context.element.topArea.style.width = '100%';
                 context.element.topArea.style.height = '100%';
+                context.element.topArea.style.zIndex = '2147483647';
 
                 this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
                 context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
