@@ -25,3 +25,10 @@ suneditor.create(document.getElementById('editor'), {
     ],
     // lang: lang
 })
+
+
+const editor2 = suneditor.init({
+
+});
+
+editor2.create(document.getElementById('editor2'));

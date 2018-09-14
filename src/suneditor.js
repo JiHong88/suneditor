@@ -20,13 +20,29 @@ const SUNEDITOR = {
     _Constructor,
     _Context,
     _defaultLang,
+
+    /**
+     * @description Returns the create function with preset options.
+     * @param {json} options - user options
+     * @returns {function}
+     */
+    init: function (options) {
+        const self = this;
+        return {
+            create: function (idOrElement) {
+                self.create.call(self, idOrElement, options);
+            }
+        }
+    },
+
     /**
      * @description Create the suneditor
-     * @param {string} elementId - textarea Id
+     * @param {String|Element} elementId - textarea Id or textarea element
      * @param {json} options - user options
      * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     create: function (idOrElement, options) {
+        if (typeof options !== 'object') options = {};
         const element = typeof idOrElement === 'string' ? document.getElementById(idOrElement) : idOrElement;
 
         if (!element) {
