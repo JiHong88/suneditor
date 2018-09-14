@@ -67,7 +67,7 @@ const _Constructor = {
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
-        textarea.className = 'input_editor html sun-editor-id-code';
+        textarea.className = 'input_editor sun-editor-id-code';
         textarea.style.display = 'none';
     
         /** resize bar */
