@@ -138,7 +138,7 @@ const core = function (context, util, modules, plugins, lang) {
         submenuOn: function (element) {
             this.submenu = element.nextElementSibling;
             this.submenu.style.display = 'block';
-            this.util.addClass(element, 'on');
+            util.addClass(element, 'on');
             this.submenuActiveButton = element;
         },
 
@@ -149,7 +149,7 @@ const core = function (context, util, modules, plugins, lang) {
             if (this.submenu) {
                 this.submenu.style.display = 'none';
                 this.submenu = null;
-                this.util.removeClass(this.submenuActiveButton, 'on');
+                util.removeClass(this.submenuActiveButton, 'on');
                 this.submenuActiveButton = null;
             }
 
@@ -188,7 +188,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Focus to wysiwyg area
          */
         focus: function () {
-            const caption = this.util.getParentElement(this._variable.selectionNode, 'figcaption');
+            const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
             if (caption) {
                 caption.focus();
             } else {
@@ -200,6 +200,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Saving the range object and the currently selected node of editor
+         * @private
          */
         _setEditorRange: function () {
             const selection = window.getSelection();
@@ -258,7 +259,7 @@ const core = function (context, util, modules, plugins, lang) {
                 return this._variable.selectionNode;
             }
 
-            return context.element.wysiwyg.firstChild
+            return context.element.wysiwyg.firstChild;
         },
 
         /**
@@ -294,7 +295,7 @@ const core = function (context, util, modules, plugins, lang) {
             const oP = document.createElement('P');
             oP.innerHTML = '&#65279';
 
-            element = this.util.getFormatElement(element);
+            element = util.getFormatElement(element);
             element.parentNode.insertBefore(oP, element.nextElementSibling);
 
             return oP;
@@ -388,9 +389,9 @@ const core = function (context, util, modules, plugins, lang) {
             let beforeNode = null;
             let afterNode = null;
 
-            const childNodes = this.util.getListChildNodes(commonCon);
-            let startIndex = this.util.getArrayIndex(childNodes, startCon);
-            let endIndex = this.util.getArrayIndex(childNodes, endCon);
+            const childNodes = util.getListChildNodes(commonCon);
+            let startIndex = util.getArrayIndex(childNodes, startCon);
+            let endIndex = util.getArrayIndex(childNodes, endCon);
 
             for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
                 if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
@@ -411,7 +412,7 @@ const core = function (context, util, modules, plugins, lang) {
                 const item = childNodes[i];
 
                 if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                    this.util.removeItem(item);
+                    util.removeItem(item);
                     continue;
                 }
 
@@ -425,7 +426,7 @@ const core = function (context, util, modules, plugins, lang) {
                     if (beforeNode.length > 0) {
                         startCon.data = beforeNode.data;
                     } else {
-                        this.util.removeItem(startCon);
+                        util.removeItem(startCon);
                     }
 
                     continue;
@@ -441,13 +442,13 @@ const core = function (context, util, modules, plugins, lang) {
                     if (afterNode.length > 0) {
                         endCon.data = afterNode.data;
                     } else {
-                        this.util.removeItem(endCon);
+                        util.removeItem(endCon);
                     }
 
                     continue;
                 }
 
-                this.util.removeItem(item);
+                util.removeItem(item);
             }
         },
 
@@ -497,7 +498,7 @@ const core = function (context, util, modules, plugins, lang) {
                     if (isElement) {
                         newNode.innerHTML = startCon.outerHTML;
                         startCon.parentNode.appendChild(newNode);
-                        this.util.removeItem(startCon);
+                        util.removeItem(startCon);
                     } else {
                         const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                         const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
@@ -525,7 +526,7 @@ const core = function (context, util, modules, plugins, lang) {
             /** multiple nodes */
             else {
                 /** tag check function*/
-                const checkFontSizeCss = function (vNode) {
+                const checkCss = function (vNode) {
                     if (vNode.nodeType === 3) return true;
 
                     let style = '';
@@ -544,7 +545,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** one line */
                 if (!util.isFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesPart(commonCon, newNode, checkFontSizeCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesPart(commonCon, newNode, checkCss, startCon, startOff, endCon, endOff);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -554,12 +555,12 @@ const core = function (context, util, modules, plugins, lang) {
                 /** multi line */
                 else {
                     // get line nodes
-                    const lineNodes = this.util.getListChildren(commonCon, function (current) {
+                    const lineNodes = util.getListChildren(commonCon, function (current) {
                         return util.isFormatElement(current);
                     });
 
-                    let startLine = this.util.getParentElement(startCon, 'P');
-                    let endLine = this.util.getParentElement(endCon, 'P');
+                    let startLine = util.getParentElement(startCon, 'P');
+                    let endLine = util.getParentElement(endCon, 'P');
 
                     for (let i = 0, len = lineNodes.length; i < len; i++) {
                         if (startLine === lineNodes[i]) {
@@ -574,15 +575,15 @@ const core = function (context, util, modules, plugins, lang) {
 
                     // startCon
                     newNode = appendNode.cloneNode(false);
-                    start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkFontSizeCss, startCon, startOff);
+                    start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkCss, startCon, startOff);
                     // mid
                     for (let i = startLine + 1; i < endLine; i++) {
                         newNode = appendNode.cloneNode(false);
-                        this._wrapLineNodes(lineNodes[i], newNode, checkFontSizeCss);
+                        this._wrapLineNodes(lineNodes[i], newNode, checkCss);
                     }
                     // endCon
                     newNode = appendNode.cloneNode(false);
-                    end = this._wrapLineNodesEnd(lineNodes[endLine], newNode, checkFontSizeCss, endCon, endOff);
+                    end = this._wrapLineNodesEnd(lineNodes[endLine], newNode, checkCss, endCon, endOff);
                 }
             }
 
@@ -734,7 +735,7 @@ const core = function (context, util, modules, plugins, lang) {
                             while (pRemove.parentNode && pRemove.parentNode.innerText.length === 0) {
                                 pRemove = pRemove.parentNode;
                             }
-                            this.util.removeItem(pRemove);
+                            util.removeItem(pRemove);
                         }
 
                         endPass = true;
@@ -884,7 +885,7 @@ const core = function (context, util, modules, plugins, lang) {
             })(element, pNode);
 
             element.parentNode.insertBefore(pNode, element);
-            this.util.removeItem(element);
+            util.removeItem(element);
 
             return {
                 container: container,
@@ -996,7 +997,7 @@ const core = function (context, util, modules, plugins, lang) {
             })(element, pNode);
 
             element.parentNode.insertBefore(pNode, element);
-            this.util.removeItem(element);
+            util.removeItem(element);
 
             return {
                 container: container,
@@ -1011,7 +1012,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @param command {String} - Separator ("indent" or "outdent")
          */
         indent: function (node, command) {
-            const p = this.util.getParentElement(node, 'P');
+            const p = util.getParentElement(node, 'P');
             if (!p) return;
 
             let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1029,7 +1030,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Add or remove the class name of "body" so that the code block is visible
          */
         toggleDisplayBlocks: function () {
-            this.util.toggleClass(context.element.wysiwyg, 'sun-editor-show-block');
+            util.toggleClass(context.element.wysiwyg, 'sun-editor-show-block');
         },
 
         /**
@@ -1071,15 +1072,15 @@ const core = function (context, util, modules, plugins, lang) {
                 this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
                 context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
-                this.util.removeClass(element.firstElementChild, 'icon-expansion');
-                this.util.addClass(element.firstElementChild, 'icon-reduction');
+                util.removeClass(element.firstElementChild, 'icon-expansion');
+                util.addClass(element.firstElementChild, 'icon-reduction');
             }
             else {
                 context.element.topArea.style.cssText = this._variable.originCssText;
                 context.element.editorArea.style.height = this._variable.editorHeight + 'px';
 
-                this.util.removeClass(element.firstElementChild, 'icon-reduction');
-                this.util.addClass(element.firstElementChild, 'icon-expansion');
+                util.removeClass(element.firstElementChild, 'icon-reduction');
+                util.addClass(element.firstElementChild, 'icon-expansion');
             }
 
             this._variable.isFullScreen = !this._variable.isFullScreen;
@@ -1089,15 +1090,15 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Opens the preview window
          */
         openPreview: function () {
-            const WindowObject = window.open('', '_blank');
-            WindowObject.mimeType = 'text/html';
-            WindowObject.document.head.innerHTML = '' +
+            const windowObject = window.open('', '_blank');
+            windowObject.mimeType = 'text/html';
+            windowObject.document.head.innerHTML = '' +
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                 '<title>' + lang.toolbar.preview + '</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + this.util.getBasePath + 'css/suneditor.css">';
-            WindowObject.document.body.className = 'sun-editor-editable';
-            WindowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
+                '<link rel="stylesheet" type="text/css" href="' + util.getBasePath + 'css/suneditor.css">';
+            windowObject.document.body.className = 'sun-editor-editable';
+            windowObject.document.body.innerHTML = context.element.wysiwyg.innerHTML;
         },
 
         /**
@@ -1145,7 +1146,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** Format */
                 if (findFormat && util.isFormatElement(selectionParent)) {
                     commandMapNodes.push('FORMAT');
-                    editor.util.changeTxt(commandMap['FORMAT'], nodeName);
+                    util.changeTxt(commandMap['FORMAT'], nodeName);
                     findFormat = false;
                     continue;
                 }
@@ -1154,7 +1155,7 @@ const core = function (context, util, modules, plugins, lang) {
                 if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
-                    editor.util.changeTxt(commandMap['FONT'], selectFont);
+                    util.changeTxt(commandMap['FONT'], selectFont);
                     findFont = false;
                 }
 
@@ -1175,7 +1176,7 @@ const core = function (context, util, modules, plugins, lang) {
                     /** font size */
                     if (selectionParent.style.fontSize.length > 0) {
                         commandMapNodes.push('SIZE');
-                        editor.util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
                     }
                 }
@@ -1209,7 +1210,7 @@ const core = function (context, util, modules, plugins, lang) {
             for (let i = 0; i < commandMapNodes.length; i++) {
                 nodeName = commandMapNodes[i];
                 if (classOnCheck.test(nodeName)) {
-                    editor.util.addClass(commandMap[nodeName], 'on');
+                    util.addClass(commandMap[nodeName], 'on');
                 }
             }
 
@@ -1217,13 +1218,13 @@ const core = function (context, util, modules, plugins, lang) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 if (/^FONT/i.test(key)) {
-                    editor.util.changeTxt(commandMap[key], lang.toolbar.font);
+                    util.changeTxt(commandMap[key], lang.toolbar.font);
                 }
                 else if (/^SIZE$/i.test(key)) {
-                    editor.util.changeTxt(commandMap[key], lang.toolbar.fontSize);
+                    util.changeTxt(commandMap[key], lang.toolbar.fontSize);
                 }
                 else {
-                    editor.util.removeClass(commandMap[key], 'on');
+                    util.removeClass(commandMap[key], 'on');
                 }
             }
 
@@ -1298,11 +1299,11 @@ const core = function (context, util, modules, plugins, lang) {
                 switch (command) {
                     case 'codeView':
                         editor.toggleCodeView();
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                         break;
                     case 'fullScreen':
                         editor.toggleFullScreen(target);
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                         break;
                     case 'indent':
                     case 'outdent':
@@ -1321,27 +1322,27 @@ const core = function (context, util, modules, plugins, lang) {
                         break;
                     case 'showBlocks':
                         editor.toggleDisplayBlocks();
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                         break;
                     case 'subscript':
-                        if (editor.util.hasClass(context.tool.superscript, 'on')) {
+                        if (util.hasClass(context.tool.superscript, 'on')) {
                             editor.execCommand('superscript', false, null);
-                            editor.util.removeClass(context.tool.superscript, 'on');
+                            util.removeClass(context.tool.superscript, 'on');
                         }
                         editor.execCommand(command, false, null);
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                         break;
                     case 'superscript':
-                        if (editor.util.hasClass(context.tool.subscript, 'on')) {
+                        if (util.hasClass(context.tool.subscript, 'on')) {
                             editor.execCommand('subscript', false, null);
-                            editor.util.removeClass(context.tool.subscript, 'on');
+                            util.removeClass(context.tool.subscript, 'on');
                         }
                         editor.execCommand(command, false, null);
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                         break;
                     default :
                         editor.execCommand(command, false, target.getAttribute('data-value'));
-                        editor.util.toggleClass(target, 'on');
+                        util.toggleClass(target, 'on');
                 }
             }
         },
@@ -1385,7 +1386,7 @@ const core = function (context, util, modules, plugins, lang) {
                 if (!key) return false;
 
                 editor.execCommand(key[0], false, null);
-                editor.util.toggleClass(editor.commandMap[key[1]], 'on');
+                util.toggleClass(editor.commandMap[key[1]], 'on');
 
                 return true;
             }
@@ -1419,9 +1420,9 @@ const core = function (context, util, modules, plugins, lang) {
                     }
 
                     if (currentNode && /^TD$/i.test(currentNode.tagName)) {
-                        const table = editor.util.getParentElement(currentNode, 'table');
-                        const cells = editor.util.getListChildren(table, editor.util.isCell);
-                        let idx = shift ? editor.util.prevIdx(cells, currentNode) : editor.util.nextIdx(cells, currentNode);
+                        const table = util.getParentElement(currentNode, 'table');
+                        const cells = util.getListChildren(table, util.isCell);
+                        let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
 
                         if (idx === cells.length && !shift) idx = 0;
                         if (idx === -1 && shift) idx = cells.length - 1;
@@ -1545,9 +1546,9 @@ const core = function (context, util, modules, plugins, lang) {
          */
         save: function () {
             if (editor._variable.wysiwygActive) {
-                context.element.originElement.innerHTML = context.element.wysiwyg.innerHTML;
+                context.element.originElement.value = context.element.wysiwyg.innerHTML;
             } else {
-                context.element.originElement.innerHTML = context.element.code.value;
+                context.element.originElement.value = context.element.code.value;
             }
         },
 
