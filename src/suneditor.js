@@ -14,7 +14,7 @@ import _Context from './lib/context';
 import _defaultLang from './lang/en'
 
 
-const SUNEDITOR = {
+export default {
     util,
     core,
     _Constructor,
@@ -77,5 +77,3 @@ const SUNEDITOR = {
         return this.core(this._Context(element, cons.constructed, cons.options), this.util, options.modules, cons.plugins, cons.options.lang);
     }
 };
-
-export default SUNEDITOR;
