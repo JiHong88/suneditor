@@ -16,9 +16,6 @@
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="../css/github.css">
     <link rel="stylesheet" href="../css/github-frameworks.css">
-    <!-- suneditor -->
-    <link href="../../src/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../src/suneditor.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -58,35 +55,112 @@
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
         <h4>1. Include JS/CSS</h4>
-        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>src/css/suneditor.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>src/js/suneditor.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
-<span class="pl-c"><span class="pl-c">&lt;!--</span> Setting language (Default : English) <span class="pl-c">--&gt;</span></span>
-<span class="pl-c"><span class="pl-c">&lt;!--</span>&lt;script src="lang/ko.js"&gt;&lt;/script&gt;<span class="pl-c">--&gt;</span></span></pre>
-        </div>
+        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
+
         <h4>2. Target a element</h4>
-        <div class="highlight highlight-text-html-basic">
-            <pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span
-                    class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span
-                    class="pl-ent">textarea</span>&gt;</pre>
-        </div>
+        <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span class="pl-ent">textarea</span>&gt;</pre></div>
+        
         <h4>3. Create</h4>
-        <div class="highlight highlight-source-js"><pre><span class="pl-ent">/**</span>
-<span class="pl-ent">* ID : 'suneditor_sample'</span>
-<span class="pl-ent">* ClassName : 'sun-eidtor'</span>
-<span class="pl-ent">*/</span>
-<span class="pl-k">const</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
+        <div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c">* ID : 'suneditor_sample'</span>
+<span class="pl-c">* ClassName : 'sun-eidtor'</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-k">const</span> <span class="pl-c1">suneditor</span> <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
     <span class="pl-c"><span class="pl-c">//</span> insert options</span>
-});</pre>
-        </div>
+});</pre></div>
+
         <h4>4. Contents display</h4>
-        <div class="highlight highlight-source-js"><pre>When you display a document created by <span class="pl-c1">suneditor</span>
+        <pre lang="text"><code>When you display a document created by suneditor
 
-You need to include <span class="pl-s"><span class="pl-pds">suneditor-contents.css</span> file</span>.
+You need to include "src/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 
-Then add <span class="pl-ent">"sun-editor-editable"</span> to the class name of the <span class="pl-k">Tag element</span> that displays the content.
+Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
 
-In <span class="pl-s"><span class="pl-pds">suneditor-contents.css</span></span>, you can define the style of all the tags created in <span class="pl-c1">suneditor</span>.</pre>
-        </div>
+In "suneditor-contents.css", you can define the style of all the tags created in suneditor.</code></pre>
+
+
+<h4>Use import statement</h4>
+
+<h4>1. Basic objects that contain all the plugins</h4>
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
+    <span class="pl-c"><span class="pl-c">//</span> insert options</span>
+});</pre></div>
+
+<h4>2. Customize</h4>
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> {<span class="pl-smi">suneditor</span>, <span class="pl-smi">modules</span>, <span class="pl-smi">plugins</span>, <span class="pl-smi">ko</span>, <span class="pl-smi">en</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
+    modules<span class="pl-k">:</span> [
+        <span class="pl-smi">modules</span>.<span class="pl-smi">dialog</span>
+    ],
+    plugins<span class="pl-k">:</span> [
+        <span class="pl-smi">plugins</span>.<span class="pl-c1">link</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">image</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">video</span>
+    ],
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>]
+    ],
+    lang<span class="pl-k">:</span> ko,
+    popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>
+})
+
+<span class="pl-c"><span class="pl-c">//</span> Plugins can be used directly in the button list</span>
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
+    modules<span class="pl-k">:</span> [
+        <span class="pl-smi">modules</span>.<span class="pl-smi">dialog</span>
+    ],
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-smi">plugins</span>.<span class="pl-c1">link</span>, <span class="pl-smi">plugins</span>.<span class="pl-smi">image</span>, <span class="pl-smi">plugins</span>.<span class="pl-smi">video</span>]
+    ],
+})</pre></div>
+
+<h4>init function</h4>
+<pre lang="text"><code>If the options overlap, the options of the 'create' function take precedence.
+</code></pre>
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> {<span class="pl-smi">suneditor</span>, <span class="pl-smi">modules</span>, <span class="pl-smi">plugins</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">sampleEditor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">init</span>({
+    modules<span class="pl-k">:</span> [
+        <span class="pl-smi">modules</span>.<span class="pl-smi">dialog</span>
+    ],
+    plugins<span class="pl-k">:</span> [
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">font</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-c1">fontSize</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">formatBlock</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">fontColor</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">hiliteColor</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-c1">align</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">horizontalRule</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">list</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">table</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-c1">link</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">image</span>,
+        <span class="pl-smi">plugins</span>.<span class="pl-smi">video</span>
+    ],
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
+        <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>,
+        [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
+    ]
+});
+
+<span class="pl-smi">sampleEditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
+    <span class="pl-c"><span class="pl-c">//</span> If the options overlap, the options of the 'create' function take precedence.</span>
+});</pre></div>
     </article>
 
     <footer>

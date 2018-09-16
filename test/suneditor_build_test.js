@@ -52,10 +52,13 @@ const editor2 = suneditor.init({
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock']
     ],
-    lang: lang_ko
+    lang: lang_ko,
+    fontSize : [
+        8, 10, 14, 18, 24, 36
+    ],
 });
 
-editor2.create(document.getElementById('editor2'), {
+editor.create(document.getElementById('editor2'), {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],

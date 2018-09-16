@@ -1,5 +1,5 @@
-// import './assets/css/suneditor.css'
-// import './assets/css/suneditor-contents.css'
+import suneditor_css from './assets/css/suneditor.css'
+import suneditor_contents_css from './assets/css/suneditor-contents.css'
 
 import {dialog} from './plugins/modules_init'
 import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from './plugins/plugins_init'
@@ -53,5 +53,10 @@ export const plugins = {
 }
 
 export const suneditor = editor;
+
+export const css = {
+    suneditor: suneditor_css,
+    suneditor_contents: suneditor_contents_css
+}
 
 export default SUNEDITOR

@@ -53,6 +53,17 @@ const suneditor = SUNEDITOR.create('sample',{
 });
 ```
 
+### 4. Contents display
+```text
+When you display a document created by suneditor
+
+You need to include "src/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
+
+Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
+
+In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
+```
+
 ### Use import statement
 
 ### 1. Basic objects that contain all the plugins
@@ -68,7 +79,7 @@ suneditor.create('sample', {
 ```javascript
 import {suneditor, modules, plugins, ko, en} from 'suneditor'
 
-suneditor.create('editor4', {
+suneditor.create('sample', {
     modules: [
         modules.dialog
     ],
@@ -83,6 +94,17 @@ suneditor.create('editor4', {
     ],
     lang: ko,
     popupDisplay: 'full'
+})
+
+// Plugins can be used directly in the button list
+suneditor.create('sample', {
+    modules: [
+        modules.dialog
+    ],
+    buttonList: [
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        [plugins.link, plugins.image, plugins.video]
+    ],
 })
 ```
 
