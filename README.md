@@ -53,7 +53,7 @@ const suneditor = SUNEDITOR.create('sample',{
 });
 ```
 
-### use import statement
+### Use import statement
 
 ### 1. Basic objects that contain all the plugins
 ```javascript
