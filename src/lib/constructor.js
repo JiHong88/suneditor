@@ -4,14 +4,16 @@
  * @description document create - call _createToolBar()
  * @param {element} element - textarea
  * @param {JSON} options - user options
+ * @param {JSON} lang - user language
  * @returns {JSON}
  * @private
  */
 const _Constructor = {
-    init: function (element, options, lang) {
+    init: function (element, options, lang, _plugins) {
         if (typeof options !== 'object') options = {};
     
         /** user options */
+        options.lang = lang;
         options.videoX = options.videoX || 560;
         options.videoY = options.videoY || 315;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
@@ -50,7 +52,7 @@ const _Constructor = {
         relative.className = 'sun-editor-container';
     
         /** tool bar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, lang, options.popupDisplay);
+        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.popupDisplay);
     
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -112,9 +114,7 @@ const _Constructor = {
                 _resizeBack: resize_back
             },
             options: options,
-            plugins: tool_bar.plugins,
-            modules: options.modules || [],
-            lang: lang
+            plugins: tool_bar.plugins
         };
     },
 
@@ -323,7 +323,7 @@ const _Constructor = {
      * @param {Array} popupDisplay - option.popupDisplay
      * @private
      */
-    _createToolBar: function (doc, buttonList, lang, popupDisplay) {
+    _createToolBar: function (doc, buttonList, _plugins, lang, popupDisplay) {
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
@@ -331,13 +331,19 @@ const _Constructor = {
         tool_cover.className = 'sun-editor-id-toolbar-cover';
 
         /** create button list */
-        const plugins = {};
         const defaultButtonList = this._defaultButtons(lang, popupDisplay);
+        const plugins = {};
+        if (_plugins) {
+            for (let i = 0, len = _plugins.length; i < len; i++) {
+                plugins[_plugins[i].name] = _plugins[i];
+            }
+        }
 
         let module = null;
         let button = null;
         let moduleElement = null;
         let buttonElement = null;
+        let pluginName = '';
 
         for (let i = 0; i < buttonList.length; i++) {
 
@@ -351,20 +357,22 @@ const _Constructor = {
                     button = buttonGroup[j];
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
-                            module = defaultButtonList[button.name];
-                            plugins[button.name] = button;
+                            pluginName = button.name;
+                            module = defaultButtonList[pluginName];
+                            plugins[pluginName] = button;
                         } else {
                             module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                         }
                     } else {
                         module = defaultButtonList[button];
+                        pluginName = button;
                     }
 
                     buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
                     moduleElement.ul.appendChild(buttonElement.li);
 
-                    if (plugins[button.name]) {
-                        plugins[button.name].buttonElement = buttonElement.button;
+                    if (plugins[pluginName]) {
+                        plugins[pluginName].buttonElement = buttonElement.button;
                     }
                 }
 

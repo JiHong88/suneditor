@@ -32,6 +32,21 @@ const util = {
     },
 
     /**
+     * @description Copies object
+     * @param {Object} obj - Object to be copy
+     * @returns {Object}
+     */
+    copyObj: function (obj) {
+        const copy = {};
+
+        for (let attr in obj) {
+            copy[attr] = obj[attr];
+        }
+
+        return copy;
+    },
+
+    /**
      * @description Get the the tag path of the arguments value
      * @param {String} name - File name
      * @param {String} extension - js, css

@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-const formatBlock = {
+
+export default {
     name: 'formatBlock',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -62,5 +63,3 @@ const formatBlock = {
         this.submenuOff();
     }
 };
-
-export default formatBlock;

@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-const hiliteColor = {
+
+export default {
     name: 'hiliteColor',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -62,5 +63,3 @@ const hiliteColor = {
         this.submenuOff();
     }
 };
-
-export default hiliteColor;

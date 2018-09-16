@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-const align = {
+
+export default {
     name: 'align',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -57,5 +58,3 @@ const align = {
         this.submenuOff();
     }
 };
-
-export default align;

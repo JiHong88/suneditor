@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-const horizontalRule = {
+
+export default {
     name: 'horizontalRule',
     add: function (_this, targetElement) {
         /** set submenu */
@@ -79,5 +80,3 @@ const horizontalRule = {
         this.submenuOff();
     }
 };
-
-export default horizontalRule;

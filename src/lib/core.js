@@ -7,7 +7,7 @@
  * @param modules
  * @param plugins
  * @param lang
- * @returns {{save: save, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+ * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
 const core = function (context, util, modules, plugins, lang) {
     /**
@@ -119,13 +119,9 @@ const core = function (context, util, modules, plugins, lang) {
          */
         callModule: function (pluginName, callBackFunction) {
             if (!this.plugins[pluginName]) {
-                const plugin = plugins[pluginName];
-                if (!plugin) {
-                    throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
-                }
-
-                plugin.add(this, plugin.buttonElement)
-                this.plugins[pluginName] = plugin;
+                throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
+            } else {
+                this.plugins[pluginName].add(this, this.plugins[pluginName].buttonElement);
             }
                 
             callBackFunction();
@@ -196,6 +192,7 @@ const core = function (context, util, modules, plugins, lang) {
             }
 
             this._setEditorRange();
+            event._findButtonEffectTag();
         },
 
         /**
@@ -1474,7 +1471,7 @@ const core = function (context, util, modules, plugins, lang) {
             e.stopPropagation();
             e.preventDefault();
             
-            if (plugins.image) {
+            if (editor.plugins.image) {
                 editor.focus();
 
                 editor.callModule('image', function () {
@@ -1531,10 +1528,23 @@ const core = function (context, util, modules, plugins, lang) {
 
     /** add plugin and module to plugins object */
     /** modules */
-    for (let i = 0, len = modules.length, plugin; i < len; i++) {
-        plugin = modules[i];
-        plugin.add(editor);
-        editor.plugins[plugin.name] = plugin;
+    if (modules) {
+        for (let i = 0, len = modules.length, plugin; i < len; i++) {
+            plugin = modules[i];
+            plugin.add(editor);
+            editor.plugins[plugin.name] = util.copyObj(plugin);
+        }
+    }
+
+    /** plugins */
+    if (plugins) {
+        let pluginsValues = Object.values(plugins);
+        for (let i = 0, len = pluginsValues.length, plugin; i < len; i++) {
+            plugin = pluginsValues[i];
+            editor.plugins[plugin.name] = util.copyObj(plugin);
+        }
+
+        pluginsValues = null;
     }
 
     /** User function */

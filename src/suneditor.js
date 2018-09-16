@@ -24,14 +24,15 @@ const SUNEDITOR = {
     /**
      * @description Returns the create function with preset options.
      * When you use the create function, if you put the options value, it ignores the init function's options and use that options value.
-     * @param {Json} init_options - user options
+     * @param {Json} options - Initialization options
      * @returns {function}
      */
     init: function (init_options) {
         const self = this;
+
         return {
             create: function (idOrElement, options) {
-                self.create.call(self, idOrElement, (options || init_options));
+                self.create(idOrElement, options, init_options);
             }
         }
     },
@@ -42,8 +43,11 @@ const SUNEDITOR = {
      * @param {Json} options - user options
      * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
-    create: function (idOrElement, options) {
+    create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};
+        if (_init_options) {
+            options = Object.assign(_init_options, options);
+        }
         const element = typeof idOrElement === 'string' ? document.getElementById(idOrElement) : idOrElement;
 
         if (!element) {
@@ -54,7 +58,7 @@ const SUNEDITOR = {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = this._Constructor.init(element, options, (options.lang || this._defaultLang));
+        const cons = this._Constructor.init(element, options, (options.lang ||  this._defaultLang), options.plugins);
 
         if (document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
@@ -70,7 +74,7 @@ const SUNEDITOR = {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return this.core(this._Context(element, cons.constructed, cons.options), this.util, cons.modules, cons.plugins, cons.lang);
+        return this.core(this._Context(element, cons.constructed, cons.options), this.util, options.modules, cons.plugins, cons.options.lang);
     }
 };
 

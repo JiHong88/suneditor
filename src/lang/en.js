@@ -5,7 +5,7 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-const lang = {
+export default {
     toolbar: {
         font: 'Font',
         formats: 'Formats',
@@ -83,5 +83,3 @@ const lang = {
         remove: 'Remove'
     }
 };
-
-export default lang;

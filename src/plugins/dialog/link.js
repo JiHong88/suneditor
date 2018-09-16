@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-const link = {
+
+export default {
     name: 'link',
     add: function (_this) {
         const context = _this.context;
@@ -175,5 +176,3 @@ const link = {
         this.context.link.linkNewWindowCheck.checked = false;
     }
 };
-
-export default link;
