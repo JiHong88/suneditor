@@ -76,6 +76,9 @@ suneditor.create('sample', {
 ```
 
 ### 2. Customize
+```text
+The link, image, video plugins require a dialog module.
+```
 ```javascript
 import {suneditor, modules, plugins, ko, en} from 'suneditor'
 
@@ -115,6 +118,7 @@ If the options overlap, the options of the 'create' function take precedence.
 ```javascript
 import {suneditor, modules, plugins} from 'suneditor'
 
+// all plugins
 const sampleEditor = suneditor.init({
     modules: [
         modules.dialog
@@ -129,6 +133,7 @@ const sampleEditor = suneditor.init({
         plugins.horizontalRule,
         plugins.list,
         plugins.table,
+        link, image, video 
         plugins.link,
         plugins.image,
         plugins.video

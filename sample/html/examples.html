@@ -60,6 +60,24 @@
         <h4>1. Options Setting</h4>
         <div class="highlight highlight-source-js">
 <pre>
+<span class="pl-c">// Modules and plugins</span>
+<span class="pl-s">modules</span>: [
+    <span class="pl-s">dialog</span>
+],
+<span class="pl-s">plugins</span>: [
+    <span class="pl-s">font</span>,
+    <span class="pl-s">fontSize</span>,
+    <span class="pl-s">formatBlock</span>,
+    <span class="pl-s">fontColor</span>,
+    <span class="pl-s">hiliteColor</span>,
+    <span class="pl-s">align</span>,
+    <span class="pl-s">horizontalRule</span>,
+    <span class="pl-s">list</span>,
+    <span class="pl-s">table</span>,
+    <span class="pl-s">link</span>,
+    <span class="pl-s">image</span>,
+    <span class="pl-s">video</span>
+],
 <span class="pl-c">// User Options</span>
 <span class="pl-s">fontSize</span><span class="pl-k">    : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
 <span class="pl-s">font</span><span class="pl-k">        : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
@@ -191,7 +209,9 @@
 
 <span class="pl-c">/** Create the suneditor */</span>
 <span class="pl-k">function</span> <span class="pl-en">sun_create</span>() {
-    </span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
+    </span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>, {
+        height: 148
+    });
 };</pre></div>
         <form id="frm" name="frm">
             <textarea id="exampleFunction" style="width:100%; height:150px;">User Function Test</textarea>
@@ -334,7 +354,7 @@
         ]
     });
 
-    let suneditor = SUNEDITOR.create('exampleFunction',{});
+    let suneditor = SUNEDITOR.create('exampleFunction');
 
     function sun_save() {
         suneditor.save();
@@ -378,7 +398,9 @@
     }
 
     function sun_create() {
-        suneditor = SUNEDITOR.create('exampleFunction');
+        suneditor = SUNEDITOR.create('exampleFunction', {
+            height: 148
+        });
     }
 </script>
 </body>

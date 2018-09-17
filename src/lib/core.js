@@ -31,14 +31,14 @@ const core = function (context, util, modules, plugins, lang) {
         plugins: {},
 
         /**
-         * @description language
-         */
-        lang: lang,
-
-        /**
          * @description util function
          */
         util: util,
+
+        /**
+         * @description loaded language
+         */
+        lang: lang,
 
         /**
          * @description dialog element
@@ -62,14 +62,15 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Elements that need to change text or className for each selection change
-         * @property {element} FONT - font family button
-         * @property {element} B - bold button
-         * @property {element} U - underline button
-         * @property {element} I - italic button
-         * @property {element} STRIKE - strike button
-         * @property {element} SUB - subscript button
-         * @property {element} SUP - superscript button
-         * @property {element} SIZE - font size button
+         * @property {Element} FORMAT - format button
+         * @property {Element} FONT - font family button
+         * @property {Element} SIZE - font size button
+         * @property {Element} B - bold button
+         * @property {Element} U - underline button
+         * @property {Element} I - italic button
+         * @property {Element} STRIKE - strike button
+         * @property {Element} SUB - subscript button
+         * @property {Element} SUP - superscript button
          */
         commandMap: {
             FORMAT: context.tool.format,
@@ -85,17 +86,17 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Variables used internally in editor operation
-         * @property {(element|null)} selectionNode - Contains selection node
-         * @property {(element|null)} range - The current range object
-         * @property {boolean} wysiwygActive - The wysiwyg frame or code view state
-         * @property {boolean} isFullScreen - State of full screen
-         * @property {number} innerHeight_fullScreen - InnerHeight in editor when in full screen
-         * @property {number} resizeClientY - Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
-         * @property {number} tabSize - Indented size when tab button clicked (4)
-         * @property {element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
-         * @property {number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
-         * @property {array} currentNodes -  An array of the current cursor's node structure
-         * @property {boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
+         * @property {(Element|null)} selectionNode - Contains selection node
+         * @property {(Object|null)} range - The current range object
+         * @property {Boolean} wysiwygActive - The wysiwyg frame or code view state
+         * @property {Boolean} isFullScreen - State of full screen
+         * @property {Number} innerHeight_fullScreen - InnerHeight in editor when in full screen
+         * @property {Number} resizeClientY - Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
+         * @property {Number} tabSize - Indented size when tab button clicked (4)
+         * @property {Element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
+         * @property {Number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
+         * @property {Array} currentNodes -  An array of the current cursor's node structure
+         * @property {Boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
          * @private
          */
         _variable: {
@@ -114,7 +115,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Call the module
-         * @param {string} pluginName - The name of the js file to call
+         * @param {String} pluginName - The name of the plugin to call
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
         callModule: function (pluginName, callBackFunction) {
@@ -129,7 +130,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Enabled submenu
-         * @param {element} element - Submenu element to call
+         * @param {Element} element - Submenu element to call
          */
         submenuOn: function (element) {
             this.submenu = element.nextElementSibling;
@@ -172,9 +173,9 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description javascript execCommand
-         * @param {string} command - javascript execCommand function property
-         * @param {boolean} showDefaultUI - javascript execCommand function property
-         * @param {string} value - javascript execCommand function property
+         * @param {String} command - javascript execCommand function property
+         * @param {Boolean} showDefaultUI - javascript execCommand function property
+         * @param {String} value - javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
             document.execCommand(command, showDefaultUI, value);
@@ -223,6 +224,10 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Set current editor's range object
+         * @param {Element} startCon - The startContainer property of the selection object.
+         * @param {Number} startOff - The startOffset property of the selection object.
+         * @param {Element} endCon - The endContainer property of the selection object.
+         * @param {Element} endOff - The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             const range = document.createRange();
@@ -261,9 +266,9 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Determine if this offset is the edge offset of container
-         * @param {object} container - The container property of the selection object.
-         * @param {number} offset - The offset property of the selection object.
-         * @returns {boolean}
+         * @param {Object} container - The container property of the selection object.
+         * @param {Number} offset - The offset property of the selection object.
+         * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
             return (offset === 0) || (offset === container.nodeValue.length);
@@ -285,8 +290,8 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Append P tag to current line next
-         * @param {element} element - Insert as siblings of that element
-         * @returns {element}
+         * @param {Element} element - Insert as siblings of that element
+         * @returns {Element}
          */
         appendP: function (element) {
             const oP = document.createElement('P');
@@ -300,8 +305,8 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Delete selected node and insert argument value node
-         * @param {element} oNode - Node to be inserted
-         * @param {(element|null)} rightNode - If the node exists, it is inserted after the node
+         * @param {Element} oNode - Node to be inserted
+         * @param {(Element|null)} rightNode - If the node exists, it is inserted after the node
          */
         insertNode: function (oNode, rightNode) {
             const range = this.getRange();
@@ -453,8 +458,8 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Copies the node of the argument value and wraps all selected text.
          * 1. When there is the same node in the selection area, the tag is stripped.
          * 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
-         * @param {element} appendNode - The dom that will wrap the selected text area
-         * @param {array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
+         * @param {Element} appendNode - The dom that will wrap the selected text area
+         * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
          */
         wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
             const range = this.getRange();
@@ -590,13 +595,13 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description wraps text nodes of line selected text.
-         * @param {element} element - The node of the line that contains the selected text node.
-         * @param {element} newInnerNode - The dom that will wrap the selected text area
+         * @param {Element} element - The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode - The dom that will wrap the selected text area
          * @param {function} validation - Check if the node should be stripped.
-         * @param {element} startCon - The startContainer property of the selection object.
-         * @param {number} startOff - The startOffset property of the selection object.
-         * @param {element} endCon - The endContainer property of the selection object.
-         * @param {number} endOff - The endOffset property of the selection object.
+         * @param {Element} startCon - The startContainer property of the selection object.
+         * @param {Number} startOff - The startOffset property of the selection object.
+         * @param {Element} endCon - The endContainer property of the selection object.
+         * @param {Number} endOff - The endOffset property of the selection object.
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
@@ -753,8 +758,8 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description wraps mid lines selected text.
-         * @param {element} element - The node of the line that contains the selected text node.
-         * @param {element} newInnerNode - The dom that will wrap the selected text area
+         * @param {Element} element - The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode - The dom that will wrap the selected text area
          * @param {function} validation - Check if the node should be stripped.
          * @private
          */
@@ -780,11 +785,11 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description wraps first line selected text.
-         * @param {element} element - The node of the line that contains the selected text node.
-         * @param {element} newInnerNode - The dom that will wrap the selected text area
+         * @param {Element} element - The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode - The dom that will wrap the selected text area
          * @param {function} validation - Check if the node should be stripped.
-         * @param {element} startCon - The startContainer property of the selection object.
-         * @param {number} startOff - The startOffset property of the selection object.
+         * @param {Element} startCon - The startContainer property of the selection object.
+         * @param {Number} startOff - The startOffset property of the selection object.
          * @returns {{container: *, offset: *}}
          * @private
          */
@@ -892,11 +897,11 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description wraps last line selected text.
-         * @param {element} element - The node of the line that contains the selected text node.
-         * @param {element} newInnerNode - The dom that will wrap the selected text area
+         * @param {Element} element - The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode - The dom that will wrap the selected text area
          * @param {function} validation - Check if the node should be stripped.
-         * @param {element} endCon - The endContainer property of the selection object.
-         * @param {number} endOff - The endOffset property of the selection object.
+         * @param {Element} endCon - The endContainer property of the selection object.
+         * @param {Number} endOff - The endOffset property of the selection object.
          * @returns {{container: *, offset: *}}
          * @private
          */
@@ -1005,11 +1010,11 @@ const core = function (context, util, modules, plugins, lang) {
         /**
          * @description This function implements indentation.
          * Set "margin-left" to "25px" in the top "P" tag of the parameter node.
-         * @param node {Node} - The node to indent (editor._variable.selectionNode)
+         * @param element {Element} - The element to indent (editor.getSelectionNode())
          * @param command {String} - Separator ("indent" or "outdent")
          */
-        indent: function (node, command) {
-            const p = util.getParentElement(node, 'P');
+        indent: function (element, command) {
+            const p = util.getParentElement(element, 'P');
             if (!p) return;
 
             let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
@@ -1055,7 +1060,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Changes to full screen or default screen
-         * @param {element} element - full screen button
+         * @param {Element} element - full screen button
          */
         toggleFullScreen: function (element) {
             if (!this._variable.isFullScreen) {
@@ -1087,7 +1092,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Open the preview window or open the print window
          * @param {String} mode - 'preview' or 'print'
          */
-        openWindowCopiedContents: function (mode) {
+        openWindowContents: function (mode) {
             const isPrint = mode === 'print';
             const windowObject = window.open('', '_blank');
             windowObject.mimeType = 'text/html';
@@ -1311,7 +1316,7 @@ const core = function (context, util, modules, plugins, lang) {
                         break;
                     case 'preview':
                     case 'print':
-                        editor.openWindowCopiedContents(command);
+                        editor.openWindowContents(command);
                         break;
                     case 'showBlocks':
                         editor.toggleDisplayBlocks();
@@ -1587,7 +1592,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Change the contents of the suneditor
-         * @param {string} content - Content to Input
+         * @param {String} content - Content to Input
          */
         setContent: function (content) {
             const innerHTML = util.convertContentForEditor(content);
@@ -1601,7 +1606,7 @@ const core = function (context, util, modules, plugins, lang) {
 
         /**
          * @description Add content to the suneditor
-         * @param {string} content - to Input
+         * @param {String} content - to Input
          */
         appendContent: function (content) {
             if (editor._variable.wysiwygActive) {
