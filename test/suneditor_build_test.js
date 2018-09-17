@@ -28,36 +28,6 @@ const editor = suneditor.init({
 });
 
 editor.create(document.getElementById('editor'));
-
-
-const editor2 = suneditor.init({
-    modules: [
-        dialog
-    ],
-    plugins: [
-        font,
-        fontSize,
-        formatBlock,
-        fontColor,
-        hiliteColor,
-        align,
-        horizontalRule,
-        list,
-        table,
-        link,
-        image,
-        video
-    ],
-    buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock']
-    ],
-    lang: lang_ko,
-    fontSize : [
-        8, 10, 14, 18, 24, 36
-    ],
-});
-
 editor.create(document.getElementById('editor2'), {
     buttonList: [
         ['undo', 'redo'],
@@ -71,11 +41,15 @@ editor.create(document.getElementById('editor2'), {
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
-    ]
+    ],
+    lang: lang_ko
 });
 
 
 suneditor.create(document.getElementById('editor3'), {
+    modules: [
+        dialog
+    ],
     buttonList: [
         ['undo', 'redo'],
         [font, fontSize, formatBlock],

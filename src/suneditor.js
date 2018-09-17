@@ -46,8 +46,9 @@ export default {
     create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
-            options = Object.assign(_init_options, options);
+            options = Object.assign(this.util.copyObj(_init_options), options);
         }
+        
         const element = typeof idOrElement === 'string' ? document.getElementById(idOrElement) : idOrElement;
 
         if (!element) {
