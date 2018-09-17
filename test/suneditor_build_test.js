@@ -6,7 +6,7 @@ import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, tab
 import {dialog} from '../src/plugins/modules_init'
 import lang_ko from '../src/lang/ko'
 
-import custom_plugin_test from './custom_plugin_test'
+import custom_plugin_submenu from './custom_plugin_submenu'
 
 
 const editor = suneditor.init({
@@ -16,7 +16,7 @@ const editor = suneditor.init({
         horizontalRule,
         list,
         table,
-        custom_plugin_test
+        custom_plugin_submenu
     ],
     buttonList: [
         ['undo', 'redo'],
@@ -35,12 +35,20 @@ editor.create(document.getElementById('editor2'), {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table',
             {
-                name: 'custom_plugin_test',
-                buttonClass:'',
-                title:'custom_plugin_test',
-                dataCommand:'custom_plugin_test',
+                // plugin's name attribute
+                name: 'custom_plugin_submenu', 
+                // name of the plugin to be recognized by the toolbar.
+                // It must be the same as the name attribute of the plugin 
+                dataCommand: 'custom_plugin_submenu',
+                // button's class ("btn_editor" class is registered, basic button click css is applied.)
+                buttonClass:'btn_editor', 
+                // HTML title attribute
+                title:'Custom plugin of the submenu', 
+                // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
+                // 'full' or '' (Only applies to dialog plugin.)
                 displayOption:'',
+                // HTML to be append to button
                 innerHTML:'<div class="icon-map-pin"></div>'
             }]
     ],
@@ -57,5 +65,6 @@ suneditor.create(document.getElementById('editor3'), {
         [fontColor, hiliteColor],
         [align, horizontalRule, list, table],
         [link, image, video],
+        ['preview', 'print']
     ]
 });

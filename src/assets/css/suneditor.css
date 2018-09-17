@@ -97,6 +97,9 @@
 .sun-editor .btn_editor.on:hover, .sun-editor .btn_editor.on:focus {background-color: #b3ceda; border-color: #8baab7; outline: 0 none;}
 .sun-editor .btn_editor.on:active {border-color:#8baab7; background-color:#b3ceda; -webkit-box-shadow: inset 0 3px 5px #8baab7; box-shadow: inset 0 3px 5px #8baab7;}
 
+.sun-editor .btn_edit:hover, .sun-editor .btn_edit:focus {background-color: #d4e3ea; border-color: #b4cad4; outline: 0 none;}
+.sun-editor .btn_edit:active {border-color:#b4cad4; background-color:#d4e3ea; -webkit-box-shadow: inset 0 3px 5px #b4cad4; box-shadow: inset 0 3px 5px #b4cad4;}
+
 .sun-editor .layer_editor {display: none; position:absolute; top:34px; left:1px; max-height:300px; overflow-y:auto; overflow-x:hidden; z-index:10000; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .layer_editor .write_place .inp_txt {float:left; width:100%; height:23px; margin-top:0; font-size:12px; text-indent:6px; border:0 none; outline:0 none;}
 .sun-editor .layer_editor button {margin:0 !important; overflow: hidden; width:100%;}

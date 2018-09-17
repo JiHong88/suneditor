@@ -1518,8 +1518,8 @@ const core = function (context, util, modules, plugins, lang) {
     context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar, false);
     context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar, false);
     context.tool.bar.addEventListener('touchend', event.onClick_toolbar, false);
-    context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
+    context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);

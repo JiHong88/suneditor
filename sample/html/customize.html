@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
-    <script src="../../dist/suneditor.min.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -56,7 +55,113 @@
 </nav>
 
 <div class="content">
-    <article>
+    <article class="markdown-body entry-content">
+
+        <h4>Add new plugin</h4>
+        <div class="highlight highlight-text-html-basic">
+        <pre><ol>
+            <li class="pl-0">dialog : It is a plugin in the form of a dialog
+         It is need a dialog module
+            <img src="../img/example_dialog.png" width="400px" height="200px"></li>
+            <li class="pl-0">submenu : It is a plugin in the form of a submenu
+            <img src="../img/example_submenu.png" width="400px" height="200px"></li>
+        </ol></pre>
+        </div>
+
+        <h4>1. submenu plugin</h4>
+        <div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">//</span> ex) A submenu plugin that appends the contents of the input element to the editor</span>
+<span class="pl-k">export</span> <span class="pl-c1">default</span> {
+    <span class="pl-c"><span class="pl-c">//</span> plugin name (Required)</span>
+    name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>,
+
+    <span class="pl-c"><span class="pl-c">//</span> add function - It is called only once when the plugin is first run.</span>
+    <span class="pl-c"><span class="pl-c">//</span> This function generates HTML to append and register the event.</span>
+    <span class="pl-c"><span class="pl-c">//</span> arguments - (_this : core object, targetElement : clicked button element)</span>
+    <span class="pl-en">add</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">_this</span>, <span class="pl-smi">targetElement</span>) {
+
+        <span class="pl-c"><span class="pl-c">//</span> Registering a namespace for caching as a plugin name in the context object</span>
+        <span class="pl-k">const</span> <span class="pl-c1">context</span> <span class="pl-k">=</span> <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>;
+        <span class="pl-smi">context</span>.<span class="pl-smi">custom</span> <span class="pl-k">=</span> {
+            textElement<span class="pl-k">:</span> <span class="pl-c1">null</span>
+        };
+
+        <span class="pl-c"><span class="pl-c">//</span> Generate submenu HTML</span>
+        <span class="pl-k">let</span> listDiv <span class="pl-k">=</span> <span class="pl-c1">eval</span>(<span class="pl-c1">this</span>.<span class="pl-en">setSubmenu</span>(<span class="pl-smi">_this</span>.<span class="pl-c1">lang</span>));
+
+        <span class="pl-c"><span class="pl-c">//</span> Input tag caching</span>
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span> <span class="pl-k">=</span> <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>INPUT<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>];
+
+        <span class="pl-c"><span class="pl-c">//</span> In addition to the button, elements that should operate within the submenu, such as focus,</span>
+        <span class="pl-c"><span class="pl-c">//</span> must call stopPropagation in the mousedown event to prevent the toolbar from executing events.</span>
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
+            <span class="pl-smi">e</span>.<span class="pl-c1">stopPropagation</span>();
+        })
+
+        <span class="pl-c"><span class="pl-c">/**</span> add event listeners <span class="pl-c">*/</span></span>
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>BUTTON<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>].<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>click<span class="pl-pds">'</span></span>, <span class="pl-c1">this</span>.<span class="pl-smi">onClick</span>.<span class="pl-en">bind</span>(_this));
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> () {
+
+        })
+
+        <span class="pl-c"><span class="pl-c">/**</span> append html <span class="pl-c">*/</span></span>
+        <span class="pl-smi">targetElement</span>.<span class="pl-c1">parentNode</span>.<span class="pl-c1">appendChild</span>(listDiv);
+    },
+
+    <span class="pl-en">setSubmenu</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">lang</span>) {
+        <span class="pl-k">const</span> <span class="pl-c1">listDiv</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">'</span>DIV<span class="pl-pds">'</span></span>);
+
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>layer_editor layer_align<span class="pl-pds">'</span></span>;
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
+        <span class="pl-smi">listDiv</span>.<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="inner_layer"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>   &lt;ul class="list_editor"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;input type="text" style="width: 100%; border: 1px solid #CCC;" /&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="btn_editor" title="Append text"&gt;Append text&lt;/button&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>   &lt;/ul&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>&lt;/div&gt;<span class="pl-pds">'</span></span>;
+
+        <span class="pl-k">return</span> listDiv;
+    },
+
+    <span class="pl-en">onClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+        <span class="pl-c"><span class="pl-c">//</span> Get Input value</span>
+        <span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createTextNode</span>(<span class="pl-c1">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">value</span>);
+
+        <span class="pl-c"><span class="pl-c">//</span> insert</span>
+        <span class="pl-c1">this</span>.<span class="pl-c1">insertNode</span>(value);
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../src/suneditor<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-smi">custom_plugin_submenu</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../test/custom_plugin_submenu<span class="pl-pds">'</span></span>
+
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>ex_submenu<span class="pl-pds">'</span></span>), {
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, {
+                <span class="pl-c"><span class="pl-c">//</span> plugin's name attribute</span>
+                name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> name of the plugin to be recognized by the toolbar.</span>
+                <span class="pl-c"><span class="pl-c">//</span> It must be the same as the name attribute of the plugin </span>
+                dataCommand<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>,
+                <span class="pl-c"><span class="pl-c">//</span> button's class ("btn_editor" class is registered, basic button click css is applied.)</span>
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>btn_editor<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> HTML title attribute</span>
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Custom plugin of the submenu<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> 'submenu' or 'dialog' or '' (command button)</span>
+                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
+                <span class="pl-c"><span class="pl-c">//</span> 'full' or '' (Only applies to dialog plugin.)</span>
+                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+                <span class="pl-c"><span class="pl-c">//</span> HTML to be append to button</span>
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="icon-map-pin"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+            }
+        ]
+    ]
+});
+</pre></div>
+
+        <textarea id="ex_submenu" style="width: 1080px; height: 150px;"></textarea>
 
     </article>
 
@@ -68,8 +173,6 @@
     </footer>
 </div>
 
-<script>
-    
-</script>
+<script src="../build/suneditor.customize.js"></script>
 </body>
 </html>

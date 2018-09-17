@@ -51,6 +51,7 @@
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
+    "customize": "webpack --config webpack.customize.ex.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
