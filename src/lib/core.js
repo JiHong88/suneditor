@@ -1428,7 +1428,7 @@ const core = function (context, util, modules, plugins, lang) {
                         const moveCell = cells[idx];
                         if (!moveCell) return false;
 
-                        eidtor.setRange(moveCell, 0, moveCell, 0)
+                        editor.setRange(moveCell, 0, moveCell, 0)
 
                         break;
                     }

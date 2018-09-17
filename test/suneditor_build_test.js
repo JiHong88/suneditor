@@ -8,6 +8,26 @@ import lang_ko from '../src/lang/ko'
 import custom_plugin_submenu from './custom_plugin_submenu'
 
 
+suneditor.create(document.getElementById('editor'), {
+    modules: [
+        dialog
+    ],
+    buttonList: [
+        ['undo', 'redo'],
+        [font, fontSize, formatBlock],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        '/',
+        [fontColor, hiliteColor],
+        ['indent', 'outdent'],
+        [align, horizontalRule, list, table],
+        [link, image, video],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
+    ]
+});
+
+
 const editor = suneditor.init({
     plugins: [
         hiliteColor,
@@ -29,8 +49,8 @@ const editor = suneditor.init({
     ]
 });
 
-editor.create(document.getElementById('editor'));
-editor.create(document.getElementById('editor2'), {
+editor.create(document.getElementById('editor2'));
+editor.create(document.getElementById('editor3'), {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table',
             {
@@ -52,18 +72,4 @@ editor.create(document.getElementById('editor2'), {
             }]
     ],
     lang: lang_ko
-});
-
-suneditor.create(document.getElementById('editor3'), {
-    modules: [
-        dialog
-    ],
-    buttonList: [
-        ['undo', 'redo'],
-        [font, fontSize, formatBlock],
-        [fontColor, hiliteColor],
-        [align, horizontalRule, list, table],
-        [link, image, video],
-        ['preview', 'print']
-    ]
 });

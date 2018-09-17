@@ -1,5 +1,5 @@
-import '../src/assets/css/suneditor.css'
-import '../src/assets/css/suneditor-contents.css'
+// import '../src/assets/css/suneditor.css'
+// import '../src/assets/css/suneditor-contents.css'
 
 import suneditor from '../src/suneditor'
 import custom_plugin_submenu from '../test/custom_plugin_submenu'
