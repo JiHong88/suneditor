@@ -6,6 +6,8 @@ import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, tab
 import {dialog} from '../src/plugins/modules_init'
 import lang_ko from '../src/lang/ko'
 
+import custom_plugin_test from './custom_plugin_test'
+
 
 const editor = suneditor.init({
     plugins: [
@@ -14,6 +16,7 @@ const editor = suneditor.init({
         horizontalRule,
         list,
         table,
+        custom_plugin_test
     ],
     buttonList: [
         ['undo', 'redo'],
@@ -30,21 +33,19 @@ const editor = suneditor.init({
 editor.create(document.getElementById('editor'));
 editor.create(document.getElementById('editor2'), {
     buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        '/',
-        ['fontColor', 'hiliteColor'],
-        ['indent', 'outdent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
+        ['align', 'horizontalRule', 'list', 'table',
+            {
+                name: 'custom_plugin_test',
+                buttonClass:'',
+                title:'custom_plugin_test',
+                dataCommand:'custom_plugin_test',
+                dataDisplay:'submenu',
+                displayOption:'',
+                innerHTML:'<div class="icon-map-pin"></div>'
+            }]
     ],
     lang: lang_ko
 });
-
 
 suneditor.create(document.getElementById('editor3'), {
     modules: [

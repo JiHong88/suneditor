@@ -9,7 +9,7 @@
  * @private
  */
 const _Constructor = {
-    init: function (element, options, lang, _plugins, convertContentForEditor) {
+    init: function (element, options, lang, _plugins, _convertContentForEditor) {
         if (typeof options !== 'object') options = {};
     
         /** user options */
@@ -65,7 +65,7 @@ const _Constructor = {
         wysiwyg_div.setAttribute('scrolling', 'auto');
         wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
-        wysiwyg_div.innerHTML = convertContentForEditor(element.value);
+        wysiwyg_div.innerHTML = _convertContentForEditor(element.value);
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
@@ -334,6 +334,7 @@ const _Constructor = {
                             module = defaultButtonList[pluginName];
                             plugins[pluginName] = button;
                         } else {
+                            pluginName = button.name;
                             module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
                         }
                     } else {

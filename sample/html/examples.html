@@ -135,19 +135,9 @@
             imageSize <span class="pl-k">:</span> <span class="pl-s">150</span>,
             buttonList <span class="pl-k">:</span> [
                 [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
-                [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
-                    <span class="pl-c">// Set the display attribute of the "image" module to "full"</span>
-                    {
-                        buttonClass:<span class="pl-s"><span class="pl-pds">''</span></span>,
-                        title:'custom image',
-                        dataCommand:<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>,
-                        dataDisplay:<span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
-                        displayOption:<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
-                        innerHTML:<span class="pl-s"><span class="pl-pds">'</span>&lt;div class="icon-image"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
-                    },
-                    <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>
-                ]
-            ]
+                [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>
+            ],
+            popupDisplay: <span class="pl-pds">'</span>full<span class="pl-pds">'</span>
         });</pre>
         </div>
         <p></p>
@@ -340,18 +330,9 @@
         imageSize : 150,
         buttonList : [
             ['font', 'fontSize'],
-            [
-                {
-                    buttonClass:'',
-                    title:'custom image',
-                    dataCommand:'image',
-                    dataDisplay:'dialog',
-                    displayOption:'full',
-                    innerHTML:'<div class="icon-image"></div>'
-                },
-                'video'
-            ]
-        ]
+            ['image', 'video']
+        ],
+        popupDisplay: 'full'
     });
 
     let suneditor = SUNEDITOR.create('exampleFunction');
