@@ -136,7 +136,6 @@ const sampleEditor = suneditor.init({
         plugins.horizontalRule,
         plugins.list,
         plugins.table,
-        link, image, video 
         plugins.link,
         plugins.image,
         plugins.video
