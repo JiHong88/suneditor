@@ -100,8 +100,10 @@ suneditor.create('sample', {
     lang: ko,
     popupDisplay: 'full'
 })
+```
 
-// Plugins can be used directly in the button list
+### 3. Plugins can be used directly in the button list
+```javascript
 suneditor.create('sample', {
     modules: [
         modules.dialog
@@ -113,7 +115,7 @@ suneditor.create('sample', {
 })
 ```
 
-### init function
+### 4. init function
 ```text
 If the options overlap, the options of the 'create' function take precedence.
 ```
