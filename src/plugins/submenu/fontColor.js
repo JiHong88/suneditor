@@ -5,7 +5,10 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.foreColor = {
+'use strict';
+
+export default {
+    name: 'fontColor',
     add: function (_this, targetElement) {
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
@@ -22,7 +25,7 @@ SUNEDITOR.plugin.foreColor = {
 
     setSubmenu: function () {
         const listDiv = document.createElement('DIV');
-        listDiv.className = 'layer_editor layer_color';
+        listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         const colorList = ['#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000', '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa',
@@ -30,15 +33,12 @@ SUNEDITOR.plugin.foreColor = {
             '#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535', '#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222'];
 
         let list = '<div class="inner_layer">' +
-            '   <div class="pallet_bgcolor">' +
-            '       <ul class="list_color list_bgcolor">';
+            '   <div class="pallet_font_color">' +
+            '       <ul class="list_color">';
         for (let i = 0, len = colorList.length; i < len; i++) {
             const color = colorList[i];
             list += '<li>' +
-                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" style="background-color:' + color + ';">' + color + '' +
-                '       <span class="bg_check"></span>' +
-                '       <span class="bg_btnframe"></span>' +
-                '   </button>' +
+                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
                 '</li>';
         }
         list += '       </ul>' +

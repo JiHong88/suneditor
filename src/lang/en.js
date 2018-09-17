@@ -5,12 +5,7 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-if (typeof window.SUNEDITOR === 'undefined') {
-    window.SUNEDITOR = {};
-    SUNEDITOR.plugin = {};
-}
-
-SUNEDITOR.lang = {
+export default {
     toolbar: {
         font: 'Font',
         formats: 'Formats',
@@ -34,7 +29,7 @@ SUNEDITOR.lang = {
         list: 'list',
         orderList: 'Ordered list',
         unorderList: 'Unordered list',
-        line: 'Line',
+        horizontalRule: 'horizontal line',
         table: 'Table',
         link: 'Link',
         image: 'Image',

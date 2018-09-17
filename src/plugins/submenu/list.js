@@ -5,10 +5,13 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.list = {
+'use strict';
+
+export default {
+    name: 'list',
     add: function (_this, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu(_this.lang));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(_this));
@@ -20,8 +23,7 @@ SUNEDITOR.plugin.list = {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const lang = SUNEDITOR.lang;
+    setSubmenu: function (lang) {
         const listDiv = document.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_list';

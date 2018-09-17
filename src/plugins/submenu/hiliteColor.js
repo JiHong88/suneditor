@@ -5,7 +5,10 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.hiliteColor = {
+'use strict';
+
+export default {
+    name: 'hiliteColor',
     add: function (_this, targetElement) {
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
@@ -22,21 +25,18 @@ SUNEDITOR.plugin.hiliteColor = {
 
     setSubmenu: function () {
         const listDiv = document.createElement('DIV');
-        listDiv.className = 'layer_editor layer_color';
+        listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         const colorList = ['#1e9af9', '#00b8c6', '#6cce02', '#ff9702', '#ff0000', '#ff00dd', '#6600ff', '#cce9ff', '#fcfd4c', '#ffffff', '#dfdede', '#8c8c8c', '#000000', '#222222'];
 
         let list = '<div class="inner_layer">' +
-            '   <div class="pallet_bgcolor pallet_text">' +
-            '       <ul class="list_color list_bgcolor">';
+            '   <div class="pallet_hilite_color">' +
+            '       <ul class="list_color">';
         for (let i = 0, len = colorList.length; i < len; i++) {
             const color = colorList[i];
             list += '<li>' +
-                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" style="background-color:' + color + ';">' + color + '' +
-                '       <span class="bg_check"></span>' +
-                '       <span class="bg_btnframe"></span>' +
-                '   </button>' +
+                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
                 '</li>';
         }
         list += '   </ul>' +

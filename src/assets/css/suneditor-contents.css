@@ -1,11 +1,10 @@
-@charset "UTF-8";
-
 /* suneditor contents */
-body.sun-editor-editable {
+.sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     word-break: break-all;
-    margin: 20px;
+    padding: 10px 20px 10px 20px;
+    margin: 0;
 }
 
 /* hr */
@@ -27,7 +26,7 @@ body.sun-editor-editable {
 .sun-editor-editable img.inner-link {
     padding: 1px;
     margin: 1px;
-    outline: 1px solid #f4b124;
+    outline: 1px solid #b4cad4;
 }
 
 /* table */
@@ -86,7 +85,7 @@ body.sun-editor-editable {
 
 /** show blocks */
 .sun-editor-show-block p:not([contenteditable=false]), .sun-editor-show-block div:not([contenteditable=false]), .sun-editor-show-block h1:not([contenteditable=false]), .sun-editor-show-block h2:not([contenteditable=false]), .sun-editor-show-block h3:not([contenteditable=false]), .sun-editor-show-block h4:not([contenteditable=false]), .sun-editor-show-block h5:not([contenteditable=false]), .sun-editor-show-block h6:not([contenteditable=false]) {
-    border: 1px dashed #f4b124;
+    border: 1px dashed #b4cad4;
     padding: 10px 8px 8px 8px;
 }
 .sun-editor-show-block p:not([contenteditable=false]) {

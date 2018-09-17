@@ -5,7 +5,10 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.font = {
+'use strict';
+
+export default {
+    name: 'font',
     add: function (_this, targetElement) {
         /** set submenu */
         let listDiv = eval(this.setSubmenu(_this.context.user));
@@ -26,7 +29,7 @@ SUNEDITOR.plugin.font = {
         listDiv.style.display = 'none';
 
         let font, text, i, len;
-        let fontList = !user.fontList ?
+        let fontList = !user.font ?
             [
                 'Arial',
                 'Comic Sans MS',
@@ -35,7 +38,7 @@ SUNEDITOR.plugin.font = {
                 'tahoma',
                 'Trebuchet MS,Helvetica',
                 'Verdana'
-            ] : user.fontList;
+            ] : user.font;
 
         let list = '<div class="inner_layer list_family">' +
             '   <ul class="list_editor sun-editor-list-font-family">';
@@ -45,19 +48,7 @@ SUNEDITOR.plugin.font = {
             list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
         }
         list += '   </ul>';
-
-        if (user.addFont) {
-            fontList = user.addFont;
-            list += '<ul class="list_editor list_family_add sun-editor-list-font-family-add">';
-            for (i = 0, len = fontList.length; i < len; i++) {
-                font = fontList[i];
-                text = font.split(',')[0];
-                list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
-            }
-            list += '</ul>';
-        }
         list += '</div>';
-
         listDiv.innerHTML = list;
 
         return listDiv;
@@ -75,7 +66,7 @@ SUNEDITOR.plugin.font = {
 
         this.focus();
 
-        this.dom.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
+        this.util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         const newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['font-family']);
         this.submenuOff();

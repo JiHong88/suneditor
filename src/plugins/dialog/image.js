@@ -5,7 +5,10 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.image = {
+'use strict';
+
+export default {
+    name: 'image',
     add: function (_this) {
         const context = _this.context;
         context.image = {
@@ -28,7 +31,7 @@ SUNEDITOR.plugin.image = {
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog(_this.context.user));
+        let image_dialog = eval(this.setDialog(_this.context.user, _this.lang));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -57,25 +60,24 @@ SUNEDITOR.plugin.image = {
     },
 
     /** dialog */
-    setDialog: function (user) {
-        const lang = SUNEDITOR.lang;
+    setDialog: function (user, lang) {
         const dialog = document.createElement('DIV');
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
 
         let html = '' +
-			'<div class="modal-header">' +
-			'   <button type="button" data-command="close" class="close" aria-label="Close">' +
-			'       <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
-			'   </button>' +
-			'   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
-			'</div>' +
+            '<div class="modal-header">' +
+            '   <button type="button" data-command="close" class="close" aria-label="Close">' +
+            '       <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
+            '   </button>' +
+            '   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
+            '</div>' +
             '<div class="sun-editor-tab-button">' +
             '   <button type="button" class="sun-editor-id-tab-link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
-			'   <button type="button" class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+            '   <button type="button" class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
-			'   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
+            '   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
             '       <div class="modal-body">';
 
             if (user.imageFileInput) {
@@ -108,24 +110,24 @@ SUNEDITOR.plugin.image = {
             '               <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
             '           </div>' +
             '       </div>' +
-			'   </div>' +
-			'   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-url" style="display: none">' +
-			'       <div class="modal-body">' +
-			'           <div class="form-group">' +
-			'               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
-			'           </div>' +
-            '           <label><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-			'       </div>' +
-			'   </div>' +
-			'   <div class="modal-footer">' +
+            '   </div>' +
+            '   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-url" style="display: none">' +
+            '       <div class="modal-body">' +
+            '           <div class="form-group">' +
+            '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
+            '           </div>' +
+            '           <input type="checkbox" id="suneditor_image_check_newLink" class="sun-editor-id-linkCheck"/><label for="suneditor_image_check_newLink">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       </div>' +
+            '   </div>' +
+            '   <div class="modal-footer">' +
             '       <div style="float: left;">' +
-			'           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.basic + '</label>' +
-			'           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.left + '</label>' +
+            '           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.basic + '</label>' +
+            '           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.left + '</label>' +
             '           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.center + '</label>' +
             '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-			'       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-			'   </div>' +
+            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '   </div>' +
             '</form>';
 
         dialog.innerHTML = html;
@@ -133,33 +135,33 @@ SUNEDITOR.plugin.image = {
         return dialog;
     },
 
-	openTab: function (e) {
+    openTab: function (e) {
         const targetElement = (e === 'init' ? document.getElementsByClassName('sun-editor-id-tab-link')[0] : e.target);
 
-		if (!/^BUTTON$/i.test(targetElement.tagName)) {
-			return false;
-		}
+        if (!/^BUTTON$/i.test(targetElement.tagName)) {
+            return false;
+        }
 
-		// Declare all variables
+        // Declare all variables
         const tabName = targetElement.getAttribute('data-tab-link');
         const contentClassName = 'sun-editor-id-tab-content';
         let i, tabcontent, tablinks;
 
-		// Get all elements with class="tabcontent" and hide them
-		tabcontent = document.getElementsByClassName(contentClassName);
-		for (i = 0; i < tabcontent.length; i++) {
-			tabcontent[i].style.display = 'none';
-		}
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName(contentClassName);
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = 'none';
+        }
 
-		// Get all elements with class="tablinks" and remove the class "active"
-		tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
-		for (i = 0; i < tablinks.length; i++) {
-            this.dom.removeClass(tablinks[i], 'active');
-		}
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
+        for (i = 0; i < tablinks.length; i++) {
+            this.util.removeClass(tablinks[i], 'active');
+        }
 
-		// Show the current tab, and add an "active" class to the button that opened the tab
+        // Show the current tab, and add an "active" class to the button that opened the tab
         this.context.image.modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
-        this.dom.addClass(targetElement, 'active');
+        this.util.addClass(targetElement, 'active');
 
         // focus
         if (tabName === 'image') {
@@ -168,8 +170,8 @@ SUNEDITOR.plugin.image = {
             this.context.image.imgLink.focus();
         }
 
-		return false;
-	},
+        return false;
+    },
 
     xmlHttp: null,
 
@@ -186,13 +188,13 @@ SUNEDITOR.plugin.image = {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    SUNEDITOR.plugin.image.xmlHttp = this.util.getXMLHttpRequest();
-                    SUNEDITOR.plugin.image.xmlHttp.onreadystatechange = SUNEDITOR.plugin.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
-                    SUNEDITOR.plugin.image.xmlHttp.open('post', imageUploadUrl, true);
-                    SUNEDITOR.plugin.image.xmlHttp.send(formData);
+                    this.plugins.image.xmlHttp = this.util.getXMLHttpRequest();
+                    this.plugins.image.xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
+                    this.plugins.image.xmlHttp.open('post', imageUploadUrl, true);
+                    this.plugins.image.xmlHttp.send(formData);
                 } else {
                     for (let i = 0; i < filesLen; i++) {
-                        SUNEDITOR.plugin.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.dialog.updateModal);
+                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.dialog.updateModal);
                     }
                 }
             }
@@ -210,20 +212,20 @@ SUNEDITOR.plugin.image = {
         const reader = new FileReader();
 
         reader.onload = function (update) {
-            SUNEDITOR.plugin.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align, update);
+            this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align, update);
         }.bind(this, update);
 
         reader.readAsDataURL(file);
     },
 
     callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update) {
-        const xmlHttp = SUNEDITOR.plugin.image.xmlHttp;
+        const xmlHttp = this.plugins.image.xmlHttp;
         if (xmlHttp.readyState === 4) {
             if (xmlHttp.status === 200) {
                 const result = eval(xmlHttp.responseText);
 
                 for (let i = 0, len = (update && result.length > 0 ? 1 : result.length); i < len; i++) {
-                    SUNEDITOR.plugin.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update);
+                    this.plugins.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update);
                 }
             } else {
                 window.open('', '_blank').document.writeln(xmlHttp.responseText);
@@ -237,7 +239,7 @@ SUNEDITOR.plugin.image = {
         if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            SUNEDITOR.plugin.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
+            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.inseretImageUrl.fail] cause : "' + e.message + '"');
@@ -255,7 +257,7 @@ SUNEDITOR.plugin.image = {
             imgTag.setAttribute('data-image-link', imgLinkValue);
             imgTag.style.padding = '1px';
             imgTag.style.margin = '1px';
-            imgTag.style.outline = '1px solid #f4b124';
+            imgTag.style.outline = '1px solid #8baab7';
 
             link.appendChild(imgTag);
             return link;
@@ -290,13 +292,13 @@ SUNEDITOR.plugin.image = {
 
         try {
             if (this.context.dialog.updateModal) {
-                SUNEDITOR.plugin.image.update_image.call(this);
+                this.plugins.image.update_image.call(this);
             } else {
-                SUNEDITOR.plugin.image.onRender_imgInput.call(this);
-                SUNEDITOR.plugin.image.onRender_imgUrl.call(this);
+                this.plugins.image.onRender_imgInput.call(this);
+                this.plugins.image.onRender_imgUrl.call(this);
             }
         } finally {
-            SUNEDITOR.plugin.dialog.closeDialog.call(this);
+            this.plugins.dialog.closeDialog.call(this);
             this.closeLoading();
         }
 
@@ -305,9 +307,9 @@ SUNEDITOR.plugin.image = {
 
     create_caption: function () {
         const caption = document.createElement('FIGCAPTION');
-        
-        caption.innerHTML = '<p>' + SUNEDITOR.lang.dialogBox.imageBox.caption + '</p>';
-        caption.addEventListener('click', SUNEDITOR.plugin.image.toggle_caption_contenteditable.bind(this, true));
+
+        caption.innerHTML = '<p>' + this.lang.dialogBox.imageBox.caption + '</p>';
+        caption.addEventListener('click', this.plugins.image.toggle_caption_contenteditable.bind(this, true));
 
         return caption;
     },
@@ -342,49 +344,50 @@ SUNEDITOR.plugin.image = {
         oImg.setAttribute('data-align', align);
         oImg.setAttribute('data-proportion', this.context.image._proportionChecked);
         oImg.alt = this.context.image._altText;
-        oImg = SUNEDITOR.plugin.image.onRender_link(oImg, linkValue, linkNewWindow);
+        oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
 
-        const cover = SUNEDITOR.plugin.image.set_cover.call(this, oImg);
-        const container = SUNEDITOR.plugin.image.set_container.call(this, cover);
+        const cover = this.plugins.image.set_cover.call(this, oImg);
+        const container = this.plugins.image.set_container.call(this, cover);
 
         // caption
         if (this.context.image._captionChecked) {
-            this.context.image._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+            this.context.image._imageCaption = this.plugins.image.create_caption.call(this);
+            this.context.image._imageCaption.setAttribute('contenteditable', false);
             cover.appendChild(this.context.image._imageCaption);
         }
-        
+
         // align
         if ('center' !== align) {
             container.style.display = 'inline-block';
             container.style.float = align;
         }
 
-        this.insertNode(container, this.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container);
         this.appendP(container);
     },
 
     update_image: function () {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
-        let cover = this.dom.getParentElement(contextImage._element, '.sun-editor-image-cover');
-        let container = this.dom.getParentElement(contextImage._element, '.sun-editor-id-image-container');
+        let cover = this.util.getParentElement(contextImage._element, '.sun-editor-image-cover');
+        let container = this.util.getParentElement(contextImage._element, '.sun-editor-id-image-container');
         let isNewContainer = false;
 
         if (cover === null) {
             isNewContainer = true;
-            cover = SUNEDITOR.plugin.image.set_cover.call(this, contextImage._element.cloneNode(true));
+            cover = this.plugins.image.set_cover.call(this, contextImage._element.cloneNode(true));
         }
 
         if (container === null) {
             isNewContainer = true;
-            container = SUNEDITOR.plugin.image.set_container.call(this, cover.cloneNode(true));
+            container = this.plugins.image.set_container.call(this, cover.cloneNode(true));
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
         }
 
         // input update
-        SUNEDITOR.plugin.image.onRender_imgInput.call(this);
+        this.plugins.image.onRender_imgInput.call(this);
 
         // src, size
         contextImage._element.src = contextImage.imgUrlFile.value;
@@ -396,12 +399,12 @@ SUNEDITOR.plugin.image = {
         // caption
         if (contextImage._captionChecked) {
             if (contextImage._imageCaption === null) {
-                contextImage._imageCaption = SUNEDITOR.plugin.image.create_caption.call(this);
+                contextImage._imageCaption = this.plugins.image.create_caption.call(this);
                 cover.appendChild(contextImage._imageCaption);
             }
         } else {
             if (contextImage._imageCaption) {
-                this.dom.removeItem(contextImage._imageCaption);
+                this.util.removeItem(contextImage._imageCaption);
             }
         }
 
@@ -420,12 +423,12 @@ SUNEDITOR.plugin.image = {
         if (linkValue.trim().length > 0) {
             if (contextImage._linkElement !== null) {
                 contextImage._linkElement.href = linkValue;
-                contextImage._linkElement.target = this.context.image.imgLinkNewWindowCheck.checked;
+                contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
-                let newEl = SUNEDITOR.plugin.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                cover.innerHTML = '';
-                cover.appendChild(newEl);
+                let newEl = this.plugins.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                cover.removeChild(contextImage._element);
+                cover.insertBefore(newEl, contextImage._imageCaption);
             }
         }
         else if (contextImage._linkElement !== null) {
@@ -437,14 +440,14 @@ SUNEDITOR.plugin.image = {
             imageElement.style.outline = '';
 
             let newEl = imageElement.cloneNode(true);
-            cover.innerHTML = '';
-            cover.appendChild(newEl);
+            cover.removeChild(imageElement);
+            cover.insertBefore(newEl, contextImage._imageCaption);
         }
 
         if (isNewContainer) {
-            const existElement = this.dom.getFormatElement(contextImage._element);
+            const existElement = this.util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
-            this.dom.removeItem(existElement);
+            this.util.removeItem(existElement);
         }
     },
 
@@ -466,7 +469,7 @@ SUNEDITOR.plugin.image = {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = contextImage._resize_element = element;
-        contextImage._imageCaption = element.nextSibling;
+        contextImage._imageCaption = contextImage._linkElement ? contextImage._linkElement.nextSibling : element.nextSibling;
 
         contextImage._element_w = size.w;
         contextImage._element_h = size.h;
@@ -490,7 +493,7 @@ SUNEDITOR.plugin.image = {
         contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage.altText.value = contextImage._element.alt;
         contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
-        contextImage.imgLinkNewWindowCheck.checked = !contextImage._linkElement || contextImage._linkElement.target === '_blank';
+        contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('#suneditor_image_radio_' + (contextImage._element.getAttribute('data-align') || 'none')).checked = true;
         contextImage._captionChecked = contextImage.caption.checked = !!contextImage._imageCaption;
         contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
@@ -499,7 +502,7 @@ SUNEDITOR.plugin.image = {
         contextImage.imageY.disabled = false;
         contextImage.proportion.disabled = false;
 
-        SUNEDITOR.plugin.dialog.openDialog.call(this, 'image', null, true);
+        this.plugins.dialog.openDialog.call(this, 'image', null, true);
     },
 
     setSize: function (x, y) {
@@ -508,9 +511,9 @@ SUNEDITOR.plugin.image = {
     },
 
     destroy: function () {
-        const imageContainer = this.dom.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
-        this.dom.removeItem(imageContainer);
-        SUNEDITOR.plugin.image.init.call(this);
+        const imageContainer = this.util.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
+        this.util.removeItem(imageContainer);
+        this.plugins.image.init.call(this);
     },
 
     init: function () {
@@ -527,6 +530,6 @@ SUNEDITOR.plugin.image = {
         this.context.image.imageY.disabled = true;
         this.context.image.proportion.disabled = true;
         this.context.image._element = null;
-        SUNEDITOR.plugin.image.openTab.call(this, 'init');
+        this.plugins.image.openTab.call(this, 'init');
     }
 };

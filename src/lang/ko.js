@@ -1,16 +1,4 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 JiHong Lee.
- * MIT license.
- */
-if (typeof window.SUNEDITOR === 'undefined') {
-    window.SUNEDITOR = {};
-    SUNEDITOR.plugin = {};
-}
-
-SUNEDITOR.lang = {
+export default {
     toolbar: {
         font: '글꼴',
         formats: '문단 형식',
@@ -34,7 +22,7 @@ SUNEDITOR.lang = {
         list: '리스트',
         orderList: '숫자형 불릿',
         unorderList: '원형 불릿',
-        line: '구분선',
+        horizontalRule: '가로 줄 삽입',
         table: '테이블',
         link: '링크',
         image: '이미지',

@@ -5,13 +5,16 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.horizontalRules = {
+'use strict';
+
+export default {
+    name: 'horizontalRule',
     add: function (_this, targetElement) {
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulesPick.bind(_this));
+        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulePick.bind(_this));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -29,17 +32,17 @@ SUNEDITOR.plugin.horizontalRules = {
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="solid">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="solid">' +
             '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dotted">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dotted">' +
             '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRules" data-value="dashed">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dashed">' +
             '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +
@@ -54,13 +57,13 @@ SUNEDITOR.plugin.horizontalRules = {
         oHr.className = className;
 
         this.focus();
-        this.insertNode(oHr, this.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
 
         const oP = this.appendP(oHr);
         this.setRange(oP, 0, oP, 0);
     },
 
-    horizontalRulesPick: function (e) {
+    horizontalRulePick: function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -73,7 +76,7 @@ SUNEDITOR.plugin.horizontalRules = {
         }
 
         this.focus();
-        SUNEDITOR.plugin.horizontalRules.appendHr.call(this,value);
+        this.plugins.horizontalRule.appendHr.call(this,value);
         this.submenuOff();
     }
 };

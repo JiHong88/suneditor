@@ -5,10 +5,13 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.formatBlock = {
+'use strict';
+
+export default {
+    name: 'formatBlock',
     add: function (_this, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu(_this.lang));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(_this));
@@ -20,8 +23,7 @@ SUNEDITOR.plugin.formatBlock = {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const lang = SUNEDITOR.lang;
+    setSubmenu: function (lang) {
         const listDiv = document.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_size';
@@ -56,7 +58,7 @@ SUNEDITOR.plugin.formatBlock = {
         }
 
         this.focus();
-        this.dom.changeTxt(this.commandMap['FORMAT'], value);
+        this.util.changeTxt(this.commandMap['FORMAT'], value);
         this.execCommand('formatBlock', false, value);
         this.submenuOff();
     }

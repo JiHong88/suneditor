@@ -21,39 +21,66 @@
         </header>
         <article>
 
+            <h4 class="name" id="SUNEDITOR.init"><span class="type-signature"></span>SUNEDITOR.init<span
+                class="signature">(options)</span><span class="type-signature"> &rarr; {create function}</span></h4>
+            <div class="description">
+                Returns the create function with preset options.<br>
+                If the options overlap, the options of the 'create' function take precedence.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>options</code></td>
+                    <td class="type">
+                        <span class="param-type">Json</span>
+                    </td>
+                    <td class="description last">User options</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
 
-        <h4 class="name" id="SUNEDITOR.create"><span class="type-signature"></span>SUNEDITOR.create<span
-                class="signature">(array, element)</span><span class="type-signature"> &rarr; {user functions}</span></h4>
-        <div class="description">
-            Create the suneditor
-        </div>
-        <h5>Parameters:</h5>
-        <table class="params">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th class="last">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td class="name"><code>elementId</code></td>
-                <td class="type">
-                    <span class="param-type">string</span>
-                </td>
-                <td class="description last">textarea Id</td>
-            </tr>
-            <tr>
-                <td class="name"><code>options</code></td>
-                <td class="type">
-                    <span class="param-type">json</span>
-                </td>
-                <td class="description last">user options</td>
-            </tr>
-            </tbody>
-        </table>
-        <dl class="details"></dl>
+
+            <h4 class="name" id="SUNEDITOR.create"><span class="type-signature"></span>SUNEDITOR.create<span
+                    class="signature">(idOrElement, options)</span><span class="type-signature"> &rarr; {user functions}</span></h4>
+            <div class="description">
+                Create the suneditor
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>idOrElement</code></td>
+                    <td class="type">
+                        <span class="param-type">String | Object</span>
+                    </td>
+                    <td class="description last">textarea Id or textarea element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>options</code></td>
+                    <td class="type">
+                        <span class="param-type">Json</span>
+                    </td>
+                    <td class="description last">User options</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
 
 
         </article>
@@ -63,13 +90,9 @@
 
 <nav>
     <h2><a href="../../index.html">Suneditor</a></h2>
-    <h3>Global</h3>
+    <h3>Editor</h3>
     <ul>
-        <li><a href="document-util.html">SUNEDITOR.util</a></li>
-        <li><a href="document-dom.html">SUNEDITOR.dom</a></li>
-    </ul>
-    <h3 style="color: #f42424;">Core</h3>
-    <ul>
+        <li><a href="document-util.html">util</a></li>
         <li><a href="document-editor.html" style="color: #f42424;">core closure</a></li>
     </ul>
     <h3>Users</h3>

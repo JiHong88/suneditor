@@ -5,7 +5,10 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-SUNEDITOR.plugin.table = {
+'use strict';
+
+export default {
+    name: 'table',
     add: function (_this, targetElement) {
         const context = _this.context;
 
@@ -66,10 +69,10 @@ SUNEDITOR.plugin.table = {
 
         oTable.innerHTML = tableHTML;
 
-        this.insertNode(oTable, this.dom.getFormatElement(this.getSelectionNode()));
+        this.insertNode(oTable, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(oTable);
 
-        SUNEDITOR.plugin.table.reset_table_picker.call(this);
+        this.plugins.table.reset_table_picker.call(this);
     },
 
     onMouseMove_tablePicker: function (e) {
@@ -87,7 +90,7 @@ SUNEDITOR.plugin.table = {
         this.context.submenu.tableUnHighlight.style.width = x_u + 'em';
         this.context.submenu.tableUnHighlight.style.height = y_u + 'em';
 
-        this.dom.changeTxt(this.context.submenu.tableDisplay, x + ' x ' + y);
+        this.util.changeTxt(this.context.submenu.tableDisplay, x + ' x ' + y);
         this.context.submenu._tableXY = [x, y];
     },
 
@@ -102,7 +105,7 @@ SUNEDITOR.plugin.table = {
         unHighlight.width = '5em';
         unHighlight.height = '5em';
 
-        this.dom.changeTxt(this.context.submenu.tableDisplay, '1 x 1');
+        this.util.changeTxt(this.context.submenu.tableDisplay, '1 x 1');
         this.submenuOff();
     }
 };

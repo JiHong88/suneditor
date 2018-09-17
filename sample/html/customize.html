@@ -17,8 +17,7 @@
     <link rel="stylesheet" href="../css/github.css">
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
-    <link href="../../src/css/suneditor.css" rel="stylesheet" type="text/css">
-    <script src="../../src/suneditor.js"></script>
+    <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -56,157 +55,115 @@
 </nav>
 
 <div class="content">
-        <article class="markdown-body entry-content" itemprop="text">
-                <h4><span style="color: #f42424;">Add new module object</span></h4>
-                    <p></p>
+    <article class="markdown-body entry-content">
 
-                    <h4>1. It is divided into two folders dialog and submenu</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ol>
-    <li class="pl-0">dialog : It is a module in the form of a dialog
-        Add the <span class="pl-k">{moduleName}.js</span> file to the 'plugins/dialog/' directory
-        <img src="../img/example_dialog.png" width="400px" height="200px"></li>
-    <li class="pl-0">submenu : It is a module in the form of a submenu
-         Add the <span class="pl-k">{moduleName}.js</span> file to the 'plugins/submenu/' directory
-        <img src="../img/example_submenu.png" width="400px" height="200px"></li>
-</ol>
-            </pre>
-                    </div>
+        <h4>Add new plugin</h4>
+        <div class="highlight highlight-text-html-basic">
+        <pre><ol>
+            <li class="pl-0">dialog : It is a plugin in the form of a dialog
+         It is need a dialog module
+            <img src="../img/example_dialog.png" width="400px" height="200px"></li>
+            <li class="pl-0">submenu : It is a plugin in the form of a submenu
+            <img src="../img/example_submenu.png" width="400px" height="200px"></li>
+        </ol></pre>
+        </div>
 
-                    <h4>2. How to create {moduleName} .js</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ol>
-    <li class="pl-0">Create a <span class="pl-k">{moduleName}.js</span> file with the same name as the module you want to add to the dialog or submenu folder</li>
-    <li class="pl-0"><span class="pl-k">SUNEDITOR.plugin.{moduleName}</span> Declare an Object and declare it within this Object
-Adds an <span class="pl-c1">element</span>, adds a <span class="pl-en">function</span> to a module, and registers an <span class="pl-s">event</span></li>
-    <li class="pl-0">In common, all module objects must declare a function named add</li><ul>
-    <li class="pl-0">The add function takes the <span class="pl-k">SUNEDITOR.editor</span> Object and the <span class="pl-c1">element</span> of the module button as an argument value</li>
-    <li class="pl-0">The argument values of the dialog module  : <span class="pl-k">SUNEDITOR.editor</span> Object</li>
-    <li class="pl-0">The argument values of the dialog submenu : <span class="pl-k">SUNEDITOR.editor</span> Object, <span class="pl-c1">element</span> of the module button</li>
-    <li class="pl-0">The <span class="pl-k">SUNEDITOR.editor</span> object contains the commonly available <span class="pl-en">function</span> and <span class="pl-en">variable values</span>, <span class="pl-k">context</span></li>
-    <li class="pl-0"><span class="pl-k">SUNEDITOR.editor.context</span> contains the <span class="pl-c1">elements</span>, <span class="pl-c1">variable values</span>, and user options that suneditor should remember</li>
-    <li class="pl-0">If you need to store the value in <span class="pl-k">SUNEDITOR.editor.context</span>
-<span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> Declare the Object and use it</li>
-<li class="pl-0">If you need to use the <span class="pl-k">SUNEDITOR.editor</span> Object in a function in a module
-Call this function by replacing the <span class="pl-k">this</span> value of the function
-with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class="pl-en">call</span> function
-</li>
-<li class="pl-0">It is recommended to keep the <span class="pl-k">this</span> value of all functions in the module except the add function as <span class="pl-k">SUNEDITOR.editor</span></li></ul>
-</ol>
-            </pre>
-                    </div>
+        <h4>1. submenu plugin</h4>
+        <div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">//</span> ex) A submenu plugin that appends the contents of the input element to the editor</span>
+<span class="pl-k">export</span> <span class="pl-c1">default</span> {
+    <span class="pl-c"><span class="pl-c">//</span> plugin name (Required)</span>
+    name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>,
 
-                    <h4>3. add function definition</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ul>
-    <li class="pl-0">Include <span class="pl-k">{moduleName}.js</span> file when module button is first clicked</li>
-    <li class="pl-0">This function is executed only once when the <span class="pl-k">{moduleName}.js</span> file is loaded.</li>
-    <li class="pl-0">It has a <span class="pl-k">SUNEDITOR.editor</span> Object as its first argument value</li>
-    <li class="pl-0">If it is a module in the submenu, it will have the second <span class="pl-c1">element</span> value of the button of the additional clicked button</li>
-    <li class="pl-0"><span class="pl-c1">element</span> creation and <span class="pl-s">event</span> registration Define the action to be inserted into the suneditor <span class="pl-c1">Dom</span></li>
-    <li class="pl-0">The <span class="pl-c1">element</span> and <span class="pl-c1">variable values</span> that need to be saved use that object by declaring <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span> Object</li>
-</ul>
-            </pre>
-                    </div>
+    <span class="pl-c"><span class="pl-c">//</span> add function - It is called only once when the plugin is first run.</span>
+    <span class="pl-c"><span class="pl-c">//</span> This function generates HTML to append and register the event.</span>
+    <span class="pl-c"><span class="pl-c">//</span> arguments - (_this : core object, targetElement : clicked button element)</span>
+    <span class="pl-en">add</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">_this</span>, <span class="pl-smi">targetElement</span>) {
 
-                    <h4>4. When adding a dialog module</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-    <ol>
-        <li class="pl-0">The module in the dialog folder receives only <span class="pl-k">SUNEDITOR.editor</span> Object as argument value in <span class="pl-en">add</span> function.</li>
-        <li class="pl-0">After creating a tag element</li><ul>
-        <li class="pl-0">Insert the element created in <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.modal</span></li></ul>
-        <li class="pl-0">When you need to focus immediately after the Dialog window appears</li><ul>
-        <li class="pl-0">In <span class="pl-k">SUNEDITOR.editor.context.{moduleName}</span><span class="pl-c1">.focusElement</span>, insert the element that should have focus</li></ul>
-        <li class="pl-0"><span class="pl-c1">element</span> creation, <span class="pl-s">event</span> registration, and insert the created <span class="pl-c1">element</span> into <span class="pl-k">context.dialog.modal</span> using <span class="pl-en">appendChaild</span> function</li>
-        <li class="pl-0">All dialog modules must declare an <span class="pl-en">init</span> function.</li><ul>
-        <li class="pl-0">The <span class="pl-en">init</span> function is executed when the window is closed.</li>
-        <li class="pl-0">You can insert the code that initializes the <span class="pl-c1">elements</span> or <span class="pl-k">variables</span> you need.</li></ul>
-    </ol>
-            </pre>
-                    </div>
+        <span class="pl-c"><span class="pl-c">//</span> Registering a namespace for caching as a plugin name in the context object</span>
+        <span class="pl-k">const</span> <span class="pl-c1">context</span> <span class="pl-k">=</span> <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>;
+        <span class="pl-smi">context</span>.<span class="pl-smi">custom</span> <span class="pl-k">=</span> {
+            textElement<span class="pl-k">:</span> <span class="pl-c1">null</span>
+        };
 
-                    <h4>5. When adding a submenu module</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-    <ol>
-        <li class="pl-0">Modules in the submenu folder receive the <span class="pl-k">SUNEDITOR.editor</span> Object and the module button <span class="pl-c1">element</span> as argument values in the <span class="pl-en">add</span> function</li>
-        <li class="pl-0">The top-level div that contains the submenu <span class="pl-c1">element</span> must contain <span class="pl-ent">'layer_editor'</span> in the class name</li>
-        <li class="pl-0"><span class="pl-c1">element</span> creation, <span class="pl-s">event</span> registration, and insert the created <span class="pl-c1">element</span> into <span class="pl-k">targetElement</span><span class="pl-c1">.parentNode</span> using <span class="pl-en">appendChaild</span> function</li>
-    </ol>
-            </pre>
-                    </div>
+        <span class="pl-c"><span class="pl-c">//</span> Generate submenu HTML</span>
+        <span class="pl-k">let</span> listDiv <span class="pl-k">=</span> <span class="pl-c1">eval</span>(<span class="pl-c1">this</span>.<span class="pl-en">setSubmenu</span>(<span class="pl-smi">_this</span>.<span class="pl-c1">lang</span>));
 
-                    <h4>6. Add module button in buttonList property of options when creating suneditor</h4>
-                    <div class="highlight highlight-text-html-basic">
-            <pre>
-<ul>
-    <li class="pl-0">create example
+        <span class="pl-c"><span class="pl-c">//</span> Input tag caching</span>
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span> <span class="pl-k">=</span> <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>INPUT<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>];
 
-    <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleButtonList<span class="pl-pds">'</span></span>, {
-    <span class="pl-c"><span class="pl-c">/**</span> The default setting is all buttons display <span class="pl-c">*/</span></span>
-    <span class="pl-c"><span class="pl-c">//</span> Defines button list to array</span>
+        <span class="pl-c"><span class="pl-c">//</span> In addition to the button, elements that should operate within the submenu, such as focus,</span>
+        <span class="pl-c"><span class="pl-c">//</span> must call stopPropagation in the mousedown event to prevent the toolbar from executing events.</span>
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
+            <span class="pl-smi">e</span>.<span class="pl-c1">stopPropagation</span>();
+        })
+
+        <span class="pl-c"><span class="pl-c">/**</span> add event listeners <span class="pl-c">*/</span></span>
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>BUTTON<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>].<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>click<span class="pl-pds">'</span></span>, <span class="pl-c1">this</span>.<span class="pl-smi">onClick</span>.<span class="pl-en">bind</span>(_this));
+        <span class="pl-smi">_this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> () {
+
+        })
+
+        <span class="pl-c"><span class="pl-c">/**</span> append html <span class="pl-c">*/</span></span>
+        <span class="pl-smi">targetElement</span>.<span class="pl-c1">parentNode</span>.<span class="pl-c1">appendChild</span>(listDiv);
+    },
+
+    <span class="pl-en">setSubmenu</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">lang</span>) {
+        <span class="pl-k">const</span> <span class="pl-c1">listDiv</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">'</span>DIV<span class="pl-pds">'</span></span>);
+
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>layer_editor layer_align<span class="pl-pds">'</span></span>;
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
+        <span class="pl-smi">listDiv</span>.<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="inner_layer"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>   &lt;ul class="list_editor"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;input type="text" style="width: 100%; border: 1px solid #CCC;" /&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="btn_editor" title="Append text"&gt;Append text&lt;/button&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>   &lt;/ul&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>&lt;/div&gt;<span class="pl-pds">'</span></span>;
+
+        <span class="pl-k">return</span> listDiv;
+    },
+
+    <span class="pl-en">onClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+        <span class="pl-c"><span class="pl-c">//</span> Get Input value</span>
+        <span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createTextNode</span>(<span class="pl-c1">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">value</span>);
+
+        <span class="pl-c"><span class="pl-c">//</span> insert</span>
+        <span class="pl-c1">this</span>.<span class="pl-c1">insertNode</span>(value);
+    }
+}</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../src/suneditor<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-smi">custom_plugin_submenu</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../test/custom_plugin_submenu<span class="pl-pds">'</span></span>
+
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>ex_submenu<span class="pl-pds">'</span></span>), {
     buttonList<span class="pl-k">:</span> [
-        <span class="pl-c"><span class="pl-c">//</span> Create a group of buttons as an array </span>
-        <span class="pl-c"><span class="pl-c">//</span> All buttons must be included in the button group</span>
- &nbsp; &nbsp; &nbsp; &nbsp;<span class="pl-c"><span class="pl-c">//</span> button group 1</span>
- &nbsp; &nbsp; &nbsp; &nbsp;[
-            <span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>
-        ],
-        <span class="pl-c"><span class="pl-c">//</span> button group 2</span>
-        [
-            <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>
-        ],
-        <span class="pl-c"><span class="pl-c">//</span> button group 3</span>
-        [
-            <span class="pl-s"><span class="pl-pds">'</span>line<span class="pl-pds">'</span></span>
-        ],
-        <span class="pl-c"><span class="pl-c">//</span> button group 4</span>
-        <span class="pl-c"><span class="pl-c">//</span> It is a way to insert a user defined module button</span>
- &nbsp; &nbsp; &nbsp; &nbsp;<span class="pl-c"><span class="pl-c">//</span> Define json in an array of button group</span>
- &nbsp; &nbsp; &nbsp; &nbsp;[
-            {
-                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> className to be added to the button</span>
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> title property</span>
-                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_submenu<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> The js file name of the added module</span>
-                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,  <span class="pl-c"><span class="pl-c">//</span> The directory location under the plugins folder of the added module ('dialog', 'submenu')</span>
-                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Options for whether the range of the dialog is inside the editor or for the entire screen</span>
-                                  <span class="pl-c"><span class="pl-c">//</span> If set to 'full', the entire screen will be used ('', 'full')</span>
-                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_submenu"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">//</span> The source into the button's innerHTML (icon image)</span>
-            },
-            {
-                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Dialog<span class="pl-pds">'</span></span>,
-                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_dialog<span class="pl-pds">'</span></span>,
-                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
+        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, {
+                <span class="pl-c"><span class="pl-c">//</span> plugin's name attribute</span>
+                name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> name of the plugin to be recognized by the toolbar.</span>
+                <span class="pl-c"><span class="pl-c">//</span> It must be the same as the name attribute of the plugin </span>
+                dataCommand<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>,
+                <span class="pl-c"><span class="pl-c">//</span> button's class ("btn_editor" class is registered, basic button click css is applied.)</span>
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>btn_editor<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> HTML title attribute</span>
+                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Custom plugin of the submenu<span class="pl-pds">'</span></span>, 
+                <span class="pl-c"><span class="pl-c">//</span> 'submenu' or 'dialog' or '' (command button)</span>
+                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
+                <span class="pl-c"><span class="pl-c">//</span> 'full' or '' (Only applies to dialog plugin.)</span>
                 displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
-                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_dialog"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
-            },
-            {
-                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
-                title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>FullDialog<span class="pl-pds">'</span></span>,
-                dataCommand<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>sample_fullDialog<span class="pl-pds">'</span></span>,
-                dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>dialog<span class="pl-pds">'</span></span>,
-                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
-                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="ico_dialog"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
-            },
-            <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>
+                <span class="pl-c"><span class="pl-c">//</span> HTML to be append to button</span>
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="icon-map-pin"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+            }
         ]
     ]
-});</pre></div></li>
-<li>To add a module as the suneditor's default button, refer suneditor.js: _createToolBar (function), _defaultButtonsList (object) </li>
-</ul>
-            </pre>
-                    </div>
-    </article>
+});
+</pre></div>
 
-    <p></p>
-    <textarea id="exampleButtonList" style="width:100%; height:200px;">Create button list</textarea>
+        <textarea id="ex_submenu" style="width: 1080px; height: 150px;"></textarea>
+
+    </article>
 
     <footer>
         <p>Suneditor create by JiHong.Lee</p>
@@ -216,49 +173,6 @@ with the <span class="pl-k">SUNEDITOR.editor</span> Object using the <span class
     </footer>
 </div>
 
-<script>
-    SUNEDITOR.create('exampleButtonList', {
-        buttonList: [
-            [
-                'undo',
-                'redo'
-            ],
-            [
-                'font',
-                'fontColor'
-            ],
-            [
-                'line'
-            ],
-            [
-                {
-                    buttonClass:'',
-                    title:'Submenu',
-                    dataCommand:'sample_submenu',
-                    dataDisplay:'submenu',
-                    displayOption:'',
-                    innerHTML:'<div class="ico_submenu"></div>'
-                },
-                {
-                    buttonClass:'',
-                    title:'Dialog',
-                    dataCommand:'sample_dialog',
-                    dataDisplay:'dialog',
-                    displayOption:'',
-                    innerHTML:'<div class="ico_dialog"></div>'
-                },
-                {
-                    buttonClass:'',
-                    title:'FullDialog',
-                    dataCommand:'sample_fullDialog',
-                    dataDisplay:'dialog',
-                    displayOption:'full',
-                    innerHTML:'<div class="ico_dialog"></div>'
-                },
-                'image'
-            ]
-        ]
-    });
-</script>
+<script src="../build/suneditor.customize.js"></script>
 </body>
 </html>
