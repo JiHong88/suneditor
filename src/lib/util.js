@@ -77,7 +77,7 @@ const util = {
     /**
      * @description Converts content into a format that can be placed in an editor
      * @param content - content
-     * @returns {string}
+     * @returns {String}
      */
     convertContentForEditor: function (content) {
         let tag, baseHtml, innerHTML = '';
@@ -99,7 +99,8 @@ const util = {
 
     /**
      * @description It is judged whether it is the edit region top div element.
-     * @returns {boolean}
+     * @param {Element} element - The element to check
+     * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
         if (element && element.nodeType === 1 && this.hasClass(element, 'sun-editor-id-wysiwyg')) return true;
@@ -107,8 +108,9 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element.
-     * @returns {boolean}
+     * @description It is judged whether it is the format element. (P, DIV, H1-6, Table...)
+     * @param {Element} element - The element to check
+     * @returns {Boolean}
      */
     isFormatElement: function (element) {
         if (element && element.nodeType === 1 && /^(?:P|DIV|H\\d)$/i.test(element.tagName)) return true;
@@ -116,8 +118,8 @@ const util = {
     },
 
     /**
-     * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...Tag whose parent is the "BODY")
-     * @param {element|null} element - Reference element if null or no value, it is relative to the current focus node.
+     * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...)
+     * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */
     getFormatElement: function (element) {
@@ -137,7 +139,7 @@ const util = {
     /**
      * @description Get the index of the argument value in the element array
      * @param {array} array - element array
-     * @param {element} element - Element to find index
+     * @param {Element} element - Element to find index
      * @returns {Number}
      */
     getArrayIndex: function (array, element) {
@@ -155,7 +157,7 @@ const util = {
     /**
      * @description Get the next index of the argument value in the element array
      * @param {array} array - element array
-     * @param {element} item - Element to find index
+     * @param {Element} item - Element to find index
      * @returns {Number}
      */
     nextIdx: function (array, item) {
@@ -167,7 +169,7 @@ const util = {
     /**
      * @description Get the previous index of the argument value in the element array
      * @param {array} array - element array
-     * @param {element} item - Element to find index
+     * @param {Element} item - Element to find index
      * @returns {Number}
      */
     prevIdx: function (array, item) {
@@ -178,7 +180,7 @@ const util = {
 
     /**
      * @description Gets whether the cell is a table
-     * @param {element} node - Nodes to scan
+     * @param {Element} node - Nodes to scan
      * @returns {Boolean}
      */
     isCell: function (node) {
@@ -187,7 +189,7 @@ const util = {
 
     /**
      * @description Get all child nodes of the argument value element (Without text node)
-     * @param {element} element - element to get child node
+     * @param {Element} element - element to get child node
      * @param {(function|null)} validation - Conditional function
      * @returns {Array}
      */
@@ -210,7 +212,7 @@ const util = {
 
     /**
      * @description Get all child nodes of the argument value element (Include text nodes)
-     * @param {element} element - element to get child node
+     * @param {Element} element - element to get child node
      * @param {(function|null)} validation - Conditional function
      * @returns {Array}
      */
@@ -236,7 +238,7 @@ const util = {
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
      * @param {Node} element - Reference element
-     * @param {string} query - Query String (tagName, .className, #ID, :name)
+     * @param {String} query - Query String (tagName, .className, #ID, :name)
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
@@ -271,7 +273,7 @@ const util = {
 
     /**
      * @description Set the text content value of the argument value element
-     * @param {element} element - Element to replace text content
+     * @param {Element} element - Element to replace text content
      * @param {String} txt - Text to be applied
      */
     changeTxt: function (element, txt) {
@@ -281,8 +283,9 @@ const util = {
 
     /**
      * @description Determine whether any of the matched elements are assigned the given class
-     * @param {element} element - Elements to search class name
-     * @param {string} className - Class name to search for
+     * @param {Element} element - Elements to search class name
+     * @param {String} className - Class name to search for
+     * @returns {Boolean}
      */
     hasClass: function (element, className) {
         if (!element) return;
@@ -292,8 +295,8 @@ const util = {
 
     /**
      * @description Append the className value of the argument value element
-     * @param {element} element - Elements to add class name
-     * @param {string} className - Class name to be add
+     * @param {Element} element - Elements to add class name
+     * @param {String} className - Class name to be add
      */
     addClass: function (element, className) {
         if (!element) return;
@@ -306,8 +309,8 @@ const util = {
 
     /**
      * @description Delete the className value of the argument value element
-     * @param {element} element - Elements to remove class name
-     * @param {string} className - Class name to be remove
+     * @param {Element} element - Elements to remove class name
+     * @param {String} className - Class name to be remove
      */
     removeClass: function (element, className) {
         if (!element) return;
@@ -318,8 +321,8 @@ const util = {
 
     /**
      * @description Argument value If there is no class name, insert it and delete the class name if it exists
-     * @param {element} element - Elements to replace class name
-     * @param {string} className - Class name to be change
+     * @param {Element} element - Elements to replace class name
+     * @param {String} className - Class name to be change
      */
     toggleClass: function (element, className) {
         if (!element) return;
@@ -335,7 +338,7 @@ const util = {
 
     /**
      * @description Delete argumenu value element
-     * @param {element} item - Element to be remove
+     * @param {Element} item - Element to be remove
      */
     removeItem: function (item) {
         try {
