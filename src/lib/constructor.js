@@ -9,7 +9,7 @@
  * @private
  */
 const _Constructor = {
-    init: function (element, options, lang, _plugins) {
+    init: function (element, options, lang, _plugins, convertContentForEditor) {
         if (typeof options !== 'object') options = {};
     
         /** user options */
@@ -65,7 +65,7 @@ const _Constructor = {
         wysiwyg_div.setAttribute('scrolling', 'auto');
         wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
-        wysiwyg_div.innerHTML = this._convertContentForEditor(element.value);
+        wysiwyg_div.innerHTML = convertContentForEditor(element.value);
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
@@ -116,30 +116,6 @@ const _Constructor = {
             options: options,
             plugins: tool_bar.plugins
         };
-    },
-
-    /**
-     * @description Converts content into a format that can be placed in an editor
-     * @param content - content
-     * @returns {string}
-     * @private
-     */
-    _convertContentForEditor: function (content) {
-        let tag, baseHtml, innerHTML = '';
-        tag = document.createRange().createContextualFragment(content.trim()).childNodes;
-
-        for (let i = 0, len = tag.length; i < len; i++) {
-            baseHtml = tag[i].outerHTML || tag[i].textContent;
-            if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
-                innerHTML += '<P>' + baseHtml + '</p>';
-            } else {
-                innerHTML += baseHtml;
-            }
-        }
-
-        if (innerHTML.length === 0) innerHTML = '<p>&#65279</p>';
-
-        return innerHTML;
     },
 
     /**
@@ -327,9 +303,6 @@ const _Constructor = {
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
-        const tool_cover = doc.createElement('DIV');
-        tool_cover.className = 'sun-editor-id-toolbar-cover';
-
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang, popupDisplay);
         const plugins = {};
@@ -385,6 +358,10 @@ const _Constructor = {
                 tool_bar.appendChild(enterDiv);
             }
         }
+
+        const tool_cover = doc.createElement('DIV');
+        tool_cover.className = 'sun-editor-id-toolbar-cover';
+        tool_bar.appendChild(tool_cover);
 
         return {
             'element': tool_bar,

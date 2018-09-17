@@ -75,6 +75,29 @@ const util = {
     },
 
     /**
+     * @description Converts content into a format that can be placed in an editor
+     * @param content - content
+     * @returns {string}
+     */
+    convertContentForEditor: function (content) {
+        let tag, baseHtml, innerHTML = '';
+        tag = document.createRange().createContextualFragment(content.trim()).childNodes;
+
+        for (let i = 0, len = tag.length; i < len; i++) {
+            baseHtml = tag[i].outerHTML || tag[i].textContent;
+            if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
+                innerHTML += '<P>' + baseHtml + '</p>';
+            } else {
+                innerHTML += baseHtml;
+            }
+        }
+
+        if (innerHTML.length === 0) innerHTML = '<p>&#65279</p>';
+
+        return innerHTML;
+    },
+
+    /**
      * @description It is judged whether it is the edit region top div element.
      * @returns {boolean}
      */

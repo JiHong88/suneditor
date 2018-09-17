@@ -1590,7 +1590,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {string} content - Content to Input
          */
         setContent: function (content) {
-            const innerHTML = _convertContentForEditor(content);
+            const innerHTML = util.convertContentForEditor(content);
 
             if (editor._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML = innerHTML;

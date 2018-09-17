@@ -9,27 +9,6 @@ import lang_en from './lang/en'
 import lang_ko from './lang/ko'
 
 
-const SUNEDITOR = editor.init({
-    modules: [
-        dialog
-    ],
-    plugins: [
-        font,
-        fontSize,
-        formatBlock,
-        fontColor,
-        hiliteColor,
-        align,
-        horizontalRule,
-        list,
-        table,
-        link,
-        image,
-        video
-    ]
-});
-
-
 export const en = lang_en
 export const ko = lang_ko
 
@@ -59,4 +38,22 @@ export const css = {
     suneditor_contents: suneditor_contents_css
 }
 
-export default SUNEDITOR
+export default editor.init({
+    modules: [
+        dialog
+    ],
+    plugins: [
+        font,
+        fontSize,
+        formatBlock,
+        fontColor,
+        hiliteColor,
+        align,
+        horizontalRule,
+        list,
+        table,
+        link,
+        image,
+        video
+    ]
+});
