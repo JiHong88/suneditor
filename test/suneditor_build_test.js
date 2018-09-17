@@ -1,5 +1,4 @@
-import '../src/assets/css/suneditor.css'
-import '../src/assets/css/suneditor-contents.css'
+import {css} from '../src/index'
 
 import suneditor from '../src/suneditor'
 import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../src/plugins/plugins_init'
