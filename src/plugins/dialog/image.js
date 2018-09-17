@@ -116,7 +116,7 @@ export default {
             '           <div class="form-group">' +
             '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
             '           </div>' +
-            '           <label><input type="checkbox" class="sun-editor-id-linkCheck" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '           <input type="checkbox" id="suneditor_image_check_newLink" class="sun-editor-id-linkCheck"/><label for="suneditor_image_check_newLink">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
@@ -257,7 +257,7 @@ export default {
             imgTag.setAttribute('data-image-link', imgLinkValue);
             imgTag.style.padding = '1px';
             imgTag.style.margin = '1px';
-            imgTag.style.outline = '1px solid #f4b124';
+            imgTag.style.outline = '1px solid #8baab7';
 
             link.appendChild(imgTag);
             return link;
@@ -352,6 +352,7 @@ export default {
         // caption
         if (this.context.image._captionChecked) {
             this.context.image._imageCaption = this.plugins.image.create_caption.call(this);
+            this.context.image._imageCaption.setAttribute('contenteditable', false);
             cover.appendChild(this.context.image._imageCaption);
         }
 
@@ -422,12 +423,12 @@ export default {
         if (linkValue.trim().length > 0) {
             if (contextImage._linkElement !== null) {
                 contextImage._linkElement.href = linkValue;
-                contextImage._linkElement.target = this.context.image.imgLinkNewWindowCheck.checked;
+                contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
                 let newEl = this.plugins.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                cover.innerHTML = '';
-                cover.appendChild(newEl);
+                cover.removeChild(contextImage._element);
+                cover.insertBefore(newEl, contextImage._imageCaption);
             }
         }
         else if (contextImage._linkElement !== null) {
@@ -439,8 +440,8 @@ export default {
             imageElement.style.outline = '';
 
             let newEl = imageElement.cloneNode(true);
-            cover.innerHTML = '';
-            cover.appendChild(newEl);
+            cover.removeChild(imageElement);
+            cover.insertBefore(newEl, contextImage._imageCaption);
         }
 
         if (isNewContainer) {
@@ -468,7 +469,7 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = contextImage._resize_element = element;
-        contextImage._imageCaption = element.nextSibling;
+        contextImage._imageCaption = contextImage._linkElement ? contextImage._linkElement.nextSibling : element.nextSibling;
 
         contextImage._element_w = size.w;
         contextImage._element_h = size.h;
@@ -492,7 +493,7 @@ export default {
         contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage.altText.value = contextImage._element.alt;
         contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
-        contextImage.imgLinkNewWindowCheck.checked = !contextImage._linkElement || contextImage._linkElement.target === '_blank';
+        contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('#suneditor_image_radio_' + (contextImage._element.getAttribute('data-align') || 'none')).checked = true;
         contextImage._captionChecked = contextImage.caption.checked = !!contextImage._imageCaption;
         contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';

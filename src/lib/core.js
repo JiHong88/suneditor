@@ -119,9 +119,10 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
         callModule: function (pluginName, callBackFunction) {
-            if (!this.plugins[pluginName]) {
+            if (!plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
-            } else {
+            } else if (!this.plugins[pluginName]){
+                this.plugins[pluginName] = util.copyObj(plugins[pluginName]);
                 this.plugins[pluginName].add(this, this.plugins[pluginName].buttonElement);
             }
                 
@@ -1539,17 +1540,6 @@ const core = function (context, util, modules, plugins, lang) {
             plugin.add(editor);
             editor.plugins[plugin.name] = util.copyObj(plugin);
         }
-    }
-
-    /** plugins */
-    if (plugins) {
-        let pluginsValues = Object.values(plugins);
-        for (let i = 0, len = pluginsValues.length, plugin; i < len; i++) {
-            plugin = pluginsValues[i];
-            editor.plugins[plugin.name] = util.copyObj(plugin);
-        }
-
-        pluginsValues = null;
     }
 
     /** User function */
