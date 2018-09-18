@@ -3,6 +3,14 @@ Pure JavaScript based WYSIWYG web editor
 
 **Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
 
+[![NPM](https://nodei.co/npm/suneditor.png)](https://nodei.co/npm/suneditor/)
+
+![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
+![GitHub release](https://img.shields.io/github/release/qubyte/rubidium.svg)
+![Npm](https://img.shields.io/npm/v/npm.svg)
+![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)
+![Github All Releases](https://img.shields.io/github/downloads/atom/atom/total.svg)
+
 ```properties
 The Suneditor is based on pure JavaScript
 Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications
