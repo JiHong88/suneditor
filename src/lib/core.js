@@ -493,10 +493,11 @@ const core = function (context, util, modules, plugins, lang) {
 
                 /** No node selected */
                 if (startOff === endOff) {
-                    newNode.innerHTML = '&nbsp;';
+                    newNode.innerHTML = '&#65279';
                     if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
                     } else {
+                        startCon.splitText(startOff);
                         startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
                     }
                 }
@@ -527,7 +528,7 @@ const core = function (context, util, modules, plugins, lang) {
                 }
 
                 start.container = newNode;
-                start.offset = 0;
+                start.offset = 1;
                 end.container = newNode;
                 end.offset = 1;
             }
@@ -551,7 +552,7 @@ const core = function (context, util, modules, plugins, lang) {
                 };
 
                 /** one line */
-                if (!util.isFormatElement(commonCon)) {
+                if (!util.hasClass(commonCon, 'sun-editor-id-wysiwyg')) {
                     newNode = appendNode.cloneNode(false);
                     const newRange = this._wrapLineNodesPart(commonCon, newNode, checkCss, startCon, startOff, endCon, endOff);
 
