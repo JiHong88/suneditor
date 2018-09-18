@@ -1647,23 +1647,11 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Destroy the suneditor
          */
         destroy: function () {
-            /** remove event listeners */
-            context.tool.bar.removeEventListener('click', event.onClick_toolbar);
-            context.tool.bar.removeEventListener('mousedown', event.onMouseDown_toolbar);
-            context.element.wysiwyg.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
-            context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
-            context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
-            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
-            context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
-            context.element.resizebar.removeEventListener('mousedown', event.onMouseDown_resizeBar);
+            /** remove window event listeners */
             window.removeEventListener('resize', event.resize_window);
             
             /** remove element */
             context.element.topArea.parentNode.removeChild(context.element.topArea);
-
-            context = null;
-            dom = null;
-            util = null;
 
             this.save = null;
             this.getContext = null;

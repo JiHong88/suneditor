@@ -155,7 +155,7 @@ const sampleEditor = suneditor.init({
         ['font', 'fontSize', 'formatBlock'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
-        '/',
+        '/', // line break
         ['fontColor', 'hiliteColor'],
         ['indent', 'outdent'],
         ['align', 'horizontalRule', 'list', 'table'],
