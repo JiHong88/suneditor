@@ -189,6 +189,8 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Focus to wysiwyg area
          */
         focus: function () {
+            if (context.element.wysiwyg.style.display === 'none') return;
+            
             const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
             if (caption) {
                 caption.focus();
