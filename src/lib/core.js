@@ -1456,6 +1456,7 @@ const core = function (context, util, modules, plugins, lang) {
 
                 editor._variable.selectionNode.appendChild(oFormatTag);
                 editor._variable.selectionNode = oFormatTag;
+                editor.setRange(oFormatTag, 0, oFormatTag, 0);
             }
 
             if (event._directionKeyKeyCode.test(e.keyCode)) {
