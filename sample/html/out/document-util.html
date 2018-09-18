@@ -62,7 +62,8 @@
             <h4 class="name" id="getIncludePath"><span class="type-signature"></span>getIncludePath<span class="signature">(name, extension)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
-                Get the the tag path of the arguments value
+                Get the the tag path of the arguments value<br>
+                If not found, return the first found value
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -75,11 +76,11 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>fileType</code></td>
+                    <td class="name"><code>nameArray</code></td>
                     <td class="type">
-                        <span class="param-type">String</span>
+                        <span class="param-type">Array</span>
                     </td>
-                    <td class="description last">File name</td>
+                    <td class="description last">File name array</td>
                 </tr>
                 <tr>
                     <td class="name"><code>extension</code></td>

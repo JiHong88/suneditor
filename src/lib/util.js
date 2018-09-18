@@ -48,16 +48,22 @@ const util = {
 
     /**
      * @description Get the the tag path of the arguments value
-     * @param {String} name - File name
+     * If not found, return the first found value
+     * @param {Array} nameArray - File name array
      * @param {String} extension - js, css
      * @returns {String}
      */
-    getIncludePath: function (name, extension) {
+    getIncludePath: function (nameArray, extension) {
         let path = '';
         const tagName = extension === 'js' ? 'script' : 'link';
         const src = extension === 'js' ? 'src' : 'href';
+        
+        let fileName = '(?:'
+        for (let i = 0, len = nameArray.length; i < len; i++) {
+            fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
+        }
 
-        const regExp = new RegExp('(^|.*[\\\\\/])' + name + '(\\..+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const regExp = new RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
             
         for (let c = document.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
             let editorTag = c[i][src].match(regExp);
@@ -66,6 +72,8 @@ const util = {
                 break;
             }
         }
+
+        if (path === '') path = document.getElementsByTagName(tagName)[0][src];
 
         -1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 

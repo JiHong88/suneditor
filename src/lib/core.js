@@ -190,7 +190,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         focus: function () {
             if (context.element.wysiwyg.style.display === 'none') return;
-            
+
             const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
             if (caption) {
                 caption.focus();
@@ -1108,7 +1108,7 @@ const core = function (context, util, modules, plugins, lang) {
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                 '<title>' + (isPrint ? lang.toolbar.print : lang.toolbar.preview) + '</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath('suneditor', 'css') + '">' +
+                '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath(['suneditor-contents', 'suneditor'], 'css') + '">' +
                 '</head>' +
                 '<body class="sun-editor-editable">' + context.element.wysiwyg.innerHTML + '</body>' +
                 '</body>' + (isPrint ? '<script>window.print();</script>' : '') + '</html>');
