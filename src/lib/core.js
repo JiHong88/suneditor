@@ -31,6 +31,11 @@ const core = function (context, util, modules, plugins, lang) {
         plugins: {},
 
         /**
+         * @description Whether the plugin is initialized
+         */
+        initPlugins: {},
+
+        /**
          * @description util function
          */
         util: util,
@@ -96,7 +101,6 @@ const core = function (context, util, modules, plugins, lang) {
          * @property {Element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
          * @property {Number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
          * @property {Array} currentNodes -  An array of the current cursor's node structure
-         * @property {Boolean} isTouchMove - Check if mobile has moved after touching (Allowing scrolling in the toolbar area)
          * @private
          */
         _variable: {
@@ -109,8 +113,7 @@ const core = function (context, util, modules, plugins, lang) {
             tabSize: 4,
             originCssText: context.element.topArea.style.cssText,
             editorHeight: context.user.height,
-            currentNodes: [],
-            isTouchMove: false
+            currentNodes: []
         },
 
         /**
@@ -119,11 +122,11 @@ const core = function (context, util, modules, plugins, lang) {
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
         callModule: function (pluginName, callBackFunction) {
-            if (!plugins[pluginName]) {
+            if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
-            } else if (!this.plugins[pluginName]){
-                this.plugins[pluginName] = util.copyObj(plugins[pluginName]);
+            } else if (!this.initPlugins[pluginName]){
                 this.plugins[pluginName].add(this, this.plugins[pluginName].buttonElement);
+                this.initPlugins[pluginName] = true;
             }
                 
             callBackFunction();
@@ -1243,21 +1246,13 @@ const core = function (context, util, modules, plugins, lang) {
             }
         },
 
-        touchstart_toolbar: function (e) {
-            e.preventDefault();
-            editor._variable.isTouchMove = false;
-        },
-
-        touchmove_toolbar: function () {
-            editor._variable.isTouchMove = true;
-        },
-
         onMouseDown_toolbar: function (e) {
             e.preventDefault();
         },
 
         onClick_toolbar: function (e) {
-            if (editor._variable.isTouchMove) return true;
+            e.preventDefault();
+            e.stopPropagation();
 
             let target = e.target;
             let display = target.getAttribute('data-display');
@@ -1271,20 +1266,16 @@ const core = function (context, util, modules, plugins, lang) {
                 className = target.className;
             }
 
-            if (!command && !display) return true;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            editor.submenuOff();
-            editor.focus();
-
+            if (!command && !display) return;
+            
             /** Dialog, Submenu */
             if (display) {
-                if (/submenu/.test(display) && (target.nextElementSibling === null || target.nextElementSibling !== editor.submenu)) {
+                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== editor.submenuActiveButton)) {
+                    editor.submenuOff();
                     editor.callModule(command, function () {
                         editor.submenuOn(target);
                     });
+                    return;
                 }
                 else if (/dialog/.test(display)) {
                     editor.callModule(command, function () {
@@ -1292,11 +1283,16 @@ const core = function (context, util, modules, plugins, lang) {
                     });
                 }
 
+                editor.submenuOff();
                 return;
             }
 
+            editor.submenuOff();
+
             /** default command */
             if (command) {
+                editor.focus();
+
                 switch (command) {
                     case 'codeView':
                         editor.toggleCodeView();
@@ -1516,9 +1512,6 @@ const core = function (context, util, modules, plugins, lang) {
 
     /** add event listeners */
     /** tool bar event */
-    context.tool.bar.addEventListener('touchstart', event.touchstart_toolbar, false);
-    context.tool.bar.addEventListener('touchmove', event.touchmove_toolbar, false);
-    context.tool.bar.addEventListener('touchend', event.onClick_toolbar, false);
     context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
     context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     /** editor area */
@@ -1540,6 +1533,16 @@ const core = function (context, util, modules, plugins, lang) {
             plugin.add(editor);
             editor.plugins[plugin.name] = util.copyObj(plugin);
         }
+    }
+
+    /** plugins */
+    if (plugins) {
+        let pluginsValues = Object.values(plugins);
+        for (let i = 0, len = pluginsValues.length, plugin; i < len; i++) {
+            plugin = pluginsValues[i];
+            editor.plugins[plugin.name] = util.copyObj(plugin);
+        }
+         pluginsValues = null;
     }
 
     /** User function */
@@ -1645,11 +1648,8 @@ const core = function (context, util, modules, plugins, lang) {
          */
         destroy: function () {
             /** remove event listeners */
-            context.tool.bar.removeEventListener('touchstart', event.touchstart_toolbar);
-            context.tool.bar.removeEventListener('touchmove', event.touchmove_toolbar);
-            context.tool.bar.removeEventListener('touchend', event.onClick_toolbar);
-            context.tool.bar.removeEventListener('mousedown', event.onMouseDown_toolbar);
             context.tool.bar.removeEventListener('click', event.onClick_toolbar);
+            context.tool.bar.removeEventListener('mousedown', event.onMouseDown_toolbar);
             context.element.wysiwyg.removeEventListener('mouseup', event.onMouseUp_wysiwyg);
             context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
