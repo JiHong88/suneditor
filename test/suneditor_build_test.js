@@ -1,27 +1,26 @@
-import {css} from '../src/index'
+import '../src/assets/css/suneditor.css'
+import '../src/assets/css/suneditor-contents.css'
 
 import suneditor from '../src/suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../src/plugins/plugins_init'
-import {dialog} from '../src/plugins/modules_init'
-import lang_ko from '../src/lang/ko'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../src/plugins'
+import plugins from '../src/plugins'
+import {ko} from '../src/lang'
 
 import custom_plugin_submenu from './custom_plugin_submenu'
 
 
 suneditor.create(document.getElementById('editor'), {
-    modules: [
-        dialog
-    ],
+    plugins: plugins,
     buttonList: [
         ['undo', 'redo'],
-        [font, fontSize, formatBlock],
+        ['font', 'fontSize', 'formatBlock'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
         '/',
-        [fontColor, hiliteColor],
+        // [fontColor, hiliteColor],
         ['indent', 'outdent'],
-        [align, horizontalRule, list, table],
-        [link, image, video],
+        // [align, horizontalRule, list, table],
+        // [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
     ]
@@ -52,7 +51,7 @@ const editor = suneditor.init({
 editor.create(document.getElementById('editor2'));
 editor.create(document.getElementById('editor3'), {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table',
+        ['align', 'horizontalRule', 'list', 'table', link,
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
@@ -71,5 +70,5 @@ editor.create(document.getElementById('editor3'), {
                 innerHTML:'<div class="icon-map-pin"></div>'
             }]
     ],
-    lang: lang_ko
+    lang: ko
 });

@@ -307,8 +307,9 @@ const _Constructor = {
         const defaultButtonList = this._defaultButtons(lang, popupDisplay);
         const plugins = {};
         if (_plugins) {
-            for (let i = 0, len = _plugins.length; i < len; i++) {
-                plugins[_plugins[i].name] = _plugins[i];
+            const pluginsValues = _plugins.length ? _plugins : Object.values(_plugins);
+            for (let i = 0, len = pluginsValues.length; i < len; i++) {
+                plugins[pluginsValues[i].name] = pluginsValues[i];
             }
         }
 

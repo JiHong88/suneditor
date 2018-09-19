@@ -13,3 +13,4 @@ import image from './dialog/image'
 import video from './dialog/video'
 
 export {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video}
+export default {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video}

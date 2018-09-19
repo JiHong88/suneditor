@@ -6,10 +6,13 @@
  * MIT license.
  */
 'use strict';
+import dialog from '../modules/dialog'
 
 export default {
     name: 'video',
     add: function (_this) {
+        _this._addModule(dialog);
+
         const context = _this.context;
         context.video = {
             _coverElement: null,

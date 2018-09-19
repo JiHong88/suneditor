@@ -117,11 +117,12 @@ const core = function (context, util, modules, plugins, lang) {
         },
 
         /**
-         * @description Call the module
+         * @description If the plugin is not added, add the plugin and call the 'add' function.
+         * If the plugin is added call callBack function.
          * @param {String} pluginName - The name of the plugin to call
          * @param {function} callBackFunction - Function to be executed immediately after module call
          */
-        callModule: function (pluginName, callBackFunction) {
+        callPlugin: function (pluginName, callBackFunction) {
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
@@ -130,6 +131,18 @@ const core = function (context, util, modules, plugins, lang) {
             }
                 
             callBackFunction();
+        },
+
+        /**
+         * @description If the module is not added, add the module and call the 'add' function
+         * @param {Object} moduleObj - module object (dialog)
+         */
+        _addModule: function (moduleObj) {
+            const moduleName = moduleObj.name;
+            if (!this.plugins[moduleName]) {
+                this.plugins[moduleName] = this.util.copyObj(moduleObj);
+                this.plugins[moduleName].add(this);
+            }
         },
 
         /**
@@ -1085,7 +1098,7 @@ const core = function (context, util, modules, plugins, lang) {
                 /** A */
                 if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
                     if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
-                        editor.callModule('link', function () {
+                        editor.callPlugin('link', function () {
                             editor.plugins.link.call_controller_linkButton.call(editor, selectionParent);
                         });
                     }
@@ -1191,13 +1204,13 @@ const core = function (context, util, modules, plugins, lang) {
             if (display) {
                 if (/submenu/.test(display) && (target.nextElementSibling === null || target !== editor.submenuActiveButton)) {
                     editor.submenuOff();
-                    editor.callModule(command, function () {
+                    editor.callPlugin(command, function () {
                         editor.submenuOn(target);
                     });
                     return;
                 }
                 else if (/dialog/.test(display)) {
-                    editor.callModule(command, function () {
+                    editor.callPlugin(command, function () {
                         editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
                     });
                 }
@@ -1275,7 +1288,7 @@ const core = function (context, util, modules, plugins, lang) {
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
-                editor.callModule('image', function () {
+                editor.callPlugin('image', function () {
                     const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
@@ -1396,7 +1409,7 @@ const core = function (context, util, modules, plugins, lang) {
             if (editor.plugins.image) {
                 editor.focus();
 
-                editor.callModule('image', function () {
+                editor.callPlugin('image', function () {
                     context.image.imgInputFile.files = files;
                     editor.plugins.image.onRender_imgInput.call(editor);
                     context.image.imgInputFile.files = null;
@@ -1445,17 +1458,7 @@ const core = function (context, util, modules, plugins, lang) {
     /** window resize event */
     window.addEventListener('resize', event.resize_window, false);
 
-    /** add plugin and module to plugins object */
-    /** modules */
-    if (modules) {
-        for (let i = 0, len = modules.length, plugin; i < len; i++) {
-            plugin = modules[i];
-            plugin.add(editor);
-            editor.plugins[plugin.name] = util.copyObj(plugin);
-        }
-    }
-
-    /** plugins */
+    /** add plugin to plugins object */
     if (plugins) {
         let pluginsValues = Object.values(plugins);
         for (let i = 0, len = pluginsValues.length, plugin; i < len; i++) {

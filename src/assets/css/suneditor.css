@@ -1,5 +1,3 @@
-@charset "UTF-8";
-
 /* suneditor main */
 .sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor * {box-sizing:border-box; font-family:Helvetica Neue, sans-serif; user-select: none; -webkit-user-drag:none;}
