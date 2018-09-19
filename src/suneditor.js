@@ -75,6 +75,6 @@ export default {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return this.core(this._Context(element, cons.constructed, cons.options), this.util, options.modules, cons.plugins, cons.options.lang);
+        return this.core(this._Context(element, cons.constructed, cons.options), this.util, cons.plugins, cons.options.lang);
     }
 };

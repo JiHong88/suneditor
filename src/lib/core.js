@@ -4,12 +4,11 @@
  * @description SunEditor core closure
  * @param context
  * @param util
- * @param modules
  * @param plugins
  * @param lang
  * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
-const core = function (context, util, modules, plugins, lang) {
+const core = function (context, util, plugins, lang) {
     /**
      * @description Practical editor function
      * This function is 'this' used by other plugins
@@ -19,11 +18,6 @@ const core = function (context, util, modules, plugins, lang) {
          * @description Elements and user options parameters of the suneditor
          */
         context: context,
-
-        /**
-         * @description loaded modules
-         */
-        modules: {},
 
         /**
          * @description loaded plugins
@@ -1555,8 +1549,7 @@ const core = function (context, util, modules, plugins, lang) {
          */
         show: function () {
             const topAreaStyle = context.element.topArea.style;
-            topAreaStyle.cssText = editor._variable.originCssText;
-            if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
+            if (topAreaStyle.display === 'none') topAreaStyle.display = context.user.display;
         },
 
         /**

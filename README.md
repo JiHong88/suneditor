@@ -91,7 +91,7 @@ suneditor.create('sample', {
 });
 ```
 
-### 2. Load plugins
+### 2. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
@@ -131,7 +131,7 @@ import suneditor from 'suneditor'
 import plugins from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
-    modules: plugins,
+    plugins: plugins,
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -144,6 +144,20 @@ suneditor.create('sample', {
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
+    ]
+})
+
+// You can also load what you want
+suneditor.create('sample', {
+    plugins: [
+        plugins.font
+        plugins.fontSize,
+        plugins.formatBlock
+    ],
+    buttonList: [
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['removeFormat']
     ]
 })
 ```

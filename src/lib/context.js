@@ -45,7 +45,8 @@ const _Context = function (element, cons, options) {
             font: options.font,
             fontSize: options.fontSize,
             height: options.height.match(/\d+/)[0],
-            showPathLabel: options.showPathLabel
+            showPathLabel: options.showPathLabel,
+            display: options.display
         },
         dialog: {},
         submenu: {}
