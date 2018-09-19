@@ -11,7 +11,7 @@ export default {
     name: 'horizontalRule',
     add: function (_this, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu(_this.lang));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulePick.bind(_this));
@@ -23,7 +23,7 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
+    setSubmenu: function (lang) {
         const listDiv = document.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_line';
@@ -32,17 +32,17 @@ export default {
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="solid">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="solid" title="' + lang.toolbar.hr_solid + '">' +
             '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dotted">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dotted" title="' + lang.toolbar.hr_dotted + '">' +
             '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dashed">' +
+            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dashed" title="' + lang.toolbar.hr_dashed + '">' +
             '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
             '           </button>' +
             '       </li>' +

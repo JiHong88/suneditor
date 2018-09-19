@@ -7,6 +7,20 @@
     margin: 0;
 }
 
+/* float */
+.sun-editor-editable .float-left {
+    float: left;
+}
+.sun-editor-editable .float-right {
+    float: right;
+}
+.sun-editor-editable .float-center {
+    float: center;
+}
+.sun-editor-editable .float-none {
+    float: none;
+}
+
 /* hr */
 .sun-editor-editable hr {
     border-width: 1px 0 0;
@@ -48,6 +62,9 @@
 }
 
 /* image */
+.sun-editor-editable .sun-editor-id-image-container {
+    text-align: center;
+}
 .sun-editor-editable .sun-editor-id-image-container figcaption {
     padding: 1em .5em;
     font-size: 13px;
@@ -57,6 +74,11 @@
     line-height: 2;
     margin: 0;
 }
+.sun-editor-editable .sun-editor-id-image-container a img {
+    padding: 1px;
+    margin: 1px;
+    outline: 1px solid #8baab7;
+}
 .sun-editor-editable .sun-editor-image-cover {
     outline: none;
     line-height: 0;
@@ -64,7 +86,6 @@
 .sun-editor-editable .sun-editor-image-cover > figcaption:not([contenteditable=false]) {
     background-color: #f3f3f3;
 }
-
 
 /** video iframe tags */
 .sun-editor-editable .sun-editor-iframe-cover {

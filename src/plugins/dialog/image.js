@@ -30,7 +30,8 @@ export default {
             _align: 'none',
             _captionChecked: false,
             _proportionChecked: true,
-            _onCaption: false
+            _onCaption: false,
+            _floatClassRegExp: 'float\\-[a-z]+'
         };
 
         /** image dialog */
@@ -70,7 +71,7 @@ export default {
 
         let html = '' +
             '<div class="modal-header">' +
-            '   <button type="button" data-command="close" class="close" aria-label="Close">' +
+            '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
             '       <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
             '   </button>' +
             '   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
@@ -129,7 +130,7 @@ export default {
             '           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.center + '</label>' +
             '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 
@@ -168,7 +169,7 @@ export default {
 
         // focus
         if (tabName === 'image') {
-            this.context.image.imgUrlFile.focus();
+            this.context.image.imgInputFile.focus();
         } else if (tabName === 'url') {
             this.context.image.imgLink.focus();
         }
@@ -258,9 +259,6 @@ export default {
             link.addEventListener('click', function (e) { e.preventDefault(); });
 
             imgTag.setAttribute('data-image-link', imgLinkValue);
-            imgTag.style.padding = '1px';
-            imgTag.style.margin = '1px';
-            imgTag.style.outline = '1px solid #8baab7';
 
             link.appendChild(imgTag);
             return link;
@@ -329,7 +327,6 @@ export default {
         const container = document.createElement('DIV');
         container.className = 'sun-editor-id-image-container';
         container.setAttribute('contenteditable', false);
-        container.style.textAlign = 'center';
         container.appendChild(cover);
 
         return container;
@@ -362,7 +359,8 @@ export default {
         // align
         if ('center' !== align) {
             container.style.display = 'inline-block';
-            container.style.float = align;
+            this.util.removeClass(container, this.context.image._floatClassRegExp);
+            this.util.addClass(container, 'float-' + align);
         }
 
         this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
@@ -414,10 +412,12 @@ export default {
         // align
         if ('center' !== contextImage._align) {
             container.style.display = 'inline-block';
-            container.style.float = contextImage._align;
+            this.util.removeClass(container, this.context.image._floatClassRegExp);
+            this.util.addClass(container, 'float-' + contextImage._align);
         } else {
             container.style.display = '';
-            container.style.float = 'none';
+            this.util.removeClass(container, this.context.image._floatClassRegExp);
+            this.util.addClass(container, 'float-none');
         }
 
         contextImage._element.setAttribute('data-align', contextImage._align);
@@ -438,12 +438,8 @@ export default {
             const imageElement = contextImage._element;
 
             imageElement.setAttribute('data-image-link', '');
-            imageElement.style.padding = '';
-            imageElement.style.margin = '';
-            imageElement.style.outline = '';
-
             let newEl = imageElement.cloneNode(true);
-            cover.removeChild(imageElement);
+            cover.removeChild(contextImage._linkElement);
             cover.insertBefore(newEl, contextImage._imageCaption);
         }
 

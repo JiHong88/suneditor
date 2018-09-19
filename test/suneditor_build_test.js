@@ -17,10 +17,10 @@ suneditor.create(document.getElementById('editor'), {
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
         '/',
-        // [fontColor, hiliteColor],
+        ['fontColor', 'hiliteColor'],
         ['indent', 'outdent'],
-        // [align, horizontalRule, list, table],
-        // [link, image, video],
+        ['align', 'horizontalRule', 'list', 'table'],
+        ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
     ]

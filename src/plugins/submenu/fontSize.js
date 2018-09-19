@@ -34,7 +34,7 @@ export default {
             '   <ul class="list_editor font_size_list">';
         for (let i = 0, len = sizeList.length; i < len; i++) {
             const size = sizeList[i];
-            list += '<li><button type="button" class="btn_edit" data-value="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
+            list += '<li><button type="button" class="btn_edit" data-value="' + size + '" title="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
         }
         list += '   </ul>' +
             '</div>';

@@ -70,7 +70,7 @@ export default {
         dialog.innerHTML = '' +
             '<form class="editor_video">' +
             '   <div class="modal-header">' +
-            '       <button type="button" data-command="close" class="close" aria-label="Close">' +
+            '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
             '           <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.videoBox.title + '</h5>' +
@@ -88,7 +88,7 @@ export default {
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-video"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 

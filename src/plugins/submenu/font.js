@@ -45,7 +45,7 @@ export default {
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
             text = font.split(',')[0];
-            list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+            list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
         }
         list += '   </ul>';
         list += '</div>';
