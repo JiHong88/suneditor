@@ -56,7 +56,9 @@ Download source and run
 * ID : 'suneditor_sample'
 * ClassName : 'sun-eidtor'
 */
-const suneditor = SUNEDITOR.create('sample',{
+// ID or DOM object
+const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),{
+    // All of the plugins are loaded in the "window.SUNEDITOR" object in dist/suneditor.min.js file
     // insert options
 });
 ```
@@ -65,7 +67,7 @@ const suneditor = SUNEDITOR.create('sample',{
 ```text
 When you display a document created by suneditor
 
-You need to include "src/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
+You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
 
@@ -74,82 +76,115 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 
 ### Use import statement
 
-### 1. Basic objects that contain all the plugins
+### 1. Default options
 ```javascript
-import {css} from 'suneditor'
+import 'suneditor/dist/css/suneditor.min.css'
+// or
+// import 'suneditor/src/assets/css/suneditor.css'
+// import 'suneditor/src/assets/css/suneditor-contents.css'
+
 import suneditor from 'suneditor'
 
+// The default button list is created.
 suneditor.create('sample', {
     // insert options
 });
 ```
 
-### 2. Customize
-```text
-The link, image, video plugins require a dialog module.
-```
+### 2. Load plugins
 ```javascript
-import {css} from 'suneditor'
-import {suneditor, modules, plugins, ko, en} from 'suneditor'
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+import {en, ko} from 'suneditor/src/lang'
+import {align, font, fontSize, fontColor, hiliteColor,
+        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
-    modules: [
-        modules.dialog
-    ],
     plugins: [
-        plugins.link,
-        plugins.image,
-        plugins.video
+        align,
+        font,
+        fontSize,
+        fontColor,
+        hiliteColor,
+        horizontalRule,
+        list,
+        table,
+        formatBlock,
+        link,
+        image,
+        video
     ],
     buttonList: [
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['fontColor', 'hiliteColor'],
+        ['align', 'horizontalRule', 'list', 'table'],
         ['link', 'image', 'video']
     ],
-    lang: ko,
-    popupDisplay: 'full'
-})
+    lang: ko
+});
 ```
 
-### 3. Plugins can be used directly in the button list
+### 3. Load all plugins
 ```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+import plugins from 'suneditor/src/plugins'
+
 suneditor.create('sample', {
-    modules: [
-        modules.dialog
-    ],
+    modules: plugins,
     buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        [plugins.link, plugins.image, plugins.video]
+        ['removeFormat'],
+        '/', Line break
+        ['fontColor', 'hiliteColor'],
+        ['indent', 'outdent'],
+        ['align', 'horizontalRule', 'list', 'table'],
+        ['link', 'image', 'video'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
+    ]
+})
+```
+
+### 4. Plugins can be used directly in the button list
+```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+import {align, font, fontSize, fontColor, hiliteColor,
+        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+
+suneditor.create('sample', {
+    buttonList: [
+        ['undo', 'redo'],
+        [font, fontSize, formatBlock],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        '/', // Line break
+        [fontColor, hiliteColor],
+        ['indent', 'outdent'],
+        [align, horizontalRule, list, table],
+        [link, image, video],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
     ],
 })
 ```
 
-### 4. init function
+### 5. Use init function
 ```text
-If the options overlap, the options of the 'create' function take precedence.
+The init function can be used by predefining options and calling the create function on the returned object.
+The value of the option argument put in the "create" function call takes precedence
 ```
 ```javascript
-import {css} from 'suneditor'
-import {suneditor, modules, plugins} from 'suneditor'
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+import plugins from 'suneditor/src/plugins'
 
 // all plugins
-const sampleEditor = suneditor.init({
-    modules: [
-        modules.dialog
-    ],
-    plugins: [
-        plugins.font,
-        plugins.fontSize,
-        plugins.formatBlock,
-        plugins.fontColor,
-        plugins.hiliteColor,
-        plugins.align,
-        plugins.horizontalRule,
-        plugins.list,
-        plugins.table,
-        plugins.link,
-        plugins.image,
-        plugins.video
-    ],
+const initEditor = suneditor.init({
+    plugins: plugins,
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -165,9 +200,76 @@ const sampleEditor = suneditor.init({
     ]
 });
 
-sampleEditor.create('sample', {
-    // If the options overlap, the options of the 'create' function take precedence.
+initEditor.create('sample_1', {
+    // The value of the option argument put in the "create" function call takes precedence
 });
+initEditor.create('sample_2', {
+    // The value of the option argument put in the "create" function call takes precedence
+    buttonList: [
+        ['undo', 'redo'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        ['indent', 'outdent'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
+    ]
+});
+```
+
+### options
+```javascript
+// Plugins
+plugins: [
+    font,
+    fontSize,
+    formatBlock,
+    fontColor,
+    hiliteColor,
+    align,
+    horizontalRule,
+    list,
+    table,
+    link,
+    image,
+    video
+],
+// User Options
+fontSize        : Change default font-size List                     default : null
+font            : Change default font-family List                   default : null
+width           : The width size of the editor                      default : textarea.offsetHeight
+height          : The height size of the editor                     default : textarea.style.width||offsetWidth
+display         : The display property of suneditor                 default : 'block'
+videoX          : The default width size of the video frame         default : 560
+videoY          : The default heigth size of the video frame        default : 315
+showPathLabel   : Displays the current node structure to resizebar  default : true
+popupDisplay    : Size of background area when activating dialog window ('full' || '') default : ''
+
+lang            : language object default : English
+
+imageFileInput  : Choose whether to create a file input tag in the image upload window default : true
+imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true
+                  If the value of imageFileInput is false, it will be unconditionally true
+imageSize       : The default width size of the image frame  default : 350
+imageUploadUrl  : The image upload to server mapping address default : null
+                  ex) "/editor/uploadImage.ajax"
+                  When not used, it enters base64 data
+                  return type : JSONArray [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
+                                           {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
+
+buttonList      : Defines button list to array
+                default : [
+                    ['undo', 'redo'],
+                    // ['font', 'fontSize', 'formatBlock'],
+                    ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                    ['removeFormat'],
+                    // '/', Line break
+                    // ['fontColor', 'hiliteColor'],
+                    ['indent', 'outdent'],
+                    // ['align', 'horizontalRule', 'list', 'table'],
+                    // ['link', 'image', 'video'],
+                    ['fullScreen', 'showBlocks', 'codeView'],
+                    ['preview', 'print']
+                ]
 ```
 
 ## Examples
