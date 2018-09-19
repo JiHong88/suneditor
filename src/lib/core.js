@@ -214,9 +214,7 @@ const core = function (context, util, modules, plugins, lang) {
                 range = selection.getRangeAt(0);
             }
             else {
-                range = document.createRange();
-                range.setStart(context.element.wysiwyg.firstChild, 0);
-                range.setEnd(context.element.wysiwyg.firstChild, 0);
+                range = this._createDefaultRange();
             }
 
             this._variable.range = range;
@@ -226,6 +224,18 @@ const core = function (context, util, modules, plugins, lang) {
             } else {
                 this._variable.selectionNode = selection.extentNode || selection.anchorNode;
             }
+        },
+
+        /**
+         * @description Return the range object of editor's first child node
+         * @returns {Object}
+         * @private
+         */
+        _createDefaultRange: function () {
+            const range = document.createRange();
+            range.setStart(context.element.wysiwyg.firstChild, 0);
+            range.setEnd(context.element.wysiwyg.firstChild, 0);
+            return range;
         },
 
         /**
@@ -255,7 +265,7 @@ const core = function (context, util, modules, plugins, lang) {
          * @returns {Object}
          */
         getRange: function () {
-            return this._variable.range;
+            return this._variable.range || this._createDefaultRange();
         },
 
         /**

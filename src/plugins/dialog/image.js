@@ -362,7 +362,7 @@ export default {
             container.style.float = align;
         }
 
-        this.insertNode(container);
+        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(container);
     },
 
