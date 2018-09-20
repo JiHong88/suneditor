@@ -140,7 +140,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
         [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-        <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, Line <span class="pl-k">break</span>
+        <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Line break</span>
         [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
@@ -242,8 +242,7 @@ plugins<span class="pl-k">:</span> [
     link,
     image,
     video
-],
-<span class="pl-c"><span class="pl-c">//</span> User Options</span>
+]               <span class="pl-k">:</span> Plugins array<span class="pl-k"></span>                                     default <span class="pl-k">:</span> <span class="pl-c1">null</span>
 fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size List                     default <span class="pl-k">:</span> <span class="pl-c1">null</span>
 font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family List                   default <span class="pl-k">:</span> <span class="pl-c1">null</span>
 width           <span class="pl-k">:</span> The width size <span class="pl-k">of</span> the editor                      default <span class="pl-k">:</span> <span class="pl-smi">textarea</span>.<span class="pl-smi">offsetHeight</span>

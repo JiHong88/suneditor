@@ -138,7 +138,7 @@ suneditor.create('sample', {
         ['font', 'fontSize', 'formatBlock'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
-        '/', Line break
+        '/', // Line break
         ['fontColor', 'hiliteColor'],
         ['indent', 'outdent'],
         ['align', 'horizontalRule', 'list', 'table'],
@@ -233,7 +233,6 @@ initEditor.create('sample_2', {
 
 ### options
 ```javascript
-// Plugins
 plugins: [
     font,
     fontSize,
@@ -247,8 +246,7 @@ plugins: [
     link,
     image,
     video
-],
-// User Options
+]               : Plugins array                                     default : null
 fontSize        : Change default font-size List                     default : null
 font            : Change default font-family List                   default : null
 width           : The width size of the editor                      default : textarea.offsetHeight

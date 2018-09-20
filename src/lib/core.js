@@ -588,8 +588,8 @@ const core = function (context, util, plugins, lang) {
                         return util.isFormatElement(current);
                     });
 
-                    let startLine = util.getParentElement(startCon, 'P');
-                    let endLine = util.getParentElement(endCon, 'P');
+                    let startLine = util.getFormatElement(startCon);
+                    let endLine = util.getFormatElement(endCon);
 
                     for (let i = 0, len = lineNodes.length; i < len; i++) {
                         if (startLine === lineNodes[i]) {
@@ -947,7 +947,7 @@ const core = function (context, util, plugins, lang) {
          * @param command {String} - Separator ("indent" or "outdent")
          */
         indent: function (element, command) {
-            const p = util.getParentElement(element, 'P');
+            const p = util.getFormatElement(element);
             if (!p) return;
 
             let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
