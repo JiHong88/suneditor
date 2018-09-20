@@ -7,8 +7,8 @@ Pure JavaScript based WYSIWYG web editor
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/releases)
-[![npm](https://img.shields.io/npm/dt/suneditor.svg)](https://github.com/JiHong88/SunEditor)
 [![GitHub stars](https://img.shields.io/github/stars/JiHong88/SunEditor.svg)](https://github.com/JiHong88/SunEditor/stargazers)
+[![npm](https://img.shields.io/npm/dt/suneditor.svg)](https://www.npmjs.com/package/suneditor)
 [![David](https://img.shields.io/david/dev/jihong88/suneditor.svg)](https://david-dm.org/jihong88/suneditor?type=dev)
 
 
