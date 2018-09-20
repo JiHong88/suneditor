@@ -7,11 +7,12 @@
  */
 'use strict';
 import dialog from '../modules/dialog'
+import resizing from '../modules/resizing'
 
 export default {
     name: 'image',
     add: function (_this) {
-        _this._addModule(dialog);
+        _this.addModule([dialog, resizing]);
         
         const context = _this.context;
         context.image = {

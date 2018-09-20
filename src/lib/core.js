@@ -129,13 +129,16 @@ const core = function (context, util, plugins, lang) {
 
         /**
          * @description If the module is not added, add the module and call the 'add' function
-         * @param {Object} moduleObj - module object (dialog)
+         * @param {Array} moduleArray - module object's Array [dialog, resizing]
          */
-        _addModule: function (moduleObj) {
-            const moduleName = moduleObj.name;
-            if (!this.plugins[moduleName]) {
-                this.plugins[moduleName] = this.util.copyObj(moduleObj);
-                this.plugins[moduleName].add(this);
+        addModule: function (moduleArray) {
+            let moduleName = '';
+            for (let i = 0, len = moduleArray.length; i < len; i++) {
+                moduleName = moduleArray[i].name;
+                if (!this.plugins[moduleName]) {
+                    this.plugins[moduleName] = this.util.copyObj(moduleArray[i]);
+                    this.plugins[moduleName].add(this);
+                }
             }
         },
 
@@ -1283,7 +1286,7 @@ const core = function (context, util, plugins, lang) {
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callPlugin('image', function () {
-                    const size = editor.plugins.dialog.call_controller_resize.call(editor, targetElement, 'image');
+                    const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
                 return;

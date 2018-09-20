@@ -7,11 +7,12 @@
  */
 'use strict';
 import dialog from '../modules/dialog'
+import resizing from '../modules/resizing'
 
 export default {
     name: 'video',
     add: function (_this) {
-        _this._addModule(dialog);
+        _this.addModule([dialog, resizing]);
 
         const context = _this.context;
         context.video = {
@@ -32,7 +33,7 @@ export default {
         context.video._coverElementInner.className = 'sun-editor-iframe-inner-cover';
         context.video._coverElementInner.addEventListener('click', function (e) {
             const pNode = e.target.parentNode;
-            const size = _this.plugins.dialog.call_controller_resize.call(_this, pNode, 'video');
+            const size = _this.plugins.resizing.call_controller_resize.call(_this, pNode, 'video');
             _this.plugins.video.onModifyMode.call(_this, pNode.children[0], size);
         });
 

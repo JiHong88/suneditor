@@ -291,14 +291,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="modules"><span class="type-signature"></span>modules<span
-                    class="type-signature"></span></h4>
-            <div class="description">
-                loaded modules
-            </div>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="plugins"><span class="type-signature"></span>plugins<span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -538,7 +530,7 @@
 
             <h3 class="subsection-title">Methods</h3>
 
-            <h4 class="name" id="callPlugin"><span class="type-signature"></span>callPlugin<span class="signature">(directory, moduleName, targetElement, callBackFunction)</span><span
+            <h4 class="name" id="callPlugin"><span class="type-signature"></span>callPlugin<span class="signature">(pluginName, callBackFunction)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 If the plugin is not added, add the plugin and call the 'add' function.<br>
@@ -567,6 +559,33 @@
                         <span class="param-type">function</span>
                     </td>
                     <td class="description last">Function to be executed immediately after module call</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="addModule"><span class="type-signature"></span>addModule<span class="signature">(moduleObj)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                If the module is not added, add the module and call the 'add' function
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>moduleObj</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">module object's Array [dialog, resizing]</td>
                 </tr>
                 </tbody>
             </table>
@@ -1000,7 +1019,6 @@
     <ul>
         <li><b>Members</b></li>
         <li><a href="document-editor.html#context">context</a></li>
-        <li><a href="document-editor.html#modules">modules</a></li>
         <li><a href="document-editor.html#plugins">plugins</a></li>
         <li><a href="document-editor.html#util">util</a></li>
         <li><a href="document-editor.html#lang">lang</a></li>
@@ -1012,6 +1030,7 @@
         <li><a href="document-editor.html#_variable">_variable</a></li>
         <li><b>Methods</b></li>
         <li><a href="document-editor.html#callPlugin">callPlugin</a></li>
+        <li><a href="document-editor.html#addModule">addModule</a></li>
         <li><a href="document-editor.html#submenuOn">submenuOn</a></li>
         <li><a href="document-editor.html#submenuOff">submenuOff</a></li>
         <li><a href="document-editor.html#controllersOff">controllersOff</a></li>
