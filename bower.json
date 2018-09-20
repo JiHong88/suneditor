@@ -6,12 +6,15 @@
   "keywords": [
     "wysiwyg",
     "editor",
-    "javascript",
+    "wysiwyg editor",
+    "rich text",
+    "rich editor",
+    "rich text editor",
+    "web",
+    "html",
+    "contenteditable",
     "suneditor",
-    "wysiwyg-eidtor",
-    "rich-text-editor",
-    "html-editor",
-    "contenteditable"
+    "javascript"
   ],
   "author": "JiHong.Lee",
   "license": "MIT",
