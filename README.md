@@ -5,18 +5,19 @@ Pure JavaScript based WYSIWYG web editor
 
 [![NPM](https://nodei.co/npm/suneditor.png)](https://nodei.co/npm/suneditor/)
 
-![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)
-![GitHub release](https://img.shields.io/github/release/qubyte/rubidium.svg)
-![Npm](https://img.shields.io/npm/v/npm.svg)
-![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)
-![Github All Releases](https://img.shields.io/github/downloads/atom/atom/total.svg)
+[![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
+[![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/releases)
+[![npm](https://img.shields.io/npm/dt/suneditor.svg)](https://github.com/JiHong88/SunEditor)
+[![GitHub stars](https://img.shields.io/github/stars/JiHong88/SunEditor.svg)](https://github.com/JiHong88/SunEditor/stargazers)
+[![David](https://img.shields.io/david/dev/jihong88/suneditor.svg)](https://david-dm.org/jihong88/suneditor?type=dev)
+
 
 ```properties
 The Suneditor is based on pure JavaScript
 Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications
 
 Supported Browser -
-Chrome, Safari, Opera, Firefox, Edge, IE 11, Mobile web
+Chrome, Opera, Firefox, Edge, IE 11, Safari(macOS, IOS), Mobile web
 ```
 
 #### npm
