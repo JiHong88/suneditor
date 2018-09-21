@@ -10,8 +10,8 @@
  */
 const core = function (context, util, plugins, lang) {
     /**
-     * @description Practical editor function
-     * This function is 'this' used by other plugins
+     * @description editor core object
+     * should always bind this object when registering an event in the plug-in.
      */
     const editor = {
         /**
@@ -118,7 +118,7 @@ const core = function (context, util, plugins, lang) {
          */
         callPlugin: function (pluginName, callBackFunction) {
             if (!this.plugins[pluginName]) {
-                throw Error('[SUNEDITOR.core.callModule.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
+                throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
                 this.plugins[pluginName].add(this, this.plugins[pluginName].buttonElement);
                 this.initPlugins[pluginName] = true;
@@ -973,21 +973,20 @@ const core = function (context, util, plugins, lang) {
          */
         toggleCodeView: function () {
             if (!this._variable.wysiwygActive) {
-                const ec = {'&amp;': '&', '&nbsp;': '\u00A0', "&quot;": "'", '&lt;': '<', '&gt;': '>'};
-                const code_html = context.element.code.value.replace(/&[a-z]+;/g, function (m) {
-                    return (typeof ec[m] === 'string') ? ec[m] : m;
-                });
-                context.element.wysiwyg.innerHTML = code_html.trim().length > 0 ? code_html : '<p>&#65279</p>';
+                const code_html = context.element.code.value.trim();
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>&#65279</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
                 this._variable.wysiwygActive = true;
+                this.focus();
             }
             else {
-                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/(?:P|DIV|H[1-6]|TABLE)>(?=[^\n])/gi, '<\/p>\n');
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
                 this._variable.wysiwygActive = false;
+                context.element.code.focus();
             }
         },
 
@@ -1403,15 +1402,13 @@ const core = function (context, util, plugins, lang) {
             e.stopPropagation();
             e.preventDefault();
             
-            if (editor.plugins.image) {
-                editor.focus();
+            editor.focus();
 
-                editor.callPlugin('image', function () {
-                    context.image.imgInputFile.files = files;
-                    editor.plugins.image.onRender_imgInput.call(editor);
-                    context.image.imgInputFile.files = null;
-                });
-            }
+            editor.callPlugin('image', function () {
+                context.image.imgInputFile.files = files;
+                editor.plugins.image.onRender_imgInput.call(editor);
+                context.image.imgInputFile.files = null;
+            });
         },
 
         onMouseDown_resizeBar: function (e) {
@@ -1490,7 +1487,7 @@ const core = function (context, util, plugins, lang) {
          * @description Gets the contents of the suneditor
          * @returns {String}
          */
-        getContent: function () {
+        getContents: function () {
             let content = '';
 
             if (context.element.wysiwyg.innerText.trim().length === 0) return content;
@@ -1507,8 +1504,8 @@ const core = function (context, util, plugins, lang) {
          * @description Change the contents of the suneditor
          * @param {String} content - Content to Input
          */
-        setContent: function (content) {
-            const innerHTML = util.convertContentForEditor(content);
+        setContents: function (content) {
+            const innerHTML = util.convertContentsForEditor(content);
 
             if (editor._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML = innerHTML;

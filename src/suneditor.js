@@ -59,7 +59,7 @@ export default {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = this._Constructor.init(element, options, (options.lang ||  this._defaultLang), options.plugins, this.util.convertContentForEditor);
+        const cons = this._Constructor.init(element, options, (options.lang ||  this._defaultLang), options.plugins, this.util);
 
         if (document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');

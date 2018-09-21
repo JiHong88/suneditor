@@ -11,10 +11,10 @@ import resizing from '../modules/resizing'
 
 export default {
     name: 'video',
-    add: function (_this) {
-        _this.addModule([dialog, resizing]);
+    add: function (core) {
+        core.addModule([dialog, resizing]);
 
-        const context = _this.context;
+        const context = core.context;
         context.video = {
             _coverElement: null,
             _coverElementInner: document.createElement('SPAN'),
@@ -33,12 +33,12 @@ export default {
         context.video._coverElementInner.className = 'sun-editor-iframe-inner-cover';
         context.video._coverElementInner.addEventListener('click', function (e) {
             const pNode = e.target.parentNode;
-            const size = _this.plugins.resizing.call_controller_resize.call(_this, pNode, 'video');
-            _this.plugins.video.onModifyMode.call(_this, pNode.children[0], size);
+            const size = core.plugins.resizing.call_controller_resize.call(core, pNode, 'video');
+            core.plugins.video.onModifyMode.call(core, pNode.children[0], size);
         });
 
         /** video dialog */
-        let video_dialog = eval(this.setDialog(_this.lang));
+        let video_dialog = eval(this.setDialog(core.lang));
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
@@ -50,10 +50,10 @@ export default {
         video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
 
         /** add event listeners */
-        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
-        context.video.videoX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
-        context.video.videoY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
-        video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
+        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        context.video.videoX.addEventListener('change', this.setInputSize.bind(core, 'x'));
+        context.video.videoY.addEventListener('change', this.setInputSize.bind(core, 'y'));
+        video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(video_dialog);

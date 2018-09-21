@@ -5,11 +5,13 @@
  * @param {element} element - textarea
  * @param {JSON} options - user options
  * @param {JSON} lang - user language
+ * @param {JSON} _lang - plugins object
+ * @param {JSON} util - util object
  * @returns {JSON}
  * @private
  */
 const _Constructor = {
-    init: function (element, options, lang, _plugins, _convertContentForEditor) {
+    init: function (element, options, lang, _plugins, util) {
         if (typeof options !== 'object') options = {};
     
         /** user options */
@@ -65,7 +67,7 @@ const _Constructor = {
         wysiwyg_div.setAttribute('scrolling', 'auto');
         wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
-        wysiwyg_div.innerHTML = _convertContentForEditor(element.value);
+        wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');

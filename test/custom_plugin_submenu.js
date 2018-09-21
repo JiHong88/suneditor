@@ -5,30 +5,31 @@ export default {
 
     // add function - It is called only once when the plugin is first run.
     // This function generates HTML to append and register the event.
-    // arguments - (_this : core object, targetElement : clicked button element)
-    add: function (_this, targetElement) {
+    // arguments - (core : core object, targetElement : clicked button element)
+    add: function (core, targetElement) {
 
         // Registering a namespace for caching as a plugin name in the context object
-        const context = _this.context;
+        const context = core.context;
         context.custom = {
             textElement: null
         };
 
         // Generate submenu HTML
-        let listDiv = eval(this.setSubmenu(_this.lang));
+        let listDiv = eval(this.setSubmenu(core.lang));
 
         // Input tag caching
-        _this.context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
+        context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
 
         // In addition to the button, elements that should operate within the submenu, such as focus,
         // must call stopPropagation in the mousedown event to prevent the toolbar from executing events.
-        _this.context.custom.textElement.addEventListener('mousedown', function (e) {
+        context.custom.textElement.addEventListener('mousedown', function (e) {
             e.stopPropagation();
         })
 
+        // You must bind "core" object when registering an event.
         /** add event listeners */
-        listDiv.getElementsByTagName('BUTTON')[0].addEventListener('click', this.onClick.bind(_this));
-        _this.context.custom.textElement.addEventListener('mousedown', function () {
+        listDiv.getElementsByTagName('BUTTON')[0].addEventListener('click', this.onClick.bind(core));
+        context.custom.textElement.addEventListener('mousedown', function () {
 
         })
 

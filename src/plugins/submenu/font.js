@@ -9,12 +9,12 @@
 
 export default {
     name: 'font',
-    add: function (_this, targetElement) {
+    add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(_this.context.user));
+        let listDiv = eval(this.setSubmenu(core.context.user));
 
         /** add event listeners */
-        listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(_this));
+        listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);

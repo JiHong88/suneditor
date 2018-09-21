@@ -11,10 +11,10 @@ import resizing from '../modules/resizing'
 
 export default {
     name: 'image',
-    add: function (_this) {
-        _this.addModule([dialog, resizing]);
+    add: function (core) {
+        core.addModule([dialog, resizing]);
         
-        const context = _this.context;
+        const context = core.context;
         context.image = {
             _linkElement: null,
             _element: null,
@@ -36,7 +36,7 @@ export default {
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog(_this.context.user, _this.lang));
+        let image_dialog = eval(this.setDialog(core.context.user, core.lang));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -48,14 +48,14 @@ export default {
         context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
         context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
 
-        context.image.imageX.value = _this.context.user.imageSize;
+        context.image.imageX.value = context.user.imageSize;
 
         /** add event listeners */
-        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(_this));
-        context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
-        context.image.imageX.addEventListener('change', this.setInputSize.bind(_this, 'x'));
-        context.image.imageY.addEventListener('change', this.setInputSize.bind(_this, 'y'));
-        image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(_this));
+        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
+        context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        context.image.imageX.addEventListener('change', this.setInputSize.bind(core, 'x'));
+        context.image.imageY.addEventListener('change', this.setInputSize.bind(core, 'y'));
+        image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(image_dialog);

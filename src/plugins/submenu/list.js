@@ -9,12 +9,12 @@
 
 export default {
     name: 'list',
-    add: function (_this, targetElement) {
+    add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(_this.lang));
+        let listDiv = eval(this.setSubmenu(core.lang));
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(_this));
+        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);

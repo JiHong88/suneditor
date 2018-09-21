@@ -9,12 +9,12 @@
 
 export default {
     name: 'fontColor',
-    add: function (_this, targetElement) {
+    add: function (core, targetElement) {
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(_this));
+        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);

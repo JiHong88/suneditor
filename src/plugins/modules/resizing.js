@@ -9,8 +9,8 @@
 
 export default {
     name: 'resizing',
-    add: function (_this) {
-        const context = _this.context;
+    add: function (core) {
+        const context = core.context;
         context.resizing = {
             _resizeClientX: 0,
             _resizeClientY: 0,
@@ -28,21 +28,21 @@ export default {
         context.resizing.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
         context.resizing.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
 
-        let resize_button = eval(this.setController_button(_this.lang));;
+        let resize_button = eval(this.setController_button(core.lang));;
         context.resizing.resizeButton = resize_button;
 
         let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
 
         /** add event listeners */
-        resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[3].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[4].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[5].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[6].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_handles[7].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(_this));
-        resize_button.addEventListener('click', this.onClick_resizeButton.bind(_this));
+        resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[3].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[4].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[5].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[6].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_handles[7].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
+        resize_button.addEventListener('click', this.onClick_resizeButton.bind(core));
 
         /** append html */
         context.element.relative.appendChild(resize_div_container);

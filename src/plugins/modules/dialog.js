@@ -9,8 +9,8 @@
 
 export default {
     name: 'dialog',
-    add: function (_this) {
-        const context = _this.context;
+    add: function (core) {
+        const context = core.context;
         context.dialog = {};
 
         /** dialog */
@@ -33,7 +33,7 @@ export default {
         context.dialog.modal = dialog_area;
 
         /** add event listeners */
-        context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(_this));
+        context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(core));
         
         /** append html */
         context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);

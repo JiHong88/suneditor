@@ -83,24 +83,37 @@ const util = {
     },
 
     /**
-     * @description Converts content into a format that can be placed in an editor
-     * @param content - content
+     * @description Converts contents into a format that can be placed in an editor
+     * @param contents - contents
      * @returns {String}
      */
-    convertContentForEditor: function (content) {
+    convertContentsForEditor: function (contents) {
         let tag, baseHtml, innerHTML = '';
-        tag = document.createRange().createContextualFragment(content.trim()).childNodes;
+        contents = contents.trim();
+
+        tag = document.createRange().createContextualFragment(contents).childNodes;
 
         for (let i = 0, len = tag.length; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
-            if (!/^(?:P|TABLE|H[1-6]|DIV)$/i.test(tag[i].tagName)) {
-                innerHTML += '<P>' + baseHtml + '</p>';
+
+            if (!this.isFormatElement(tag[i])) {
+                const textArray = baseHtml.split(/\n|\r/g);
+                let text = '';
+                for (let t = 0, tLen = textArray.length; t < tLen; t++) {
+                    text = textArray[t].trim();
+                    if (text.length > 0) innerHTML += '<P>' + text + '</p>';
+                }
             } else {
                 innerHTML += baseHtml;
             }
         }
 
-        if (innerHTML.length === 0) innerHTML = '<p>&#65279</p>';
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
+        contents = contents.replace(/&|\u00A0|'|\<|\>/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+
+        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '&#65279') + '</p>';
 
         return innerHTML;
     },
@@ -121,7 +134,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H\\d)$/i.test(element.tagName)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|TABLE)$/i.test(element.tagName)) return true;
         return false;
     },
 

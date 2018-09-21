@@ -10,27 +10,27 @@ import dialog from '../modules/dialog'
 
 export default {
     name: 'link',
-    add: function (_this) {
-        _this.addModule([dialog]);
+    add: function (core) {
+        core.addModule([dialog]);
 
-        const context = _this.context;
+        const context = core.context;
         context.link = {};
 
         /** link dialog */
-        let link_dialog = eval(this.setDialog(_this.lang));
+        let link_dialog = eval(this.setDialog(core.lang));
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
         context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
         context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
-        let link_button = eval(this.setController_LinkBtn(_this.lang));
+        let link_button = eval(this.setController_LinkBtn(core.lang));
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(_this));
-        link_button.addEventListener('click', this.onClick_linkBtn.bind(_this));
+        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        link_button.addEventListener('click', this.onClick_linkBtn.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);

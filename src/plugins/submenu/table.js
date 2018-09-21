@@ -9,8 +9,8 @@
 
 export default {
     name: 'table',
-    add: function (_this, targetElement) {
-        const context = _this.context;
+    add: function (core, targetElement) {
+        const context = core.context;
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
@@ -22,8 +22,8 @@ export default {
         context.submenu._tableXY = [];
 
         /** add event listeners */
-        tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(_this));
-        tablePicker.addEventListener('click', this.appendTable.bind(_this));
+        tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core));
+        tablePicker.addEventListener('click', this.appendTable.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
