@@ -60,6 +60,11 @@ const core = function (context, util, plugins, lang) {
         controllerArray: [],
 
         /**
+         * @description An array of buttons whose class name is not "code-view-enabled"
+         */
+        codeViewDisabledButtons: document.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+
+        /**
          * @description Elements that need to change text or className for each selection change
          * @property {Element} FORMAT - format button
          * @property {Element} FONT - font family button
@@ -972,7 +977,14 @@ const core = function (context, util, plugins, lang) {
          * @description Changes to code view or wysiwyg view
          */
         toggleCodeView: function () {
-            if (!this._variable.wysiwygActive) {
+            const wysiwygActive = this._variable.wysiwygActive;
+
+            const disButtons = this.codeViewDisabledButtons;
+            for (let i = 0, len = disButtons.length; i < len; i++) {
+                disButtons[i].disabled = wysiwygActive;
+            }
+
+            if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>&#65279</p>';
                 context.element.wysiwyg.scrollTop = 0;
@@ -1195,6 +1207,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             if (!command && !display) return;
+            if (target.disabled) return;
             
             /** Dialog, Submenu */
             if (display) {

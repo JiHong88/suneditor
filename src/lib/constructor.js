@@ -163,7 +163,7 @@ const _Constructor = {
                 '<div class="icon-indent-left"></div>'
             ],
 
-            fullScreen: ['', lang.toolbar.fullScreen, 'fullScreen', '', '',
+            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '', '',
                 '<div class="icon-expansion"></div>'
             ],
 
@@ -171,15 +171,15 @@ const _Constructor = {
                 '<div class="icon-showBlocks"></div>'
             ],
 
-            codeView: ['', lang.toolbar.codeView, 'codeView', '', '',
+            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '', '',
                 '<div class="icon-code-view"></div>'
             ],
 
-            undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
+            undo: ['code-view-enabled', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
                 '<div class="icon-undo"></div>'
             ],
 
-            redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+            redo: ['code-view-enabled', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
                 '<div class="icon-redo"></div>'
             ],
 
@@ -220,9 +220,7 @@ const _Constructor = {
             ],
 
             horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', '',
-                '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-                '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-                '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />'
+                '<div class="icon-hr"></div>'
             ],
 
             table: ['', lang.toolbar.table, 'table', 'submenu', '',
