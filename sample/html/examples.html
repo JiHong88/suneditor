@@ -60,7 +60,6 @@
         <h4>1. Options Setting</h4>
         <div class="highlight highlight-source-js">
 <pre>
-<span class="pl-c">// plugins</span>
 <span class="pl-s">plugins</span>: [
     <span class="pl-s">font</span>,
     <span class="pl-s">fontSize</span>,
@@ -74,10 +73,9 @@
     <span class="pl-s">link</span>,
     <span class="pl-s">image</span>,
     <span class="pl-s">video</span>
-],
-<span class="pl-c">// User Options</span>
-<span class="pl-s">fontSize</span><span class="pl-k">    : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
-<span class="pl-s">font</span><span class="pl-k">        : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+]<span class="pl-s"></span><span class="pl-k">               : </span>Plugins array                                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">fontSize</span><span class="pl-k">        : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span>
+<span class="pl-s">font</span><span class="pl-k">            : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span>
 <span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span>
 <span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width||offsetWidth</span>
 <span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor                 <span class="pl-ent">default : </span><span class="pl-c1">'block'</span>
@@ -86,7 +84,7 @@
 <span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizebar  <span class="pl-ent">default : </span><span class="pl-c1">true</span>
 <span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || '') <span class="pl-ent">default : </span><span class="pl-c1">''</span>
 
-<span class="pl-k">lang</span><span class="pl-k">            : </span>language object <span class="pl-ent">default : </span><span class="pl-c1">English</span>
+<span class="pl-k">lang</span><span class="pl-k">            : </span>language object (en, ko) <span class="pl-ent">default : </span><span class="pl-c1">English</span>
 
 <span class="pl-k">imageFileInput</span><span class="pl-k">  : </span>Choose whether to create a file input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span>
 <span class="pl-k">imageUrlInput</span><span class="pl-k">   : </span>Choose whether to create a image url input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span>

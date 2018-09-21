@@ -257,7 +257,7 @@ videoY          : The default heigth size of the video frame        default : 31
 showPathLabel   : Displays the current node structure to resizebar  default : true
 popupDisplay    : Size of background area when activating dialog window ('full' || '') default : ''
 
-lang            : language object default : English
+lang            : language object (en, ko) default : English
 
 imageFileInput  : Choose whether to create a file input tag in the image upload window default : true
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true
