@@ -1264,7 +1264,6 @@ const core = function (context, util, plugins, lang) {
         },
 
         onClick_toolbar: function (e) {
-            editor.focus();
             e.preventDefault();
             e.stopPropagation();
 

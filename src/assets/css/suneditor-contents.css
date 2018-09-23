@@ -1,13 +1,15 @@
 /* suneditor contents */
 .sun-editor-editable {
+    font-family: Helvetica Neue, sans-serif;
+    font-size: 13px;
     word-break: break-all;
     padding: 10px 20px 10px 20px;
     margin: 0;
 }
 
 .sun-editor-editable * {
-    font-family: Helvetica Neue, sans-serif;
-    font-size: 13px;
+    font-size: inherit;
+    font-family: inherit;
 }
 
 /* float */
