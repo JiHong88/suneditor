@@ -69,6 +69,7 @@ export default {
             const oQuote = document.createElement(value);
             this.wrapToTags(oQuote);
             this.setRange(oQuote.firstChild, 0, oQuote.firstChild, 0);
+            this.appendP(oQuote);
         }
         // others
         else {

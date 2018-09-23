@@ -540,7 +540,7 @@ const core = function (context, util, plugins, lang) {
          */
         wrapToTags: function (wrapTag) {
             const range = this.getRange();
-            const commonCon = util.getFormatElement(range.commonAncestorContainer);
+            const commonCon = range.commonAncestorContainer;
             const rangeLines = [];
 
             if (this.util.isWysiwygDiv(commonCon) || this.util.isRangeFormatElement(commonCon)) {
