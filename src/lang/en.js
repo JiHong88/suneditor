@@ -46,7 +46,8 @@ export default {
         print: 'print',
         tag_p: 'Paragraph',
         tag_div: 'Normal (DIV)',
-        tag_h: 'Header'
+        tag_h: 'Header',
+        tag_quote: 'Quote'
     },
     dialogBox: {
         linkBox: {

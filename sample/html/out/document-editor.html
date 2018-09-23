@@ -748,10 +748,44 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="setSelectionNode"><span class="type-signature"></span>setSelectionNode<span class="signature">(node)</span></h4>
+            <div class="description">
+                Set the selected node. (Used by getSelectionNode function)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>node</code></td>
+                    <td class="type">
+                        <span class="param-type">Node</span>
+                    </td>
+                    <td class="description last">node object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="getSelectionNode"><span class="type-signature"></span>getSelectionNode<span
                 class="signature">()</span><span class="type-signature"> &rarr; {Node}</span></h4>
             <div class="description">
                 Get current select node
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getRangeSelectedFormatElement"><span class="type-signature"></span>getRangeSelectedFormatElement<span
+                class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+            <div class="description">
+                Returns a "formatElement"(P, DIV, H[1-6]) array from the currently selected range.
             </div>
             <dl class="details"></dl>
 
@@ -877,10 +911,37 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="wrapToTags"><span class="type-signature"></span>wrapToTags<span class="signature">(wrapTag)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                appended all selected format Element to the argument element and insert
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>wrapTag</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element of wrap the arguments</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="wrapRangeToTag"><span class="type-signature"></span>wrapRangeToTag<span class="signature">(appendNode, checkCSSPropertyText)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Copies the node of the argument value and wraps all selected text.<br>
+                Copies the node of the argument value and append all selected nodes and insert.<br>
                 1. When there is the same node in the selection area, the tag is stripped.<br>
                 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
             </div>
@@ -1047,13 +1108,16 @@
         <li><a href="document-editor.html#focus">focus</a></li>
         <li><a href="document-editor.html#setRange">setRange</a></li>
         <li><a href="document-editor.html#getRange">getRange</a></li>
+        <li><a href="document-editor.html#setSelectionNode">setSelectionNode</a></li>
         <li><a href="document-editor.html#getSelectionNode">getSelectionNode</a></li>
+        <li><a href="document-editor.html#getRangeSelectedFormatElement">getRangeSelectedFormatElement</a></li>
         <li><a href="document-editor.html#isEdgePoint">isEdgePoint</a></li>
         <li><a href="document-editor.html#showLoading">showLoading</a></li>
         <li><a href="document-editor.html#closeLoading">closeLoading</a></li>
         <li><a href="document-editor.html#appendP">appendP</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
+        <li><a href="document-editor.html#wrapToTags">wrapToTags</a></li>
         <li><a href="document-editor.html#wrapRangeToTag">wrapRangeToTag</a></li>
         <li><a href="document-editor.html#indent">indent</a></li>
         <li><a href="document-editor.html#toggleDisplayBlocks">toggleDisplayBlocks</a></li>

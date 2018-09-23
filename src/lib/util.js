@@ -97,7 +97,7 @@ const util = {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
 
             if (!this.isFormatElement(tag[i])) {
-                const textArray = baseHtml.split(/\n|\r/g);
+                const textArray = baseHtml.split(/\n/g);
                 let text = '';
                 for (let t = 0, tLen = textArray.length; t < tLen; t++) {
                     text = textArray[t].trim();
@@ -129,29 +129,45 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element. (P, DIV, H1-6, Table...)
+     * @description It is judged whether it is the format element (P, DIV, H1-6)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|TABLE)$/i.test(element.tagName)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6])$/i.test(element.tagName)) return true;
         return false;
     },
 
     /**
-     * @description Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...)
+     * @description It is judged whether it is the range format element. (blockquote, TABLE)
+     * * Range format element is wrap the format element  (P, DIV, H1-6)
+     * @param {Element} element - The element to check
+     * @returns {Boolean}
+     */
+    isRangeFormatElement: function (element) {
+        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE$/i.test(element.tagName)) return true;
+        return false;
+    },
+
+    /**
+     * @description Get format element of the argument value (P, DIV, H[1-6])
+     * Or a tag whose parent tag is the editing area. (table, blockquote)
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */
     getFormatElement: function (element) {
         if (!element) return null;
 
-        if (!element || this.isWysiwygDiv(element)) {
-            element = context.element.wysiwyg.firstChild;
-        } else {
-            while (!this.isWysiwygDiv(element.parentNode)) {
-                element = element.parentNode;
-            }
+        if (this.isWysiwygDiv(element)) {
+            const firstFormatElement = this.getListChildren(element, function (current) {
+                return this.isFormatElement(current);
+            }.bind(this))[0];
+
+            return firstFormatElement;
+        }
+
+        while (!this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+            element = element.parentNode;
         }
 
         return element;

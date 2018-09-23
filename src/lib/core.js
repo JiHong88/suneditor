@@ -206,7 +206,7 @@ const core = function (context, util, plugins, lang) {
         focus: function () {
             if (context.element.wysiwyg.style.display === 'none') return;
 
-            const caption = util.getParentElement(this._variable.selectionNode, 'figcaption');
+            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
             if (caption) {
                 caption.focus();
             } else {
@@ -235,9 +235,9 @@ const core = function (context, util, plugins, lang) {
             this._variable.range = range;
 
             if (range.collapsed) {
-                this._variable.selectionNode = range.commonAncestorContainer;
+                this.setSelectionNode(range.commonAncestorContainer);
             } else {
-                this._variable.selectionNode = selection.extentNode || selection.anchorNode;
+                this.setSelectionNode(selection.extentNode || selection.anchorNode);
             }
         },
 
@@ -284,6 +284,14 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
+         * @description Set the selected node. (Used by getSelectionNode function)
+         * @param {Node} node - node object
+         */
+        setSelectionNode: function (node) {
+            this._variable.selectionNode = node;
+        },
+
+        /**
          * @description Get current select node
          * @returns {Node}
          */
@@ -293,6 +301,47 @@ const core = function (context, util, plugins, lang) {
             }
 
             return context.element.wysiwyg.firstChild;
+        },
+
+        /**
+         * @description Returns a "formatElement"(P, DIV, H[1-6]) array from the currently selected range.
+         * @returns {Array}
+         */
+        getRangeSelectedFormatElement: function () {
+            const range = this.getRange();
+            const startCon = range.startContainer;
+            const endCon = range.endContainer;
+            const commonCon = range.commonAncestorContainer;
+            const rangeFormatElements = [];
+
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) return rangeFormatElements;
+
+            // get line nodes
+            const lineNodes = util.getListChildren(commonCon, function (current) {
+                return util.isFormatElement(current);
+            });
+
+            if (startCon === endCon) return lineNodes[0];
+
+            let startLine = util.getFormatElement(startCon);
+            let endLine = util.getFormatElement(endCon);
+
+            for (let i = 0, len = lineNodes.length; i < len; i++) {
+                if (startLine === lineNodes[i]) {
+                    startLine = i;
+                    continue;
+                }
+                if (endLine === lineNodes[i]) {
+                    endLine = i;
+                    break;
+                }
+            }
+
+            for (let i = startLine; i <= endLine; i++) {
+                rangeFormatElements.push(lineNodes[i]);
+            }
+
+            return rangeFormatElements;
         },
 
         /**
@@ -486,7 +535,35 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
-         * @description Copies the node of the argument value and wraps all selected text.
+         * @description appended all selected format Element to the argument element and insert
+         * @param {Element} wrapTag - Element of wrap the arguments
+         */
+        wrapToTags: function (wrapTag) {
+            const range = this.getRange();
+            const commonCon = util.getFormatElement(range.commonAncestorContainer);
+            const rangeLines = [];
+
+            if (this.util.isWysiwygDiv(commonCon) || this.util.isRangeFormatElement(commonCon)) {
+                const lineNodes = this.getRangeSelectedFormatElement();
+                for (let i = 0, len = lineNodes.length; i < len; i++) {
+                    rangeLines.push(lineNodes[i]);
+                }
+            } else {
+                rangeLines.push(util.getFormatElement(commonCon));
+            }
+
+            const beforeTag = rangeLines[rangeLines.length - 1].nextSibling;
+            const pElement = rangeLines[rangeLines.length - 1].parentNode;
+            
+            for (let i = 0, len = rangeLines.length; i < len; i++) {
+                wrapTag.appendChild(rangeLines[i]);
+            }
+
+            pElement.insertBefore(wrapTag, beforeTag);
+        },
+
+        /**
+         * @description Copies the node of the argument value and append all selected nodes and insert
          * 1. When there is the same node in the selection area, the tag is stripped.
          * 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
          * @param {Element} appendNode - The dom that will wrap the selected text area
@@ -577,9 +654,9 @@ const core = function (context, util, plugins, lang) {
                 };
 
                 /** one line */
-                if (!util.hasClass(commonCon, 'sun-editor-id-wysiwyg')) {
+                if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesPart(commonCon, newNode, checkCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesPart(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -589,35 +666,22 @@ const core = function (context, util, plugins, lang) {
                 /** multi line */
                 else {
                     // get line nodes
-                    const lineNodes = util.getListChildren(commonCon, function (current) {
-                        return util.isFormatElement(current);
-                    });
-
-                    let startLine = util.getFormatElement(startCon);
-                    let endLine = util.getFormatElement(endCon);
-
-                    for (let i = 0, len = lineNodes.length; i < len; i++) {
-                        if (startLine === lineNodes[i]) {
-                            startLine = i;
-                            continue;
-                        }
-                        if (endLine === lineNodes[i]) {
-                            endLine = i;
-                            break;
-                        }
-                    }
+                    const lineNodes = this.getRangeSelectedFormatElement();
+                    const endLength = lineNodes.length - 1;
 
                     // startCon
                     newNode = appendNode.cloneNode(false);
-                    start = this._wrapLineNodesStart(lineNodes[startLine], newNode, checkCss, startCon, startOff);
+                    start = this._wrapLineNodesStart(lineNodes[0], newNode, checkCss, startCon, startOff);
+
                     // mid
-                    for (let i = startLine + 1; i < endLine; i++) {
+                    for (let i = 1; i < endLength; i++) {
                         newNode = appendNode.cloneNode(false);
                         this._wrapLineNodes(lineNodes[i], newNode, checkCss);
                     }
+
                     // endCon
                     newNode = appendNode.cloneNode(false);
-                    end = this._wrapLineNodesEnd(lineNodes[endLine], newNode, checkCss, endCon, endOff);
+                    end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff);
                 }
             }
 
@@ -638,53 +702,66 @@ const core = function (context, util, plugins, lang) {
          * @private
          */
         _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
-            const el = element;
-            const removeNodeList = [];
-
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
             let endOffset = endOff;
-            let prevNode, afterNode;
+            let startPass = false;
+            let endPass = false;
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
 
                 for (let i = 0, len = childNodes.length; i < len; i++) {
+                    if (endPass) break;
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if (validation(child)) {
+                    if (validation(child) && child.textContent.length > 0) {
                         let cloneNode;
 
+                        // startContainer
                         if (child === startContainer) {
-                            prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
                             child = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+
+                            startContainer = cloneNode = child.cloneNode(true);
                             startOffset = 0;
-                            startContainer = cloneNode = child.cloneNode(false);
+                            
+                            startPass = true;
                         }
+                        // endContainer
                         else if (child === endContainer) {
-                            afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                             child = document.createTextNode(endContainer.substringData(0, endOffset));
-                            endOffset = child.length;
-                            endContainer = cloneNode = child.cloneNode(false);
+
+                            endContainer = cloneNode = child.cloneNode(true);
+                            endOffset = child.textContent.length;
+
+                            newInnerNode.appendChild(cloneNode);
+                            endPass = true;
                         }
+                        // between
                         else {
                             cloneNode = child.cloneNode(false);
                         }
 
-                        removeNodeList.push(child);
-                        node.appendChild(cloneNode);
+                        if (startPass || child.nodeType === 1) node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
                     }
+
                     recursionFunc(child, coverNode);
                 }
-            })(el, newInnerNode);
+            })(element, newInnerNode);
+            
+            this.removeNode();
 
-            el.innerHTML = '';
-            el.appendChild(prevNode);
-            el.appendChild(newInnerNode);
-            el.appendChild(afterNode);
+            while (endCon.parentNode.textContent.length === 0 && !util.isFormatElement(endCon.parentNode)) {
+                endCon = endCon.parentNode;
+            }
+
+            endCon.parentNode.insertBefore(newInnerNode, endCon);
+
+            if (endCon.textContent.length === 0) util.removeItem(endCon);
+            if (startCon.textContent.length === 0) util.removeItem(startCon);
 
             return {
                 startContainer: startContainer,
@@ -708,7 +785,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
                     let coverNode = node;
-                    if (validation(child)) {
+                    if (validation(child) && child.textContent.length > 0) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -814,7 +891,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if (!passNode || validation(child)) {
+                    if ((!passNode || validation(child)) && child.textContent.length > 0) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -926,7 +1003,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if (!passNode || validation(child)) {
+                    if ((!passNode || validation(child)) && child.textContent.length > 0) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -994,7 +1071,7 @@ const core = function (context, util, plugins, lang) {
                 this.focus();
             }
             else {
-                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/(?:P|DIV|H[1-6]|TABLE)>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/P>(?=[^\n])/gi, '<\/p>\n');
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
                 this._variable.wysiwygActive = false;
@@ -1082,7 +1159,7 @@ const core = function (context, util, plugins, lang) {
             let findB = true, findI = true, findU = true, findS = true;
             let cssText = '', nodeName = '';
 
-            for (let selectionParent = editor._variable.selectionNode; !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
+            for (let selectionParent = editor.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
                 if (selectionParent.nodeType !== 1) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
@@ -1186,11 +1263,8 @@ const core = function (context, util, plugins, lang) {
             }
         },
 
-        onMouseDown_toolbar: function (e) {
-            e.preventDefault();
-        },
-
         onClick_toolbar: function (e) {
+            editor.focus();
             e.preventDefault();
             e.stopPropagation();
 
@@ -1245,7 +1319,7 @@ const core = function (context, util, plugins, lang) {
                         break;
                     case 'indent':
                     case 'outdent':
-                        editor.indent(editor._variable.selectionNode, command);
+                        editor.indent(editor.getSelectionNode(), command);
                         break;
                     case 'redo':
                     case 'undo':
@@ -1309,8 +1383,6 @@ const core = function (context, util, plugins, lang) {
         },
 
         onKeyDown_wysiwyg: function (e) {
-            // editor._setSelectionNode();
-
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey;
@@ -1336,21 +1408,23 @@ const core = function (context, util, plugins, lang) {
             }
 
             /** default key action */
+            const selectionNode = editor.getSelectionNode();
             switch (keyCode) {
                 case 8: /**backspace key*/
-                    if (util.isFormatElement(editor._variable.selectionNode) && editor._variable.selectionNode.previousSibling === null) {
+                    if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && selectionNode.previousSibling === null) {
                         e.preventDefault();
                         e.stopPropagation();
-                        editor._variable.selectionNode.innerHTML = '&#65279';
+                        selectionNode.innerHTML = '&#65279';
                         return false;
                     }
+                    
                     break;
                 case 9:
                     /**tab key*/
                     e.preventDefault();
                     if (ctrl || alt) break;
 
-                    let currentNode = editor._variable.selectionNode || editor.getSelectionNode();
+                    let currentNode = selectionNode || editor.getSelectionNode();
                     while (!/^TD$/i.test(currentNode.tagName) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
@@ -1384,18 +1458,25 @@ const core = function (context, util, plugins, lang) {
 
         onKeyUp_wysiwyg: function (e) {
             editor._setEditorRange();
+            const selectionNode = editor.getSelectionNode();
 
             /** when format tag deleted */
-            if (e.keyCode === 8 && util.isWysiwygDiv(editor._variable.selectionNode)) {
+            if (e.keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent.length === 0) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const oFormatTag = document.createElement(editor._variable.currentNodes[0]);
+                const oFormatTag = document.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
                 oFormatTag.innerHTML = '&#65279';
 
-                editor._variable.selectionNode.appendChild(oFormatTag);
-                editor._variable.selectionNode = oFormatTag;
+                selectionNode.appendChild(oFormatTag);
+                editor.setSelectionNode(oFormatTag);
                 editor.setRange(oFormatTag, 0, oFormatTag, 0);
+                return;
+            }
+
+            if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
+                editor.execCommand('formatBlock', false, util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
+                return;
             }
 
             if (event._directionKeyKeyCode.test(e.keyCode)) {
@@ -1453,7 +1534,6 @@ const core = function (context, util, plugins, lang) {
     /** add event listeners */
     /** tool bar event */
     context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
-    context.tool.bar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);

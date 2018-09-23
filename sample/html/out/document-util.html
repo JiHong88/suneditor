@@ -151,7 +151,35 @@
             <h4 class="name" id="isFormatElement"><span class="type-signature"></span>isFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the format element. (P, DIV, H1-6, Table...)
+                It is judged whether it is the format element. (P, DIV, H1-6)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">The element to check</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isRangeFormatElement"><span class="type-signature"></span>isRangeFormatElement<span class="signature">(element)</span><span
+                    class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                It is judged whether it is the range format element. (blockquote, TABLE)<br>
+                Range format element is wrap the format element  (P, DIV, H1-6)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -178,7 +206,8 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                Get format element of the argument value (P, DIV, Table, H1, H2, H3, H4, H5, H6...)
+                Get format element of the argument value (P, DIV, H[1-6])<br>
+                Or a tag whose parent tag is the editing area. (table, blockquote)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -655,6 +684,7 @@
         <li><a href="document-util.html#convertContentsForEditor">convertContentsForEditor</a></li>
         <li><a href="document-util.html#isWysiwygDiv">isWysiwygDiv</a></li>
         <li><a href="document-util.html#isFormatElement">isFormatElement</a></li>
+        <li><a href="document-util.html#isRangeFormatElement">isRangeFormatElement</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>

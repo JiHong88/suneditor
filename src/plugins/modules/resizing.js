@@ -96,8 +96,8 @@ export default {
 
     call_controller_resize: function (targetElement, plugin) {
         this.context.resizing._resize_plugin = plugin;
-        targetElement.setAttribute('unselectable', 'on');
-        targetElement.contentEditable = false;
+        // targetElement.setAttribute('unselectable', 'on');
+        // targetElement.contentEditable = false;
 
         const resizeContainer = this.context.resizing.resizeContainer;
         const resizeDiv = this.context.resizing.resizeDiv;

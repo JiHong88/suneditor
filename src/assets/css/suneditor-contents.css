@@ -38,6 +38,32 @@
     padding: 0;
 }
 
+/* blockquote */
+.sun-editor-editable blockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+    border-style: solid;
+    border-width: 0;
+    padding-left: 20px;
+    padding-right: 5px;
+    border-left-width: 5px;
+}
+.sun-editor-editable blockquote {
+    border-color: #8baab7;
+}
+.sun-editor-editable blockquote blockquote {
+    border-color: #a2bfcc;
+}
+.sun-editor-editable blockquote blockquote blockquote {
+    border-color: #bbd5e0;
+}
+.sun-editor-editable blockquote blockquote blockquote blockquote {
+    border-color: #d4e3ea;
+}
+
 /* h1 */
 .sun-editor-editable h1 {
     display: block;
@@ -117,7 +143,7 @@
 .sun-editor-editable img.inner-link {
     padding: 1px;
     margin: 1px;
-    outline: 1px solid #b4cad4;
+    outline: 1px solid #a2bfcc;
 }
 
 /* table */
@@ -183,7 +209,7 @@
 
 /** show blocks */
 .sun-editor-show-block p:not([contenteditable=false]), .sun-editor-show-block div:not([contenteditable=false]), .sun-editor-show-block h1:not([contenteditable=false]), .sun-editor-show-block h2:not([contenteditable=false]), .sun-editor-show-block h3:not([contenteditable=false]), .sun-editor-show-block h4:not([contenteditable=false]), .sun-editor-show-block h5:not([contenteditable=false]), .sun-editor-show-block h6:not([contenteditable=false]) {
-    border: 1px dashed #b4cad4;
+    border: 1px dashed #a2bfcc;
     padding: 10px 8px 8px 8px;
 }
 .sun-editor-show-block p:not([contenteditable=false]) {

@@ -39,7 +39,8 @@ export default {
         print: '인쇄',
         tag_p: '본문',
         tag_div: '기본 (DIV)',
-        tag_h: '제목'
+        tag_h: '제목',
+        tag_quote: '인용문'
     },
     dialogBox: {
         linkBox: {
