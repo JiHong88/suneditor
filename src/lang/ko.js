@@ -76,8 +76,14 @@ export default {
         width: '가로',
         height: '세로'
     },
-    editLink: {
+    controller: {
         edit: '편집',
-        remove: '삭제'
+        remove: '삭제',
+        insertRowAbove: '위에 행 삽입',
+        insertRowBelow: '아래에 행 삽입',
+        deleteRow: '행 삭제',
+        insertColumnBefore: '왼쪽에 열 삽입',
+        insertColumnAfter: '오른쪽에 열 삽입',
+        deleteColumn: '열 삭제'
     }
 };

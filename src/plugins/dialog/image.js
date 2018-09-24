@@ -517,19 +517,20 @@ export default {
     },
 
     init: function () {
-        this.context.image.imgInputFile.value = '';
-        this.context.image.imgUrlFile.value = '';
-        this.context.image.altText.value = '';
-        this.context.image.imgLink.value = '';
-        this.context.image.imgLinkNewWindowCheck.checked = false;
-        this.context.image.modal.querySelector('#suneditor_image_radio_none').checked = true;
-        this.context.image.caption.checked = false;
-        this.context.image.proportion.checked = false;
-        this.context.image.imageX.value = this.context.user.imageSize;
-        this.context.image.imageY.value = '';
-        this.context.image.imageY.disabled = true;
-        this.context.image.proportion.disabled = true;
-        this.context.image._element = null;
+        const contextImage = this.context.image;
+        contextImage.imgInputFile.value = '';
+        contextImage.imgUrlFile.value = '';
+        contextImage.altText.value = '';
+        contextImage.imgLink.value = '';
+        contextImage.imgLinkNewWindowCheck.checked = false;
+        contextImage.modal.querySelector('#suneditor_image_radio_none').checked = true;
+        contextImage.caption.checked = false;
+        contextImage.proportion.checked = false;
+        contextImage.imageX.value = this.context.user.imageSize;
+        contextImage.imageY.value = '';
+        contextImage.imageY.disabled = true;
+        contextImage.proportion.disabled = true;
+        contextImage._element = null;
         this.plugins.image.openTab.call(this, 'init');
     }
 };

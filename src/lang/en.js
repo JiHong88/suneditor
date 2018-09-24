@@ -83,8 +83,14 @@ export default {
         right: 'Right',
         center: 'Center'
     },
-    editLink: {
+    controller: {
         edit: 'Edit',
-        remove: 'Remove'
+        remove: 'Remove',
+        insertRowAbove: 'Insert row above',
+        insertRowBelow: 'Insert row below',
+        deleteRow: 'Delete row',
+        insertColumnBefore: 'Insert column before',
+        insertColumnAfter: 'Insert column after',
+        deleteColumn: 'Delete column'
     }
 };

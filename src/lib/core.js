@@ -55,9 +55,14 @@ const core = function (context, util, plugins, lang) {
         submenuActiveButton: null,
 
         /**
-         * @description controllers array (image resize area, link modified button)
+         * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
          */
         controllerArray: [],
+
+        /**
+         * @description The functions array to be executed when the controllersOff function is executed ex) init function of table plugin
+         */
+        controllerFunction: [],
 
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
@@ -181,10 +186,18 @@ const core = function (context, util, plugins, lang) {
          */
         controllersOff: function () {
             const len = this.controllerArray.length;
+            const fLen = this.controllerFunction.length;
 
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     this.controllerArray[i].style.display = 'none';
+                }
+                this.controllerArray = [];
+            }
+
+            if (fLen > 0) {
+                for (let i = 0; i < fLen; i++) {
+                    this.controllerFunction[i]();
                 }
                 this.controllerArray = [];
             }
@@ -1368,6 +1381,9 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
 
+            editor._setEditorRange();
+            event._findButtonEffectTag();
+
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callPlugin('image', function () {
@@ -1376,9 +1392,18 @@ const core = function (context, util, plugins, lang) {
                 });
                 return;
             }
+            
+            if (/^TD$/i.test(targetElement.nodeName) || /^TD$/i.test(targetElement.parentNode.nodeName)) {
+                editor.controllersOff();
 
-            editor._setEditorRange();
-            event._findButtonEffectTag();
+                let td = targetElement;
+                while (!/^TD$/i.test(td.nodeName)) {
+                    td = td.parentNode;
+                }
+
+                editor.callPlugin('table', editor.plugins.table.call_controller_tableResize.bind(editor, td));
+                return;
+            }
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -1423,12 +1448,14 @@ const core = function (context, util, plugins, lang) {
                     e.preventDefault();
                     if (ctrl || alt) break;
 
+                    editor.controllersOff();
+
                     let currentNode = selectionNode || editor.getSelectionNode();
-                    while (!/^TD$/i.test(currentNode.tagName) && !util.isWysiwygDiv(currentNode)) {
+                    while (!/^TD$/i.test(currentNode.nodeName) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
 
-                    if (currentNode && /^TD$/i.test(currentNode.tagName)) {
+                    if (currentNode && /^TD$/i.test(currentNode.nodeName)) {
                         const table = util.getParentElement(currentNode, 'table');
                         const cells = util.getListChildren(table, util.isCell);
                         let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);

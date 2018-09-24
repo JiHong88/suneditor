@@ -143,9 +143,8 @@ export default {
         this.context[this.context.resizing._resize_plugin]._resize_element.style.width = this.context.resizing._resize_w + 'px';
         this.context[this.context.resizing._resize_plugin]._resize_element.style.height =this.context.resizing._resize_h + 'px';
 
+        this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
-        this.context.resizing.resizeContainer.style.display = 'none';
-        this.context.resizing.resizeButton.style.display = 'none';
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
     },
 

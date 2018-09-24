@@ -24,7 +24,7 @@ export default {
         context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
-        let link_button = eval(this.setController_LinkBtn(core.lang));
+        let link_button = eval(this.setController_LinkButton(core.lang));
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
 
@@ -73,7 +73,7 @@ export default {
     },
 
     /** modify controller button */
-    setController_LinkBtn: function (lang) {
+    setController_LinkButton: function (lang) {
         const link_btn = document.createElement('DIV');
 
         link_btn.className = 'sun-editor-id-link-btn';
@@ -82,8 +82,8 @@ export default {
             '<div class="arrow"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="btn-group">' +
-            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.editLink.edit + '"><div class="icon-link"></div></button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.editLink.remove + '"><div class="icon-cancel"></div></button>' +
+            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.controller.edit + '"><div class="icon-link"></div></button>' +
+            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.controller.remove + '"><div class="icon-cancel"></div></button>' +
             '   </div>' +
             '</div>';
 
@@ -140,8 +140,25 @@ export default {
         linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
-        linkBtn.style.left = selectionATag.offsetLeft + 'px';
-        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight - this.context.element.wysiwyg.scrollTop + 10) + 'px';
+        let tableOffsetLeft = 0;
+        let tableOffsetTop = 0;
+        let tdElement = selectionATag.parentNode;
+        while (!this.util.isWysiwygDiv(tdElement) && !/^TD$/i.test(tdElement.nodeName)) {
+            tdElement = tdElement.parentNode;
+        }
+
+        if (/^TD$/i.test(tdElement.nodeName)) {
+            let table = tdElement;
+            while (!/^TABLE$/i.test(table.nodeName)) {
+                table = table.parentNode;
+            }
+
+            tableOffsetLeft = tdElement.offsetLeft + table.offsetLeft;
+            tableOffsetTop = tdElement.offsetTop + table.offsetTop;
+        }
+
+        linkBtn.style.left = (selectionATag.offsetLeft + tableOffsetLeft) + 'px';
+        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + tableOffsetTop - this.context.element.wysiwyg.scrollTop + 10) + 'px';
         linkBtn.style.display = 'block';
 
         this.controllerArray = [linkBtn];
@@ -168,14 +185,15 @@ export default {
             this.focus();
         }
 
-        this.context.link.linkBtn.style.display = 'none';
+        this.controllersOff();
     },
 
     init: function () {
-        this.context.link.linkBtn.style.display = 'none';
-        this.context.link._linkAnchor = null;
-        this.context.link.focusElement.value = '';
-        this.context.link.linkAnchorText.value = '';
-        this.context.link.linkNewWindowCheck.checked = false;
+        const contextLink = this.context.link;
+        contextLink.linkBtn.style.display = 'none';
+        contextLink._linkAnchor = null;
+        contextLink.focusElement.value = '';
+        contextLink.linkAnchorText.value = '';
+        contextLink.linkNewWindowCheck.checked = false;
     }
 };

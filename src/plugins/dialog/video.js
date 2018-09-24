@@ -251,10 +251,11 @@ export default {
     },
 
     init: function () {
-        this.context.video.focusElement.value = '';
-        this.context.video.videoX.value = this.context.user.videoX;
-        this.context.video.videoY.value = this.context.user.videoY;
-        this.context.video.proportion.checked = false;
-        this.context.video.proportion.disabled = true;
+        const contextVideo = this.context.video;
+        contextVideo.focusElement.value = '';
+        contextVideo.videoX.value = this.context.user.videoX;
+        contextVideo.videoY.value = this.context.user.videoY;
+        contextVideo.proportion.checked = false;
+        contextVideo.proportion.disabled = true;
     }
 };

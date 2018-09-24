@@ -157,6 +157,7 @@
 .sun-editor-editable table {
     table-layout: auto;
     border: 1px solid rgb(204, 204, 204);
+    table-layout: fixed;
     width: 100%;
     max-width: 100%;
     margin-bottom: 20px;
@@ -169,6 +170,9 @@
 }
 .sun-editor-editable table td {
     border: 1px solid #ccc; padding:8px;
+}
+.sun-editor-editable table td.sun-editor-selected-cell {
+    border: 1px double #8baab7;
 }
 
 /* image */

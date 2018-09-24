@@ -135,7 +135,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6])$/i.test(element.tagName)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6])$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -146,7 +146,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE$/i.test(element.tagName)) return true;
+        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE$/i.test(element.nodeName)) return true;
         return false;
     },
 
