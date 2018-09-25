@@ -1573,12 +1573,10 @@ const core = function (context, util, plugins, lang) {
 
     /** add plugin to plugins object */
     if (plugins) {
-        let pluginsValues = Object.values(plugins);
-        for (let i = 0, len = pluginsValues.length, plugin; i < len; i++) {
-            plugin = pluginsValues[i];
+        Object.keys(plugins).map(function(e) {
+            let plugin = plugins[e];
             editor.plugins[plugin.name] = util.copyObj(plugin);
-        }
-         pluginsValues = null;
+        });
     }
 
     /** User function */

@@ -124,7 +124,6 @@ export default {
         this.insertNode(oTable, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(oTable);
 
-        // oTable.addEventListener('mouseover', this.plugins.table.onMouseover_table);
         this.plugins.table.reset_table_picker.call(this);
     },
 

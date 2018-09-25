@@ -8,7 +8,7 @@
 .sun-editor-common dl, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common menu, .sun-editor-common li {list-style: none !important;}
 .sun-editor-common hr {margin:6px 0 6px 0 !important;}
 .sun-editor textarea {resize:none !important; border:0 !important;}
-.sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer;}
+.sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer; outline: none;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align: middle;}
 .sun-editor button .txt {display: block; margin-top: 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
