@@ -226,9 +226,9 @@
 .sun-editor .table-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:5em; height:5em; background:url('../img/unhighlighted.png') repeat;}
 .sun-editor .table-display {padding-left:5px;}
 
-/* table resizing */
-.sun-editor .sun-editor-id-table-resize {position:absolute; top:0; left:0; z-index:11; display:none; max-width:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
-.sun-editor .sun-editor-id-table-resize-bar {position: absolute; display: none; width: 2px; background-color: #8baab7;}
+/* table edit, resizing */
+.sun-editor .sun-editor-id-table-edit {position:absolute; width:165px; top:0; left:0; z-index:11; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+/* .sun-editor .sun-editor-id-table-resize-bar {position: absolute; display: block; width: 2px; background-color: #8baab7; cursor:e-resize;} */
 
 /* resize (image, iframe) */
 .sun-editor .modal-resize-container {position:absolute; display:none; z-index:8; border:1px solid #a2bfcc;}
@@ -249,7 +249,7 @@
 .sun-editor .resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:12; max-width:310px; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 
 /* link controller button */
-.sun-editor .sun-editor-id-link-btn {position:absolute; top:0; left:0; z-index:11; display:none; max-width:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .sun-editor-id-link-btn {position:absolute; top:0; left:0; z-index:11; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .sun-editor .sun-editor-id-link-btn:before, .sun-editor .sun-editor-id-link-btn:after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .sun-editor-id-link-btn .link-content {padding:0; margin:0;}
 .sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}

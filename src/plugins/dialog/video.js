@@ -154,8 +154,8 @@ export default {
             coverSpan.setAttribute('contentEditable', false);
 
             /** cover event */
-            coverSpan.addEventListener('mouseenter', this.plugins.video.onMouseEnter_cover.bind(this));
-            coverSpan.addEventListener('mouseleave', this.plugins.video.onMouseLeave_cover.bind(this).bind(this));
+            coverSpan.addEventListener('mouseenter', this.plugins.video.onMouseenter_cover.bind(this));
+            coverSpan.addEventListener('mouseleave', this.plugins.video.onMouseleave_cover.bind(this).bind(this));
 
             oIframe.width = '100%';
             oIframe.height = '100%';
@@ -182,14 +182,14 @@ export default {
         return false;
     },
 
-    onMouseEnter_cover: function (e) {
+    onMouseenter_cover: function (e) {
         const target = e.target;
         if (target === this.context.video._coverElementInner.parentNode) return;
 
         target.appendChild(this.context.video._coverElementInner);
     },
 
-    onMouseLeave_cover: function (e) {
+    onMouseleave_cover: function (e) {
         const target = e.target;
         if (target === this.context.video._coverElementInner.parentNode) target.removeChild(this.context.video._coverElementInner);
     },

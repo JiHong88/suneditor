@@ -32,11 +32,8 @@ export default {
         context.table.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
 
         /** set resizing */
-        let resizeDiv = eval(this.setController_tableResize(core.lang));
-        let resizeBar = this.setController_tableResizeBar();
-
+        let resizeDiv = eval(this.setController_tableEditor(core.lang));
         context.table.resizeDiv = resizeDiv;
-        context.table.resizeBar = resizeBar;
         
         /** add event listeners */
         tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core));
@@ -46,10 +43,9 @@ export default {
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
         context.element.relative.appendChild(resizeDiv);
-        context.element.relative.appendChild(resizeBar);
 
         /** empty memory */
-        listDiv = null, tablePicker = null, resizeDiv = null, resizeBar = null;
+        listDiv = null, tablePicker = null, resizeDiv = null;
     },
 
     setSubmenu: function () {
@@ -68,10 +64,10 @@ export default {
         return listDiv;
     },
 
-    setController_tableResize: function (lang) {
+    setController_tableEditor: function (lang) {
         const tableResize = document.createElement('DIV');
 
-        tableResize.className = 'sun-editor-id-table-resize';
+        tableResize.className = 'sun-editor-id-table-edit';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div class="arrow"></div>' +
@@ -88,16 +84,10 @@ export default {
             '     <button type="button" data-command="insert" data-value="cell" data-option="right" title="' + lang.controller.insertColumnAfter + '"><div class="icon-insert-column-right"></div></button>' +
             '     <button type="button" data-command="delete" data-value="cell" title="' + lang.controller.deleteColumn + '"><div class="icon-delete-column"></div></button>' +
             '     <button type="button" data-command="remove" title="' + lang.controller.remove + '"><div class="icon-delete"></div></button>' +
+            '   </div>' +
             '</div>';
 
         return tableResize;
-    },
-
-    setController_tableResizeBar: function () {
-        const resizeDiv = document.createElement('DIV');
-        resizeDiv.style.display = 'none';
-        resizeDiv.className = 'sun-editor-id-table-resize-bar';
-        return resizeDiv;
     },
 
     appendTable: function () {
@@ -175,21 +165,22 @@ export default {
         contextTable._trCnt = 0;
         contextTable._tdCnt = 0;
         contextTable._tableXY = [];
+        contextTable._resizeBars = [];
     },
 
-    /** table resizing */
-    call_controller_tableResize: function (tdElement) {
+    /** table edit controller */
+    call_controller_tableEdit: function (tdElement) {
         const contextTable = this.context.table;
         const resizeDiv = contextTable.resizeDiv;
         
-        this.plugins.table.setPositionResizeDiv.call(this, tdElement, false);
+        this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
         resizeDiv.style.display = 'block';
 
         this.controllerArray = [resizeDiv];
         this.controllerFunction = [this.plugins.table.init.bind(this)];
     },
 
-    setPositionResizeDiv: function (tdElement, reset) {
+    setPositionControllerDiv: function (tdElement, reset) {
         const contextTable = this.context.table;
         const resizeDiv = contextTable.resizeDiv;
         let table = contextTable._element;
@@ -247,7 +238,7 @@ export default {
             }
         }
 
-        this.plugins.table.setPositionResizeDiv.call(this, contextTable._tdElement, true);
+        this.plugins.table.setPositionControllerDiv.call(this, contextTable._tdElement, true);
     },
 
     deleteRowCell: function (type) {

@@ -47,11 +47,11 @@ export default {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
             // options = Object.assign(this.util.copyObj(_init_options), options);
-            options =  [this.util.copyObj(_init_options), options].reduce(function (r, o) {
-                            Object.keys(o).forEach(function (k) {
-                                r[k] = o[k];
+            options =  [this.util.copyObj(_init_options), options].reduce(function (init, option) {
+                            Object.keys(option).forEach(function (key) {
+                                init[key] = option[key];
                             });
-                            return r;
+                            return init;
                         }, {});
         }
         

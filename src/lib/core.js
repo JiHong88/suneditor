@@ -210,7 +210,7 @@ const core = function (context, util, plugins, lang) {
          * @param {String} value - javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
-            document.execCommand(command, showDefaultUI, value);
+            document.execCommand(command, showDefaultUI, (value ? '<' + value + '>' : null));
         },
 
         /**
@@ -1401,7 +1401,7 @@ const core = function (context, util, plugins, lang) {
                     td = td.parentNode;
                 }
 
-                editor.callPlugin('table', editor.plugins.table.call_controller_tableResize.bind(editor, td));
+                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
                 return;
             }
         },
@@ -1573,8 +1573,8 @@ const core = function (context, util, plugins, lang) {
 
     /** add plugin to plugins object */
     if (plugins) {
-        Object.keys(plugins).map(function(e) {
-            let plugin = plugins[e];
+        Object.keys(plugins).map(function(key) {
+            let plugin = plugins[key];
             editor.plugins[plugin.name] = util.copyObj(plugin);
         });
     }
@@ -1684,7 +1684,7 @@ const core = function (context, util, plugins, lang) {
             window.removeEventListener('resize', event.resize_window);
             
             /** remove element */
-            context.element.topArea.parentNode.removeChild(context.element.topArea);
+            util.removeItem(context.element.topArea);
 
             this.save = null;
             this.getContext = null;
