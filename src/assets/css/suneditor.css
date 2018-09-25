@@ -76,14 +76,15 @@
 .sun-editor .icon-cancel:before{content:'\0068'; font-size:10px;}
 .sun-editor .icon-hr:before{content:'\0069';}
 .sun-editor .icon-insert-column-right:before{content:'\006a';}
-.sun-editor .icon-insert-row-above:before{content:'\006b';}
-.sun-editor .icon-insert-row-below:before{content:'\006c';}
+.sun-editor .icon-insert-row-below:before{content:'\006b';}
+.sun-editor .icon-insert-row-above:before{content:'\006c';}
 .sun-editor .icon-insert-column-left:before{content:'\006d';}
 .sun-editor .icon-delete-row:before{content:'\006e';}
 .sun-editor .icon-delete-column:before{content:'\006f';}
 .sun-editor .icon-quote:before{content:'\0070';}
 .sun-editor .icon-empty-file:before{content:'\0071';}
 .sun-editor .icon-paragraph:before{content:'\0072';}
+.sun-editor .icon-delete:before{content:'\0073';}
 .sun-editor .arrow-more-down {position:absolute; top:14px; right:10px; width:7px; height:7px; background:url('../img/arrow_down.svg') no-repeat; background-size:100%;}
 
 /* used color #000 , #fff , #CCC , #d4e3ea , #bbd5e0 , #a2bfcc , #8baab7*/

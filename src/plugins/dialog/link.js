@@ -83,7 +83,7 @@ export default {
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="btn-group">' +
             '     <button type="button" data-command="update" tabindex="-1" title="' + lang.controller.edit + '"><div class="icon-link"></div></button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.controller.remove + '"><div class="icon-cancel"></div></button>' +
+            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.controller.remove + '"><div class="icon-delete"></div></button>' +
             '   </div>' +
             '</div>';
 

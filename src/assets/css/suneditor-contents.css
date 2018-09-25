@@ -10,6 +10,9 @@
 .sun-editor-editable * {
     font-size: inherit;
     font-family: inherit;
+    color: inherit;
+    background-color: inherit;
+    text-align: inherit;
 }
 
 /* float */
@@ -172,7 +175,7 @@
     border: 1px solid #ccc; padding:8px;
 }
 .sun-editor-editable table td.sun-editor-selected-cell {
-    border: 1px double #8baab7;
+    outline: 2px solid #8baab7;
 }
 
 /* image */

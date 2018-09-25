@@ -88,7 +88,7 @@ export default {
             '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
             '</div>' +
             '<div class="btn-group remove">' +
-            '   <button type="button" data-command="delete" title="' + lang.dialogBox.remove + '"><div aria-hidden="true" class="icon-cancel"></div></button>' +
+            '   <button type="button" data-command="delete" title="' + lang.dialogBox.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
 
         return resize_button;

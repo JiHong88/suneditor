@@ -19,17 +19,17 @@ export default {
             _tdIndex: 0,
             _trIndex: 0,
             _tdCnt: 0,
-            _trCnt: 0
+            _trCnt: 0,
+            _tableXY: []
         };
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu());
         let tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
 
-        context.submenu.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
-        context.submenu.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
-        context.submenu.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
-        context.submenu._tableXY = [];
+        context.table.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
+        context.table.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
+        context.table.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
 
         /** set resizing */
         let resizeDiv = eval(this.setController_tableResize(core.lang));
@@ -81,14 +81,13 @@ export default {
             '     <button type="button" data-command="insert" data-value="row" data-option="down" title="' + lang.controller.insertRowBelow + '"><div class="icon-insert-row-below"></div></button>' +
             '     <button type="button" data-command="delete" data-value="row" title="' + lang.controller.deleteRow + '"><div class="icon-delete-row"></div></button>' +
             '   </div>' +
+            '</div>' +
+            '<div style="margin-top: -5px;">' +
             '   <div class="btn-group">' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="left" title="' + lang.controller.insertColumnBefore + '"><div class="icon-insert-column-left"></div></button>' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="right" title="' + lang.controller.insertColumnAfter + '"><div class="icon-insert-column-right"></div></button>' +
             '     <button type="button" data-command="delete" data-value="cell" title="' + lang.controller.deleteColumn + '"><div class="icon-delete-column"></div></button>' +
-            '   </div>' +
-            '   <div class="btn-group">' +
-            '     <button type="button" data-command="remove" title="' + lang.controller.remove + '"><div class="icon-cancel"></div></button>' +
-            '   </div>' +
+            '     <button type="button" data-command="remove" title="' + lang.controller.remove + '"><div class="icon-delete"></div></button>' +
             '</div>';
 
         return tableResize;
@@ -104,8 +103,8 @@ export default {
     appendTable: function () {
         const oTable = document.createElement('TABLE');
 
-        let x = this.context.submenu._tableXY[0];
-        let y = this.context.submenu._tableXY[1];
+        let x = this.context.table._tableXY[0];
+        let y = this.context.table._tableXY[1];
         let tableHTML = '<tbody>';
 
         while (y > 0) {
@@ -136,30 +135,30 @@ export default {
         let y = Math.ceil(e.offsetY / 18);
         x = x < 1 ? 1 : x;
         y = y < 1 ? 1 : y;
-        this.context.submenu.tableHighlight.style.width = x + 'em';
-        this.context.submenu.tableHighlight.style.height = y + 'em';
+        this.context.table.tableHighlight.style.width = x + 'em';
+        this.context.table.tableHighlight.style.height = y + 'em';
 
         let x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
         let y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
-        this.context.submenu.tableUnHighlight.style.width = x_u + 'em';
-        this.context.submenu.tableUnHighlight.style.height = y_u + 'em';
+        this.context.table.tableUnHighlight.style.width = x_u + 'em';
+        this.context.table.tableUnHighlight.style.height = y_u + 'em';
 
-        this.util.changeTxt(this.context.submenu.tableDisplay, x + ' x ' + y);
-        this.context.submenu._tableXY = [x, y];
+        this.util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
+        this.context.table._tableXY = [x, y];
     },
 
     reset_table_picker: function () {
-        if (!this.context.submenu.tableHighlight) return;
+        if (!this.context.table.tableHighlight) return;
 
-        const highlight = this.context.submenu.tableHighlight.style;
-        const unHighlight = this.context.submenu.tableUnHighlight.style;
+        const highlight = this.context.table.tableHighlight.style;
+        const unHighlight = this.context.table.tableUnHighlight.style;
 
         highlight.width = '1em';
         highlight.height = '1em';
         unHighlight.width = '5em';
         unHighlight.height = '5em';
 
-        this.util.changeTxt(this.context.submenu.tableDisplay, '1 x 1');
+        this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
         this.submenuOff();
     },
 
@@ -176,6 +175,7 @@ export default {
         contextTable._trIndex = 0;
         contextTable._trCnt = 0;
         contextTable._tdCnt = 0;
+        contextTable._tableXY = [];
     },
 
     /** table resizing */
