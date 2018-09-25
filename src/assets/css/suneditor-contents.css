@@ -12,7 +12,6 @@
     font-family: inherit;
     color: inherit;
     background-color: inherit;
-    text-align: inherit;
 }
 
 /* float */
@@ -27,6 +26,17 @@
 }
 .sun-editor-editable .float-none {
     float: none;
+}
+
+/* a */
+.sun-editor-editable a {
+    color: #004cff;
+    text-decoration: none;
+}
+.sun-editor-editable a:hover, .sun-editor-editable a:focus {
+    cursor: pointer;
+    color: #0093ff;
+    text-decoration: underline;
 }
 
 /** format style */
