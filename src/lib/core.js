@@ -612,7 +612,6 @@ const core = function (context, util, plugins, lang) {
                     if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
                     } else {
-                        startCon.splitText(startOff);
                         startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
                     }
                 }
@@ -1173,6 +1172,7 @@ const core = function (context, util, plugins, lang) {
             let cssText = '', nodeName = '';
 
             for (let selectionParent = editor.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
+                if (!selectionParent) break;
                 if (selectionParent.nodeType !== 1) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
