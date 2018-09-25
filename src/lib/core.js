@@ -1484,6 +1484,7 @@ const core = function (context, util, plugins, lang) {
 
         onKeyUp_wysiwyg: function (e) {
             editor._setEditorRange();
+            editor.controllersOff();
             const selectionNode = editor.getSelectionNode();
 
             /** when format tag deleted */
