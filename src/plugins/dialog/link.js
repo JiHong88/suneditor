@@ -157,6 +157,11 @@ export default {
             tableOffsetTop = tdElement.offsetTop + table.offsetTop;
         }
 
+        if (/^(?:SUB|SUP)$/i.test(selectionATag.parentNode.nodeName)) {
+            tableOffsetLeft += selectionATag.parentNode.offsetLeft;
+            tableOffsetTop += selectionATag.parentNode.offsetTop;
+        }
+
         linkBtn.style.left = (selectionATag.offsetLeft + tableOffsetLeft) + 'px';
         linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + tableOffsetTop - this.context.element.wysiwyg.scrollTop + 10) + 'px';
         linkBtn.style.display = 'block';

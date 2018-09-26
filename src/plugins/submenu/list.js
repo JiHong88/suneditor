@@ -54,7 +54,10 @@ export default {
         }
 
         this.focus();
+
         this.execCommand(command, false, value);
+
         this.submenuOff();
+        this.focus();
     }
 };

@@ -62,6 +62,8 @@ export default {
 
         const newNode = document.createElement('SPAN'); newNode.style.color = e.target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['color']);
+
         this.submenuOff();
+        this.focus();
     }
 };

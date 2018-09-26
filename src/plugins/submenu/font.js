@@ -69,6 +69,8 @@ export default {
         this.util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         const newNode = document.createElement('SPAN'); newNode.style.fontFamily = target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['font-family']);
+        
         this.submenuOff();
+        this.focus();
     }
 };

@@ -76,7 +76,10 @@ export default {
         }
 
         this.focus();
+
         this.plugins.horizontalRule.appendHr.call(this,value);
+
         this.submenuOff();
+        this.focus();
     }
 };

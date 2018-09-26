@@ -60,6 +60,8 @@ export default {
 
         const newNode = document.createElement('SPAN'); newNode.style.backgroundColor = e.target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['background-color']);
+
         this.submenuOff();
+        this.focus();
     }
 };

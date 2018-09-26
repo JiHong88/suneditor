@@ -96,11 +96,10 @@ const util = {
         for (let i = 0, len = tag.length; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
 
-            if (!this.isFormatElement(tag[i]) && !this.isRangeFormatElement(tag[i])) {
+            if (tag[i].nodeType === 3) {
                 const textArray = baseHtml.split(/\n/g);
                 let text = '';
                 for (let t = 0, tLen = textArray.length; t < tLen; t++) {
-                    if (textArray[t].nodeType !== 3) continue;
                     text = textArray[t].trim();
                     if (text.length > 0) innerHTML += '<P>' + text + '</p>';
                 }

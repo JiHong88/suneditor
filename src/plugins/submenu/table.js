@@ -113,6 +113,7 @@ export default {
 
         this.insertNode(oTable, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(oTable);
+        this.focus();
 
         this.plugins.table.reset_table_picker.call(this);
     },

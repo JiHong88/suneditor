@@ -304,6 +304,8 @@ export default {
             this.closeLoading();
         }
 
+        this.focus();
+
         return false;
     },
 
