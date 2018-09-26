@@ -59,7 +59,9 @@ export default {
         const formatElement = this.util.getFormatElement(this.getSelectionNode());
 
         if (/^LI$/i.test(formatElement.tagName)) {
+            const cancel = formatElement.parentNode.tagName === value;
             this.execCommand(command, false, null);
+            if (cancel) this.execCommand('formatBlock', false, 'DIV');
         } else {
             const rightNode = formatElement.nextSibling;
             const list = document.createElement(value);
