@@ -7,13 +7,6 @@
     margin: 0;
 }
 
-.sun-editor-editable * {
-    font-size: inherit;
-    font-family: inherit;
-    color: inherit;
-    background-color: inherit;
-}
-
 /* float */
 .sun-editor-editable .float-left {
     float: left;
@@ -37,6 +30,19 @@
     cursor: pointer;
     color: #0093ff;
     text-decoration: underline;
+}
+
+/* sub, sup */
+.sun-editor-editable sub, sup {
+    position: relative;
+    font-size: 75%;
+    line-height: 0;
+}
+.sun-editor-editable sub {
+    vertical-align: sub;
+}
+.sun-editor-editable sup {
+    vertical-align: super;
 }
 
 /** format style */
