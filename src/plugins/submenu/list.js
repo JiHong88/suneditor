@@ -1,3 +1,5 @@
+import { format } from "path";
+
 /*
  * wysiwyg web editor
  *
@@ -31,8 +33,8 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
-            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="DECIMAL" title="' + lang.toolbar.orderList + '"><div class="icon-list-number"></div></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="DISC" title="' + lang.toolbar.unorderList + '"><div class="icon-list-bullets"></div></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="OL" title="' + lang.toolbar.orderList + '"><div class="icon-list-number"></div></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="UL" title="' + lang.toolbar.unorderList + '"><div class="icon-list-bullets"></div></button></li>' +
             '   </ul>' +
             '</div>';
 
@@ -44,18 +46,27 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let command = null;
-        let value = null;
+        let command = '';
+        let value = '';
 
-        while (!value && !/UL/i.test(target.tagName)) {
+        while (!command && !/^UL$/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');
             target = target.parentNode;
         }
 
         this.focus();
+        const formatElement = this.util.getFormatElement(this.getSelectionNode());
 
-        this.execCommand(command, false, value);
+        if (/^LI$/i.test(formatElement.tagName)) {
+            this.execCommand(command, false, null);
+        } else {
+            const rightNode = formatElement.nextSibling;
+            const list = document.createElement(value);
+            list.innerHTML = '<li>' + formatElement.innerHTML + '</li>';
+            this.util.removeItem(formatElement);
+            this.insertNode(list, rightNode);
+        }
 
         this.submenuOff();
         this.focus();

@@ -55,7 +55,8 @@ export default {
         this.focus();
 
         this.util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
-        const newNode = document.createElement('SPAN'); newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
+        const newNode = document.createElement('SPAN');
+        newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
         this.wrapRangeToTag(newNode, ['font-size']);
 
         this.submenuOff();

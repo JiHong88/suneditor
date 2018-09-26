@@ -464,7 +464,9 @@ const core = function (context, util, plugins, lang) {
                 parentNode.appendChild(oNode);
             }
 
-            this.setRange(oNode, 0, oNode, oNode.textContent.length);
+            try {
+                this.setRange(oNode, 0, oNode, oNode.textContent.length);
+            } catch (e) {}
         },
 
         /**
@@ -672,7 +674,7 @@ const core = function (context, util, plugins, lang) {
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesPart(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesOneLine(commonCon, newNode, checkCss, startCon, startOff, endCon, endOff);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -717,7 +719,7 @@ const core = function (context, util, plugins, lang) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _wrapLineNodesPart: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
@@ -733,7 +735,7 @@ const core = function (context, util, plugins, lang) {
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if (validation(child) && child.textContent.length > 0) {
+                    if (validation(child) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
                         let cloneNode;
 
                         // startContainer
@@ -770,11 +772,12 @@ const core = function (context, util, plugins, lang) {
             
             this.removeNode();
 
-            while (endCon.parentNode.textContent.length === 0 && !util.isFormatElement(endCon.parentNode)) {
-                endCon = endCon.parentNode;
+            let rightNode = endCon;
+            while (rightNode.parentNode !== element) {
+                rightNode = rightNode.parentNode;
             }
 
-            endCon.parentNode.insertBefore(newInnerNode, endCon);
+            element.insertBefore(newInnerNode, rightNode);
 
             if (endCon.textContent.length === 0) util.removeItem(endCon);
             if (startCon.textContent.length === 0) util.removeItem(startCon);
@@ -801,7 +804,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
                     let coverNode = node;
-                    if (validation(child) && child.textContent.length > 0) {
+                    if (validation(child) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -826,7 +829,7 @@ const core = function (context, util, plugins, lang) {
          */
         _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
             const el = element;
-            const pNode = document.createElement('P');
+            const pNode = element.cloneNode(false);
 
             let container = startCon;
             let offset = startOff;
@@ -938,7 +941,7 @@ const core = function (context, util, plugins, lang) {
          */
         _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
             const el = element;
-            const pNode = document.createElement('P');
+            const pNode = element.cloneNode(false);
 
             let container = endCon;
             let offset = endOff;

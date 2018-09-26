@@ -129,23 +129,23 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6])$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName)) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the range format element. (blockquote, TABLE)
-     * * Range format element is wrap the format element  (P, DIV, H1-6)
+     * @description It is judged whether it is the range format element. (blockquote, TABLE, OL, UL)
+     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE|OL|UL$/i.test(element.nodeName)) return true;
         return false;
     },
 

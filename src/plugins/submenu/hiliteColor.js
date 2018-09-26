@@ -58,7 +58,8 @@ export default {
 
         this.focus();
 
-        const newNode = document.createElement('SPAN'); newNode.style.backgroundColor = e.target.getAttribute('data-value');
+        const newNode = document.createElement('SPAN');
+        newNode.style.backgroundColor = e.target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['background-color']);
 
         this.submenuOff();
