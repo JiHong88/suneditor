@@ -417,7 +417,7 @@ const core = function (context, util, plugins, lang) {
                     parentNode = startCon.parentNode;
                 }
 
-                /** Select within the same node */
+                /** No Select range node */
                 if (range.collapsed) {
                     if (commonCon.nodeType === 3) {
                         rightNode = commonCon.splitText(endOff);
@@ -429,7 +429,7 @@ const core = function (context, util, plugins, lang) {
                         rightNode = null;
                     }
                 }
-                /** Select multiple nodes */
+                /** Select range nodes */
                 else {
                     const isSameContainer = startCon === endCon;
 
@@ -444,7 +444,12 @@ const core = function (context, util, plugins, lang) {
                     }
                     else {
                         this.removeNode();
+                        parentNode = commonCon;
                         rightNode = endCon;
+
+                        while (rightNode.parentNode !== commonCon) {
+                            rightNode = rightNode.parentNode;
+                        }
                     }
                 }
             }
@@ -604,19 +609,20 @@ const core = function (context, util, plugins, lang) {
             if (startCon === endCon) {
                 newNode = appendNode.cloneNode(false);
 
-                /** No node selected */
-                if (startOff === endOff) {
+                /** No range node selected */
+                if (range.collapsed) {
                     newNode.innerHTML = '&#65279';
                     if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
                     } else {
-                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                        const parentNode = startCon.nodeType === 3 ? startCon.parentNode : startCon;
+                        const rightNode = commonCon.nodeType === 3 ? commonCon.splitText(endOff) : null;
+                        parentNode.insertBefore(newNode, rightNode);
                     }
                 }
-                /** Select within the same node */
+                /** Select range node */
                 else {
-                    const isElement = startCon.nodeType === 1;
-                    if (isElement) {
+                    if (startCon.nodeType === 1) {
                         newNode.innerHTML = startCon.outerHTML;
                         startCon.parentNode.appendChild(newNode);
                         util.removeItem(startCon);
