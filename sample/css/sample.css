@@ -5,13 +5,13 @@
 
 .back_index {
     background: url("../img/sun_big.jpg") repeat;
-    background-size: auto auto;
+    background-size: 100%;
     background-position: 0 64px;
 }
 
 .back_categorys {
     background: url("../img/sun_big.jpg") repeat;
-    background-size: auto auto;
+    background-size: 100%;
     background-position: 0 64px;
 }
 
@@ -58,7 +58,7 @@ button {
 }
 
 .github-cat:hover, .github-cat:focus {
-    color: #d33f03 !important;
+    color: #fff !important;
 }
 
 .github-cat:hover::before {
@@ -83,8 +83,8 @@ button {
     margin-right: 2px;
 }
 
-.down-icon:hover, .down-icon:focus {
-    color: #d33f03 !important;
+.down-icon:hover {
+    color: #fff !important;
 }
 
 .down-icon:hover::before {

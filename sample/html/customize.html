@@ -22,6 +22,9 @@
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
         });
+        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor/releases/latest', function(data) {
+            $('#download_latest').attr('href', data.zipball_url);
+        });
     </script>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
@@ -45,7 +48,7 @@
                 <li><a href="customize.html" style="color:#fff;" title="Customize">Customize</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li>&nbsp;&nbsp;</li>
-                <li><a href="//codeload.github.com/JiHong88/SunEditor/zip/master" class="down-icon" title="Download">Download</a></li>
+                <li><a href="#" id="download_latest" class="down-icon" title="Download">Download</a></li>
                 <li>
                     <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
                 </li>
@@ -129,6 +132,9 @@
 
         <span class="pl-c"><span class="pl-c">//</span> insert</span>
         <span class="pl-c1">this</span>.<span class="pl-c1">insertNode</span>(value);
+
+        <span class="pl-c"><span class="pl-c">//</span> focus</span>
+        <span class="pl-c1">this</span>.<span class="pl-c1">focus</span>();
     }
 }</pre></div>
 
@@ -138,8 +144,8 @@
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>ex_submenu<span class="pl-pds">'</span></span>), {
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, {
+        [
+            {
                 <span class="pl-c"><span class="pl-c">//</span> plugin's name attribute</span>
                 name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>, 
                 <span class="pl-c"><span class="pl-c">//</span> name of the plugin to be recognized by the toolbar.</span>

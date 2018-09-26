@@ -59,5 +59,8 @@ export default {
 
         // insert
         this.insertNode(value);
+
+        // focus
+        this.focus();
     }
 }

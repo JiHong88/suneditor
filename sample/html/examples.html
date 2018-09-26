@@ -23,6 +23,9 @@
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
         });
+        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor/releases/latest', function(data) {
+            $('#download_latest').attr('href', data.zipball_url);
+        });
     </script>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
@@ -46,7 +49,7 @@
                 <li><a href="customize.html" title="Customize">Customize</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li>&nbsp;&nbsp;</li>
-                <li><a href="//codeload.github.com/JiHong88/SunEditor/zip/master" class="down-icon" title="Download">Download</a></li>
+                <li><a href="#" id="download_latest" class="down-icon" title="Download">Download</a></li>
                 <li>
                     <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
                 </li>

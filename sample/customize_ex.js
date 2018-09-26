@@ -10,8 +10,8 @@ suneditor.create(document.getElementById('ex_submenu'), {
     ],
     buttonList: [
         ['undo', 'redo'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['preview', {
+        [
+            {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
                 // name of the plugin to be recognized by the toolbar.
