@@ -434,8 +434,10 @@ const core = function (context, util, plugins, lang) {
                     const isSameContainer = startCon === endCon;
 
                     if (isSameContainer) {
+                        if (this.isEdgePoint(endCon, endOff)) rightNode = endCon.nextSibling;
+                        else rightNode = endCon.splitText(endOff);
+
                         let removeNode = startCon;
-                        if (!this.isEdgePoint(endCon, endOff)) rightNode = endCon.splitText(endOff);
                         if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
                         parentNode.removeChild(removeNode);
@@ -443,10 +445,6 @@ const core = function (context, util, plugins, lang) {
                     else {
                         this.removeNode();
                         rightNode = endCon;
-
-                        while (rightNode.nodeType !== 1) {
-                            rightNode = rightNode.parentNode;
-                        }
                     }
                 }
             }
@@ -461,7 +459,7 @@ const core = function (context, util, plugins, lang) {
                 parentNode.appendChild(oNode);
             }
 
-            // this.setRange(oNode, 0, oNode, 0);
+            this.setRange(oNode, 0, oNode, oNode.textContent.length);
         },
 
         /**
