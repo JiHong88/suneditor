@@ -273,7 +273,7 @@ export default {
 
     setSize: function (x, y) {
         this.context.video._resize_element.style.width = x;
-        this.context.video._resize_element.style.height = y;
+        this.context.video._resize_element.style.height = x;
     },
 
     destroy: function () {
