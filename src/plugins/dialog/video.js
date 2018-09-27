@@ -16,22 +16,24 @@ export default {
 
         const context = core.context;
         context.video = {
-            _coverElement: null,
-            _coverElementInner: document.createElement('SPAN'),
+            _containerElement: null,
+            _coverElement: document.createElement('SPAN'),
             _element: null,
             _resize_element: null,
-            _element_w: 1,
-            _element_h: 1,
+            _element_w: context.user.videoX,
+            _element_h: context.user.videoY,
             _element_l: 0,
             _element_t: 0,
             _origin_w: context.user.videoX,
             _origin_h: context.user.videoY,
-            _proportionChecked: false
+            _proportionChecked: true,
+            _align: 'none',
+            _floatClassRegExp: 'float\\-[a-z]+'
         };
 
         /** Inner node needed to edit video iframe event */
-        context.video._coverElementInner.className = 'sun-editor-iframe-inner-cover';
-        context.video._coverElementInner.addEventListener('click', function (e) {
+        context.video._coverElement.className = 'sun-editor-iframe-inner-cover';
+        context.video._coverElement.addEventListener('click', function (e) {
             const pNode = e.target.parentNode;
             const size = core.plugins.resizing.call_controller_resize.call(core, pNode, 'video');
             core.plugins.video.onModifyMode.call(core, pNode.children[0], size);
@@ -84,11 +86,17 @@ export default {
             '       <div class="form-group">' +
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '           <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
-            '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" disabled/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
+            '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" checked/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
             '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
+            '       <div style="float: left;">' +
+            '           <input type="radio" id="suneditor_video_radio_none" name="suneditor_video_radio" class="modal-radio" value="none" checked><label for="suneditor_video_radio_none">' + lang.dialogBox.basic + '</label>' +
+            '           <input type="radio" id="suneditor_video_radio_left" name="suneditor_video_radio" class="modal-radio" value="left"><label for="suneditor_video_radio_left">' + lang.dialogBox.left + '</label>' +
+            '           <input type="radio" id="suneditor_video_radio_center" name="suneditor_video_radio" class="modal-radio" value="center"><label for="suneditor_video_radio_center">' + lang.dialogBox.center + '</label>' +
+            '           <input type="radio" id="suneditor_video_radio_right" name="suneditor_video_radio" class="modal-radio" value="right"><label for="suneditor_video_radio_right">' + lang.dialogBox.right + '</label>' +
+            '       </div>' +
             '       <button type="submit" class="btn btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
@@ -115,10 +123,13 @@ export default {
         function submitAction() {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
-            const w = (/^\d+$/.test(this.context.video.videoX.value) ? this.context.video.videoX.value : this.context.user.videoX);
-            const h = (/^\d+$/.test(this.context.video.videoY.value) ? this.context.video.videoY.value : this.context.user.videoY);
+            const contextVideo = this.context.video;
+            const w = (/^\d+$/.test(contextVideo.videoX.value) ? contextVideo.videoX.value : this.context.user.videoX);
+            const h = (/^\d+$/.test(contextVideo.videoY.value) ? contextVideo.videoY.value : this.context.user.videoY);
             let oIframe = null;
-            let url = this.context.video.focusElement.value.trim();
+            let container = null;
+            let url = contextVideo.focusElement.value.trim();
+            contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
             /** iframe source */
             if (/^\<iframe.*iframe\>$/.test(url)) {
@@ -139,36 +150,54 @@ export default {
 
             /** update */
             if (this.context.dialog.updateModal) {
-                this.context.video._element.src = oIframe.src;
-                this.context.video._element.setAttribute('data-proportion', this.context.video._proportionChecked);
-                this.context.video._coverElement.style.width = w + 'px';
-                this.context.video._coverElement.style.height = h + 'px';
-                return;
+                contextVideo._element.src = oIframe.src;
+                contextVideo._element.setAttribute('data-proportion', contextVideo._proportionChecked);
+                container = contextVideo._containerElement;
+                oIframe = contextVideo._element;
+            }
+            /** create */
+            else {
+                /** container */
+                container = document.createElement('DIV');
+                container.className = 'sun-editor-id-media-container sun-editor-id-iframe-container';
+                container.setAttribute('contentEditable', false);
+    
+                /** container event */
+                container.addEventListener('mouseenter', this.plugins.video.onMouseenter_container.bind(this));
+                container.addEventListener('mouseleave', this.plugins.video.onMouseleave_container.bind(this).bind(this));
+
+                oIframe.width = '100%';
+                oIframe.height = '100%';
+                oIframe.frameBorder = '0';
+                oIframe.allowFullscreen = true;
+                oIframe.setAttribute('data-proportion', contextVideo._proportionChecked);
+                oIframe.contentDocument;
             }
 
-            /** create */
-            const coverSpan = document.createElement('SPAN');
-            coverSpan.className = 'sun-editor-iframe-cover';
-            coverSpan.style.width = w + 'px';
-            coverSpan.style.height = h + 'px';
-            coverSpan.setAttribute('contentEditable', false);
+            // size
+            container.style.width = w + 'px';
+            container.style.height = h + 'px';
 
-            /** cover event */
-            coverSpan.addEventListener('mouseenter', this.plugins.video.onMouseenter_cover.bind(this));
-            coverSpan.addEventListener('mouseleave', this.plugins.video.onMouseleave_cover.bind(this).bind(this));
+            // align
+            if ('center' !== contextVideo._align) {
+                container.style.display = 'inline-block';
+                this.util.removeClass(container, this.context.video._floatClassRegExp);
+                this.util.addClass(container, 'float-' + contextVideo._align);
+            } else {
+                container.style.display = 'table';
+                this.util.removeClass(container, this.context.video._floatClassRegExp);
+                this.util.addClass(container, 'float-none');
+            }
 
-            oIframe.width = '100%';
-            oIframe.height = '100%';
-            oIframe.frameBorder = '0';
-            oIframe.allowFullscreen = true;
-            oIframe.setAttribute('data-proportion', this.context.video._proportionChecked);
-            oIframe.contentDocument;
+            oIframe.setAttribute('data-align', contextVideo._align);
 
-            this.context.video._coverElement = coverSpan;
-            coverSpan.appendChild(oIframe);
-
-            this.insertNode(coverSpan);
-            this.appendP(coverSpan);
+            if (!this.context.dialog.updateModal) {
+                contextVideo._containerElement = container;
+                container.appendChild(oIframe);
+    
+                this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
+                this.appendP(container);
+            }
         }
 
         try {
@@ -184,16 +213,16 @@ export default {
         return false;
     },
 
-    onMouseenter_cover: function (e) {
+    onMouseenter_container: function (e) {
         const target = e.target;
-        if (target === this.context.video._coverElementInner.parentNode) return;
+        if (target === this.context.video._coverElement.parentNode) return;
 
-        target.appendChild(this.context.video._coverElementInner);
+        target.appendChild(this.context.video._coverElement);
     },
 
-    onMouseleave_cover: function (e) {
+    onMouseleave_container: function (e) {
         const target = e.target;
-        if (target === this.context.video._coverElementInner.parentNode) target.removeChild(this.context.video._coverElementInner);
+        if (target === this.context.video._coverElement.parentNode) target.removeChild(this.context.video._coverElement);
     },
 
     sizeRevert: function () {
@@ -205,39 +234,39 @@ export default {
     },
 
     onModifyMode: function (element, size) {
-        const videoContext = this.context.video;
-        const pSpan = videoContext._resize_element = videoContext._coverElement;
-        videoContext._element = element;
+        const contextVideo = this.context.video;
+        const container = contextVideo._resize_element = contextVideo._containerElement = element.parentNode;
+        contextVideo._element = container.firstChild;
 
-        if (pSpan === videoContext._coverElementInner.parentNode) pSpan.removeChild(videoContext._coverElementInner);
+        if (container === contextVideo._coverElement.parentNode) container.removeChild(contextVideo._coverElement);
 
-        videoContext._element_w = size.w;
-        videoContext._element_h = size.h;
-        videoContext._element_t = size.t;
-        videoContext._element_l = size.l;
+        contextVideo._element_w = size.w;
+        contextVideo._element_h = size.h;
+        contextVideo._element_t = size.t;
+        contextVideo._element_l = size.l;
 
-        let origin = videoContext._element.getAttribute('data-origin');
+        let origin = contextVideo._element.getAttribute('data-origin');
         if (origin) {
             origin = origin.split(',');
-            videoContext._origin_w = origin[0] * 1;
-            videoContext._origin_h = origin[1] * 1;
+            contextVideo._origin_w = origin[0] * 1;
+            contextVideo._origin_h = origin[1] * 1;
         } else {
-            videoContext._origin_w = size.w;
-            videoContext._origin_h = size.h;
-            videoContext._element.setAttribute('data-origin', size.w + ',' + size.h);
+            contextVideo._origin_w = size.w;
+            contextVideo._origin_h = size.h;
+            contextVideo._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },
 
     openModify: function () {
         const contextVideo = this.context.video;
-        const pSpan = contextVideo._coverElement;
-        const frame = pSpan.children[0];
+        const container = contextVideo._containerElement;
 
-        contextVideo.focusElement.value = frame.src;
-        contextVideo.videoX.value = pSpan.style.width.match(/\d+/)[0];
-        contextVideo.videoY.value = pSpan.style.height.match(/\d+/)[0];
+        contextVideo.focusElement.value = contextVideo._element.src;
+        contextVideo.videoX.value = container.offsetWidth;
+        contextVideo.videoY.value = container.offsetHeight;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
+        contextVideo.modal.querySelector('#suneditor_video_radio_' + (contextVideo._element.getAttribute('data-align') || 'none')).checked = true;
 
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
@@ -248,7 +277,7 @@ export default {
     },
 
     destroy: function () {
-        this.util.removeItem(this.context.video._coverElement);
+        this.util.removeItem(this.context.video._containerElement);
         this.plugins.video.init.call(this);
     },
 
@@ -257,7 +286,8 @@ export default {
         contextVideo.focusElement.value = '';
         contextVideo.videoX.value = this.context.user.videoX;
         contextVideo.videoY.value = this.context.user.videoY;
-        contextVideo.proportion.checked = false;
+        contextVideo.proportion.checked = true;
         contextVideo.proportion.disabled = true;
+        contextVideo.modal.querySelector('#suneditor_video_radio_none').checked = true;
     }
 };

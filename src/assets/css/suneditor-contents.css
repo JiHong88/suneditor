@@ -245,10 +245,9 @@
 }
 
 /** video iframe tags */
-.sun-editor-editable .sun-editor-iframe-cover {
-    display: inline-block;
+.sun-editor-editable .sun-editor-id-iframe-container {
     position: relative;
-    margin: 0 2px 0 2px;
+    margin: auto;
     line-height: 0;
     padding: 0;
     border: 1px solid #9e9e9e;

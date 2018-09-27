@@ -199,7 +199,7 @@ export default {
                     this.plugins.image.xmlHttp.send(formData);
                 } else {
                     for (let i = 0; i < filesLen; i++) {
-                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.dialog.updateModal);
+                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
                     }
                 }
             }
@@ -213,11 +213,11 @@ export default {
         }
     },
 
-    setup_reader: function (file, imgLinkValue, newWindowCheck, update) {
+    setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, update) {
         const reader = new FileReader();
 
         reader.onload = function (update) {
-            this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, this.context.image.imageX.value + 'px', this.context.image._align, update);
+            this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update);
         }.bind(this, update);
 
         reader.readAsDataURL(file);
