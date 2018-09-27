@@ -842,8 +842,8 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode) {
-                        if (child.nodeType === 1) {
+                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                        if (child.nodeType === 1 && !/^BR$/i.test(child.nodeName)) {
                             recursionFunc(child, child);
                             continue;
                         }
@@ -910,7 +910,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && child.textContent.length > 0) {
+                    if ((!passNode || validation(child)) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -954,8 +954,8 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode) {
-                        if (child.nodeType === 1) {
+                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                        if (child.nodeType === 1 && !/^BR$/i.test(child.nodeName)) {
                             recursionFunc(child, child);
                             continue;
                         }
@@ -1022,7 +1022,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && child.textContent.length > 0) {
+                    if ((!passNode || validation(child)) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
                         if (child.nodeType === 1) coverNode = cloneNode;
