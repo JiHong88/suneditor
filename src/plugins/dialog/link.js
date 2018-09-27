@@ -140,30 +140,10 @@ export default {
         linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
-        let tableOffsetLeft = 0;
-        let tableOffsetTop = 0;
-        let tdElement = selectionATag.parentNode;
-        while (!this.util.isWysiwygDiv(tdElement) && !/^TD$/i.test(tdElement.nodeName)) {
-            tdElement = tdElement.parentNode;
-        }
-
-        if (/^TD$/i.test(tdElement.nodeName)) {
-            let table = tdElement;
-            while (!/^TABLE$/i.test(table.nodeName)) {
-                table = table.parentNode;
-            }
-
-            tableOffsetLeft = tdElement.offsetLeft + table.offsetLeft;
-            tableOffsetTop = tdElement.offsetTop + table.offsetTop;
-        }
-
-        if (/^(?:SUB|SUP)$/i.test(selectionATag.parentNode.nodeName)) {
-            tableOffsetLeft += selectionATag.parentNode.offsetLeft;
-            tableOffsetTop += selectionATag.parentNode.offsetTop;
-        }
-
-        linkBtn.style.left = (selectionATag.offsetLeft + tableOffsetLeft) + 'px';
-        linkBtn.style.top = (selectionATag.offsetTop + selectionATag.offsetHeight + tableOffsetTop - this.context.element.wysiwyg.scrollTop + 10) + 'px';
+        const offset = this.util.getOffset(selectionATag);
+        linkBtn.style.left = offset.left + 'px';
+        linkBtn.style.top = offset.top + 'px';
+        
         linkBtn.style.display = 'block';
 
         this.controllerArray = [linkBtn];

@@ -200,7 +200,7 @@
 .sun-editor-editable table {
     table-layout: auto;
     border: 1px solid rgb(204, 204, 204);
-    table-layout: fixed;
+    /* table-layout: fixed; */
     width: 100%;
     max-width: 100%;
     margin-bottom: 20px;

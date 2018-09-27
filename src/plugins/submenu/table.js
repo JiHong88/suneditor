@@ -209,8 +209,9 @@ export default {
             contextTable._tdCnt = contextTable._trElement.cells.length;
         }
 
-        resizeDiv.style.left = (tdElement.offsetLeft + table.offsetLeft) + 'px';
-        resizeDiv.style.top = (tdElement.offsetTop + tdElement.offsetHeight + table.offsetTop - this.context.element.wysiwyg.scrollTop + 10) + 'px';
+        const offset = this.util.getOffset(tdElement);
+        resizeDiv.style.left = offset.left + 'px';
+        resizeDiv.style.top = offset.top + 'px';
     },
 
     insertRowCell: function (type, option) {

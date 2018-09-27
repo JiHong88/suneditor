@@ -139,13 +139,13 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (blockquote, TABLE, OL, UL)
+     * @description It is judged whether it is the range format element. (blockquote, TABLE, TR, TD, OL, UL)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE|OL|UL$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE|TD|TR|OL|UL$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -306,6 +306,35 @@ const util = {
         }
 
         return element;
+    },
+
+    /**
+     * @description Returns the position of the left and top (bottom line position) of argument. {left:0, top:0}
+     * @param {Element} element - Element node
+     * @returns {Object}
+     */
+    getOffset: function (element) {
+        let tableOffsetLeft = 0;
+        let tableOffsetTop = 0;
+        let tableElement = element.parentNode;
+
+        while (!this.isWysiwygDiv(tableElement)) {
+            if(/^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
+                tableOffsetLeft += tableElement.offsetLeft;
+                tableOffsetTop += tableElement.offsetTop;
+            }
+            tableElement = tableElement.parentNode;
+        }
+
+        if (/^(?:SUB|SUP)$/i.test(element.parentNode.nodeName)) {
+            tableOffsetLeft = element.parentNode.offsetLeft;
+            tableOffsetTop = element.parentNode.offsetTop;
+        }
+
+        return {
+            left: element.offsetLeft + tableOffsetLeft,
+            top: element.offsetTop + element.offsetHeight + tableOffsetTop - tableElement.scrollTop + 10
+        }
     },
 
     /**
