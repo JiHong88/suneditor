@@ -102,10 +102,12 @@ export default {
         const resizeContainer = this.context.resizing.resizeContainer;
         const resizeDiv = this.context.resizing.resizeDiv;
 
+        const offset = this.util.getOffset(targetElement);
+
         const w = targetElement.offsetWidth;
         const h = targetElement.offsetHeight;
-        const t = (targetElement.offsetTop - this.context.element.wysiwyg.scrollTop);
-        const l = (targetElement.offsetLeft);
+        const t = offset.top;
+        const l = offset.left;
 
         resizeContainer.style.top = t + 'px';
         resizeContainer.style.left = l + 'px';

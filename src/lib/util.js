@@ -134,7 +134,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-media-container/.test(element.className)) return true;
         return false;
     },
 
@@ -309,7 +309,7 @@ const util = {
     },
 
     /**
-     * @description Returns the position of the left and top (bottom line position) of argument. {left:0, top:0}
+     * @description Returns the position of the left and top of argument. {left:0, top:0}
      * @param {Element} element - Element node
      * @returns {Object}
      */
@@ -333,7 +333,7 @@ const util = {
 
         return {
             left: element.offsetLeft + tableOffsetLeft,
-            top: element.offsetTop + element.offsetHeight + tableOffsetTop - tableElement.scrollTop + 10
+            top: element.offsetTop + tableOffsetTop - tableElement.scrollTop
         }
     },
 

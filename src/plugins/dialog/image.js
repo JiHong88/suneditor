@@ -328,7 +328,7 @@ export default {
 
     set_container: function (cover) {
         const container = document.createElement('DIV');
-        container.className = 'sun-editor-id-image-container';
+        container.className = 'sun-editor-id-media-container sun-editor-id-image-container';
         container.setAttribute('contenteditable', false);
         container.appendChild(cover);
 

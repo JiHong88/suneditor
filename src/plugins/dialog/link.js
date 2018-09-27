@@ -142,7 +142,7 @@ export default {
 
         const offset = this.util.getOffset(selectionATag);
         linkBtn.style.left = offset.left + 'px';
-        linkBtn.style.top = offset.top + 'px';
+        linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
         
         linkBtn.style.display = 'block';
 

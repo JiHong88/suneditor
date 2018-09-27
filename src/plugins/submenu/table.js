@@ -211,7 +211,7 @@ export default {
 
         const offset = this.util.getOffset(tdElement);
         resizeDiv.style.left = offset.left + 'px';
-        resizeDiv.style.top = offset.top + 'px';
+        resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 10) + 'px';
     },
 
     insertRowCell: function (type, option) {
