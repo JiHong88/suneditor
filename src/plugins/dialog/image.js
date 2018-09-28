@@ -32,7 +32,8 @@ export default {
             _captionChecked: false,
             _proportionChecked: true,
             _onCaption: false,
-            _floatClassRegExp: 'float\\-[a-z]+'
+            _floatClassRegExp: 'float\\-[a-z]+',
+            _xmlHttp: null
         };
 
         /** image dialog */
@@ -178,8 +179,6 @@ export default {
         return false;
     },
 
-    xmlHttp: null,
-
     onRender_imgInput: function () {
         function inputAction(files) {
             if (files.length > 0) {
@@ -193,13 +192,14 @@ export default {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    this.plugins.image.xmlHttp = this.util.getXMLHttpRequest();
-                    this.plugins.image.xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
-                    this.plugins.image.xmlHttp.open('post', imageUploadUrl, true);
-                    this.plugins.image.xmlHttp.send(formData);
-                } else {
+                    this.context.image._xmlHttp = this.util.getXMLHttpRequest();
+                    this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                    this.context.image._xmlHttp.open('post', imageUploadUrl, true);
+                    this.context.image._xmlHttp.send(formData);
+                }
+                else {
                     for (let i = 0; i < filesLen; i++) {
-                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal);
+                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, i, filesLen - 1);
                     }
                 }
             }
@@ -213,30 +213,38 @@ export default {
         }
     },
 
-    setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, update) {
+    setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, index, filesLen) {
         const reader = new FileReader();
 
-        reader.onload = function (update) {
-            this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update);
-        }.bind(this, update);
+        reader.onload = function (update, updateElement) {
+            try {
+                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement);
+                if (index === filesLen) this.closeLoading();
+            } catch (e) {
+                this.closeLoading();
+                throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
+            }
+        }.bind(this, this.context.dialog.updateModal, this.context.image._element);
 
         reader.readAsDataURL(file);
     },
 
-    callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update) {
-        const xmlHttp = this.plugins.image.xmlHttp;
-        if (xmlHttp.readyState === 4) {
-            if (xmlHttp.status === 200) {
-                const result = eval(xmlHttp.responseText);
+    callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update, updateElement) {
+        if (this.context.image._xmlHttp.readyState === 4) {
+            if (this.context.image._xmlHttp.status === 200) {
+                const result = eval(this.context.image._xmlHttp.responseText);
 
                 for (let i = 0, len = (update && result.length > 0 ? 1 : result.length); i < len; i++) {
-                    this.plugins.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update);
+                    this.plugins.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update, updateElement);
                 }
-            } else {
-                window.open('', '_blank').document.writeln(xmlHttp.responseText);
-            }
 
-            this.closeLoading();
+                this.closeLoading();
+            }
+            // error
+            else {
+                this.closeLoading();
+                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status);
+            }
         }
     },
 
@@ -244,10 +252,11 @@ export default {
         if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align);
+            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
         } catch (e) {
+            throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
+        } finally {
             this.closeLoading();
-            throw Error('[SUNEDITOR.inseretImageUrl.fail] cause : "' + e.message + '"');
         }
     },
 
@@ -295,13 +304,20 @@ export default {
         try {
             if (this.context.dialog.updateModal) {
                 this.plugins.image.update_image.call(this);
-            } else {
-                this.plugins.image.onRender_imgInput.call(this);
-                this.plugins.image.onRender_imgUrl.call(this);
             }
+            
+            if (this.context.image.imgInputFile.files.length > 0) {
+                this.plugins.image.onRender_imgInput.call(this);
+            } else if (this.context.image.imgUrlFile.value.trim().length > 0) {
+                this.plugins.image.onRender_imgUrl.call(this);
+            } else {
+                this.closeLoading();
+            }
+        } catch (e) {
+            this.closeLoading();
+            throw Error('[SUNEDITOR.image.submit.fail] cause : "' + e.message + '"');
         } finally {
             this.plugins.dialog.closeDialog.call(this);
-            this.closeLoading();
         }
 
         this.focus();
@@ -335,9 +351,9 @@ export default {
         return container;
     },
 
-    create_image: function (src, linkValue, linkNewWindow, width, align, update) {
+    create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement) {
         if (update) {
-            this.context.image._element.src = src;
+            updateElement.src = src;
             return;
         }
 
@@ -409,6 +425,7 @@ export default {
         } else {
             if (contextImage._imageCaption) {
                 this.util.removeItem(contextImage._imageCaption);
+                contextImage._imageCaption = null;
             }
         }
 
@@ -432,8 +449,7 @@ export default {
                 contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
                 contextImage._element.setAttribute('data-image-link', linkValue);
             } else {
-                let newEl = this.plugins.image.onRender_link(contextImage._element.cloneNode(true), linkValue, this.context.image.imgLinkNewWindowCheck.checked);
-                cover.removeChild(contextImage._element);
+                let newEl = this.plugins.image.onRender_link(contextImage._element, linkValue, this.context.image.imgLinkNewWindowCheck.checked);
                 cover.insertBefore(newEl, contextImage._imageCaption);
             }
         }
@@ -444,6 +460,7 @@ export default {
             let newEl = imageElement.cloneNode(true);
             cover.removeChild(contextImage._linkElement);
             cover.insertBefore(newEl, contextImage._imageCaption);
+            contextImage._element = newEl;
         }
 
         if (isNewContainer) {
