@@ -193,14 +193,14 @@ const _Constructor = {
 
             /** plugins - submenu */
             font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
-                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="arrow-more-down"></span>'
+                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
             ],
             formatBlock: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
-                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="arrow-more-down"></span>'
+                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
             ],
 
             fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
-                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="arrow-more-down"></span>'
+                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', '',
