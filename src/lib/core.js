@@ -668,7 +668,7 @@ const core = function (context, util, plugins, lang) {
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesOneLine(commonCon, newNode, checkCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -714,67 +714,192 @@ const core = function (context, util, plugins, lang) {
          * @private
          */
         _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+            const el = element;
+            const pNode = element.cloneNode(false);
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
             let endOffset = endOff;
             let startPass = false;
             let endPass = false;
+            let pCurrent, newNode, appendNode, cssText;
+
+            function checkCss (vNode) {
+                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'gi');
+                let style = '';
+
+                if (regExp && vNode.style.cssText.length > 0) {
+                    style = regExp.test(vNode.style.cssText);
+                }
+            
+                return !style;
+            };
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
 
                 for (let i = 0, len = childNodes.length; i < len; i++) {
-                    if (endPass) break;
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if (validation(child) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
+                    if ((child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
                         let cloneNode;
 
                         // startContainer
                         if (child === startContainer) {
-                            child = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+                            const prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
+                            const textNode = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
 
-                            startContainer = cloneNode = child.cloneNode(true);
+                            if (prevNode.data.length > 0) {
+                                node.appendChild(prevNode);
+                            }
+
+                            newNode = node;
+                            pCurrent = [];
+                            cssText = '';
+                            while (newNode !== pNode && newNode !== el && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1 && checkCss(newNode)) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                    cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            const childNode = appendNode = newNode = pCurrent.pop() || node;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                                appendNode = newNode;
+                            }
+
+                            newInnerNode.appendChild(childNode);
+                            node = newNode;
+
+                            pNode.appendChild(newInnerNode);
+                            startContainer = textNode;
                             startOffset = 0;
-                            
                             startPass = true;
+
+                            node.appendChild(startContainer);
+                            continue;
                         }
                         // endContainer
                         else if (child === endContainer) {
-                            child = document.createTextNode(endContainer.substringData(0, endOffset));
+                            const afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
+                            const textNode = document.createTextNode(endContainer.substringData(0, endOffset));
 
-                            endContainer = cloneNode = child.cloneNode(true);
-                            endOffset = child.textContent.length;
+                            if (afterNode.data.length > 0) {
+                                newNode = child;
+                                cssText = '';
+                                pCurrent = [];
+                                while (newNode !== pNode && newNode !== el && newNode !== null) {
+                                    if (newNode.nodeType === 1 && checkCss(newNode)) {
+                                        pCurrent.push(newNode.cloneNode(false));
+                                        cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+                                    }
+                                    newNode = newNode.parentNode;
+                                }
 
-                            newInnerNode.appendChild(cloneNode);
+                                cloneNode = appendNode = newNode = pCurrent.pop();
+                                while (pCurrent.length > 0) {
+                                    newNode = pCurrent.pop();
+                                    appendNode.appendChild(newNode);
+                                    appendNode = newNode;
+                                }
+
+                                pNode.appendChild(cloneNode);
+                                newNode.textContent = afterNode.data;
+                            }
+
+                            newNode = node;
+                            pCurrent = [];
+                            cssText = '';
+                            while (newNode !== pNode && newNode !== el && newNode !== null) {
+                                if (validation(newNode) && newNode.nodeType === 1 && checkCss(newNode)) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                    cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+                                }
+                                newNode = newNode.parentNode;
+                            }
+
+                            const childNode = appendNode = newNode = pCurrent.pop() || node;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                                appendNode = newNode;
+                            }
+
+                            newInnerNode.appendChild(childNode);
+                            node = newNode;
+
+                            pNode.insertBefore(newInnerNode, cloneNode);
+                            endContainer = textNode;
+                            endOffset = textNode.data.length;
                             endPass = true;
+
+                            node.appendChild(endContainer);
+                            node = pNode;
+                            continue;
                         }
-                        // between
-                        else {
-                            cloneNode = child.cloneNode(false);
+                        // other
+                        if (startPass && validation(child)) {
+                            if (child.nodeType === 1) {
+                                recursionFunc(child, child);
+                                continue;
+                            }
+    
+                            newNode = child;
+                            pCurrent = [];
+                            cssText = '';
+                            while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
+                                if (newNode.nodeType === 1 && validation(newNode) && checkCss(newNode)) {
+                                    pCurrent.push(newNode.cloneNode(false));
+                                    cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+                                }
+                                newNode = newNode.parentNode;
+                            }
+    
+                            if (pCurrent.length > 0) {
+                                const childNode = appendNode = newNode = pCurrent.pop();
+                                while (pCurrent.length > 0) {
+                                    newNode = pCurrent.pop();
+                                    appendNode.appendChild(newNode);
+                                    appendNode = newNode;
+                                }
+                                
+                                if (endPass) {
+                                    pNode.appendChild(childNode);
+                                } else {
+                                    newInnerNode.appendChild(childNode);
+                                    pNode.appendChild(newInnerNode);
+                                }
+
+                                node = newNode;
+                            } else {
+                                node = pNode;
+                            }
                         }
 
-                        if (startPass || child.nodeType === 1) node.appendChild(cloneNode);
+                        cloneNode = child.cloneNode(false);
+                        node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
                     }
 
                     recursionFunc(child, coverNode);
                 }
-            })(element, newInnerNode);
-            
-            this.removeNode();
+            })(element, pNode);
 
-            let rightNode = endCon;
-            while (rightNode.parentNode !== element) {
-                rightNode = rightNode.parentNode;
+            const children = pNode.children;
+            for (let i = 0, len = children.length; i < len; i++) {
+                if (children[i].textContent.length === 0 && !/^BR$/i.test(children[i].nodeName)) {
+                    util.removeItem(children[i]);
+                    --i;
+                    --len;
+                }
             }
 
-            element.insertBefore(newInnerNode, rightNode);
-
-            if (endCon.textContent.length === 0) util.removeItem(endCon);
-            if (startCon.textContent.length === 0) util.removeItem(startCon);
+            element.parentNode.insertBefore(pNode, element);
+            util.removeItem(element);
 
             return {
                 startContainer: startContainer,
@@ -837,7 +962,7 @@ const core = function (context, util, plugins, lang) {
                     let coverNode = node;
 
                     if (passNode && !/^BR$/i.test(child.nodeName)) {
-                        if (child.nodeType === 1 && !/^BR$/i.test(child.nodeName)) {
+                        if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
                         }
@@ -845,19 +970,20 @@ const core = function (context, util, plugins, lang) {
                         newNode = child;
                         pCurrent = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            if (validation(newNode) && newNode.nodeType === 1) {
+                            if (newNode.nodeType === 1 && validation(newNode)) {
                                 pCurrent.push(newNode.cloneNode(false));
                             }
                             newNode = newNode.parentNode;
                         }
 
                         if (pCurrent.length > 0) {
-                            appendNode = newNode = pCurrent.pop();
+                            const childNode = appendNode = newNode = pCurrent.pop();
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
+                                appendNode = newNode;
                             }
-                            newInnerNode.appendChild(appendNode);
+                            newInnerNode.appendChild(childNode);
                             node = newNode;
                         } else {
                             node = newInnerNode;
@@ -876,20 +1002,21 @@ const core = function (context, util, plugins, lang) {
                         newNode = node;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
-                            if (validation(newNode) && newNode.nodeType === 1) {
+                            if (newNode.nodeType === 1 && validation(newNode)) {
                                 pCurrent.push(newNode.cloneNode(false));
                             }
                             newNode = newNode.parentNode;
                         }
 
-                        appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = appendNode = newNode = pCurrent.pop() || node;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
+                            appendNode = newNode;
                         }
 
-                        if (appendNode !== node) {
-                            newInnerNode.appendChild(appendNode);
+                        if (childNode !== node) {
+                            newInnerNode.appendChild(childNode);
                             node = newNode;
                         } else {
                             node = newInnerNode;
@@ -949,7 +1076,7 @@ const core = function (context, util, plugins, lang) {
                     let coverNode = node;
 
                     if (passNode && !/^BR$/i.test(child.nodeName)) {
-                        if (child.nodeType === 1 && !/^BR$/i.test(child.nodeName)) {
+                        if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
                         }
@@ -964,12 +1091,13 @@ const core = function (context, util, plugins, lang) {
                         }
 
                         if (pCurrent.length > 0) {
-                            appendNode = newNode = pCurrent.pop();
+                            const childNode = appendNode = newNode = pCurrent.pop();
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
-                                appendNode.insertBefore(newNode, appendNode.firstChild);
+                                appendNode.appendChild(newNode);
+                                appendNode = newNode;
                             }
-                            newInnerNode.insertBefore(appendNode, newInnerNode.firstChild);
+                            newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             node = newNode;
                         } else {
                             node = newInnerNode;
@@ -994,14 +1122,15 @@ const core = function (context, util, plugins, lang) {
                             newNode = newNode.parentNode;
                         }
 
-                        appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = appendNode = newNode = pCurrent.pop() || node;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
-                            appendNode.insertBefore(newNode, appendNode.firstChild);
+                            appendNode.appendChild(newNode);
+                            appendNode = newNode;
                         }
 
-                        if (appendNode !== node) {
-                            newInnerNode.insertBefore(appendNode, newInnerNode.firstChild);
+                        if (childNode !== node) {
+                            newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             node = newNode;
                         } else {
                             node = newInnerNode;
