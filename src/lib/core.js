@@ -327,7 +327,7 @@ const core = function (context, util, plugins, lang) {
             const commonCon = range.commonAncestorContainer;
             const rangeFormatElements = [];
 
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) return rangeFormatElements;
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) return [util.getFormatElement(commonCon)];
 
             // get line nodes
             const lineNodes = util.getListChildren(commonCon, function (current) {
@@ -557,17 +557,11 @@ const core = function (context, util, plugins, lang) {
          * @param {Element} wrapTag - Element of wrap the arguments
          */
         wrapToTags: function (wrapTag) {
-            const range = this.getRange();
-            const commonCon = range.commonAncestorContainer;
             const rangeLines = [];
-
-            if (this.util.isWysiwygDiv(commonCon) || this.util.isRangeFormatElement(commonCon)) {
-                const lineNodes = this.getRangeSelectedFormatElement();
-                for (let i = 0, len = lineNodes.length; i < len; i++) {
-                    rangeLines.push(lineNodes[i]);
-                }
-            } else {
-                rangeLines.push(util.getFormatElement(commonCon));
+            const lineNodes = this.getRangeSelectedFormatElement();
+            
+            for (let i = 0, len = lineNodes.length; i < len; i++) {
+                rangeLines.push(lineNodes[i]);
             }
 
             const beforeTag = rangeLines[rangeLines.length - 1].nextSibling;
