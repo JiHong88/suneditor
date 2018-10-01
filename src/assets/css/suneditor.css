@@ -85,7 +85,6 @@
 .sun-editor .icon-empty-file:before{content:'\0071';}
 .sun-editor .icon-paragraph:before{content:'\0072';}
 .sun-editor .icon-delete:before{content:'\0073';}
-.sun-editor .arrow-more-down {position:absolute; top:14px; right:10px; width:7px; height:7px; background:url('../img/arrow_down.svg') no-repeat; background-size:100%;}
 
 /* used color #000 , #fff , #CCC , #d4e3ea , #bbd5e0 , #a2bfcc , #8baab7*/
 /* container */
@@ -211,8 +210,9 @@
 .sun-editor .modal-dialog .btn-primary:active {border-color:#a2bfcc; background-color:#bbd5e0; -webkit-box-shadow: inset 0 3px 5px #a2bfcc; box-shadow: inset 0 3px 5px #a2bfcc;}
 
 /* loading box */
-.sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#ffffff; background-image:url('../img/loading.gif'); background-repeat:no-repeat; background-position:center; background-size:auto auto; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
-.sun-editor .sun-editor-id-loading .loading-effect {display:none;}
+.sun-editor .sun-editor-id-loading {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#ffffff; opacity:.7; filter:alpha(opacity=70); z-index:9999;}
+.sun-editor .sun-editor-id-loading .loading-effect {position:absolute; display:block; top:50%; left:50%; height:25px; width:25px; border-top:2px solid #07d; border-right:2px solid transparent; border-radius:50%; animation:spinner .8s linear infinite;margin: -25px 0 0 -25px;}
+@keyframes spinner {to {transform: rotate(360deg);}}
 
 /* button group */
 .sun-editor .btn-group {position:relative; display:inline-block; vertical-align:middle; padding:5px 5px 5px 0;}
@@ -231,7 +231,6 @@
 
 /* table edit, resizing */
 .sun-editor .sun-editor-id-table-edit {position:absolute; width:165px; top:0; left:0; z-index:11; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
-/* .sun-editor .sun-editor-id-table-resize-bar {position: absolute; display: block; width: 2px; background-color: #8baab7; cursor:e-resize;} */
 
 /* resize (image, iframe) */
 .sun-editor .modal-resize-container {position:absolute; display:none; z-index:8; border:1px solid #a2bfcc;}
