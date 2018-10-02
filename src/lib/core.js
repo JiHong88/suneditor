@@ -576,8 +576,8 @@ const core = function (context, util, plugins, lang) {
 
         /**
          * @description Copies the node of the argument value and append all selected nodes and insert
-         * 1. When there is the same node in the selection area, the tag is stripped.
-         * 2. If there is another css value other thanCss attribute values received as arguments on the same node, removed only Css attribute values received as arguments
+         * 1. When there is the same css value node in the selection area, the tag is stripped.
+         * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
          * @param {Element} appendNode - The dom that will wrap the selected text area
          * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
          */
@@ -598,8 +598,27 @@ const core = function (context, util, plugins, lang) {
                     regExp += '|' + checkCSSPropertyArray[i];
                 }
                 regExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                regExp = new RegExp(regExp, 'gi');
+                regExp = new RegExp(regExp, 'i');
+            } else {
+                regExp = new RegExp('', 'i');
             }
+
+            /** tag check function*/
+            const checkCss = function (vNode) {
+                if (vNode.nodeType === 3) return true;
+
+                let style = '';
+                if (regExp && vNode.style.cssText.length > 0) {
+                    style = vNode.style.cssText.replace(regExp, '').trim();
+                }
+
+                if (style.length > 0) {
+                    if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
+                    return true;
+                }
+
+                return false;
+            };
 
             /** one node */
             if (startCon === endCon) {
@@ -624,7 +643,7 @@ const core = function (context, util, plugins, lang) {
                 /** Select range node */
                 else {
                     if (startCon.nodeType === 1) {
-                        newNode.innerHTML = startCon.outerHTML;
+                        newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
                         startCon.parentNode.appendChild(newNode);
                         util.removeItem(startCon);
                     } else {
@@ -632,16 +651,22 @@ const core = function (context, util, plugins, lang) {
                         const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
 
                         newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-                        startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
 
-                        if (beforeNode.data.length > 0) {
-                            startCon.data = beforeNode.data;
+                        if (beforeNode.data.length === 0 && afterNode.data.length === 0 && !util.isFormatElement(startCon.parentNode)) {
+                            startCon.parentNode.parentNode.insertBefore(newNode, startCon.parentNode.nextSibling);
+                            util.removeItem(startCon.parentNode);
                         } else {
-                            startCon.data = startCon.substringData(0, startOff);
-                        }
+                            startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
 
-                        if (afterNode.data.length > 0) {
-                            startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                            if (beforeNode.data.length > 0) {
+                                startCon.data = beforeNode.data;
+                            } else {
+                                startCon.data = startCon.substringData(0, startOff);
+                            }
+    
+                            if (afterNode.data.length > 0) {
+                                startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                            }
                         }
                     }
 
@@ -653,23 +678,6 @@ const core = function (context, util, plugins, lang) {
             }
             /** multiple nodes */
             else {
-                /** tag check function*/
-                const checkCss = function (vNode) {
-                    if (vNode.nodeType === 3) return true;
-
-                    let style = '';
-                    if (regExp && vNode.style.cssText.length > 0) {
-                        style = vNode.style.cssText.replace(regExp, '').trim();
-                    }
-
-                    if (vNode.nodeName !== appendNode.nodeName || style.length > 0) {
-                        if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
-                        return true;
-                    }
-
-                    return false;
-                };
-
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
@@ -730,7 +738,7 @@ const core = function (context, util, plugins, lang) {
             let pCurrent, newNode, appendNode, cssText;
 
             function checkCss (vNode) {
-                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'gi');
+                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'i');
                 let style = '';
 
                 if (regExp && vNode.style.cssText.length > 0) {
@@ -747,7 +755,7 @@ const core = function (context, util, plugins, lang) {
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if ((child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
+                    if ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName)) {
                         let cloneNode;
 
                         // startContainer
@@ -759,7 +767,7 @@ const core = function (context, util, plugins, lang) {
                                 node.appendChild(prevNode);
                             }
 
-                            newNode = node;
+                            newNode = child;
                             pCurrent = [];
                             cssText = '';
                             while (newNode !== pNode && newNode !== el && newNode !== null) {
@@ -770,7 +778,7 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || node;
+                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -778,14 +786,13 @@ const core = function (context, util, plugins, lang) {
                             }
 
                             newInnerNode.appendChild(childNode);
-                            node = newNode;
-
                             pNode.appendChild(newInnerNode);
+                            
                             startContainer = textNode;
                             startOffset = 0;
                             startPass = true;
 
-                            node.appendChild(startContainer);
+                            if (newNode !== textNode) newNode.appendChild(startContainer);
                             continue;
                         }
                         // endContainer
@@ -805,7 +812,7 @@ const core = function (context, util, plugins, lang) {
                                     newNode = newNode.parentNode;
                                 }
 
-                                cloneNode = appendNode = newNode = pCurrent.pop();
+                                cloneNode = appendNode = newNode = pCurrent.pop() || afterNode;
                                 while (pCurrent.length > 0) {
                                     newNode = pCurrent.pop();
                                     appendNode.appendChild(newNode);
@@ -827,7 +834,7 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || node;
+                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -835,19 +842,16 @@ const core = function (context, util, plugins, lang) {
                             }
 
                             newInnerNode.appendChild(childNode);
-                            node = newNode;
 
-                            pNode.insertBefore(newInnerNode, cloneNode);
                             endContainer = textNode;
                             endOffset = textNode.data.length;
                             endPass = true;
 
-                            node.appendChild(endContainer);
-                            node = pNode;
+                            if (newNode !== textNode) newNode.appendChild(endContainer);
                             continue;
                         }
                         // other
-                        if (startPass && validation(child)) {
+                        if (startPass) {
                             if (child.nodeType === 1) {
                                 recursionFunc(child, child);
                                 continue;
@@ -857,31 +861,29 @@ const core = function (context, util, plugins, lang) {
                             pCurrent = [];
                             cssText = '';
                             while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                                if (newNode.nodeType === 1 && validation(newNode) && checkCss(newNode)) {
+                                if (newNode.nodeType === 1 && (endPass || validation(newNode)) && checkCss(newNode)) {
                                     pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
                                 newNode = newNode.parentNode;
                             }
     
-                            if (pCurrent.length > 0) {
-                                const childNode = appendNode = newNode = pCurrent.pop();
-                                while (pCurrent.length > 0) {
-                                    newNode = pCurrent.pop();
-                                    appendNode.appendChild(newNode);
-                                    appendNode = newNode;
-                                }
-                                
-                                if (endPass) {
-                                    pNode.appendChild(childNode);
-                                } else {
-                                    newInnerNode.appendChild(childNode);
-                                    pNode.appendChild(newInnerNode);
-                                }
-
+                            const childNode = appendNode = newNode = pCurrent.pop() || child;
+                            while (pCurrent.length > 0) {
+                                newNode = pCurrent.pop();
+                                appendNode.appendChild(newNode);
+                                appendNode = newNode;
+                            }
+                            
+                            if (childNode === child) {
+                                if (!endPass) node = newInnerNode;
+                                else node = pNode;
+                            } else if (endPass) {
+                                pNode.appendChild(childNode);
                                 node = newNode;
                             } else {
-                                node = pNode;
+                                newInnerNode.appendChild(childNode);
+                                node = newNode;
                             }
                         }
 
@@ -896,7 +898,7 @@ const core = function (context, util, plugins, lang) {
 
             const children = pNode.children;
             for (let i = 0, len = children.length; i < len; i++) {
-                if (children[i].textContent.length === 0 && !/^BR$/i.test(children[i].nodeName)) {
+                if ((children[i].textContent.length === 0 || children[i].textContent === '&#65279') && !/^BR$/i.test(children[i].nodeName)) {
                     util.removeItem(children[i]);
                     --i;
                     --len;
@@ -928,7 +930,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
                     let coverNode = node;
-                    if (validation(child) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
+                    if (validation(child) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1036,7 +1038,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1150,7 +1152,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && (child.textContent.length > 0 || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
                         if (child.nodeType === 1) coverNode = cloneNode;
