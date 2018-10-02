@@ -649,14 +649,15 @@ const core = function (context, util, plugins, lang) {
                     } else {
                         const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
                         const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+                        const startConParent = startCon.parentNode;
 
                         newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
 
-                        if (beforeNode.data.length === 0 && afterNode.data.length === 0 && !util.isFormatElement(startCon.parentNode)) {
-                            startCon.parentNode.parentNode.insertBefore(newNode, startCon.parentNode.nextSibling);
-                            util.removeItem(startCon.parentNode);
+                        if (beforeNode.data.length === 0 && afterNode.data.length === 0 && !checkCss(startConParent) && !util.isFormatElement(startConParent)) {
+                            startConParent.parentNode.insertBefore(newNode, startConParent.nextSibling);
+                            util.removeItem(startConParent);
                         } else {
-                            startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                            startConParent.insertBefore(newNode, startCon.nextSibling);
 
                             if (beforeNode.data.length > 0) {
                                 startCon.data = beforeNode.data;
@@ -665,7 +666,7 @@ const core = function (context, util, plugins, lang) {
                             }
     
                             if (afterNode.data.length > 0) {
-                                startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
+                                startConParent.insertBefore(afterNode, newNode.nextSibling);
                             }
                         }
                     }
