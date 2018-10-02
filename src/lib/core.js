@@ -615,6 +615,11 @@ const core = function (context, util, plugins, lang) {
                         const rightNode = commonCon.nodeType === 3 ? commonCon.splitText(endOff) : null;
                         parentNode.insertBefore(newNode, rightNode);
                     }
+
+                    start.container = newNode;
+                    start.offset = 1;
+                    end.container = newNode;
+                    end.offset = 1;
                 }
                 /** Select range node */
                 else {
@@ -639,12 +644,12 @@ const core = function (context, util, plugins, lang) {
                             startCon.parentNode.insertBefore(afterNode, newNode.nextSibling);
                         }
                     }
-                }
 
-                start.container = newNode;
-                start.offset = 1;
-                end.container = newNode;
-                end.offset = 1;
+                    start.container = newNode;
+                    start.offset = 0;
+                    end.container = newNode;
+                    end.offset = 1;
+                }
             }
             /** multiple nodes */
             else {
