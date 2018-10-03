@@ -1,10 +1,11 @@
 /* suneditor main */
-.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:inherit; border:1px solid #dadada; background-color:#FFF;}
+.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; background-color:#FFF;}
 .sun-editor * {box-sizing:border-box; user-select: none; -webkit-user-drag:none;}
-.sun-editor-common th, .sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5; color:#111;}
+.sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5;}
 .sun-editor-common body, .sun-editor-common div, .sun-editor-common dl, .sun-editor-common dt, .sun-editor-common dd, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common li,
-.sun-editor-common h1, .sun-editor-common h2, .sun-editor-common h3, .sun-editor-common h4, .sun-editor-common h5, .sun-editor-common h6, .sun-editor-common pre, .sun-editor-common code, .sun-editor-common form, .sun-editor-common fieldset,
-.sun-editor-common legend, .sun-editor-common textarea, .sun-editor-common p, .sun-editor-common blockquote, .sun-editor-common th, .sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0; color:#000 !important;}
+.sun-editor-common h1, .sun-editor-common h2, .sun-editor-common h3, .sun-editor-common h4, .sun-editor-common h5, .sun-editor-common h6, .sun-editor-common pre, .sun-editor-common code,
+.sun-editor-common form, .sun-editor-common fieldset, .sun-editor-common legend, .sun-editor-common textarea, .sun-editor-common p, .sun-editor-common blockquote, .sun-editor-common th,
+.sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0; color:#000 !important;}
 .sun-editor-common dl, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common menu, .sun-editor-common li {list-style: none !important;}
 .sun-editor-common hr {margin:6px 0 6px 0 !important;}
 .sun-editor textarea {resize:none !important; border:0 !important;}
@@ -90,22 +91,22 @@
 /* container */
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}
 
-/* arrow */
+/* controller arrow */
 .sun-editor .arrow, .sun-editor .arrow:after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
 .sun-editor .arrow {top:-11px; left:20px !important; margin-left:-11px; border-top-width:0; border-bottom-color:#999; border-bottom-color:rgba(0, 0, 0, .25);}
 .sun-editor .arrow:after {top:1px; margin-left:-10px; content:" "; border-top-width:0; border-bottom-color:#fff;}
 
 /* tool bar */
-.sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; right:0; bottom:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:1;}
-.sun-editor .sun-editor-id-toolbar {overflow:visible; position:relative; height:auto; font-family:Helvetica Neue, sans-serif;  padding:3px 3px 3px 0; background-color:#fafafa; border-bottom:1px solid #dadada;}
+.sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:1;}
+.sun-editor .sun-editor-id-toolbar {display:block; overflow:visible; position:relative; height:auto; padding:3px; margin:0; background-color:#fafafa; border-bottom:1px solid #dadada;}
 
 .sun-editor .tool_module {display:inline-block;}
-.sun-editor .tool_module_enter {display:block; width:0; height:0;}
-.sun-editor .editor_tool {float: left;height: 32px;margin:5px 0 5px 5px;}
-.sun-editor .editor_tool li {position:relative; float:left;}
+.sun-editor .tool_module_enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
+.sun-editor .editor_tool {float:left; padding:0; margin:0;}
+.sun-editor .editor_tool li {position:relative; float:left; padding:0; margin:0;}
 
 /** .btn_editor button effect */
-.sun-editor .btn_editor {overflow:hidden; float:left; width:32px; height:32px; border:0; margin-left:2px; font-size:12px; line-height:27px; background-color:transparent;}
+.sun-editor .btn_editor {overflow:hidden; float:left; width:35px; height:35px; border:0; margin:0 1px 0 1px !important; font-size:12px; line-height:27px;}
 .sun-editor .btn_editor:enabled:hover, .sun-editor .btn_editor:enabled:focus {background-color: #d4e3ea; border-color: #bbd5e0; outline: 0 none;}
 .sun-editor .btn_editor:enabled:active {border-color:#bbd5e0; background-color:#d4e3ea; -webkit-box-shadow: inset 0 3px 5px #bbd5e0; box-shadow: inset 0 3px 5px #bbd5e0;}
 /** .btn_editor.on button effect */
@@ -158,13 +159,12 @@
 .sun-editor .layer_editor.layer_line {left:0; width:158px;}
 
 .sun-editor .btn_edit {width:100%; height:28px; padding:0 14px; margin-left:0; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
-.sun-editor .btn_font {width:100px; text-align:left; text-indent:7px; padding:0 5px 0 5px;}
-.sun-editor .btn_format {width:100px; text-align:left; text-indent:7px; padding:0 5px 0 5px;}
-.sun-editor .btn_size {width:70px; text-align:left; text-indent:7px; padding:0 5px 0 5px;}
-.sun-editor .btn_line {padding:0 5px 0 5px;}
+.sun-editor .btn_font {width:100px; text-align:left; text-indent:7px; padding:0;}
+.sun-editor .btn_format {width:90px; text-align:left; text-indent:7px; padding:0;}
+.sun-editor .btn_size {width:70px; text-align:left; text-indent:7px; padding:0;}
 
 .sun-editor .btn_font .txt {width:65px; float:left;}
-.sun-editor .btn_format .txt {width:65px; float:left;}
+.sun-editor .btn_format .txt {width:55px; float:left;}
 .sun-editor .btn_size .txt {width:35px; float:left;}
 
 /* editor area */

@@ -12,17 +12,16 @@ import custom_plugin_submenu from './custom_plugin_submenu'
 suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
     buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        '/',
-        ['fontColor', 'hiliteColor'],
-        ['indent', 'outdent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'removeFormat',
+        'fontColor', 'hiliteColor',
+        'indent', 'outdent',
+        'align', 'horizontalRule', 'list', 'table',
+        'link', 'image', 'video',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print']
     ]
 });
 

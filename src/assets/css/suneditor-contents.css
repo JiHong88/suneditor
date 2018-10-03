@@ -2,9 +2,18 @@
 .sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
+    color: #000;
+    background-color: #fff;
     word-break: break-all;
     padding: 10px 20px 10px 20px;
     margin: 0;
+}
+
+.sun-editor-editable * {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: inherit;
 }
 
 /* float */

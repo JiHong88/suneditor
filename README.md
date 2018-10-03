@@ -157,8 +157,7 @@ suneditor.create('sample', {
     ],
     buttonList: [
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['removeFormat']
+        ['font', 'fontSize', 'formatBlock', 'removeFormat', 'preview', 'print']
     ]
 })
 ```
@@ -201,17 +200,16 @@ import plugins from 'suneditor/src/plugins'
 const initEditor = suneditor.init({
     plugins: plugins,
     buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        '/', // line break
-        ['fontColor', 'hiliteColor'],
-        ['indent', 'outdent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'removeFormat',
+        'fontColor', 'hiliteColor',
+        'indent', 'outdent',
+        'align', 'horizontalRule', 'list', 'table',
+        'link', 'image', 'video',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print']
     ]
 });
 
