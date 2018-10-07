@@ -63,11 +63,25 @@ export default {
             this.execCommand(command, false, null);
             if (cancel) this.execCommand('formatBlock', false, 'DIV');
         } else {
-            const rightNode = formatElement.nextSibling;
+            let rightNode = formatElement.nextSibling;
+            let pNode = formatElement.parentNode;
+
             const list = document.createElement(value);
-            list.innerHTML = '<li>' + formatElement.innerHTML + '</li>';
-            this.util.removeItem(formatElement);
-            this.insertNode(list, rightNode);
+            const formatElementList = this.getSelectedFormatElements();
+            
+            for (let i = 0, len = formatElementList.length, fTag = null; i < len; i++) {
+                fTag = formatElementList[i];
+
+                if (i === len - 1) {
+                    rightNode = fTag.nextSibling;
+                    pNode = fTag.parentNode;
+                }
+
+                list.innerHTML += '<li>' + fTag.innerHTML + '</li>';
+                this.util.removeItem(fTag);
+            }
+
+            pNode.insertBefore(list, rightNode);
         }
 
         this.submenuOff();
