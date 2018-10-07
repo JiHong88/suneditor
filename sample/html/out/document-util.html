@@ -206,8 +206,34 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                Get format element of the argument value (P, DIV, H[1-6])<br>
-                Or a tag whose parent tag is the editing area. (table, blockquote)
+                Get format element of the argument value (P, DIV, H[1-6], LI)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
+                class="signature">(element)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
+            <div class="description">
+                Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -698,6 +724,33 @@
         </table>
         <dl class="details"></dl>
 
+
+        <h4 class="name" id="removeEmptyNode"><span class="type-signature"></span>removeEmptyNode<span class="signature">(element)</span><span
+                class="type-signature"></span></h4>
+        <div class="description">
+            Delete a empty child node of argument element
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element node</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
         </article>
     </section>
 </div>
@@ -715,6 +768,7 @@
         <li><a href="document-util.html#isFormatElement">isFormatElement</a></li>
         <li><a href="document-util.html#isRangeFormatElement">isRangeFormatElement</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
+        <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
@@ -729,6 +783,7 @@
         <li><a href="document-util.html#removeClass">removeClass</a></li>
         <li><a href="document-util.html#toggleClass">toggleClass</a></li>
         <li><a href="document-util.html#removeItem">removeItem</a></li>
+        <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
     </ul>
 </nav>
 
