@@ -602,18 +602,22 @@ const core = function (context, util, plugins, lang) {
          * @param {Element} wrapTag - Element of wrap the arguments
          */
         wrapToTags: function (wrapTag) {
-            const rangeLines = [];
-            const wrapElements = this.getSelectedFormatElements();
+            const range = this.getRange();
+            const rangeLines = this.getSelectedFormatElements();
+            const last  = rangeLines[rangeLines.length - 1];
+            let standTag, beforeTag, pElement;
 
-            for (let i = 0, len = wrapElements.length; i < len; i++) {
-                rangeLines.push(wrapElements[i]);
+            if (util.isRangeFormatElement(last) || util.isFormatElement(last)) {
+                standTag = last;
+            } else {
+                standTag = util.getRangeFormatElement(last) || util.getFormatElement(last);
             }
+            
+            if (/^TD$/i.test(last.nodeName)) last = util.getFormatElement(last);
+            
+            beforeTag = standTag.nextSibling;
+            pElement = standTag.parentNode;
 
-            let last = util.getRangeFormatElement(rangeLines[rangeLines.length - 1]) || util.getFormatElement(rangeLines[rangeLines.length - 1]);
-            if (/^TD$/i.test(last.nodeName)) last = util.getFormatElement(rangeLines[rangeLines.length - 1]);
-
-            let beforeTag = last.nextSibling;
-            let pElement = last.parentNode;
             let listParent = null;
             let line = null;
             let prevNodeName = '';
@@ -636,7 +640,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             pElement.insertBefore(wrapTag, beforeTag);
-            util.removeEmptyNode(pElement);
+            if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
         },
 
         /**
