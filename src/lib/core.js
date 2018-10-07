@@ -317,10 +317,10 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
-         * @description Returns a "formatElement"(P, DIV, H[1-6]) array from the currently selected range.
+         * @description Returns a "formatElement"(P, DIV, H[1-6], LI) array from the currently selected range.
          * @returns {Array}
          */
-        getRangeSelectedFormatElement: function () {
+        getSelectedFormatElements: function () {
             const range = this.getRange();
             const startCon = range.startContainer;
             const endCon = range.endContainer;
@@ -352,6 +352,51 @@ const core = function (context, util, plugins, lang) {
 
             for (let i = startLine; i <= endLine; i++) {
                 rangeFormatElements.push(lineNodes[i]);
+            }
+
+            return rangeFormatElements;
+        },
+
+        /**
+         * @description Returns a "rangeFormatElement"(blockquote, TABLE, TR, TD, OL, UL, PRE) array from the currently selected range.
+         * @returns {Array}
+         */
+        getSelectedRangeFormatElements: function () {
+            const range = this.getRange();
+            const startCon = range.startContainer;
+            const endCon = range.endContainer;
+            const commonCon = range.commonAncestorContainer;
+            const rangeFormatElements = [];
+
+            if (util.isRangeFormatElement(commonCon)) [commonCon];
+            if (!util.isWysiwygDiv(commonCon)) {
+                const el = util.getRangeFormatElement(commonCon);
+                return el ? [el] : [];
+            }
+
+            // get range Elements
+            const rangeElements = util.getListChildren(commonCon, function (current) {
+                return util.isRangeFormatElement(current);
+            });
+
+            if (startCon === endCon) return rangeElements[0];
+
+            let startLine = util.getRangeFormatElement(startCon);
+            let endLine = util.getRangeFormatElement(endCon);
+
+            for (let i = 0, len = rangeElements.length; i < len; i++) {
+                if (startLine === rangeElements[i]) {
+                    startLine = i;
+                    continue;
+                }
+                if (endLine === rangeElements[i]) {
+                    endLine = i;
+                    break;
+                }
+            }
+
+            for (let i = startLine; i <= endLine; i++) {
+                if (rangeElements[i]) rangeFormatElements.push(rangeElements[i]);
             }
 
             return rangeFormatElements;
@@ -390,7 +435,7 @@ const core = function (context, util, plugins, lang) {
             const oP = document.createElement('P');
             oP.innerHTML = '&#65279';
 
-            element = util.getFormatElement(element);
+            element = util.getRangeFormatElement(element) || util.getFormatElement(element);
             element.parentNode.insertBefore(oP, element.nextElementSibling);
 
             return oP;
@@ -558,20 +603,40 @@ const core = function (context, util, plugins, lang) {
          */
         wrapToTags: function (wrapTag) {
             const rangeLines = [];
-            const lineNodes = this.getRangeSelectedFormatElement();
-            
-            for (let i = 0, len = lineNodes.length; i < len; i++) {
-                rangeLines.push(lineNodes[i]);
+            const wrapElements = this.getSelectedFormatElements();
+
+            for (let i = 0, len = wrapElements.length; i < len; i++) {
+                rangeLines.push(wrapElements[i]);
             }
 
-            const beforeTag = rangeLines[rangeLines.length - 1].nextSibling;
-            const pElement = rangeLines[rangeLines.length - 1].parentNode;
+            let last = util.getRangeFormatElement(rangeLines[rangeLines.length - 1]) || util.getFormatElement(rangeLines[rangeLines.length - 1]);
+            if (/^TD$/i.test(last.nodeName)) last = util.getFormatElement(rangeLines[rangeLines.length - 1]);
+
+            let beforeTag = last.nextSibling;
+            let pElement = last.parentNode;
+            let listParent = null;
+            let line = null;
+            let prevNodeName = '';
             
             for (let i = 0, len = rangeLines.length; i < len; i++) {
-                wrapTag.appendChild(rangeLines[i]);
+                line = rangeLines[i];
+
+                if (/^LI$/i.test(line.nodeName)) {
+                    if (listParent === null || !/^LI$/i.test(prevNodeName)) {
+                        listParent = document.createElement(line.parentNode.nodeName);
+                    }
+
+                    listParent.appendChild(line);
+                    if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) wrapTag.appendChild(listParent);
+                } else {
+                    wrapTag.appendChild(line);
+                }
+
+                prevNodeName = line.nodeName;
             }
 
             pElement.insertBefore(wrapTag, beforeTag);
+            util.removeEmptyNode(pElement);
         },
 
         /**
@@ -692,7 +757,7 @@ const core = function (context, util, plugins, lang) {
                 /** multi line */
                 else {
                     // get line nodes
-                    const lineNodes = this.getRangeSelectedFormatElement();
+                    const lineNodes = this.getSelectedFormatElements();
                     const endLength = lineNodes.length - 1;
 
                     // startCon
@@ -897,15 +962,7 @@ const core = function (context, util, plugins, lang) {
                 }
             })(element, pNode);
 
-            const children = pNode.children;
-            for (let i = 0, len = children.length; i < len; i++) {
-                if ((children[i].textContent.length === 0 || children[i].textContent === '&#65279') && !/^BR$/i.test(children[i].nodeName)) {
-                    util.removeItem(children[i]);
-                    --i;
-                    --len;
-                }
-            }
-
+            util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
 

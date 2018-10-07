@@ -139,26 +139,29 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (blockquote, TABLE, TR, TD, OL, UL)
+     * @description It is judged whether it is the range format element. (blockquote, TABLE, TR, TD, OL, UL, PRE)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^BLOCKQUOTE|TABLE|TD|TR|OL|UL$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TABLE|TBODY|THEAD|TFOOT|TR|TD|OL|UL|PRE)$/i.test(element.nodeName)) return true;
         return false;
     },
 
     /**
      * @description Get format element of the argument value (P, DIV, H[1-6])
-     * Or a tag whose parent tag is the editing area. (table, blockquote)
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */
     getFormatElement: function (element) {
         if (!element) return null;
 
-        if (this.isWysiwygDiv(element)) {
+        while (!this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+            element = element.parentNode;
+        }
+
+        if (this.isWysiwygDiv(element) || this.isRangeFormatElement(element)) {
             const firstFormatElement = this.getListChildren(element, function (current) {
                 return this.isFormatElement(current);
             }.bind(this))[0];
@@ -166,11 +169,22 @@ const util = {
             return firstFormatElement;
         }
 
-        while (!this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+        return element;
+    },
+
+    /**
+     * @description Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
+     * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
+     * @returns {Element|null}
+     */
+    getRangeFormatElement: function (element) {
+        if (!element) return null;
+
+        while (!this.isRangeFormatElement(element) && !this.isWysiwygDiv(element)) {
             element = element.parentNode;
         }
 
-        return element;
+        return this.isWysiwygDiv(element) ? null : element;
     },
 
     /**
@@ -412,6 +426,23 @@ const util = {
         } catch (e) {
             item.parentNode.removeChild(item);
         }
+    },
+
+    /**
+     * @description Delete a empty child node of argument element
+     * @param {Element} element - Element node
+     */
+    removeEmptyNode: function (element) {
+        (function recursionFunc(current) {
+            if ((current.textContent.trim().length === 0 || current.textContent === '&#65279') && !/^BR$/i.test(current.nodeName)) {
+                current.parentNode.removeChild(current);
+            } else {
+                for (let i = 0, len = current.children.length; i < len; i++) {
+                    if (!current.children[i]) break;
+                    recursionFunc(current.children[i]);
+                }
+            }
+        })(element);
     }
 };
 
