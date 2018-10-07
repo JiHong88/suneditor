@@ -37,6 +37,10 @@ export default {
             '               <blockquote style="font-size:13px; height:22px; line-height:1.5; border-style:solid; border-color:#8baab7; padding-left:20px; border-left-width:5px;">' + lang.toolbar.tag_quote + '</blockquote>' +
             '           </button>' +
             '       </li>' +
+            '       <li><button type="button" class="btn_edit" data-command="range" data-value="PRE" title="' + lang.toolbar.pre + '">' +
+            '               <pre style="font-size:13px; padding:8px; background-color:#f6f8fa; border:1px solid #dce5e5; border-radius:3px;">' + lang.toolbar.pre + '</pre>' +
+            '           </button>' +
+            '       </li>' +
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H1" title="' + lang.toolbar.tag_h + ' 1" style="height:40px;"><h1>' + lang.toolbar.tag_h + ' 1</h1></button></li>' +
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H2" title="' + lang.toolbar.tag_h + ' 2" style="height:34px;"><h2>' + lang.toolbar.tag_h + ' 2</h2></button></li>' +
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H3" title="' + lang.toolbar.tag_h + ' 3" style="height:26px;"><h3>' + lang.toolbar.tag_h + ' 3</h3></button></li>' +
@@ -64,12 +68,12 @@ export default {
 
         this.focus();
 
-        // blockquote
+        // blockquote, pre
         if (command === 'range') {
-            const oQuote = document.createElement(value);
-            this.wrapToTags(oQuote);
-            this.setRange(oQuote.firstChild, 0, oQuote.firstChild, 0);
-            this.appendP(oQuote);
+            const rangeElement = document.createElement(value);
+            this.wrapToTags(rangeElement);
+            this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
+            this.appendP(rangeElement);
         }
         // others
         else {

@@ -150,7 +150,7 @@ const util = {
     },
 
     /**
-     * @description Get format element of the argument value (P, DIV, H[1-6])
+     * @description Get format element of the argument value (P, DIV, H[1-6], LI)
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */

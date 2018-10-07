@@ -41,6 +41,21 @@
     text-decoration: underline;
 }
 
+/* pre */
+.sun-editor-editable pre {
+    display: block;
+    padding: 8px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f6f8fa;
+    border: 1px solid #dce5e5;
+    border-radius: 3px;
+}
+
 /* ol, ul */
 .sun-editor-editable ol {
     display: block;
@@ -63,6 +78,7 @@
 .sun-editor-editable li {
     display: list-item;
     text-align: -webkit-match-parent;
+    margin-bottom: 5px;
 }
 
 /* sub, sup */
