@@ -1,5 +1,5 @@
 /* suneditor main */
-.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; background-color:#FFF;}
+.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; text-align:left; background-color:#FFF;}
 .sun-editor * {box-sizing:border-box; user-select: none; -webkit-user-drag:none;}
 .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5;}
 .sun-editor-common body, .sun-editor-common div, .sun-editor-common dl, .sun-editor-common dt, .sun-editor-common dd, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common li,
@@ -98,7 +98,7 @@
 
 /* tool bar */
 .sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:1;}
-.sun-editor .sun-editor-id-toolbar {display:block; overflow:visible; position:relative; height:auto; padding:3px; margin:0; text-align:left; background-color:#fafafa; border-bottom:1px solid #dadada;}
+.sun-editor .sun-editor-id-toolbar {display:block; overflow:visible; position:relative; height:auto; padding:3px; margin:0; background-color:#fafafa; border-bottom:1px solid #dadada;}
 
 .sun-editor .tool_module {display:inline-block;}
 .sun-editor .tool_module_enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
@@ -175,7 +175,7 @@
 .sun-editor .sun-editor-id-editorArea .sun-editor-id-code {background-color:#191919; color:#fff;}
 
 /* resize bar */
-.sun-editor .sun-editor-id-resizeBar {width:auto; height:16px; border-top:1px solid #dadada; padding:2px 8px 2px; text-align:left; background-color:#fafafa; cursor:ns-resize;}
+.sun-editor .sun-editor-id-resizeBar {width:auto; height:16px; border-top:1px solid #dadada; padding:2px 8px 2px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .sun-editor-id-navigation {position:absolute; width:auto; height:auto; margin:0; padding:0; font-size:11px; font-weight:bold; line-height:1;}
 .sun-editor .sun-editor-id-resize-background {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:10000;}
 

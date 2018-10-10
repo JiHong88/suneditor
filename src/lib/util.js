@@ -55,6 +55,7 @@ const util = {
      */
     getIncludePath: function (nameArray, extension) {
         let path = '';
+        const pathList = [];
         const tagName = extension === 'js' ? 'script' : 'link';
         const src = extension === 'js' ? 'src' : 'href';
         
@@ -64,16 +65,23 @@ const util = {
         }
 
         const regExp = new RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
             
         for (let c = document.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
-            let editorTag = c[i][src].match(regExp);
+            if (extRegExp.test(c[i][src])) {
+                pathList.push(c[i]);
+            }
+        }
+
+        for (let i = 0; i < pathList.length; i++) {
+            let editorTag = pathList[i][src].match(regExp);
             if (editorTag) {
                 path = editorTag[0];
                 break;
             }
         }
 
-        if (path === '') path = document.getElementsByTagName(tagName)[0][src];
+        if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
         -1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
