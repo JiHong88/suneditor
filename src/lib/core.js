@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 'use strict';
 
 /**
@@ -368,7 +375,7 @@ const core = function (context, util, plugins, lang) {
             const commonCon = range.commonAncestorContainer;
             const rangeFormatElements = [];
 
-            if (util.isRangeFormatElement(commonCon)) [commonCon];
+            if (util.isRangeFormatElement(commonCon)) return [commonCon];
             if (!util.isWysiwygDiv(commonCon)) {
                 const el = util.getRangeFormatElement(commonCon);
                 return el ? [el] : [];
@@ -604,7 +611,7 @@ const core = function (context, util, plugins, lang) {
         wrapToTags: function (wrapTag) {
             const range = this.getRange();
             const rangeLines = this.getSelectedFormatElements();
-            const last  = rangeLines[rangeLines.length - 1];
+            let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
 
             if (util.isRangeFormatElement(last) || util.isFormatElement(last)) {
@@ -1336,8 +1343,11 @@ const core = function (context, util, plugins, lang) {
                 '<title>' + (isPrint ? lang.toolbar.print : lang.toolbar.preview) + '</title>' +
                 '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath(['suneditor-contents', 'suneditor'], 'css') + '">' +
                 '</head>' +
-                '<body class="sun-editor-editable">' + context.element.wysiwyg.innerHTML + '</body>' +
-                '</body>' + (isPrint ? '<script>window.print();</script>' : '') + '</html>');
+                '<body>' +
+                '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
+                context.element.wysiwyg.innerHTML + '</div>' +
+                (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
+                '</html>');
         }
     };
 
@@ -1379,7 +1389,7 @@ const core = function (context, util, plugins, lang) {
                 /** Format */
                 if (findFormat && util.isFormatElement(selectionParent)) {
                     commandMapNodes.push('FORMAT');
-                    util.changeTxt(commandMap['FORMAT'], nodeName);
+                    util.changeTxt(commandMap.FORMAT, nodeName);
                     findFormat = false;
                     continue;
                 }
@@ -1388,7 +1398,7 @@ const core = function (context, util, plugins, lang) {
                 if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
-                    util.changeTxt(commandMap['FONT'], selectFont);
+                    util.changeTxt(commandMap.FONT, selectFont);
                     findFont = false;
                 }
 
@@ -1409,7 +1419,7 @@ const core = function (context, util, plugins, lang) {
                     /** font size */
                     if (selectionParent.style.fontSize.length > 0) {
                         commandMapNodes.push('SIZE');
-                        util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
                     }
                 }
@@ -1665,7 +1675,7 @@ const core = function (context, util, plugins, lang) {
                         const moveCell = cells[idx];
                         if (!moveCell) return false;
 
-                        editor.setRange(moveCell, 0, moveCell, 0)
+                        editor.setRange(moveCell, 0, moveCell, 0);
 
                         break;
                     }
@@ -1675,7 +1685,7 @@ const core = function (context, util, plugins, lang) {
 
                     const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
                     editor.insertNode(tabText);
-                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize)
+                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
 
                     break;
             }
@@ -1841,7 +1851,7 @@ const core = function (context, util, plugins, lang) {
                 oP.innerHTML = content;
                 context.element.wysiwyg.appendChild(oP);
             } else {
-                context.element.code.value += oP.outerHTML;
+                context.element.code.value += content;
             }
         },
 

@@ -1,3 +1,12 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
+'use strict';
+
 export default {
     toolbar: {
         font: '글꼴',

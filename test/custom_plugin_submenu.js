@@ -1,3 +1,5 @@
+'use strict';
+
 // ex) A submenu plugin that appends the contents of the input element to the editor
 export default {
     // plugin name (Required)
@@ -24,20 +26,20 @@ export default {
         // must call stopPropagation in the mousedown event to prevent the toolbar from executing events.
         context.custom.textElement.addEventListener('mousedown', function (e) {
             e.stopPropagation();
-        })
+        });
 
         // You must bind "core" object when registering an event.
         /** add event listeners */
         listDiv.getElementsByTagName('BUTTON')[0].addEventListener('click', this.onClick.bind(core));
         context.custom.textElement.addEventListener('mousedown', function () {
 
-        })
+        });
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
     },
 
-    setSubmenu: function (lang) {
+    setSubmenu: function () {
         const listDiv = document.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_align';
@@ -63,4 +65,4 @@ export default {
         // focus
         this.focus();
     }
-}
+};

@@ -6,8 +6,9 @@
  * MIT license.
  */
 'use strict';
-import dialog from '../modules/dialog'
-import resizing from '../modules/resizing'
+
+import dialog from '../modules/dialog';
+import resizing from '../modules/resizing';
 
 export default {
     name: 'image',
@@ -180,7 +181,7 @@ export default {
     },
 
     onRender_imgInput: function () {
-        function inputAction(files) {
+        const submitAction = function (files) {
             if (files.length > 0) {
                 const imageUploadUrl = this.context.user.imageUploadUrl;
                 const filesLen = this.context.dialog.updateModal ? 1 : files.length;
@@ -203,10 +204,10 @@ export default {
                     }
                 }
             }
-        }
+        }.bind(this);
 
         try {
-            inputAction.call(this, this.context.image.imgInputFile.files);
+            submitAction(this.context.image.imgInputFile.files);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
@@ -313,9 +314,9 @@ export default {
             } else {
                 this.closeLoading();
             }
-        } catch (e) {
+        } catch (error) {
             this.closeLoading();
-            throw Error('[SUNEDITOR.image.submit.fail] cause : "' + e.message + '"');
+            throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
             this.plugins.dialog.closeDialog.call(this);
         }
@@ -412,7 +413,7 @@ export default {
         // src, size
         contextImage._element.src = contextImage.imgUrlFile.value;
         contextImage._element.alt = contextImage._altText;
-        contextImage._element.setAttribute('data-proportion', contextImage._proportionChecked);;
+        contextImage._element.setAttribute('data-proportion', contextImage._proportionChecked);
         contextImage._element.style.width = contextImage.imageX.value + 'px';
         contextImage._element.style.height = contextImage.imageY.value + 'px';
 
@@ -470,7 +471,7 @@ export default {
         }
     },
 
-    toggle_caption_contenteditable: function (on, e) {
+    toggle_caption_contenteditable: function (on) {
         this.context.image._onCaption = on;
         this.context.image._imageCaption.setAttribute('contenteditable', on);
         this.context.image._imageCaption.focus();

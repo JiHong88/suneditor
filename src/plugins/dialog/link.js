@@ -6,7 +6,8 @@
  * MIT license.
  */
 'use strict';
-import dialog from '../modules/dialog'
+
+import dialog from '../modules/dialog';
 
 export default {
     name: 'link',
@@ -96,7 +97,7 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        function submitAction() {
+        const submitAction = function () {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
             const url = /^https?:\/\//.test(this.context.link.focusElement.value) ? this.context.link.focusElement.value : "http://" + this.context.link.focusElement.value;
@@ -120,10 +121,10 @@ export default {
 
             this.context.link.focusElement.value = '';
             this.context.link.linkAnchorText.value = '';
-        }
+        }.bind(this);
 
         try {
-            submitAction.call(this);
+            submitAction();
         } finally {
             this.plugins.dialog.closeDialog.call(this);
             this.closeLoading();

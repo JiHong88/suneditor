@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 'use strict';
 
 /**
@@ -307,7 +314,7 @@ const _Constructor = {
         const defaultButtonList = this._defaultButtons(lang, popupDisplay);
         const plugins = {};
         if (_plugins) {
-            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(e) { return _plugins[e] });
+            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(e) { return _plugins[e]; });
             for (let i = 0, len = pluginsValues.length; i < len; i++) {
                 plugins[pluginsValues[i].name] = pluginsValues[i];
             }

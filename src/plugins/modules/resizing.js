@@ -28,7 +28,7 @@ export default {
         context.resizing.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
         context.resizing.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
 
-        let resize_button = eval(this.setController_button(core.lang));;
+        let resize_button = eval(this.setController_button(core.lang));
         context.resizing.resizeButton = resize_button;
 
         let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
@@ -96,12 +96,9 @@ export default {
 
     call_controller_resize: function (targetElement, plugin) {
         this.context.resizing._resize_plugin = plugin;
-        // targetElement.setAttribute('unselectable', 'on');
-        // targetElement.contentEditable = false;
 
         const resizeContainer = this.context.resizing.resizeContainer;
         const resizeDiv = this.context.resizing.resizeDiv;
-
         const offset = this.util.getOffset(targetElement);
 
         const w = targetElement.offsetWidth;
@@ -184,14 +181,13 @@ export default {
         this.context.resizing.resizeButton.style.display = 'none';
         this.context.resizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
-        function closureFunc() {
+        const closureFunc_bind = function closureFunc() {
             this.plugins.resizing.cancel_controller_resize.call(this);
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
-        }
+        }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this);
-        const closureFunc_bind = closureFunc.bind(this);
 
         document.addEventListener('mousemove', resizing_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
@@ -231,4 +227,4 @@ export default {
         this.context.resizing._resize_h = resultH;
         this.util.changeTxt(this.context.resizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
-}
+};

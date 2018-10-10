@@ -1,5 +1,3 @@
-import { format } from "path";
-
 /*
  * wysiwyg web editor
  *

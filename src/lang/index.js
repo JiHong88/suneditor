@@ -1,5 +1,7 @@
-import en from './en'
-import ko from './ko'
+'use strict';
 
-export {en, ko}
-export default {en, ko}
+import en from './en';
+import ko from './ko';
+
+export { en, ko };
+export default { en, ko };
