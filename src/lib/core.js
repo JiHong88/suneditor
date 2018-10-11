@@ -823,7 +823,7 @@ const core = function (context, util, plugins, lang) {
                 }
             
                 return !style;
-            };
+            }
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
@@ -855,7 +855,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
+                            const childNode = pCurrent.pop() || textNode;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -911,7 +912,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
+                            const childNode = pCurrent.pop() || textNode;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -945,7 +947,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
     
-                            const childNode = appendNode = newNode = pCurrent.pop() || child;
+                            const childNode = pCurrent.pop() || child;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1053,7 +1056,8 @@ const core = function (context, util, plugins, lang) {
                         }
 
                         if (pCurrent.length > 0) {
-                            const childNode = appendNode = newNode = pCurrent.pop();
+                            const childNode = pCurrent.pop();
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1084,7 +1088,8 @@ const core = function (context, util, plugins, lang) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || node;
+                        appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
@@ -1167,7 +1172,8 @@ const core = function (context, util, plugins, lang) {
                         }
 
                         if (pCurrent.length > 0) {
-                            const childNode = appendNode = newNode = pCurrent.pop();
+                            const childNode = pCurrent.pop();
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1198,7 +1204,8 @@ const core = function (context, util, plugins, lang) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || node;
+                        appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
