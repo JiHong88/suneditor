@@ -172,8 +172,8 @@
 };
 
 <span class="pl-c">/** Add content to the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_appendContent</span>(<span class="pl-smi">contents</span>) {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">appendContent</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
+<span class="pl-k">function</span> <span class="pl-en">sun_appendContents</span>(<span class="pl-smi">contents</span>) {
+    <span class="pl-smi">suneditor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
 };
 
 <span class="pl-c">/** Disable the suneditor */</span>
@@ -214,7 +214,7 @@
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContent('append contents<br>')">AppendContent</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_disabled()">Disabled</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_enabled()">Enabled</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_hide()">Hide</button>
@@ -366,8 +366,8 @@
         suneditor.setContents(content);
     }
 
-    function sun_appendContent(content) {
-        suneditor.appendContent(content);
+    function sun_appendContents(content) {
+        suneditor.appendContents(content);
     }
 
     function sun_disabled() {

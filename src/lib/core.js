@@ -1822,43 +1822,39 @@ const core = function (context, util, plugins, lang) {
          * @returns {String}
          */
         getContents: function () {
-            let content = '';
+            let contents = '';
 
-            if (context.element.wysiwyg.innerText.trim().length === 0) return content;
+            if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
 
             if (editor._variable.wysiwygActive) {
-                content = context.element.wysiwyg.innerHTML;
+                contents = context.element.wysiwyg.innerHTML;
             } else {
-                content = context.element.code.value;
+                contents = context.element.code.value;
             }
-            return content;
+            return contents;
         },
 
         /**
          * @description Change the contents of the suneditor
-         * @param {String} content - Content to Input
+         * @param {String} contents - Contents to Input
          */
-        setContents: function (content) {
-            const innerHTML = util.convertContentsForEditor(content);
-
+        setContents: function (contents) {
             if (editor._variable.wysiwygActive) {
-                context.element.wysiwyg.innerHTML = innerHTML;
+                context.element.wysiwyg.innerHTML = util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value = innerHTML;
+                context.element.code.value = contents;
             }
         },
 
         /**
-         * @description Add content to the suneditor
-         * @param {String} content - to Input
+         * @description Add contents to the suneditor
+         * @param {String} contents - Contents to Input
          */
-        appendContent: function (content) {
+        appendContents: function (contents) {
             if (editor._variable.wysiwygActive) {
-                const oP = document.createElement('P');
-                oP.innerHTML = content;
-                context.element.wysiwyg.appendChild(oP);
+                context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value += content;
+                context.element.code.value += contents;
             }
         },
 
@@ -1868,6 +1864,7 @@ const core = function (context, util, plugins, lang) {
         disabled: function () {
             context.tool.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
+            context.element.code.setAttribute('disabled', 'disabled');
         },
 
         /**
@@ -1876,6 +1873,7 @@ const core = function (context, util, plugins, lang) {
         enabled: function () {
             context.tool.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
+            context.element.code.removeAttribute('disabled');
         },
 
         /**
@@ -1905,9 +1903,9 @@ const core = function (context, util, plugins, lang) {
 
             this.save = null;
             this.getContext = null;
-            this.getContent = null;
-            this.setContent = null;
-            this.appendContent = null;
+            this.getContents = null;
+            this.setContents = null;
+            this.appendContents = null;
             this.disabled = null;
             this.enabled = null;
             this.show = null;
