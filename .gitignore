@@ -1,7 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
+.DS_Store
 
 # project files
-.*
+.vscode/**
+.idea/**
 out
 gen
 

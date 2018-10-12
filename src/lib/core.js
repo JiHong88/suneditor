@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 'use strict';
 
 /**
@@ -368,7 +375,7 @@ const core = function (context, util, plugins, lang) {
             const commonCon = range.commonAncestorContainer;
             const rangeFormatElements = [];
 
-            if (util.isRangeFormatElement(commonCon)) [commonCon];
+            if (util.isRangeFormatElement(commonCon)) return [commonCon];
             if (!util.isWysiwygDiv(commonCon)) {
                 const el = util.getRangeFormatElement(commonCon);
                 return el ? [el] : [];
@@ -604,7 +611,7 @@ const core = function (context, util, plugins, lang) {
         wrapToTags: function (wrapTag) {
             const range = this.getRange();
             const rangeLines = this.getSelectedFormatElements();
-            const last  = rangeLines[rangeLines.length - 1];
+            let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
 
             if (util.isRangeFormatElement(last) || util.isFormatElement(last)) {
@@ -816,7 +823,7 @@ const core = function (context, util, plugins, lang) {
                 }
             
                 return !style;
-            };
+            }
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
@@ -848,7 +855,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
+                            const childNode = pCurrent.pop() || textNode;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -904,7 +912,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
 
-                            const childNode = appendNode = newNode = pCurrent.pop() || textNode;
+                            const childNode = pCurrent.pop() || textNode;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -938,7 +947,8 @@ const core = function (context, util, plugins, lang) {
                                 newNode = newNode.parentNode;
                             }
     
-                            const childNode = appendNode = newNode = pCurrent.pop() || child;
+                            const childNode = pCurrent.pop() || child;
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1046,7 +1056,8 @@ const core = function (context, util, plugins, lang) {
                         }
 
                         if (pCurrent.length > 0) {
-                            const childNode = appendNode = newNode = pCurrent.pop();
+                            const childNode = pCurrent.pop();
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1077,7 +1088,8 @@ const core = function (context, util, plugins, lang) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || node;
+                        appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
@@ -1160,7 +1172,8 @@ const core = function (context, util, plugins, lang) {
                         }
 
                         if (pCurrent.length > 0) {
-                            const childNode = appendNode = newNode = pCurrent.pop();
+                            const childNode = pCurrent.pop();
+                            appendNode = newNode = childNode;
                             while (pCurrent.length > 0) {
                                 newNode = pCurrent.pop();
                                 appendNode.appendChild(newNode);
@@ -1191,7 +1204,8 @@ const core = function (context, util, plugins, lang) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = appendNode = newNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || node;
+                        appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
                             appendNode.appendChild(newNode);
@@ -1336,8 +1350,11 @@ const core = function (context, util, plugins, lang) {
                 '<title>' + (isPrint ? lang.toolbar.print : lang.toolbar.preview) + '</title>' +
                 '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath(['suneditor-contents', 'suneditor'], 'css') + '">' +
                 '</head>' +
-                '<body class="sun-editor-editable">' + context.element.wysiwyg.innerHTML + '</body>' +
-                '</body>' + (isPrint ? '<script>window.print();</script>' : '') + '</html>');
+                '<body>' +
+                '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
+                context.element.wysiwyg.innerHTML + '</div>' +
+                (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
+                '</html>');
         }
     };
 
@@ -1379,7 +1396,7 @@ const core = function (context, util, plugins, lang) {
                 /** Format */
                 if (findFormat && util.isFormatElement(selectionParent)) {
                     commandMapNodes.push('FORMAT');
-                    util.changeTxt(commandMap['FORMAT'], nodeName);
+                    util.changeTxt(commandMap.FORMAT, nodeName);
                     findFormat = false;
                     continue;
                 }
@@ -1388,7 +1405,7 @@ const core = function (context, util, plugins, lang) {
                 if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
-                    util.changeTxt(commandMap['FONT'], selectFont);
+                    util.changeTxt(commandMap.FONT, selectFont);
                     findFont = false;
                 }
 
@@ -1409,7 +1426,7 @@ const core = function (context, util, plugins, lang) {
                     /** font size */
                     if (selectionParent.style.fontSize.length > 0) {
                         commandMapNodes.push('SIZE');
-                        util.changeTxt(commandMap['SIZE'], selectionParent.style.fontSize.match(/\d+/)[0]);
+                        util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize.match(/\d+/)[0]);
                         findSize = false;
                     }
                 }
@@ -1665,7 +1682,7 @@ const core = function (context, util, plugins, lang) {
                         const moveCell = cells[idx];
                         if (!moveCell) return false;
 
-                        editor.setRange(moveCell, 0, moveCell, 0)
+                        editor.setRange(moveCell, 0, moveCell, 0);
 
                         break;
                     }
@@ -1675,7 +1692,7 @@ const core = function (context, util, plugins, lang) {
 
                     const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
                     editor.insertNode(tabText);
-                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize)
+                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
 
                     break;
             }
@@ -1805,43 +1822,39 @@ const core = function (context, util, plugins, lang) {
          * @returns {String}
          */
         getContents: function () {
-            let content = '';
+            let contents = '';
 
-            if (context.element.wysiwyg.innerText.trim().length === 0) return content;
+            if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
 
             if (editor._variable.wysiwygActive) {
-                content = context.element.wysiwyg.innerHTML;
+                contents = context.element.wysiwyg.innerHTML;
             } else {
-                content = context.element.code.value;
+                contents = context.element.code.value;
             }
-            return content;
+            return contents;
         },
 
         /**
          * @description Change the contents of the suneditor
-         * @param {String} content - Content to Input
+         * @param {String} contents - Contents to Input
          */
-        setContents: function (content) {
-            const innerHTML = util.convertContentsForEditor(content);
-
+        setContents: function (contents) {
             if (editor._variable.wysiwygActive) {
-                context.element.wysiwyg.innerHTML = innerHTML;
+                context.element.wysiwyg.innerHTML = util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value = innerHTML;
+                context.element.code.value = contents;
             }
         },
 
         /**
-         * @description Add content to the suneditor
-         * @param {String} content - to Input
+         * @description Add contents to the suneditor
+         * @param {String} contents - Contents to Input
          */
-        appendContent: function (content) {
+        appendContents: function (contents) {
             if (editor._variable.wysiwygActive) {
-                const oP = document.createElement('P');
-                oP.innerHTML = content;
-                context.element.wysiwyg.appendChild(oP);
+                context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value += oP.outerHTML;
+                context.element.code.value += contents;
             }
         },
 
@@ -1851,6 +1864,7 @@ const core = function (context, util, plugins, lang) {
         disabled: function () {
             context.tool.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
+            context.element.code.setAttribute('disabled', 'disabled');
         },
 
         /**
@@ -1859,6 +1873,7 @@ const core = function (context, util, plugins, lang) {
         enabled: function () {
             context.tool.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
+            context.element.code.removeAttribute('disabled');
         },
 
         /**
@@ -1888,9 +1903,9 @@ const core = function (context, util, plugins, lang) {
 
             this.save = null;
             this.getContext = null;
-            this.getContent = null;
-            this.setContent = null;
-            this.appendContent = null;
+            this.getContents = null;
+            this.setContents = null;
+            this.appendContents = null;
             this.disabled = null;
             this.enabled = null;
             this.show = null;

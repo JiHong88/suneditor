@@ -1,3 +1,10 @@
+/*
+ * wysiwyg web editor
+ *
+ * suneditor.js
+ * Copyright 2017 JiHong Lee.
+ * MIT license.
+ */
 'use strict';
 
 /**
@@ -59,7 +66,7 @@ const util = {
         const tagName = extension === 'js' ? 'script' : 'link';
         const src = extension === 'js' ? 'src' : 'href';
         
-        let fileName = '(?:'
+        let fileName = '(?:';
         for (let i = 0, len = nameArray.length; i < len; i++) {
             fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
         }
@@ -117,7 +124,7 @@ const util = {
         }
 
         const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
-        contents = contents.replace(/&|\u00A0|'|\<|\>/g, function (m) {
+        contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
 
@@ -356,7 +363,7 @@ const util = {
         return {
             left: element.offsetLeft + tableOffsetLeft,
             top: element.offsetTop + tableOffsetTop - tableElement.scrollTop
-        }
+        };
     },
 
     /**

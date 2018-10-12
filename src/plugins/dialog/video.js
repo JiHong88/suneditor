@@ -6,8 +6,9 @@
  * MIT license.
  */
 'use strict';
-import dialog from '../modules/dialog'
-import resizing from '../modules/resizing'
+
+import dialog from '../modules/dialog';
+import resizing from '../modules/resizing';
 
 export default {
     name: 'video',
@@ -120,7 +121,9 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        function submitAction() {
+        this.context.video._proportionChecked = this.context.video.proportion.checked;
+
+        const submitAction = function () {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
             const contextVideo = this.context.video;
@@ -133,7 +136,7 @@ export default {
 
             /** iframe source */
             if (/^\<iframe.*iframe\>$/.test(url)) {
-                oIframe = (new DOMParser()).parseFromString(url, 'text/html').getElementsByTagName('iframe')[0]
+                oIframe = (new DOMParser()).parseFromString(url, 'text/html').getElementsByTagName('iframe')[0];
             }
             /** url */
             else {
@@ -198,11 +201,10 @@ export default {
                 this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
                 this.appendP(container);
             }
-        }
+        }.bind(this);
 
         try {
-            this.context.video._proportionChecked = this.context.video.proportion.checked;
-            submitAction.call(this);
+            submitAction();
         } finally {
             this.plugins.dialog.closeDialog.call(this);
             this.closeLoading();
@@ -271,9 +273,10 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
-    setSize: function (x, y) {
-        this.context.video._resize_element.style.width = x;
-        this.context.video._resize_element.style.height = x;
+    setSize: function (x) {
+        const contextVideo = this.context.video;
+        contextVideo._resize_element.style.width = x;
+        contextVideo._resize_element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._resize_element.offsetWidth) + 'px';
     },
 
     destroy: function () {

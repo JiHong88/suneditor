@@ -2,11 +2,14 @@ import '../../src/assets/css/suneditor.css'
 import '../../src/assets/css/suneditor-contents.css'
 
 import suneditor from '../../src/suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, link, image, video} from '../../src/plugins'
 import plugins from '../../src/plugins'
 import {ko} from '../../src/lang'
 
-import custom_plugin_submenu from './custom_plugin_submenu'
+import suneditor from '../src/suneditor';
+import plugins from '../src/plugins';
+import { ko } from '../src/lang';
+
+import custom_plugin_submenu from './custom_plugin_submenu';
 
 
 suneditor.create(document.getElementById('editor'), {
@@ -28,11 +31,11 @@ suneditor.create(document.getElementById('editor'), {
 
 const editor = suneditor.init({
     plugins: [
-        hiliteColor,
-        align,
-        horizontalRule,
-        list,
-        table,
+        plugins.hiliteColor,
+        plugins.align,
+        plugins.horizontalRule,
+        plugins.list,
+        plugins.table,
         custom_plugin_submenu
     ],
     buttonList: [
@@ -50,7 +53,7 @@ const editor = suneditor.init({
 editor.create(document.getElementById('editor2'));
 editor.create(document.getElementById('editor3'), {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', link,
+        ['align', 'horizontalRule', 'list', 'table', plugins.link,
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
