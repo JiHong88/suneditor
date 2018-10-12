@@ -32,12 +32,6 @@ $ npm install suneditor
 $ bower install suneditor
 ```
 
-## Sample
-```text
-Download source and run
- - sample/index.html
-```
-
 ## Getting Started
 **<a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>**
 ### 1. Include

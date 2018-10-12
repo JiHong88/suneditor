@@ -1,3 +1,4 @@
+sample/
 test/
-LICENSE
-bower.json
+.jshintrc
+.karma.conf.js
