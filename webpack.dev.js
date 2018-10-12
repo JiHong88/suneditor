@@ -8,7 +8,7 @@ const common = require('./webpack.common')
 
 module.exports = merge(common, {
 	mode: 'development',
-	entry: './test/suneditor_build_test',
+	entry: './test/dev/suneditor_build_test',
 	output: {
 		filename: 'suneditor.[hash].js',
 		path: path.resolve(__dirname, 'dist')
@@ -27,7 +27,7 @@ module.exports = merge(common, {
 		}),
 		new webpack.NamedModulesPlugin(),
 		new HtmlWebpackPlugin({
-			template: './test/suneditor_build_test.html',
+			template: './test/dev/suneditor_build_test.html',
 			inject: true
 		}),
 	],

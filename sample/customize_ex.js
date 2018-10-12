@@ -2,7 +2,7 @@
 // import '../src/assets/css/suneditor-contents.css'
 
 import suneditor from '../src/suneditor'
-import custom_plugin_submenu from '../test/custom_plugin_submenu'
+import custom_plugin_submenu from '../test/dev/custom_plugin_submenu'
 
 suneditor.create(document.getElementById('ex_submenu'), {
     plugins: [
