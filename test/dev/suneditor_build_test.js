@@ -1,13 +1,9 @@
 import '../../src/assets/css/suneditor.css'
 import '../../src/assets/css/suneditor-contents.css'
 
-import suneditor from '../../src/suneditor'
-import plugins from '../../src/plugins'
-import {ko} from '../../src/lang'
-
-import suneditor from '../src/suneditor';
-import plugins from '../src/plugins';
-import { ko } from '../src/lang';
+import suneditor from '../../src/suneditor';
+import plugins from '../../src/plugins';
+import { ko } from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 

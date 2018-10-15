@@ -70,12 +70,7 @@ export default {
             title: 'Insert Video',
             url: 'Media embed URL, YouTube'
         },
-        resize100: 'Resize 100%',
-        resize75: 'Resize 75%',
-        resize50: 'Resize 50%',
-        resize25: 'Resize 25%',
         close: 'Close',
-        remove: 'Remove',
         submitButton: 'Submit',
         revertButton: 'Revert',
         proportion: 'constrain proportions',
@@ -94,6 +89,13 @@ export default {
         deleteRow: 'Delete row',
         insertColumnBefore: 'Insert column before',
         insertColumnAfter: 'Insert column after',
-        deleteColumn: 'Delete column'
+        deleteColumn: 'Delete column',
+        resize100: 'Resize 100%',
+        resize75: 'Resize 75%',
+        resize50: 'Resize 50%',
+        resize25: 'Resize 25%',
+        remove: 'Remove',
+        mirrorHorizontal: 'Mirror, Horizontal',
+        mirrorVertical: 'Mirror, Vertical'
     }
 };

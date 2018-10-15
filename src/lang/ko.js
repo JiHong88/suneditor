@@ -70,12 +70,7 @@ export default {
             title: '동영상 삽입',
             url: '미디어 임베드 주소, 유튜브'
         },
-        resize100: '100% 크기',
-        resize75: '75% 크기',
-        resize50: '50% 크기',
-        resize25: '25% 크기',
         close: '닫기',
-        remove: '삭제',
         submitButton: '확인',
         revertButton: '되돌리기',
         proportion: '비율 맞춤',
@@ -94,6 +89,13 @@ export default {
         deleteRow: '행 삭제',
         insertColumnBefore: '왼쪽에 열 삽입',
         insertColumnAfter: '오른쪽에 열 삽입',
-        deleteColumn: '열 삭제'
+        deleteColumn: '열 삭제',
+        resize100: '100% 크기',
+        resize75: '75% 크기',
+        resize50: '50% 크기',
+        resize25: '25% 크기',
+        remove: '삭제',
+        mirrorHorizontal: '좌우 반전',
+        mirrorVertical: '상하 반전'
     }
 };

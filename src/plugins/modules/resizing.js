@@ -81,14 +81,16 @@ export default {
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="btn-group">' +
-            '   <button type="button" data-command="100" title="' + lang.dialogBox.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
-            '   <button type="button" data-command="75" title="' + lang.dialogBox.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
-            '   <button type="button" data-command="50" title="' + lang.dialogBox.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
-            '   <button type="button" data-command="25" title="' + lang.dialogBox.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
+            '   <button type="button" data-command="100" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
+            '   <button type="button" data-command="75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
+            '   <button type="button" data-command="50" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
+            '   <button type="button" data-command="25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
+            '   <button type="button" data-command="rotate" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
+            '   <button type="button" data-command="rotate" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
             '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
             '</div>' +
             '<div class="btn-group remove">' +
-            '   <button type="button" data-command="delete" title="' + lang.dialogBox.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
+            '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
 
         return resize_button;
@@ -158,6 +160,19 @@ export default {
         if (/^\d+$/.test(command)) {
             this.plugins[this.context.resizing._resize_plugin].setSize.call(this, command + '%', '');
         }
+        else if (/rotate/.test(command)) {
+            const value = e.target.getAttribute('data-value') || e.target.parentNode.getAttribute('data-value');
+            const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
+            const transform = contextEl.style.transform;
+
+            if (value === 'h') {
+                contextEl.style.transform = transform.match(/rotateY/) ? transform.replace(/rotateY\(\d+deg\)(?:\s|;|$)/, '') : transform + ' rotateY(180deg)';
+            } else {
+                contextEl.style.transform = transform.match(/rotateX/) ? transform.replace(/rotateX\(\d+deg\)(?:\s|;|$)/, '') : transform + ' rotateX(180deg)';
+            }
+
+            return;
+        }
         else if (/update/.test(command)) {
             this.plugins[this.context.resizing._resize_plugin].openModify.call(this);
         }
@@ -211,7 +226,7 @@ export default {
 
         if (/r|l/.test(direction)) {
             this.context.resizing.resizeDiv.style.width = w + 'px';
-            resultW =w;
+            resultW = w;
         }
 
         if (/^(?:t|b)[^h]$/.test(direction)) {

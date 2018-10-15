@@ -86,6 +86,10 @@
 .sun-editor .icon-empty-file:before{content:'\0071';}
 .sun-editor .icon-paragraph:before{content:'\0072';}
 .sun-editor .icon-delete:before{content:'\0073';}
+.sun-editor .icon-rotate-left:before{content:'\0074';}
+.sun-editor .icon-rotate-right:before{content:'\0075';}
+.sun-editor .icon-mirror-horizontal:before{content:'\0076';}
+.sun-editor .icon-mirror-vertical:before{content:'\0077';}
 
 /* used color #000 , #fff , #CCC , #d4e3ea , #bbd5e0 , #a2bfcc , #8baab7*/
 /* container */
@@ -249,7 +253,7 @@
 .sun-editor .modal-resize-container .resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:#F00; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 
 /* resize button */
-.sun-editor .resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:12; max-width:310px; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; z-index:12; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 
 /* link controller button */
 .sun-editor .sun-editor-id-link-btn {position:absolute; top:0; left:0; z-index:11; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
