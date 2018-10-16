@@ -11,7 +11,7 @@ import util from './lib/util';
 import core from './lib/core';
 import _Constructor from './lib/constructor';
 import _Context from './lib/context';
-import _defaultLang from './lang/en'
+import _defaultLang from './lang/en';
 
 
 export default {
@@ -34,7 +34,7 @@ export default {
             create: function (idOrElement, options) {
                 return self.create(idOrElement, options, init_options);
             }
-        }
+        };
     },
 
     /**

@@ -135,7 +135,7 @@ export default {
             contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
             /** iframe source */
-            if (/^\<iframe.*iframe\>$/.test(url)) {
+            if (/^<iframe.*\/iframe>$/.test(url)) {
                 oIframe = (new DOMParser()).parseFromString(url, 'text/html').getElementsByTagName('iframe')[0];
             }
             /** url */
