@@ -202,6 +202,7 @@
 
 /* hr */
 .sun-editor-editable hr {
+    display: block;
     border-width: 1px 0 0;
     border-color: black;
     border-image: initial;
@@ -224,6 +225,7 @@
 
 /* table */
 .sun-editor-editable table {
+    display: table;
     table-layout: auto;
     border: 1px solid rgb(204, 204, 204);
     /* table-layout: fixed; */
@@ -246,9 +248,11 @@
 
 /* image */
 .sun-editor-editable .sun-editor-id-image-container {
+    display: block;
     text-align: center;
 }
 .sun-editor-editable .sun-editor-id-image-container figcaption {
+    display: block;
     padding: 1em .5em;
     font-size: 13px;
     text-align: center;
@@ -263,6 +267,7 @@
     outline: 1px solid #8baab7;
 }
 .sun-editor-editable .sun-editor-image-cover {
+    display: block;
     outline: none;
     line-height: 0;
 }
@@ -272,6 +277,7 @@
 
 /** video iframe tags */
 .sun-editor-editable .sun-editor-id-iframe-container {
+    display: block;
     position: relative;
     margin: auto;
     line-height: 0;
@@ -279,6 +285,7 @@
     border: 1px solid #9e9e9e;
 }
 .sun-editor-editable .sun-editor-iframe-inner-cover {
+    display: block;
     position:absolute;
     width:100%;
     height:100%;

@@ -130,6 +130,8 @@
             videoX <span class="pl-k">:</span> <span class="pl-c1">360</span>,
             videoY <span class="pl-k">:</span> <span class="pl-c1">115</span>,
             imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
+            showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+            popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
             buttonList <span class="pl-k">:</span> [
                 [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>,
@@ -141,8 +143,7 @@
                 <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>,
                 <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-            ],
-            popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>
+            ]
         });</pre></div>
         <p></p>
         <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting</textarea>
@@ -332,6 +333,8 @@
         videoX : 360,
         videoY : 115,
         imageSize : 150,
+        popupDisplay: 'full',
+        showPathLabel: false,
         buttonList : [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
@@ -344,7 +347,6 @@
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print']
         ],
-        popupDisplay: 'full'
     });
 
     let suneditor = SUNEDITOR.create('exampleFunction');
