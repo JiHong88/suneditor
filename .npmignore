@@ -17,7 +17,6 @@ bower_components/
 
 #dev
 .git/
-dist/
 sample/
 test/
 .jshintrc
