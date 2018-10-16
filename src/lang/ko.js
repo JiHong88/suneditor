@@ -94,7 +94,6 @@ export default {
         resize75: '75% 크기',
         resize50: '50% 크기',
         resize25: '25% 크기',
-        remove: '삭제',
         mirrorHorizontal: '좌우 반전',
         mirrorVertical: '상하 반전'
     }
