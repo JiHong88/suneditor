@@ -99,7 +99,7 @@ const util = {
 
     /**
      * @description Converts contents into a format that can be placed in an editor
-     * @param contents - contents
+     * @param {String} contents - contents
      * @returns {String}
      */
     convertContentsForEditor: function (contents) {
