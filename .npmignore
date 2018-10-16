@@ -1,6 +1,26 @@
+# Created by .ignore support plugin (hsz.mobi)
+.DS_Store
+
+# project files
+.vscode/
+.idea/
+out
+gen
+
+# modules
+node_modules/
+bower_components/
+*.log
+
+#build
+.travis.yml
+
+#dev
+.git/
 dist/
 sample/
 test/
 .jshintrc
-.karma.conf.js
+karma.conf.js
 bower.json
+webpack.*.js
