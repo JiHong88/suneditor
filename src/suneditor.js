@@ -15,12 +15,6 @@ import _defaultLang from './lang/en';
 
 
 export default {
-    util,
-    core,
-    _Constructor,
-    _Context,
-    _defaultLang,
-
     /**
      * @description Returns the create function with preset options.
      * If the options overlap, the options of the 'create' function take precedence.
@@ -46,8 +40,8 @@ export default {
     create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
-            // options = Object.assign(this.util.copyObj(_init_options), options);
-            options =  [this.util.copyObj(_init_options), options].reduce(function (init, option) {
+            // options = Object.assign(util.copyObj(_init_options), options);
+            options =  [util.copyObj(_init_options), options].reduce(function (init, option) {
                             Object.keys(option).forEach(function (key) {
                                 init[key] = option[key];
                             });
@@ -65,7 +59,7 @@ export default {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = this._Constructor.init(element, options, (options.lang ||  this._defaultLang), options.plugins, this.util);
+        const cons = _Constructor.init(element, options, (options.lang ||  _defaultLang), options.plugins, util);
 
         if (document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
@@ -81,6 +75,6 @@ export default {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return this.core(this._Context(element, cons.constructed, cons.options), this.util, cons.plugins, cons.options.lang);
+        return core(_Context(element, cons.constructed, cons.options), util, cons.plugins, cons.options.lang);
     }
 };
