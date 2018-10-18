@@ -117,36 +117,54 @@
         </div>
 
         <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleOptions<span class="pl-pds">'</span></span>,{
-            fontSize <span class="pl-k">:</span> [
-                <span class="pl-c1">8</span>, <span class="pl-c1">10</span>, <span class="pl-c1">14</span>, <span class="pl-c1">18</span>, <span class="pl-c1">24</span>, <span class="pl-c1">36</span>
-            ],
-            font <span class="pl-k">:</span> [
-                <span class="pl-s"><span class="pl-pds">'</span>Arial<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>tahoma<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>Courier New,Courier<span class="pl-pds">'</span></span>
-            ],
-            width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span>,
-            height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
-            videoX <span class="pl-k">:</span> <span class="pl-c1">360</span>,
-            videoY <span class="pl-k">:</span> <span class="pl-c1">115</span>,
-            imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
-            showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
-            popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
-            buttonList <span class="pl-k">:</span> [
-                [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>,
-                <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-            ]
-        });</pre></div>
+        fontSize <span class="pl-k">:</span> [
+            <span class="pl-c1">8</span>, <span class="pl-c1">10</span>, <span class="pl-c1">14</span>, <span class="pl-c1">18</span>, <span class="pl-c1">24</span>, <span class="pl-c1">36</span>
+        ],
+        font <span class="pl-k">:</span> [
+            <span class="pl-s"><span class="pl-pds">'</span>Arial<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>tahoma<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>Courier New,Courier<span class="pl-pds">'</span></span>
+        ],
+        width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span>,
+        height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
+        videoX <span class="pl-k">:</span> <span class="pl-c1">360</span>,
+        videoY <span class="pl-k">:</span> <span class="pl-c1">115</span>,
+        imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
+        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
+        showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+        buttonList <span class="pl-k">:</span> [
+            [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>,
+            <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
+        ],
+});
+    
+<span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>lineBreak<span class="pl-pds">'</span></span>, {
+        buttonList<span class="pl-k">:</span> [
+            [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
+            <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span>Line break</span>
+            [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
+        ]
+});</pre></div>
         <p></p>
         <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting</textarea>
+        <p></p>
+        <textarea id="lineBreak" style="width:100%; height:100px;">line Break</textarea>
 
         <h4>2. User Function</h4>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
@@ -347,6 +365,22 @@
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print']
         ],
+    });
+    
+    SUNEDITOR.create('lineBreak', {
+        buttonList: [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formatBlock'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+            ['removeFormat'],
+            '/', //Line break
+            ['fontColor', 'hiliteColor'],
+            ['indent', 'outdent'],
+            ['align', 'horizontalRule', 'list', 'table'],
+            ['link', 'image', 'video'],
+            ['fullScreen', 'showBlocks', 'codeView'],
+            ['preview', 'print']
+        ]
     });
 
     let suneditor = SUNEDITOR.create('exampleFunction');

@@ -46,7 +46,7 @@ const editor = suneditor.init({
     ]
 });
 
-editor.create(document.getElementById('editor2'));
+suneditor.create(document.getElementById('editor2'));
 editor.create(document.getElementById('editor3'), {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table', plugins.link,
