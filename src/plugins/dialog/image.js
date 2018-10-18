@@ -143,7 +143,8 @@ export default {
     },
 
     openTab: function (e) {
-        const targetElement = (e === 'init' ? document.getElementsByClassName('sun-editor-id-tab-link')[0] : e.target);
+        const modal = this.context.image.modal;
+        const targetElement = (e === 'init' ? modal.getElementsByClassName('sun-editor-id-tab-link')[0] : e.target);
 
         if (!/^BUTTON$/i.test(targetElement.tagName)) {
             return false;
@@ -152,22 +153,22 @@ export default {
         // Declare all variables
         const tabName = targetElement.getAttribute('data-tab-link');
         const contentClassName = 'sun-editor-id-tab-content';
-        let i, tabcontent, tablinks;
+        let i, tabContent, tabLinks;
 
         // Get all elements with class="tabcontent" and hide them
-        tabcontent = document.getElementsByClassName(contentClassName);
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = 'none';
+        tabContent = modal.getElementsByClassName(contentClassName);
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = 'none';
         }
 
         // Get all elements with class="tablinks" and remove the class "active"
-        tablinks = document.getElementsByClassName('sun-editor-id-tab-link');
-        for (i = 0; i < tablinks.length; i++) {
-            this.util.removeClass(tablinks[i], 'active');
+        tabLinks = modal.getElementsByClassName('sun-editor-id-tab-link');
+        for (i = 0; i < tabLinks.length; i++) {
+            this.util.removeClass(tabLinks[i], 'active');
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
-        this.context.image.modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
+        modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
         this.util.addClass(targetElement, 'active');
 
         // focus
