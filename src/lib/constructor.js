@@ -254,9 +254,9 @@ const _Constructor = {
      * @returns {Element}
      * @private
      */
-    _createModuleGroup: function () {
+    _createModuleGroup: function (oneModule) {
         const oDiv = document.createElement('DIV');
-        oDiv.className = 'tool_module';
+        oDiv.className = 'tool_module' + (oneModule ? '' : ' sun-editor-module-border');
 
         const oUl = document.createElement('UL');
         oUl.className = 'editor_tool';
@@ -307,6 +307,9 @@ const _Constructor = {
      * @private
      */
     _createToolBar: function (doc, buttonList, _plugins, lang, popupDisplay) {
+        const separator_vertical = doc.createElement('DIV');
+        separator_vertical.className = 'sun-editor-toolbar-separator-vertical';
+
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
@@ -325,11 +328,13 @@ const _Constructor = {
         let moduleElement = null;
         let buttonElement = null;
         let pluginName = '';
+        let vertical = false;
+        const oneModule = buttonList.length === 1;
 
         for (let i = 0; i < buttonList.length; i++) {
 
             const buttonGroup = buttonList[i];
-            moduleElement = this._createModuleGroup();
+            moduleElement = this._createModuleGroup(oneModule);
 
             /** button object */
             if (typeof buttonGroup === 'object') {
@@ -358,13 +363,16 @@ const _Constructor = {
                     }
                 }
 
+                if (vertical) tool_bar.appendChild(separator_vertical.cloneNode(false));
                 tool_bar.appendChild(moduleElement.div);
+                vertical = true;
             }
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
                 const enterDiv = doc.createElement('DIV');
                 enterDiv.className = 'tool_module_enter';
                 tool_bar.appendChild(enterDiv);
+                vertical = false;
             }
         }
 
