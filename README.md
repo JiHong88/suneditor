@@ -223,7 +223,7 @@ initEditor.create('sample_2', {
 });
 ```
 
-### options
+### Options
 ```javascript
 plugins: [
     font,
@@ -239,8 +239,8 @@ plugins: [
     image,
     video
 ]               : Plugins array                                     default : null
-fontSize        : Change default font-size List                     default : null
-font            : Change default font-family List                   default : null
+fontSize        : Change default font-size array                    default : null
+font            : Change default font-family array                  default : null
 width           : The width size of the editor                      default : textarea.offsetHeight
 height          : The height size of the editor                     default : textarea.style.width||offsetWidth
 display         : The display property of suneditor                 default : 'block'
@@ -275,6 +275,43 @@ buttonList      : Defines button list to array
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print']
                 ]
+```
+
+### Functions
+```javascript
+import suneditor from 'suneditor'
+
+const editor = suneditor.create('example');
+
+// Copies the contents of the suneditor into a [textarea]
+editor.save();
+
+// Gets the suneditor's context object. Contains settings, plugins, and cached element objects
+editor.getContext();
+
+// Gets the contents of the suneditor
+editor.getContents();
+
+// Change the contents of the suneditor
+editor.setContents('set contents');
+
+// Add content to the suneditor
+editor.appendContents('append contents');
+
+// Disable the suneditor
+editor.disabled();
+
+// Enabled the suneditor
+editor.enabled();
+
+// Hide the suneditor
+editor.hide();
+
+// Show the suneditor
+editor.show();
+    
+// Destroy the suneditor
+editor.destroy();
 ```
 
 ## Examples

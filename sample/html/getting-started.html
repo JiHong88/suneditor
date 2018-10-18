@@ -244,8 +244,8 @@ plugins<span class="pl-k">:</span> [
     image,
     video
 ]               <span class="pl-k">:</span> Plugins array<span class="pl-k"></span>                                     default <span class="pl-k">:</span> <span class="pl-c1">null</span>
-fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size List                     default <span class="pl-k">:</span> <span class="pl-c1">null</span>
-font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family List                   default <span class="pl-k">:</span> <span class="pl-c1">null</span>
+fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size array                    default <span class="pl-k">:</span> <span class="pl-c1">null</span>
+font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family array                  default <span class="pl-k">:</span> <span class="pl-c1">null</span>
 width           <span class="pl-k">:</span> The width size <span class="pl-k">of</span> the editor                      default <span class="pl-k">:</span> <span class="pl-smi">textarea</span>.<span class="pl-smi">offsetHeight</span>
 height          <span class="pl-k">:</span> The height size <span class="pl-k">of</span> the editor                     default <span class="pl-k">:</span> <span class="pl-smi">textarea</span>.<span class="pl-c1">style</span>.<span class="pl-c1">width</span><span class="pl-k">||</span>offsetWidth
 display         <span class="pl-k">:</span> The display property <span class="pl-k">of</span> suneditor                 default <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>block<span class="pl-pds">'</span></span>
@@ -280,6 +280,41 @@ buttonList      <span class="pl-k">:</span> Defines button list to array
                     [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
                     [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
                 ]</pre></div>
+
+    <h4>Functions</h4>
+    <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Copies the contents of the suneditor into a [textarea]</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">save</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Gets the suneditor's context object. Contains settings, plugins, and cached element objects</span>
+<span class="pl-smi">editor</span>.<span class="pl-c1">getContext</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Gets the contents of the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Add content to the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Disable the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-c1">disabled</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Enabled the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">enabled</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Hide the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">hide</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Show the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">show</span>();
+    
+<span class="pl-c"><span class="pl-c">//</span> Destroy the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();</pre></div>
     
     </article>
 
