@@ -60,7 +60,7 @@
 
 <div class="content" style="max-width: 1265px;">
     <form name="frm">
-        <textarea id="editor" style="width:100%; height:400px;">
+        <textarea id="editor" style="width:100%; height:400px; display:none;">
             <div class="sun-editor-id-media-container sun-editor-id-image-container float-right" contenteditable="false" style="display: inline-block;"><figure class="sun-editor-image-cover"><img src="./img/sun-hand.svg" data-align="right" data-proportion="false" alt="" style="width: 350px; height: 350px;" data-origin="350,350"></figure></div>
             <h3>The Suneditor is based on pure JavaScript</h3><p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications﻿.</p>
             <pre><p><span style="background-color: rgb(246, 248, 250);">Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</span>﻿</p></pre>
@@ -84,6 +84,9 @@
 
 <script>
     SUNEDITOR.create('editor', {
+        display: 'block',
+        width: '100%',
+        height: '400px',
         popupDisplay: 'full',
         buttonList: [
             ['undo', 'redo'],
