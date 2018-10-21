@@ -346,15 +346,14 @@ const util = {
         let tableOffsetLeft = 0;
         let tableOffsetTop = 0;
         let tableElement = element.parentNode;
+        const noIframe = !/sun-editor-id-iframe-container/.test(element.className);
 
-        if (!/sun-editor-id-iframe-container/.test(element.className)) {
-            while (!this.isWysiwygDiv(tableElement)) {
-                if(/^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
-                    tableOffsetLeft += tableElement.offsetLeft;
-                    tableOffsetTop += tableElement.offsetTop;
-                }
-                tableElement = tableElement.parentNode;
+        while (!this.isWysiwygDiv(tableElement)) {
+            if(noIframe && /^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
+                tableOffsetLeft += tableElement.offsetLeft;
+                tableOffsetTop += tableElement.offsetTop;
             }
+            tableElement = tableElement.parentNode;
         }
 
         if (/^(?:SUB|SUP)$/i.test(element.parentNode.nodeName)) {

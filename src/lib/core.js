@@ -1250,10 +1250,11 @@ const core = function (context, util, plugins, lang) {
 
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
+         * (redo, undo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
          * @param {Element} target - The element of command button
          * @param {String} command - Property of command button (data-value)
          */
-        defaultCommand: function (target, command) {
+        commandHandler: function (target, command) {
             switch (command) {
                 case 'codeView':
                     this.toggleCodeView();
@@ -1592,7 +1593,7 @@ const core = function (context, util, plugins, lang) {
             /** default command */
             if (command) {
                 editor.focus();
-                editor.defaultCommand(target, command);
+                editor.commandHandler(target, command);
             }
         },
 
@@ -1644,7 +1645,7 @@ const core = function (context, util, plugins, lang) {
                 const key = event._shortcutKeyCode[keyCode];
                 if (!key) return false;
 
-                editor.defaultCommand(util.getFormatElement(editor.getSelectionNode()), key[0]);
+                editor.commandHandler(util.getFormatElement(editor.getSelectionNode()), key[0]);
                 util.toggleClass(editor.commandMap[key[1]], 'on');
 
                 return true;
