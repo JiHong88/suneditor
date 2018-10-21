@@ -1256,48 +1256,48 @@ const core = function (context, util, plugins, lang) {
         defaultCommand: function (target, command) {
             switch (command) {
                 case 'codeView':
-                    editor.toggleCodeView();
+                    this.toggleCodeView();
                     util.toggleClass(target, 'on');
                     break;
                 case 'fullScreen':
-                    editor.toggleFullScreen(target);
+                    this.toggleFullScreen(target);
                     util.toggleClass(target, 'on');
                     break;
                 case 'indent':
                 case 'outdent':
-                    editor.indent(command);
+                    this.indent(command);
                     break;
                 case 'redo':
                 case 'undo':
                 case 'removeFormat':
-                    editor.execCommand(command, false, null);
+                    this.execCommand(command, false, null);
                     break;
                 case 'preview':
                 case 'print':
-                    editor.openWindowContents(command);
+                    this.openWindowContents(command);
                     break;
                 case 'showBlocks':
-                    editor.toggleDisplayBlocks();
+                    this.toggleDisplayBlocks();
                     util.toggleClass(target, 'on');
                     break;
                 case 'subscript':
                     if (util.hasClass(context.tool.superscript, 'on')) {
-                        editor.execCommand('superscript', false, null);
+                        this.execCommand('superscript', false, null);
                         util.removeClass(context.tool.superscript, 'on');
                     }
-                    editor.execCommand(command, false, null);
+                    this.execCommand(command, false, null);
                     util.toggleClass(target, 'on');
                     break;
                 case 'superscript':
                     if (util.hasClass(context.tool.subscript, 'on')) {
-                        editor.execCommand('subscript', false, null);
+                        this.execCommand('subscript', false, null);
                         util.removeClass(context.tool.subscript, 'on');
                     }
-                    editor.execCommand(command, false, null);
+                    this.execCommand(command, false, null);
                     util.toggleClass(target, 'on');
                     break;
                 default :
-                    editor.execCommand(command, false, target.getAttribute('data-value'));
+                    this.execCommand(command, false, target.getAttribute('data-value'));
                     util.toggleClass(target, 'on');
             }
         },

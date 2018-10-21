@@ -111,7 +111,9 @@ export default {
 
         oTable.innerHTML = tableHTML;
 
-        this.insertNode(oTable, this.util.getFormatElement(this.getSelectionNode()));
+        const formatEl = this.util.getFormatElement(this.getSelectionNode());
+
+        this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? this.util.getRangeFormatElement(formatEl) : formatEl);
         this.appendP(oTable);
         this.focus();
 
