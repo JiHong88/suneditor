@@ -1249,6 +1249,60 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
+         * @description Execute command of command button(All Buttons except submenu and dialog)
+         * @param {Element} target - The element of command button
+         * @param {String} command - Property of command button (data-value)
+         */
+        defaultCommand: function (target, command) {
+            switch (command) {
+                case 'codeView':
+                    editor.toggleCodeView();
+                    util.toggleClass(target, 'on');
+                    break;
+                case 'fullScreen':
+                    editor.toggleFullScreen(target);
+                    util.toggleClass(target, 'on');
+                    break;
+                case 'indent':
+                case 'outdent':
+                    editor.indent(editor.getSelectionNode(), command);
+                    break;
+                case 'redo':
+                case 'undo':
+                case 'removeFormat':
+                    editor.execCommand(command, false, null);
+                    break;
+                case 'preview':
+                case 'print':
+                    editor.openWindowContents(command);
+                    break;
+                case 'showBlocks':
+                    editor.toggleDisplayBlocks();
+                    util.toggleClass(target, 'on');
+                    break;
+                case 'subscript':
+                    if (util.hasClass(context.tool.superscript, 'on')) {
+                        editor.execCommand('superscript', false, null);
+                        util.removeClass(context.tool.superscript, 'on');
+                    }
+                    editor.execCommand(command, false, null);
+                    util.toggleClass(target, 'on');
+                    break;
+                case 'superscript':
+                    if (util.hasClass(context.tool.subscript, 'on')) {
+                        editor.execCommand('subscript', false, null);
+                        util.removeClass(context.tool.subscript, 'on');
+                    }
+                    editor.execCommand(command, false, null);
+                    util.toggleClass(target, 'on');
+                    break;
+                default :
+                    editor.execCommand(command, false, target.getAttribute('data-value'));
+                    util.toggleClass(target, 'on');
+            }
+        },
+
+        /**
          * @description This function implements indentation.
          * Set "margin-left" to "25px" in the top "P" tag of the parameter node.
          * @param element {Element} - The element to indent (editor.getSelectionNode())
@@ -1536,53 +1590,7 @@ const core = function (context, util, plugins, lang) {
             /** default command */
             if (command) {
                 editor.focus();
-
-                switch (command) {
-                    case 'codeView':
-                        editor.toggleCodeView();
-                        util.toggleClass(target, 'on');
-                        break;
-                    case 'fullScreen':
-                        editor.toggleFullScreen(target);
-                        util.toggleClass(target, 'on');
-                        break;
-                    case 'indent':
-                    case 'outdent':
-                        editor.indent(editor.getSelectionNode(), command);
-                        break;
-                    case 'redo':
-                    case 'undo':
-                    case 'removeFormat':
-                        editor.execCommand(command, false, null);
-                        break;
-                    case 'preview':
-                    case 'print':
-                        editor.openWindowContents(command);
-                        break;
-                    case 'showBlocks':
-                        editor.toggleDisplayBlocks();
-                        util.toggleClass(target, 'on');
-                        break;
-                    case 'subscript':
-                        if (util.hasClass(context.tool.superscript, 'on')) {
-                            editor.execCommand('superscript', false, null);
-                            util.removeClass(context.tool.superscript, 'on');
-                        }
-                        editor.execCommand(command, false, null);
-                        util.toggleClass(target, 'on');
-                        break;
-                    case 'superscript':
-                        if (util.hasClass(context.tool.subscript, 'on')) {
-                            editor.execCommand('subscript', false, null);
-                            util.removeClass(context.tool.subscript, 'on');
-                        }
-                        editor.execCommand(command, false, null);
-                        util.toggleClass(target, 'on');
-                        break;
-                    default :
-                        editor.execCommand(command, false, target.getAttribute('data-value'));
-                        util.toggleClass(target, 'on');
-                }
+                editor.defaultCommand(target, command);
             }
         },
 
@@ -1634,7 +1642,7 @@ const core = function (context, util, plugins, lang) {
                 const key = event._shortcutKeyCode[keyCode];
                 if (!key) return false;
 
-                editor.execCommand(key[0], false, null);
+                editor.defaultCommand(util.getFormatElement(editor.getSelectionNode()), key[0]);
                 util.toggleClass(editor.commandMap[key[1]], 'on');
 
                 return true;

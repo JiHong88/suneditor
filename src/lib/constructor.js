@@ -162,11 +162,11 @@ const _Constructor = {
                 '<div class="icon-erase"></div>'
             ],
 
-            indent: ['', lang.toolbar.indent + '(Ctrl + [)', 'indent', '', '',
+            indent: ['', lang.toolbar.indent + '(Ctrl + ])', 'indent', '', '',
                 '<div class="icon-indent-right"></div>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + '(Ctrl + ])', 'outdent', '', '',
+            outdent: ['', lang.toolbar.outdent + '(Ctrl + [)', 'outdent', '', '',
                 '<div class="icon-indent-left"></div>'
             ],
 
