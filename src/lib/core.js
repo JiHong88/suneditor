@@ -1265,7 +1265,7 @@ const core = function (context, util, plugins, lang) {
                     break;
                 case 'indent':
                 case 'outdent':
-                    editor.indent(editor.getSelectionNode(), command);
+                    editor.indent(command);
                     break;
                 case 'redo':
                 case 'undo':
@@ -1303,24 +1303,26 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
-         * @description This function implements indentation.
-         * Set "margin-left" to "25px" in the top "P" tag of the parameter node.
-         * @param element {Element} - The element to indent (editor.getSelectionNode())
+         * @description This method implements indentation to selected range.
+         * Setted "margin-left" to "25px" in the top "P" tag of the parameter node.
          * @param command {String} - Separator ("indent" or "outdent")
          */
-        indent: function (element, command) {
-            const p = util.getFormatElement(element);
-            if (!p) return;
+        indent: function (command) {
+            const rangeLines = this.getSelectedFormatElements();
+            let p, margin;
 
-            let margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
+            for (let i = 0, len = rangeLines.length; i < len; i++) {
+                p = rangeLines[i];
+                margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
 
-            if ('indent' === command) {
-                margin += 25;
-            } else {
-                margin -= 25;
+                if ('indent' === command) {
+                    margin += 25;
+                } else {
+                    margin -= 25;
+                }
+    
+                p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
             }
-
-            p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
         },
 
         /**
