@@ -20,6 +20,7 @@ bower_components/
 sample/
 test/
 .jshintrc
+.jshintignore
 karma.conf.js
 bower.json
 webpack.*.js
