@@ -322,8 +322,6 @@ export default {
             this.plugins.dialog.closeDialog.call(this);
         }
 
-        this.focus();
-
         return false;
     },
 

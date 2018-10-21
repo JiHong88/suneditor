@@ -83,7 +83,7 @@
 }
 
 /* sub, sup */
-.sun-editor-editable sub, sup {
+.sun-editor-editable sub, .sun-editor-editable sup {
     position: relative;
     font-size: 75%;
     line-height: 0;
