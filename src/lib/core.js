@@ -439,11 +439,12 @@ const core = function (context, util, plugins, lang) {
          * @returns {Element}
          */
         appendP: function (element) {
+            const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
             const oP = document.createElement('P');
             oP.innerHTML = '&#65279';
 
-            element = util.getRangeFormatElement(element) || util.getFormatElement(element);
-            element.parentNode.insertBefore(oP, element.nextElementSibling);
+            if (/^TD$/i.test(formatEl.nodeName)) formatEl.insertBefore(oP, element.nextElementSibling);
+            else formatEl.parentNode.insertBefore(oP, formatEl.nextElementSibling);
 
             return oP;
         },
