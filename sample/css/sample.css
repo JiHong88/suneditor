@@ -3,14 +3,8 @@
     margin: 60px auto 0 auto;
 }
 
-.back_index {
-    background: url("../img/sun_big.jpg") repeat;
-    background-size: 100%;
-    background-position: 0 64px;
-}
-
-.back_categorys {
-    background: url("../img/sun_big.jpg") repeat;
+.back_index, .back_categorys{
+    background: url("../img/candlelight.jpg") repeat;
     background-size: 100%;
     background-position: 0 64px;
 }
