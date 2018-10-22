@@ -3,10 +3,11 @@
     margin: 60px auto 0 auto;
 }
 
-.back_index, .back_categorys{
-    background: url("../img/candlelight.jpg") repeat;
+.back_index, .back_categorys {
+    background: url("../img/fire.jpg") no-repeat;
     background-size: 100%;
-    background-position: 0 64px;
+    background-position: 0;
+    background-attachment: fixed;
 }
 
 footer {
