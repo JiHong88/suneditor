@@ -13,7 +13,7 @@
 footer {
     color: #ffebc1 !important;
     bottom: 0;
-    margin-top: 30px;
+    margin-top: 50px;
 }
 
 h4 {
@@ -22,16 +22,6 @@ h4 {
 
 button {
     margin-bottom: 10px !important;
-}
-
-.intro {
-    color: #fff !important;
-    bottom: 0;
-    margin-top: 50px;
-}
-
-.intro p {
-    font-size: 20px;
 }
 
 /** github-cat*/
