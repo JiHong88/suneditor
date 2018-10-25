@@ -488,7 +488,7 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = contextImage._resize_element = element;
-        contextImage._imageCaption = contextImage._linkElement ? contextImage._linkElement.nextSibling : element.nextSibling;
+        contextImage._imageCaption = contextImage._linkElement ? contextImage._linkElement.nextElementSibling : element.nextElementSibling;
 
         contextImage._element_w = size.w;
         contextImage._element_h = size.h;
