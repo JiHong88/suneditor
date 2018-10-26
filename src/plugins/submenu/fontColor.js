@@ -22,7 +22,6 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu(context.colorPicker.colorListHTML));
-        context.fontColor.previewEl = listDiv.getElementsByClassName('sun-editor-id-submenu-color-preview')[0];
         context.fontColor.colorInput = listDiv.getElementsByClassName('sun-editor-id-submenu-color-input')[0];
 
         /** add event listeners */
@@ -50,18 +49,15 @@ export default {
     on: function () {
         const contextPicker = this.context.colorPicker;
 
-        contextPicker._previewEl = this.context.fontColor.previewEl;
         contextPicker._colorInput = this.context.fontColor.colorInput;
         contextPicker._defaultColor = '#000000';
         contextPicker._styleProperty = 'color';
 
-        this.plugins.colorPicker.setCurrentColor.call(this, this.getSelectionNode(), null);
+        this.plugins.colorPicker.init.call(this, this.getSelectionNode(), null);
     },
 
     onChangeInput: function (e) {
-        const colorStr = '#' + e.target.value;
-        this.context.colorPicker._currentColor = colorStr;
-        this.plugins.colorPicker.setColorPreviewEl.call(this, colorStr);
+        this.plugins.colorPicker.setCurrentColor.call(this, '#' + e.target.value);
     },
 
     submit: function () {

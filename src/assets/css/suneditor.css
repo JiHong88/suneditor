@@ -176,9 +176,8 @@
 /** submenu form group (color selector) */
 .sun-editor .sub-form-group {height:34px; padding:0 7px 7px 7px;}
 .sun-editor .sub-form-group label {display:inline-block; font-weight:bold; font-size:14px; letter-spacing:1px;}
-.sun-editor .sub-form-group input {display:inline-block; width:120px; font-size:14px; border-bottom:5px solid #8baab7; text-transform:uppercase;}
+.sun-editor .sub-form-group input {display:inline-block; width:130px; font-size:14px; border-bottom:5px solid #8baab7; text-transform:uppercase;}
 .sun-editor .sub-form-group input:focus {outline:none;}
-.sun-editor .sub-form-group .sun-editor-id-submenu-color-preview {display:inline-block; width:30px; height:100%; border:1px solid #000; margin-bottom:-10px;}
 .sun-editor .sub-form-group button {float:right; width:auto; height:100%; background-color:#bbd5e0; border-color: #a2bfcc; outline: 0 none; padding: 0 15px 0 15px;}
 
 /* editor area */

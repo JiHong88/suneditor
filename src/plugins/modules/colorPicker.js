@@ -13,7 +13,6 @@ export default {
         const context = core.context;
         context.colorPicker = {
             colorListHTML: '',
-            _previewEl: '',
             _colorInput: '',
             _defaultColor: '#000',
             _styleProperty: 'color',
@@ -52,7 +51,6 @@ export default {
             '<form class="sub-form-group">' +
             '   <label>#</label>' +
             '   <input type="text" maxlength="6" class="sun-editor-id-submenu-color-input" />' +
-            '   <div class="sun-editor-id-submenu-color-preview"></div>' +
             '   <button type="submit" data-command="100" class="sun-editor-id-submenu-color-submit" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '</form>' +
             '</div>';
@@ -60,21 +58,22 @@ export default {
         return list;
     },
     
-    setCurrentColor: function (node, color) {
-        const fillColor = color ? color : this.plugins.colorPicker.getColorInNode.call(this, node) || this.context.colorPicker._defaultColor;
-        const hexColor = this.util.isHexColor(fillColor) ? fillColor : this.util.rgb2hex(fillColor);
+    init: function (node, color) {
+        const colorPicker = this.plugins.colorPicker;
+        let fillColor = color ? color : colorPicker.getColorInNode.call(this, node) || this.context.colorPicker._defaultColor;
+        fillColor = colorPicker.isHexColor(fillColor) ? fillColor : colorPicker.rgb2hex(fillColor);
 
-        this.context.colorPicker._currentColor = hexColor;
-        this.plugins.colorPicker.setColorPreviewEl.call(this, hexColor);
-        this.plugins.colorPicker.setInputText.call(this, hexColor);
+        colorPicker.setInputText.call(this, fillColor);
     },
 
-    setColorPreviewEl: function (hexColorStr) {
-        this.context.colorPicker._previewEl.style.backgroundColor = hexColorStr;
+    setCurrentColor: function (hexColorStr) {
+        this.context.colorPicker._currentColor = hexColorStr;
+        this.context.colorPicker._colorInput.style.borderColor = hexColorStr;
     },
 
     setInputText: function (hexColorStr) {
         this.context.colorPicker._colorInput.value = hexColorStr.replace('#', '');
+        this.plugins.colorPicker.setCurrentColor.call(this, hexColorStr);
     },
 
     getColorInNode: function (node) {
@@ -87,5 +86,27 @@ export default {
         }
 
         return findedColor;
+    },
+
+    /**
+     * @description Function to check hex format color
+     * @param {String} str
+     */
+    isHexColor: function (str) {
+        return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
+    },
+
+    /**
+     * @description Function to convert hex format to a rgb color
+     * @param {String} rgb - RGB color format
+     * @returns {String}
+     */
+    rgb2hex: function (rgb) {
+        rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+
+        return (rgb && rgb.length === 4) ? "#" +
+            ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
     }
 };
