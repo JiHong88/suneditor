@@ -164,6 +164,9 @@ const core = function (context, util, plugins, lang) {
          * @param {Element} element - Submenu element to call
          */
         submenuOn: function (element) {
+            const submenuName = element.getAttribute('data-command');
+            if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
+
             this.submenu = element.nextElementSibling;
             this.submenu.style.display = 'block';
             util.addClass(element, 'on');

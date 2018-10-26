@@ -7,14 +7,28 @@
  */
 'use strict';
 
+import colorPicker from '../modules/colorPicker';
+
 export default {
     name: 'fontColor',
     add: function (core, targetElement) {
+        core.addModule([colorPicker]);
+
+        const context = core.context;
+        context.fontColor = {
+            previewEl: null,
+            colorInput: null
+        };
+
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu(context.colorPicker.colorListHTML));
+        context.fontColor.previewEl = listDiv.getElementsByClassName('sun-editor-id-submenu-color-preview')[0];
+        context.fontColor.colorInput = listDiv.getElementsByClassName('sun-editor-id-submenu-color-input')[0];
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(core));
+        context.fontColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
+        listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
+        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -23,34 +37,38 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
+    setSubmenu: function (colorArea) {
         const listDiv = document.createElement('DIV');
+
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
-
-        const colorList = ['#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000', '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa',
-            '#ffffff', '#ffa7a7', '#ffc19e', '#faed7d', '#cef279', '#b2ebf4', '#b2ccff', '#d1b2ff', '#ffb2f5', '#bdbdbd', '#f15f5f', '#f29661', '#e5d85c', '#bce55c', '#5cd1e5', '#6699ff', '#a366ff', '#f261df', '#8c8c8c',
-            '#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535', '#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222'];
-
-        let list = '<div class="inner_layer">' +
-            '   <div class="pallet_font_color">' +
-            '       <ul class="list_color">';
-        for (let i = 0, len = colorList.length; i < len; i++) {
-            const color = colorList[i];
-            list += '<li>' +
-                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
-                '</li>';
-        }
-        list += '       </ul>' +
-            '   </div>' +
-            '</div>';
-
-        listDiv.innerHTML = list;
+        listDiv.innerHTML = colorArea;
 
         return listDiv;
     },
 
-    pickUp: function (e) {
+    on: function () {
+        const contextPicker = this.context.colorPicker;
+
+        contextPicker._previewEl = this.context.fontColor.previewEl;
+        contextPicker._colorInput = this.context.fontColor.colorInput;
+        contextPicker._defaultColor = '#000';
+        contextPicker._styleProperty = 'color';
+
+        this.plugins.colorPicker.changeCurrentColor.call(this, this.getSelectionNode(), null);
+    },
+
+    onChangeInput: function (e) {
+        const colorStr = '#' + e.target.value;
+        this.context.colorPicker._currentColor = colorStr;
+        this.plugins.colorPicker.changePreviewEl.call(this, null, colorStr);
+    },
+
+    submit: function () {
+        this.plugins.fontColor.applyColor.call(this, this.context.colorPicker._currentColor);
+    },
+
+    pickup: function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -58,10 +76,13 @@ export default {
             return false;
         }
 
-        this.focus();
+        this.plugins.fontColor.applyColor.call(this, e.target.getAttribute('data-value'));
+    },
 
+    applyColor: function (color) {
         const newNode = document.createElement('SPAN');
-        newNode.style.color = e.target.getAttribute('data-value');
+        newNode.style.color = color;
+
         this.wrapRangeToTag(newNode, ['color']);
 
         this.submenuOff();

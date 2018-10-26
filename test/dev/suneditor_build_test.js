@@ -26,6 +26,22 @@ suneditor.create(document.getElementById('editor'), {
     ]
 });
 
+suneditor.create(document.getElementById('editor1'), {
+    plugins: plugins,
+    buttonList: [
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'removeFormat',
+        'fontColor', 'hiliteColor',
+        'indent', 'outdent',
+        'align', 'horizontalRule', 'list', 'table',
+        'link', 'image', 'video',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print']
+    ]
+});
+
 
 const editor = suneditor.init({
     plugins: [

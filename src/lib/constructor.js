@@ -31,6 +31,7 @@ const _Constructor = {
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
+        options.colorList = options.colorList || null;
         options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.popupDisplay = options.popupDisplay || '';

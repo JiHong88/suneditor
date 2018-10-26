@@ -7,14 +7,28 @@
  */
 'use strict';
 
+import colorPicker from '../modules/colorPicker';
+
 export default {
     name: 'hiliteColor',
     add: function (core, targetElement) {
+        core.addModule([colorPicker]);
+
+        const context = core.context;
+        context.hiliteColor = {
+            previewEl: null,
+            colorInput: null
+        };
+
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu(context.colorPicker.colorListHTML));
+        context.hiliteColor.previewEl = listDiv.getElementsByClassName('sun-editor-id-submenu-color-preview')[0];
+        context.hiliteColor.colorInput = listDiv.getElementsByClassName('sun-editor-id-submenu-color-input')[0];
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.colorPick.bind(core));
+        context.hiliteColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
+        listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
+        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -23,32 +37,38 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
+    setSubmenu: function (colorArea) {
         const listDiv = document.createElement('DIV');
+
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
-
-        const colorList = ['#1e9af9', '#00b8c6', '#6cce02', '#ff9702', '#ff0000', '#ff00dd', '#6600ff', '#cce9ff', '#fcfd4c', '#ffffff', '#dfdede', '#8c8c8c', '#000000', '#222222'];
-
-        let list = '<div class="inner_layer">' +
-            '   <div class="pallet_hilite_color">' +
-            '       <ul class="list_color">';
-        for (let i = 0, len = colorList.length; i < len; i++) {
-            const color = colorList[i];
-            list += '<li>' +
-                '   <button type="button" class="' + (/ffffff/.test(color) ? ' color_white' : '') + '" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
-                '</li>';
-        }
-        list += '   </ul>' +
-            '   </div>' +
-            '</div>';
-
-        listDiv.innerHTML = list;
+        listDiv.innerHTML = colorArea;
 
         return listDiv;
     },
 
-    colorPick: function (e) {
+    on: function () {
+        const contextPicker = this.context.colorPicker;
+
+        contextPicker._previewEl = this.context.hiliteColor.previewEl;
+        contextPicker._colorInput = this.context.hiliteColor.colorInput;
+        contextPicker._defaultColor = '#FFF';
+        contextPicker._styleProperty = 'backgroundColor';
+
+        this.plugins.colorPicker.changeCurrentColor.call(this, this.getSelectionNode(), null);
+    },
+
+    onChangeInput: function (e) {
+        const colorStr = '#' + e.target.value;
+        this.context.colorPicker._currentColor = colorStr;
+        this.plugins.colorPicker.changePreviewEl.call(this, null, colorStr);
+    },
+
+    submit: function () {
+        this.plugins.hiliteColor.applyColor.call(this, this.context.colorPicker._currentColor);
+    },
+
+    pickup: function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -56,12 +76,15 @@ export default {
             return false;
         }
 
-        this.focus();
+        this.plugins.hiliteColor.applyColor.call(this, e.target.getAttribute('data-value'));
+    },
 
+    applyColor: function (color) {
         const newNode = document.createElement('SPAN');
-        newNode.style.backgroundColor = e.target.getAttribute('data-value');
-        this.wrapRangeToTag(newNode, ['background-color']);
+        newNode.style.backgroundColor = color;
 
+        this.wrapRangeToTag(newNode, ['background-color']);
+        
         this.submenuOff();
         this.focus();
     }

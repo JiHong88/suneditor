@@ -51,6 +51,7 @@ const _Context = function (element, cons, options) {
             imageUploadUrl: options.imageUploadUrl,
             font: options.font,
             fontSize: options.fontSize,
+            colorList: options.colorList,
             height: options.height.match(/\d+/)[0],
             showPathLabel: options.showPathLabel,
             display: options.display
