@@ -699,16 +699,20 @@ const core = function (context, util, plugins, lang) {
             };
 
             const checkStyleValue = function (vNode, nNode) {
-                let styleCnt = checkCSSPropertyArray.length;
+                const checkArray = JSON.parse(JSON.stringify(checkCSSPropertyArray));
+                let styleCnt = checkArray.length;
                 let styleValue = '';
 
                 while (!util.isWysiwygDiv(vNode)) {
                     if (vNode.nodeType === 1) {
-                        for (let i = 0; i < checkCSSPropertyArray.length; i++) {
-                            styleValue = vNode.style[checkCSSPropertyArray[i]];
-                            if (styleValue && styleValue === nNode.style[checkCSSPropertyArray[i]]) {
-                                nNode.style[checkCSSPropertyArray[i]] = '';
-                                styleCnt--;
+                        for (let i = 0; i < checkArray.length; i++) {
+                            styleValue = vNode.style[checkArray[i]];
+                            if (styleValue) {
+                                if (styleValue === nNode.style[checkArray[i]]) {
+                                    nNode.style[checkArray[i]] = '';
+                                    styleCnt--;
+                                }
+                                checkArray.splice(i, 1);
                             }
                         }
                     }
