@@ -52,16 +52,16 @@ export default {
 
         contextPicker._previewEl = this.context.fontColor.previewEl;
         contextPicker._colorInput = this.context.fontColor.colorInput;
-        contextPicker._defaultColor = '#000';
+        contextPicker._defaultColor = '#000000';
         contextPicker._styleProperty = 'color';
 
-        this.plugins.colorPicker.changeCurrentColor.call(this, this.getSelectionNode(), null);
+        this.plugins.colorPicker.setCurrentColor.call(this, this.getSelectionNode(), null);
     },
 
     onChangeInput: function (e) {
         const colorStr = '#' + e.target.value;
         this.context.colorPicker._currentColor = colorStr;
-        this.plugins.colorPicker.changePreviewEl.call(this, null, colorStr);
+        this.plugins.colorPicker.setColorPreviewEl.call(this, colorStr);
     },
 
     submit: function () {

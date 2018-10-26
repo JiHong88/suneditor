@@ -60,20 +60,20 @@ export default {
         return list;
     },
     
-    changeCurrentColor: function (node, color) {
+    setCurrentColor: function (node, color) {
         const fillColor = color ? color : this.plugins.colorPicker.getColorInNode.call(this, node) || this.context.colorPicker._defaultColor;
         const hexColor = this.util.isHexColor(fillColor) ? fillColor : this.util.rgb2hex(fillColor);
 
         this.context.colorPicker._currentColor = hexColor;
-        this.plugins.colorPicker.changePreviewEl.call(this, hexColor);
-        this.plugins.colorPicker.changeInputText.call(this, hexColor);
+        this.plugins.colorPicker.setColorPreviewEl.call(this, hexColor);
+        this.plugins.colorPicker.setInputText.call(this, hexColor);
     },
 
-    changePreviewEl: function (hexColorStr) {
+    setColorPreviewEl: function (hexColorStr) {
         this.context.colorPicker._previewEl.style.backgroundColor = hexColorStr;
     },
 
-    changeInputText: function (hexColorStr) {
+    setInputText: function (hexColorStr) {
         this.context.colorPicker._colorInput.value = hexColorStr.replace('#', '');
     },
 
@@ -87,9 +87,5 @@ export default {
         }
 
         return findedColor;
-    },
-
-    _changeCurrentColor: function (hexColorStr) {
-        this.context.colorPicker._currentColor = hexColorStr;
     }
 };

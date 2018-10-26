@@ -52,16 +52,16 @@ export default {
 
         contextPicker._previewEl = this.context.hiliteColor.previewEl;
         contextPicker._colorInput = this.context.hiliteColor.colorInput;
-        contextPicker._defaultColor = '#FFF';
+        contextPicker._defaultColor = '#FFFFFF';
         contextPicker._styleProperty = 'backgroundColor';
 
-        this.plugins.colorPicker.changeCurrentColor.call(this, this.getSelectionNode(), null);
+        this.plugins.colorPicker.setCurrentColor.call(this, this.getSelectionNode(), null);
     },
 
     onChangeInput: function (e) {
         const colorStr = '#' + e.target.value;
         this.context.colorPicker._currentColor = colorStr;
-        this.plugins.colorPicker.changePreviewEl.call(this, null, colorStr);
+        this.plugins.colorPicker.setColorPreviewEl.call(this, colorStr);
     },
 
     submit: function () {
