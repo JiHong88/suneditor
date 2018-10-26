@@ -678,9 +678,7 @@ const core = function (context, util, plugins, lang) {
                     regExp += '|' + checkCSSPropertyArray[i];
                 }
                 regExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                regExp = new RegExp(regExp, 'i');
-            } else {
-                regExp = new RegExp('', 'i');
+                regExp = new RegExp(regExp, 'ig');
             }
 
             /** tag check function*/
@@ -700,9 +698,31 @@ const core = function (context, util, plugins, lang) {
                 return false;
             };
 
+            const checkStyleValue = function (vNode, nNode) {
+                let styleCnt = checkCSSPropertyArray.length;
+                let styleValue = '';
+
+                while (!util.isWysiwygDiv(vNode)) {
+                    if (vNode.nodeType === 1) {
+                        for (let i = 0; i < checkCSSPropertyArray.length; i++) {
+                            styleValue = vNode.style[checkCSSPropertyArray[i]];
+                            if (styleValue && styleValue === nNode.style[checkCSSPropertyArray[i]]) {
+                                nNode.style[checkCSSPropertyArray[i]] = '';
+                                styleCnt--;
+                            }
+                        }
+                    }
+
+                    vNode = vNode.parentNode;
+                }
+
+                return styleCnt > 0 ? nNode : null;
+            }
+
             /** one node */
             if (startCon === endCon) {
-                newNode = appendNode.cloneNode(false);
+                newNode = checkStyleValue(startCon, appendNode.cloneNode(false));
+                if (!newNode) return;
 
                 /** No range node selected */
                 if (range.collapsed) {
