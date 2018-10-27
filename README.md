@@ -23,13 +23,13 @@ Chrome, Opera, Firefox, Edge, IE 11, Safari(macOS, IOS), Mobile web
 #### npm
 
 ``` sh
-$ npm install suneditor
+$ npm install --save suneditor
 ```
 
 #### bower
 
 ``` sh
-$ bower install suneditor
+$ bower install --save suneditor
 ```
 
 ## Getting Started
