@@ -60,7 +60,7 @@
 
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
-        <h4>1. Options Setting</h4>
+        <a id="setting" href="#setting"><h4>1. Options Setting</h4></a>
         <div class="highlight highlight-source-js">
 <pre>
 <span class="pl-s">plugins</span>: [
@@ -161,72 +161,53 @@
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">line Break</textarea>
 
-        <h4>2. User Function</h4>
+        <a id="functions" href="#functions"><h4>2. User Function</h4></a>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Copies the contents of the suneditor into a [textarea] */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_save</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">save</span>();
-    <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>frm<span class="pl-pds">'</span></span>).<span class="pl-c1">submit</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">save</span>();
 
 <span class="pl-c">/** Gets the suneditor's context object. Contains settings, plugins, and cached element objects */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_getContext</span>() {
-    <span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContext</span>());
-};
+<span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContext</span>());
 
 <span class="pl-c">/** Gets the contents of the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_getContents</span>() {
-    <span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContents</span>());
-};
+<span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContents</span>());
+
+<span class="pl-c">/** Inserts an HTML element or HTML string or plain string at the current cursor position */</span>
+<span class="pl-smi">suneditor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Change the contents of the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_setContents</span>(<span class="pl-smi">contents</span>) {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Add content to the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_appendContents</span>(<span class="pl-smi">contents</span>) {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Disable the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_disabled</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-c1">disabled</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-c1">disabled</span>();
 
 <span class="pl-c">/** Enabled the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_enabled</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">enabled</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">enabled</span>();
 
 <span class="pl-c">/** Hide the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_hide</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">hide</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">hide</span>();
 
 <span class="pl-c">/** Show the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_show</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">show</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">show</span>();
 
 <span class="pl-c">/** Destroy the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_destroy</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">destroy</span>();
-};
+<span class="pl-smi">suneditor</span>.<span class="pl-en">destroy</span>();
 
 <span class="pl-c">/** Create the suneditor */</span>
-<span class="pl-k">function</span> <span class="pl-en">sun_create</span>() {
-    </span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>, {
-        height: 148
-    });
-};</pre></div>
+</span>suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>, {
+    height: 148
+});</pre></div>
         <form id="frm" name="frm">
             <textarea id="exampleFunction" style="width:100%; height:150px;">User Function Test</textarea>
             <p></p>
-            <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
+            <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">save</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\'>')">insertHTML</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_disabled()">Disabled</button>
@@ -238,12 +219,12 @@
         </form>
         <p></p>
 
-        <h4>3. Image upload to server</h4>
+        <a id="serverUpload" href="#serverUpload"><h4>3. Image upload to server</h4></a>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>,{
     imageUploadUrl<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
 });</pre></div>
 
-        <h4>3-1. Sample) Java</h4>
+        <a id="serverUpload_java" href="#serverUpload_java"><h4>3-1. Sample) Java</h4></a>
         <div class="highlight highlight-source-java"><pre><span class="pl-k">package</span> <span class="pl-smi">suneditor.test.controller</span>;
 
 <span class="pl-k">import</span> <span class="pl-smi">org.json.simple.JSONArray</span>;
@@ -376,7 +357,6 @@
 
     function sun_save() {
         suneditor.save();
-        document.getElementById('frm').submit();
     }
 
     function sun_getContext() {
@@ -385,6 +365,10 @@
 
     function sun_getContents() {
         alert(suneditor.getContents());
+    }
+
+    function sun_insertHTML(html) {
+        suneditor.insertHTML(html);
     }
 
     function sun_setContents(content) {

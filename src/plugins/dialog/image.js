@@ -391,17 +391,21 @@ export default {
         const linkValue = contextImage._linkValue;
         let cover = this.util.getParentElement(contextImage._element, '.sun-editor-image-cover');
         let container = this.util.getParentElement(contextImage._element, '.sun-editor-id-image-container');
+        let imageEl = contextImage._element;
         let isNewContainer = false;
 
         if (cover === null) {
             isNewContainer = true;
-            cover = this.plugins.image.set_cover.call(this, contextImage._element.cloneNode(true));
+            imageEl = contextImage._element.cloneNode(true);
+            cover = this.plugins.image.set_cover.call(this, imageEl);
         }
 
         if (container === null) {
             isNewContainer = true;
             container = this.plugins.image.set_container.call(this, cover.cloneNode(true));
-        } else if (isNewContainer) {
+        }
+        
+        if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
         }
@@ -410,11 +414,11 @@ export default {
         this.plugins.image.onRender_imgInput.call(this);
 
         // src, size
-        contextImage._element.src = contextImage.imgUrlFile.value;
-        contextImage._element.alt = contextImage._altText;
-        contextImage._element.setAttribute('data-proportion', contextImage._proportionChecked);
-        contextImage._element.style.width = contextImage.imageX.value + 'px';
-        contextImage._element.style.height = contextImage.imageY.value + 'px';
+        imageEl.src = contextImage.imgUrlFile.value;
+        imageEl.alt = contextImage._altText;
+        imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
+        imageEl.style.width = contextImage.imageX.value + 'px';
+        imageEl.style.height = contextImage.imageY.value + 'px';
 
         // caption
         if (contextImage._captionChecked) {
@@ -440,27 +444,27 @@ export default {
             this.util.addClass(container, 'float-none');
         }
 
-        contextImage._element.setAttribute('data-align', contextImage._align);
+        imageEl.setAttribute('data-align', contextImage._align);
 
         // link
         if (linkValue.trim().length > 0) {
             if (contextImage._linkElement !== null) {
                 contextImage._linkElement.href = linkValue;
                 contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
-                contextImage._element.setAttribute('data-image-link', linkValue);
+                imageEl.setAttribute('data-image-link', linkValue);
             } else {
-                let newEl = this.plugins.image.onRender_link(contextImage._element, linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                let newEl = this.plugins.image.onRender_link(imageEl, linkValue, this.context.image.imgLinkNewWindowCheck.checked);
                 cover.insertBefore(newEl, contextImage._imageCaption);
             }
         }
         else if (contextImage._linkElement !== null) {
-            const imageElement = contextImage._element;
+            const imageElement = imageEl;
 
             imageElement.setAttribute('data-image-link', '');
             let newEl = imageElement.cloneNode(true);
             cover.removeChild(contextImage._linkElement);
             cover.insertBefore(newEl, contextImage._imageCaption);
-            contextImage._element = newEl;
+            imageEl = newEl;
         }
 
         if (isNewContainer) {

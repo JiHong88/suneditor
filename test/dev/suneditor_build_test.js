@@ -26,7 +26,7 @@ suneditor.create(document.getElementById('editor'), {
     ]
 });
 
-suneditor.create(document.getElementById('editor1'), {
+const ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
     buttonList: [
         ['undo', 'redo',
@@ -41,6 +41,56 @@ suneditor.create(document.getElementById('editor1'), {
         'preview', 'print']
     ]
 });
+
+window.sun_save = function () {
+    ss.save();
+}
+
+window.sun_getContext = function () {
+    console.log(ss.getContext());
+}
+
+window.sun_insertHTML = function (html) {
+    ss.insertHTML(html)
+}
+
+window.sun_getContents = function () {
+    alert(ss.getContents());
+}
+
+window.sun_setContents = function (content) {
+    ss.setContents(content);
+}
+
+window.sun_appendContents = function (content) {
+    ss.appendContents(content);
+}
+
+window.sun_disabled = function () {
+    ss.disabled();
+}
+
+window.sun_enabled = function () {
+    ss.enabled();
+}
+
+window.sun_show = function () {
+    ss.show();
+}
+
+window.sun_hide = function () {
+    ss.hide();
+}
+
+window.sun_destroy = function () {
+    ss.destroy();
+}
+
+window.sun_create = function () {
+    ss = suneditor.create('editor1', {
+        height: 148
+    });
+}
 
 
 const editor = suneditor.init({

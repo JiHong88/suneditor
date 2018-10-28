@@ -293,6 +293,9 @@ editor.getContext();
 // Gets the contents of the suneditor
 editor.getContents();
 
+// Inserts an HTML element or HTML string or plain string at the current cursor position
+editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
+
 // Change the contents of the suneditor
 editor.setContents('set contents');
 

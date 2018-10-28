@@ -16,7 +16,7 @@
                 </figure>
             </div>
             <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
-            <pre><p><span style="background-color: rgb(246, 248, 250);">Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</span></p></pre>
+            <pre><p><span style="background-color: rgb(246, 248, 250);">Supports browser.</span></p></pre>
             <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>
@@ -24,6 +24,19 @@
         <textarea id="editor1" style="width: 1080px; height: 200px;">
         </textarea>
         <br>
+            <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\'>')">insertHTML</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_disabled()">Disabled</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_enabled()">Enabled</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_hide()">Hide</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_show()">Show</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_destroy()">Destroy</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_create()">Create</button>
+        <br><br>
         <textarea id="editor2" style="width: 1080px; height: 200px;"></textarea>
         <br>
         <textarea id="editor3" style="width: 1080px; height: 200px;"></textarea>

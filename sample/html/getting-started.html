@@ -57,14 +57,14 @@
 
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
-        <h4>1. Include JS/CSS</h4>
+<a id="include" href="#include"><h4>1. Include JS/CSS</h4></a>
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
 
-        <h4>2. Target a element</h4>
+    <a id="target" href="#target"><h4>2. Target a element</h4></a>
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span class="pl-ent">textarea</span>&gt;</pre></div>
         
-        <h4>3. Create</h4>
+    <a id="create" href="#create"><h4>3. Create</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c">* ID : 'suneditor_sample'</span>
 <span class="pl-c">* ClassName : 'sun-eidtor'</span>
@@ -75,7 +75,7 @@
     <span class="pl-c"><span class="pl-c">//</span> insert options</span>
 });</pre></div>
 
-    <h4>4. Contents display</h4>
+<a id="contentsDisplay" href="#contentsDisplay"><h4>4. Contents display</h4></a>
 <pre lang="text"><code>When you display a document created by suneditor
 
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
@@ -87,7 +87,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 
     <h4>Use import statement</h4>
     <p></p>
-    <h4>1. Default options</h4>
+<a id="defaultOptions" href="#defaultOptions"><h4>1. Default options</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-c"><span class="pl-c">//</span> or</span>
 <span class="pl-c"><span class="pl-c">//</span> import 'suneditor/src/assets/css/suneditor.css'</span>
@@ -100,7 +100,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
     <span class="pl-c"><span class="pl-c">//</span> insert options</span>
 });</pre></div>
 
-    <h4>2. Load only what you want</h4>
+<a id="loadOnly" href="#loadOnly"><h4>2. Load only what you want</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> {<span class="pl-smi">en</span>, <span class="pl-smi">ko</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
@@ -131,7 +131,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
     lang<span class="pl-k">:</span> ko
 });</pre></div>
 
-    <h4>3. Load all plugins</h4>
+<a id="loadAll" href="#loadAll"><h4>3. Load all plugins</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">plugins</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
@@ -166,7 +166,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
     ]
 })</pre></div>
 
-    <h4>4. Plugins can be used directly in the button list</h4>
+<a id="usedDirectly" href="#usedDirectly"><h4>4. Plugins can be used directly in the button list</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> {<span class="pl-smi">align</span>, <span class="pl-smi">font</span>, <span class="pl-smi">fontSize</span>, <span class="pl-smi">fontColor</span>, <span class="pl-smi">hiliteColor</span>,
@@ -188,7 +188,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
     ],
 })</pre></div>
 
-    <h4>5. Use init function</h4>
+<a id="initFunction" href="#initFunction"><h4>5. Use init function</h4></a>
     <pre lang="text"><code>The init function can be used by predefining options and calling the create function on the returned object.
 The value of the option argument put in the "create" function call takes precedence
 </code></pre>
@@ -228,7 +228,7 @@ The value of the option argument put in the "create" function call takes precede
     ]
 });</pre></div>
 
-    <h4>options</h4>
+<a id="options" href="#options"><h4>options</h4></a>
 <div class="highlight highlight-source-js"><pre>
 plugins<span class="pl-k">:</span> [
     font,
@@ -282,7 +282,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array
                     [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
                 ]</pre></div>
 
-    <h4>Functions</h4>
+<a id="functions" href="#functions"><h4>Functions</h4></a>
     <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 
 <span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
@@ -295,6 +295,9 @@ buttonList      <span class="pl-k">:</span> Defines button list to array
 
 <span class="pl-c"><span class="pl-c">//</span> Gets the contents of the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);

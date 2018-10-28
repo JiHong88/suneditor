@@ -41,10 +41,37 @@
 
 
             <h4 class="name" id="getContents"><span class="type-signature"></span>getContents<span
-                    class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
+                    class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Gets the contents of the suneditor
             </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="insertHTML"><span class="type-signature"></span>insertHTML<span class="signature">(html)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Inserts an HTML element or HTML string or plain string at the current cursor position
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>html</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|String</span>
+                    </td>
+                    <td class="description last">HTML Element or HTML string or plain string</td>
+                </tr>
+                </tbody>
+            </table>
             <dl class="details"></dl>
 
 
@@ -66,7 +93,7 @@
                 <tr>
                     <td class="name"><code>contents</code></td>
                     <td class="type">
-                        <span class="param-type">string</span>
+                        <span class="param-type">String</span>
                     </td>
                     <td class="description last">Contents to Input</td>
                 </tr>
@@ -93,7 +120,7 @@
                 <tr>
                     <td class="name"><code>contents</code></td>
                     <td class="type">
-                        <span class="param-type">string</span>
+                        <span class="param-type">String</span>
                     </td>
                     <td class="description last">Contents to Input</td>
                 </tr>
@@ -154,6 +181,7 @@
         <li><a href="document-user.html#save">save</a></li>
         <li><a href="document-user.html#getContext">getContext</a></li>
         <li><a href="document-user.html#getContents">getContents</a></li>
+        <li><a href="document-user.html#insertHTML">insertHTML</a></li>
         <li><a href="document-user.html#setContents">setContents</a></li>
         <li><a href="document-user.html#appendContents">appendContents</a></li>
         <li><a href="document-user.html#disabled">disabled</a></li>

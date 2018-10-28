@@ -524,9 +524,9 @@ const core = function (context, util, plugins, lang) {
                 parentNode.appendChild(oNode);
             }
 
-            try {
-                this.setRange(oNode, 0, oNode, oNode.textContent.length);
-            } catch (e) {}
+            // try {
+            //     this.setRange(oNode, 0, oNode, oNode.textContent.length);
+            // } catch (e) {}
         },
 
         /**
@@ -709,7 +709,6 @@ const core = function (context, util, plugins, lang) {
 
                 /** No range node selected */
                 if (range.collapsed) {
-                    newNode = 
                     newNode.innerHTML = '&#65279';
                     if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
@@ -1855,6 +1854,21 @@ const core = function (context, util, plugins, lang) {
                 contents = context.element.code.value;
             }
             return contents;
+        },
+
+        /**
+         * @description Inserts an HTML element or HTML string or plain string at the current cursor position
+         * @param {Element|String} html - HTML Element or HTML string or plain string
+         */
+        insertHTML: function (html) {
+            if (!html.nodeType || html.nodeType !== 1) {
+                const template = document.createElement('template');
+                template.innerHTML = html;
+                html = template.content.firstChild;
+            }
+
+            editor.insertNode(html);
+            editor.focus();
         },
 
         /**
