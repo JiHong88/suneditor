@@ -100,7 +100,7 @@ export default {
         const submitAction = function () {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
-            const url = /^https?:\/\//.test(this.context.link.focusElement.value) ? this.context.link.focusElement.value : "http://" + this.context.link.focusElement.value;
+            const url = this.context.link.focusElement.value;
             const anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
