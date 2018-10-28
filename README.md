@@ -241,6 +241,7 @@ plugins: [
 ]               : Plugins array                                     default : null
 fontSize        : Change default font-size array                    default : null
 font            : Change default font-family array                  default : null
+colorList       : Change default color array of color picker        default : null
 width           : The width size of the editor                      default : textarea.offsetHeight
 height          : The height size of the editor                     default : textarea.style.width||offsetWidth
 display         : The display property of suneditor                 default : 'block'

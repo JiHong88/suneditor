@@ -53,7 +53,6 @@ export default {
             target = target.parentNode;
         }
 
-        this.focus();
         const formatElement = this.util.getFormatElement(this.getSelectionNode());
 
         if (/^LI$/i.test(formatElement.tagName)) {

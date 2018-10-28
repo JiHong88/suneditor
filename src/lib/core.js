@@ -220,7 +220,7 @@ const core = function (context, util, plugins, lang) {
          * @param {String} value - javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
-            document.execCommand(command, showDefaultUI, (value ? '<' + value + '>' : null));
+            document.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
         },
 
         /**
@@ -348,19 +348,21 @@ const core = function (context, util, plugins, lang) {
 
             let startLine = util.getFormatElement(startCon);
             let endLine = util.getFormatElement(endCon);
+            let startIdx = 0;
+            let endIdx = 0;
 
             for (let i = 0, len = lineNodes.length; i < len; i++) {
                 if (startLine === lineNodes[i]) {
-                    startLine = i;
+                    startIdx = i;
                     continue;
                 }
                 if (endLine === lineNodes[i]) {
-                    endLine = i;
+                    endIdx = i;
                     break;
                 }
             }
 
-            for (let i = startLine; i <= endLine; i++) {
+            for (let i = startIdx; i <= endIdx; i++) {
                 rangeFormatElements.push(lineNodes[i]);
             }
 
@@ -393,19 +395,21 @@ const core = function (context, util, plugins, lang) {
 
             let startLine = util.getRangeFormatElement(startCon);
             let endLine = util.getRangeFormatElement(endCon);
+            let startIdx = 0;
+            let endIdx = 0;
 
             for (let i = 0, len = rangeElements.length; i < len; i++) {
                 if (startLine === rangeElements[i]) {
-                    startLine = i;
+                    startIdx = i;
                     continue;
                 }
                 if (endLine === rangeElements[i]) {
-                    endLine = i;
+                    endIdx = i;
                     break;
                 }
             }
 
-            for (let i = startLine; i <= endLine; i++) {
+            for (let i = startIdx; i <= endIdx; i++) {
                 if (rangeElements[i]) rangeFormatElements.push(rangeElements[i]);
             }
 
@@ -705,6 +709,7 @@ const core = function (context, util, plugins, lang) {
 
                 /** No range node selected */
                 if (range.collapsed) {
+                    newNode = 
                     newNode.innerHTML = '&#65279';
                     if (util.isFormatElement(startCon)) {
                         startCon.appendChild(newNode);
@@ -785,8 +790,12 @@ const core = function (context, util, plugins, lang) {
                     }
 
                     // endCon
-                    newNode = appendNode.cloneNode(false);
-                    end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff);
+                    if (endLength > 0) {
+                        newNode = appendNode.cloneNode(false);
+                        end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff);
+                    } else {
+                        end = start;
+                    }
                 }
             }
 
@@ -818,7 +827,7 @@ const core = function (context, util, plugins, lang) {
             let pCurrent, newNode, appendNode, cssText;
 
             function checkCss (vNode) {
-                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'i');
+                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
                 let style = '';
 
                 if (regExp && vNode.style.cssText.length > 0) {

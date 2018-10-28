@@ -66,8 +66,6 @@ export default {
             target = target.parentNode;
         }
 
-        this.focus();
-
         // blockquote, pre
         if (command === 'range') {
             const rangeElement = document.createElement(value);
