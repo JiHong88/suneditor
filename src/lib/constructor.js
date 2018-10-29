@@ -53,7 +53,7 @@ const _Constructor = {
         /** suneditor div */
         const top_div = doc.createElement('DIV');
         top_div.className = 'sun-editor';
-        top_div.id = 'suneditor_' + element.id;
+        if (element.id) top_div.id = 'suneditor_' + element.id;
         top_div.style.width = options.width;
         top_div.style.display = options.display;
     

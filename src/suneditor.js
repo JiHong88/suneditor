@@ -61,7 +61,7 @@ export default {
 
         const cons = _Constructor.init(element, options, (options.lang ||  _defaultLang), options.plugins, util);
 
-        if (document.getElementById(cons.constructed._top.id)) {
+        if (cons.constructed._top.id && document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
