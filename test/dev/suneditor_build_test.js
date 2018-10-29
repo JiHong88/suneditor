@@ -24,10 +24,11 @@ suneditor.create(document.getElementById('editor'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print']
     ],
-    height: 'auto'
+    height: 'auto',
+    width: '100%'
 });
 
-const ss = suneditor.create(document.getElementById('editor1'), {
+let ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
     buttonList: [
         ['undo', 'redo',
@@ -40,7 +41,8 @@ const ss = suneditor.create(document.getElementById('editor1'), {
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print']
-    ]
+    ],
+    width: '100%'
 });
 
 window.sun_save = function () {
@@ -103,19 +105,10 @@ const editor = suneditor.init({
         plugins.table,
         custom_plugin_submenu
     ],
-    buttonList: [
-        ['undo', 'redo'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        '/',
-        ['indent', 'outdent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
-    ]
+    width: '100%'
 });
 
-suneditor.create(document.getElementById('editor2'));
+editor.create(document.getElementById('editor2'));
 editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table', plugins.link,
@@ -137,5 +130,6 @@ editor.create(document.getElementsByName('editor3')[0], {
                 innerHTML:'<div class="icon-map-pin"></div>'
             }]
     ],
-    lang: ko
+    lang: ko,
+    width: '100%'
 });

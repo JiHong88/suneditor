@@ -71,7 +71,13 @@ const core = function (context, util, plugins, lang) {
          */
         controllerFunction: [],
 
-        sticky: false,
+        /**
+         * @description Variables for the sticky toolbar
+         */
+        _sticky: {
+            on: false,
+            top: context.element.topArea.offsetTop
+        },
 
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
@@ -1795,24 +1801,24 @@ const core = function (context, util, plugins, lang) {
 
         onScroll_window: function () {
             const element = editor.context.element;
-            const top = element.topArea.offsetTop;
+            const editorTop = editor._sticky.top;
             const editorHeight = element.editorArea.offsetHeight;
             
-            if (editor.sticky && this.scrollY < top) {
+            if (editor._sticky.on && this.scrollY < editorTop) {
                 element.toolbar.style.top = '';
                 element.toolbar.style.width = '';
                 element.editorArea.style.marginTop = '';
                 util.removeClass(element.toolbar, 'sun-editor-sticky');
-                editor.sticky = false;
+                editor._sticky.on = false;
             }
-            else if (editor.sticky && this.scrollY + top > editorHeight) {
-                element.toolbar.style.top = (editorHeight - (this.scrollY + top)) + 'px';
+            else if (editor._sticky.on && this.scrollY + 50 > editorHeight + editorTop) {
+                element.toolbar.style.top = (editorHeight + editorTop - this.scrollY - 50) + 'px';
             }
-            else if (!editor.sticky && this.scrollY > top && this.scrollY < editorHeight) {
+            else if (!editor._sticky.on && this.scrollY > editorTop) {
                 element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
                 element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
                 util.addClass(element.toolbar, 'sun-editor-sticky');
-                editor.sticky = true;
+                editor._sticky.on = true;
             }
         }
     };
