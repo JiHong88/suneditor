@@ -45,8 +45,8 @@ export default {
         context.image.altText = image_dialog.getElementsByClassName('sun-editor-id-image-alt')[0];
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
-        context.image.caption = image_dialog.querySelector('#suneditor_image_check_caption');
-        context.image.proportion = image_dialog.querySelector('#suneditor_image_check_proportion');
+        context.image.caption = image_dialog.getElementsByClassName('suneditor-id-image-check-caption')[0];
+        context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
         context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
         context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
 
@@ -110,11 +110,11 @@ export default {
             '           <div class="form-group">' +
             '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '               <input class="form-size-control sun-editor-id-image-x" type="number" min="1" /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
-            '               <input type="checkbox" id="suneditor_image_check_proportion" style="margin-left: 20px;" checked disabled/><label for="suneditor_image_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
+            '               <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
             '               <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '           </div>' +
             '           <div class="form-group-footer">' +
-            '               <input type="checkbox" id="suneditor_image_check_caption" /><label for="suneditor_image_check_caption">&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
+            '               <label><input type="checkbox" class="suneditor-id-image-check-caption" />&nbsp;' + lang.dialogBox.imageBox.caption + '</label>' +
             '           </div>' +
             '       </div>' +
             '   </div>' +
@@ -123,15 +123,15 @@ export default {
             '           <div class="form-group">' +
             '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
             '           </div>' +
-            '           <input type="checkbox" id="suneditor_image_check_newLink" class="sun-editor-id-linkCheck"/><label for="suneditor_image_check_newLink">&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '           <label><input type="checkbox" class="sun-editor-id-linkCheck"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
             '       <div style="float: left;">' +
-            '           <input type="radio" id="suneditor_image_radio_none" name="suneditor_image_radio" class="modal-radio" value="none" checked><label for="suneditor_image_radio_none">' + lang.dialogBox.basic + '</label>' +
-            '           <input type="radio" id="suneditor_image_radio_left" name="suneditor_image_radio" class="modal-radio" value="left"><label for="suneditor_image_radio_left">' + lang.dialogBox.left + '</label>' +
-            '           <input type="radio" id="suneditor_image_radio_center" name="suneditor_image_radio" class="modal-radio" value="center"><label for="suneditor_image_radio_center">' + lang.dialogBox.center + '</label>' +
-            '           <input type="radio" id="suneditor_image_radio_right" name="suneditor_image_radio" class="modal-radio" value="right"><label for="suneditor_image_radio_right">' + lang.dialogBox.right + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="left">' + lang.dialogBox.left + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
             '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
@@ -517,7 +517,7 @@ export default {
         contextImage.altText.value = contextImage._element.alt;
         contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
-        contextImage.modal.querySelector('#suneditor_image_radio_' + (contextImage._element.getAttribute('data-align') || 'none')).checked = true;
+        contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + (contextImage._element.getAttribute('data-align') || 'none') + '"]').checked = true;
         contextImage._captionChecked = contextImage.caption.checked = !!contextImage._imageCaption;
         contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
         contextImage.imageX.value = contextImage._element.offsetWidth;
@@ -546,7 +546,7 @@ export default {
         contextImage.altText.value = '';
         contextImage.imgLink.value = '';
         contextImage.imgLinkNewWindowCheck.checked = false;
-        contextImage.modal.querySelector('#suneditor_image_radio_none').checked = true;
+        contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
         contextImage.caption.checked = false;
         contextImage.proportion.checked = false;
         contextImage.imageX.value = this.context.user.imageSize;

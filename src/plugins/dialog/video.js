@@ -46,7 +46,7 @@ export default {
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
         context.video.videoY = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
-        context.video.proportion = video_dialog.querySelector('#suneditor_video_check_proportion');
+        context.video.proportion = video_dialog.getElementsByClassName('suneditor-id-video-check-proportion')[0];
 
         /** set user option value */
         video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
@@ -87,16 +87,16 @@ export default {
             '       <div class="form-group">' +
             '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
             '           <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
-            '           <input type="checkbox" id="suneditor_video_check_proportion" style="margin-left: 20px;" checked/><label for="suneditor_video_check_proportion">&nbsp;' + lang.dialogBox.proportion + '</label>' +
+            '           <label><input type="checkbox" class="suneditor-id-video-check-proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
             '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
             '       <div style="float: left;">' +
-            '           <input type="radio" id="suneditor_video_radio_none" name="suneditor_video_radio" class="modal-radio" value="none" checked><label for="suneditor_video_radio_none">' + lang.dialogBox.basic + '</label>' +
-            '           <input type="radio" id="suneditor_video_radio_left" name="suneditor_video_radio" class="modal-radio" value="left"><label for="suneditor_video_radio_left">' + lang.dialogBox.left + '</label>' +
-            '           <input type="radio" id="suneditor_video_radio_center" name="suneditor_video_radio" class="modal-radio" value="center"><label for="suneditor_video_radio_center">' + lang.dialogBox.center + '</label>' +
-            '           <input type="radio" id="suneditor_video_radio_right" name="suneditor_video_radio" class="modal-radio" value="right"><label for="suneditor_video_radio_right">' + lang.dialogBox.right + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="left">' + lang.dialogBox.left + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
             '       <button type="submit" class="btn btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
@@ -268,7 +268,7 @@ export default {
         contextVideo.videoY.value = container.offsetHeight;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
-        contextVideo.modal.querySelector('#suneditor_video_radio_' + (contextVideo._element.getAttribute('data-align') || 'none')).checked = true;
+        contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + (contextVideo._element.getAttribute('data-align') || 'none') + '"]').checked = true;
 
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
@@ -291,6 +291,6 @@ export default {
         contextVideo.videoY.value = this.context.user.videoY;
         contextVideo.proportion.checked = true;
         contextVideo.proportion.disabled = true;
-        contextVideo.modal.querySelector('#suneditor_video_radio_none').checked = true;
+        contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
     }
 };

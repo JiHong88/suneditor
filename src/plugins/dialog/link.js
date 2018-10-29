@@ -63,7 +63,7 @@ export default {
             '       <div class="form-group">' +
             '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="form-control sun-editor-id-link-text" type="text" />' +
             '       </div>' +
-            '       <label class="label-check"><input type="checkbox" class="sun-editor-id-link-check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       <label><input type="checkbox" class="sun-editor-id-link-check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '   </div>' +
             '   <div class="modal-footer">' +
             '       <button type="submit" class="btn btn-primary sun-editor-id-submit-link" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
