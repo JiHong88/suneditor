@@ -34,6 +34,7 @@ export default {
                 'Arial',
                 'Comic Sans MS',
                 'Courier New,Courier',
+                'Impact,Charcoal,sans-serif',
                 'Georgia',
                 'tahoma',
                 'Trebuchet MS,Helvetica',
