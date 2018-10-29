@@ -72,14 +72,6 @@ const core = function (context, util, plugins, lang) {
         controllerFunction: [],
 
         /**
-         * @description Variables for the sticky toolbar
-         */
-        _sticky: {
-            on: false,
-            top: context.element.topArea.offsetTop
-        },
-
-        /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
         codeViewDisabledButtons: document.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
@@ -117,8 +109,6 @@ const core = function (context, util, plugins, lang) {
          * @property {Number} innerHeight_fullScreen - InnerHeight in editor when in full screen
          * @property {Number} resizeClientY - Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize - Indented size when tab button clicked (4)
-         * @property {Element} originCssText - Remembered the CSS of the editor before full screen (Used when returning to original size again)
-         * @property {Number} editorHeight - The height value entered by the user or the height value of the "textarea" when the suneditor is created
          * @property {Array} currentNodes -  An array of the current cursor's node structure
          * @private
          */
@@ -130,9 +120,13 @@ const core = function (context, util, plugins, lang) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
-            originCssText: context.element.topArea.style.cssText,
-            editorHeight: context.user.height,
-            currentNodes: []
+            currentNodes: [],
+            _originCssText: context.element.topArea.style.cssText,
+            _bodyOverflow: '',
+            _editorAreaOriginCssText: '',
+            _wysiwygOriginCssText: '',
+            _codeOriginCssText: '',
+            _sticky: false
         },
 
         /**
@@ -1385,12 +1379,25 @@ const core = function (context, util, plugins, lang) {
          */
         toggleFullScreen: function (element) {
             if (!this._variable.isFullScreen) {
+                this._variable.isFullScreen = true;
+
                 context.element.topArea.style.position = 'fixed';
                 context.element.topArea.style.top = '0';
                 context.element.topArea.style.left = '0';
                 context.element.topArea.style.width = '100%';
                 context.element.topArea.style.height = '100%';
                 context.element.topArea.style.zIndex = '2147483647';
+
+                this._variable._bodyOverflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+
+                this._variable._editorAreaOriginCssText = context.element.editorArea.style.cssText;
+                this._variable._wysiwygOriginCssText = context.element.wysiwyg.style.cssText;
+                this._variable._codeOriginCssText = context.element.code.style.cssText;
+
+                context.element.editorArea.style.cssText = context.element.toolbar.style.cssText = context.element.wysiwyg.style.cssText = context.element.code.style.cssText = '';
+                context.element.toolbar.style.width = context.element.wysiwyg.style.height = context.element.code.style.height = '100%';
+                context.element.toolbar.style.position = 'relative';
 
                 this._variable.innerHeight_fullScreen = (window.innerHeight - context.element.toolbar.offsetHeight);
                 context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
@@ -1399,14 +1406,23 @@ const core = function (context, util, plugins, lang) {
                 util.addClass(element.firstElementChild, 'icon-reduction');
             }
             else {
-                context.element.topArea.style.cssText = this._variable.originCssText;
-                context.element.editorArea.style.height = this._variable.editorHeight;
+                this._variable.isFullScreen = false;
+
+                context.element.code.style.cssText = this._variable._codeOriginCssText;
+                context.element.wysiwyg.style.cssText = this._variable._wysiwygOriginCssText;
+                context.element.toolbar.style.cssText = '';
+                context.element.editorArea.style.cssText = this._variable._editorAreaOriginCssText;
+                context.element.topArea.style.cssText = this._variable._originCssText;
+                document.body.style.overflow = this._variable._bodyOverflow;
+
+                if (context.user.stickyToolbar > -1) {
+                    util.removeClass(context.element.toolbar, 'sun-editor-sticky');
+                    event.onScroll_window();
+                }
 
                 util.removeClass(element.firstElementChild, 'icon-reduction');
                 util.addClass(element.firstElementChild, 'icon-expansion');
             }
-
-            this._variable.isFullScreen = !this._variable.isFullScreen;
         },
 
         /**
@@ -1564,6 +1580,10 @@ const core = function (context, util, plugins, lang) {
             if (editor._variable.isFullScreen) {
                 editor._variable.innerHeight_fullScreen += (window.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
+            }
+            else if (editor._variable._sticky) {
+                context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
+                event.onScroll_window();
             }
         },
 
@@ -1795,30 +1815,35 @@ const core = function (context, util, plugins, lang) {
 
         resize_editor: function (e) {
             const resizeInterval = (e.clientY - editor._variable.resizeClientY);
-            editor._variable.editorHeight = context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
+            context.element.wysiwyg.style.height = context.element.code.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
             editor._variable.resizeClientY = e.clientY;
         },
 
         onScroll_window: function () {
-            const element = editor.context.element;
-            const editorTop = editor._sticky.top;
+            if (editor._variable.isFullScreen) return;
+
+            const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
+            const editorTop = element.topArea.offsetTop;
+            const y = (window.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
             
-            if (editor._sticky.on && this.scrollY < editorTop) {
+            if (y < editorTop) {
                 element.toolbar.style.top = '';
                 element.toolbar.style.width = '';
                 element.editorArea.style.marginTop = '';
                 util.removeClass(element.toolbar, 'sun-editor-sticky');
-                editor._sticky.on = false;
+                editor._variable._sticky = false;
             }
-            else if (editor._sticky.on && this.scrollY + 50 > editorHeight + editorTop) {
-                element.toolbar.style.top = (editorHeight + editorTop - this.scrollY - 50) + 'px';
+            else if (y + 50 > editorHeight + editorTop) {
+                element.toolbar.style.top = (editorHeight + editorTop - y - 50 + context.user.stickyToolbar) + 'px';
+                editor._variable._sticky = true;
             }
-            else if (!editor._sticky.on && this.scrollY > editorTop) {
+            else if (y > editorTop) {
                 element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
-                element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
+                element.editorArea.style.marginTop = (element.toolbar.offsetHeight + context.user.stickyToolbar) + 'px';
+                element.toolbar.style.top = context.user.stickyToolbar + 'px';
                 util.addClass(element.toolbar, 'sun-editor-sticky');
-                editor._sticky.on = true;
+                editor._variable._sticky = true;
             }
         }
     };
@@ -1836,7 +1861,7 @@ const core = function (context, util, plugins, lang) {
     if (context.element.resizebar) context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar, false);
     /** window event */
     window.addEventListener('resize', event.resize_window, false);
-    window.addEventListener('scroll', event.onScroll_window, false);
+    if (context.user.stickyToolbar > -1) window.addEventListener('scroll', event.onScroll_window, false);
 
     /** add plugin to plugins object */
     if (plugins) {
@@ -1962,7 +1987,7 @@ const core = function (context, util, plugins, lang) {
         destroy: function () {
             /** remove window event listeners */
             window.removeEventListener('resize', event.resize_window);
-            window.removeEventListener('scroll', event.onScroll_window);
+            if (context.user.stickyToolbar > -1) window.removeEventListener('scroll', event.onScroll_window);
             
             /** remove element */
             util.removeItem(context.element.topArea);

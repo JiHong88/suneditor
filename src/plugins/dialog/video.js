@@ -21,12 +21,12 @@ export default {
             _coverElement: document.createElement('SPAN'),
             _element: null,
             _resize_element: null,
-            _element_w: context.user.videoX,
-            _element_h: context.user.videoY,
+            _element_w: context.user.videoWidth,
+            _element_h: context.user.videoHeight,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: context.user.videoX,
-            _origin_h: context.user.videoY,
+            _origin_w: context.user.videoWidth,
+            _origin_h: context.user.videoHeight,
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: 'float\\-[a-z]+'
@@ -44,18 +44,18 @@ export default {
         let video_dialog = eval(this.setDialog(core.lang));
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
-        context.video.videoX = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
-        context.video.videoY = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.videoWidth = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
+        context.video.videoHeight = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
         context.video.proportion = video_dialog.getElementsByClassName('suneditor-id-video-check-proportion')[0];
 
         /** set user option value */
-        video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoX;
-        video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoY;
+        video_dialog.getElementsByClassName('sun-editor-id-video-x')[0].value = context.user.videoWidth;
+        video_dialog.getElementsByClassName('sun-editor-id-video-y')[0].value = context.user.videoHeight;
 
         /** add event listeners */
         video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
-        context.video.videoX.addEventListener('change', this.setInputSize.bind(core, 'x'));
-        context.video.videoY.addEventListener('change', this.setInputSize.bind(core, 'y'));
+        context.video.videoWidth.addEventListener('change', this.setInputSize.bind(core, 'x'));
+        context.video.videoHeight.addEventListener('change', this.setInputSize.bind(core, 'y'));
         video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
 
         /** append html */
@@ -108,9 +108,9 @@ export default {
     setInputSize: function (xy) {
         if (this.context.video.proportion.checked) {
             if (xy === 'x') {
-                this.context.video.videoY.value = Math.round((this.context.video._element_h / this.context.video._element_w) * this.context.video.videoX.value);
+                this.context.video.videoHeight.value = Math.round((this.context.video._element_h / this.context.video._element_w) * this.context.video.videoWidth.value);
             } else {
-                this.context.video.videoX.value = Math.round((this.context.video._element_w / this.context.video._element_h) * this.context.video.videoY.value);
+                this.context.video.videoWidth.value = Math.round((this.context.video._element_w / this.context.video._element_h) * this.context.video.videoHeight.value);
             }
         }
     },
@@ -127,8 +127,8 @@ export default {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
             const contextVideo = this.context.video;
-            const w = (/^\d+$/.test(contextVideo.videoX.value) ? contextVideo.videoX.value : this.context.user.videoX);
-            const h = (/^\d+$/.test(contextVideo.videoY.value) ? contextVideo.videoY.value : this.context.user.videoY);
+            const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.user.videoWidth);
+            const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.user.videoHeight);
             let oIframe = null;
             let container = null;
             let url = contextVideo.focusElement.value.trim();
@@ -230,8 +230,8 @@ export default {
     sizeRevert: function () {
         const contextVideo = this.context.video;
         if (contextVideo._origin_w) {
-            contextVideo.videoX.value = contextVideo._element_w = contextVideo._origin_w;
-            contextVideo.videoY.value = contextVideo._element_h = contextVideo._origin_h;
+            contextVideo.videoWidth.value = contextVideo._element_w = contextVideo._origin_w;
+            contextVideo.videoHeight.value = contextVideo._element_h = contextVideo._origin_h;
         }
     },
 
@@ -264,8 +264,8 @@ export default {
         const container = contextVideo._containerElement;
 
         contextVideo.focusElement.value = contextVideo._element.src;
-        contextVideo.videoX.value = container.offsetWidth;
-        contextVideo.videoY.value = container.offsetHeight;
+        contextVideo.videoWidth.value = container.offsetWidth;
+        contextVideo.videoHeight.value = container.offsetHeight;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + (contextVideo._element.getAttribute('data-align') || 'none') + '"]').checked = true;
@@ -287,8 +287,8 @@ export default {
     init: function () {
         const contextVideo = this.context.video;
         contextVideo.focusElement.value = '';
-        contextVideo.videoX.value = this.context.user.videoX;
-        contextVideo.videoY.value = this.context.user.videoY;
+        contextVideo.videoWidth.value = this.context.user.videoWidth;
+        contextVideo.videoHeight.value = this.context.user.videoHeight;
         contextVideo.proportion.checked = true;
         contextVideo.proportion.disabled = true;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;

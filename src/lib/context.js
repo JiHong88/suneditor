@@ -43,8 +43,9 @@ const _Context = function (element, cons, options) {
             fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
         },
         user: {
-            videoX: options.videoX,
-            videoY: options.videoY,
+            stickyToolbar: options.stickyToolbar,
+            videoWidth: options.videoWidth,
+            videoHeight: options.videoHeight,
             imageFileInput: options.imageFileInput,
             imageUrlInput: options.imageUrlInput,
             imageSize: options.imageSize,
@@ -53,6 +54,8 @@ const _Context = function (element, cons, options) {
             fontSize: options.fontSize,
             colorList: options.colorList,
             height: options.height,
+            minHeight: options.minHeight,
+            maxHeight: options.maxHeight,
             showPathLabel: options.showPathLabel,
             display: options.display
         },

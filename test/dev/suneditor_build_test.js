@@ -25,7 +25,10 @@ suneditor.create(document.getElementById('editor'), {
         'preview', 'print']
     ],
     height: 'auto',
-    width: '100%'
+    width: '100%',
+    minHeight: '150px',
+    maxHeight: '500px',
+    stickyToolbar: '50px'
 });
 
 let ss = suneditor.create(document.getElementById('editor1'), {
@@ -42,7 +45,8 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print']
     ],
-    width: '100%'
+    width: '100%',
+    stickyToolbar: 50
 });
 
 window.sun_save = function () {
@@ -131,5 +135,6 @@ editor.create(document.getElementsByName('editor3')[0], {
             }]
     ],
     lang: ko,
-    width: '100%'
+    width: '100%',
+    stickyToolbar: false
 });

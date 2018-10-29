@@ -238,31 +238,37 @@ plugins: [
     link,
     image,
     video
-]               : Plugins array                                     default : null
-fontSize        : Change default font-size array                    default : null
-font            : Change default font-family array                  default : null
-colorList       : Change default color array of color picker        default : null
-width           : The width size of the editor                      default : textarea.offsetHeight
-height          : The height size of the editor                     default : textarea.style.width||offsetWidth
-display         : The display property of suneditor                 default : 'block'
-videoX          : The default width size of the video frame         default : 560
-videoY          : The default heigth size of the video frame        default : 315
-showPathLabel   : Displays the current node structure to resizebar  default : true
-popupDisplay    : Size of background area when activating dialog window ('full' || '') default : ''
+]               : Plugins array                                     default : null {Array}
+stickyToolbar   : Reference height value that should be changed to sticky toolbar mode
+                  It can also be used when there is another fixed toolbar at the top
+                  Set to 0, '0px', '50px', etc
+                  If set to -1 or false or null to turn off         default : 0 {Number|String|Boolean}
+fontSize        : Change default font-size array                    default : null {Array}
+font            : Change default font-family array                  default : null {Array}
+colorList       : Change default color array of color picker        default : null {Array}
+width           : The width size of the editor                      default : textarea.offsetHeight {Number|String}
+height          : The height size of the editor                     default : textarea.style.width||offsetWidth {Number|String}
+minHeight       : The min-height size of the editor, used when 'height' value is 'auto' default : null {Number|String}
+maxHeight       : The max-height size of the editor, used when 'height' value is 'auto' default : null {Number|String}
+display         : The display property of suneditor                 default : 'block' {String}
+videoWidth      : The default width size of the video frame         default : 560 {Number}
+videoHeight     : The default heigth size of the video frame        default : 315 {Number}
+showPathLabel   : Displays the current node structure to resizebar  default : true {Boolean}
+popupDisplay    : Size of background area when activating dialog window ('full' || '') default : '' {String}
 
-lang            : language object (en, ko) default : English
+lang            : language object (en, ko) default : English {Object}
 
-imageFileInput  : Choose whether to create a file input tag in the image upload window default : true
-imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true
-                  If the value of imageFileInput is false, it will be unconditionally true
-imageSize       : The default width size of the image frame  default : 350
-imageUploadUrl  : The image upload to server mapping address default : null
+imageFileInput  : Choose whether to create a file input tag in the image upload window default : true {Boolean}
+imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true {Boolean}
+                  If the value of imageFileInput is false, it will be unconditionally true {Boolean}
+imageSize       : The default width size of the image frame  default : 350 {Number}
+imageUploadUrl  : The image upload to server mapping address default : null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data
                   return type : JSONArray [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
                                            {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
 
-buttonList      : Defines button list to array
+buttonList      : Defines button list to array {Array}
                 default : [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],

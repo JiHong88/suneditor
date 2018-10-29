@@ -23,8 +23,9 @@ const _Constructor = {
     
         /** user options */
         options.lang = lang;
-        options.videoX = options.videoX || 560;
-        options.videoY = options.videoY || 315;
+        options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.videoWidth = options.videoWidth || 560;
+        options.videoHeight = options.videoHeight || 315;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageSize = options.imageSize || 350;
@@ -33,6 +34,8 @@ const _Constructor = {
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
+        options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
+        options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.popupDisplay = options.popupDisplay || '';
         options.buttonList = options.buttonList || [
@@ -67,7 +70,6 @@ const _Constructor = {
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
         editor_div.className = 'sun-editor-id-editorArea';
-        editor_div.style.height = options.height;
     
         /** wysiwyg div */
         const wysiwyg_div = doc.createElement('DIV');
@@ -76,16 +78,19 @@ const _Constructor = {
         wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
         wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
+        wysiwyg_div.style.height = options.height;
+        wysiwyg_div.style.minHeight = options.minHeight;
+        wysiwyg_div.style.maxHeight = options.maxHeight;
     
         /** textarea for code view */
-        // const textarea = doc.createElement('TEXTAREA');
-        // textarea.className = 'input_editor sun-editor-id-code';
-        // textarea.style.display = 'none';
         const textarea = doc.createElement('DIV');
         textarea.setAttribute('contenteditable', true);
         textarea.setAttribute('scrolling', 'auto');
         textarea.className = 'input_editor sun-editor-id-code';
         textarea.style.display = 'none';
+        textarea.style.height = options.height;
+        textarea.style.minHeight = options.minHeight;
+        textarea.style.maxHeight = options.maxHeight;
     
         /** resize bar */
         let resize_bar = null;
