@@ -3,7 +3,7 @@
   "sideEffects": [
     "./src/assets/css/*.css"
   ],
-  "version": "2.5.3",
+  "version": "2.6.0",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
   "keywords": [
@@ -46,15 +46,15 @@
     "jasmine": "^2.99.0",
     "jasmine-core": "^2.99.1",
     "jshint": "^2.9.6",
-    "karma": "^3.0.0",
+    "karma": "^3.1.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.2",
     "mini-css-extract-plugin": "^0.4.4",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "url-loader": "^1.1.2",
-    "webpack": "^4.20.2",
+    "webpack": "^4.23.1",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.9",
+    "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
   },
   "scripts": {
