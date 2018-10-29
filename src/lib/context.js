@@ -21,6 +21,7 @@ const _Context = function (element, cons, options) {
             originElement: element,
             topArea: cons._top,
             relative: cons._relative,
+            toolbar: cons._toolBar,
             resizebar: cons._resizeBar,
             navigation: cons._navigation,
             editorArea: cons._editorArea,
@@ -30,7 +31,6 @@ const _Context = function (element, cons, options) {
             resizeBackground: cons._resizeBack
         },
         tool: {
-            bar: cons._toolBar,
             cover: cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
             bold: cons._toolBar.getElementsByClassName('sun-editor-id-bold')[0],
             underline: cons._toolBar.getElementsByClassName('sun-editor-id-underline')[0],
@@ -52,7 +52,7 @@ const _Context = function (element, cons, options) {
             font: options.font,
             fontSize: options.fontSize,
             colorList: options.colorList,
-            height: options.height.match(/\d+/)[0],
+            height: options.height,
             showPathLabel: options.showPathLabel,
             display: options.display
         },

@@ -23,7 +23,8 @@ suneditor.create(document.getElementById('editor'), {
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print']
-    ]
+    ],
+    height: 'auto'
 });
 
 const ss = suneditor.create(document.getElementById('editor1'), {
@@ -115,7 +116,7 @@ const editor = suneditor.init({
 });
 
 suneditor.create(document.getElementById('editor2'));
-editor.create(document.getElementById('editor3'), {
+editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table', plugins.link,
             {

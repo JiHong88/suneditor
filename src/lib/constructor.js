@@ -32,7 +32,7 @@ const _Constructor = {
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
-        options.height = /^\d+/.test(options.height) ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
+        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.popupDisplay = options.popupDisplay || '';
         options.buttonList = options.buttonList || [
@@ -78,13 +78,21 @@ const _Constructor = {
         wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
     
         /** textarea for code view */
-        const textarea = doc.createElement('TEXTAREA');
+        // const textarea = doc.createElement('TEXTAREA');
+        // textarea.className = 'input_editor sun-editor-id-code';
+        // textarea.style.display = 'none';
+        const textarea = doc.createElement('DIV');
+        textarea.setAttribute('contenteditable', true);
+        textarea.setAttribute('scrolling', 'auto');
         textarea.className = 'input_editor sun-editor-id-code';
         textarea.style.display = 'none';
     
         /** resize bar */
-        const resize_bar = doc.createElement('DIV');
-        resize_bar.className = 'sun-editor-id-resizeBar sun-editor-common';
+        let resize_bar = null;
+        if (/\d+/.test(options.height)) {
+            resize_bar = doc.createElement('DIV');
+            resize_bar.className = 'sun-editor-id-resizeBar sun-editor-common';
+        }
     
         /** navigation */
         const navigation = doc.createElement('SPAN');
@@ -102,12 +110,16 @@ const _Constructor = {
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
-        resize_bar.appendChild(navigation);
         relative.appendChild(tool_bar.element);
         relative.appendChild(editor_div);
-        relative.appendChild(resize_bar);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
+
+        if (resize_bar) {
+            resize_bar.appendChild(navigation);
+            relative.appendChild(resize_bar);
+        }
+        
         top_div.appendChild(relative);
     
         return {

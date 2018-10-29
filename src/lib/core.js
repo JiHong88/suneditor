@@ -71,6 +71,8 @@ const core = function (context, util, plugins, lang) {
          */
         controllerFunction: [],
 
+        sticky: false,
+
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
@@ -1348,14 +1350,13 @@ const core = function (context, util, plugins, lang) {
          */
         toggleCodeView: function () {
             const wysiwygActive = this._variable.wysiwygActive;
-
             const disButtons = this.codeViewDisabledButtons;
             for (let i = 0, len = disButtons.length; i < len; i++) {
                 disButtons[i].disabled = wysiwygActive;
             }
 
             if (!wysiwygActive) {
-                const code_html = context.element.code.value.trim();
+                const code_html = context.element.code.textContent.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>&#65279</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
@@ -1364,7 +1365,7 @@ const core = function (context, util, plugins, lang) {
                 this.focus();
             }
             else {
-                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/P>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.textContent = context.element.wysiwyg.innerHTML.trim();//.replace(/<\/P>(?=[^\n])/gi, '<\/p>\n');
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
                 this._variable.wysiwygActive = false;
@@ -1385,7 +1386,7 @@ const core = function (context, util, plugins, lang) {
                 context.element.topArea.style.height = '100%';
                 context.element.topArea.style.zIndex = '2147483647';
 
-                this._variable.innerHeight_fullScreen = (window.innerHeight - context.tool.bar.offsetHeight);
+                this._variable.innerHeight_fullScreen = (window.innerHeight - context.element.toolbar.offsetHeight);
                 context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
                 util.removeClass(element.firstElementChild, 'icon-expansion');
@@ -1393,7 +1394,7 @@ const core = function (context, util, plugins, lang) {
             }
             else {
                 context.element.topArea.style.cssText = this._variable.originCssText;
-                context.element.editorArea.style.height = this._variable.editorHeight + 'px';
+                context.element.editorArea.style.height = this._variable.editorHeight;
 
                 util.removeClass(element.firstElementChild, 'icon-reduction');
                 util.addClass(element.firstElementChild, 'icon-expansion');
@@ -1555,7 +1556,7 @@ const core = function (context, util, plugins, lang) {
 
         resize_window: function () {
             if (editor._variable.isFullScreen) {
-                editor._variable.innerHeight_fullScreen += (window.innerHeight - context.tool.bar.offsetHeight) - editor._variable.innerHeight_fullScreen;
+                editor._variable.innerHeight_fullScreen += (window.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
             }
         },
@@ -1788,17 +1789,37 @@ const core = function (context, util, plugins, lang) {
 
         resize_editor: function (e) {
             const resizeInterval = (e.clientY - editor._variable.resizeClientY);
-
-            context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
-            editor._variable.editorHeight = (context.element.editorArea.offsetHeight + resizeInterval);
-
+            editor._variable.editorHeight = context.element.editorArea.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
             editor._variable.resizeClientY = e.clientY;
+        },
+
+        onScroll_window: function () {
+            const element = editor.context.element;
+            const top = element.topArea.offsetTop;
+            const editorHeight = element.editorArea.offsetHeight;
+            
+            if (editor.sticky && this.scrollY < top) {
+                element.toolbar.style.top = '';
+                element.toolbar.style.width = '';
+                element.editorArea.style.marginTop = '';
+                util.removeClass(element.toolbar, 'sun-editor-sticky');
+                editor.sticky = false;
+            }
+            else if (editor.sticky && this.scrollY + top > editorHeight) {
+                element.toolbar.style.top = (editorHeight - (this.scrollY + top)) + 'px';
+            }
+            else if (!editor.sticky && this.scrollY > top && this.scrollY < editorHeight) {
+                element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
+                element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
+                util.addClass(element.toolbar, 'sun-editor-sticky');
+                editor.sticky = true;
+            }
         }
     };
 
     /** add event listeners */
     /** tool bar event */
-    context.tool.bar.addEventListener('click', event.onClick_toolbar, false);
+    context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
@@ -1806,9 +1827,10 @@ const core = function (context, util, plugins, lang) {
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     /** resize bar */
-    context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar, false);
-    /** window resize event */
+    if (context.element.resizebar) context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar, false);
+    /** window event */
     window.addEventListener('resize', event.resize_window, false);
+    window.addEventListener('scroll', event.onScroll_window, false);
 
     /** add plugin to plugins object */
     if (plugins) {
@@ -1934,6 +1956,7 @@ const core = function (context, util, plugins, lang) {
         destroy: function () {
             /** remove window event listeners */
             window.removeEventListener('resize', event.resize_window);
+            window.removeEventListener('scroll', event.onScroll_window);
             
             /** remove element */
             util.removeItem(context.element.topArea);
