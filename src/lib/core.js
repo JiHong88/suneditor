@@ -173,6 +173,10 @@ const core = function (context, util, plugins, lang) {
             this.submenu.style.display = 'block';
             util.addClass(element, 'on');
             this.submenuActiveButton = element;
+
+            const overLeft = this.context.element.toolbar.offsetWidth - (element.parentElement.offsetLeft + this.submenu.offsetWidth);
+            if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
+            else this.submenu.style.left = '1px';
         },
 
         /**
