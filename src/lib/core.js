@@ -1582,17 +1582,6 @@ const core = function (context, util, plugins, lang) {
             if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
         },
 
-        resize_window: function () {
-            if (editor._variable.isFullScreen) {
-                editor._variable.innerHeight_fullScreen += (window.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
-                context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
-            }
-            else if (editor._variable._sticky) {
-                context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
-                event.onScroll_window();
-            }
-        },
-
         onClick_toolbar: function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1811,18 +1800,29 @@ const core = function (context, util, plugins, lang) {
 
             function closureFunc() {
                 context.element.resizeBackground.style.display = 'none';
-                document.removeEventListener('mousemove', event.resize_editor);
+                document.removeEventListener('mousemove', event._resize_editor);
                 document.removeEventListener('mouseup', closureFunc);
             }
 
-            document.addEventListener('mousemove', event.resize_editor);
+            document.addEventListener('mousemove', event._resize_editor);
             document.addEventListener('mouseup', closureFunc);
         },
 
-        resize_editor: function (e) {
+        _resize_editor: function (e) {
             const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - editor._variable.resizeClientY);
             context.element.wysiwyg.style.height = context.element.code.style.height = (resizeInterval < editor._variable.minResizingSize ? editor._variable.minResizingSize : resizeInterval) + 'px';
             editor._variable.resizeClientY = e.clientY;
+        },
+
+        onResize_window: function () {
+            if (editor._variable.isFullScreen) {
+                editor._variable.innerHeight_fullScreen += (window.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
+                context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
+            }
+            else if (editor._variable._sticky) {
+                context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
+                event.onScroll_window();
+            }
         },
 
         onScroll_window: function () {
@@ -1831,26 +1831,34 @@ const core = function (context, util, plugins, lang) {
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const editorTop = element.topArea.offsetTop;
-            const y = (window.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
+            const y = (this.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
             
             if (y < editorTop) {
-                element.toolbar.style.top = '';
-                element.toolbar.style.width = '';
-                element.editorArea.style.marginTop = '';
-                util.removeClass(element.toolbar, 'sun-editor-sticky');
-                editor._variable._sticky = false;
+                event._offStickyToolbar(element);
             }
-            else if (y >= editorHeight + editorTop) {
-                element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y) + 'px';
-                editor._variable._sticky = true;
+            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop) {
+                if (!editor._variable._sticky) event._onStickyToolbar(element);
+                element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
-                element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
-                element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
-                element.toolbar.style.top = context.user.stickyToolbar + 'px';
-                util.addClass(element.toolbar, 'sun-editor-sticky');
-                editor._variable._sticky = true;
+                event._onStickyToolbar(element);
             }
+        },
+
+        _onStickyToolbar: function (element) {
+            element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
+            element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
+            element.toolbar.style.top = context.user.stickyToolbar + 'px';
+            util.addClass(element.toolbar, 'sun-editor-sticky');
+            editor._variable._sticky = true;
+        },
+
+        _offStickyToolbar: function (element) {
+            element.toolbar.style.top = '';
+            element.toolbar.style.width = '';
+            element.editorArea.style.marginTop = '';
+            util.removeClass(element.toolbar, 'sun-editor-sticky');
+            editor._variable._sticky = false;
         }
     };
 
@@ -1874,7 +1882,7 @@ const core = function (context, util, plugins, lang) {
     }
     
     /** window event */
-    window.addEventListener('resize', event.resize_window, false);
+    window.addEventListener('resize', event.onResize_window, false);
     if (context.user.stickyToolbar > -1) window.addEventListener('scroll', event.onScroll_window, false);
 
     /** add plugin to plugins object */
@@ -2000,7 +2008,7 @@ const core = function (context, util, plugins, lang) {
          */
         destroy: function () {
             /** remove window event listeners */
-            window.removeEventListener('resize', event.resize_window);
+            window.removeEventListener('resize', event.onResize_window);
             window.removeEventListener('scroll', event.onScroll_window);
             
             /** remove element */
