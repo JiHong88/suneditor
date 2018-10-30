@@ -82,12 +82,12 @@
                   Set to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
                   If set to <span class="pl-c1">-1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn off         <span class="pl-ent">default : </span><span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
 <span class="pl-s">resizingBar</span><span class="pl-k">     : </span>Show the bottom resizing bar
-                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be resized <span class="pl-ent">default : </span></span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be resized <span class="pl-ent">default : </span></span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
 <span class="pl-s">fontSize</span><span class="pl-k">        : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">font</span><span class="pl-k">            : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">colorList</span><span class="pl-k">       : </span>Change default color array of color picker array  <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width||offsetWidth</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientHeight</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width||clientWidth</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">minHeight</span><span class="pl-k">       : </span>The min-height size of the editor.
                   Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">maxHeight</span><span class="pl-k">       : </span>The max-height size of the editor.
@@ -157,14 +157,14 @@
         ],
 });</pre></div>
         <p></p>
-        <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting</textarea>
+        <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting, hide bottom resizingBar, popupDisplay: full</textarea>
 
 <p></p>
 <div class="highlight highlight-source-js">
 <pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>lineBreak<span class="pl-pds">'</span></span>, {
     showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
     height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
-    minHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
+    minHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100px<span class="pl-pds">'</span></span>,
     maxHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>250px<span class="pl-pds">'</span></span>,
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
@@ -178,10 +178,7 @@
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">
             <p>line Break</p>
-            <p>1</p>
-            <p>2</p>
-            <p>3</p>
-            <p>4</p>
+            <p>minHeight: 100px, mxHeight: 250px</p>
         </textarea>
 
         <a id="functions" href="#functions"><h4>2. User Function</h4></a>
@@ -403,7 +400,7 @@
     SUNEDITOR.create('lineBreak', {
         showPathLabel: false,
         height: 'auto',
-        minHeight : '150px',
+        minHeight : '100px',
         maxHeight : '250px',
         buttonList: [
             ['undo', 'redo', 'font', 'fontSize', 'formatBlock'],

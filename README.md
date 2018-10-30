@@ -244,12 +244,12 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   Set to 0, '0px', '50px', etc
                   If set to -1 or false or null to turn off         default : 0 {Number|String|Boolean}
 resizingBar     : Show the bottom resizing bar.
-                  If 'height' value is 'auto', it will not be resized     default : true {Boolean}
+                  If 'height' value is 'auto', it will not be resized default : true {Boolean}
 fontSize        : Change default font-size array                    default : null {Array}
 font            : Change default font-family array                  default : null {Array}
 colorList       : Change default color array of color picker        default : null {Array}
-width           : The width size of the editor                      default : textarea.offsetHeight {Number|String}
-height          : The height size of the editor                     default : textarea.style.width||offsetWidth {Number|String}
+width           : The width size of the editor                      default : textarea.clientHeight {Number|String}
+height          : The height size of the editor                     default : textarea.style.width||clientWidth {Number|String}
 minHeight       : The min-height size of the editor.
                   Used when 'height' value is 'auto'                default : null {Number|String}
 maxHeight       : The max-height size of the editor
