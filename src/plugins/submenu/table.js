@@ -168,7 +168,6 @@ export default {
         contextTable._trCnt = 0;
         contextTable._tdCnt = 0;
         contextTable._tableXY = [];
-        contextTable._resizeBars = [];
     },
 
     /** table edit controller */
