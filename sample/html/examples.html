@@ -80,18 +80,22 @@
 <span class="pl-s">stickyToolbar</span><span class="pl-k">   : </span>Reference height value that should be changed to sticky toolbar mode
                   It can also be used when there is another fixed toolbar at the top
                   Set to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
-                  If set to <span class="pl-c1">-1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn off         <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
+                  If set to <span class="pl-c1">-1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn off         <span class="pl-ent">default : </span><span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
+<span class="pl-s">resizingBar</span><span class="pl-k">     : </span>Show the bottom resizing bar
+                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be resized <span class="pl-ent">default : </span></span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
 <span class="pl-s">fontSize</span><span class="pl-k">        : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">font</span><span class="pl-k">            : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">colorList</span><span class="pl-k">       : </span>Change default color array of color picker array  <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.offsetHeight</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width||offsetWidth</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">minHeight</span><span class="pl-k">       : </span>The min-height size of the editor, used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">maxHeight</span><span class="pl-k">       : </span>The max-height size of the editor, used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">minHeight</span><span class="pl-k">       : </span>The min-height size of the editor.
+                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">maxHeight</span><span class="pl-k">       : </span>The max-height size of the editor.
+                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor                 <span class="pl-ent">default : </span><span class="pl-c1">'block'</span> {<span class="pl-c1">String</span>}
 <span class="pl-s">videoWidth</span><span class="pl-k">      : </span>The default width size of the video frame         <span class="pl-ent">default : </span><span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
 <span class="pl-s">videoHeight</span><span class="pl-k">     : </span>The default heigth size of the video frame        <span class="pl-ent">default : </span><span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
-<span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizebar  <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+<span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizingBar <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
 <span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || '') <span class="pl-ent">default : </span><span class="pl-c1">''</span> {<span class="pl-c1">String</span>}
 
 <span class="pl-k">lang</span><span class="pl-k">            : </span>language object (en, ko) <span class="pl-ent">default : </span><span class="pl-c1">English</span> {<span class="pl-c1">Object</span>}
@@ -134,13 +138,11 @@
         ],
         width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span>,
         height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
-        minHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
-        maxHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>250px<span class="pl-pds">'</span></span>,
         videoWidth <span class="pl-k">:</span> <span class="pl-c1">360</span>,
         videoHeight <span class="pl-k">:</span> <span class="pl-c1">115</span>,
         imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
         popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
-        showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+        resizingBar<span class="pl-k">:</span> <span class="pl-c1">false</span>,
         buttonList <span class="pl-k">:</span> [
             [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
             <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>,
@@ -160,14 +162,17 @@
 <p></p>
 <div class="highlight highlight-source-js">
 <pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>lineBreak<span class="pl-pds">'</span></span>, {
+    showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+    height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
+    minHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>150px<span class="pl-pds">'</span></span>,
+    maxHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>250px<span class="pl-pds">'</span></span>,
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
         <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span>Line break</span>
         [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-    ],
-    height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
+    ]
 });</pre>
 </div>
         <p></p>
@@ -180,7 +185,7 @@
         </textarea>
 
         <a id="functions" href="#functions"><h4>2. User Function</h4></a>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>);
+        <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
 
 <span class="pl-c">/** Copies the contents of the suneditor into a [textarea] */</span>
 <span class="pl-smi">suneditor</span>.<span class="pl-en">save</span>();
@@ -216,7 +221,7 @@
 <span class="pl-smi">suneditor</span>.<span class="pl-en">destroy</span>();
 
 <span class="pl-c">/** Create the suneditor */</span>
-</span>suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleEditor<span class="pl-pds">'</span></span>, {
+</span>suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>, {
     height: 148
 });</pre></div>
         <form id="frm" name="frm">
@@ -376,13 +381,11 @@
         ],
         width : '100%',
         height : 'auto',
-        minHeight : '150px',
-        maxHeight : '250px',
         videoWidth : 360,
         videoHeight : 115,
         imageSize : 150,
         popupDisplay: 'full',
-        showPathLabel: false,
+        resizingBar: false,
         buttonList : [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
@@ -398,14 +401,17 @@
     });
     
     SUNEDITOR.create('lineBreak', {
+        showPathLabel: false,
+        height: 'auto',
+        minHeight : '150px',
+        maxHeight : '250px',
         buttonList: [
             ['undo', 'redo', 'font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'],
             '/', //Line break
             ['fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'],
             ['link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print']
-        ],
-        height: 'auto'
+        ]
     });
 
     let suneditor = SUNEDITOR.create('exampleFunction');

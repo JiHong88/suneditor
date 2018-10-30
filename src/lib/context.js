@@ -22,7 +22,7 @@ const _Context = function (element, cons, options) {
             topArea: cons._top,
             relative: cons._relative,
             toolbar: cons._toolBar,
-            resizebar: cons._resizeBar,
+            resizingBar: cons._resizingBar,
             navigation: cons._navigation,
             editorArea: cons._editorArea,
             wysiwyg: cons._wysiwygArea,
@@ -44,6 +44,7 @@ const _Context = function (element, cons, options) {
         },
         user: {
             stickyToolbar: options.stickyToolbar,
+            resizingBar: options.resizingBar,
             videoWidth: options.videoWidth,
             videoHeight: options.videoHeight,
             imageFileInput: options.imageFileInput,

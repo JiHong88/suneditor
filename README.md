@@ -243,17 +243,21 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   It can also be used when there is another fixed toolbar at the top
                   Set to 0, '0px', '50px', etc
                   If set to -1 or false or null to turn off         default : 0 {Number|String|Boolean}
+resizingBar     : Show the bottom resizing bar.
+                  If 'height' value is 'auto', it will not be resized     default : true {Boolean}
 fontSize        : Change default font-size array                    default : null {Array}
 font            : Change default font-family array                  default : null {Array}
 colorList       : Change default color array of color picker        default : null {Array}
 width           : The width size of the editor                      default : textarea.offsetHeight {Number|String}
 height          : The height size of the editor                     default : textarea.style.width||offsetWidth {Number|String}
-minHeight       : The min-height size of the editor, used when 'height' value is 'auto' default : null {Number|String}
-maxHeight       : The max-height size of the editor, used when 'height' value is 'auto' default : null {Number|String}
+minHeight       : The min-height size of the editor.
+                  Used when 'height' value is 'auto'                default : null {Number|String}
+maxHeight       : The max-height size of the editor
+                  Used when 'height' value is 'auto'                default : null {Number|String}
 display         : The display property of suneditor                 default : 'block' {String}
 videoWidth      : The default width size of the video frame         default : 560 {Number}
 videoHeight     : The default heigth size of the video frame        default : 315 {Number}
-showPathLabel   : Displays the current node structure to resizebar  default : true {Boolean}
+showPathLabel   : Displays the current node structure to resizingBar default : true {Boolean}
 popupDisplay    : Size of background area when activating dialog window ('full' || '') default : '' {String}
 
 lang            : language object (en, ko) default : English {Object}

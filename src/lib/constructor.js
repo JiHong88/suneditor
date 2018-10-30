@@ -24,6 +24,7 @@ const _Constructor = {
         /** user options */
         options.lang = lang;
         options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.resizingBar = options.resizingBar === undefined ? true : options.resizingBar;
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
@@ -93,10 +94,10 @@ const _Constructor = {
         textarea.style.maxHeight = options.maxHeight;
     
         /** resize bar */
-        let resize_bar = null;
-        if (/\d+/.test(options.height)) {
-            resize_bar = doc.createElement('DIV');
-            resize_bar.className = 'sun-editor-id-resizeBar sun-editor-common';
+        let resizing_bar = null;
+        if (options.resizingBar) {
+            resizing_bar = doc.createElement('DIV');
+            resizing_bar.className = 'sun-editor-id-resizingBar sun-editor-common';
         }
     
         /** navigation */
@@ -120,9 +121,9 @@ const _Constructor = {
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
 
-        if (resize_bar) {
-            resize_bar.appendChild(navigation);
-            relative.appendChild(resize_bar);
+        if (resizing_bar) {
+            resizing_bar.appendChild(navigation);
+            relative.appendChild(resizing_bar);
         }
         
         top_div.appendChild(relative);
@@ -135,7 +136,7 @@ const _Constructor = {
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
-                _resizeBar: resize_bar,
+                _resizingBar: resizing_bar,
                 _navigation: navigation,
                 _loading: loading_box,
                 _resizeBack: resize_back

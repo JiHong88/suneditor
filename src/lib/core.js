@@ -109,6 +109,7 @@ const core = function (context, util, plugins, lang) {
          * @property {Number} innerHeight_fullScreen - InnerHeight in editor when in full screen
          * @property {Number} resizeClientY - Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize - Indented size when tab button clicked (4)
+         * @property {Number} minResizingSize - Minimum size of editing area when resized (65)
          * @property {Array} currentNodes -  An array of the current cursor's node structure
          * @private
          */
@@ -120,6 +121,7 @@ const core = function (context, util, plugins, lang) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
+            minResizingSize: 65,
             currentNodes: [],
             _originCssText: context.element.topArea.style.cssText,
             _bodyOverflow: '',
@@ -1576,7 +1578,7 @@ const core = function (context, util, plugins, lang) {
             /** save current nodes */
             editor._variable.currentNodes = currentNodes.reverse();
 
-            /**  Displays the current node structure to resizebar */
+            /**  Displays the current node structure to resizingBar */
             if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
         },
 
@@ -1638,7 +1640,7 @@ const core = function (context, util, plugins, lang) {
             }
         },
 
-        onMouseUp_wysiwyg: function (e) {
+        onClick_wysiwyg: function (e) {
             e.stopPropagation();
 
             const targetElement = e.target;
@@ -1801,7 +1803,7 @@ const core = function (context, util, plugins, lang) {
             });
         },
 
-        onMouseDown_resizeBar: function (e) {
+        onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
 
             editor._variable.resizeClientY = e.clientY;
@@ -1818,8 +1820,8 @@ const core = function (context, util, plugins, lang) {
         },
 
         resize_editor: function (e) {
-            const resizeInterval = (e.clientY - editor._variable.resizeClientY);
-            context.element.wysiwyg.style.height = context.element.code.style.height = (context.element.editorArea.offsetHeight + resizeInterval) + 'px';
+            const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - editor._variable.resizeClientY);
+            context.element.wysiwyg.style.height = context.element.code.style.height = (resizeInterval < editor._variable.minResizingSize ? editor._variable.minResizingSize : resizeInterval) + 'px';
             editor._variable.resizeClientY = e.clientY;
         },
 
@@ -1829,7 +1831,7 @@ const core = function (context, util, plugins, lang) {
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const editorTop = element.topArea.offsetTop;
-            const y = (this.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
+            const y = (window.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
             
             if (y < editorTop) {
                 element.toolbar.style.top = '';
@@ -1838,13 +1840,13 @@ const core = function (context, util, plugins, lang) {
                 util.removeClass(element.toolbar, 'sun-editor-sticky');
                 editor._variable._sticky = false;
             }
-            else if (y + 50 > editorHeight + editorTop) {
-                element.toolbar.style.top = (editorHeight + editorTop - y - 50 + context.user.stickyToolbar) + 'px';
+            else if (y >= editorHeight + editorTop) {
+                element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y) + 'px';
                 editor._variable._sticky = true;
             }
-            else if (y > editorTop) {
+            else if (y >= editorTop) {
                 element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
-                element.editorArea.style.marginTop = (element.toolbar.offsetHeight + context.user.stickyToolbar) + 'px';
+                element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
                 element.toolbar.style.top = context.user.stickyToolbar + 'px';
                 util.addClass(element.toolbar, 'sun-editor-sticky');
                 editor._variable._sticky = true;
@@ -1853,16 +1855,24 @@ const core = function (context, util, plugins, lang) {
     };
 
     /** add event listeners */
-    /** tool bar event */
+    /** toolbar event */
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
-    /** resize bar */
-    if (context.element.resizebar) context.element.resizebar.addEventListener('mousedown', event.onMouseDown_resizeBar, false);
+
+    /** resizingBar */
+    if (context.element.resizingBar) {
+        if (/\d+/.test(context.user.height)) {
+            context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
+        } else {
+            util.addClass(context.element.resizingBar, 'none-resize');
+        }
+    }
+    
     /** window event */
     window.addEventListener('resize', event.resize_window, false);
     if (context.user.stickyToolbar > -1) window.addEventListener('scroll', event.onScroll_window, false);

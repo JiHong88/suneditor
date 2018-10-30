@@ -26,9 +26,7 @@ suneditor.create(document.getElementById('editor'), {
     ],
     height: 'auto',
     width: '100%',
-    minHeight: '150px',
-    maxHeight: '500px',
-    stickyToolbar: '50px'
+    stickyToolbar: '0'
 });
 
 let ss = suneditor.create(document.getElementById('editor1'), {
@@ -47,6 +45,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     ],
     width: '100%',
     stickyToolbar: 50
+    ,height: 'auto'
 });
 
 window.sun_save = function () {
@@ -109,10 +108,13 @@ const editor = suneditor.init({
         plugins.table,
         custom_plugin_submenu
     ],
-    width: '100%'
+    width: '100%',
 });
 
-editor.create(document.getElementById('editor2'));
+editor.create(document.getElementById('editor2'), {
+    minHeight: '150px',
+    maxHeight: '500px',
+});
 editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table', plugins.link,
