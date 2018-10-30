@@ -74,7 +74,7 @@ const core = function (context, util, plugins, lang) {
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
-        codeViewDisabledButtons: document.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -1829,7 +1829,7 @@ const core = function (context, util, plugins, lang) {
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const editorTop = element.topArea.offsetTop;
-            const y = (window.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
+            const y = (this.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
             
             if (y < editorTop) {
                 element.toolbar.style.top = '';
@@ -1991,7 +1991,7 @@ const core = function (context, util, plugins, lang) {
         destroy: function () {
             /** remove window event listeners */
             window.removeEventListener('resize', event.resize_window);
-            if (context.user.stickyToolbar > -1) window.removeEventListener('scroll', event.onScroll_window);
+            window.removeEventListener('scroll', event.onScroll_window);
             
             /** remove element */
             util.removeItem(context.element.topArea);
