@@ -1,5 +1,5 @@
 # Suneditor
-Pure JavaScript based WYSIWYG web editor
+Pure javscript based WYSIWYG web editor, with no dependencies
 
 **Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
 
@@ -13,11 +13,11 @@ Pure JavaScript based WYSIWYG web editor
 
 
 ```properties
-The Suneditor is based on pure JavaScript
-Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications
+The Suneditor is based on pure javascript, with no dependencies.
+Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
 
 Supported Browser -
-Chrome, Opera, Firefox, Edge, IE 11, Safari(macOS, IOS), Mobile web
+Chrome, Opera, Firefox, Edge, IE 11, Safari(macOS, IOS), Mobile web.
 ```
 
 #### npm
