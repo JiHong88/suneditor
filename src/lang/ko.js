@@ -95,6 +95,8 @@ export default {
         resize50: '50% 크기',
         resize25: '25% 크기',
         mirrorHorizontal: '좌우 반전',
-        mirrorVertical: '상하 반전'
+        mirrorVertical: '상하 반전',
+        rotateLeft: '왼쪽으로 회전',
+        rotateRight: '오른쪽으로 회전'
     }
 };

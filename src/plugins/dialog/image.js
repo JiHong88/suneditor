@@ -24,8 +24,8 @@ export default {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: context.user.imageSize,
-            _origin_h: 0,
+            _user_w: context.user.imageSize,
+            _user_h: 0,
             _altText: '',
             _imageCaption: null,
             _linkValue: '',
@@ -362,6 +362,12 @@ export default {
         oImg.setAttribute('data-proportion', this.context.image._proportionChecked);
         oImg.alt = this.context.image._altText;
         oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
+        oImg.setAttribute('data-rotate', '0');
+        oImg.onload = function () {
+            this.setAttribute('origin-size', this.naturalWidth + ',' + this.naturalHeight);
+            this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
+            this.style.height = this.offsetHeight + 'px';
+        }.bind(oImg);
 
         const cover = this.plugins.image.set_cover.call(this, oImg);
         const container = this.plugins.image.set_container.call(this, cover);
@@ -486,9 +492,9 @@ export default {
 
     sizeRevert: function () {
         const contextImage = this.context.image;
-        if (contextImage._origin_w) {
-            contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
-            contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
+        if (contextImage._user_w) {
+            contextImage.imageX.value = contextImage._element_w = contextImage._user_w;
+            contextImage.imageY.value = contextImage._element_h = contextImage._user_h;
         }
     },
 
@@ -503,14 +509,14 @@ export default {
         contextImage._element_t = size.t;
         contextImage._element_l = size.l;
 
-        let origin = contextImage._element.getAttribute('data-origin');
-        if (origin) {
-            origin = origin.split(',');
-            contextImage._origin_w = origin[0] * 1;
-            contextImage._origin_h = origin[1] * 1;
+        let userSize = contextImage._element.getAttribute('data-origin');
+        if (userSize) {
+            userSize = userSize.split(',');
+            contextImage._user_w = userSize[0] * 1;
+            contextImage._user_h = userSize[1] * 1;
         } else {
-            contextImage._origin_w = size.w;
-            contextImage._origin_h = size.h;
+            contextImage._user_w = size.w;
+            contextImage._user_h = size.h;
             contextImage._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },

@@ -17,6 +17,8 @@ export default {
             _resize_plugin: '',
             _resize_w: 0,
             _resize_h: 0,
+            _origin_w: 0,
+            _origin_h: 0,
             _resize_direction: ''
         };
 
@@ -81,12 +83,14 @@ export default {
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="btn-group">' +
-            '   <button type="button" data-command="100" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
-            '   <button type="button" data-command="75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
-            '   <button type="button" data-command="50" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
-            '   <button type="button" data-command="25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="rotate" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
-            '   <button type="button" data-command="rotate" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
+            '   <button type="button" data-command="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
+            '   <button type="button" data-command="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
+            '   <button type="button" data-command="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
+            '   <button type="button" data-command="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
+            '   <button type="button" data-command="rotate" data-value="l" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
+            '   <button type="button" data-command="rotate" data-value="r" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
+            '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
+            '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
             '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
             '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
@@ -95,10 +99,11 @@ export default {
     },
 
     call_controller_resize: function (targetElement, plugin) {
-        this.context.resizing._resize_plugin = plugin;
+        const contextResizing = this.context.resizing;
+        contextResizing._resize_plugin = plugin;
 
-        const resizeContainer = this.context.resizing.resizeContainer;
-        const resizeDiv = this.context.resizing.resizeDiv;
+        const resizeContainer = contextResizing.resizeContainer;
+        const resizeDiv = contextResizing.resizeDiv;
         const offset = this.util.getOffset(targetElement);
 
         const w = targetElement.offsetWidth;
@@ -116,19 +121,23 @@ export default {
         resizeDiv.style.width =  w + 'px';
         resizeDiv.style.height =  h + 'px';
 
-        this.context.resizing.resizeButton.style.top = (h + t) + 'px';
-        this.context.resizing.resizeButton.style.left = l + 'px';
+        contextResizing.resizeButton.style.top = (h + t) + 'px';
+        contextResizing.resizeButton.style.left = l + 'px';
 
-        this.util.changeTxt(this.context.resizing.resizeDisplay, w + ' x ' + h);
+        this.util.changeTxt(contextResizing.resizeDisplay, w + ' x ' + h);
 
-        this.context.resizing.resizeContainer.style.display = 'block';
-        this.context.resizing.resizeButton.style.display = 'block';
-        this.context.resizing.resizeDot.style.display = 'block';
+        contextResizing.resizeContainer.style.display = 'block';
+        contextResizing.resizeButton.style.display = 'block';
+        contextResizing.resizeDot.style.display = 'block';
 
-        this.context.resizing._resize_w = w;
-        this.context.resizing._resize_h = h;
+        contextResizing._resize_w = w;
+        contextResizing._resize_h = h;
 
-        this.controllerArray = [this.context.resizing.resizeContainer, this.context.resizing.resizeButton];
+        this.controllerArray = [contextResizing.resizeContainer, contextResizing.resizeButton];
+
+        const originSize = targetElement.getAttribute('origin-size').split(',');
+        contextResizing._origin_w = originSize[0] || targetElement.naturalWidth;
+        contextResizing._origin_h = originSize[1] || targetElement.naturalHeight;
 
         return {
             w: w,
@@ -150,16 +159,20 @@ export default {
     onClick_resizeButton: function (e) {
         e.stopPropagation();
 
-        const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
+        const target = e.target;
+        const command = target.getAttribute('data-command') || target.parentNode.getAttribute('data-command');
+
         if (!command) return;
+
+        const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
 
         e.preventDefault();
 
         if (/^\d+$/.test(command)) {
-            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, command + '%', '');
+            const contextResizing = this.context.resizing;
+            this.plugins[contextResizing._resize_plugin].setSize.call(this, (contextResizing._origin_w * command) + 'px', (contextResizing._origin_h * command) + 'px');
         }
-        else if (/rotate/.test(command)) {
-            const value = e.target.getAttribute('data-value') || e.target.parentNode.getAttribute('data-value');
+        else if (/mirror/.test(command)) {
             const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
             const transform = contextEl.style.transform;
 
@@ -170,6 +183,36 @@ export default {
             }
 
             return;
+        }
+        else if (/rotate/.test(command)) {
+            const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
+            const cover = contextEl.parentNode;
+
+            const size = contextEl.getAttribute('data-origin').split(',');
+            const slope = (contextEl.getAttribute('data-rotate') * 1) + (value === 'l' ? -90 : 90);
+            const deg = Math.abs(slope) === 360 ? 0 : slope;
+            const isVertical = /^(90|270)$/.test(Math.abs(deg).toString());
+            const w = isVertical ? size[1] : size[0];
+            const h = isVertical ? size[0] : size[1];
+
+            cover.style.width = w + 'px';
+            cover.style.height = h + 'px';
+            contextEl.style.transform = 'rotate(' + deg + 'deg)';
+
+            let transOrigin = '';
+            if (isVertical) {
+                let transW = (size[0]/2) + 'px ' + (size[0]/2) + 'px 0';
+                let transH = (size[1]/2) + 'px ' + (size[1]/2) + 'px 0';
+                transOrigin = deg === 90 || deg === -270 ? transH : transW;
+            }
+
+            contextEl.style.transformOrigin = transOrigin;
+
+            if (contextEl.nextElementSibling) {
+                contextEl.nextElementSibling.style.marginTop = (isVertical ? w/2 - 40 : 0) + 'px';
+            }
+
+            contextEl.setAttribute('data-rotate', deg);
         }
         else if (/update/.test(command)) {
             this.plugins[this.context.resizing._resize_plugin].openModify.call(this);

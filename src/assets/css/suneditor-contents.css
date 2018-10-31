@@ -251,27 +251,30 @@
     display: block;
     text-align: center;
 }
-.sun-editor-editable .sun-editor-id-image-container figcaption {
-    display: block;
-    padding: 1em .5em;
-    font-size: 13px;
-    text-align: center;
-}
-.sun-editor-editable .sun-editor-id-image-container figcaption p{
-    line-height: 2;
-    margin: 0;
-}
 .sun-editor-editable .sun-editor-id-image-container a img {
     padding: 1px;
     margin: 1px;
     outline: 1px solid #8baab7;
 }
-.sun-editor-editable .sun-editor-image-cover {
+.sun-editor-editable figure.sun-editor-image-cover {
     display: block;
     outline: none;
     line-height: 0;
+    margin: 20px 40px;
+    padding: 0;
 }
-.sun-editor-editable .sun-editor-image-cover > figcaption:not([contenteditable=false]) {
+.sun-editor-editable figure.sun-editor-image-cover figcaption {
+    display: block;
+    padding: 1em .5em;
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+}
+.sun-editor-editable figure.sun-editor-image-cover figcaption p{
+    line-height: 2;
+    margin: 0;
+}
+.sun-editor-editable figure.sun-editor-image-cover figcaption:not([contenteditable=false]) {
     background-color: #f3f3f3;
 }
 

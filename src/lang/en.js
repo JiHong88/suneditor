@@ -95,6 +95,8 @@ export default {
         resize50: 'Resize 50%',
         resize25: 'Resize 25%',
         mirrorHorizontal: 'Mirror, Horizontal',
-        mirrorVertical: 'Mirror, Vertical'
+        mirrorVertical: 'Mirror, Vertical',
+        rotateLeft: 'Rotate left',
+        rotateRight: 'Rotate right'
     }
 };
