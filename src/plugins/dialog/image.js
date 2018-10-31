@@ -327,10 +327,8 @@ export default {
 
     create_caption: function () {
         const caption = document.createElement('FIGCAPTION');
-
+        caption.setAttribute('contenteditable', false);
         caption.innerHTML = '<p>' + this.lang.dialogBox.imageBox.caption + '</p>';
-        caption.addEventListener('click', this.plugins.image.toggle_caption_contenteditable.bind(this, true));
-
         return caption;
     },
 
@@ -474,10 +472,16 @@ export default {
         }
     },
 
-    toggle_caption_contenteditable: function (on) {
+    toggle_caption_contenteditable: function (on, figcaption) {
         this.context.image._onCaption = on;
-        this.context.image._imageCaption.setAttribute('contenteditable', on);
-        this.context.image._imageCaption.focus();
+
+        if (on) {
+            this.context.image._imageCaption = figcaption;
+            figcaption.setAttribute('contenteditable', on);
+            this.context.image._imageCaption.focus();
+        } else {
+            this.context.image._imageCaption.setAttribute('contenteditable', on);
+        }
     },
 
     sizeRevert: function () {

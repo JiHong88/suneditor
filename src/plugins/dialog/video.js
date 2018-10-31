@@ -18,7 +18,6 @@ export default {
         const context = core.context;
         context.video = {
             _containerElement: null,
-            _coverElement: document.createElement('SPAN'),
             _element: null,
             _resize_element: null,
             _element_w: context.user.videoWidth,
@@ -31,14 +30,6 @@ export default {
             _align: 'none',
             _floatClassRegExp: 'float\\-[a-z]+'
         };
-
-        /** Inner node needed to edit video iframe event */
-        context.video._coverElement.className = 'sun-editor-iframe-inner-cover';
-        context.video._coverElement.addEventListener('click', function (e) {
-            const pNode = e.target.parentNode;
-            const size = core.plugins.resizing.call_controller_resize.call(core, pNode, 'video');
-            core.plugins.video.onModifyMode.call(core, pNode.children[0], size);
-        });
 
         /** video dialog */
         let video_dialog = eval(this.setDialog(core.lang));
@@ -165,9 +156,10 @@ export default {
                 container.className = 'sun-editor-id-media-container sun-editor-id-iframe-container';
                 container.setAttribute('contentEditable', false);
     
-                /** container event */
-                container.addEventListener('mouseenter', this.plugins.video.onMouseenter_container.bind(this));
-                container.addEventListener('mouseleave', this.plugins.video.onMouseleave_container.bind(this).bind(this));
+                /** cover */
+                const cover = document.createElement('DIV');
+                cover.className = 'sun-editor-iframe-inner-cover';
+                container.appendChild(cover);
 
                 oIframe.width = '100%';
                 oIframe.height = '100%';
@@ -215,18 +207,6 @@ export default {
         return false;
     },
 
-    onMouseenter_container: function (e) {
-        const target = e.target;
-        if (target === this.context.video._coverElement.parentNode) return;
-
-        target.appendChild(this.context.video._coverElement);
-    },
-
-    onMouseleave_container: function (e) {
-        const target = e.target;
-        if (target === this.context.video._coverElement.parentNode) target.removeChild(this.context.video._coverElement);
-    },
-
     sizeRevert: function () {
         const contextVideo = this.context.video;
         if (contextVideo._origin_w) {
@@ -237,11 +217,9 @@ export default {
 
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
-        const container = contextVideo._resize_element = contextVideo._containerElement = element.parentNode;
-        contextVideo._element = container.firstChild;
+        const container = contextVideo._resize_element = contextVideo._containerElement = element;
 
-        if (container === contextVideo._coverElement.parentNode) container.removeChild(contextVideo._coverElement);
-
+        contextVideo._element = container.children[1];
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
         contextVideo._element_t = size.t;

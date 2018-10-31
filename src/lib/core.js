@@ -1635,12 +1635,6 @@ const core = function (context, util, plugins, lang) {
             const targetElement = e.target;
             editor.submenuOff();
 
-            if (/^HTML$/i.test(targetElement.nodeName)) {
-                e.preventDefault();
-                editor.focus();
-                return;
-            }
-
             editor._setEditorRange();
             event._findButtonEffectTag();
 
@@ -1652,7 +1646,7 @@ const core = function (context, util, plugins, lang) {
                 });
                 return;
             }
-            
+
             if (/^TD$/i.test(targetElement.nodeName) || /^TD$/i.test(targetElement.parentNode.nodeName)) {
                 editor.controllersOff();
 
@@ -1662,6 +1656,24 @@ const core = function (context, util, plugins, lang) {
                 }
 
                 editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+                return;
+            }
+
+            if (/sun-editor-iframe-inner-cover/i.test(targetElement.className)) {
+                e.preventDefault();
+                editor.callPlugin('video', function () {
+                    const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement.parentNode, 'video');
+                    editor.plugins.video.onModifyMode.call(editor, targetElement.parentNode, size);
+                });
+                return;
+            }
+
+            const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
+            if (figcaption) {
+                e.preventDefault();
+                editor.callPlugin('image', function () {
+                    editor.plugins.image.toggle_caption_contenteditable.call(editor, true, figcaption);
+                });
                 return;
             }
         },
