@@ -1744,12 +1744,31 @@ const core = function (context, util, plugins, lang) {
                         break;
                     }
 
-                    /** if P Tag */
-                    if (shift) break;
+                    /** format Tag */
+                    const range = editor.getRange();
 
-                    const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
-                    editor.insertNode(tabText);
-                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
+                    if (!shift) {
+                        const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
+                        if (range.collapsed) {
+                            editor.insertNode(tabText);
+                            editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
+                        } else {
+                            const lines = editor.getSelectedFormatElements();
+                            for (let i = 0, len = lines.length; i < len; i++) {
+                                lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
+                            }
+                        }
+                    } else {
+                        const lines = editor.getSelectedFormatElements();
+                        for (let i = 0, len = lines.length, child; i < len; i++) {
+                            child = lines[i].firstChild;
+                            if (/^\s{1,4}$/.test(child.textContent)) {
+                                util.removeItem(child);
+                            } else if (/^\s{1,4}/.test(child.textContent)) {
+                                child.textContent = child.textContent.replace(/^\s{1,4}/, '');
+                            }
+                        }
+                    }
 
                     break;
             }
