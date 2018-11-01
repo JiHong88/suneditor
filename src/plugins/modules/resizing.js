@@ -19,6 +19,7 @@ export default {
             _resize_h: 0,
             _origin_w: 0,
             _origin_h: 0,
+            _rotateVertical: false,
             _resize_direction: ''
         };
 
@@ -87,8 +88,8 @@ export default {
             '   <button type="button" data-command="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
             '   <button type="button" data-command="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
             '   <button type="button" data-command="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="rotate" data-value="l" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
-            '   <button type="button" data-command="rotate" data-value="r" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
+            '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
+            '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
             '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
@@ -106,8 +107,10 @@ export default {
         const resizeDiv = contextResizing.resizeDiv;
         const offset = this.util.getOffset(targetElement);
 
-        const w = targetElement.offsetWidth;
-        const h = targetElement.offsetHeight;
+        contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
+
+        const w = contextResizing._rotateVertical ? targetElement.offsetHeight : targetElement.offsetWidth;
+        const h = contextResizing._rotateVertical ? targetElement.offsetWidth : targetElement.offsetHeight;
         const t = offset.top;
         const l = offset.left;
 
@@ -147,9 +150,9 @@ export default {
         };
     },
 
-    cancel_controller_resize: function () {
-        this.context[this.context.resizing._resize_plugin]._resize_element.style.width = this.context.resizing._resize_w + 'px';
-        this.context[this.context.resizing._resize_plugin]._resize_element.style.height =this.context.resizing._resize_h + 'px';
+    cancel_controller_resize: function (isVertical) {
+        this.context[this.context.resizing._resize_plugin]._resize_element.style.width = (isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w) + 'px';
+        this.context[this.context.resizing._resize_plugin]._resize_element.style.height = (isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h) + 'px';
 
         this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
@@ -168,36 +171,40 @@ export default {
 
         e.preventDefault();
 
-        if (/^\d+$/.test(command)) {
-            const contextResizing = this.context.resizing;
-            this.plugins[contextResizing._resize_plugin].setSize.call(this, (contextResizing._origin_w * command) + 'px', (contextResizing._origin_h * command) + 'px');
+        if (!isNaN(command)) {
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, command);
         }
         else if (/mirror/.test(command)) {
             const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
             const transform = contextEl.style.transform;
+            const r = /rotate\(/.test(transform) ? transform.match(/rotate\((-?\d+)deg\)(?:\s|;|$)/)[1] : '0';
+            let x = /rotateX/.test(transform) ? transform.match(/rotateX\(\d+deg\)(?:\s|;|$)/)[0] : '';
+            let y = /rotateY/.test(transform) ? transform.match(/rotateY\(\d+deg\)(?:\s|;|$)/)[0] : '';
 
-            if (value === 'h') {
-                contextEl.style.transform = transform.match(/rotateY/) ? transform.replace(/rotateY\(\d+deg\)(?:\s|;|$)/, '') : transform + ' rotateY(180deg)';
+            if ((value === 'h' && !this.context.resizing._rotateVertical) || (value === 'v' && this.context.resizing._rotateVertical)) {
+                y = y ? '' : ' rotateY(180deg)';
             } else {
-                contextEl.style.transform = transform.match(/rotateX/) ? transform.replace(/rotateX\(\d+deg\)(?:\s|;|$)/, '') : transform + ' rotateX(180deg)';
+                x = x ? '' : ' rotateX(180deg)';
             }
 
+            this.plugins.resizing._setTransForm(contextEl, r, x, y);
             return;
         }
         else if (/rotate/.test(command)) {
-            const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
+            const contextResizing = this.context.resizing;
+            const contextEl = this.context[contextResizing._resize_plugin]._resize_element;
             const cover = contextEl.parentNode;
 
-            const size = contextEl.getAttribute('data-origin').split(',');
-            const slope = (contextEl.getAttribute('data-rotate') * 1) + (value === 'l' ? -90 : 90);
-            const deg = Math.abs(slope) === 360 ? 0 : slope;
-            const isVertical = /^(90|270)$/.test(Math.abs(deg).toString());
+            const transform = contextEl.style.transform;
+            const size = [contextEl.offsetWidth, contextEl.offsetHeight];
+            const slope = (contextEl.getAttribute('data-rotate') * 1) + (value * 1);
+            const deg = Math.abs(slope) >= 360 ? 0 : slope;
+            const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
             const w = isVertical ? size[1] : size[0];
             const h = isVertical ? size[0] : size[1];
 
             cover.style.width = w + 'px';
             cover.style.height = h + 'px';
-            contextEl.style.transform = 'rotate(' + deg + 'deg)';
 
             let transOrigin = '';
             if (isVertical) {
@@ -212,7 +219,14 @@ export default {
                 contextEl.nextElementSibling.style.marginTop = (isVertical ? w/2 - 40 : 0) + 'px';
             }
 
+            const x = /rotateX/.test(transform) ? transform.match(/rotateX\(\d+deg\)(?:\s|;|$)/)[0] : '';
+            const y = /rotateY/.test(transform) ? transform.match(/rotateY\(\d+deg\)(?:\s|;|$)/)[0] : '';
+
             contextEl.setAttribute('data-rotate', deg);
+            this.plugins.resizing._setTransForm(contextEl, deg.toString(), x, y);
+
+            this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
+            return;
         }
         else if (/update/.test(command)) {
             this.plugins[this.context.resizing._resize_plugin].openModify.call(this);
@@ -225,62 +239,91 @@ export default {
         this.focus();
     },
 
+    _setTransForm: function (element, r, x, y) {
+        let width = (element.offsetWidth/2/2) * (/-/.test(r) ? 1 : -1);
+        let translate = '';
+
+        if (/[1-9]/.test(r) && (x || y)) {
+            translate = x ? 'Y' : 'X';
+
+            switch (r) {
+                case '90':
+                    translate = x && y ? 'X' : y ? translate : '';
+                    break;
+                case '270':
+                    width *= -1;
+                    translate = x && y ? 'Y' : x ? translate : '';
+                    break;
+                case '-90':
+                    translate = x && y ? 'Y' : x ? translate : '';
+                    break;
+                case '-270':
+                    width *= -1;
+                    translate = x && y ? 'X' : y ? translate : '';
+                    break;
+                default:
+                    translate = '';
+            }
+        }
+        
+        element.style.transform = 'rotate(' + r + 'deg)' + x + y + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
+    },
+
     onMouseDown_resize_handle: function (e) {
-        const direction = this.context.resizing._resize_direction = e.target.classList[0];
+        const contextResizing = this.context.resizing;
+        const direction = contextResizing._resize_direction = e.target.classList[0];
         e.stopPropagation();
         e.preventDefault();
 
-        this.context.resizing.resizeDot.style.display = 'none';
-        this.context.resizing._resizeClientX = e.clientX;
-        this.context.resizing._resizeClientY = e.clientY;
+        contextResizing.resizeDot.style.display = 'none';
+        contextResizing._resizeClientX = e.clientX;
+        contextResizing._resizeClientY = e.clientY;
         this.context.element.resizeBackground.style.display = 'block';
-        this.context.resizing.resizeButton.style.display = 'none';
-        this.context.resizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+        contextResizing.resizeButton.style.display = 'none';
+        contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
         const closureFunc_bind = function closureFunc() {
-            this.plugins.resizing.cancel_controller_resize.call(this);
+            this.plugins.resizing.cancel_controller_resize.call(this, this.context.resizing._rotateVertical);
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
         }.bind(this);
 
-        const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this);
+        const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
 
         document.addEventListener('mousemove', resizing_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
     },
 
-    resizing_element: function (e) {
-        const direction = this.context.resizing._resize_direction;
+    resizing_element: function (contextResizing, direction, plugin, e) {
         const clientX = e.clientX;
         const clientY = e.clientY;
-        const plugin = this.context[this.context.resizing._resize_plugin];
 
         let resultW = plugin._element_w;
         let resultH = plugin._element_h;
 
-        const w = plugin._element_w + (/r/.test(direction) ? clientX - this.context.resizing._resizeClientX : this.context.resizing._resizeClientX - clientX);
-        const h = plugin._element_h + (/b/.test(direction) ? clientY - this.context.resizing._resizeClientY : this.context.resizing._resizeClientY - clientY);
+        const w = plugin._element_w + (/r/.test(direction) ? clientX - contextResizing._resizeClientX : contextResizing._resizeClientX - clientX);
+        const h = plugin._element_h + (/b/.test(direction) ? clientY - contextResizing._resizeClientY : contextResizing._resizeClientY - clientY);
         const wh = ((plugin._element_h / plugin._element_w) * w);
 
-        if (/t/.test(direction)) this.context.resizing.resizeDiv.style.top = (plugin._element_h - (/h/.test(direction) ? h : wh)) + 'px';
-        if (/l/.test(direction)) this.context.resizing.resizeDiv.style.left = (plugin._element_w - w) + 'px';
+        if (/t/.test(direction)) contextResizing.resizeDiv.style.top = (plugin._element_h - (/h/.test(direction) ? h : wh)) + 'px';
+        if (/l/.test(direction)) contextResizing.resizeDiv.style.left = (plugin._element_w - w) + 'px';
 
         if (/r|l/.test(direction)) {
-            this.context.resizing.resizeDiv.style.width = w + 'px';
+            contextResizing.resizeDiv.style.width = w + 'px';
             resultW = w;
         }
 
         if (/^(?:t|b)[^h]$/.test(direction)) {
-            this.context.resizing.resizeDiv.style.height = wh + 'px';
+            contextResizing.resizeDiv.style.height = wh + 'px';
             resultH = wh;
         }
         else if (/^(?:t|b)h$/.test(direction)) {
-            this.context.resizing.resizeDiv.style.height = h + 'px';
+            contextResizing.resizeDiv.style.height = h + 'px';
             resultH = h;
         }
 
-        this.context.resizing._resize_w = resultW;
-        this.context.resizing._resize_h = resultH;
-        this.util.changeTxt(this.context.resizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        contextResizing._resize_w = resultW;
+        contextResizing._resize_h = resultH;
+        this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

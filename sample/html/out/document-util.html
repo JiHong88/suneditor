@@ -499,6 +499,45 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="getChildElement"><span class="type-signature"></span>getChildElement<span
+                class="signature">(element, query)</span><span class="type-signature"> &rarr; {Element}</span>
+        </h4>
+        <div class="description">
+            Get the parent child of the argument value.<br>
+            A tag that satisfies the query condition is imported.<br>
+            Returns null if not found.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Reference element</td>
+            </tr>
+            <tr>
+                <td class="name"><code>query</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">Query String (tagName, .className, #ID, :name)<br>
+                    Not use it like jquery.<br>
+                    Only one condition can be entered at a time.</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="getOffset"><span class="type-signature"></span>getOffset<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Object}</span>
         </h4>
@@ -776,6 +815,7 @@
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
         <li><a href="document-util.html#getListChildNodes">getListChildNodes</a></li>
         <li><a href="document-util.html#getParentElement">getParentElement</a></li>
+        <li><a href="document-util.html#getChildElement">getChildElement</a></li>
         <li><a href="document-util.html#getOffset">getOffset</a></li>
         <li><a href="document-util.html#changeTxt">changeTxt</a></li>
         <li><a href="document-util.html#hasClass">hasClass</a></li>

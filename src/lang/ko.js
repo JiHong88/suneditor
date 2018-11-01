@@ -63,13 +63,13 @@ export default {
             title: '이미지 삽입',
             file: '파일 선택',
             url: '이미지 주소',
-            caption: '이미지 설명 넣기',
             altText: '대체 문자열'
         },
         videoBox: {
             title: '동영상 삽입',
             url: '미디어 임베드 주소, 유튜브'
         },
+        caption: '설명 넣기',
         close: '닫기',
         submitButton: '확인',
         revertButton: '되돌리기',
