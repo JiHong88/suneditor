@@ -248,8 +248,8 @@ resizingBar     : Show the bottom resizing bar.
 fontSize        : Change default font-size array                    default : null {Array}
 font            : Change default font-family array                  default : null {Array}
 colorList       : Change default color array of color picker        default : null {Array}
-width           : The width size of the editor                      default : textarea.clientHeight {Number|String}
-height          : The height size of the editor                     default : textarea.style.width||clientWidth {Number|String}
+width           : The width size of the editor                      default : textarea.clientWidth || '100%' {Number|String}
+height          : The height size of the editor                     default : textarea.clientHeight|| 'auto' {Number|String}
 minHeight       : The min-height size of the editor.
                   Used when 'height' value is 'auto'                default : null {Number|String}
 maxHeight       : The max-height size of the editor

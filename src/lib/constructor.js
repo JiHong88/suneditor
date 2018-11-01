@@ -34,7 +34,7 @@ const _Constructor = {
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
-        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
+        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
@@ -49,7 +49,7 @@ const _Constructor = {
         ];
     
         /** editor seting options */
-        options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + 'px');
+        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');;
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
     
         const doc = document;
