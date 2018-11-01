@@ -149,7 +149,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-media-container/.test(element.className)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
         return false;
     },
 
@@ -338,6 +338,41 @@ const util = {
     },
 
     /**
+     * @description Get the child element of the argument value.
+     * A tag that satisfies the query condition is imported.
+     * Returns null if not found.
+     * @param {Node} element - Reference element
+     * @param {String} query - Query String (tagName, .className, #ID, :name)
+     * Not use it like jquery.
+     * Only one condition can be entered at a time.
+     * @returns {Element|null}
+     */
+    getChildElement: function (element, query) {
+        let attr;
+
+        if (/\./.test(query)) {
+            attr = 'className';
+            query = query.split('.')[1];
+        } else if (/#/.test(query)) {
+            attr = 'id';
+            query = '^' + query.split('#')[1] + '$';
+        } else if (/:/.test(query)) {
+            attr = 'name';
+            query = '^' + query.split(':')[1] + '$';
+        } else {
+            attr = 'tagName';
+            query = '^' + query + '$';
+        }
+
+        const check = new RegExp(query, 'i');
+        const childList = this.getListChildren(element, function (current) {
+            return check.test(current[attr]);
+        });
+
+        return childList[0];
+    },
+
+    /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
      * @param {Element} element - Element node
      * @returns {Object}
@@ -346,10 +381,9 @@ const util = {
         let tableOffsetLeft = 0;
         let tableOffsetTop = 0;
         let tableElement = element.parentNode;
-        const noIframe = !/sun-editor-id-iframe-container/.test(element.className);
 
         while (!this.isWysiwygDiv(tableElement)) {
-            if(noIframe && /^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
+            if(/^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }

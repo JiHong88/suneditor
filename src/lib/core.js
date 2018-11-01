@@ -1659,11 +1659,12 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
 
-            if (/sun-editor-iframe-inner-cover/i.test(targetElement.className)) {
+            if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
                 editor.callPlugin('video', function () {
-                    const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement.parentNode, 'video');
-                    editor.plugins.video.onModifyMode.call(editor, targetElement.parentNode, size);
+                    const iframe = util.getChildElement(targetElement.parentNode, 'iframe');
+                    const size = editor.plugins.resizing.call_controller_resize.call(editor, iframe, 'video');
+                    editor.plugins.video.onModifyMode.call(editor, iframe, size);
                 });
                 return;
             }

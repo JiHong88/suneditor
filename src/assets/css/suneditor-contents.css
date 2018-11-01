@@ -246,51 +246,58 @@
     outline: 2px solid #8baab7;
 }
 
-/* image */
-.sun-editor-editable .sun-editor-id-image-container {
+/** component (image, iframe video) */
+.sun-editor-editable .sun-editor-id-comp {
     display: block;
-    text-align: center;
+    position: static;
 }
-.sun-editor-editable .sun-editor-id-image-container a img {
-    padding: 1px;
-    margin: 1px;
-    outline: 1px solid #8baab7;
-}
-.sun-editor-editable figure.sun-editor-image-cover {
+
+/** image, video iframe figure cover */
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover {
     display: block;
     outline: none;
     line-height: 0;
     margin: 20px 40px;
     padding: 0;
 }
-.sun-editor-editable figure.sun-editor-image-cover figcaption {
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption {
     display: block;
     padding: 1em .5em;
     margin: 0;
     font-size: 13px;
     text-align: center;
 }
-.sun-editor-editable figure.sun-editor-image-cover figcaption p{
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption p{
     line-height: 2;
     margin: 0;
 }
-.sun-editor-editable figure.sun-editor-image-cover figcaption:not([contenteditable=false]) {
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption:not([contenteditable=false]) {
     background-color: #f3f3f3;
+}
+
+/* image */
+.sun-editor-editable .sun-editor-id-image-container {
+    text-align: center;
+    padding: 0;
+}
+.sun-editor-editable .sun-editor-id-image-container a img {
+    padding: 1px;
+    margin: 1px;
+    outline: 1px solid #8baab7;
 }
 
 /** video iframe tags */
 .sun-editor-editable .sun-editor-id-iframe-container {
-    display: block;
-    position: relative;
-    margin: auto;
-    line-height: 0;
+    text-align: center;
     padding: 0;
-    border: 1px solid #9e9e9e;
 }
-.sun-editor-editable .sun-editor-iframe-inner-cover {
+.sun-editor-editable .sun-editor-id-iframe-container iframe {
+    outline: 1px solid #9e9e9e;
+}
+.sun-editor-editable .sun-editor-id-iframe-inner-resizing-cover {
     display: none;
 }
-.sun-editor-editable[contenteditable=true] .sun-editor-iframe-inner-cover {
+.sun-editor-editable[contenteditable=true] .sun-editor-id-iframe-inner-resizing-cover {
     display: block;
     position:absolute;
     width: 100%;
@@ -298,6 +305,7 @@
     left: 0px;
     top: 0px;
     background-color: transparent;
+    z-index: 2;
 }
 
 /** show blocks */

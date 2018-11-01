@@ -63,13 +63,13 @@ export default {
             title: 'Insert image',
             file: 'Select from files',
             url: 'Image URL',
-            caption: 'Insert image description',
             altText: 'Alternative text'
         },
         videoBox: {
             title: 'Insert Video',
             url: 'Media embed URL, YouTube'
         },
+        caption: 'Insert description',
         close: 'Close',
         submitButton: 'Submit',
         revertButton: 'Revert',
