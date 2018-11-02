@@ -65,8 +65,12 @@ const _Constructor = {
         const relative = doc.createElement('DIV');
         relative.className = 'sun-editor-container';
     
-        /** tool bar */
+        /** toolbar */
         const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.popupDisplay);
+
+        /** sticky toolbar dummy */
+        const sticky_dummy = doc.createElement('DIV');
+        sticky_dummy.className = 'sun-editor-sticky-dummy';
     
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -117,6 +121,7 @@ const _Constructor = {
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         relative.appendChild(tool_bar.element);
+        relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
@@ -139,7 +144,8 @@ const _Constructor = {
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
                 _loading: loading_box,
-                _resizeBack: resize_back
+                _resizeBack: resize_back,
+                _stickyDummy: sticky_dummy
             },
             options: options,
             plugins: tool_bar.plugins

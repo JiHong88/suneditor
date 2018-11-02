@@ -539,9 +539,9 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'image', null, true);
     },
 
-    setPercentSize: function (percent) {
-        this.context.image._resize_element.style.width = (this.context.resizing._origin_w * percent) + 'px';
-        this.context.image._resize_element.style.height = (this.context.resizing._origin_h * percent) + 'px';
+    setPercentSize: function (w, h) {
+        this.context.image._resize_element.style.width = w;
+        this.context.image._resize_element.style.height = h;
     },
 
     destroy: function () {

@@ -1854,6 +1854,9 @@ const core = function (context, util, plugins, lang) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
+
+            editor.controllersOff();
+            editor.submenuOff();
         },
 
         onScroll_window: function () {
@@ -1877,14 +1880,16 @@ const core = function (context, util, plugins, lang) {
         },
 
         _onStickyToolbar: function (element) {
+            element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
+            element._stickyDummy.style.display = 'block';
             element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
-            element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
             element.toolbar.style.top = context.user.stickyToolbar + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
+            element._stickyDummy.style.display = 'none';
             element.toolbar.style.top = '';
             element.toolbar.style.width = '';
             element.editorArea.style.marginTop = '';

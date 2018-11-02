@@ -291,12 +291,12 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
-    setPercentSize: function (percent) {
+    setPercentSize: function (w) {
         const contextVideo = this.context.video;
         const container = this.util.getParentElement(contextVideo._resize_element, '.sun-editor-id-iframe-container');
 
         contextVideo._resize_element.style.width = '100%';
-        container.style.width = (percent * 100) + '%';
+        container.style.width = w;
 
         contextVideo._resize_element.style.width = contextVideo._resize_element.offsetWidth + 'px';
         contextVideo._resize_element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._resize_element.offsetWidth) + 'px';

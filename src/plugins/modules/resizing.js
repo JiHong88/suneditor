@@ -84,10 +84,10 @@ export default {
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="btn-group">' +
-            '   <button type="button" data-command="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
-            '   <button type="button" data-command="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
-            '   <button type="button" data-command="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
-            '   <button type="button" data-command="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
+            '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
+            '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
+            '   <button type="button" data-command="percent" data-value="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
+            '   <button type="button" data-command="percent" data-value="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
             '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
             '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
@@ -168,14 +168,25 @@ export default {
         if (!command) return;
 
         const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
+        const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
 
         e.preventDefault();
 
-        if (!isNaN(command)) {
-            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, command);
+        if (/percent/.test(command)) {
+            contextEl.setAttribute('data-percent', value * 100);
+            let w, h;
+
+            if (this.context.resizing._rotateVertical) {
+                w = (this.context.resizing._origin_w * value) + 'px';
+                h = (this.context.resizing._origin_h * value) + 'px';
+            } else {
+                w = (value * 100) + '%';
+                h = 'auto';
+            }
+
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, w, h);
         }
         else if (/mirror/.test(command)) {
-            const contextEl = this.context[this.context.resizing._resize_plugin]._resize_element;
             const transform = contextEl.style.transform;
             const r = /rotate\(/.test(transform) ? transform.match(/rotate\((-?\d+)deg\)(?:\s|;|$)/)[1] : '0';
             let x = /rotateX/.test(transform) ? transform.match(/rotateX\(\d+deg\)(?:\s|;|$)/)[0] : '';
@@ -192,24 +203,33 @@ export default {
         }
         else if (/rotate/.test(command)) {
             const contextResizing = this.context.resizing;
-            const contextEl = this.context[contextResizing._resize_plugin]._resize_element;
+            
             const cover = contextEl.parentNode;
-
             const transform = contextEl.style.transform;
-            const size = [contextEl.offsetWidth, contextEl.offsetHeight];
             const slope = (contextEl.getAttribute('data-rotate') * 1) + (value * 1);
             const deg = Math.abs(slope) >= 360 ? 0 : slope;
             const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
-            const w = isVertical ? size[1] : size[0];
-            const h = isVertical ? size[0] : size[1];
+            const offsetW = contextEl.offsetWidth;
+            const offsetH = contextEl.offsetHeight;
+            const w = isVertical ? offsetH : offsetW;
+            const h = isVertical ? offsetW : offsetH;
 
-            cover.style.width = w + 'px';
-            cover.style.height = h + 'px';
+            if (/^(?:0|180)$/.test(Math.abs(deg).toString()) && contextEl.getAttribute('data-percent')) {
+                contextEl.style.width = contextEl.getAttribute('data-percent') + '%';
+                contextEl.style.height = 'auto';
+                cover.style.width = 'auto';
+                cover.style.height = 'auto';
+            } else {
+                contextEl.style.width = offsetW + 'px';
+                contextEl.style.height = offsetH + 'px';
+                cover.style.width = w + 'px';
+                cover.style.height = h + 'px';
+            }
 
             let transOrigin = '';
             if (isVertical) {
-                let transW = (size[0]/2) + 'px ' + (size[0]/2) + 'px 0';
-                let transH = (size[1]/2) + 'px ' + (size[1]/2) + 'px 0';
+                let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
+                let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
                 transOrigin = deg === 90 || deg === -270 ? transH : transW;
             }
 

@@ -28,7 +28,8 @@ const _Context = function (element, cons, options) {
             wysiwyg: cons._wysiwygArea,
             code: cons._codeArea,
             loading: cons._loading,
-            resizeBackground: cons._resizeBack
+            resizeBackground: cons._resizeBack,
+            _stickyDummy: cons._stickyDummy
         },
         tool: {
             cover: cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
