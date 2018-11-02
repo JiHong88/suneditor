@@ -287,14 +287,12 @@ export default {
         const offsetW = element.offsetWidth;
         const offsetH = element.offsetHeight;
         const w = isVertical ? offsetH : offsetW;
-        const h = isVertical ? offsetW : offsetH;
 
         this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
 
         element.style.width = offsetW + 'px';
         element.style.height = offsetH + 'px';
         cover.style.width = w + 'px';
-        cover.style.height = h + 'px';
 
         let transOrigin = '';
         if (isVertical) {

@@ -520,7 +520,7 @@ export default {
 
         contextImage._cover.style.width = '100%';
         contextImage._element.style.width = w;
-        contextImage._cover.style.height = contextImage._element.style.height = h;
+        contextImage._element.style.height = h;
     },
 
     cancelPercentAttr: function () {

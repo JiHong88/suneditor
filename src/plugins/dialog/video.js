@@ -279,14 +279,13 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
-    setPercentSize: function (w, h) {
+    setPercentSize: function (w) {
         const contextVideo = this.context.video;
 
         this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
         this.util.addClass(contextVideo._element, 'float-' + contextVideo._align);
 
         contextVideo._cover.style.width = '100%';
-        contextVideo._cover.style.height = h;
         contextVideo._element.style.width = '100%';
         contextVideo._container.style.width = w;
 

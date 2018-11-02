@@ -270,7 +270,6 @@
     display: flex;
 }
 .sun-editor-editable figure.sun-editor-figure-cover figcaption {
-    display: block;
     padding: 1em .5em;
     margin: 0;
     font-size: 13px;
@@ -279,7 +278,7 @@
     line-height: 2;
     margin: 0;
 }
-.sun-editor-editable figure.sun-editor-figure-cover figcaption:not([contenteditable=false]) {
+.sun-editor-editable figure.sun-editor-figure-cover figcaption[contenteditable=true] {
     background-color: #f3f3f3;
 }
 
