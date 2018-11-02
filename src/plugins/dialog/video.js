@@ -17,9 +17,9 @@ export default {
 
         const context = core.context;
         context.video = {
-            _containerElement: null,
+            _container: null,
+            _cover: null,
             _element: null,
-            _resize_element: null,
             _element_w: context.user.videoWidth,
             _element_h: context.user.videoHeight,
             _element_l: 0,
@@ -155,7 +155,7 @@ export default {
             if (this.context.dialog.updateModal) {
                 contextVideo._element.src = oIframe.src;
                 contextVideo._element.setAttribute('data-proportion', contextVideo._proportionChecked);
-                container = contextVideo._containerElement;
+                container = contextVideo._container;
                 cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
             }
@@ -201,7 +201,7 @@ export default {
             oIframe.style.height = h + 'px';
 
             // align
-            if ('none' !== contextVideo._align) {
+            if (contextVideo._align && 'none' !== contextVideo._align) {
                 cover.style.margin = 'auto';
             } else {
                 cover.style.margin = '0';
@@ -216,10 +216,9 @@ export default {
                 this.appendP(container);
             } else {
                 oIframe.setAttribute('data-percent', '');
-                this.plugins.resizing.setSize.call(this, oIframe);
-                this.plugins.resizing._setTransForm(oIframe, oIframe.getAttribute('data-rotate') || '', oIframe.getAttribute('data-rotateX') || '', oIframe.getAttribute('data-rotateY') || '');
-                if (contextVideo._captionChecked) this.plugins.resizing.setCaptionPosition.call(this, oIframe, contextVideo._caption);
+                this.plugins.resizing.setTransformSize.call(this, oIframe);
             }
+
         }.bind(this);
 
         try {
@@ -244,9 +243,10 @@ export default {
 
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
-        contextVideo._resize_element = contextVideo._element = element;
-        contextVideo._containerElement = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
-        contextVideo._caption = this.util.getChildElement(contextVideo._containerElement, 'FIGCAPTION');
+        contextVideo._element = element;
+        contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
+        contextVideo._caption = this.util.getChildElement(contextVideo._container, 'FIGCAPTION');
 
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
@@ -279,20 +279,44 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
-    setPercentSize: function (w) {
+    setPercentSize: function (w, h) {
         const contextVideo = this.context.video;
-        const container = this.util.getParentElement(contextVideo._resize_element, '.sun-editor-id-iframe-container');
 
-        contextVideo._resize_element.style.width = '100%';
-        container.style.width = w;
+        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        this.util.addClass(contextVideo._element, 'float-' + contextVideo._align);
 
-        contextVideo._resize_element.style.width = contextVideo._resize_element.offsetWidth + 'px';
-        contextVideo._resize_element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._resize_element.offsetWidth) + 'px';
-        container.style.width = '';
+        contextVideo._cover.style.width = '100%';
+        contextVideo._cover.style.height = h;
+        contextVideo._element.style.width = '100%';
+        contextVideo._container.style.width = w;
+
+        contextVideo._element.style.width = contextVideo._element.offsetWidth + 'px';
+        contextVideo._element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._element.offsetWidth) + 'px';
+        contextVideo._container.style.width = '';
+    },
+
+    cancelPercentAttr: function () {
+        const contextVideo = this.context.video;
+
+        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
+        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
+        
+        contextVideo._cover.style.width = '';
+        contextVideo._cover.style.height = '';
+    },
+
+    resetAlign: function () {
+        const contextVideo = this.context.video;
+
+        contextVideo._element.setAttribute('data-align', '');
+        contextVideo._align = 'none';
+        contextVideo._cover.style.margin = '0';
+        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
     },
 
     destroy: function () {
-        this.util.removeItem(this.context.video._containerElement);
+        this.util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
     },
 
