@@ -279,7 +279,7 @@ export default {
     },
 
     setTransformSize: function (element) {
-        const cover = element.parentNode;
+        const cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -311,7 +311,7 @@ export default {
 
     _setCaptionPosition: function (element, figcaption) {
         if (figcaption) {
-            figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetHeight/2 - 40 : 0) + 'px';
+            figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
         }
     },
 

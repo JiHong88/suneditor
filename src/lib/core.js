@@ -192,10 +192,6 @@ const core = function (context, util, plugins, lang) {
                 this.submenuActiveButton = null;
             }
 
-            if (context.image && context.image._onCaption === true) {
-                this.plugins.image.toggle_caption_contenteditable.call(editor, false);
-            }
-
             this.controllersOff();
         },
 
@@ -217,7 +213,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0; i < fLen; i++) {
                     this.controllerFunction[i]();
                 }
-                this.controllerArray = [];
+                this.controllerFunction = [];
             }
         },
 
@@ -1670,9 +1666,10 @@ const core = function (context, util, plugins, lang) {
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption) {
                 e.preventDefault();
-                editor.callPlugin('image', function () {
-                    editor.plugins.image.toggle_caption_contenteditable.call(editor, true, figcaption);
-                });
+
+                figcaption.setAttribute('contenteditable', true);
+                figcaption.focus();
+                
                 return;
             }
 

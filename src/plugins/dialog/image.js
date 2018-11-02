@@ -34,7 +34,6 @@ export default {
             _align: 'none',
             _captionChecked: false,
             _proportionChecked: true,
-            _onCaption: false,
             _floatClassRegExp: 'float\\-[a-z]+',
             _xmlHttp: null
         };
@@ -461,18 +460,6 @@ export default {
         // transform
         imageEl.setAttribute('data-percent', '');
         this.plugins.resizing.setTransformSize.call(this, imageEl);
-    },
-
-    toggle_caption_contenteditable: function (on, figcaption) {
-        this.context.image._onCaption = on;
-
-        if (on) {
-            this.context.image._caption = figcaption;
-            figcaption.setAttribute('contenteditable', on);
-            this.context.image._caption.focus();
-        } else {
-            this.context.image._caption.setAttribute('contenteditable', on);
-        }
     },
 
     sizeRevert: function () {
