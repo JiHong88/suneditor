@@ -240,7 +240,7 @@ export default {
     },
 
     _setTransForm: function (element, r, x, y) {
-        let width = (element.offsetWidth/2/2) * (/-/.test(r) ? 1 : -1);
+        let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
         let translate = '';
 
         if (/[1-9]/.test(r) && (x || y)) {
