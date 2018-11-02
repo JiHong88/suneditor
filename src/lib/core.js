@@ -680,6 +680,7 @@ const core = function (context, util, plugins, lang) {
             const endCon = range.endContainer;
             const endOff = range.endOffset;
             const commonCon = range.commonAncestorContainer;
+            const newNodeName = appendNode.nodeName;
 
             let start = {}, end = {};
             let newNode, regExp;
@@ -702,7 +703,7 @@ const core = function (context, util, plugins, lang) {
                     style = vNode.style.cssText.replace(regExp, '').trim();
                 }
 
-                if (style.length > 0) {
+                if (style.length > 0 || vNode.nodeName !== newNodeName) {
                     if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
                     return true;
                 }
