@@ -83,16 +83,20 @@ export default {
         resize_button.className = "resize-btn";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
+            '<div class="arrow"></div>' +
             '<div class="btn-group">' +
             '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
+            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
+            '</div>' +
+            '<div class="btn-group btn-bottom-group">' +
             '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
             '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
-            '   <button type="button" data-command="update" title="' + lang.toolbar.image + '"><div class="icon-modify"></div></button>' +
+            '   <button type="button" data-command="revert" title="' + lang.dialogBox.revertButton + '"><div class="icon-revert"></div></button>' +
             '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
 
@@ -124,21 +128,23 @@ export default {
         resizeDiv.style.width =  w + 'px';
         resizeDiv.style.height =  h + 'px';
 
-        contextResizing.resizeButton.style.top = (h + t) + 'px';
-        contextResizing.resizeButton.style.left = l + 'px';
-
         this.util.changeTxt(contextResizing.resizeDisplay, w + ' x ' + h);
 
         contextResizing.resizeContainer.style.display = 'block';
         contextResizing.resizeButton.style.display = 'block';
         contextResizing.resizeDot.style.display = 'block';
 
+        // button group
+        const overLeft = this.context.element.toolbar.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
+        contextResizing.resizeButton.style.top = (h + t + 60) + 'px';
+        contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft : 0)) + 'px';
+
         contextResizing._resize_w = w;
         contextResizing._resize_h = h;
 
         this.controllerArray = [contextResizing.resizeContainer, contextResizing.resizeButton];
 
-        const originSize = targetElement.getAttribute('origin-size').split(',');
+        const originSize = (targetElement.getAttribute('origin-size') || '').split(',');
         contextResizing._origin_w = originSize[0] || targetElement.naturalWidth;
         contextResizing._origin_h = originSize[1] || targetElement.naturalHeight;
 
@@ -157,6 +163,30 @@ export default {
         this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
+    },
+
+    create_caption: function () {
+        const caption = document.createElement('FIGCAPTION');
+        caption.setAttribute('contenteditable', false);
+        caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
+        return caption;
+    },
+
+    set_cover: function (element) {
+        const cover = document.createElement('FIGURE');
+        cover.className = 'sun-editor-figure-cover sun-editor-id-position-relative';
+        cover.appendChild(element);
+
+        return cover;
+    },
+
+    set_container: function (cover, className) {
+        const container = document.createElement('DIV');
+        container.className = 'sun-editor-id-comp ' + className;
+        container.setAttribute('contenteditable', false);
+        container.appendChild(cover);
+
+        return container;
     },
 
     onClick_resizeButton: function (e) {
@@ -185,68 +215,48 @@ export default {
             }
 
             this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, w, h);
+
+            this.plugins.resizing.setSize.call(this, contextEl);
+            this.plugins.resizing._setTransForm(contextEl, contextEl.getAttribute('data-rotate') || '', contextEl.getAttribute('data-rotateX') || '', contextEl.getAttribute('data-rotateY') || '');
+            this.plugins.resizing.setCaptionPosition.call(this, contextEl, this.util.getChildElement(this.util.getParentElement(contextEl, '.sun-editor-figure-cover'), 'FIGCAPTION'));
         }
         else if (/mirror/.test(command)) {
-            const transform = contextEl.style.transform;
-            const r = /rotate\(/.test(transform) ? transform.match(/rotate\((-?\d+)deg\)(?:\s|;|$)/)[1] : '0';
-            let x = /rotateX/.test(transform) ? transform.match(/rotateX\(\d+deg\)(?:\s|;|$)/)[0] : '';
-            let y = /rotateY/.test(transform) ? transform.match(/rotateY\(\d+deg\)(?:\s|;|$)/)[0] : '';
+            const r = contextEl.getAttribute('data-rotate') || '0';
+            let x = contextEl.getAttribute('data-rotateX') || '';
+            let y = contextEl.getAttribute('data-rotateY') || '';
 
             if ((value === 'h' && !this.context.resizing._rotateVertical) || (value === 'v' && this.context.resizing._rotateVertical)) {
-                y = y ? '' : ' rotateY(180deg)';
+                y = y ? '' : '180';
             } else {
-                x = x ? '' : ' rotateX(180deg)';
+                x = x ? '' : '180';
             }
 
+            contextEl.setAttribute('data-rotateX', x);
+            contextEl.setAttribute('data-rotateY', y);
             this.plugins.resizing._setTransForm(contextEl, r, x, y);
             return;
         }
         else if (/rotate/.test(command)) {
             const contextResizing = this.context.resizing;
             
-            const cover = contextEl.parentNode;
-            const transform = contextEl.style.transform;
             const slope = (contextEl.getAttribute('data-rotate') * 1) + (value * 1);
             const deg = Math.abs(slope) >= 360 ? 0 : slope;
-            const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
-            const offsetW = contextEl.offsetWidth;
-            const offsetH = contextEl.offsetHeight;
-            const w = isVertical ? offsetH : offsetW;
-            const h = isVertical ? offsetW : offsetH;
-
-            if (/^(?:0|180)$/.test(Math.abs(deg).toString()) && contextEl.getAttribute('data-percent')) {
-                contextEl.style.width = contextEl.getAttribute('data-percent') + '%';
-                contextEl.style.height = 'auto';
-                cover.style.width = 'auto';
-                cover.style.height = 'auto';
-            } else {
-                contextEl.style.width = offsetW + 'px';
-                contextEl.style.height = offsetH + 'px';
-                cover.style.width = w + 'px';
-                cover.style.height = h + 'px';
-            }
-
-            let transOrigin = '';
-            if (isVertical) {
-                let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
-                let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
-                transOrigin = deg === 90 || deg === -270 ? transH : transW;
-            }
-
-            contextEl.style.transformOrigin = transOrigin;
-
-            if (contextEl.nextElementSibling) {
-                contextEl.nextElementSibling.style.marginTop = (isVertical ? w/2 - 40 : 0) + 'px';
-            }
-
-            const x = /rotateX/.test(transform) ? transform.match(/rotateX\(\d+deg\)(?:\s|;|$)/)[0] : '';
-            const y = /rotateY/.test(transform) ? transform.match(/rotateY\(\d+deg\)(?:\s|;|$)/)[0] : '';
 
             contextEl.setAttribute('data-rotate', deg);
+            contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
+            this.plugins.resizing.setSize.call(this, contextEl);
+
+            const x = contextEl.getAttribute('data-rotateX') || '';
+            const y = contextEl.getAttribute('data-rotateY') || '';
+            
             this.plugins.resizing._setTransForm(contextEl, deg.toString(), x, y);
+            this.plugins.resizing.setCaptionPosition.call(this, contextEl, this.util.getChildElement(this.util.getParentElement(contextEl, '.sun-editor-id-comp'), 'FIGCAPTION'));
 
             this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
             return;
+        }
+        else if (/revert/.test(command)) {
+            
         }
         else if (/update/.test(command)) {
             this.plugins[this.context.resizing._resize_plugin].openModify.call(this);
@@ -257,6 +267,45 @@ export default {
 
         this.submenuOff();
         this.focus();
+    },
+
+    setSize: function (element) {
+        const cover = element.parentNode;
+
+        const isVertical = this.context.resizing._rotateVertical;
+        const deg = element.getAttribute('data-rotate') * 1;
+
+        const offsetW = element.offsetWidth;
+        const offsetH = element.offsetHeight;
+        const w = isVertical ? offsetH : offsetW;
+        const h = isVertical ? offsetW : offsetH;
+
+        if (/^(?:0|180)$/.test(Math.abs(deg).toString()) && element.getAttribute('data-percent')) {
+            element.style.width = element.getAttribute('data-percent') + '%';
+            element.style.height = 'auto';
+            cover.style.width = 'auto';
+            cover.style.height = 'auto';
+        } else {
+            element.style.width = offsetW + 'px';
+            element.style.height = offsetH + 'px';
+            cover.style.width = w + 'px';
+            cover.style.height = h + 'px';
+        }
+
+        let transOrigin = '';
+        if (isVertical) {
+            let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
+            let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
+            transOrigin = deg === 90 || deg === -270 ? transH : transW;
+        }
+
+        element.style.transformOrigin = transOrigin;
+    },
+
+    setCaptionPosition: function (element, figcaption) {
+        if (figcaption) {
+            figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetHeight/2 - 40 : 0) + 'px';
+        }
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -286,7 +335,7 @@ export default {
             }
         }
         
-        element.style.transform = 'rotate(' + r + 'deg)' + x + y + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
+        element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
     },
 
     onMouseDown_resize_handle: function (e) {

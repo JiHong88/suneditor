@@ -113,21 +113,6 @@ export default {
         }
     },
 
-    create_caption: function () {
-        const caption = document.createElement('FIGCAPTION');
-        caption.setAttribute('contenteditable', false);
-        caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
-        return caption;
-    },
-
-    set_cover: function (iframeElement) {
-        const cover = document.createElement('FIGURE');
-        cover.className = 'sun-editor-id-comp-figure-cover';
-        cover.appendChild(iframeElement);
-
-        return cover;
-    },
-
     submit: function (e) {
         this.showLoading();
 
@@ -171,16 +156,11 @@ export default {
                 contextVideo._element.src = oIframe.src;
                 contextVideo._element.setAttribute('data-proportion', contextVideo._proportionChecked);
                 container = contextVideo._containerElement;
-                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-id-comp-figure-cover');
+                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
             }
             /** create */
             else {
-                /** container */
-                container = document.createElement('DIV');
-                container.className = 'sun-editor-id-comp sun-editor-id-iframe-container';
-                container.setAttribute('contentEditable', false);
-                
                 oIframe.frameBorder = '0';
                 oIframe.allowFullscreen = true;
                 oIframe.setAttribute('data-proportion', contextVideo._proportionChecked);
@@ -192,19 +172,28 @@ export default {
                 }.bind(oIframe);
 
                 /** cover */
-                cover = this.plugins.video.set_cover.call(this, oIframe);
+                cover = this.plugins.resizing.set_cover.call(this, oIframe);
 
                 /** resizingDiv */
                 const resizingDiv = document.createElement('DIV');
                 resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
-                container.appendChild(resizingDiv);
+                cover.appendChild(resizingDiv);
+
+                /** container */
+                container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-iframe-container');
             }
 
             // caption
-            if (contextVideo._captionChecked && !contextVideo._caption) {
-                contextVideo._caption = this.plugins.video.create_caption.call(this);
-                contextVideo._caption.setAttribute('contenteditable', false);
-                cover.appendChild(contextVideo._caption);
+            if (contextVideo._captionChecked) {
+                if (!contextVideo._caption) {
+                    contextVideo._caption = this.plugins.resizing.create_caption.call(this);
+                    cover.appendChild(contextVideo._caption);
+                }
+            } else {
+                if (contextVideo._caption) {
+                    this.util.removeItem(contextVideo._caption);
+                    contextVideo._caption = null;
+                }
             }
 
             // size
@@ -223,11 +212,13 @@ export default {
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {
-                contextVideo._containerElement = container;
-                container.appendChild(cover);
-    
                 this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
                 this.appendP(container);
+            } else {
+                oIframe.setAttribute('data-percent', '');
+                this.plugins.resizing.setSize.call(this, oIframe);
+                this.plugins.resizing._setTransForm(oIframe, oIframe.getAttribute('data-rotate') || '', oIframe.getAttribute('data-rotateX') || '', oIframe.getAttribute('data-rotateY') || '');
+                if (contextVideo._captionChecked) this.plugins.resizing.setCaptionPosition.call(this, oIframe, contextVideo._caption);
             }
         }.bind(this);
 
@@ -255,7 +246,7 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._resize_element = contextVideo._element = element;
         contextVideo._containerElement = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
-        contextVideo._caption = element.nextElementSibling;
+        contextVideo._caption = this.util.getChildElement(contextVideo._containerElement, 'FIGCAPTION');
 
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
@@ -276,11 +267,10 @@ export default {
 
     openModify: function () {
         const contextVideo = this.context.video;
-        const container = contextVideo._containerElement;
 
         contextVideo.focusElement.value = contextVideo._element.src;
-        contextVideo.videoWidth.value = container.offsetWidth;
-        contextVideo.videoHeight.value = container.offsetHeight;
+        contextVideo.videoWidth.value = contextVideo._element.offsetWidth;
+        contextVideo.videoHeight.value = contextVideo._element.offsetHeight;
         contextVideo._captionChecked = contextVideo.captionCheckEl.checked = !!contextVideo._caption;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;

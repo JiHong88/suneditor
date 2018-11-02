@@ -326,30 +326,6 @@ export default {
         return false;
     },
 
-    create_caption: function () {
-        const caption = document.createElement('FIGCAPTION');
-        caption.setAttribute('contenteditable', false);
-        caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
-        return caption;
-    },
-
-    set_cover: function (imageElement) {
-        const cover = document.createElement('FIGURE');
-        cover.className = 'sun-editor-id-comp-figure-cover';
-        cover.appendChild(imageElement);
-
-        return cover;
-    },
-
-    set_container: function (cover) {
-        const container = document.createElement('DIV');
-        container.className = 'sun-editor-id-comp sun-editor-id-image-container';
-        container.setAttribute('contenteditable', false);
-        container.appendChild(cover);
-
-        return container;
-    },
-
     create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement) {
         if (update) {
             updateElement.src = src;
@@ -372,12 +348,12 @@ export default {
             this.style.height = this.offsetHeight + 'px';
         }.bind(oImg);
 
-        const cover = this.plugins.image.set_cover.call(this, oImg);
-        const container = this.plugins.image.set_container.call(this, cover);
+        const cover = this.plugins.resizing.set_cover.call(this, oImg);
+        const container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
 
         // caption
         if (contextImage._captionChecked) {
-            contextImage._caption = this.plugins.image.create_caption.call(this);
+            contextImage._caption = this.plugins.resizing.create_caption.call(this);
             contextImage._caption.setAttribute('contenteditable', false);
             cover.appendChild(contextImage._caption);
         }
@@ -399,20 +375,20 @@ export default {
     update_image: function () {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
-        let cover = this.util.getParentElement(contextImage._element, '.sun-editor-id-comp-figure-cover');
-        let container = this.util.getParentElement(contextImage._element, '.sun-editor-id-image-container');
         let imageEl = contextImage._element;
+        let cover = this.util.getParentElement(imageEl, '.sun-editor-figure-cover');
+        let container = this.util.getParentElement(imageEl, '.sun-editor-id-image-container');
         let isNewContainer = false;
 
         if (cover === null) {
             isNewContainer = true;
             imageEl = contextImage._element.cloneNode(true);
-            cover = this.plugins.image.set_cover.call(this, imageEl);
+            cover = this.plugins.resizing.set_cover.call(this, imageEl);
         }
 
         if (container === null) {
             isNewContainer = true;
-            container = this.plugins.image.set_container.call(this, cover.cloneNode(true));
+            container = this.plugins.resizing.set_container.call(this, cover.cloneNode(true), 'sun-editor-id-image-container');
         }
         
         if (isNewContainer) {
@@ -432,8 +408,8 @@ export default {
 
         // caption
         if (contextImage._captionChecked) {
-            if (contextImage._caption === null) {
-                contextImage._caption = this.plugins.image.create_caption.call(this);
+            if (!contextImage._caption) {
+                contextImage._caption = this.plugins.resizing.create_caption.call(this);
                 cover.appendChild(contextImage._caption);
             }
         } else {
@@ -476,10 +452,16 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.getFormatElement(contextImage._element);
+            const existElement = this.util.getFormatElement(imageEl);
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(existElement);
         }
+
+        // transform
+        imageEl.setAttribute('data-percent', '');
+        this.plugins.resizing.setSize.call(this, imageEl);
+        this.plugins.resizing._setTransForm(imageEl, imageEl.getAttribute('data-rotate') || '', imageEl.getAttribute('data-rotateX') || '', imageEl.getAttribute('data-rotateY') || '');
+        if (contextImage._captionChecked) this.plugins.resizing.setCaptionPosition.call(this, imageEl, contextImage._caption);
     },
 
     toggle_caption_contenteditable: function (on, figcaption) {
@@ -506,7 +488,7 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = contextImage._resize_element = element;
-        contextImage._caption = contextImage._linkElement ? contextImage._linkElement.nextElementSibling : element.nextElementSibling;
+        contextImage._caption = this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION');
 
         contextImage._element_w = size.w;
         contextImage._element_h = size.h;

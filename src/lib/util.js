@@ -383,16 +383,11 @@ const util = {
         let tableElement = element.parentNode;
 
         while (!this.isWysiwygDiv(tableElement)) {
-            if(/^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
+            if ((/^(?:TD|TABLE)$/i.test(tableElement.nodeName)) || /sun-editor-id-position-relative/.test(tableElement.className)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }
             tableElement = tableElement.parentNode;
-        }
-
-        if (/^(?:SUB|SUP)$/i.test(element.parentNode.nodeName)) {
-            tableOffsetLeft = element.parentNode.offsetLeft;
-            tableOffsetTop = element.parentNode.offsetTop;
         }
 
         return {

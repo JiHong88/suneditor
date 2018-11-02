@@ -1636,9 +1636,6 @@ const core = function (context, util, plugins, lang) {
             const targetElement = e.target;
             editor.submenuOff();
 
-            editor._setEditorRange();
-            event._findButtonEffectTag();
-
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callPlugin('image', function () {
@@ -1678,6 +1675,9 @@ const core = function (context, util, plugins, lang) {
                 });
                 return;
             }
+
+            editor._setEditorRange();
+            event._findButtonEffectTag();
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -1855,7 +1855,6 @@ const core = function (context, util, plugins, lang) {
                 event.onScroll_window();
             }
 
-            editor.controllersOff();
             editor.submenuOff();
         },
 
