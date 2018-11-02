@@ -248,8 +248,10 @@
 
 /** component (image, iframe video) */
 .sun-editor-editable .sun-editor-id-comp {
-    display: block;
+    display: flex;
     position: static;
+    z-index: -1;
+    padding: 20px 40px;
 }
 
 /** image, video iframe figure cover */
@@ -257,14 +259,19 @@
     display: block;
     outline: none;
     line-height: 0;
-    margin: 20px 40px;
+    margin: 0;
     padding: 0;
+}
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover * {
+    display: flex;
 }
 .sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption {
     display: block;
     padding: 1em .5em;
     margin: 0;
     font-size: 13px;
+}
+.sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption * {
     text-align: center;
 }
 .sun-editor-editable figure.sun-editor-id-comp-figure-cover figcaption p{
@@ -278,7 +285,6 @@
 /* image */
 .sun-editor-editable .sun-editor-id-image-container {
     text-align: center;
-    padding: 0;
 }
 .sun-editor-editable .sun-editor-id-image-container a img {
     padding: 1px;
@@ -289,16 +295,27 @@
 /** video iframe tags */
 .sun-editor-editable .sun-editor-id-iframe-container {
     text-align: center;
-    padding: 0;
 }
 .sun-editor-editable .sun-editor-id-iframe-container iframe {
     outline: 1px solid #9e9e9e;
+}
+.sun-editor-editable .sun-editor-id-iframe-container figure.sun-editor-id-comp-figure-cover::after {
+    position: absolute;
+    content: '';
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+    display: block;
+    background: rgba(0,0,0,0);
 }
 .sun-editor-editable .sun-editor-id-iframe-inner-resizing-cover {
     display: none;
 }
 .sun-editor-editable[contenteditable=true] .sun-editor-id-iframe-inner-resizing-cover {
-    display: block;
+    display: none;
     position:absolute;
     width: 100%;
     height: 100%;

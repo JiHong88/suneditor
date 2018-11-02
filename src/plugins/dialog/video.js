@@ -212,16 +212,14 @@ export default {
             oIframe.style.height = h + 'px';
 
             // align
-            if ('center' !== contextVideo._align) {
-                container.style.display = 'inline-block';
-                this.util.removeClass(container, this.context.video._floatClassRegExp);
-                this.util.addClass(container, 'float-' + contextVideo._align);
+            if ('none' !== contextVideo._align) {
+                cover.style.margin = 'auto';
             } else {
-                container.style.display = 'table';
-                this.util.removeClass(container, this.context.video._floatClassRegExp);
-                this.util.addClass(container, 'float-none');
+                cover.style.margin = '0';
             }
-
+            
+            this.util.removeClass(container, this.context.video._floatClassRegExp);
+            this.util.addClass(container, 'float-' + contextVideo._align);
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {

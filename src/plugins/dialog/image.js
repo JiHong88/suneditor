@@ -356,12 +356,14 @@ export default {
             return;
         }
 
+        const contextImage = this.context.image;
+
         let oImg = document.createElement('IMG');
         oImg.src = src;
         oImg.style.width = width;
         oImg.setAttribute('data-align', align);
-        oImg.setAttribute('data-proportion', this.context.image._proportionChecked);
-        oImg.alt = this.context.image._altText;
+        oImg.setAttribute('data-proportion', contextImage._proportionChecked);
+        oImg.alt = contextImage._altText;
         oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
         oImg.setAttribute('data-rotate', '0');
         oImg.onload = function () {
@@ -374,18 +376,21 @@ export default {
         const container = this.plugins.image.set_container.call(this, cover);
 
         // caption
-        if (this.context.image._captionChecked) {
-            this.context.image._caption = this.plugins.image.create_caption.call(this);
-            this.context.image._caption.setAttribute('contenteditable', false);
-            cover.appendChild(this.context.image._caption);
+        if (contextImage._captionChecked) {
+            contextImage._caption = this.plugins.image.create_caption.call(this);
+            contextImage._caption.setAttribute('contenteditable', false);
+            cover.appendChild(contextImage._caption);
         }
 
         // align
-        if ('center' !== align) {
-            container.style.display = 'inline-block';
-            this.util.removeClass(container, this.context.image._floatClassRegExp);
-            this.util.addClass(container, 'float-' + align);
+        if ('none' !== align) {
+            cover.style.margin = 'auto';
+        } else {
+            cover.style.margin = '0';
         }
+        
+        this.util.removeClass(container, contextImage._floatClassRegExp);
+        this.util.addClass(container, 'float-' + align);
 
         this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
         this.appendP(container);
@@ -439,16 +444,14 @@ export default {
         }
 
         // align
-        if ('center' !== contextImage._align) {
-            container.style.display = 'inline-block';
-            this.util.removeClass(container, this.context.image._floatClassRegExp);
-            this.util.addClass(container, 'float-' + contextImage._align);
+        if ('none' !== contextImage._align) {
+            cover.style.margin = 'auto';
         } else {
-            container.style.display = '';
-            this.util.removeClass(container, this.context.image._floatClassRegExp);
-            this.util.addClass(container, 'float-none');
+            cover.style.margin = '0';
         }
 
+        this.util.removeClass(container, this.context.image._floatClassRegExp);
+        this.util.addClass(container, 'float-' + contextImage._align);
         imageEl.setAttribute('data-align', contextImage._align);
 
         // link
