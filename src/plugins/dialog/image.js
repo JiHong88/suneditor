@@ -269,8 +269,6 @@ export default {
             link.href = /^https?:\/\//.test(imgLinkValue) ? imgLinkValue : 'http://' + imgLinkValue;
             link.target = (newWindowCheck ? '_blank' : '');
             link.setAttribute('data-image-link', 'image');
-            link.addEventListener('click', function (e) { e.preventDefault(); });
-
             imgTag.setAttribute('data-image-link', imgLinkValue);
 
             link.appendChild(imgTag);

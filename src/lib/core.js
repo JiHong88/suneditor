@@ -1579,6 +1579,11 @@ const core = function (context, util, plugins, lang) {
             if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
         },
 
+        _cancelCaptionEdit: function () {
+            this.setAttribute('contenteditable', false);
+            this.removeEventListener('blur', event._cancelCaptionEdit);
+        },
+
         onClick_toolbar: function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1669,6 +1674,8 @@ const core = function (context, util, plugins, lang) {
 
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
+
+                figcaption.addEventListener('blur', event._cancelCaptionEdit);
                 
                 return;
             }
