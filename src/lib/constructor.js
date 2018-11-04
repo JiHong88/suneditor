@@ -49,7 +49,7 @@ const _Constructor = {
         ];
     
         /** editor seting options */
-        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');;
+        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
     
         const doc = document;
@@ -88,9 +88,7 @@ const _Constructor = {
         wysiwyg_div.style.maxHeight = options.maxHeight;
     
         /** textarea for code view */
-        const textarea = doc.createElement('DIV');
-        textarea.setAttribute('contenteditable', true);
-        textarea.setAttribute('scrolling', 'auto');
+        const textarea = doc.createElement('TEXTAREA');
         textarea.className = 'input_editor sun-editor-id-code';
         textarea.style.display = 'none';
         textarea.style.height = options.height;

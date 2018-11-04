@@ -657,7 +657,6 @@ const core = function (context, util, plugins, lang) {
             let listParent = null;
             let line = null;
             let prevNodeName = '';
-            let oDiv;
             
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 line = rangeLines[i];
@@ -1378,7 +1377,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             if (!wysiwygActive) {
-                const code_html = context.element.code.textContent.trim();
+                const code_html = context.element.code.value.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>&#65279</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
@@ -1387,9 +1386,10 @@ const core = function (context, util, plugins, lang) {
                 this.focus();
             }
             else {
-                context.element.code.textContent = context.element.wysiwyg.innerHTML.trim();//.replace(/<\/P>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
+                if (context.user.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
             }
