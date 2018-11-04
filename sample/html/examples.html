@@ -86,8 +86,8 @@
 <span class="pl-s">fontSize</span><span class="pl-k">        : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">font</span><span class="pl-k">            : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-s">colorList</span><span class="pl-k">       : </span>Change default color array of color picker array  <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientHeight</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.style.width||clientWidth</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientWidth || '100%'</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientHeight || 'auto'</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">minHeight</span><span class="pl-k">       : </span>The min-height size of the editor.
                   Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 <span class="pl-s">maxHeight</span><span class="pl-k">       : </span>The max-height size of the editor.
@@ -96,7 +96,7 @@
 <span class="pl-s">videoWidth</span><span class="pl-k">      : </span>The default width size of the video frame         <span class="pl-ent">default : </span><span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
 <span class="pl-s">videoHeight</span><span class="pl-k">     : </span>The default heigth size of the video frame        <span class="pl-ent">default : </span><span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
 <span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizingBar <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || '') <span class="pl-ent">default : </span><span class="pl-c1">''</span> {<span class="pl-c1">String</span>}
+<span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || 'local') <span class="pl-ent">default : </span><span class="pl-c1">'full'</span> {<span class="pl-c1">String</span>}
 
 <span class="pl-k">lang</span><span class="pl-k">            : </span>language object (en, ko) <span class="pl-ent">default : </span><span class="pl-c1">English</span> {<span class="pl-c1">Object</span>}
 
@@ -141,7 +141,7 @@
         videoWidth <span class="pl-k">:</span> <span class="pl-c1">360</span>,
         videoHeight <span class="pl-k">:</span> <span class="pl-c1">115</span>,
         imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
-        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
+        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>,
         resizingBar<span class="pl-k">:</span> <span class="pl-c1">false</span>,
         buttonList <span class="pl-k">:</span> [
             [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
@@ -157,7 +157,36 @@
         ],
 });</pre></div>
         <p></p>
-        <textarea id="exampleOptions" style="width:100%; height:200px;">Options Setting, hide bottom resizingBar, popupDisplay: full</textarea>
+        <textarea id="exampleOptions" style="width:100%; height:200px;">
+            <div><span style="color: rgb(0, 130, 153);"><b>SUNEDITOR</b></span><b>.<span style="color: rgb(61, 0, 153);">create</span></b>(<span style="color: rgb(152, 0, 0);">'exampleOptions'</span>, {</div>
+            <div>&nbsp; &nbsp; fontSize : [</div>
+            <div><span style="color: rgb(0, 51, 153);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 8, 10, 14, 18, 24, 36</span></div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; font : [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; <span style="color: rgb(152, 0, 0);">'Arial'</span>,</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'tohoma'</span>,</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'Courier New,Courier'</span></div>
+            <div>&nbsp; &nbsp; ],</div><div>&nbsp; &nbsp; width :<span style="color: rgb(152, 0, 0);"> '100%'</span>,</div>
+            <div>&nbsp; &nbsp; height : <span style="color: rgb(152, 0, 0);">'auto'</span>,</div>
+            <div>&nbsp; &nbsp; videoWidth : <span style="color: rgb(0, 51, 153);">360</span>,</div>
+            <div>&nbsp; &nbsp; videoHeight : <span style="color: rgb(0, 51, 153);">115</span>,</div>
+            <div>&nbsp; &nbsp; imageSize : <span style="color: rgb(0, 51, 153);">150,</span></div>
+            <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'local'</span>,</div>
+            <div>&nbsp; &nbsp; resizingBar : <span style="color: rgb(0, 130, 153);">false</span>,</div>
+            <div>&nbsp; &nbsp; buttonList : [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span style="color: rgb(152, 0, 0);">'undo', 'redo',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'font', 'fontSize', 'formatBlock',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'removeFormat',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fontColor', 'hiliteColor',</span><span style="color: rgb(152, 0, 0);">﻿</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'indent', 'outdent',</span><span style="color: rgb(152, 0, 0);">&nbsp;</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'align', 'horizontalRule', 'list', 'table',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'link', 'image', 'video',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fullScreen', 'showBlocks', 'codeView',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'preview', 'print'</span>]</div>
+            <div>&nbsp; &nbsp; ]</div>
+            <div>});</div>
+        </textarea>
 
 <p></p>
 <div class="highlight highlight-source-js">
@@ -165,7 +194,7 @@
     showPathLabel<span class="pl-k">:</span> <span class="pl-c1">false</span>,
     height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
     minHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100px<span class="pl-pds">'</span></span>,
-    maxHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>250px<span class="pl-pds">'</span></span>,
+    maxHeight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>270px<span class="pl-pds">'</span></span>,
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
@@ -177,8 +206,19 @@
 </div>
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">
-            <p>line Break</p>
-            <p>minHeight: 100px, mxHeight: 250px</p>
+            <div><span style="font-weight: bold;"><span style="color: rgb(0, 130, 153);">SUNEDITOR</span>.<span style="color: rgb(61, 0, 153);">create</span></span>(<span style="color: rgb(152, 0, 0);">'lineBreak'</span>, {</div>
+            <div>&nbsp; &nbsp; showPathLabel : <span style="color: rgb(0, 130, 153);">false</span>,</div>
+            <div>&nbsp; &nbsp; height : <span style="color: rgb(152, 0, 0);">'auto'</span>,</div>
+            <div>&nbsp; &nbsp; minHeight : <span style="color: rgb(152, 0, 0);">'100px'</span>,</div>
+            <div>&nbsp; &nbsp; maxHeight: <span style="color: rgb(152, 0, 0);">'250px'</span>,</div>
+            <div>&nbsp; &nbsp; buttonList : [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'undo', 'redo', 'font', 'fontSize', 'formatBlock'</span>],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'</span>],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span style="color: rgb(152, 0, 0);"> '/' </span><span style="color: rgb(53, 53, 53); font-weight: bold; font-style: italic;">// Line break</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'</span>],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'</span>]</div>
+            <div>&nbsp; &nbsp; ]</div>
+            <div>});</div>
         </textarea>
 
         <a id="functions" href="#functions"><h4>2. User Function</h4></a>
@@ -381,7 +421,7 @@
         videoWidth : 360,
         videoHeight : 115,
         imageSize : 150,
-        popupDisplay: 'full',
+        popupDisplay: 'local',
         resizingBar: false,
         buttonList : [
             ['undo', 'redo',
@@ -401,7 +441,7 @@
         showPathLabel: false,
         height: 'auto',
         minHeight : '100px',
-        maxHeight : '250px',
+        maxHeight : '270px',
         buttonList: [
             ['undo', 'redo', 'font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'],

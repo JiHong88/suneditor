@@ -117,7 +117,7 @@ editor.create(document.getElementById('editor2'), {
 });
 editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', plugins.link,
+        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link,
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 

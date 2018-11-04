@@ -34,11 +34,11 @@ const _Constructor = {
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
-        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : element.clientHeight + 'px';
+        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
-        options.popupDisplay = options.popupDisplay || '';
+        options.popupDisplay = options.popupDisplay || 'full';
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -49,7 +49,7 @@ const _Constructor = {
         ];
     
         /** editor seting options */
-        options.width = /^\d+/.test(options.width) ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (/%|auto/.test(element.style.width) ? element.style.width : element.clientWidth + 'px');
+        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
     
         const doc = document;
@@ -65,8 +65,12 @@ const _Constructor = {
         const relative = doc.createElement('DIV');
         relative.className = 'sun-editor-container';
     
-        /** tool bar */
+        /** toolbar */
         const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.popupDisplay);
+
+        /** sticky toolbar dummy */
+        const sticky_dummy = doc.createElement('DIV');
+        sticky_dummy.className = 'sun-editor-sticky-dummy';
     
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
@@ -84,9 +88,7 @@ const _Constructor = {
         wysiwyg_div.style.maxHeight = options.maxHeight;
     
         /** textarea for code view */
-        const textarea = doc.createElement('DIV');
-        textarea.setAttribute('contenteditable', true);
-        textarea.setAttribute('scrolling', 'auto');
+        const textarea = doc.createElement('TEXTAREA');
         textarea.className = 'input_editor sun-editor-id-code';
         textarea.style.display = 'none';
         textarea.style.height = options.height;
@@ -117,6 +119,7 @@ const _Constructor = {
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         relative.appendChild(tool_bar.element);
+        relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
@@ -139,7 +142,8 @@ const _Constructor = {
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
                 _loading: loading_box,
-                _resizeBack: resize_back
+                _resizeBack: resize_back,
+                _stickyDummy: sticky_dummy
             },
             options: options,
             plugins: tool_bar.plugins

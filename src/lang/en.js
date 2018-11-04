@@ -63,13 +63,13 @@ export default {
             title: 'Insert image',
             file: 'Select from files',
             url: 'Image URL',
-            caption: 'Insert image description',
             altText: 'Alternative text'
         },
         videoBox: {
             title: 'Insert Video',
             url: 'Media embed URL, YouTube'
         },
+        caption: 'Insert description',
         close: 'Close',
         submitButton: 'Submit',
         revertButton: 'Revert',
@@ -95,6 +95,8 @@ export default {
         resize50: 'Resize 50%',
         resize25: 'Resize 25%',
         mirrorHorizontal: 'Mirror, Horizontal',
-        mirrorVertical: 'Mirror, Vertical'
+        mirrorVertical: 'Mirror, Vertical',
+        rotateLeft: 'Rotate left',
+        rotateRight: 'Rotate right'
     }
 };

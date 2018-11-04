@@ -17,15 +17,19 @@ export default {
 
         const context = core.context;
         context.video = {
-            _containerElement: null,
+            _container: null,
+            _cover: null,
             _element: null,
-            _resize_element: null,
+            _resizingDiv: null,
             _element_w: context.user.videoWidth,
             _element_h: context.user.videoHeight,
             _element_l: 0,
             _element_t: 0,
             _origin_w: context.user.videoWidth,
             _origin_h: context.user.videoHeight,
+            _caption: null,
+            captionCheckEl: null,
+            _captionChecked: false,
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: 'float\\-[a-z]+'
@@ -37,6 +41,7 @@ export default {
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.videoWidth = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
         context.video.videoHeight = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
+        context.video.captionCheckEl = video_dialog.getElementsByClassName('suneditor-id-video-check-caption')[0];
         context.video.proportion = video_dialog.getElementsByClassName('suneditor-id-video-check-proportion')[0];
 
         /** set user option value */
@@ -81,6 +86,9 @@ export default {
             '           <label><input type="checkbox" class="suneditor-id-video-check-proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
             '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-video-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
             '       </div>' +
+            '       <div class="form-group-footer">' +
+            '           <label><input type="checkbox" class="suneditor-id-video-check-caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+            '       </div>' +
             '   </div>' +
             '   <div class="modal-footer">' +
             '       <div style="float: left;">' +
@@ -112,6 +120,7 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
+        this.context.video._captionChecked = this.context.video.captionCheckEl.checked;
         this.context.video._proportionChecked = this.context.video.proportion.checked;
 
         const submitAction = function () {
@@ -120,7 +129,9 @@ export default {
             const contextVideo = this.context.video;
             const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.user.videoWidth);
             const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.user.videoHeight);
+            let resizingDiv = null;
             let oIframe = null;
+            let cover = null;
             let container = null;
             let url = contextVideo.focusElement.value.trim();
             contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
@@ -146,53 +157,71 @@ export default {
             if (this.context.dialog.updateModal) {
                 contextVideo._element.src = oIframe.src;
                 contextVideo._element.setAttribute('data-proportion', contextVideo._proportionChecked);
-                container = contextVideo._containerElement;
+                container = contextVideo._container;
+                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
+                resizingDiv = contextVideo._resizingDiv;
             }
             /** create */
             else {
-                /** container */
-                container = document.createElement('DIV');
-                container.className = 'sun-editor-id-media-container sun-editor-id-iframe-container';
-                container.setAttribute('contentEditable', false);
-    
-                /** cover */
-                const cover = document.createElement('DIV');
-                cover.className = 'sun-editor-iframe-inner-cover';
-                container.appendChild(cover);
-
-                oIframe.width = '100%';
-                oIframe.height = '100%';
                 oIframe.frameBorder = '0';
                 oIframe.allowFullscreen = true;
                 oIframe.setAttribute('data-proportion', contextVideo._proportionChecked);
                 oIframe.contentDocument;
+                oIframe.onload = function () {
+                    this.setAttribute('origin-size', this.offsetWidth + ',' + this.offsetHeight);
+                    this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
+                    this.style.height = this.offsetHeight + 'px';
+                }.bind(oIframe);
+
+                /** cover */
+                cover = this.plugins.resizing.set_cover.call(this, oIframe);
+
+                /** resizingDiv */
+                resizingDiv = document.createElement('DIV');
+                resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
+                cover.appendChild(resizingDiv);
+
+                /** container */
+                container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-iframe-container');
+            }
+
+            // caption
+            if (contextVideo._captionChecked) {
+                if (!contextVideo._caption) {
+                    contextVideo._caption = this.plugins.resizing.create_caption.call(this);
+                    cover.appendChild(contextVideo._caption);
+                }
+            } else {
+                if (contextVideo._caption) {
+                    this.util.removeItem(contextVideo._caption);
+                    contextVideo._caption = null;
+                }
             }
 
             // size
-            container.style.width = w + 'px';
-            container.style.height = h + 'px';
+            oIframe.style.width = w + 'px';
+            oIframe.style.height = resizingDiv.style.height = h + 'px';
 
             // align
-            if ('center' !== contextVideo._align) {
-                container.style.display = 'inline-block';
-                this.util.removeClass(container, this.context.video._floatClassRegExp);
-                this.util.addClass(container, 'float-' + contextVideo._align);
+            if (contextVideo._align && 'none' !== contextVideo._align) {
+                cover.style.margin = 'auto';
             } else {
-                container.style.display = 'table';
-                this.util.removeClass(container, this.context.video._floatClassRegExp);
-                this.util.addClass(container, 'float-none');
+                cover.style.margin = '0';
             }
-
+            
+            this.util.removeClass(container, this.context.video._floatClassRegExp);
+            this.util.addClass(container, 'float-' + contextVideo._align);
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {
-                contextVideo._containerElement = container;
-                container.appendChild(oIframe);
-    
                 this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-                this.appendP(container);
+                this.appendFormatTag(container);
+            } else {
+                oIframe.setAttribute('data-percent', '');
+                this.plugins.resizing.setTransformSize.call(this, oIframe);
             }
+
         }.bind(this);
 
         try {
@@ -217,9 +246,12 @@ export default {
 
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
-        const container = contextVideo._resize_element = contextVideo._containerElement = element;
+        contextVideo._element = element;
+        contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
+        contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
+        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
 
-        contextVideo._element = container.children[1];
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
         contextVideo._element_t = size.t;
@@ -239,11 +271,11 @@ export default {
 
     openModify: function () {
         const contextVideo = this.context.video;
-        const container = contextVideo._containerElement;
 
         contextVideo.focusElement.value = contextVideo._element.src;
-        contextVideo.videoWidth.value = container.offsetWidth;
-        contextVideo.videoHeight.value = container.offsetHeight;
+        contextVideo.videoWidth.value = contextVideo._element.offsetWidth;
+        contextVideo.videoHeight.value = contextVideo._element.offsetHeight;
+        contextVideo._captionChecked = contextVideo.captionCheckEl.checked = !!contextVideo._caption;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + (contextVideo._element.getAttribute('data-align') || 'none') + '"]').checked = true;
@@ -251,14 +283,51 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
-    setSize: function (x) {
+    setSize: function (w, h, isVertical) {
         const contextVideo = this.context.video;
-        contextVideo._resize_element.style.width = x;
-        contextVideo._resize_element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._resize_element.offsetWidth) + 'px';
+        contextVideo._element.style.width = w + 'px';
+        contextVideo._element.style.height = h + 'px';
+        contextVideo._resizingDiv.style.height = (isVertical ? w : h) + 'px';
+    },
+
+    setPercentSize: function (w) {
+        const contextVideo = this.context.video;
+
+        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        this.util.addClass(contextVideo._element, 'float-' + contextVideo._align);
+
+        contextVideo._cover.style.width = '100%';
+        contextVideo._cover.style.height = '';
+        contextVideo._element.style.width = '100%';
+        contextVideo._container.style.width = w;
+
+        contextVideo._element.style.width = contextVideo._element.offsetWidth + 'px';
+        contextVideo._element.style.height = contextVideo._cover.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
+        contextVideo._container.style.width = '';
+    },
+
+    cancelPercentAttr: function () {
+        const contextVideo = this.context.video;
+
+        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
+        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
+        
+        contextVideo._cover.style.width = '';
+        contextVideo._cover.style.height = '';
+    },
+
+    resetAlign: function () {
+        const contextVideo = this.context.video;
+
+        contextVideo._element.setAttribute('data-align', '');
+        contextVideo._align = 'none';
+        contextVideo._cover.style.margin = '0';
+        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
     },
 
     destroy: function () {
-        this.util.removeItem(this.context.video._containerElement);
+        this.util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
     },
 
@@ -267,6 +336,7 @@ export default {
         contextVideo.focusElement.value = '';
         contextVideo.videoWidth.value = this.context.user.videoWidth;
         contextVideo.videoHeight.value = this.context.user.videoHeight;
+        contextVideo.captionCheckEl.checked = false;
         contextVideo.proportion.checked = true;
         contextVideo.proportion.disabled = true;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;

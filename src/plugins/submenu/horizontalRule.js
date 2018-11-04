@@ -59,8 +59,8 @@ export default {
         this.focus();
         this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
 
-        const oP = this.appendP(oHr);
-        this.setRange(oP, 0, oP, 0);
+        const oNode = this.appendFormatTag(oHr);
+        this.setRange(oNode, 0, oNode, 0);
     },
 
     horizontalRulePick: function (e) {

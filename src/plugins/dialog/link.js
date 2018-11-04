@@ -142,7 +142,7 @@ export default {
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
         const offset = this.util.getOffset(selectionATag);
-        linkBtn.style.left = offset.left + 'px';
+        linkBtn.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
         
         linkBtn.style.display = 'block';

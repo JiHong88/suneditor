@@ -192,10 +192,6 @@ const core = function (context, util, plugins, lang) {
                 this.submenuActiveButton = null;
             }
 
-            if (context.image && context.image._onCaption === true) {
-                this.plugins.image.toggle_caption_contenteditable.call(editor, false);
-            }
-
             this.controllersOff();
         },
 
@@ -217,7 +213,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0; i < fLen; i++) {
                     this.controllerFunction[i]();
                 }
-                this.controllerArray = [];
+                this.controllerFunction = [];
             }
         },
 
@@ -449,19 +445,24 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
-         * @description Append P tag to current line next
+         * @description Append format element to sibling node of argument element.
+         * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
+         * If not, the currently selected format tag is inserted.
          * @param {Element} element - Insert as siblings of that element
+         * @param {String|null} formatNodeName - Node name to be inserted
          * @returns {Element}
          */
-        appendP: function (element) {
+        appendFormatTag: function (element, formatNodeName) {
             const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
-            const oP = document.createElement('P');
-            oP.innerHTML = '&#65279';
+            const currentFormatEl = util.getFormatElement(this.getSelectionNode());
+            const oFormatName = formatNodeName ? formatNodeName : this.util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormat = document.createElement(oFormatName);
+            oFormat.innerHTML = '&#65279';
 
-            if (/^TD$/i.test(formatEl.nodeName)) formatEl.insertBefore(oP, element.nextElementSibling);
-            else formatEl.parentNode.insertBefore(oP, formatEl.nextElementSibling);
+            if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
+            else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
 
-            return oP;
+            return oFormat;
         },
 
         /**
@@ -491,7 +492,7 @@ const core = function (context, util, plugins, lang) {
                         rightNode = commonCon.splitText(endOff);
                     }
                     else {
-                        if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
+                        if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
                             parentNode.removeChild(parentNode.lastChild);
                         }
                         rightNode = null;
@@ -627,6 +628,15 @@ const core = function (context, util, plugins, lang) {
         wrapToTags: function (wrapTag) {
             const range = this.getRange();
             const rangeLines = this.getSelectedFormatElements();
+
+            if (!rangeLines) {
+                const inner = document.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
+                inner.innerHTML = '&#65279';
+                wrapTag.appendChild(inner);
+                this.getSelectionNode().appendChild(wrapTag);
+                return;
+            }
+
             let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
 
@@ -635,11 +645,14 @@ const core = function (context, util, plugins, lang) {
             } else {
                 standTag = util.getRangeFormatElement(last) || util.getFormatElement(last);
             }
-            
-            if (/^TD$/i.test(last.nodeName)) last = util.getFormatElement(last);
-            
-            beforeTag = standTag.nextSibling;
-            pElement = standTag.parentNode;
+
+            if (util.isCell(standTag)) {
+                beforeTag = null;
+                pElement = standTag;
+            } else {
+                beforeTag = standTag.nextSibling;
+                pElement = standTag.parentNode;
+            }
 
             let listParent = null;
             let line = null;
@@ -655,7 +668,8 @@ const core = function (context, util, plugins, lang) {
 
                     listParent.appendChild(line);
                     if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) wrapTag.appendChild(listParent);
-                } else {
+                }
+                else {
                     wrapTag.appendChild(line);
                 }
 
@@ -680,6 +694,7 @@ const core = function (context, util, plugins, lang) {
             const endCon = range.endContainer;
             const endOff = range.endOffset;
             const commonCon = range.commonAncestorContainer;
+            const newNodeName = appendNode.nodeName;
 
             let start = {}, end = {};
             let newNode, regExp;
@@ -695,14 +710,14 @@ const core = function (context, util, plugins, lang) {
 
             /** tag check function*/
             const checkCss = function (vNode) {
-                if (vNode.nodeType === 3) return true;
+                if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
 
                 let style = '';
                 if (regExp && vNode.style.cssText.length > 0) {
                     style = vNode.style.cssText.replace(regExp, '').trim();
                 }
 
-                if (style.length > 0) {
+                if (style.length > 0 || vNode.nodeName !== newNodeName) {
                     if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
                     return true;
                 }
@@ -851,7 +866,7 @@ const core = function (context, util, plugins, lang) {
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName)) {
+                    if ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child)) {
                         let cloneNode;
 
                         // startContainer
@@ -920,7 +935,7 @@ const core = function (context, util, plugins, lang) {
                                 newNode.textContent = afterNode.data;
                             }
 
-                            newNode = node;
+                            newNode = child;
                             pCurrent = [];
                             cssText = '';
                             while (newNode !== pNode && newNode !== el && newNode !== null) {
@@ -950,7 +965,7 @@ const core = function (context, util, plugins, lang) {
                         }
                         // other
                         if (startPass) {
-                            if (child.nodeType === 1) {
+                            if (child.nodeType === 1 && !util.isBreak(child)) {
                                 recursionFunc(child, child);
                                 continue;
                             }
@@ -959,7 +974,7 @@ const core = function (context, util, plugins, lang) {
                             pCurrent = [];
                             cssText = '';
                             while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                                if (newNode.nodeType === 1 && (endPass || validation(newNode)) && checkCss(newNode)) {
+                                if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || validation(newNode)) && checkCss(newNode)) {
                                     pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
@@ -988,7 +1003,7 @@ const core = function (context, util, plugins, lang) {
 
                         cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
-                        if (child.nodeType === 1) coverNode = cloneNode;
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -1021,7 +1036,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
                     let coverNode = node;
-                    if (validation(child) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if (validation(child) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1059,7 +1074,7 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                    if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
@@ -1131,7 +1146,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1175,7 +1190,7 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                    if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
@@ -1247,7 +1262,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1362,7 +1377,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             if (!wysiwygActive) {
-                const code_html = context.element.code.textContent.trim();
+                const code_html = context.element.code.value.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>&#65279</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
@@ -1371,9 +1386,10 @@ const core = function (context, util, plugins, lang) {
                 this.focus();
             }
             else {
-                context.element.code.textContent = context.element.wysiwyg.innerHTML.trim();//.replace(/<\/P>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
+                if (context.user.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
             }
@@ -1582,6 +1598,11 @@ const core = function (context, util, plugins, lang) {
             if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
         },
 
+        _cancelCaptionEdit: function () {
+            this.setAttribute('contenteditable', false);
+            this.removeEventListener('blur', event._cancelCaptionEdit);
+        },
+
         onClick_toolbar: function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1635,9 +1656,6 @@ const core = function (context, util, plugins, lang) {
             const targetElement = e.target;
             editor.submenuOff();
 
-            editor._setEditorRange();
-            event._findButtonEffectTag();
-
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 editor.callPlugin('image', function () {
@@ -1647,34 +1665,36 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
 
-            if (/^TD$/i.test(targetElement.nodeName) || /^TD$/i.test(targetElement.parentNode.nodeName)) {
-                editor.controllersOff();
-
-                let td = targetElement;
-                while (!/^TD$/i.test(td.nodeName)) {
-                    td = td.parentNode;
-                }
-
-                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
-                return;
-            }
-
-            if (/sun-editor-iframe-inner-cover/i.test(targetElement.className)) {
+            if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
                 editor.callPlugin('video', function () {
-                    const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement.parentNode, 'video');
-                    editor.plugins.video.onModifyMode.call(editor, targetElement.parentNode, size);
+                    const iframe = util.getChildElement(targetElement.parentNode, 'iframe');
+                    const size = editor.plugins.resizing.call_controller_resize.call(editor, iframe, 'video');
+                    editor.plugins.video.onModifyMode.call(editor, iframe, size);
                 });
                 return;
             }
+
+            editor._setEditorRange();
+            event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption) {
                 e.preventDefault();
-                editor.callPlugin('image', function () {
-                    editor.plugins.image.toggle_caption_contenteditable.call(editor, true, figcaption);
-                });
-                return;
+
+                figcaption.setAttribute('contenteditable', true);
+                figcaption.focus();
+
+                figcaption.addEventListener('blur', event._cancelCaptionEdit);
+            } else if (util.isCell(targetElement) || util.isCell(targetElement.parentNode)) {
+                editor.controllersOff();
+
+                let td = targetElement;
+                while (!util.isCell(td)) {
+                    td = td.parentNode;
+                }
+
+                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
             }
         },
 
@@ -1723,11 +1743,11 @@ const core = function (context, util, plugins, lang) {
                     editor.controllersOff();
 
                     let currentNode = selectionNode || editor.getSelectionNode();
-                    while (!/^TD$/i.test(currentNode.nodeName) && !util.isWysiwygDiv(currentNode)) {
+                    while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
 
-                    if (currentNode && /^TD$/i.test(currentNode.nodeName)) {
+                    if (currentNode && util.isCell(currentNode)) {
                         const table = util.getParentElement(currentNode, 'table');
                         const cells = util.getListChildren(table, util.isCell);
                         let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
@@ -1743,12 +1763,29 @@ const core = function (context, util, plugins, lang) {
                         break;
                     }
 
-                    /** if P Tag */
-                    if (shift) break;
+                    /** format Tag */
+                    const lines = editor.getSelectedFormatElements();
 
-                    const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
-                    editor.insertNode(tabText);
-                    editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
+                    if (!shift) {
+                        const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
+                        if (lines.length === 1) {
+                            editor.insertNode(tabText);
+                            editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
+                        } else {
+                            for (let i = 0, len = lines.length; i < len; i++) {
+                                lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
+                            }
+                        }
+                    } else {
+                        for (let i = 0, len = lines.length, child; i < len; i++) {
+                            child = lines[i].firstChild;
+                            if (/^\s{1,4}$/.test(child.textContent)) {
+                                util.removeItem(child);
+                            } else if (/^\s{1,4}/.test(child.textContent)) {
+                                child.textContent = child.textContent.replace(/^\s{1,4}/, '');
+                            }
+                        }
+                    }
 
                     break;
             }
@@ -1774,7 +1811,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
-                editor.execCommand('formatBlock', false, util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
+                editor.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
                 return;
             }
 
@@ -1835,6 +1872,8 @@ const core = function (context, util, plugins, lang) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
+
+            editor.submenuOff();
         },
 
         onScroll_window: function () {
@@ -1858,14 +1897,16 @@ const core = function (context, util, plugins, lang) {
         },
 
         _onStickyToolbar: function (element) {
+            element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
+            element._stickyDummy.style.display = 'block';
             element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
-            element.editorArea.style.marginTop = element.toolbar.offsetHeight + 'px';
             element.toolbar.style.top = context.user.stickyToolbar + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
+            element._stickyDummy.style.display = 'none';
             element.toolbar.style.top = '';
             element.toolbar.style.width = '';
             element.editorArea.style.marginTop = '';

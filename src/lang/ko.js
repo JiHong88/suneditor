@@ -63,13 +63,13 @@ export default {
             title: '이미지 삽입',
             file: '파일 선택',
             url: '이미지 주소',
-            caption: '이미지 설명 넣기',
             altText: '대체 문자열'
         },
         videoBox: {
             title: '동영상 삽입',
             url: '미디어 임베드 주소, 유튜브'
         },
+        caption: '설명 넣기',
         close: '닫기',
         submitButton: '확인',
         revertButton: '되돌리기',
@@ -95,6 +95,8 @@ export default {
         resize50: '50% 크기',
         resize25: '25% 크기',
         mirrorHorizontal: '좌우 반전',
-        mirrorVertical: '상하 반전'
+        mirrorVertical: '상하 반전',
+        rotateLeft: '왼쪽으로 회전',
+        rotateRight: '오른쪽으로 회전'
     }
 };

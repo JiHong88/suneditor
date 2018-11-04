@@ -149,18 +149,18 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-media-container/.test(element.className)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the range format element. (blockquote, TABLE, TR, TD, OL, UL, PRE)
+     * @description It is judged whether it is the range format element. (blockquote, TH, TD, OL, UL, PRE)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TABLE|TBODY|THEAD|TFOOT|TR|TD|OL|UL|PRE)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TH|TD|OL|UL|PRE)$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -245,12 +245,21 @@ const util = {
     },
 
     /**
-     * @description Gets whether the cell is a table
-     * @param {Element} node - Nodes to scan
+     * @description Check the node is a table cell
+     * @param {Element} node - Nodes to check
      * @returns {Boolean}
      */
     isCell: function (node) {
         return node && /^(?:TD|TH)$/i.test(node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a break node (BR)
+     * @param {Element} node - Nodes to check
+     * @returns {Boolean}
+     */
+    isBreak: function (node) {
+        return node && /^BR$/i.test(node.nodeName);
     },
 
     /**
@@ -304,30 +313,39 @@ const util = {
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
      * @param {Node} element - Reference element
-     * @param {String} query - Query String (tagName, .className, #ID, :name)
+     * @param {String|Function} query - Query String (tagName, .className, #ID, :name) or validation function.
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
      */
     getParentElement: function (element, query) {
-        let attr;
+        let check;
 
-        if (/\./.test(query)) {
-            attr = 'className';
-            query = query.split('.')[1];
-        } else if (/#/.test(query)) {
-            attr = 'id';
-            query = '^' + query.split('#')[1] + '$';
-        } else if (/:/.test(query)) {
-            attr = 'name';
-            query = '^' + query.split(':')[1] + '$';
+        if (typeof query === 'function') {
+            check = query;
         } else {
-            attr = 'tagName';
-            query = '^' + query + '$';
+            let attr;
+            if (/\./.test(query)) {
+                attr = 'className';
+                query = query.split('.')[1];
+            } else if (/#/.test(query)) {
+                attr = 'id';
+                query = '^' + query.split('#')[1] + '$';
+            } else if (/:/.test(query)) {
+                attr = 'name';
+                query = '^' + query.split(':')[1] + '$';
+            } else {
+                attr = 'tagName';
+                query = '^' + query + '$';
+            }
+
+            const regExp = new RegExp(query, 'i');
+            check = function (el) {
+                return regExp.test(el[attr]);
+            };
         }
 
-        const check = new RegExp(query, 'i');
-        while (element && (element.nodeType === 3 || !check.test(element[attr]))) {
+        while (element && (element.nodeType === 3 || !check(element))) {
             if (this.isWysiwygDiv(element)) {
                 return null;
             }
@@ -335,6 +353,50 @@ const util = {
         }
 
         return element;
+    },
+
+    /**
+     * @description Get the child element of the argument value.
+     * A tag that satisfies the query condition is imported.
+     * Returns null if not found.
+     * @param {Node} element - Reference element
+     * @param {String|Function} query - Query String (tagName, .className, #ID, :name) or validation function.
+     * Not use it like jquery.
+     * Only one condition can be entered at a time.
+     * @returns {Element|null}
+     */
+    getChildElement: function (element, query) {
+        let check;
+
+        if (typeof query === 'function') {
+            check = query;
+        } else {
+            let attr;
+            if (/\./.test(query)) {
+                attr = 'className';
+                query = query.split('.')[1];
+            } else if (/#/.test(query)) {
+                attr = 'id';
+                query = '^' + query.split('#')[1] + '$';
+            } else if (/:/.test(query)) {
+                attr = 'name';
+                query = '^' + query.split(':')[1] + '$';
+            } else {
+                attr = 'tagName';
+                query = '^' + query + '$';
+            }
+
+            const regExp = new RegExp(query, 'i');
+            check = function (el) {
+                return regExp.test(el[attr]);
+            };
+        }
+
+        const childList = this.getListChildren(element, function (current) {
+            return check(current);
+        });
+
+        return childList[0];
     },
 
     /**
@@ -346,19 +408,13 @@ const util = {
         let tableOffsetLeft = 0;
         let tableOffsetTop = 0;
         let tableElement = element.parentNode;
-        const noIframe = !/sun-editor-id-iframe-container/.test(element.className);
 
         while (!this.isWysiwygDiv(tableElement)) {
-            if(noIframe && /^(?:TD|TABLE)$/i.test(tableElement.nodeName)) {
+            if (/sun-editor-id-position-relative/.test(tableElement.className) || /relative/.test(tableElement.style.position)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }
             tableElement = tableElement.parentNode;
-        }
-
-        if (/^(?:SUB|SUP)$/i.test(element.parentNode.nodeName)) {
-            tableOffsetLeft = element.parentNode.offsetLeft;
-            tableOffsetTop = element.parentNode.offsetTop;
         }
 
         return {
