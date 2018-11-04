@@ -101,7 +101,7 @@ export default {
             tableHTML += '<tr>';
             let tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td><div>&#65279</div></td>';
+                tableHTML += '<td></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';
@@ -114,7 +114,7 @@ export default {
         const formatEl = this.util.getFormatElement(this.getSelectionNode());
 
         this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? this.util.getRangeFormatElement(formatEl) : formatEl);
-        this.appendP(oTable);
+        this.appendFormatTag(oTable);
         this.focus();
 
         this.plugins.table.reset_table_picker.call(this);
@@ -223,7 +223,7 @@ export default {
             let cells = '';
 
             for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td><div>&#65279</div></td>';
+                cells += '<td></td>';
             }
 
             const newRow = contextTable._element.insertRow(rowIndex);
@@ -233,11 +233,9 @@ export default {
         else {
             const trArray = contextTable._trElements;
             const cellIndex = option === 'left' ? contextTable._tdIndex : contextTable._tdIndex + 1;
-            let cell = null;
             
             for (let i = 0, len = contextTable._trCnt; i < len; i++) {
-                cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>&#65279</div>';
+                trArray[i].insertCell(cellIndex);
             }
         }
 

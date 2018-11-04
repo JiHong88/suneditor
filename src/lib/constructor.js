@@ -38,7 +38,7 @@ const _Constructor = {
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
-        options.popupDisplay = options.popupDisplay || '';
+        options.popupDisplay = options.popupDisplay || 'full';
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],

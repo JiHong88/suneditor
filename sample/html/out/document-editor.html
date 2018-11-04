@@ -851,10 +851,12 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="appendP"><span class="type-signature"></span>appendP<span
+            <h4 class="name" id="appendFormatTag"><span class="type-signature"></span>appendFormatTag<span
                     class="signature">(element)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Append P tag to current line next
+                Append format element to sibling node of argument element.<br>
+                If the "formatNodeName" argument value is present, the tag of that argument value is inserted,<br>
+                If not, the currently selected format tag is inserted.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -872,6 +874,13 @@
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">Insert as siblings of that element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>formatNodeName</code></td>
+                    <td class="type">
+                        <span class="param-type">String | null</span>
+                    </td>
+                    <td class="description last">Node name to be inserted</td>
                 </tr>
                 </tbody>
             </table>
@@ -903,9 +912,7 @@
                 <tr>
                     <td class="name"><code>rightNode</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
-                        |
-                        <span class="param-type">null</span>
+                        <span class="param-type">Element | null</span>
                     </td>
                     <td class="description last">If the node exists, it is inserted after the node</td>
                 </tr>
@@ -1155,7 +1162,7 @@
         <li><a href="document-editor.html#isEdgePoint">isEdgePoint</a></li>
         <li><a href="document-editor.html#showLoading">showLoading</a></li>
         <li><a href="document-editor.html#closeLoading">closeLoading</a></li>
-        <li><a href="document-editor.html#appendP">appendP</a></li>
+        <li><a href="document-editor.html#appendFormatTag">appendFormatTag</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
         <li><a href="document-editor.html#wrapToTags">wrapToTags</a></li>

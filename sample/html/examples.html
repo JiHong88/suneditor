@@ -96,7 +96,7 @@
 <span class="pl-s">videoWidth</span><span class="pl-k">      : </span>The default width size of the video frame         <span class="pl-ent">default : </span><span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
 <span class="pl-s">videoHeight</span><span class="pl-k">     : </span>The default heigth size of the video frame        <span class="pl-ent">default : </span><span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
 <span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizingBar <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || '') <span class="pl-ent">default : </span><span class="pl-c1">''</span> {<span class="pl-c1">String</span>}
+<span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || 'local') <span class="pl-ent">default : </span><span class="pl-c1">'full'</span> {<span class="pl-c1">String</span>}
 
 <span class="pl-k">lang</span><span class="pl-k">            : </span>language object (en, ko) <span class="pl-ent">default : </span><span class="pl-c1">English</span> {<span class="pl-c1">Object</span>}
 
@@ -141,7 +141,7 @@
         videoWidth <span class="pl-k">:</span> <span class="pl-c1">360</span>,
         videoHeight <span class="pl-k">:</span> <span class="pl-c1">115</span>,
         imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
-        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span>,
+        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>,
         resizingBar<span class="pl-k">:</span> <span class="pl-c1">false</span>,
         buttonList <span class="pl-k">:</span> [
             [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
@@ -171,7 +171,7 @@
             <div>&nbsp; &nbsp; videoWidth : <span style="color: rgb(0, 51, 153);">360</span>,</div>
             <div>&nbsp; &nbsp; videoHeight : <span style="color: rgb(0, 51, 153);">115</span>,</div>
             <div>&nbsp; &nbsp; imageSize : <span style="color: rgb(0, 51, 153);">150,</span></div>
-            <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'full'</span>,</div>
+            <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'local'</span>,</div>
             <div>&nbsp; &nbsp; resizingBar : <span style="color: rgb(0, 130, 153);">false</span>,</div>
             <div>&nbsp; &nbsp; buttonList : [</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span style="color: rgb(152, 0, 0);">'undo', 'redo',</span></div>
@@ -421,7 +421,7 @@
         videoWidth : 360,
         videoHeight : 115,
         imageSize : 150,
-        popupDisplay: 'full',
+        popupDisplay: 'local',
         resizingBar: false,
         buttonList : [
             ['undo', 'redo',

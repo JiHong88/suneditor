@@ -20,6 +20,7 @@ export default {
             _container: null,
             _cover: null,
             _element: null,
+            _resizingDiv: null,
             _element_w: context.user.videoWidth,
             _element_h: context.user.videoHeight,
             _element_l: 0,
@@ -128,6 +129,7 @@ export default {
             const contextVideo = this.context.video;
             const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.user.videoWidth);
             const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.user.videoHeight);
+            let resizingDiv = null;
             let oIframe = null;
             let cover = null;
             let container = null;
@@ -158,6 +160,7 @@ export default {
                 container = contextVideo._container;
                 cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
+                resizingDiv = contextVideo._resizingDiv;
             }
             /** create */
             else {
@@ -175,7 +178,7 @@ export default {
                 cover = this.plugins.resizing.set_cover.call(this, oIframe);
 
                 /** resizingDiv */
-                const resizingDiv = document.createElement('DIV');
+                resizingDiv = document.createElement('DIV');
                 resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
                 cover.appendChild(resizingDiv);
 
@@ -198,7 +201,7 @@ export default {
 
             // size
             oIframe.style.width = w + 'px';
-            oIframe.style.height = h + 'px';
+            oIframe.style.height = resizingDiv.style.height = h + 'px';
 
             // align
             if (contextVideo._align && 'none' !== contextVideo._align) {
@@ -213,7 +216,7 @@ export default {
 
             if (!this.context.dialog.updateModal) {
                 this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-                this.appendP(container);
+                this.appendFormatTag(container);
             } else {
                 oIframe.setAttribute('data-percent', '');
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
@@ -246,7 +249,8 @@ export default {
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
         contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
-        contextVideo._caption = this.util.getChildElement(contextVideo._container, 'FIGCAPTION');
+        contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
+        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
 
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
@@ -279,6 +283,13 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
 
+    setSize: function (w, h, isVertical) {
+        const contextVideo = this.context.video;
+        contextVideo._element.style.width = w + 'px';
+        contextVideo._element.style.height = h + 'px';
+        contextVideo._resizingDiv.style.height = (isVertical ? w : h) + 'px';
+    },
+
     setPercentSize: function (w) {
         const contextVideo = this.context.video;
 
@@ -286,11 +297,12 @@ export default {
         this.util.addClass(contextVideo._element, 'float-' + contextVideo._align);
 
         contextVideo._cover.style.width = '100%';
+        contextVideo._cover.style.height = '';
         contextVideo._element.style.width = '100%';
         contextVideo._container.style.width = w;
 
         contextVideo._element.style.width = contextVideo._element.offsetWidth + 'px';
-        contextVideo._element.style.height = ((contextVideo._element_h / contextVideo._element_w) * contextVideo._element.offsetWidth) + 'px';
+        contextVideo._element.style.height = contextVideo._cover.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
         contextVideo._container.style.width = '';
     },
 

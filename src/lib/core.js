@@ -445,19 +445,24 @@ const core = function (context, util, plugins, lang) {
         },
 
         /**
-         * @description Append P tag to current line next
+         * @description Append format element to sibling node of argument element.
+         * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
+         * If not, the currently selected format tag is inserted.
          * @param {Element} element - Insert as siblings of that element
+         * @param {String|null} formatNodeName - Node name to be inserted
          * @returns {Element}
          */
-        appendP: function (element) {
+        appendFormatTag: function (element, formatNodeName) {
             const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
-            const oP = document.createElement('P');
-            oP.innerHTML = '&#65279';
+            const currentFormatEl = util.getFormatElement(this.getSelectionNode());
+            const oFormatName = formatNodeName ? formatNodeName : this.util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormat = document.createElement(oFormatName);
+            oFormat.innerHTML = '&#65279';
 
-            if (/^TD$/i.test(formatEl.nodeName)) formatEl.insertBefore(oP, element.nextElementSibling);
-            else formatEl.parentNode.insertBefore(oP, formatEl.nextElementSibling);
+            if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
+            else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
 
-            return oP;
+            return oFormat;
         },
 
         /**
@@ -487,7 +492,7 @@ const core = function (context, util, plugins, lang) {
                         rightNode = commonCon.splitText(endOff);
                     }
                     else {
-                        if (parentNode.lastChild !== null && /^BR$/i.test(parentNode.lastChild.nodeName)) {
+                        if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
                             parentNode.removeChild(parentNode.lastChild);
                         }
                         rightNode = null;
@@ -623,6 +628,15 @@ const core = function (context, util, plugins, lang) {
         wrapToTags: function (wrapTag) {
             const range = this.getRange();
             const rangeLines = this.getSelectedFormatElements();
+
+            if (!rangeLines) {
+                const inner = document.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
+                inner.innerHTML = '&#65279';
+                wrapTag.appendChild(inner);
+                this.getSelectionNode().appendChild(wrapTag);
+                return;
+            }
+
             let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
 
@@ -631,15 +645,19 @@ const core = function (context, util, plugins, lang) {
             } else {
                 standTag = util.getRangeFormatElement(last) || util.getFormatElement(last);
             }
-            
-            if (/^TD$/i.test(last.nodeName)) last = util.getFormatElement(last);
-            
-            beforeTag = standTag.nextSibling;
-            pElement = standTag.parentNode;
+
+            if (util.isCell(standTag)) {
+                beforeTag = null;
+                pElement = standTag;
+            } else {
+                beforeTag = standTag.nextSibling;
+                pElement = standTag.parentNode;
+            }
 
             let listParent = null;
             let line = null;
             let prevNodeName = '';
+            let oDiv;
             
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 line = rangeLines[i];
@@ -651,7 +669,8 @@ const core = function (context, util, plugins, lang) {
 
                     listParent.appendChild(line);
                     if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) wrapTag.appendChild(listParent);
-                } else {
+                }
+                else {
                     wrapTag.appendChild(line);
                 }
 
@@ -692,7 +711,7 @@ const core = function (context, util, plugins, lang) {
 
             /** tag check function*/
             const checkCss = function (vNode) {
-                if (vNode.nodeType === 3) return true;
+                if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
 
                 let style = '';
                 if (regExp && vNode.style.cssText.length > 0) {
@@ -848,7 +867,7 @@ const core = function (context, util, plugins, lang) {
                     let child = childNodes[i];
                     let coverNode = node;
 
-                    if ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName)) {
+                    if ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child)) {
                         let cloneNode;
 
                         // startContainer
@@ -917,7 +936,7 @@ const core = function (context, util, plugins, lang) {
                                 newNode.textContent = afterNode.data;
                             }
 
-                            newNode = node;
+                            newNode = child;
                             pCurrent = [];
                             cssText = '';
                             while (newNode !== pNode && newNode !== el && newNode !== null) {
@@ -947,7 +966,7 @@ const core = function (context, util, plugins, lang) {
                         }
                         // other
                         if (startPass) {
-                            if (child.nodeType === 1) {
+                            if (child.nodeType === 1 && !util.isBreak(child)) {
                                 recursionFunc(child, child);
                                 continue;
                             }
@@ -956,7 +975,7 @@ const core = function (context, util, plugins, lang) {
                             pCurrent = [];
                             cssText = '';
                             while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                                if (newNode.nodeType === 1 && (endPass || validation(newNode)) && checkCss(newNode)) {
+                                if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || validation(newNode)) && checkCss(newNode)) {
                                     pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
@@ -985,7 +1004,7 @@ const core = function (context, util, plugins, lang) {
 
                         cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
-                        if (child.nodeType === 1) coverNode = cloneNode;
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -1018,7 +1037,7 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
                     let coverNode = node;
-                    if (validation(child) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if (validation(child) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1056,7 +1075,7 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                    if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
@@ -1128,7 +1147,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1172,7 +1191,7 @@ const core = function (context, util, plugins, lang) {
                     const child = childNodes[i];
                     let coverNode = node;
 
-                    if (passNode && !/^BR$/i.test(child.nodeName)) {
+                    if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             recursionFunc(child, child);
                             continue;
@@ -1244,7 +1263,7 @@ const core = function (context, util, plugins, lang) {
                         continue;
                     }
 
-                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || /^BR$/i.test(child.nodeName))) {
+                    if ((!passNode || validation(child)) && ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child))) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
                         if (child.nodeType === 1) coverNode = cloneNode;
@@ -1646,18 +1665,6 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
 
-            if (/^TD$/i.test(targetElement.nodeName) || /^TD$/i.test(targetElement.parentNode.nodeName)) {
-                editor.controllersOff();
-
-                let td = targetElement;
-                while (!/^TD$/i.test(td.nodeName)) {
-                    td = td.parentNode;
-                }
-
-                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
-                return;
-            }
-
             if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
                 editor.callPlugin('video', function () {
@@ -1668,6 +1675,9 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
 
+            editor._setEditorRange();
+            event._findButtonEffectTag();
+
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption) {
                 e.preventDefault();
@@ -1676,12 +1686,16 @@ const core = function (context, util, plugins, lang) {
                 figcaption.focus();
 
                 figcaption.addEventListener('blur', event._cancelCaptionEdit);
-                
-                return;
-            }
+            } else if (util.isCell(targetElement) || util.isCell(targetElement.parentNode)) {
+                editor.controllersOff();
 
-            editor._setEditorRange();
-            event._findButtonEffectTag();
+                let td = targetElement;
+                while (!util.isCell(td)) {
+                    td = td.parentNode;
+                }
+
+                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+            }
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -1729,11 +1743,11 @@ const core = function (context, util, plugins, lang) {
                     editor.controllersOff();
 
                     let currentNode = selectionNode || editor.getSelectionNode();
-                    while (!/^TD$/i.test(currentNode.nodeName) && !util.isWysiwygDiv(currentNode)) {
+                    while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
 
-                    if (currentNode && /^TD$/i.test(currentNode.nodeName)) {
+                    if (currentNode && util.isCell(currentNode)) {
                         const table = util.getParentElement(currentNode, 'table');
                         const cells = util.getListChildren(table, util.isCell);
                         let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
@@ -1797,7 +1811,7 @@ const core = function (context, util, plugins, lang) {
             }
 
             if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
-                editor.execCommand('formatBlock', false, util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
+                editor.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
                 return;
             }
 

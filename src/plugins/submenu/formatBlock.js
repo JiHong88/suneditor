@@ -71,7 +71,7 @@ export default {
             const rangeElement = document.createElement(value);
             this.wrapToTags(rangeElement);
             this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
-            this.appendP(rangeElement);
+            this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
         }
         // others
         else {

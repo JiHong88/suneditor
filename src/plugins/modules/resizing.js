@@ -111,12 +111,12 @@ export default {
         const resizeDiv = contextResizing.resizeDiv;
         const offset = this.util.getOffset(targetElement);
 
-        contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
+        const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 
-        const w = contextResizing._rotateVertical ? targetElement.offsetHeight : targetElement.offsetWidth;
-        const h = contextResizing._rotateVertical ? targetElement.offsetWidth : targetElement.offsetHeight;
+        const w = isVertical ? targetElement.offsetHeight : targetElement.offsetWidth;
+        const h = isVertical ? targetElement.offsetWidth : targetElement.offsetHeight;
         const t = offset.top;
-        const l = offset.left;
+        const l = offset.left - this.context.element.wysiwyg.scrollLeft;
 
         resizeContainer.style.top = t + 'px';
         resizeContainer.style.left = l + 'px';
@@ -158,12 +158,17 @@ export default {
         };
     },
 
-    cancel_controller_resize: function (isVertical) {
-        this.context[this.context.resizing._resize_plugin]._element.style.width = (isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w) + 'px';
-        this.context[this.context.resizing._resize_plugin]._element.style.height = (isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h) + 'px';
-
+    cancel_controller_resize: function () {
+        const isVertical = this.context.resizing._rotateVertical;
         this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
+
+        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
+        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
+
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
+        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
+        
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
     },
 
@@ -201,6 +206,7 @@ export default {
 
         const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
         const contextEl = this.context[this.context.resizing._resize_plugin]._element;
+        const contextPlugin = this.plugins[this.context.resizing._resize_plugin];
 
         e.preventDefault();
 
@@ -208,8 +214,10 @@ export default {
             this.plugins.resizing.resetTransform.call(this, contextEl);
 
             contextEl.setAttribute('data-percent', value * 100);
-            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, (value * 100) + '%', 'auto');
-            this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
+            contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
+
+            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
+            contextPlugin.onModifyMode.call(this, contextEl, size);
 
             return;
         }
@@ -240,22 +248,26 @@ export default {
             contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
 
             this.plugins.resizing.setTransformSize.call(this, contextEl);
-            this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
+
+            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
+            contextPlugin.onModifyMode.call(this, contextEl, size);
 
             return;
         }
         else if (/revert/.test(command)) {
-            this.plugins[this.context.resizing._resize_plugin].resetAlign.call(this);
+            contextPlugin.resetAlign.call(this);
             this.plugins.resizing.resetTransform.call(this, contextEl);
-            this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
+
+            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
+            contextPlugin.onModifyMode.call(this, contextEl, size);
 
             return;
         }
         else if (/update/.test(command)) {
-            this.plugins[this.context.resizing._resize_plugin].openModify.call(this);
+            contextPlugin.openModify.call(this);
         }
         else if (/delete/.test(command)) {
-            this.plugins[this.context.resizing._resize_plugin].destroy.call(this);
+            contextPlugin.destroy.call(this);
         }
 
         this.submenuOff();
@@ -287,12 +299,13 @@ export default {
         const offsetW = element.offsetWidth;
         const offsetH = element.offsetHeight;
         const w = isVertical ? offsetH : offsetW;
+        const h = isVertical ? offsetW : offsetH;
 
         this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH, isVertical);
 
-        element.style.width = offsetW + 'px';
-        element.style.height = offsetH + 'px';
         cover.style.width = w + 'px';
+        cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h + 'px');
 
         let transOrigin = '';
         if (isVertical) {
@@ -302,15 +315,9 @@ export default {
         }
 
         element.style.transformOrigin = transOrigin;
-            
+
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
         this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
-    },
-
-    _setCaptionPosition: function (element, figcaption) {
-        if (figcaption) {
-            figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
-        }
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -343,6 +350,12 @@ export default {
         element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
     },
 
+    _setCaptionPosition: function (element, figcaption) {
+        if (figcaption) {
+            figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
+        }
+    },
+
     onMouseDown_resize_handle: function (e) {
         const contextResizing = this.context.resizing;
         const direction = contextResizing._resize_direction = e.target.classList[0];
@@ -357,7 +370,7 @@ export default {
         contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
         const closureFunc_bind = function closureFunc() {
-            this.plugins.resizing.cancel_controller_resize.call(this, this.context.resizing._rotateVertical);
+            this.plugins.resizing.cancel_controller_resize.call(this);
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
         }.bind(this);

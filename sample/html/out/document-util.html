@@ -178,7 +178,7 @@
             <h4 class="name" id="isRangeFormatElement"><span class="type-signature"></span>isRangeFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the range format element. (blockquote, TABLE, TR, TD, OL, UL)<br>
+                It is judged whether it is the range format element. (blockquote, TH, TD, OL, UL)<br>
                 Range format element is wrap the format element  (P, DIV, H1-6, LI)
             </div>
             <h5>Parameters:</h5>
@@ -362,7 +362,34 @@
         <h4 class="name" id="isCell"><span class="type-signature"></span>isCell<span class="signature">(node)</span><span
                 class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
-            Gets whether the cell is a table
+            Check the node is a table cell
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Nodes to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isBreak"><span class="type-signature"></span>isBreak<span class="signature">(node)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Check the node is a break node (BR)
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -488,9 +515,9 @@
             <tr>
                 <td class="name"><code>query</code></td>
                 <td class="type">
-                    <span class="param-type">String</span>
+                    <span class="param-type">String | Function</span>
                 </td>
-                <td class="description last">Query String (tagName, .className, #ID, :name)<br>
+                <td class="description last">Query String (tagName, .className, #ID, :name) or validation function.<br>
                     Not use it like jquery.<br>
                     Only one condition can be entered at a time.</td>
             </tr>
@@ -527,9 +554,9 @@
             <tr>
                 <td class="name"><code>query</code></td>
                 <td class="type">
-                    <span class="param-type">String</span>
+                    <span class="param-type">String | Function</span>
                 </td>
-                <td class="description last">Query String (tagName, .className, #ID, :name)<br>
+                <td class="description last">Query String (tagName, .className, #ID, :name) or validation function.<br>
                     Not use it like jquery.<br>
                     Only one condition can be entered at a time.</td>
             </tr>
@@ -812,6 +839,7 @@
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
         <li><a href="document-util.html#isCell">isCell</a></li>
+        <li><a href="document-util.html#isBreak">isBreak</a></li>
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
         <li><a href="document-util.html#getListChildNodes">getListChildNodes</a></li>
         <li><a href="document-util.html#getParentElement">getParentElement</a></li>

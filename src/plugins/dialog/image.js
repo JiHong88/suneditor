@@ -367,7 +367,7 @@ export default {
         this.util.addClass(container, 'float-' + align);
 
         this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-        this.appendP(container);
+        this.appendFormatTag(container);
     },
 
     update_image: function () {
@@ -471,7 +471,7 @@ export default {
     onModifyMode: function (element, size) {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
-        contextImage._element = contextImage._element = element;
+        contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
         contextImage._container = this.util.getParentElement(element, '.sun-editor-id-image-container');
         contextImage._caption = this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION');
@@ -510,6 +510,12 @@ export default {
         this.plugins.dialog.openDialog.call(this, 'image', null, true);
     },
 
+    setSize: function (w, h) {
+        const contextImage = this.context.image;
+        contextImage._element.style.width = w + 'px';
+        contextImage._element.style.height = h + 'px';
+    },
+
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
 
@@ -517,6 +523,7 @@ export default {
         this.util.addClass(contextImage._element, 'float-' + contextImage._align);
 
         contextImage._cover.style.width = '100%';
+        contextImage._cover.style.height = '';
         contextImage._element.style.width = w;
         contextImage._element.style.height = h;
     },

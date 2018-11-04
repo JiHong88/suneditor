@@ -258,7 +258,7 @@ display         : The display property of suneditor                 default : 'b
 videoWidth      : The default width size of the video frame         default : 560 {Number}
 videoHeight     : The default heigth size of the video frame        default : 315 {Number}
 showPathLabel   : Displays the current node structure to resizingBar default : true {Boolean}
-popupDisplay    : Size of background area when activating dialog window ('full' || '') default : '' {String}
+popupDisplay    : Size of background area when activating dialog window ('full' || 'local') default : 'full' {String}
 
 lang            : language object (en, ko) default : English {Object}
 
