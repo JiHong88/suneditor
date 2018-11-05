@@ -1876,7 +1876,7 @@ const core = function (context, util, plugins, lang) {
                 event.onScroll_window();
             }
 
-            editor.submenuOff();
+            editor.controllersOff();
         },
 
         onScroll_window: function () {
