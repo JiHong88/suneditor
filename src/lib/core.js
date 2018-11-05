@@ -1382,11 +1382,12 @@ const core = function (context, util, plugins, lang) {
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
+                if (context.user.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
             }
             else {
-                context.element.code.value = context.element.wysiwyg.innerHTML.trim().replace(/<\/p>(?=[^\n])/gi, '<\/p>\n');
+                context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg.innerHTML.trim());
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
                 if (context.user.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
@@ -1912,6 +1913,10 @@ const core = function (context, util, plugins, lang) {
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = false;
+        },
+
+        _codeViewAutoScroll: function () {
+            context.element.code.style.height = context.element.code.scrollHeight + 'px';
         }
     };
 
@@ -1924,6 +1929,9 @@ const core = function (context, util, plugins, lang) {
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+
+    /** code view area auto line */
+    if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
 
     /** resizingBar */
     if (context.element.resizingBar) {

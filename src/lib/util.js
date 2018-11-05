@@ -134,6 +134,35 @@ const util = {
     },
 
     /**
+     * @description Converts HTML string into a format that can be placed in an editor of code view mode
+     * @param {String} html - HTML string
+     * @returns {String}
+     */
+    convertHTMLForCodeView: function (html) {
+        return html.replace(/\s*<(?:li|td)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/gi, this._insertIndent)
+                    .replace(/<\/?(?:blockquote|pre|hr|ol|ul|table|tbody|thead|th|tr)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>(?=[^\n])/gi, this._insertLineBreak)
+                    .replace(/<\/(?:p|div|h[1-6]|li|td)>(?=[^\n])/gi, this._insertLineBreak);
+    },
+
+    /**
+     * @description Add a line break to the open tag
+     * @param {String} matchTag - matched tag string
+     * @returns {String}
+     */
+    _insertIndent: function (matchTag) {
+        return '  ' + matchTag.trim();
+    },
+
+    /**
+     * @description Add a line breaks to the tags
+     * @param {String} matchTag - matched tag string
+     * @returns {String}
+     */
+    _insertLineBreak: function (matchTag) {
+        return matchTag + '\n';
+    },
+
+    /**
      * @description It is judged whether it is the edit region top div element.
      * @param {Element} element - The element to check
      * @returns {Boolean}
