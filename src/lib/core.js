@@ -869,8 +869,17 @@ const core = function (context, util, plugins, lang) {
                     if ((child.textContent.length > 0 && child.textContent !== '&#65279') || util.isBreak(child)) {
                         let cloneNode;
 
+                        if (!startPass && startContainer.nodeType === 1 && child.nodeType === 3) {
+                            let newStart;
+                            if (startContainer.firstChild && startContainer.firstChild.nodeType === 3) newStart = startContainer.firstChild;
+                            else newStart = child;
+
+                            startOffset = newStart.length;
+                            startContainer = newStart;
+                        }
+
                         // startContainer
-                        if (child === startContainer) {
+                        if (!startPass && child === startContainer) {
                             const prevNode = document.createTextNode(startContainer.substringData(0, startOffset));
                             const textNode = document.createTextNode(startContainer.substringData(startOffset, (startContainer.length - startOffset)));
 
@@ -908,7 +917,7 @@ const core = function (context, util, plugins, lang) {
                             continue;
                         }
                         // endContainer
-                        else if (child === endContainer) {
+                        else if (!endPass && child === endContainer) {
                             const afterNode = document.createTextNode(endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                             const textNode = document.createTextNode(endContainer.substringData(0, endOffset));
 
@@ -1073,6 +1082,15 @@ const core = function (context, util, plugins, lang) {
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     const child = childNodes[i];
                     let coverNode = node;
+
+                    if (!passNode && container.nodeType === 1 && child.nodeType === 3) {
+                        let newStart;
+                        if (container.firstChild && container.firstChild.nodeType === 3) newStart = container.firstChild;
+                        else newStart = child;
+
+                        offset = newStart.length;
+                        container = newStart;
+                    }
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
