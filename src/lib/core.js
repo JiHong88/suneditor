@@ -1689,14 +1689,13 @@ const core = function (context, util, plugins, lang) {
                 figcaption.focus();
 
                 figcaption.addEventListener('blur', event._cancelCaptionEdit);
-            } else if (util.isCell(targetElement) || util.isCell(targetElement.parentNode)) {
+
+                return;
+            }
+            
+            const td = util.getParentElement(targetElement, 'TD');
+            if (td) {
                 editor.controllersOff();
-
-                let td = targetElement;
-                while (!util.isCell(td)) {
-                    td = td.parentNode;
-                }
-
                 editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
             }
         },
