@@ -140,8 +140,8 @@ const util = {
      */
     convertHTMLForCodeView: function (html) {
         return html.replace(/\s*<(?:li|td)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/gi, this._insertIndent)
-                    .replace(/<\/?(?:blockquote|pre|hr|ol|ul|table|tbody|thead|th|tr)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>(?=[^\n])/gi, this._insertLineBreak)
-                    .replace(/<\/(?:p|div|h[1-6]|li|td)>(?=[^\n])/gi, this._insertLineBreak);
+                    .replace(/<\/?(?:blockquote|hr|ol|ul|table|tbody|thead|th|tr)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>(?=[^\n])/gi, this._insertLineBreak)
+                    .replace(/<\/(?:p|div|h[1-6]|li|td|pre)>(?=[^\n])/gi, this._insertLineBreak);
     },
 
     /**
