@@ -293,27 +293,21 @@ export default {
     setPercentSize: function (w) {
         const contextVideo = this.context.video;
 
-        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-        this.util.addClass(contextVideo._element, 'float-' + contextVideo._align);
-
+        contextVideo._container.style.width = w;
+        contextVideo._container.style.height = '';
         contextVideo._cover.style.width = '100%';
         contextVideo._cover.style.height = '';
         contextVideo._element.style.width = '100%';
-        contextVideo._container.style.width = w;
-
-        contextVideo._element.style.width = contextVideo._element.offsetWidth + 'px';
-        contextVideo._element.style.height = contextVideo._cover.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
-        contextVideo._container.style.width = '';
+        contextVideo._element.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
     },
 
     cancelPercentAttr: function () {
         const contextVideo = this.context.video;
-
-        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
-        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
         
         contextVideo._cover.style.width = '';
         contextVideo._cover.style.height = '';
+        contextVideo._container.style.width = '';
+        contextVideo._container.style.height = '';
     },
 
     resetAlign: function () {

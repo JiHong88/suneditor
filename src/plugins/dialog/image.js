@@ -519,23 +519,21 @@ export default {
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
 
-        this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
-        this.util.addClass(contextImage._element, 'float-' + contextImage._align);
-
+        contextImage._container.style.width = w;
+        contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
         contextImage._cover.style.height = '';
-        contextImage._element.style.width = w;
+        contextImage._element.style.width = '100%';
         contextImage._element.style.height = h;
     },
 
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
-
-        this.util.addClass(contextImage._container, 'float-' + contextImage._align);
-        this.util.removeClass(contextImage._element, contextImage._floatClassRegExp);
         
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
+        contextImage._container.style.width = '';
+        contextImage._container.style.height = '';
     },
 
     resetAlign: function () {
