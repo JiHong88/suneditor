@@ -15,6 +15,7 @@
     font-size: inherit;
     color: inherit;
     background-color: inherit;
+    box-sizing: border-box;
 }
 
 /** controllers on tag */

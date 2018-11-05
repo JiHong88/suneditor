@@ -1711,8 +1711,14 @@ const core = function (context, util, plugins, lang) {
                 return;
             }
             
-            const td = util.getParentElement(targetElement, 'TD');
+            const td = util.getParentElement(targetElement, util.isCell);
             if (td) {
+                if (util.isCell(targetElement)) {
+                    editor.execCommand('formatBlock', false, 'DIV');
+                    editor._setEditorRange();
+                    event._findButtonEffectTag();
+                }
+
                 editor.controllersOff();
                 editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
             }
@@ -1832,6 +1838,8 @@ const core = function (context, util, plugins, lang) {
 
             if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
                 editor.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
+                editor._setEditorRange();
+                event._findButtonEffectTag();
                 return;
             }
 
