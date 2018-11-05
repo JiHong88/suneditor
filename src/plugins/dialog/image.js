@@ -525,6 +525,11 @@ export default {
         contextImage._cover.style.height = '';
         contextImage._element.style.width = '100%';
         contextImage._element.style.height = h;
+
+        if (/100/.test(w)) {
+            this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+            this.util.addClass(contextImage._container, 'float-center');
+        }
     },
 
     cancelPercentAttr: function () {
@@ -534,6 +539,9 @@ export default {
         contextImage._cover.style.height = '';
         contextImage._container.style.width = '';
         contextImage._container.style.height = '';
+
+        this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+        this.util.addClass(contextImage._container, 'float-' + contextImage._align);
     },
 
     resetAlign: function () {
@@ -543,7 +551,6 @@ export default {
         contextImage._align = 'none';
         contextImage._cover.style.margin = '0';
         this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
-        this.util.removeClass(contextImage._element, contextImage._floatClassRegExp);
     },
 
     destroy: function () {

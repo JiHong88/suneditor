@@ -299,6 +299,11 @@ export default {
         contextVideo._cover.style.height = '';
         contextVideo._element.style.width = '100%';
         contextVideo._element.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
+
+        if (/100/.test(w)) {
+            this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+            this.util.addClass(contextVideo._container, 'float-center');
+        }
     },
 
     cancelPercentAttr: function () {
@@ -308,6 +313,9 @@ export default {
         contextVideo._cover.style.height = '';
         contextVideo._container.style.width = '';
         contextVideo._container.style.height = '';
+
+        this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
     },
 
     resetAlign: function () {
@@ -317,7 +325,6 @@ export default {
         contextVideo._align = 'none';
         contextVideo._cover.style.margin = '0';
         this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-        this.util.removeClass(contextVideo._element, contextVideo._floatClassRegExp);
     },
 
     destroy: function () {
