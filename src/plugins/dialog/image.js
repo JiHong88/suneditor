@@ -477,7 +477,9 @@ export default {
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
         contextImage._container = this.util.getParentElement(element, '.sun-editor-id-image-container');
-        contextImage._caption = this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION');
+        contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
+
+        contextImage._align = element.getAttribute('data-align') || 'none';
 
         contextImage._element_w = size.w;
         contextImage._element_h = size.h;
@@ -502,7 +504,7 @@ export default {
         contextImage.altText.value = contextImage._element.alt;
         contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
-        contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + (contextImage._element.getAttribute('data-align') || 'none') + '"]').checked = true;
+        contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
         contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
         contextImage.imageX.value = contextImage._element.offsetWidth;

@@ -255,6 +255,8 @@ export default {
         contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
         contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
 
+        contextVideo._align = element.getAttribute('data-align') || 'none';
+
         contextVideo._element_w = size.w;
         contextVideo._element_h = size.h;
         contextVideo._element_t = size.t;
@@ -281,7 +283,7 @@ export default {
         contextVideo._captionChecked = contextVideo.captionCheckEl.checked = !!contextVideo._caption;
         contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
         contextVideo.proportion.disabled = false;
-        contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + (contextVideo._element.getAttribute('data-align') || 'none') + '"]').checked = true;
+        contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
         this.plugins.dialog.openDialog.call(this, 'video', null, true);
     },
