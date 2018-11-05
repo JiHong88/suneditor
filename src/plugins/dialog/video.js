@@ -173,18 +173,21 @@ export default {
                     this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
                     this.style.height = this.offsetHeight + 'px';
                 }.bind(oIframe);
+                contextVideo._element = oIframe;
 
                 /** cover */
                 cover = this.plugins.resizing.set_cover.call(this, oIframe);
 
                 /** resizingDiv */
-                resizingDiv = document.createElement('DIV');
+                contextVideo._resizingDiv = resizingDiv = document.createElement('DIV');
                 resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
                 cover.appendChild(resizingDiv);
 
                 /** container */
                 container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-iframe-container');
             }
+
+            const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
 
             // caption
             if (contextVideo._captionChecked) {
@@ -200,8 +203,9 @@ export default {
             }
 
             // size
-            oIframe.style.width = w + 'px';
-            oIframe.style.height = resizingDiv.style.height = h + 'px';
+            if (changeSize) {
+                this.plugins.video.setSize.call(this, w, h);
+            }
 
             // align
             if (contextVideo._align && 'none' !== contextVideo._align) {
@@ -217,8 +221,7 @@ export default {
             if (!this.context.dialog.updateModal) {
                 this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
                 this.appendFormatTag(container);
-            } else {
-                oIframe.setAttribute('data-percent', '');
+            } else if(changeSize) {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
             }
 

@@ -377,6 +377,7 @@ export default {
         let cover = contextImage._cover;
         let container = contextImage._container;
         let isNewContainer = false;
+        const changeSize = contextImage.imageX.value * 1 !== imageEl.offsetWidth || contextImage.imageY.value * 1 !== imageEl.offsetHeight;
 
         if (cover === null) {
             isNewContainer = true;
@@ -401,8 +402,9 @@ export default {
         imageEl.src = contextImage.imgUrlFile.value;
         imageEl.alt = contextImage._altText;
         imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
-        imageEl.style.width = contextImage.imageX.value + 'px';
-        imageEl.style.height = contextImage.imageY.value + 'px';
+        if (changeSize) {
+            this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
+        }
 
         // caption
         if (contextImage._captionChecked) {
@@ -456,8 +458,9 @@ export default {
         }
 
         // transform
-        imageEl.setAttribute('data-percent', '');
-        this.plugins.resizing.setTransformSize.call(this, imageEl);
+        if (changeSize) {
+            this.plugins.resizing.setTransformSize.call(this, imageEl);
+        }
     },
 
     sizeRevert: function () {
@@ -516,7 +519,7 @@ export default {
         contextImage._element.style.height = h + 'px';
     },
 
-    setPercentSize: function (w, h) {
+    setPercentSize: function (w) {
         const contextImage = this.context.image;
 
         contextImage._container.style.width = w;
@@ -524,7 +527,7 @@ export default {
         contextImage._cover.style.width = '100%';
         contextImage._cover.style.height = '';
         contextImage._element.style.width = '100%';
-        contextImage._element.style.height = h;
+        contextImage._element.style.height = '';
 
         if (/100/.test(w)) {
             this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);

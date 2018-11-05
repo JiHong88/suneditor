@@ -213,7 +213,6 @@ export default {
         if (/percent/.test(command)) {
             this.plugins.resizing.resetTransform.call(this, contextEl);
 
-            contextEl.setAttribute('data-percent', value * 100);
             contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
@@ -280,7 +279,6 @@ export default {
 
         element.style.transform = '';
         element.style.transformOrigin = '';
-        element.setAttribute('data-percent', '');
         element.setAttribute('data-rotate', '');
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
