@@ -439,7 +439,7 @@ const util = {
         let tableElement = element;
 
         while (!this.isWysiwygDiv(tableElement.parentNode)) {
-            if (!/^(TR|TABLE)$/.test(tableElement.nodeName)) {
+            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME)$/.test(tableElement.nodeName)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }

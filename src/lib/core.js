@@ -691,8 +691,8 @@ const core = function (context, util, plugins, lang) {
             const range = this.getRange();
             const startCon = range.startContainer;
             const startOff = range.startOffset;
-            const endCon = range.endContainer;
-            const endOff = range.endOffset;
+            const endCon = range.endContainer.nodeType === 1 ? startCon : range.endContainer;
+            const endOff = range.endContainer.nodeType === 1 ? startCon.length : range.endOffset;
             const commonCon = range.commonAncestorContainer;
             const newNodeName = appendNode.nodeName;
 
