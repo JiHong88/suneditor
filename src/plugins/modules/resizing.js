@@ -181,7 +181,7 @@ export default {
 
     set_cover: function (element) {
         const cover = document.createElement('FIGURE');
-        cover.className = 'sun-editor-figure-cover sun-editor-id-position-relative';
+        cover.className = 'sun-editor-figure-cover';
         cover.appendChild(element);
 
         return cover;

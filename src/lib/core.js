@@ -1290,10 +1290,12 @@ const core = function (context, util, plugins, lang) {
         commandHandler: function (target, command) {
             switch (command) {
                 case 'codeView':
+                    this.controllersOff();
                     this.toggleCodeView();
                     util.toggleClass(target, 'on');
                     break;
-                case 'fullScreen':
+                    case 'fullScreen':
+                    this.controllersOff();
                     this.toggleFullScreen(target);
                     util.toggleClass(target, 'on');
                     break;

@@ -211,7 +211,7 @@ export default {
         }
 
         const offset = this.util.getOffset(tdElement);
-        resizeDiv.style.left = offset.left + 'px';
+        resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
     },
 

@@ -18,7 +18,8 @@
 }
 
 /** controllers on tag */
-.sun-editor-editable a, .sun-editor-editable td {
+.sun-editor-editable a, .sun-editor-editable td, .sun-editor-editable th, .sun-editor-editable figure, .sun-editor-editable img, .sun-editor-editable iframe,
+.sun-editor-editable td *:not(table) {
     position: relative;
 }
 
@@ -34,11 +35,6 @@
 }
 .sun-editor-editable .float-none {
     float: none;
-}
-
-/** position relative */
-.sun-editor-editable .sun-editor-id-position-relative {
-    position: relative;
 }
 
 /* a */
@@ -258,8 +254,6 @@
 /** component (image, iframe video) */
 .sun-editor-editable .sun-editor-id-comp {
     display: flex;
-    position: static;
-    z-index: -1;
     padding: 20px 40px;
 }
 .sun-editor-editable[contenteditable=true] .sun-editor-id-comp {

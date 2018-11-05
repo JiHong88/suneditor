@@ -436,10 +436,10 @@ const util = {
     getOffset: function (element) {
         let tableOffsetLeft = 0;
         let tableOffsetTop = 0;
-        let tableElement = element.parentNode;
+        let tableElement = element;
 
-        while (!this.isWysiwygDiv(tableElement)) {
-            if (/sun-editor-id-position-relative/.test(tableElement.className) || /relative/.test(tableElement.style.position)) {
+        while (!this.isWysiwygDiv(tableElement.parentNode)) {
+            if (!/^(TR|TABLE)$/.test(tableElement.nodeName)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }
@@ -447,8 +447,8 @@ const util = {
         }
 
         return {
-            left: element.offsetLeft + tableOffsetLeft,
-            top: element.offsetTop + tableOffsetTop - tableElement.scrollTop
+            left: tableOffsetLeft,
+            top: tableOffsetTop - tableElement.parentNode.scrollTop
         };
     },
 
