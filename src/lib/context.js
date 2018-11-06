@@ -50,8 +50,11 @@ const _Context = function (element, cons, options) {
             videoHeight: options.videoHeight,
             imageFileInput: options.imageFileInput,
             imageUrlInput: options.imageUrlInput,
-            imageSize: options.imageSize,
             imageUploadUrl: options.imageUploadUrl,
+            imageWidth: options.imageWidth,
+            imageMaxSize: options.imageMaxSize,
+            imageTotalMaxSize: options.imageTotalMaxSize,
+            imageMaxCount: options.imageMaxCount,
             font: options.font,
             fontSize: options.fontSize,
             colorList: options.colorList,
@@ -60,9 +63,7 @@ const _Context = function (element, cons, options) {
             maxHeight: options.maxHeight,
             showPathLabel: options.showPathLabel,
             display: options.display
-        },
-        dialog: {},
-        submenu: {}
+        }
     };
 };
 

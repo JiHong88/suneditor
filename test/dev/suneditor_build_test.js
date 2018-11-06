@@ -56,6 +56,11 @@ window.sun_getContext = function () {
     console.log(ss.getContext());
 }
 
+window.sun_getImagesInfo = function () {
+    console.log(ss.getImagesInfo());
+    ss.getImagesInfo().list[0].select();
+}
+
 window.sun_insertHTML = function (html) {
     ss.insertHTML(html)
 }

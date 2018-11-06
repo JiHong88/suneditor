@@ -265,7 +265,7 @@ lang            : language object (en, ko) default : English {Object}
 imageFileInput  : Choose whether to create a file input tag in the image upload window default : true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true {Boolean}
                   If the value of imageFileInput is false, it will be unconditionally true {Boolean}
-imageSize       : The default width size of the image frame  default : 350 {Number}
+imageWidth       : The default width size of the image frame  default : 350 {Number}
 imageUploadUrl  : The image upload to server mapping address default : null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data

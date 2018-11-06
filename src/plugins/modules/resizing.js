@@ -283,7 +283,7 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        element.style.width = (originSize[0] || this.context.user.imageSize) + 'px';
+        element.style.width = (originSize[0] || this.context.user.imageWidth) + 'px';
         element.style.height = (originSize[1] + 'px' || 'auto');
         this.plugins.resizing.setTransformSize.call(this, element);
     },

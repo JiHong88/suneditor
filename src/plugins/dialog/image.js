@@ -25,7 +25,7 @@ export default {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _user_w: context.user.imageSize,
+            _user_w: context.user.imageWidth,
             _user_h: 0,
             _altText: '',
             _caption: null,
@@ -51,7 +51,7 @@ export default {
         context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
         context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
 
-        context.image.imageX.value = context.user.imageSize;
+        context.image.imageX.value = context.user.imageWidth;
 
         /** add event listeners */
         context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
@@ -219,15 +219,20 @@ export default {
     setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, index, filesLen) {
         const reader = new FileReader();
 
-        reader.onload = function (update, updateElement) {
+        if (this.context.dialog.updateModal) {
+            this.context.image._element.setAttribute('file-name', file.name);
+            this.context.image._element.setAttribute('file-size', file.size);
+        }
+        
+        reader.onload = function (update, updateElement, file) {
             try {
-                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement);
+                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
                 if (index === filesLen) this.closeLoading();
             } catch (e) {
                 this.closeLoading();
                 throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
             }
-        }.bind(this, this.context.dialog.updateModal, this.context.image._element);
+        }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
 
         reader.readAsDataURL(file);
     },
@@ -324,7 +329,45 @@ export default {
         return false;
     },
 
-    create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement) {
+    _onload_image: function (oImg, file) {
+        oImg.removeEventListener('load', this.context.image._loadBind);
+        oImg.style.height = oImg.offsetHeight + 'px';
+        oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
+        oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
+
+        const dataIndex = oImg.getAttribute('data-index');
+
+        if (!dataIndex) {
+            oImg.setAttribute('data-index', this._variable._imageIndex);
+
+            this._variable._imagesInfo[this._variable._imageIndex] = {
+                index: this._variable._imageIndex,
+                name: file.name,
+                size: file.size,
+                select: function () {
+                    const size = this.plugins.resizing.call_controller_resize.call(this, oImg, 'image');
+                    this.plugins.image.onModifyMode.call(this, oImg, size);
+                    oImg.scrollIntoView();
+                }.bind(this),
+                delete: this.plugins.image.destroy.bind(this, oImg)
+            }
+
+            this._variable._imageIndex++;
+            this._variable._imagesTotalSize += file.size;
+            this._variable._imagesTotalCount += 1;
+        }
+        else {
+            const imgInfo = this._variable._imagesInfo[dataIndex];
+
+            imgInfo.name = oImg.getAttribute("file-name");
+            imgInfo.size = oImg.getAttribute("file-size") * 1;
+
+            this._variable._imagesTotalSize -= file.size;
+            this._variable._imagesTotalSize += imgInfo.size;
+        }
+    },
+
+    create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {
         if (update) {
             updateElement.src = src;
             return;
@@ -333,6 +376,8 @@ export default {
         const contextImage = this.context.image;
 
         let oImg = document.createElement('IMG');
+        oImg.addEventListener('load', this.plugins.image._onload_image.bind(this, oImg, file));
+
         oImg.src = src;
         oImg.style.width = width;
         oImg.setAttribute('data-align', align);
@@ -340,11 +385,6 @@ export default {
         oImg.alt = contextImage._altText;
         oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
         oImg.setAttribute('data-rotate', '0');
-        oImg.onload = function () {
-            this.setAttribute('origin-size', this.naturalWidth + ',' + this.naturalHeight);
-            this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
-            this.style.height = this.offsetHeight + 'px';
-        }.bind(oImg);
 
         const cover = this.plugins.resizing.set_cover.call(this, oImg);
         const container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
@@ -558,8 +598,11 @@ export default {
         this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
     },
 
-    destroy: function () {
-        const imageContainer = this.util.getParentElement(this.context.image._element, '.sun-editor-id-image-container') || this.context.image._element;
+    destroy: function (element) {
+        delete this._variable._imagesInfo[imageEl.getAttribute('data-index')];
+
+        const imageEl = element || this.context.image._element;
+        const imageContainer = this.util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
     },
@@ -574,7 +617,7 @@ export default {
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
         contextImage.captionCheckEl.checked = false;
         contextImage.proportion.checked = false;
-        contextImage.imageX.value = this.context.user.imageSize;
+        contextImage.imageX.value = this.context.user.imageWidth;
         contextImage.imageY.value = '';
         contextImage.imageY.disabled = true;
         contextImage.proportion.disabled = true;

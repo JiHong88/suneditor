@@ -103,7 +103,7 @@
 <span class="pl-k">imageFileInput</span><span class="pl-k">  : </span>Choose whether to create a file input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
 <span class="pl-k">imageUrlInput</span><span class="pl-k">   : </span>Choose whether to create a image url input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
 <span class="pl-k"></span><span class="pl-k">                  </span>If the value of <span class="pl-k">imageFileInput</span> is false, it will be unconditionally true
-<span class="pl-k">imageSize</span><span class="pl-k">       : </span>The default width size of the image frame  <span class="pl-ent">default : </span><span class="pl-c1">350</span> {<span class="pl-c1">Number</span>}
+<span class="pl-k">imageWidth</span><span class="pl-k">       : </span>The default width size of the image frame  <span class="pl-ent">default : </span><span class="pl-c1">350</span> {<span class="pl-c1">Number</span>}
 <span class="pl-k">imageUploadUrl</span><span class="pl-k">  : </span>The image upload to server mapping address <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
 <span class="pl-s"></span><span class="pl-k">                  </span>ex) <span class="pl-c1">"/editor/uploadImage.ajax"</span>
 <span class="pl-s"></span><span class="pl-k">                  </span>When not used, it enters base64 data
@@ -140,7 +140,7 @@
         height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
         videoWidth <span class="pl-k">:</span> <span class="pl-c1">360</span>,
         videoHeight <span class="pl-k">:</span> <span class="pl-c1">115</span>,
-        imageSize <span class="pl-k">:</span> <span class="pl-c1">150</span>,
+        imageWidth <span class="pl-k">:</span> <span class="pl-c1">150</span>,
         popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>,
         resizingBar<span class="pl-k">:</span> <span class="pl-c1">false</span>,
         buttonList <span class="pl-k">:</span> [
@@ -170,7 +170,7 @@
             <div>&nbsp; &nbsp; height : <span style="color: rgb(152, 0, 0);">'auto'</span>,</div>
             <div>&nbsp; &nbsp; videoWidth : <span style="color: rgb(0, 51, 153);">360</span>,</div>
             <div>&nbsp; &nbsp; videoHeight : <span style="color: rgb(0, 51, 153);">115</span>,</div>
-            <div>&nbsp; &nbsp; imageSize : <span style="color: rgb(0, 51, 153);">150,</span></div>
+            <div>&nbsp; &nbsp; imageWidth : <span style="color: rgb(0, 51, 153);">150,</span></div>
             <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'local'</span>,</div>
             <div>&nbsp; &nbsp; resizingBar : <span style="color: rgb(0, 130, 153);">false</span>,</div>
             <div>&nbsp; &nbsp; buttonList : [</div>
@@ -420,7 +420,7 @@
         height : 'auto',
         videoWidth : 360,
         videoHeight : 115,
-        imageSize : 150,
+        imageWidth : 150,
         popupDisplay: 'local',
         resizingBar: false,
         buttonList : [

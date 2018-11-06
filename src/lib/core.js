@@ -128,7 +128,11 @@ const core = function (context, util, plugins, lang) {
             _editorAreaOriginCssText: '',
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
-            _sticky: false
+            _sticky: false,
+            _imagesInfo: [],
+            _imagesTotalSize: 0,
+            _imagesTotalCount: 0,
+            _imageIndex: 0
         },
 
         /**
@@ -2017,6 +2021,14 @@ const core = function (context, util, plugins, lang) {
                 contents = context.element.code.value;
             }
             return contents;
+        },
+
+        getImagesInfo: function () {
+            return {
+                list: editor._variable._imagesInfo,
+                totalSize: editor._variable._imagesTotalSize,
+                totalCount: editor._variable._imagesTotalCount
+            };
         },
 
         /**

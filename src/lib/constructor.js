@@ -29,8 +29,11 @@ const _Constructor = {
         options.videoHeight = options.videoHeight || 315;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
-        options.imageSize = options.imageSize || 350;
         options.imageUploadUrl = options.imageUploadUrl || null;
+        options.imageWidth = options.imageWidth || 350;
+        options.imageMaxSize = options.imageMaxSize || null;
+        options.imageTotalMaxSize = options.imageTotalMaxSize || null;
+        options.imageMaxCount = options.imageMaxCount || null;
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
