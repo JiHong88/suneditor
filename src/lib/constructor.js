@@ -69,7 +69,7 @@ const _Constructor = {
         relative.className = 'sun-editor-container';
     
         /** toolbar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.popupDisplay);
+        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
 
         /** sticky toolbar dummy */
         const sticky_dummy = doc.createElement('DIV');
@@ -157,102 +157,102 @@ const _Constructor = {
      * @description Suneditor's Default button list
      * @private
      */
-    _defaultButtons: function (lang, popupDisplay) {
+    _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '', '',
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '',
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '', '',
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '',
                 '<div class="icon-underline"></div>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '', '',
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '',
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '', '',
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
-            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '', '',
+            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '',
                 '<div class="icon-subscript"></div>'
             ],
 
-            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '', '',
+            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '',
                 '<div class="icon-superscript"></div>'
             ],
 
-            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', '',
+            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '',
                 '<div class="icon-erase"></div>'
             ],
 
-            indent: ['', lang.toolbar.indent + '(Ctrl + ])', 'indent', '', '',
+            indent: ['', lang.toolbar.indent + '(Ctrl + ])', 'indent', '',
                 '<div class="icon-indent-right"></div>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + '(Ctrl + [)', 'outdent', '', '',
+            outdent: ['', lang.toolbar.outdent + '(Ctrl + [)', 'outdent', '',
                 '<div class="icon-indent-left"></div>'
             ],
 
-            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '', '',
+            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '',
                 '<div class="icon-expansion"></div>'
             ],
 
-            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', '',
+            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '',
                 '<div class="icon-showBlocks"></div>'
             ],
 
-            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '', '',
+            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '',
                 '<div class="icon-code-view"></div>'
             ],
 
-            undo: ['code-view-enabled', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '', '',
+            undo: ['code-view-enabled', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '',
                 '<div class="icon-undo"></div>'
             ],
 
-            redo: ['code-view-enabled', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '', '',
+            redo: ['code-view-enabled', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '',
                 '<div class="icon-redo"></div>'
             ],
 
-            preview: ['', lang.toolbar.preview, 'preview', '', '',
+            preview: ['', lang.toolbar.preview, 'preview', '',
                 '<div class="icon-preview"></div>'
             ],
 
-            print: ['', lang.toolbar.print, 'print', '', '',
+            print: ['', lang.toolbar.print, 'print', '',
                 '<div class="icon-print"></div>'
             ],
 
             /** plugins - submenu */
-            font: ['btn_font', lang.toolbar.font, 'font', 'submenu', '',
+            font: ['btn_font', lang.toolbar.font, 'font', 'submenu',
                 '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
             ],
-            formatBlock: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu', '',
+            formatBlock: ['btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
                 '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
             ],
 
-            fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu', '',
+            fontSize: ['btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
                 '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
             ],
 
-            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', '',
+            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
                 '<div class="icon-fontColor"></div>'
             ],
 
-            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', '',
+            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
                 '<div class="icon-hiliteColor"></div>'
             ],
 
-            align: ['btn_align', lang.toolbar.align, 'align', 'submenu', '',
+            align: ['btn_align', lang.toolbar.align, 'align', 'submenu',
                 '<div class="icon-align-left"></div>'
             ],
 
-            list: ['', lang.toolbar.list, 'list', 'submenu', '',
+            list: ['', lang.toolbar.list, 'list', 'submenu',
                 '<div class="icon-list-number"></div>'
             ],
 
-            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', '',
+            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu',
                 '<div class="icon-hr"></div>'
             ],
 
@@ -261,15 +261,15 @@ const _Constructor = {
             ],
 
             /** plugins - dialog */
-            link: ['', lang.toolbar.link, 'link', 'dialog', popupDisplay,
+            link: ['', lang.toolbar.link, 'link', 'dialog',
                 '<div class="icon-link"></div>'
             ],
 
-            image: ['', lang.toolbar.image, 'image', 'dialog', popupDisplay,
+            image: ['', lang.toolbar.image, 'image', 'dialog',
                 '<div class="icon-image"></div>'
             ],
 
-            video: ['', lang.toolbar.video, 'video', 'dialog', popupDisplay,
+            video: ['', lang.toolbar.video, 'video', 'dialog',
                 '<div class="icon-video"></div>'
             ]
         };
@@ -300,12 +300,11 @@ const _Constructor = {
      * @param {string} title - Title in button
      * @param {string} dataCommand - The data-command property of the button
      * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
-     * @param {string} displayOption - Options for whether the range of the dialog is inside the editor or for the entire screen ('', 'full')
      * @param {string} innerHTML - Html in button
      * @returns {Element}
      * @private
      */
-    _createButton: function (buttonClass, title, dataCommand, dataDisplay, displayOption, innerHTML) {
+    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML) {
         const oLi = document.createElement('LI');
         const oButton = document.createElement('BUTTON');
 
@@ -314,7 +313,6 @@ const _Constructor = {
         oButton.setAttribute('title', title);
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
-        oButton.setAttribute('data-option', displayOption);
         oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
 
@@ -329,10 +327,9 @@ const _Constructor = {
      * @param {Array} doc - document object
      * @param {Array} buttonList - option.buttonList
      * @param {Array} lang - option.lang
-     * @param {Array} popupDisplay - option.popupDisplay
      * @private
      */
-    _createToolBar: function (doc, buttonList, _plugins, lang, popupDisplay) {
+    _createToolBar: function (doc, buttonList, _plugins, lang) {
         const separator_vertical = doc.createElement('DIV');
         separator_vertical.className = 'sun-editor-toolbar-separator-vertical';
 
@@ -340,7 +337,7 @@ const _Constructor = {
         tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
 
         /** create button list */
-        const defaultButtonList = this._defaultButtons(lang, popupDisplay);
+        const defaultButtonList = this._defaultButtons(lang);
         const plugins = {};
         if (_plugins) {
             const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(e) { return _plugins[e]; });
@@ -381,7 +378,7 @@ const _Constructor = {
                         pluginName = button;
                     }
 
-                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
+                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4]);
                     moduleElement.ul.appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {

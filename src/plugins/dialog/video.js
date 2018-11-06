@@ -285,7 +285,7 @@ export default {
         contextVideo.proportion.disabled = false;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
-        this.plugins.dialog.openDialog.call(this, 'video', null, true);
+        this.plugins.dialog.openDialog.call(this, 'video', true);
     },
 
     setSize: function (w, h, isVertical) {

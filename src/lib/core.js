@@ -1658,7 +1658,7 @@ const core = function (context, util, plugins, lang) {
                 }
                 else if (/dialog/.test(display)) {
                     editor.callPlugin(command, function () {
-                        editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                        editor.plugins.dialog.openDialog.call(editor, command, false);
                     });
                 }
 

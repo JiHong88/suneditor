@@ -50,12 +50,12 @@ export default {
         }
     },
 
-    openDialog: function (kind, option, update)  {
+    openDialog: function (kind, update)  {
         if (this.modalForm) return false;
 
         this.context.dialog.updateModal = update;
 
-        if (option === 'full') {
+        if (this.context.user.popupDisplay === 'full') {
             this.context.dialog.modalArea.style.position = 'fixed';
         } else {
             this.context.dialog.modalArea.style.position = 'absolute';

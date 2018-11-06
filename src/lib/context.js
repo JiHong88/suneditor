@@ -46,6 +46,7 @@ const _Context = function (element, cons, options) {
         user: {
             stickyToolbar: options.stickyToolbar,
             resizingBar: options.resizingBar,
+            popupDisplay: options.popupDisplay,
             videoWidth: options.videoWidth,
             videoHeight: options.videoHeight,
             imageFileInput: options.imageFileInput,

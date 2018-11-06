@@ -222,19 +222,21 @@ export default {
         if (this.context.dialog.updateModal) {
             this.context.image._element.setAttribute('file-name', file.name);
             this.context.image._element.setAttribute('file-size', file.size);
-        }
-        
-        reader.onload = function (update, updateElement, file) {
-            try {
-                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
-                if (index === filesLen) this.closeLoading();
-            } catch (e) {
-                this.closeLoading();
-                throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
-            }
-        }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
+            reader.readAsDataURL(file);
+            this.closeLoading();
+        } else {
+            reader.onload = function (update, updateElement, file) {
+                try {
+                    this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
+                    if (index === filesLen) this.closeLoading();
+                } catch (e) {
+                    this.closeLoading();
+                    throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
+                }
+            }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
 
-        reader.readAsDataURL(file);
+            reader.readAsDataURL(file);
+        }
     },
 
     callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update, updateElement) {
@@ -335,8 +337,9 @@ export default {
         oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
         oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
 
-        const dataIndex = oImg.getAttribute('data-index');
+        if (!file) return;
 
+        const dataIndex = oImg.getAttribute('data-index');
         if (!dataIndex) {
             oImg.setAttribute('data-index', this._variable._imageIndex);
 
@@ -350,11 +353,14 @@ export default {
                     oImg.scrollIntoView();
                 }.bind(this),
                 delete: this.plugins.image.destroy.bind(this, oImg)
-            }
+            };
 
             this._variable._imageIndex++;
             this._variable._imagesTotalSize += file.size;
             this._variable._imagesTotalCount += 1;
+
+            oImg.setAttribute('file-name', file.name);
+            oImg.setAttribute('file-size', file.size);
         }
         else {
             const imgInfo = this._variable._imagesInfo[dataIndex];
@@ -363,7 +369,7 @@ export default {
             imgInfo.size = oImg.getAttribute("file-size") * 1;
 
             this._variable._imagesTotalSize -= file.size;
-            this._variable._imagesTotalSize += imgInfo.size;
+            this._variable._imagesTotalSize += imgInfo.size * 1;
         }
     },
 
@@ -552,7 +558,7 @@ export default {
         contextImage.imageY.disabled = false;
         contextImage.proportion.disabled = false;
 
-        this.plugins.dialog.openDialog.call(this, 'image', null, true);
+        this.plugins.dialog.openDialog.call(this, 'image', true);
     },
 
     setSize: function (w, h) {
@@ -599,9 +605,11 @@ export default {
     },
 
     destroy: function (element) {
+        const imageEl = element || this.context.image._element;
+        this._variable._imagesTotalCount -= 1;
+        this._variable._imagesTotalSize -= imageEl.getAttribute('file-size') * 1;
         delete this._variable._imagesInfo[imageEl.getAttribute('data-index')];
 
-        const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
