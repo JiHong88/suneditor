@@ -63,6 +63,7 @@
     background-color: #f6f8fa;
     border: 1px solid #dce5e5;
     border-radius: 3px;
+    overflow: auto;
 }
 
 /* ol, ul */
