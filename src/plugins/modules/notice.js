@@ -34,13 +34,14 @@ export default {
         notice_button.addEventListener('click', this.onClick_cancel.bind(core));
         
         /** append html */
-        context.element.editorArea.appendChild(notice_div);
+        context.element.editorArea.insertBefore(notice_div, context.element.wysiwyg);
         
         /** empty memory */
         notice_div = null;
     },
 
     onClick_cancel: function (e) {
+        e.preventDefault();
         e.stopPropagation();
         this.plugins.notice.close.call(this);
     },

@@ -221,26 +221,24 @@ export default {
 
     setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, index, filesLen) {
         const reader = new FileReader();
-
+        
         if (this.context.dialog.updateModal) {
             this.context.image._element.setAttribute('file-name', file.name);
             this.context.image._element.setAttribute('file-size', file.size);
-            reader.readAsDataURL(file);
-            this.closeLoading();
-        } else {
-            reader.onload = function (update, updateElement, file) {
-                try {
-                    this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
-                    if (index === filesLen) this.closeLoading();
-                } catch (e) {
-                    this.closeLoading();
-                    notice.open.call(this, e.message);
-                    throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
-                }
-            }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
-
-            reader.readAsDataURL(file);
         }
+
+        reader.onload = function (update, updateElement, file) {
+            try {
+                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
+                if (index === filesLen) this.closeLoading();
+            } catch (e) {
+                this.closeLoading();
+                notice.open.call(this, e.message);
+                throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
+            }
+        }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
+
+        reader.readAsDataURL(file);
     },
 
     callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update, updateElement) {
@@ -251,12 +249,11 @@ export default {
                 if (response.errorMessage) {
                     this.closeLoading();
                     notice.open.call(this, response.errorMessage);
-                    return;
-                }
-
-                const fileList = response.result;
-                for (let i = 0, len = (update && fileList.length > 0 ? 1 : fileList.length); i < len; i++) {
-                    this.plugins.image.create_image.call(this, fileList[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update, updateElement);
+                } else {
+                    const fileList = response.result;
+                    for (let i = 0, len = (update && fileList.length > 0 ? 1 : fileList.length); i < len; i++) {
+                        this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, align, update, updateElement, {name: fileList[i].name, size: fileList[i].size});
+                    }
                 }
 
                 this.closeLoading();
@@ -370,8 +367,6 @@ export default {
             };
 
             this._variable._imageIndex++;
-            this._variable._imagesTotalSize += file.size;
-            this._variable._imagesTotalCount += 1;
 
             oImg.setAttribute('file-name', file.name);
             oImg.setAttribute('file-size', file.size);
@@ -381,10 +376,9 @@ export default {
 
             imgInfo.name = oImg.getAttribute("file-name");
             imgInfo.size = oImg.getAttribute("file-size") * 1;
-
-            this._variable._imagesTotalSize -= file.size;
-            this._variable._imagesTotalSize += imgInfo.size * 1;
         }
+
+        this._imageUpload(oImg);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {
@@ -455,11 +449,7 @@ export default {
             container.appendChild(cover);
         }
 
-        // input update
-        this.plugins.image.onRender_imgInput.call(this);
-
-        // src, size
-        imageEl.src = contextImage.imgUrlFile.value;
+        // size
         imageEl.alt = contextImage._altText;
         imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
         if (changeSize) {
@@ -620,11 +610,14 @@ export default {
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        this._variable._imagesTotalCount -= 1;
-        this._variable._imagesTotalSize -= imageEl.getAttribute('file-size') * 1;
-        delete this._variable._imagesInfo[imageEl.getAttribute('data-index')];
-
         const imageContainer = util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
+
+        const dataIndex = imageEl.getAttribute('data-index');
+        if (dataIndex) {
+            delete this._variable._imagesInfo[dataIndex];
+            this._imageUpload(imageEl);
+        }
+        
         util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
     },

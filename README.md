@@ -272,8 +272,11 @@ imageUploadUrl  : The image upload to server mapping address default : null {Str
                   return {
                             "errorMessage": "insert error message",
                             "result": [
-                                {"SUNEDITOR_IMAGE_SRC": "/download/editorImg/image1.jpg"},
-                                {"SUNEDITOR_IMAGE_SRC": "/download/editorImg/image2.jpg"}
+                                {
+                                    "url": "/download/editorImg/test_image.jpg",
+                                    "name": "test_image.jpg",
+                                    "size": "561276"
+                                }
                             ]
                         }
 
@@ -299,6 +302,12 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
+// Open a notice area
+editor.noticeOpen('test notice');
+
+// Close a notice area
+editor.noticeClose();
+
 // Copies the contents of the suneditor into a [textarea]
 editor.save();
 
@@ -307,6 +316,9 @@ editor.getContext();
 
 // Gets the contents of the suneditor
 editor.getContents();
+
+// Gets a list of images uploaded to the editor
+editor.getImagesInfo();
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
 editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
@@ -335,15 +347,18 @@ editor.destroy();
 // Event functions
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
-editor.onScroll = function (e) { console.log('onScroll', e); };
+editor.onScroll = function (e) { console.log('onScroll', e) }
 
-editor.onClick = function (e) { console.log('onClick', e); };
+editor.onClick = function (e) { console.log('onClick', e) }
 
-editor.onKeyDown = function (e) { console.log('onKeyDown', e); };
+editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
 
-editor.onKeyUp = function (e) { console.log('onKeyUp', e); };
+editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
 
-editor.onDrop = function (e) { console.log('onDrop', e); };
+editor.onDrop = function (e) { console.log('onDrop', e) }
+
+// Called when the image is uploaded or the uploaded image is deleted
+editor.onImageUpload = function (targetImgElement) { console.log('targetImgElement', targetImgElement) }
 ```
 
 ## Examples

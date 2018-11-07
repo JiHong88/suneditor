@@ -64,6 +64,18 @@ ss.onDrop = function (e) {
     console.log('onDrop', e);
 };
 
+ss.onImageUpload = function () {
+    console.log(ss.getImagesInfo());
+}
+
+window.sun_noticeOpen = function () {
+    ss.noticeOpen('test notice');
+}
+
+window.sun_noticeClose = function () {
+    ss.noticeClose();
+}
+
 window.sun_save = function () {
     ss.save();
 }
@@ -159,5 +171,6 @@ editor.create(document.getElementsByName('editor3')[0], {
     ],
     lang: ko,
     width: '100%',
-    stickyToolbar: false
+    stickyToolbar: false,
+    popupDisplay: 'local'
 });

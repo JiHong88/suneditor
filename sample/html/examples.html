@@ -110,8 +110,11 @@
 <span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">return </span>{
                              <span class="pl-c1">"errorMessage"</span>: <span class="pl-c1">"insert error message"</span>,
                              <span class="pl-c1">"result"</span>: [
-                                 {<span class="pl-c1">"SUNEDITOR_IMAGE_SRC"</span>:<span class="pl-c1">"/download/editorImg/image1.jpg"}</span>,
-                                 {<span class="pl-c1">"SUNEDITOR_IMAGE_SRC"</span>:<span class="pl-c1">"/download/editorImg/image2.jpg"}</span>
+                                 {
+                                     <span class="pl-c1">"url"</span>:<span class="pl-c1">"/download/editorImg/test_image.jpg"</span>,
+                                     <span class="pl-c1">"name"</span>:<span class="pl-c1">"test_image.jpg"</span>,
+                                     <span class="pl-c1">"size"</span>:<span class="pl-c1">"561276"</span>
+                                 }
                              ]
                          }
 
@@ -229,6 +232,12 @@
         <a id="functions" href="#functions"><h4>2. User Function</h4></a>
         <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
 
+<span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
+<span class="pl-smi">suneditor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Close a notice area</span>
+<span class="pl-smi">suneditor</span>.<span class="pl-en">noticeClose</span>();
+
 <span class="pl-c">/** Copies the contents of the suneditor into a [textarea] */</span>
 <span class="pl-smi">suneditor</span>.<span class="pl-en">save</span>();
 
@@ -237,6 +246,9 @@
 
 <span class="pl-c">/** Gets the contents of the suneditor */</span>
 <span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContents</span>());
+
+<span class="pl-c"><span class="pl-c">//</span> Gets a list of images uploaded to the editor</span>
+<span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getImagesInfo</span>());
 
 <span class="pl-c">/** Inserts an HTML element or HTML string or plain string at the current cursor position */</span>
 <span class="pl-smi">suneditor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg" style="width:115px; height:64px;"&gt;<span class="pl-pds">'</span></span>);
@@ -268,16 +280,21 @@
 <span class="pl-c"><span class="pl-c">//</span> Event functions</span>
 <span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
 <span class="pl-c"><span class="pl-c">//</span> It is not called in exceptional cases and is called after the default event function has finished.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e); };
 
-<span class="pl-smi">editor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e); };
 
-<span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e); };
 
-<span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e); };
 
-<span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e); };</pre></div>
-        <form id="frm" name="frm">
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e); };
+
+<span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
+<span class="pl-smi">suneditor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement<span class="pl-pds">'</span></span>, targetImgElement) }</pre></div>
+        
+
+<form id="frm" name="frm">
             <textarea id="exampleFunction" style="width:100%; height:250px;">
                 <p>User Function Test</p>
 <pre style="font-size: 13.6px; font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace; padding: 16px; word-break: normal; overflow-wrap: normal; border-color: rgb(204, 204, 204);"><span class="pl-c" style="color: rgb(150, 152, 150);"><span class="pl-c" style="color: rgb(150, 152, 150);">//</span> Copies the contents of the suneditor into a [textarea]</span> 
@@ -314,7 +331,9 @@
 <span class="pl-smi" style="color: rgb(51, 51, 51);">editor</span>.<span class="pl-en" style="color: rgb(121, 93, 163);">destroy</span>();</pre>
             </textarea>
             <p></p>
-            <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">save</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_noticeClose()">noticeClose</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_save()">save</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
@@ -469,6 +488,14 @@
 
     var suneditor = SUNEDITOR.create('exampleFunction');
 
+    function sun_noticeOpen(message) {
+        suneditor.noticeOpen(message);
+    }
+
+    function sun_noticeClose() {
+        suneditor.noticeClose();
+    }
+    
     function sun_save() {
         suneditor.save();
     }
@@ -479,6 +506,10 @@
 
     function sun_getContents() {
         alert(suneditor.getContents());
+    }
+
+    function sun_getImagesInfo() {
+        console.log(suneditor.getImagesInfo());
     }
 
     function sun_insertHTML(html) {
@@ -515,18 +546,20 @@
 
     function sun_create() {
         suneditor = SUNEDITOR.create('exampleFunction');
-        suneditor.onScroll = function (e) { console.log('onScroll', e); };
-        suneditor.onClick = function (e) { console.log('onClick', e); };
-        suneditor.onKeyDown = function (e) { console.log('onKeyDown', e); };
-        suneditor.onKeyUp = function (e) { console.log('onKeyUp', e); };
-        suneditor.onDrop = function (e) { console.log('onDrop', e); };
+        suneditor.onScroll = function (e) { console.log('onScroll', e); }
+        suneditor.onClick = function (e) { console.log('onClick', e) }
+        suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+        suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+        suneditor.onDrop = function (e) { console.log('onDrop', e) }
+        suneditor.onImageUpload = function () { console.log(suneditor.getImagesInfo()) }
     }
 
-    suneditor.onScroll = function (e) { console.log('onScroll', e); };
-    suneditor.onClick = function (e) { console.log('onClick', e); };
-    suneditor.onKeyDown = function (e) { console.log('onKeyDown', e); };
-    suneditor.onKeyUp = function (e) { console.log('onKeyUp', e); };
-    suneditor.onDrop = function (e) { console.log('onDrop', e); };
+    suneditor.onScroll = function (e) { console.log('onScroll', e) }
+    suneditor.onClick = function (e) { console.log('onClick', e) }
+    suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+    suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+    suneditor.onDrop = function (e) { console.log('onDrop', e); }
+    suneditor.onImageUpload = function () { console.log(suneditor.getImagesInfo()) }
 </script>
 </body>
 </html>

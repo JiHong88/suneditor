@@ -8,6 +8,7 @@
 'use strict';
 
 import util from './util';
+import notice from '../plugins/modules/notice';
 
 /**
  * @description SunEditor core closure
@@ -73,6 +74,14 @@ const core = function (context, plugins, lang) {
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
+         * @description An user event function when image uploaded success or remove image
+         * @private
+         */
+        _imageUpload: function (targetImgElement) {
+            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement);
+        },
+
+        /**
          * @description Elements that need to change text or className for each selection change
          * @property {Element} FORMAT - format button
          * @property {Element} FONT - font family button
@@ -126,8 +135,6 @@ const core = function (context, plugins, lang) {
             _codeOriginCssText: '',
             _sticky: false,
             _imagesInfo: [],
-            _imagesTotalSize: 0,
-            _imagesTotalCount: 0,
             _imageIndex: 0
         },
 
@@ -1999,6 +2006,25 @@ const core = function (context, plugins, lang) {
         onKeyDown: null,
         onKeyUp: null,
         onDrop: null,
+        onImageUpload: null,
+
+        /**
+         * @description Open a notice area
+         * @param {String} message 
+         */
+        noticeOpen: function (message) {
+            editor.addModule([notice]);
+            notice.open.call(editor, message);
+        },
+
+        /**
+         * @description Close a notice area
+         */
+        noticeClose: function () {
+            editor.addModule([notice]);
+            notice.close.call(editor);
+        },
+
         /**
          * @description Copying the contents of the editor to the original textarea
          */
@@ -2036,11 +2062,7 @@ const core = function (context, plugins, lang) {
         },
 
         getImagesInfo: function () {
-            return {
-                list: editor._variable._imagesInfo,
-                totalSize: editor._variable._imagesTotalSize,
-                totalCount: editor._variable._imagesTotalCount
-            };
+            return editor._variable._imagesInfo;
         },
 
         /**
@@ -2138,7 +2160,7 @@ const core = function (context, plugins, lang) {
             this.destroy = null;
         }
     };
-    
+
     return userFunction;
 };
 
