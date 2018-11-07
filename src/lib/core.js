@@ -1673,7 +1673,6 @@ const core = function (context, plugins, lang) {
 
         onClick_wysiwyg: function (e) {
             e.stopPropagation();
-
             const targetElement = e.target;
             editor.submenuOff();
 
@@ -1683,6 +1682,7 @@ const core = function (context, plugins, lang) {
                     const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
                 });
+
                 return;
             }
 
@@ -1693,6 +1693,7 @@ const core = function (context, plugins, lang) {
                     const size = editor.plugins.resizing.call_controller_resize.call(editor, iframe, 'video');
                     editor.plugins.video.onModifyMode.call(editor, iframe, size);
                 });
+
                 return;
             }
 
@@ -1707,21 +1708,21 @@ const core = function (context, plugins, lang) {
                 figcaption.focus();
 
                 figcaption.addEventListener('blur', event._cancelCaptionEdit);
-
-                return;
-            }
-            
-            const td = util.getParentElement(targetElement, util.isCell);
-            if (td) {
-                if (util.isCell(targetElement)) {
-                    editor.execCommand('formatBlock', false, 'DIV');
-                    editor._setEditorRange();
-                    event._findButtonEffectTag();
+            } else {
+                const td = util.getParentElement(targetElement, util.isCell);
+                if (td) {
+                    if (util.isCell(targetElement)) {
+                        editor.execCommand('formatBlock', false, 'DIV');
+                        editor._setEditorRange();
+                        event._findButtonEffectTag();
+                    }
+    
+                    editor.controllersOff();
+                    editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
                 }
-
-                editor.controllersOff();
-                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
             }
+
+            if (userFunction.onClick) userFunction.onClick(e);
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -1815,6 +1816,8 @@ const core = function (context, plugins, lang) {
 
                     break;
             }
+
+            if (userFunction.onKeyDown) userFunction.onKeyDown(e);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -1846,27 +1849,32 @@ const core = function (context, plugins, lang) {
             if (event._directionKeyKeyCode.test(e.keyCode)) {
                 event._findButtonEffectTag();
             }
+
+            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
         },
 
-        onScroll_wysiwyg: function () {
+        onScroll_wysiwyg: function (e) {
             editor.controllersOff();
+            if (userFunction.onScroll) userFunction.onScroll(e);
         },
 
         onDrop_wysiwyg: function (e) {
             const files = e.dataTransfer.files;
 
-            if (files.length === 0) return true;
+            if (files.length > 0) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                editor.focus();
+    
+                editor.callPlugin('image', function () {
+                    context.image.imgInputFile.files = files;
+                    editor.plugins.image.onRender_imgInput.call(editor);
+                    context.image.imgInputFile.files = null;
+                });
+            }
 
-            e.stopPropagation();
-            e.preventDefault();
-            
-            editor.focus();
-
-            editor.callPlugin('image', function () {
-                context.image.imgInputFile.files = files;
-                editor.plugins.image.onRender_imgInput.call(editor);
-                context.image.imgInputFile.files = null;
-            });
+            if (userFunction.onDrop) userFunction.onDrop(e);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -1982,7 +1990,15 @@ const core = function (context, plugins, lang) {
     }
 
     /** User function */
-    return {
+    const userFunction = {
+        /**
+         * @description Event functions
+         */
+        onScroll: null,
+        onClick: null,
+        onKeyDown: null,
+        onKeyUp: null,
+        onDrop: null,
         /**
          * @description Copying the contents of the editor to the original textarea
          */
@@ -2122,6 +2138,8 @@ const core = function (context, plugins, lang) {
             this.destroy = null;
         }
     };
+    
+    return userFunction;
 };
 
 export default core;

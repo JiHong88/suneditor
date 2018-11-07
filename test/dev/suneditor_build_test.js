@@ -48,6 +48,22 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     ,height: 'auto'
 });
 
+ss.onScroll = function (e) {
+    console.log('onScroll', e);
+};
+ss.onClick = function (e) {
+    console.log('onClick', e);
+};
+ss.onKeyDown = function (e) {
+    console.log('onKeyDown', e);
+};
+ss.onKeyUp = function (e) {
+    console.log('onKeyUp', e);
+};
+ss.onDrop = function (e) {
+    console.log('onDrop', e);
+};
+
 window.sun_save = function () {
     ss.save();
 }

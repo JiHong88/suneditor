@@ -331,6 +331,19 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
+
+// Event functions
+// It can be redefined by receiving event object as parameter.
+// It is not called in exceptional cases and is called after the default event function has finished.
+editor.onScroll = function (e) { console.log('onScroll', e); };
+
+editor.onClick = function (e) { console.log('onClick', e); };
+
+editor.onKeyDown = function (e) { console.log('onKeyDown', e); };
+
+editor.onKeyUp = function (e) { console.log('onKeyUp', e); };
+
+editor.onDrop = function (e) { console.log('onDrop', e); };
 ```
 
 ## Examples
