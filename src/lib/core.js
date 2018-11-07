@@ -7,15 +7,16 @@
  */
 'use strict';
 
+import util from './util';
+
 /**
  * @description SunEditor core closure
  * @param context
- * @param util
  * @param plugins
  * @param lang
  * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
-const core = function (context, util, plugins, lang) {
+const core = function (context, plugins, lang) {
     /**
      * @description editor core object
      * should always bind this object when registering an event in the plug-in.
@@ -35,11 +36,6 @@ const core = function (context, util, plugins, lang) {
          * @description Whether the plugin is initialized
          */
         initPlugins: {},
-
-        /**
-         * @description util function
-         */
-        util: util,
 
         /**
          * @description loaded language
@@ -161,7 +157,7 @@ const core = function (context, util, plugins, lang) {
             for (let i = 0, len = moduleArray.length; i < len; i++) {
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
-                    this.plugins[moduleName] = this.util.copyObj(moduleArray[i]);
+                    this.plugins[moduleName] = util.copyObj(moduleArray[i]);
                     this.plugins[moduleName].add(this);
                 }
             }
@@ -459,7 +455,7 @@ const core = function (context, util, plugins, lang) {
         appendFormatTag: function (element, formatNodeName) {
             const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : this.util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = document.createElement(oFormatName);
             oFormat.innerHTML = '&#65279';
 
@@ -1658,7 +1654,7 @@ const core = function (context, util, plugins, lang) {
                 }
                 else if (/dialog/.test(display)) {
                     editor.callPlugin(command, function () {
-                        editor.plugins.dialog.openDialog.call(editor, command, false);
+                        editor.plugins.dialog.open.call(editor, command, false);
                     });
                 }
 

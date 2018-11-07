@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'resizing',
     add: function (core) {
@@ -109,7 +111,7 @@ export default {
 
         const resizeContainer = contextResizing.resizeContainer;
         const resizeDiv = contextResizing.resizeDiv;
-        const offset = this.util.getOffset(targetElement);
+        const offset = util.getOffset(targetElement);
 
         const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 
@@ -130,7 +132,7 @@ export default {
 
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+        util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
 
         contextResizing.resizeContainer.style.display = 'block';
         contextResizing.resizeButton.style.display = 'block';
@@ -289,7 +291,7 @@ export default {
     },
 
     setTransformSize: function (element) {
-        const cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        const cover = util.getParentElement(element, '.sun-editor-figure-cover');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -315,7 +317,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
+        this.plugins.resizing._setCaptionPosition.call(this, element, util.getChildElement(util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -409,6 +411,6 @@ export default {
 
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
-        this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'horizontalRule',
     add: function (core, targetElement) {
@@ -57,7 +59,7 @@ export default {
         oHr.className = className;
 
         this.focus();
-        this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
+        this.insertNode(oHr, util.getFormatElement(this.getSelectionNode()));
 
         const oNode = this.appendFormatTag(oHr);
         this.setRange(oNode, 0, oNode, 0);

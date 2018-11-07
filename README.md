@@ -269,8 +269,13 @@ imageWidth       : The default width size of the image frame  default : 350 {Num
 imageUploadUrl  : The image upload to server mapping address default : null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data
-                  return type : JSONArray [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
-                                           {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
+                  return {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {"SUNEDITOR_IMAGE_SRC": "/download/editorImg/image1.jpg"},
+                                {"SUNEDITOR_IMAGE_SRC": "/download/editorImg/image2.jpg"}
+                            ]
+                        }
 
 buttonList      : Defines button list to array {Array}
                 default : [

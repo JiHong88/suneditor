@@ -44,7 +44,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'preview', 'print']
     ],
     width: '100%',
-    stickyToolbar: 50
+    stickyToolbar: 0
     ,height: 'auto'
 });
 

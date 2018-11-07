@@ -7,18 +7,19 @@
  */
 'use strict';
 
+import util from './util';
+
 /**
  * @description document create - call _createToolBar()
  * @param {element} element - textarea
  * @param {JSON} options - user options
  * @param {JSON} lang - user language
  * @param {JSON} _lang - plugins object
- * @param {JSON} util - util object
  * @returns {JSON}
  * @private
  */
 const _Constructor = {
-    init: function (element, options, lang, _plugins, util) {
+    init: function (element, options, lang, _plugins) {
         if (typeof options !== 'object') options = {};
     
         /** user options */
@@ -256,7 +257,7 @@ const _Constructor = {
                 '<div class="icon-hr"></div>'
             ],
 
-            table: ['', lang.toolbar.table, 'table', 'submenu', '',
+            table: ['', lang.toolbar.table, 'table', 'submenu',
                 '<div class="icon-grid"></div>'
             ],
 

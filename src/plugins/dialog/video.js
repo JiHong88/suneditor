@@ -7,6 +7,7 @@
  */
 'use strict';
 
+import util from '../../lib/util';
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
 
@@ -158,7 +159,7 @@ export default {
                 contextVideo._element.src = oIframe.src;
                 contextVideo._element.setAttribute('data-proportion', contextVideo._proportionChecked);
                 container = contextVideo._container;
-                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
+                cover = util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
                 resizingDiv = contextVideo._resizingDiv;
             }
@@ -197,7 +198,7 @@ export default {
                 }
             } else {
                 if (contextVideo._caption) {
-                    this.util.removeItem(contextVideo._caption);
+                    util.removeItem(contextVideo._caption);
                     contextVideo._caption = null;
                 }
             }
@@ -214,12 +215,12 @@ export default {
                 cover.style.margin = '0';
             }
             
-            this.util.removeClass(container, this.context.video._floatClassRegExp);
-            this.util.addClass(container, 'float-' + contextVideo._align);
+            util.removeClass(container, this.context.video._floatClassRegExp);
+            util.addClass(container, 'float-' + contextVideo._align);
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {
-                this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
+                this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
                 this.appendFormatTag(container);
             } else if(changeSize) {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
@@ -230,7 +231,7 @@ export default {
         try {
             submitAction();
         } finally {
-            this.plugins.dialog.closeDialog.call(this);
+            this.plugins.dialog.close.call(this);
             this.closeLoading();
         }
 
@@ -250,10 +251,10 @@ export default {
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
-        contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
-        contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
-        contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
-        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
+        contextVideo._cover = util.getParentElement(element, '.sun-editor-figure-cover');
+        contextVideo._container = util.getParentElement(element, '.sun-editor-id-iframe-container');
+        contextVideo._caption = util.getChildElement(contextVideo._cover, 'FIGCAPTION');
+        contextVideo._resizingDiv = util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -285,7 +286,7 @@ export default {
         contextVideo.proportion.disabled = false;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
-        this.plugins.dialog.openDialog.call(this, 'video', true);
+        this.plugins.dialog.open.call(this, 'video', true);
     },
 
     setSize: function (w, h, isVertical) {
@@ -306,8 +307,8 @@ export default {
         contextVideo._element.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
 
         if (/100/.test(w)) {
-            this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-            this.util.addClass(contextVideo._container, 'float-center');
+            util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+            util.addClass(contextVideo._container, 'float-center');
         }
     },
 
@@ -319,8 +320,8 @@ export default {
         contextVideo._container.style.width = '';
         contextVideo._container.style.height = '';
 
-        this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
+        util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+        util.addClass(contextVideo._container, 'float-' + contextVideo._align);
     },
 
     resetAlign: function () {
@@ -329,11 +330,11 @@ export default {
         contextVideo._element.setAttribute('data-align', '');
         contextVideo._align = 'none';
         contextVideo._cover.style.margin = '0';
-        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
     },
 
     destroy: function () {
-        this.util.removeItem(this.context.video._container);
+        util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
     },
 

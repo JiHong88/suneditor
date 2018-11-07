@@ -107,8 +107,13 @@
 <span class="pl-k">imageUploadUrl</span><span class="pl-k">  : </span>The image upload to server mapping address <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
 <span class="pl-s"></span><span class="pl-k">                  </span>ex) <span class="pl-c1">"/editor/uploadImage.ajax"</span>
 <span class="pl-s"></span><span class="pl-k">                  </span>When not used, it enters base64 data
-<span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">return type : </span>JSONArray<span class="pl-c1"> [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},</span>
-<span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">              </span>          <span class="pl-c1"> {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]</span>
+<span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">return </span>{
+                             <span class="pl-c1">"errorMessage"</span>: <span class="pl-c1">"insert error message"</span>,
+                             <span class="pl-c1">"result"</span>: [
+                                 {<span class="pl-c1">"SUNEDITOR_IMAGE_SRC"</span>:<span class="pl-c1">"/download/editorImg/image1.jpg"}</span>,
+                                 {<span class="pl-c1">"SUNEDITOR_IMAGE_SRC"</span>:<span class="pl-c1">"/download/editorImg/image2.jpg"}</span>
+                             ]
+                         }
 
 <span class="pl-s">buttonList</span><span class="pl-k">      : </span>Defines button list to array {<span class="pl-c1">Array</span>}
                 <span class="pl-ent">default :</span> [

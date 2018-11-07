@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'formatBlock',
     add: function (core, targetElement) {
@@ -71,12 +73,12 @@ export default {
             const rangeElement = document.createElement(value);
             this.wrapToTags(rangeElement);
             this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
-            this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
+            this.appendFormatTag(rangeElement, util.isCell(this.getSelectionNode()) ? 'DIV' : '');
         }
         // others
         else {
             this.execCommand('formatBlock', false, value);
-            this.util.changeTxt(this.commandMap.FORMAT, value);
+            util.changeTxt(this.commandMap.FORMAT, value);
         }
 
         this.submenuOff();

@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'table',
     add: function (core, targetElement) {
@@ -111,9 +113,9 @@ export default {
 
         oTable.innerHTML = tableHTML;
 
-        const formatEl = this.util.getFormatElement(this.getSelectionNode());
+        const formatEl = util.getFormatElement(this.getSelectionNode());
 
-        this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? this.util.getRangeFormatElement(formatEl) : formatEl);
+        this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? util.getRangeFormatElement(formatEl) : formatEl);
         this.appendFormatTag(oTable);
         this.focus();
 
@@ -135,7 +137,7 @@ export default {
         this.context.table.tableUnHighlight.style.width = x_u + 'em';
         this.context.table.tableUnHighlight.style.height = y_u + 'em';
 
-        this.util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
+        util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
         this.context.table._tableXY = [x, y];
     },
 
@@ -150,14 +152,14 @@ export default {
         unHighlight.width = '5em';
         unHighlight.height = '5em';
 
-        this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
+        util.changeTxt(this.context.table.tableDisplay, '1 x 1');
         this.submenuOff();
     },
 
     init: function () {
         const contextTable = this.context.table;
         
-        if (contextTable._tdElement) this.util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
+        if (contextTable._tdElement) util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
 
         contextTable._element = null;
         contextTable._tdElement = null;
@@ -196,8 +198,8 @@ export default {
         }
 
         if (contextTable._tdElement !== tdElement) {
-            if (contextTable._tdElement) this.util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
-            this.util.addClass(tdElement, 'sun-editor-selected-cell');
+            if (contextTable._tdElement) util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
+            util.addClass(tdElement, 'sun-editor-selected-cell');
             contextTable._tdElement = tdElement;
             contextTable._trElement = tdElement.parentNode;
         }
@@ -210,7 +212,7 @@ export default {
             contextTable._tdCnt = contextTable._trElement.cells.length;
         }
 
-        const offset = this.util.getOffset(tdElement);
+        const offset = util.getOffset(tdElement);
         resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
     },
@@ -282,7 +284,7 @@ export default {
                 this.plugins.table.deleteRowCell.call(this, value);
                 break;
             case 'remove':
-            this.util.removeItem(contextTable._element);
+            util.removeItem(contextTable._element);
             this.controllersOff();
             this.focus();
         }

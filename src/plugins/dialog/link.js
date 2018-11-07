@@ -7,6 +7,7 @@
  */
 'use strict';
 
+import util from '../../lib/util';
 import dialog from '../modules/dialog';
 
 export default {
@@ -126,7 +127,7 @@ export default {
         try {
             submitAction();
         } finally {
-            this.plugins.dialog.closeDialog.call(this);
+            this.plugins.dialog.close.call(this);
             this.closeLoading();
             this.focus();
         }
@@ -141,7 +142,7 @@ export default {
         linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
-        const offset = this.util.getOffset(selectionATag);
+        const offset = util.getOffset(selectionATag);
         linkBtn.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
         
@@ -162,11 +163,11 @@ export default {
             this.context.link.focusElement.value = this.context.link._linkAnchor.href;
             this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
             this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
-            this.plugins.dialog.openDialog.call(this, 'link', true);
+            this.plugins.dialog.open.call(this, 'link', true);
         }
         else {
             /** delete */
-            this.util.removeItem(this.context.link._linkAnchor);
+            util.removeItem(this.context.link._linkAnchor);
             this.context.link._linkAnchor = null;
             this.focus();
         }

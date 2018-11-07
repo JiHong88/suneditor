@@ -7,13 +7,15 @@
  */
 'use strict';
 
+import util from '../../lib/util';
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
+import notice from '../modules/notice';
 
 export default {
     name: 'image',
     add: function (core) {
-        core.addModule([dialog, resizing]);
+        core.addModule([dialog, resizing, notice]);
         
         const context = core.context;
         context.image = {
@@ -165,12 +167,12 @@ export default {
         // Get all elements with class="tablinks" and remove the class "active"
         tabLinks = modal.getElementsByClassName('sun-editor-id-tab-link');
         for (i = 0; i < tabLinks.length; i++) {
-            this.util.removeClass(tabLinks[i], 'active');
+            util.removeClass(tabLinks[i], 'active');
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
         modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
-        this.util.addClass(targetElement, 'active');
+        util.addClass(targetElement, 'active');
 
         // focus
         if (tabName === 'image') {
@@ -195,7 +197,7 @@ export default {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    this.context.image._xmlHttp = this.util.getXMLHttpRequest();
+                    this.context.image._xmlHttp = util.getXMLHttpRequest();
                     this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
                     this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                     this.context.image._xmlHttp.send(formData);
@@ -212,6 +214,7 @@ export default {
             submitAction(this.context.image.imgInputFile.files);
         } catch (e) {
             this.closeLoading();
+            notice.open.call(this, e.message);
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
         }
     },
@@ -231,6 +234,7 @@ export default {
                     if (index === filesLen) this.closeLoading();
                 } catch (e) {
                     this.closeLoading();
+                    notice.open.call(this, e.message);
                     throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
                 }
             }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
@@ -242,18 +246,26 @@ export default {
     callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update, updateElement) {
         if (this.context.image._xmlHttp.readyState === 4) {
             if (this.context.image._xmlHttp.status === 200) {
-                const result = eval(this.context.image._xmlHttp.responseText);
+                const response = JSON.parse(this.context.image._xmlHttp.responseText);
 
-                for (let i = 0, len = (update && result.length > 0 ? 1 : result.length); i < len; i++) {
-                    this.plugins.image.create_image.call(this, result[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update, updateElement);
+                if (response.errorMessage) {
+                    this.closeLoading();
+                    notice.open.call(this, response.errorMessage);
+                    return;
+                }
+
+                const fileList = response.result;
+                for (let i = 0, len = (update && fileList.length > 0 ? 1 : fileList.length); i < len; i++) {
+                    this.plugins.image.create_image.call(this, fileList[i].SUNEDITOR_IMAGE_SRC, linkValue, linkNewWindow, width, align, update, updateElement);
                 }
 
                 this.closeLoading();
             }
             // error
             else {
+                notice.open.call(this, this.context.image._xmlHttp.statusText + ' ( ' + this.context.image._xmlHttp.status + ' )');
                 this.closeLoading();
-                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status);
+                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseURL: ' + this.context.image._xmlHttp.responseURL);
             }
         }
     },
@@ -264,6 +276,7 @@ export default {
         try {
             this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
         } catch (e) {
+            notice.open.call(this, e.message);
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
         } finally {
             this.closeLoading();
@@ -323,9 +336,10 @@ export default {
             }
         } catch (error) {
             this.closeLoading();
+            notice.open.call(this, error.message);
             throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
-            this.plugins.dialog.closeDialog.call(this);
+            this.plugins.dialog.close.call(this);
         }
 
         return false;
@@ -409,10 +423,10 @@ export default {
             cover.style.margin = '0';
         }
         
-        this.util.removeClass(container, contextImage._floatClassRegExp);
-        this.util.addClass(container, 'float-' + align);
+        util.removeClass(container, contextImage._floatClassRegExp);
+        util.addClass(container, 'float-' + align);
 
-        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
         this.appendFormatTag(container);
     },
 
@@ -460,7 +474,7 @@ export default {
             }
         } else {
             if (contextImage._caption) {
-                this.util.removeItem(contextImage._caption);
+                util.removeItem(contextImage._caption);
                 contextImage._caption = null;
             }
         }
@@ -472,8 +486,8 @@ export default {
             cover.style.margin = '0';
         }
 
-        this.util.removeClass(container, this.context.image._floatClassRegExp);
-        this.util.addClass(container, 'float-' + contextImage._align);
+        util.removeClass(container, this.context.image._floatClassRegExp);
+        util.addClass(container, 'float-' + contextImage._align);
         imageEl.setAttribute('data-align', contextImage._align);
 
         // link
@@ -498,9 +512,9 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.getFormatElement(imageEl);
+            const existElement = util.getFormatElement(imageEl);
             existElement.parentNode.insertBefore(container, existElement);
-            this.util.removeItem(existElement);
+            util.removeItem(existElement);
         }
 
         // transform
@@ -521,9 +535,9 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
-        contextImage._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
-        contextImage._container = this.util.getParentElement(element, '.sun-editor-id-image-container');
-        contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
+        contextImage._cover = util.getParentElement(element, '.sun-editor-figure-cover');
+        contextImage._container = util.getParentElement(element, '.sun-editor-id-image-container');
+        contextImage._caption = util.getChildElement(contextImage._cover, 'FIGCAPTION');
 
         contextImage._align = element.getAttribute('data-align') || 'none';
 
@@ -558,7 +572,7 @@ export default {
         contextImage.imageY.disabled = false;
         contextImage.proportion.disabled = false;
 
-        this.plugins.dialog.openDialog.call(this, 'image', true);
+        this.plugins.dialog.open.call(this, 'image', true);
     },
 
     setSize: function (w, h) {
@@ -578,8 +592,8 @@ export default {
         contextImage._element.style.height = '';
 
         if (/100/.test(w)) {
-            this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-            this.util.addClass(contextImage._container, 'float-center');
+            util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+            util.addClass(contextImage._container, 'float-center');
         }
     },
 
@@ -591,8 +605,8 @@ export default {
         contextImage._container.style.width = '';
         contextImage._container.style.height = '';
 
-        this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-        this.util.addClass(contextImage._container, 'float-' + contextImage._align);
+        util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+        util.addClass(contextImage._container, 'float-' + contextImage._align);
     },
 
     resetAlign: function () {
@@ -601,7 +615,7 @@ export default {
         contextImage._element.setAttribute('data-align', '');
         contextImage._align = 'none';
         contextImage._cover.style.margin = '0';
-        this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
+        util.removeClass(contextImage._container, contextImage._floatClassRegExp);
     },
 
     destroy: function (element) {
@@ -610,8 +624,8 @@ export default {
         this._variable._imagesTotalSize -= imageEl.getAttribute('file-size') * 1;
         delete this._variable._imagesInfo[imageEl.getAttribute('data-index')];
 
-        const imageContainer = this.util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
-        this.util.removeItem(imageContainer);
+        const imageContainer = util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
+        util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
     },
 
