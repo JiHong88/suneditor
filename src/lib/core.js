@@ -1959,6 +1959,18 @@ const core = function (context, plugins, lang) {
 
         _codeViewAutoScroll: function () {
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
+        },
+
+        onPaste_wysiwyg: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+ 
+            const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
+            console.log('cleanData', cleanData);
+
+            const html = document.createRange().createContextualFragment(cleanData)
+            console.log('html', html);
+            // context.element.wysiwyg.innerHTML = html;
         }
     };
 
@@ -1971,6 +1983,7 @@ const core = function (context, plugins, lang) {
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
 
     /** code view area auto line */
     if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);

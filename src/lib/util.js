@@ -544,6 +544,15 @@ const util = {
                 }
             }
         })(element);
+    },
+
+    /**
+     * @description Gets the clean HTML code for editor
+     * @param {String} html - HTML string
+     */
+    cleanHTML: function (html) {
+
+        return html;
     }
 };
 
