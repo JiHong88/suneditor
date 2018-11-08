@@ -27,8 +27,8 @@ export default {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _user_w: context.user.imageWidth,
-            _user_h: 0,
+            _origin_w: context.user.imageWidth === 'auto' ? '' : context.user.imageWidth,
+            _origin_h: '',
             _altText: '',
             _caption: null,
             captionCheckEl: null,
@@ -37,7 +37,9 @@ export default {
             _captionChecked: false,
             _proportionChecked: true,
             _floatClassRegExp: 'float\\-[a-z]+',
-            _xmlHttp: null
+            _xmlHttp: null,
+            _resizing: context.user.imageResizing,
+            _defaultAuto: context.user.imageWidth === 'auto' ? true : false
         };
 
         /** image dialog */
@@ -49,18 +51,23 @@ export default {
         context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
         context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
         context.image.captionCheckEl = image_dialog.getElementsByClassName('suneditor-id-image-check-caption')[0];
-        context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
-        context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
-        context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
-
-        context.image.imageX.value = context.user.imageWidth;
 
         /** add event listeners */
         context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
         context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
-        context.image.imageX.addEventListener('change', this.setInputSize.bind(core, 'x'));
-        context.image.imageY.addEventListener('change', this.setInputSize.bind(core, 'y'));
-        image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
+        
+        context.image.imageX = {}
+        context.image.imageY = {}
+        if (context.user.imageResizing) {
+            context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
+            context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
+            context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
+            context.image.imageX.value = context.user.imageWidth;
+            
+            context.image.imageX.addEventListener('change', this.setInputSize.bind(core, 'x'));
+            context.image.imageY.addEventListener('change', this.setInputSize.bind(core, 'y'));
+            image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
+        }
 
         /** append html */
         context.dialog.modal.appendChild(image_dialog);
@@ -109,13 +116,19 @@ export default {
             html += '' +
             '           <div class="form-group">' +
             '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="form-control sun-editor-id-image-alt" type="text" />' +
-            '           </div>' +
-            '           <div class="form-group">' +
-            '               <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-            '               <input class="form-size-control sun-editor-id-image-x" type="number" min="1" /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
-            '               <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-            '               <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
-            '           </div>' +
+            '           </div>';
+
+            if (user.imageResizing) {
+                html += '' +
+                '       <div class="form-group">' +
+                '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+                '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (user.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
+                '           <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
+                '       </div>' ;
+            }
+
+            html += '' +
             '           <div class="form-group-footer">' +
             '               <label><input type="checkbox" class="suneditor-id-image-check-caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
             '           </div>' +
@@ -317,7 +330,7 @@ export default {
         this.context.image._altText = this.context.image.altText.value;
         this.context.image._align = this.context.image.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         this.context.image._captionChecked = this.context.image.captionCheckEl.checked;
-        this.context.image._proportionChecked = this.context.image.proportion.checked;
+        if (this.context.image._resizing) this.context.image._proportionChecked = this.context.image.proportion.checked;
 
         try {
             if (this.context.dialog.updateModal) {
@@ -342,9 +355,8 @@ export default {
         return false;
     },
 
-    _onload_image: function (oImg, file) {
-        oImg.removeEventListener('load', this.context.image._loadBind);
-        oImg.style.height = oImg.offsetHeight + 'px';
+    _onload_image: function (oImg, file, _resizing) {
+        if (/\d+/.test(oImg.style.width)) oImg.style.height = oImg.offsetHeight + 'px';
         oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
         oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
 
@@ -393,12 +405,15 @@ export default {
         oImg.addEventListener('load', this.plugins.image._onload_image.bind(this, oImg, file));
 
         oImg.src = src;
-        oImg.style.width = width;
         oImg.setAttribute('data-align', align);
-        oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         oImg.alt = contextImage._altText;
         oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
         oImg.setAttribute('data-rotate', '0');
+
+        if (contextImage._resizing) {
+            if (/\d+/.test(width)) oImg.style.width = width;
+            oImg.setAttribute('data-proportion', contextImage._proportionChecked);
+        }
 
         const cover = this.plugins.resizing.set_cover.call(this, oImg);
         const container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
@@ -419,6 +434,14 @@ export default {
         
         util.removeClass(container, contextImage._floatClassRegExp);
         util.addClass(container, 'float-' + align);
+
+        if (!contextImage._resizing || !/\d+/.test(width)) {
+            this.context.resizing._resize_plugin = 'image';
+            contextImage._element = oImg;
+            contextImage._cover = cover;
+            contextImage._container = container;
+            this.plugins.image.setAutoSize.call(this);
+        }
 
         this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
         this.appendFormatTag(container);
@@ -451,9 +474,10 @@ export default {
 
         // size
         imageEl.alt = contextImage._altText;
-        imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
-        if (changeSize) {
-            this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
+
+        if (contextImage._resizing) {
+            imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
+            if (changeSize) this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
         }
 
         // caption
@@ -508,16 +532,16 @@ export default {
         }
 
         // transform
-        if (changeSize) {
+        if (contextImage._resizing && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
     },
 
     sizeRevert: function () {
         const contextImage = this.context.image;
-        if (contextImage._user_w) {
-            contextImage.imageX.value = contextImage._element_w = contextImage._user_w;
-            contextImage.imageY.value = contextImage._element_h = contextImage._user_h;
+        if (contextImage._origin_w) {
+            contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
+            contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
         }
     },
 
@@ -528,7 +552,6 @@ export default {
         contextImage._cover = util.getParentElement(element, '.sun-editor-figure-cover');
         contextImage._container = util.getParentElement(element, '.sun-editor-id-image-container');
         contextImage._caption = util.getChildElement(contextImage._cover, 'FIGCAPTION');
-
         contextImage._align = element.getAttribute('data-align') || 'none';
 
         contextImage._element_w = size.w;
@@ -539,11 +562,11 @@ export default {
         let userSize = contextImage._element.getAttribute('data-origin');
         if (userSize) {
             userSize = userSize.split(',');
-            contextImage._user_w = userSize[0] * 1;
-            contextImage._user_h = userSize[1] * 1;
+            contextImage._origin_w = userSize[0] * 1;
+            contextImage._origin_h = userSize[1] * 1;
         } else {
-            contextImage._user_w = size.w;
-            contextImage._user_h = size.h;
+            contextImage._origin_w = size.w;
+            contextImage._origin_h = size.h;
             contextImage._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },
@@ -556,11 +579,15 @@ export default {
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
-        contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
-        contextImage.imageX.value = contextImage._element.offsetWidth;
-        contextImage.imageY.value = contextImage._element.offsetHeight;
-        contextImage.imageY.disabled = false;
-        contextImage.proportion.disabled = false;
+
+        if (contextImage._resizing) {
+            contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
+            contextImage.imageX.value = contextImage._element.offsetWidth;
+            contextImage.imageY.value = contextImage._element.offsetHeight;
+            contextImage.imageX.disabled = false;
+            contextImage.imageY.disabled = false;
+            contextImage.proportion.disabled = false;
+        }
 
         this.plugins.dialog.open.call(this, 'image', true);
     },
@@ -569,6 +596,19 @@ export default {
         const contextImage = this.context.image;
         contextImage._element.style.width = w + 'px';
         contextImage._element.style.height = h + 'px';
+    },
+    
+    setAutoSize: function () {
+        const contextImage = this.context.image;
+
+        this.plugins.resizing.resetTransform.call(this, contextImage._element);
+        this.plugins.image.cancelPercentAttr.call(this);
+
+        contextImage._element.style.maxWidth = '100%';
+        contextImage._element.style.width = '';
+        contextImage._element.style.height = '';
+        contextImage._cover.style.width = '';
+        contextImage._cover.style.height = '';
     },
 
     setPercentSize: function (w) {
@@ -590,6 +630,7 @@ export default {
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
         
+        contextImage._element.style.maxWidth = '';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
         contextImage._container.style.width = '';
@@ -631,12 +672,18 @@ export default {
         contextImage.imgLinkNewWindowCheck.checked = false;
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
         contextImage.captionCheckEl.checked = false;
-        contextImage.proportion.checked = false;
-        contextImage.imageX.value = this.context.user.imageWidth;
-        contextImage.imageY.value = '';
-        contextImage.imageY.disabled = true;
-        contextImage.proportion.disabled = true;
         contextImage._element = null;
         this.plugins.image.openTab.call(this, 'init');
+
+        if (contextImage._resizing) {
+            const autoWidth = this.context.user.imageWidth === 'auto';
+
+            contextImage.proportion.checked = false;
+            contextImage.imageX.value = autoWidth ? '' : this.context.user.imageWidth;
+            contextImage.imageY.value = '';
+            contextImage.imageX.disabled = autoWidth;
+            contextImage.imageY.disabled = true;
+            contextImage.proportion.disabled = true;
+        }
     }
 };

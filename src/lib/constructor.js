@@ -14,7 +14,7 @@ import util from './util';
  * @param {element} element - textarea
  * @param {JSON} options - user options
  * @param {JSON} lang - user language
- * @param {JSON} _lang - plugins object
+ * @param {JSON} _plugins - plugins object
  * @returns {JSON}
  * @private
  */
@@ -26,23 +26,24 @@ const _Constructor = {
         options.lang = lang;
         options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
         options.resizingBar = options.resizingBar === undefined ? true : options.resizingBar;
-        options.videoWidth = options.videoWidth || 560;
-        options.videoHeight = options.videoHeight || 315;
-        options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
-        options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
-        options.imageUploadUrl = options.imageUploadUrl || null;
-        options.imageWidth = options.imageWidth || 350;
-        options.imageMaxSize = options.imageMaxSize || null;
-        options.imageTotalMaxSize = options.imageTotalMaxSize || null;
-        options.imageMaxCount = options.imageMaxCount || null;
-        options.font = options.font || null;
-        options.fontSize = options.fontSize || null;
-        options.colorList = options.colorList || null;
+        options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        options.popupDisplay = options.popupDisplay || 'full';
+        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
+        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
-        options.popupDisplay = options.popupDisplay || 'full';
+        options.font = options.font || null;
+        options.fontSize = options.fontSize || null;
+        options.colorList = options.colorList || null;
+        options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
+        options.imageWidth = options.imageWidth || 'auto';
+        options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
+        options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
+        options.imageUploadUrl = options.imageUploadUrl || null;
+        options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
+        options.videoWidth = options.videoWidth || 560;
+        options.videoHeight = options.videoHeight || 315;
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -51,10 +52,6 @@ const _Constructor = {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
-    
-        /** editor seting options */
-        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
-        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
     
         const doc = document;
     

@@ -257,7 +257,7 @@
 /** component (image, iframe video) */
 .sun-editor-editable .sun-editor-id-comp {
     display: flex;
-    padding: 20px 40px;
+    padding: 5px;
 }
 .sun-editor-editable[contenteditable=true] .sun-editor-id-comp {
     outline: 1px dashed #ccc;

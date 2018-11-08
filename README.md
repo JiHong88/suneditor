@@ -238,39 +238,40 @@ plugins: [
     link,
     image,
     video
-]               : Plugins array                                     default : null {Array}
-stickyToolbar   : Reference height value that should be changed to sticky toolbar mode
-                  It can also be used when there is another fixed toolbar at the top
-                  Set to 0, '0px', '50px', etc
-                  If set to -1 or false or null to turn off         default : 0 {Number|String|Boolean}
+]               : Plugins array.                                    default: null {Array}
+------------------------------------------------------------------------------------------------------------------
+lang            : language object. (en, ko) default : English {Object}
+stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
+                  It can also be used when there is another fixed toolbar at the top.
+                  Set to 0, '0px', '50px', etc.
+                  If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 resizingBar     : Show the bottom resizing bar.
-                  If 'height' value is 'auto', it will not be resized default : true {Boolean}
-fontSize        : Change default font-size array                    default : null {Array}
-font            : Change default font-family array                  default : null {Array}
-colorList       : Change default color array of color picker        default : null {Array}
-width           : The width size of the editor                      default : textarea.clientWidth || '100%' {Number|String}
-height          : The height size of the editor                     default : textarea.clientHeight|| 'auto' {Number|String}
+                  If 'height' value is 'auto', it will not be resized. default: true {Boolean}
+showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
+------------------------------------------------------------------------------------------------------------------
+display         : The display property of suneditor.                default: 'block' {String}
+width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
+height          : The height size of the editor.                    default: clientHeight||'auto' {Number|String}
 minHeight       : The min-height size of the editor.
-                  Used when 'height' value is 'auto'                default : null {Number|String}
-maxHeight       : The max-height size of the editor
-                  Used when 'height' value is 'auto'                default : null {Number|String}
-display         : The display property of suneditor                 default : 'block' {String}
-videoWidth      : The default width size of the video frame         default : 560 {Number}
-videoHeight     : The default heigth size of the video frame        default : 315 {Number}
-showPathLabel   : Displays the current node structure to resizingBar default : true {Boolean}
-popupDisplay    : Size of background area when activating dialog window ('full' || 'local') default : 'full' {String}
-
-lang            : language object (en, ko) default : English {Object}
-
-imageFileInput  : Choose whether to create a file input tag in the image upload window default : true {Boolean}
-imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true {Boolean}
-                  If the value of imageFileInput is false, it will be unconditionally true {Boolean}
-imageWidth       : The default width size of the image frame  default : 350 {Number}
-imageUploadUrl  : The image upload to server mapping address default : null {String}
+                  Used when 'height' value is 'auto'.               default: null {Number|String}
+maxHeight       : The max-height size of the editor.
+                  Used when 'height' value is 'auto'.               default: null {Number|String}
+------------------------------------------------------------------------------------------------------------------
+font            : Change default font-family array.                 default: null {Array}
+fontSize        : Change default font-size array.                   default: null {Array}
+colorList       : Change default color array of color picker.       default: null {Array}
+------------------------------------------------------------------------------------------------------------------
+imageResizing   : Can resize the image.                             default: true {Boolean}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
+imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
+                  If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
+imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data
                   return {
-                            "errorMessage": "insert error message",
+                      "errorMessage": "insert error message",
                             "result": [
                                 {
                                     "url": "/download/editorImg/test_image.jpg",
@@ -279,9 +280,13 @@ imageUploadUrl  : The image upload to server mapping address default : null {Str
                                 }
                             ]
                         }
-
+------------------------------------------------------------------------------------------------------------------
+videoResizing   : Can resize the video iframe.                       default: true {Boolean}
+videoWidth      : The default width size of the video frame.         default: 560 {Number}
+videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
-                default : [
+                default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],

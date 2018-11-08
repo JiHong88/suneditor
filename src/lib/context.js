@@ -46,24 +46,23 @@ const _Context = function (element, cons, options) {
         user: {
             stickyToolbar: options.stickyToolbar,
             resizingBar: options.resizingBar,
+            showPathLabel: options.showPathLabel,
             popupDisplay: options.popupDisplay,
-            videoWidth: options.videoWidth,
-            videoHeight: options.videoHeight,
-            imageFileInput: options.imageFileInput,
-            imageUrlInput: options.imageUrlInput,
-            imageUploadUrl: options.imageUploadUrl,
-            imageWidth: options.imageWidth,
-            imageMaxSize: options.imageMaxSize,
-            imageTotalMaxSize: options.imageTotalMaxSize,
-            imageMaxCount: options.imageMaxCount,
-            font: options.font,
-            fontSize: options.fontSize,
-            colorList: options.colorList,
+            display: options.display,
             height: options.height,
             minHeight: options.minHeight,
             maxHeight: options.maxHeight,
-            showPathLabel: options.showPathLabel,
-            display: options.display
+            font: options.font,
+            fontSize: options.fontSize,
+            colorList: options.colorList,
+            imageResizing: options.imageResizing,
+            imageWidth: options.imageWidth,
+            imageFileInput: options.imageFileInput,
+            imageUrlInput: options.imageUrlInput,
+            imageUploadUrl: options.imageUploadUrl,
+            videoResizing: options.videoResizing,
+            videoWidth: options.videoWidth,
+            videoHeight: options.videoHeight
         }
     };
 };

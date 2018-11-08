@@ -36,7 +36,8 @@ export default {
         let resize_button = eval(this.setController_button(core.lang));
         context.resizing.resizeButton = resize_button;
 
-        let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
+        let resize_handles = context.resizing.resizeHandles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
+        context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
 
         /** add event listeners */
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -86,19 +87,19 @@ export default {
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="arrow"></div>' +
-            '<div class="btn-group">' +
+            '<div class="btn-group sun-editor-id-resize-button-group">' +
             '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
-            '</div>' +
-            '<div class="btn-group btn-bottom-group">' +
             '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
             '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
+            '</div>' +
+            '<div class="btn-group">' +
             '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
             '   <button type="button" data-command="revert" title="' + lang.dialogBox.revertButton + '"><div class="icon-revert"></div></button>' +
+            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
             '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
 
@@ -133,6 +134,14 @@ export default {
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
         util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+
+        const resizeDisplay = this.context[plugin]._resizing ? 'flex' : 'none';
+        const resizeHandles = contextResizing.resizeHandles;
+
+        contextResizing.resizeButtonGroup.style.display = resizeDisplay;
+        for (let i = 0, len = resizeHandles.length; i < len; i++) {
+            resizeHandles[i].style.display = resizeDisplay;
+        }
 
         contextResizing.resizeContainer.style.display = 'block';
         contextResizing.resizeButton.style.display = 'block';
@@ -259,6 +268,10 @@ export default {
             contextPlugin.resetAlign.call(this);
             this.plugins.resizing.resetTransform.call(this, contextEl);
 
+            if (this.context[this.context.resizing._resize_plugin]._defaultAuto) {
+                contextPlugin.setAutoSize.call(this);
+            }
+
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
 
@@ -285,8 +298,8 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        element.style.width = (originSize[0] || this.context.user.imageWidth) + 'px';
-        element.style.height = (originSize[1] + 'px' || 'auto');
+        element.style.width = (originSize[0] + 'px' || 'auto');
+        element.style.height = (originSize[1] + 'px' || '');
         this.plugins.resizing.setTransformSize.call(this, element);
     },
 
