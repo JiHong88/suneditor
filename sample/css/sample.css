@@ -50,29 +50,3 @@ button {
     background-image: url(../img/github.png);
 }
 
-/** download icon */
-.down-icon {
-    color: #0d2636 !important;
-    font-family: initial;
-}
-
-.down-icon::before {
-    content: "";
-    display: inline-block;
-    background-image: url(../img/download_black.png);
-    width: 15px;
-    height: 15px;
-    background-repeat: no-repeat;
-    background-size: 15px 15px;
-    vertical-align: bottom;
-    margin-right: 2px;
-}
-
-.down-icon:hover {
-    color: #fff !important;
-}
-
-.down-icon:hover::before {
-    background-image: url(../img/download_white.png);
-}
-

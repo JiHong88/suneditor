@@ -372,6 +372,9 @@ editor.onImageUpload = function (targetImgElement) { console.log('targetImgEleme
 ## Customize
 **<a href="http://suneditor.com/sample/html/customize.html" target="_blank">Customize</a>**
 
+## customPlugins
+**<a href="http://suneditor.com/sample/html/customPlugins.html" target="_blank">Customize</a>**
+
 ## Document
 **<a href="http://suneditor.com/sample/html/document.html" target="_blank">Document</a>**
     
