@@ -77,8 +77,8 @@ const core = function (context, plugins, lang) {
          * @description An user event function when image uploaded success or remove image
          * @private
          */
-        _imageUpload: function (targetImgElement) {
-            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement);
+        _imageUpload: function (targetImgElement, index, isDelete) {
+            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement, index, isDelete);
         },
 
         /**
@@ -1965,7 +1965,7 @@ const core = function (context, plugins, lang) {
 
         onPaste_wysiwyg: function (e) {
             if (!e.clipboardData.getData) return true;
-            
+
             e.stopPropagation();
             e.preventDefault();
             

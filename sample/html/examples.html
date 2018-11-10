@@ -339,6 +339,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_save()">save</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getImagesInfo()">getImagesInfo</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>
@@ -481,7 +482,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
-        suneditor.onImageUpload = function () { console.log(console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)) }
+        suneditor.onImageUpload = function (targetImgElement, index, isDelete) { console.log(console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)) }
     }
 
     sun_create();
