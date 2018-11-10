@@ -259,11 +259,11 @@ export default {
             contextPlugin.onModifyMode.call(this, contextEl, size);
         }
         else if (/revert/.test(command)) {
-            contextPlugin.resetAlign.call(this);
-            this.plugins.resizing.resetTransform.call(this, contextEl);
-
-            if (this.context[this.context.resizing._resize_plugin]._defaultAuto) {
+            if (contextPlugin.setAutoSize) {
                 contextPlugin.setAutoSize.call(this);
+            } else {
+                contextPlugin.resetAlign.call(this);
+                this.plugins.resizing.resetTransform.call(this, contextEl);
             }
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
@@ -305,7 +305,7 @@ export default {
         const h = isVertical ? offsetW : offsetH;
 
         this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH, isVertical);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH);
 
         cover.style.width = w + 'px';
         cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h + 'px');

@@ -27,8 +27,8 @@ suneditor.create(document.getElementById('editor'), {
     height: 'auto',
     width: '100%',
     stickyToolbar: '0',
-    imageResizing: false,
     videoResizing: false,
+    imageWidth: 150
 });
 
 let ss = suneditor.create(document.getElementById('editor1'), {

@@ -632,7 +632,7 @@ export default {
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
         
-        contextImage._element.style.maxWidth = '';
+        contextImage._element.style.maxWidth = 'none';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
         contextImage._container.style.width = '';
