@@ -534,7 +534,7 @@ export default {
         }
 
         // transform
-        if (contextImage._resizing && changeSize) {
+        if ((contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked)) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
     },

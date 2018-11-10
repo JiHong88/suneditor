@@ -239,7 +239,7 @@ export default {
             if (!this.context.dialog.updateModal) {
                 this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
                 this.appendFormatTag(container);
-            } else if(changeSize) {
+            } else if((contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
             }
 
