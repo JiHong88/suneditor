@@ -561,7 +561,7 @@ const util = {
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML.replace(/\s(?:style|class|dir|xmlns|data-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*/ig, '').replace(/<\/?(?:span)>/ig, '');
+                cleanHTML += domTree[i].outerHTML.replace(/\s(?:style|class|dir|xmlns|data-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*/ig, '').replace(/<\/?(?:span|font)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '').replace(/<\/?[a-z]+:[a-z]+\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '');
             } else {
                 cleanHTML += domTree[i].textContent;
             }

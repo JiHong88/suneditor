@@ -1964,6 +1964,8 @@ const core = function (context, plugins, lang) {
         },
 
         onPaste_wysiwyg: function (e) {
+            if (!e.clipboardData.getData) return true;
+            
             e.stopPropagation();
             e.preventDefault();
             
