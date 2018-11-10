@@ -486,7 +486,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         ]
     });
 
-    var suneditor = SUNEDITOR.create('exampleFunction');
+    var suneditor = null;
 
     function sun_noticeOpen(message) {
         suneditor.noticeOpen(message);
@@ -545,7 +545,18 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
     }
 
     function sun_create() {
-        suneditor = SUNEDITOR.create('exampleFunction');
+        suneditor = SUNEDITOR.create('exampleFunction', {
+            buttonList: [
+            ['undo', 'redo'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+            ['removeFormat'],
+            ['indent', 'outdent'],
+            ['fullScreen', 'showBlocks', 'codeView'],
+            ['preview', 'print'],
+            ['image']
+        ]
+        });
+
         suneditor.onScroll = function (e) { console.log('onScroll', e); }
         suneditor.onClick = function (e) { console.log('onClick', e) }
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
@@ -554,12 +565,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         suneditor.onImageUpload = function () { console.log(suneditor.getImagesInfo()) }
     }
 
-    suneditor.onScroll = function (e) { console.log('onScroll', e) }
-    suneditor.onClick = function (e) { console.log('onClick', e) }
-    suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
-    suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
-    suneditor.onDrop = function (e) { console.log('onDrop', e); }
-    suneditor.onImageUpload = function () { console.log(suneditor.getImagesInfo()) }
+    sun_create();
 </script>
 </body>
 </html>

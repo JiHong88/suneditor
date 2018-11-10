@@ -337,9 +337,9 @@ export default {
                 this.plugins.image.update_image.call(this);
             }
             
-            if (this.context.image.imgInputFile.files.length > 0) {
+            if (this.context.image.imgInputFile && this.context.image.imgInputFile.files.length > 0) {
                 this.plugins.image.onRender_imgInput.call(this);
-            } else if (this.context.image.imgUrlFile.value.trim().length > 0) {
+            } else if (this.context.image.imgUrlFile && this.context.image.imgUrlFile.value.trim().length > 0) {
                 this.plugins.image.onRender_imgUrl.call(this);
             } else {
                 this.closeLoading();
@@ -655,19 +655,22 @@ export default {
         const imageContainer = util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
 
         const dataIndex = imageEl.getAttribute('data-index');
+        
+        util.removeItem(imageContainer);
+        this.plugins.image.init.call(this);
+
+        this.controllersOff();
+
         if (dataIndex) {
             delete this._variable._imagesInfo[dataIndex];
             this._imageUpload(imageEl);
         }
-        
-        util.removeItem(imageContainer);
-        this.plugins.image.init.call(this);
     },
 
     init: function () {
         const contextImage = this.context.image;
-        contextImage.imgInputFile.value = '';
-        contextImage.imgUrlFile.value = '';
+        if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';
+        if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = '';
         contextImage.altText.value = '';
         contextImage.imgLink.value = '';
         contextImage.imgLinkNewWindowCheck.checked = false;

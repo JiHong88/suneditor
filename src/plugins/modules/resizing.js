@@ -228,8 +228,6 @@ export default {
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/mirror/.test(command)) {
             const r = contextEl.getAttribute('data-rotate') || '0';
@@ -246,8 +244,6 @@ export default {
             contextEl.setAttribute('data-rotateY', y);
 
             this.plugins.resizing._setTransForm(contextEl, r, x, y);
-
-            return;
         }
         else if (/rotate/.test(command)) {
             const contextResizing = this.context.resizing;
@@ -261,8 +257,6 @@ export default {
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/revert/.test(command)) {
             contextPlugin.resetAlign.call(this);
@@ -274,18 +268,14 @@ export default {
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/update/.test(command)) {
             contextPlugin.openModify.call(this);
+            this.controllersOff();
         }
         else if (/delete/.test(command)) {
             contextPlugin.destroy.call(this);
         }
-
-        this.submenuOff();
-        this.focus();
     },
 
     resetTransform: function (element) {

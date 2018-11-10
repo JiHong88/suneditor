@@ -356,6 +356,7 @@ export default {
     destroy: function () {
         util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
+        this.controllersOff();
     },
 
     init: function () {
