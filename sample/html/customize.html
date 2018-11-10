@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="../../dist/suneditor.min.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -56,7 +57,8 @@
 
 <div class="content">
     <article class="markdown-body entry-content">
-
+        <input type="checkbox" id="stickyToolbar" checked>
+        <textarea id="sample_editor" style="display: none;"></textarea>
     </article>
 
     <footer>
@@ -67,6 +69,46 @@
     </footer>
 </div>
 
-<script src="../build/suneditor.customize.js"></script>
+<script>
+
+function sun_create () {
+    SUNEDITOR.create('sample_editor', {
+        stickyToolbar,
+        resizingBar: document.getElementById('resizingBar').checked,
+        showPathLabel: document.getElementById('showPathLabel').checked,
+        popupDisplay,
+        display,
+        width,
+        height,
+        minHeight,
+        maxHeight,
+        font,
+        fontSize,
+        colorList,
+        imageResizing: document.getElementById('imageResizing').checked,
+        imageWidth,
+        imageFileInput,
+        imageUrlInput,
+        imageUploadUrl,
+        videoResizing: document.getElementById('videoResizing').checked,
+        videoWidth,
+        videoHeight,
+        buttonList: [
+            ['undo', 'redo',
+            'font', 'fontSize', 'formatBlock',
+            'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+            'removeFormat',
+            'fontColor', 'hiliteColor',
+            'indent', 'outdent',
+            'align', 'horizontalRule', 'list', 'table',
+            'link', 'image', 'video',
+            'fullScreen', 'showBlocks', 'codeView',
+            'preview', 'print']
+        ]
+    });
+}
+
+sun_create();
+</script>
 </body>
 </html>
