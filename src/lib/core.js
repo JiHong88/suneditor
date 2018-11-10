@@ -1688,6 +1688,12 @@ const core = function (context, plugins, lang) {
                 editor.callPlugin('image', function () {
                     const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
+                    
+                    if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
+                        editor.plugins.image.openModify.call(editor, true);
+                        editor.plugins.image.update_image.call(editor);
+                        editor.controllersOff();
+                    }
                 });
 
                 return;
@@ -1718,14 +1724,10 @@ const core = function (context, plugins, lang) {
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
                 if (td) {
-                    if (util.isCell(targetElement)) {
-                        editor.execCommand('formatBlock', false, 'DIV');
-                        editor._setEditorRange();
-                        event._findButtonEffectTag();
-                    }
     
-                    editor.controllersOff();
-                    editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+                    if (editor.controllerArray.length === 0) {
+                        editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+                    }
                 }
             }
 
@@ -1964,13 +1966,10 @@ const core = function (context, plugins, lang) {
         onPaste_wysiwyg: function (e) {
             e.stopPropagation();
             e.preventDefault();
- 
+            
             const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
-            console.log('cleanData', cleanData);
+            editor.execCommand('insertHTML', false, cleanData || 'Hello, World!');
 
-            const html = document.createRange().createContextualFragment(cleanData)
-            console.log('html', html);
-            // context.element.wysiwyg.innerHTML = html;
         }
     };
 

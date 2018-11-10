@@ -56,8 +56,8 @@ export default {
         context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
         context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
         
-        context.image.imageX = {}
-        context.image.imageY = {}
+        context.image.imageX = {};
+        context.image.imageY = {};
         if (context.user.imageResizing) {
             context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
             context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
@@ -236,8 +236,8 @@ export default {
         const reader = new FileReader();
         
         if (this.context.dialog.updateModal) {
-            this.context.image._element.setAttribute('file-name', file.name);
-            this.context.image._element.setAttribute('file-size', file.size);
+            this.context.image._element.setAttribute('data-file-name', file.name);
+            this.context.image._element.setAttribute('data-file-size', file.size);
         }
 
         reader.onload = function (update, updateElement, file) {
@@ -355,7 +355,7 @@ export default {
         return false;
     },
 
-    _onload_image: function (oImg, file, _resizing) {
+    _onload_image: function (oImg, file) {
         if (/\d+/.test(oImg.style.width)) oImg.style.height = oImg.offsetHeight + 'px';
         oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
         oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
@@ -380,14 +380,14 @@ export default {
 
             this._variable._imageIndex++;
 
-            oImg.setAttribute('file-name', file.name);
-            oImg.setAttribute('file-size', file.size);
+            oImg.setAttribute('data-file-name', file.name);
+            oImg.setAttribute('data-file-size', file.size);
         }
         else {
             const imgInfo = this._variable._imagesInfo[dataIndex];
 
-            imgInfo.name = oImg.getAttribute("file-name");
-            imgInfo.size = oImg.getAttribute("file-size") * 1;
+            imgInfo.name = oImg.getAttribute("data-file-name");
+            imgInfo.size = oImg.getAttribute("data-file-size") * 1;
         }
 
         this._imageUpload(oImg);
@@ -463,8 +463,9 @@ export default {
         }
 
         if (container === null) {
+            cover = cover.cloneNode(true);
             isNewContainer = true;
-            container = this.plugins.resizing.set_container.call(this, cover.cloneNode(true), 'sun-editor-id-image-container');
+            container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
         }
         
         if (isNewContainer) {
@@ -526,7 +527,7 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = util.getFormatElement(imageEl);
+            const existElement = util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
             util.removeItem(existElement);
         }
@@ -571,7 +572,7 @@ export default {
         }
     },
 
-    openModify: function () {
+    openModify: function (notOpen) {
         const contextImage = this.context.image;
         contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage.altText.value = contextImage._element.alt;
@@ -589,7 +590,7 @@ export default {
             contextImage.proportion.disabled = false;
         }
 
-        this.plugins.dialog.open.call(this, 'image', true);
+        if (!notOpen) this.plugins.dialog.open.call(this, 'image', true);
     },
 
     setSize: function (w, h) {

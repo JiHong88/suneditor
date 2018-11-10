@@ -103,7 +103,7 @@ export default {
             tableHTML += '<tr>';
             let tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td></td>';
+                tableHTML += '<td><div>&#65279</div></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';
@@ -225,7 +225,7 @@ export default {
             let cells = '';
 
             for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td></td>';
+                cells += '<td><div>&#65279</div></td>';
             }
 
             const newRow = contextTable._element.insertRow(rowIndex);
@@ -235,9 +235,11 @@ export default {
         else {
             const trArray = contextTable._trElements;
             const cellIndex = option === 'left' ? contextTable._tdIndex : contextTable._tdIndex + 1;
+            let cell = null;
             
             for (let i = 0, len = contextTable._trCnt; i < len; i++) {
-                trArray[i].insertCell(cellIndex);
+                cell = trArray[i].insertCell(cellIndex);
+                cell.innerHTML = '<div>&#65279</div>';
             }
         }
 

@@ -178,7 +178,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
+        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
         return false;
     },
 
@@ -299,6 +299,8 @@ const util = {
      */
     getListChildren: function (element, validation) {
         const children = [];
+        if (!element || !element.children) return children;
+
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
@@ -322,6 +324,8 @@ const util = {
      */
     getListChildNodes: function (element, validation) {
         const children = [];
+        if (!element || !element.childNodes) return children;
+
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
@@ -551,8 +555,19 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
+        const tagsAllowed = new RegExp('^(P|DIV|PRE|H1|H2|H3|H4|H5|H6|B|U|I|STRIKE|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
+        const domTree = document.createRange().createContextualFragment(html).children;
+        let cleanHTML = '';
 
-        return html;
+        for (let i = 0, len = domTree.length; i < len; i++) {
+            if (tagsAllowed.test(domTree[i].nodeName)) {
+                cleanHTML += domTree[i].outerHTML.replace(/\s(?:style|class|dir|xmlns|data-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*/ig, '').replace(/<\/?(?:span)>/ig, '');
+            } else {
+                cleanHTML += domTree[i].textContent;
+            }
+        }
+
+        return cleanHTML || html;
     }
 };
 
