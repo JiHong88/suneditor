@@ -23,9 +23,6 @@
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
         });
-        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor/releases/latest', function(data) {
-            $('#download_latest').attr('href', data.zipball_url);
-        });
     </script>
 </head>
 <body class="back_index" style="min-width:100%; background-color:#000;">
@@ -47,9 +44,9 @@
                 <li><a href="html/getting-started.html" title="Getting started">Getting started</a></li>
                 <li><a href="html/examples.html" title="Examples">Examples</a></li>
                 <li><a href="html/customize.html" title="Customize">Customize</a></li>
+                <li><a href="html/customPlugins.html" title="CustomPlugins">CustomPlugins</a></li>
                 <li><a href="html/document.html" title="Document">Document</a></li>
                 <li>&nbsp;&nbsp;</li>
-                <li><a href="#" id="download_latest" class="down-icon" title="Download">Download</a></li>
                 <li>
                     <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
                 </li>
@@ -61,11 +58,11 @@
 <div class="content" style="max-width: 1265px;">
     <form name="frm">
         <textarea id="editor" style="display:none;">
+            <p><br></p>
+            <div class="sun-editor-id-comp sun-editor-id-image-container float-right" contenteditable="false"><figure class="sun-editor-figure-cover" style="margin: auto;"><img src="http://suneditor.com/sample/img/sunset.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="false" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
             <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
-            <div class="sun-editor-id-comp sun-editor-id-image-container float-right" contenteditable="false"><figure class="sun-editor-figure-cover" style="margin: auto; width: 250px; height: 141px;"><img src="http://suneditor.com/sample/img/sunset.jpg" data-align="right" data-proportion="false" alt="Sunset image" data-rotate="" origin-size="640,360" data-origin="350,197" data-rotatex="" data-rotatey="" style="width: 250px; height: 141px; transform: rotate(0deg);" class=""></figure></div>
             <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
-            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p>
-            </pre>
+            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
             <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>

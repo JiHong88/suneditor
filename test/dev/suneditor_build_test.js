@@ -26,7 +26,9 @@ suneditor.create(document.getElementById('editor'), {
     ],
     height: 'auto',
     width: '100%',
-    stickyToolbar: '0'
+    stickyToolbar: '0',
+    videoResizing: false,
+    imageWidth: 150
 });
 
 let ss = suneditor.create(document.getElementById('editor1'), {
@@ -44,9 +46,37 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'preview', 'print']
     ],
     width: '100%',
-    stickyToolbar: 50
+    stickyToolbar: 0
     ,height: 'auto'
 });
+
+ss.onScroll = function (e) {
+    console.log('onScroll', e);
+};
+ss.onClick = function (e) {
+    console.log('onClick', e);
+};
+ss.onKeyDown = function (e) {
+    console.log('onKeyDown', e);
+};
+ss.onKeyUp = function (e) {
+    console.log('onKeyUp', e);
+};
+ss.onDrop = function (e) {
+    console.log('onDrop', e);
+};
+
+ss.onImageUpload = function () {
+    console.log(ss.getImagesInfo());
+}
+
+window.sun_noticeOpen = function () {
+    ss.noticeOpen('test notice');
+}
+
+window.sun_noticeClose = function () {
+    ss.noticeClose();
+}
 
 window.sun_save = function () {
     ss.save();
@@ -54,6 +84,11 @@ window.sun_save = function () {
 
 window.sun_getContext = function () {
     console.log(ss.getContext());
+}
+
+window.sun_getImagesInfo = function () {
+    console.log(ss.getImagesInfo());
+    ss.getImagesInfo().list[0].select();
 }
 
 window.sun_insertHTML = function (html) {
@@ -138,5 +173,6 @@ editor.create(document.getElementsByName('editor3')[0], {
     ],
     lang: ko,
     width: '100%',
-    stickyToolbar: false
+    stickyToolbar: false,
+    popupDisplay: 'local'
 });

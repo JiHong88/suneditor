@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'font',
     add: function (core, targetElement) {
@@ -65,7 +67,7 @@ export default {
 
         const target = e.target;
 
-        this.util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
+        util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         const newNode = document.createElement('SPAN');
         newNode.style.fontFamily = target.getAttribute('data-value');
         this.wrapRangeToTag(newNode, ['font-family']);

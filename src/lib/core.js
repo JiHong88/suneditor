@@ -7,15 +7,17 @@
  */
 'use strict';
 
+import util from './util';
+import notice from '../plugins/modules/notice';
+
 /**
  * @description SunEditor core closure
  * @param context
- * @param util
  * @param plugins
  * @param lang
  * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
-const core = function (context, util, plugins, lang) {
+const core = function (context, plugins, lang) {
     /**
      * @description editor core object
      * should always bind this object when registering an event in the plug-in.
@@ -35,11 +37,6 @@ const core = function (context, util, plugins, lang) {
          * @description Whether the plugin is initialized
          */
         initPlugins: {},
-
-        /**
-         * @description util function
-         */
-        util: util,
 
         /**
          * @description loaded language
@@ -75,6 +72,14 @@ const core = function (context, util, plugins, lang) {
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+
+        /**
+         * @description An user event function when image uploaded success or remove image
+         * @private
+         */
+        _imageUpload: function (targetImgElement, index, isDelete) {
+            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement, index, isDelete);
+        },
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -128,7 +133,9 @@ const core = function (context, util, plugins, lang) {
             _editorAreaOriginCssText: '',
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
-            _sticky: false
+            _sticky: false,
+            _imagesInfo: [],
+            _imageIndex: 0
         },
 
         /**
@@ -157,7 +164,7 @@ const core = function (context, util, plugins, lang) {
             for (let i = 0, len = moduleArray.length; i < len; i++) {
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
-                    this.plugins[moduleName] = this.util.copyObj(moduleArray[i]);
+                    this.plugins[moduleName] = util.copyObj(moduleArray[i]);
                     this.plugins[moduleName].add(this);
                 }
             }
@@ -455,7 +462,7 @@ const core = function (context, util, plugins, lang) {
         appendFormatTag: function (element, formatNodeName) {
             const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : this.util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = document.createElement(oFormatName);
             oFormat.innerHTML = '&#65279';
 
@@ -1654,7 +1661,7 @@ const core = function (context, util, plugins, lang) {
                 }
                 else if (/dialog/.test(display)) {
                     editor.callPlugin(command, function () {
-                        editor.plugins.dialog.openDialog.call(editor, command, target.getAttribute('data-option'), false);
+                        editor.plugins.dialog.open.call(editor, command, false);
                     });
                 }
 
@@ -1673,7 +1680,6 @@ const core = function (context, util, plugins, lang) {
 
         onClick_wysiwyg: function (e) {
             e.stopPropagation();
-
             const targetElement = e.target;
             editor.submenuOff();
 
@@ -1682,7 +1688,14 @@ const core = function (context, util, plugins, lang) {
                 editor.callPlugin('image', function () {
                     const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement, 'image');
                     editor.plugins.image.onModifyMode.call(editor, targetElement, size);
+                    
+                    if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
+                        editor.plugins.image.openModify.call(editor, true);
+                        editor.plugins.image.update_image.call(editor);
+                        editor.controllersOff();
+                    }
                 });
+
                 return;
             }
 
@@ -1693,6 +1706,7 @@ const core = function (context, util, plugins, lang) {
                     const size = editor.plugins.resizing.call_controller_resize.call(editor, iframe, 'video');
                     editor.plugins.video.onModifyMode.call(editor, iframe, size);
                 });
+
                 return;
             }
 
@@ -1707,21 +1721,17 @@ const core = function (context, util, plugins, lang) {
                 figcaption.focus();
 
                 figcaption.addEventListener('blur', event._cancelCaptionEdit);
-
-                return;
-            }
-            
-            const td = util.getParentElement(targetElement, util.isCell);
-            if (td) {
-                if (util.isCell(targetElement)) {
-                    editor.execCommand('formatBlock', false, 'DIV');
-                    editor._setEditorRange();
-                    event._findButtonEffectTag();
+            } else {
+                const td = util.getParentElement(targetElement, util.isCell);
+                if (td) {
+    
+                    if (editor.controllerArray.length === 0) {
+                        editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+                    }
                 }
-
-                editor.controllersOff();
-                editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
             }
+
+            if (userFunction.onClick) userFunction.onClick(e);
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -1815,6 +1825,8 @@ const core = function (context, util, plugins, lang) {
 
                     break;
             }
+
+            if (userFunction.onKeyDown) userFunction.onKeyDown(e);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -1846,27 +1858,32 @@ const core = function (context, util, plugins, lang) {
             if (event._directionKeyKeyCode.test(e.keyCode)) {
                 event._findButtonEffectTag();
             }
+
+            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
         },
 
-        onScroll_wysiwyg: function () {
+        onScroll_wysiwyg: function (e) {
             editor.controllersOff();
+            if (userFunction.onScroll) userFunction.onScroll(e);
         },
 
         onDrop_wysiwyg: function (e) {
             const files = e.dataTransfer.files;
 
-            if (files.length === 0) return true;
+            if (files.length > 0) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                editor.focus();
+    
+                editor.callPlugin('image', function () {
+                    context.image.imgInputFile.files = files;
+                    editor.plugins.image.onRender_imgInput.call(editor);
+                    context.image.imgInputFile.files = null;
+                });
+            }
 
-            e.stopPropagation();
-            e.preventDefault();
-            
-            editor.focus();
-
-            editor.callPlugin('image', function () {
-                context.image.imgInputFile.files = files;
-                editor.plugins.image.onRender_imgInput.call(editor);
-                context.image.imgInputFile.files = null;
-            });
+            if (userFunction.onDrop) userFunction.onDrop(e);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -1944,6 +1961,17 @@ const core = function (context, util, plugins, lang) {
 
         _codeViewAutoScroll: function () {
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
+        },
+
+        onPaste_wysiwyg: function (e) {
+            if (!e.clipboardData.getData) return true;
+
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
+            editor.execCommand('insertHTML', false, cleanData || 'Hello, World!');
+
         }
     };
 
@@ -1956,6 +1984,7 @@ const core = function (context, util, plugins, lang) {
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
 
     /** code view area auto line */
     if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
@@ -1982,7 +2011,34 @@ const core = function (context, util, plugins, lang) {
     }
 
     /** User function */
-    return {
+    const userFunction = {
+        /**
+         * @description Event functions
+         */
+        onScroll: null,
+        onClick: null,
+        onKeyDown: null,
+        onKeyUp: null,
+        onDrop: null,
+        onImageUpload: null,
+
+        /**
+         * @description Open a notice area
+         * @param {String} message 
+         */
+        noticeOpen: function (message) {
+            editor.addModule([notice]);
+            notice.open.call(editor, message);
+        },
+
+        /**
+         * @description Close a notice area
+         */
+        noticeClose: function () {
+            editor.addModule([notice]);
+            notice.close.call(editor);
+        },
+
         /**
          * @description Copying the contents of the editor to the original textarea
          */
@@ -2017,6 +2073,10 @@ const core = function (context, util, plugins, lang) {
                 contents = context.element.code.value;
             }
             return contents;
+        },
+
+        getImagesInfo: function () {
+            return editor._variable._imagesInfo;
         },
 
         /**
@@ -2114,6 +2174,8 @@ const core = function (context, util, plugins, lang) {
             this.destroy = null;
         }
     };
+
+    return userFunction;
 };
 
 export default core;

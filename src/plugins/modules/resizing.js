@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'resizing',
     add: function (core) {
@@ -34,7 +36,8 @@ export default {
         let resize_button = eval(this.setController_button(core.lang));
         context.resizing.resizeButton = resize_button;
 
-        let resize_handles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
+        let resize_handles = context.resizing.resizeHandles = resize_div_container.querySelectorAll('.sun-editor-name-resize-handle');
+        context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
 
         /** add event listeners */
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -84,19 +87,19 @@ export default {
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="arrow"></div>' +
-            '<div class="btn-group">' +
+            '<div class="btn-group sun-editor-id-resize-button-group">' +
             '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
-            '</div>' +
-            '<div class="btn-group btn-bottom-group">' +
             '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
             '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
+            '</div>' +
+            '<div class="btn-group">' +
             '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
             '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
             '   <button type="button" data-command="revert" title="' + lang.dialogBox.revertButton + '"><div class="icon-revert"></div></button>' +
+            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
             '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
             '</div>';
 
@@ -109,7 +112,7 @@ export default {
 
         const resizeContainer = contextResizing.resizeContainer;
         const resizeDiv = contextResizing.resizeDiv;
-        const offset = this.util.getOffset(targetElement);
+        const offset = util.getOffset(targetElement);
 
         const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 
@@ -130,7 +133,15 @@ export default {
 
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+        util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+
+        const resizeDisplay = this.context[plugin]._resizing ? 'flex' : 'none';
+        const resizeHandles = contextResizing.resizeHandles;
+
+        contextResizing.resizeButtonGroup.style.display = resizeDisplay;
+        for (let i = 0, len = resizeHandles.length; i < len; i++) {
+            resizeHandles[i].style.display = resizeDisplay;
+        }
 
         contextResizing.resizeContainer.style.display = 'block';
         contextResizing.resizeButton.style.display = 'block';
@@ -217,8 +228,6 @@ export default {
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/mirror/.test(command)) {
             const r = contextEl.getAttribute('data-rotate') || '0';
@@ -235,8 +244,6 @@ export default {
             contextEl.setAttribute('data-rotateY', y);
 
             this.plugins.resizing._setTransForm(contextEl, r, x, y);
-
-            return;
         }
         else if (/rotate/.test(command)) {
             const contextResizing = this.context.resizing;
@@ -250,27 +257,25 @@ export default {
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/revert/.test(command)) {
-            contextPlugin.resetAlign.call(this);
-            this.plugins.resizing.resetTransform.call(this, contextEl);
+            if (contextPlugin.setAutoSize) {
+                contextPlugin.setAutoSize.call(this);
+            } else {
+                contextPlugin.resetAlign.call(this);
+                this.plugins.resizing.resetTransform.call(this, contextEl);
+            }
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
-
-            return;
         }
         else if (/update/.test(command)) {
             contextPlugin.openModify.call(this);
+            this.controllersOff();
         }
         else if (/delete/.test(command)) {
             contextPlugin.destroy.call(this);
         }
-
-        this.submenuOff();
-        this.focus();
     },
 
     resetTransform: function (element) {
@@ -283,13 +288,13 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        element.style.width = (originSize[0] || this.context.user.imageSize) + 'px';
-        element.style.height = (originSize[1] + 'px' || 'auto');
+        element.style.width = (originSize[0] + 'px' || 'auto');
+        element.style.height = (originSize[1] + 'px' || '');
         this.plugins.resizing.setTransformSize.call(this, element);
     },
 
     setTransformSize: function (element) {
-        const cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        const cover = util.getParentElement(element, '.sun-editor-figure-cover');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -300,7 +305,7 @@ export default {
         const h = isVertical ? offsetW : offsetH;
 
         this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH, isVertical);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH);
 
         cover.style.width = w + 'px';
         cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h + 'px');
@@ -315,7 +320,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
+        this.plugins.resizing._setCaptionPosition.call(this, element, util.getChildElement(util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -409,6 +414,6 @@ export default {
 
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
-        this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

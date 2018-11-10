@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'list',
     add: function (core, targetElement) {
@@ -53,7 +55,7 @@ export default {
             target = target.parentNode;
         }
 
-        const formatElement = this.util.getFormatElement(this.getSelectionNode());
+        const formatElement = util.getFormatElement(this.getSelectionNode());
 
         if (/^LI$/i.test(formatElement.tagName)) {
             const cancel = formatElement.parentNode.tagName === value;
@@ -75,7 +77,7 @@ export default {
                 }
 
                 list.innerHTML += '<li>' + fTag.innerHTML + '</li>';
-                this.util.removeItem(fTag);
+                util.removeItem(fTag);
             }
 
             pNode.insertBefore(list, rightNode);

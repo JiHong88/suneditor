@@ -7,16 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <div style="max-width: 1080px; margin: 60px auto 0 auto; height: 1200px;">
+    <div style="max-width: 960px; margin: 60px auto 0 auto; height: 1200px;">
         <textarea id="editor" style="width: 1080px; height: 200px;">
         </textarea>
         <br>
         <textarea id="editor1" style="width: 1080px; height: 200px;">
         </textarea>
         <br>
+            <button type="button" class="btn btn-lg btn-primary" onclick="sun_noticeOpen()">noticeOpen</button>
+            <button type="button" class="btn btn-lg btn-primary" onclick="sun_noticeClose()">noticeClose</button>
             <button type="button" class="btn btn-lg btn-primary" onclick="sun_save()">Submit</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
+            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getImagesInfo()">getImagesInfo</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\'>')">insertHTML</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
             <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>

@@ -20,9 +20,6 @@
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
         });
-        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor/releases/latest', function(data) {
-            $('#download_latest').attr('href', data.zipball_url);
-        });
     </script>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
@@ -44,9 +41,9 @@
                 <li><a href="getting-started.html" style="color:#fff;" title="Getting started">Getting started</a></li>
                 <li><a href="examples.html" title="Examples">Examples</a></li>
                 <li><a href="customize.html" title="Customize">Customize</a></li>
+                <li><a href="customPlugins.html" title="CustomPlugins">CustomPlugins</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li>&nbsp;&nbsp;</li>
-                <li><a href="#" id="download_latest" class="down-icon" title="Download">Download</a></li>
                 <li>
                     <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
                 </li>
@@ -230,56 +227,68 @@ The value of the option argument put in the "create" function call takes precede
 
 <a id="options" href="#options"><h4>options</h4></a>
 <div class="highlight highlight-source-js">
-<pre>
-<span class="pl-s">plugins</span>: [
-    <span class="pl-s">font</span>,
-    <span class="pl-s">fontSize</span>,
-    <span class="pl-s">formatBlock</span>,
-    <span class="pl-s">fontColor</span>,
-    <span class="pl-s">hiliteColor</span>,
-    <span class="pl-s">align</span>,
-    <span class="pl-s">horizontalRule</span>,
-    <span class="pl-s">list</span>,
-    <span class="pl-s">table</span>,
-    <span class="pl-s">link</span>,
-    <span class="pl-s">image</span>,
-    <span class="pl-s">video</span>
-]<span class="pl-s"></span><span class="pl-k">               : </span>Plugins array                                     <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">stickyToolbar</span><span class="pl-k">   : </span>Reference height value that should be changed to sticky toolbar mode
-                  It can also be used when there is another fixed toolbar at the top
-                  Set to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
-                  If set to <span class="pl-c1">-1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn off         <span class="pl-ent">default : </span><span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
-<span class="pl-s">resizingBar</span><span class="pl-k">     : </span>Show the bottom resizing bar
-                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be resized <span class="pl-ent">default : </span></span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-s">fontSize</span><span class="pl-k">        : </span>Change default font-size List                     <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">font</span><span class="pl-k">            : </span>Change default font-family List                   <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">colorList</span><span class="pl-k">       : </span>Change default color array of color picker array  <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-s">width</span><span class="pl-k">           : </span>The width size of the editor                      <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientWidth || '100%'</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">height</span><span class="pl-k">          : </span>The height size of the editor                     <span class="pl-ent">default : </span><span class="pl-c1">textarea.clientHeight || 'auto'</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">minHeight</span><span class="pl-k">       : </span>The min-height size of the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">maxHeight</span><span class="pl-k">       : </span>The max-height size of the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>                <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-s">display</span><span class="pl-k">         : </span>The display property of suneditor                 <span class="pl-ent">default : </span><span class="pl-c1">'block'</span> {<span class="pl-c1">String</span>}
-<span class="pl-s">videoWidth</span><span class="pl-k">      : </span>The default width size of the video frame         <span class="pl-ent">default : </span><span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
-<span class="pl-s">videoHeight</span><span class="pl-k">     : </span>The default heigth size of the video frame        <span class="pl-ent">default : </span><span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
-<span class="pl-s">showPathLabel</span><span class="pl-k">   : </span>Displays the current node structure to resizingBar <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-s">popupDisplay</span><span class="pl-k">    : </span>Size of background area when activating dialog window ('full' || 'local') <span class="pl-ent">default : </span><span class="pl-c1">'full'</span> {<span class="pl-c1">String</span>}
-
-<span class="pl-k">lang</span><span class="pl-k">            : </span>language object (en, ko) <span class="pl-ent">default : </span><span class="pl-c1">English</span> {<span class="pl-c1">Object</span>}
-
-<span class="pl-k">imageFileInput</span><span class="pl-k">  : </span>Choose whether to create a file input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-k">imageUrlInput</span><span class="pl-k">   : </span>Choose whether to create a image url input tag in the image upload window <span class="pl-ent">default : </span><span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-<span class="pl-k"></span><span class="pl-k">                  </span>If the value of <span class="pl-k">imageFileInput</span> is false, it will be unconditionally true
-<span class="pl-k">imageSize</span><span class="pl-k">       : </span>The default width size of the image frame  <span class="pl-ent">default : </span><span class="pl-c1">350</span> {<span class="pl-c1">Number</span>}
-<span class="pl-k">imageUploadUrl</span><span class="pl-k">  : </span>The image upload to server mapping address <span class="pl-ent">default : </span><span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
-<span class="pl-s"></span><span class="pl-k">                  </span>ex) <span class="pl-c1">"/editor/uploadImage.ajax"</span>
-<span class="pl-s"></span><span class="pl-k">                  </span>When not used, it enters base64 data
-<span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">return type : </span>JSONArray<span class="pl-c1"> [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},</span>
-<span class="pl-s"></span><span class="pl-k">                  </span><span class="pl-k">              </span>          <span class="pl-c1"> {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]</span>
-
-<span class="pl-s">buttonList</span><span class="pl-k">      : </span>Defines button list to array {<span class="pl-c1">Array</span>}
-                <span class="pl-ent">default :</span> [
+<pre>plugins<span class="pl-k">:</span> [
+    font,
+    fontSize,
+    formatBlock,
+    fontColor,
+    hiliteColor,
+    align,
+    horizontalRule,
+    list,
+    table,
+    link,
+    image,
+    video
+]               <span class="pl-k">:</span> Plugins <span class="pl-smi">array</span>.                                    <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+lang            <span class="pl-k">:</span> language object. (en, ko) default <span class="pl-k">:</span> English {<span class="pl-c1">Object</span>}
+stickyToolbar   <span class="pl-k">:</span> Reference height value that should be changed to sticky toolbar mode.
+                    It can also be used when there is another fixed toolbar at the top.
+                    <span class="pl-c1">Set</span> to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
+                    If set to <span class="pl-k">-</span><span class="pl-c1">1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn <span class="pl-smi">off</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
+resizingBar     <span class="pl-k">:</span> Show the bottom resizing bar.
+                    If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be <span class="pl-smi">resized</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+showPathLabel   <span class="pl-k">:</span> Displays the current node structure to <span class="pl-smi">resizingBar</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+popupDisplay    <span class="pl-k">:</span> Size <span class="pl-k">of</span> background area when activating dialog <span class="pl-c1">window</span> (<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span><span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>) default<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+display         <span class="pl-k">:</span> The display property <span class="pl-k">of</span> <span class="pl-smi">suneditor</span>.                <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>block<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
+width           <span class="pl-k">:</span> The width size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                     <span class="pl-smi">default</span><span class="pl-k">:</span> clientWidth<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+height          <span class="pl-k">:</span> The height size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                    <span class="pl-smi">default</span><span class="pl-k">:</span> clientHeight<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+minHeight       <span class="pl-k">:</span> The min<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
+                    Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+maxHeight       <span class="pl-k">:</span> The max<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
+                    Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family <span class="pl-smi">array</span>.                 <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
+fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size <span class="pl-smi">array</span>.                   <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
+colorList       <span class="pl-k">:</span> Change default color array <span class="pl-k">of</span> color <span class="pl-smi">picker</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+imageResizing   <span class="pl-k">:</span> Can resize the <span class="pl-smi">image</span>.                             <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+imageWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the image <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+imageFileInput  <span class="pl-k">:</span> Choose whether to create a file input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+imageUrlInput   <span class="pl-k">:</span> Choose whether to create a image url input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.
+                    If the value <span class="pl-k">of</span> imageFileInput is <span class="pl-c1">false</span>, it will be <span class="pl-smi">unconditionally</span>.   <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+imageUploadUrl  <span class="pl-k">:</span> The image upload to server mapping <span class="pl-smi">address</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
+                    ex) <span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
+                    When not used, it enters base64 data
+                    <span class="pl-k">return</span> {
+                        <span class="pl-s"><span class="pl-pds">"</span>errorMessage<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>insert error message<span class="pl-pds">"</span></span>,
+                            <span class="pl-s"><span class="pl-pds">"</span>result<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
+                                {
+                                    <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/download/editorImg/test_image.jpg<span class="pl-pds">"</span></span>,
+                                    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_image.jpg<span class="pl-pds">"</span></span>,
+                                    <span class="pl-s"><span class="pl-pds">"</span>size<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>561276<span class="pl-pds">"</span></span>
+                                }
+                            ]
+                        }
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+videoResizing   <span class="pl-k">:</span> Can resize the video <span class="pl-smi">iframe</span>.                       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
+videoWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.         <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
+videoHeight     <span class="pl-k">:</span> The default heigth size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
+                default<span class="pl-k">:</span> [
                     [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
                     <span class="pl-c"><span class="pl-c">//</span> ['font', 'fontSize', 'formatBlock'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
@@ -291,14 +300,20 @@ The value of the option argument put in the "create" function call takes precede
                     <span class="pl-c"><span class="pl-c">//</span> ['link', 'image', 'video'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
                     [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-                ]
-</pre>
-        </div>
+                ]</pre>
+</div>
 
 <a id="functions" href="#functions"><h4>Functions</h4></a>
-    <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-js">
+<pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 
 <span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Close a notice area</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">noticeClose</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Copies the contents of the suneditor into a [textarea]</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">save</span>();
@@ -308,6 +323,9 @@ The value of the option argument put in the "create" function call takes precede
 
 <span class="pl-c"><span class="pl-c">//</span> Gets the contents of the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Gets a list of images uploaded to the editor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
@@ -331,7 +349,26 @@ The value of the option argument put in the "create" function call takes precede
 <span class="pl-smi">editor</span>.<span class="pl-en">show</span>();
     
 <span class="pl-c"><span class="pl-c">//</span> Destroy the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();</pre></div>
+<span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Event functions</span>
+<span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
+<span class="pl-c"><span class="pl-c">//</span> It is not called in exceptional cases and is called after the default event function has finished.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-smi">editor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement :<span class="pl-pds">'</span></span> <span class="pl-k">+</span> targetImgElement <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
+}</pre>
+</div>
     
     </article>
 

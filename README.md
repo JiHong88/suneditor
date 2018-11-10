@@ -238,42 +238,55 @@ plugins: [
     link,
     image,
     video
-]               : Plugins array                                     default : null {Array}
-stickyToolbar   : Reference height value that should be changed to sticky toolbar mode
-                  It can also be used when there is another fixed toolbar at the top
-                  Set to 0, '0px', '50px', etc
-                  If set to -1 or false or null to turn off         default : 0 {Number|String|Boolean}
+]               : Plugins array.                                    default: null {Array}
+------------------------------------------------------------------------------------------------------------------
+lang            : language object. (en, ko) default : English {Object}
+stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
+                  It can also be used when there is another fixed toolbar at the top.
+                  Set to 0, '0px', '50px', etc.
+                  If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 resizingBar     : Show the bottom resizing bar.
-                  If 'height' value is 'auto', it will not be resized default : true {Boolean}
-fontSize        : Change default font-size array                    default : null {Array}
-font            : Change default font-family array                  default : null {Array}
-colorList       : Change default color array of color picker        default : null {Array}
-width           : The width size of the editor                      default : textarea.clientWidth || '100%' {Number|String}
-height          : The height size of the editor                     default : textarea.clientHeight|| 'auto' {Number|String}
+                  If 'height' value is 'auto', it will not be resized. default: true {Boolean}
+showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
+------------------------------------------------------------------------------------------------------------------
+display         : The display property of suneditor.                default: 'block' {String}
+width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
+height          : The height size of the editor.                    default: clientHeight||'auto' {Number|String}
 minHeight       : The min-height size of the editor.
-                  Used when 'height' value is 'auto'                default : null {Number|String}
-maxHeight       : The max-height size of the editor
-                  Used when 'height' value is 'auto'                default : null {Number|String}
-display         : The display property of suneditor                 default : 'block' {String}
-videoWidth      : The default width size of the video frame         default : 560 {Number}
-videoHeight     : The default heigth size of the video frame        default : 315 {Number}
-showPathLabel   : Displays the current node structure to resizingBar default : true {Boolean}
-popupDisplay    : Size of background area when activating dialog window ('full' || 'local') default : 'full' {String}
-
-lang            : language object (en, ko) default : English {Object}
-
-imageFileInput  : Choose whether to create a file input tag in the image upload window default : true {Boolean}
-imageUrlInput   : Choose whether to create a image url input tag in the image upload window default : true {Boolean}
-                  If the value of imageFileInput is false, it will be unconditionally true {Boolean}
-imageSize       : The default width size of the image frame  default : 350 {Number}
-imageUploadUrl  : The image upload to server mapping address default : null {String}
+                  Used when 'height' value is 'auto'.               default: null {Number|String}
+maxHeight       : The max-height size of the editor.
+                  Used when 'height' value is 'auto'.               default: null {Number|String}
+------------------------------------------------------------------------------------------------------------------
+font            : Change default font-family array.                 default: null {Array}
+fontSize        : Change default font-size array.                   default: null {Array}
+colorList       : Change default color array of color picker.       default: null {Array}
+------------------------------------------------------------------------------------------------------------------
+imageResizing   : Can resize the image.                             default: true {Boolean}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
+imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
+                  If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
+imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data
-                  return type : JSONArray [{"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image1.jpg"},
-                                           {"SUNEDITOR_IMAGE_SRC":"/download/editorImg/image2.jpg"}]
-
+                  return {
+                      "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "url": "/download/editorImg/test_image.jpg",
+                                    "name": "test_image.jpg",
+                                    "size": "561276"
+                                }
+                            ]
+                        }
+------------------------------------------------------------------------------------------------------------------
+videoResizing   : Can resize the video iframe.                       default: true {Boolean}
+videoWidth      : The default width size of the video frame.         default: 560 {Number}
+videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
-                default : [
+                default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -294,6 +307,12 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
+// Open a notice area
+editor.noticeOpen('test notice');
+
+// Close a notice area
+editor.noticeClose();
+
 // Copies the contents of the suneditor into a [textarea]
 editor.save();
 
@@ -302,6 +321,9 @@ editor.getContext();
 
 // Gets the contents of the suneditor
 editor.getContents();
+
+// Gets a list of images uploaded to the editor
+editor.getImagesInfo();
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
 editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
@@ -326,6 +348,24 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
+
+// Event functions
+// It can be redefined by receiving event object as parameter.
+// It is not called in exceptional cases and is called after the default event function has finished.
+editor.onScroll = function (e) { console.log('onScroll', e) }
+
+editor.onClick = function (e) { console.log('onClick', e) }
+
+editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+
+editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+
+editor.onDrop = function (e) { console.log('onDrop', e) }
+
+// Called when the image is uploaded or the uploaded image is deleted
+editor.onImageUpload = function (targetImgElement, index, isDelete) {
+    console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)
+}
 ```
 
 ## Examples
@@ -333,6 +373,9 @@ editor.destroy();
 
 ## Customize
 **<a href="http://suneditor.com/sample/html/customize.html" target="_blank">Customize</a>**
+
+## customPlugins
+**<a href="http://suneditor.com/sample/html/customPlugins.html" target="_blank">customPlugins</a>**
 
 ## Document
 **<a href="http://suneditor.com/sample/html/document.html" target="_blank">Document</a>**

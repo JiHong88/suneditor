@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'fontSize',
     add: function (core, targetElement) {
@@ -52,7 +54,7 @@ export default {
             return false;
         }
 
-        this.util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
+        util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
         const newNode = document.createElement('SPAN');
         newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
         this.wrapRangeToTag(newNode, ['font-size']);

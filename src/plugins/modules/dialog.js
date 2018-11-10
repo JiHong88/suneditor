@@ -36,7 +36,7 @@ export default {
         context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(core));
         
         /** append html */
-        context.element.topArea.getElementsByClassName('sun-editor-container')[0].appendChild(dialog_div);
+        context.element.relative.appendChild(dialog_div);
         
         /** empty memory */
         dialog_div = null, dialog_back = null, dialog_area = null;
@@ -46,16 +46,16 @@ export default {
         e.stopPropagation();
 
         if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
-            this.plugins.dialog.closeDialog.call(this);
+            this.plugins.dialog.close.call(this);
         }
     },
 
-    openDialog: function (kind, option, update)  {
+    open: function (kind, update)  {
         if (this.modalForm) return false;
 
         this.context.dialog.updateModal = update;
 
-        if (option === 'full') {
+        if (this.context.user.popupDisplay === 'full') {
             this.context.dialog.modalArea.style.position = 'fixed';
         } else {
             this.context.dialog.modalArea.style.position = 'absolute';
@@ -73,7 +73,7 @@ export default {
         if (focusElement) focusElement.focus();
     },
 
-    closeDialog: function () {
+    close: function () {
         this.modalForm.style.display = 'none';
         this.context.dialog.back.style.display = 'none';
         this.context.dialog.modalArea.style.display = 'none';

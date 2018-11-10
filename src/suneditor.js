@@ -59,7 +59,7 @@ export default {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = _Constructor.init(element, options, (options.lang ||  _defaultLang), options.plugins, util);
+        const cons = _Constructor.init(element, options, (options.lang ||  _defaultLang), options.plugins);
 
         if (cons.constructed._top.id && document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
@@ -75,6 +75,6 @@ export default {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), util, cons.plugins, cons.options.lang);
+        return core(_Context(element, cons.constructed, cons.options), cons.plugins, cons.options.lang);
     }
 };
