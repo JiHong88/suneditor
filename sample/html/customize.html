@@ -57,7 +57,73 @@
 
 <div class="content">
     <article class="markdown-body entry-content">
-        <input type="checkbox" id="stickyToolbar" checked>
+        <div style="background-color: #f3f3f3; padding: 20px; user-select: none;">
+            <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
+            <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="popupDisplay">&nbsp;&nbsp;popupDisplay</label>
+            <input type="text" id="popupDisplay_value" placeholder="full, local">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+
+            <label><input type="checkbox" id="resizingBar">&nbsp;&nbsp;resizingBar</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="showPathLabel">&nbsp;&nbsp;showPathLabel</label>
+            <br><br>
+
+            <label><input type="checkbox" id="display">&nbsp;&nbsp;display</label>
+            <input type="text" id="display_value" placeholder="block, inline, etc.">
+            <br><br>
+
+            <label><input type="checkbox" id="width">&nbsp;&nbsp;width</label>
+            <input type="text" id="width_value" placeholder="Number, ...px, ...%">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="height">&nbsp;&nbsp;height</label>
+            <input type="text" id="height_value" placeholder="auto, Number, ...px, ...%" style="width: 200px">
+            <br><br>
+
+            <label><input type="checkbox" id="minHeight">&nbsp;&nbsp;minHeight</label>
+            <input type="text" id="minHeight_value" placeholder="Number, ...px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="maxHeight">&nbsp;&nbsp;maxHeight</label>
+            <input type="text" id="maxHeight_value" placeholder="Number, ...px">
+            <br><br>
+
+            <label><input type="checkbox" id="font">&nbsp;&nbsp;font</label>
+            <span>[ 'Arial', 'tahoma', 'Courier New,Courier' ]</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="fontSize">&nbsp;&nbsp;fontSize</label>
+            <span>[ 8, 10, 14, 18, 24, 36 ]</span>
+            <br><br>
+            
+            <label><input type="checkbox" id="colorList">&nbsp;&nbsp;colorList</label>
+            <span>[ '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000' ]</span>
+            <br><br>
+
+            <label><input type="checkbox" id="imageResizing">&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageFileInput">&nbsp;&nbsp;imageFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageUrlInput">&nbsp;&nbsp;imageUrlInput</label>
+            <br><br>
+
+            <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
+            <input type="text" id="imageWidth_value" placeholder="auto, Number" style="width: 200px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+
+            <label><input type="checkbox" id="imageUploadUrl">&nbsp;&nbsp;imageUploadUrl</label>
+            <input type="text" id="imageUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
+            <br><br>
+
+            <label><input type="checkbox" id="videoResizing">&nbsp;&nbsp;videoResizing</label>
+            <br><br>
+
+            <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
+            <input type="text" id="videoWidth_value" placeholder="Number">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoHeight">&nbsp;&nbsp;videoHeight</label>
+            <input type="text" id="videoHeight_value" placeholder="Number">
+        </div>
+        <br>
+        <button type="button" class="btn btn-lg" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
     </article>
 
@@ -70,29 +136,40 @@
 </div>
 
 <script>
+var editor = null;
 
 function sun_create () {
-    SUNEDITOR.create('sample_editor', {
-        stickyToolbar,
+    if (editor) editor.destroy();
+    
+    editor = SUNEDITOR.create('sample_editor', {
+        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
+        popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
         resizingBar: document.getElementById('resizingBar').checked,
         showPathLabel: document.getElementById('showPathLabel').checked,
-        popupDisplay,
-        display,
-        width,
-        height,
-        minHeight,
-        maxHeight,
-        font,
-        fontSize,
-        colorList,
+        display: document.getElementById('display').checked ? document.getElementById('display_value').value : null,
+        width: document.getElementById('width').checked ? document.getElementById('width_value').value : null,
+        height: document.getElementById('height').checked ? document.getElementById('height_value').value : null,
+        minHeight: document.getElementById('minHeight').checked ? document.getElementById('minHeight_value').value : null,
+        maxHeight: document.getElementById('maxHeight').checked ? document.getElementById('maxHeight_value').value : null,
+        font: !document.getElementById('font').checked ? null : [
+            'Arial',
+            'tahoma',
+            'Courier New,Courier'
+        ],
+        fontSize: !document.getElementById('fontSize').checked ? null : [
+            8, 10, 14, 18, 24, 36
+        ],
+        colorList: !document.getElementById('colorList').checked ? null : [
+            '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000'
+        ],
         imageResizing: document.getElementById('imageResizing').checked,
-        imageWidth,
-        imageFileInput,
-        imageUrlInput,
-        imageUploadUrl,
+        imageFileInput: document.getElementById('imageFileInput').checked,
+        imageUrlInput: document.getElementById('imageUrlInput').checked,
+        imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : null,
+        imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : null,
         videoResizing: document.getElementById('videoResizing').checked,
-        videoWidth,
-        videoHeight,
+        videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,
+        videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',

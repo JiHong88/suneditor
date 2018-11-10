@@ -227,7 +227,7 @@ export default {
             submitAction(this.context.image.imgInputFile.files);
         } catch (e) {
             this.closeLoading();
-            notice.open.call(this, e.message);
+            notice.open.call(this, '[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
         }
     },
@@ -246,7 +246,7 @@ export default {
                 if (index === filesLen) this.closeLoading();
             } catch (e) {
                 this.closeLoading();
-                notice.open.call(this, e.message);
+                notice.open.call(this, '[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
                 throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
             }
         }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
@@ -273,7 +273,7 @@ export default {
             }
             // error
             else {
-                notice.open.call(this, this.context.image._xmlHttp.statusText + ' ( ' + this.context.image._xmlHttp.status + ' )');
+                notice.open.call(this, '[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseURL: ' + this.context.image._xmlHttp.responseURL);
                 this.closeLoading();
                 throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseURL: ' + this.context.image._xmlHttp.responseURL);
             }
@@ -286,7 +286,7 @@ export default {
         try {
             this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
         } catch (e) {
-            notice.open.call(this, e.message);
+            notice.open.call(this, '[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
         } finally {
             this.closeLoading();
@@ -346,7 +346,7 @@ export default {
             }
         } catch (error) {
             this.closeLoading();
-            notice.open.call(this, error.message);
+            notice.open.call(this, '[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
             throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
             this.plugins.dialog.close.call(this);
