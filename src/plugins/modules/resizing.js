@@ -36,7 +36,7 @@ export default {
         let resize_button = eval(this.setController_button(core.lang));
         context.resizing.resizeButton = resize_button;
 
-        let resize_handles = context.resizing.resizeHandles = resize_div_container.getElementsByClassName('sun-editor-name-resize-handle');
+        let resize_handles = context.resizing.resizeHandles = resize_div_container.querySelectorAll('.sun-editor-name-resize-handle');
         context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
 
         /** add event listeners */
