@@ -362,12 +362,13 @@ export default {
 
         if (!file) return;
 
-        const dataIndex = oImg.getAttribute('data-index');
+        let dataIndex = oImg.getAttribute('data-index');
         if (!dataIndex) {
-            oImg.setAttribute('data-index', this._variable._imageIndex);
+            dataIndex = this._variable._imageIndex;
+            oImg.setAttribute('data-index', dataIndex);
 
-            this._variable._imagesInfo[this._variable._imageIndex] = {
-                index: this._variable._imageIndex,
+            this._variable._imagesInfo[dataIndex] = {
+                index: dataIndex,
                 name: file.name,
                 size: file.size,
                 select: function () {
@@ -390,7 +391,7 @@ export default {
             imgInfo.size = oImg.getAttribute("data-file-size") * 1;
         }
 
-        this._imageUpload(oImg);
+        this._imageUpload(oImg, dataIndex, false);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {
@@ -663,7 +664,7 @@ export default {
 
         if (dataIndex) {
             delete this._variable._imagesInfo[dataIndex];
-            this._imageUpload(imageEl);
+            this._imageUpload(imageEl, dataIndex, true);
         }
     },
 

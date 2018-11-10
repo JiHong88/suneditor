@@ -200,7 +200,7 @@ function sun_create () {
         ]
     });
 
-    editor.onImageUpload = function () {
+    editor.onImageUpload = function (targetImgElement, index, isDelete) {
         var imageList = editor.getImagesInfo();
         var list = '';
         var i;

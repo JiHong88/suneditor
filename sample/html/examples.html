@@ -230,68 +230,71 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         </textarea>
 
         <a id="functions" href="#functions"><h4>2. User Function</h4></a>
-        <div class="highlight highlight-source-js"><pre><span class="pl-k">let</span> suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
+        <div class="highlight highlight-source-js">
+<pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
+<span class="pl-smi">editor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Close a notice area</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">noticeClose</span>();
+<span class="pl-smi">editor</span>.<span class="pl-en">noticeClose</span>();
 
-<span class="pl-c">/** Copies the contents of the suneditor into a [textarea] */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">save</span>();
+<span class="pl-c"><span class="pl-c">//</span> Copies the contents of the suneditor into a [textarea]</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">save</span>();
 
-<span class="pl-c">/** Gets the suneditor's context object. Contains settings, plugins, and cached element objects */</span>
-<span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContext</span>());
+<span class="pl-c"><span class="pl-c">//</span> Gets the suneditor's context object. Contains settings, plugins, and cached element objects</span>
+<span class="pl-smi">editor</span>.<span class="pl-c1">getContext</span>();
 
-<span class="pl-c">/** Gets the contents of the suneditor */</span>
-<span class="pl-en">alert</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getContents</span>());
+<span class="pl-c"><span class="pl-c">//</span> Gets the contents of the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Gets a list of images uploaded to the editor</span>
-<span class="pl-en">console.log</span>(<span class="pl-smi">suneditor</span>.<span class="pl-en">getImagesInfo</span>());
+<span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
 
-<span class="pl-c">/** Inserts an HTML element or HTML string or plain string at the current cursor position */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg" style="width:115px; height:64px;"&gt;<span class="pl-pds">'</span></span>);
+<span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">/** Change the contents of the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
+<span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">/** Add content to the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
+<span class="pl-c"><span class="pl-c">//</span> Add content to the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">/** Disable the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-c1">disabled</span>();
+<span class="pl-c"><span class="pl-c">//</span> Disable the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-c1">disabled</span>();
 
-<span class="pl-c">/** Enabled the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">enabled</span>();
+<span class="pl-c"><span class="pl-c">//</span> Enabled the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">enabled</span>();
 
-<span class="pl-c">/** Hide the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">hide</span>();
+<span class="pl-c"><span class="pl-c">//</span> Hide the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">hide</span>();
 
-<span class="pl-c">/** Show the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">show</span>();
-
-<span class="pl-c">/** Destroy the suneditor */</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">destroy</span>();
-
-<span class="pl-c">/** Create the suneditor */</span>
-</span>suneditor <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
+<span class="pl-c"><span class="pl-c">//</span> Show the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">show</span>();
+    
+<span class="pl-c"><span class="pl-c">//</span> Destroy the suneditor</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Event functions</span>
 <span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
 <span class="pl-c"><span class="pl-c">//</span> It is not called in exceptional cases and is called after the default event function has finished.</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">editor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e) }
 
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">editor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e) }
 
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e) }
 
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
 
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e); };
+<span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
-<span class="pl-smi">suneditor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement<span class="pl-pds">'</span></span>, targetImgElement) }</pre></div>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement :<span class="pl-pds">'</span></span> <span class="pl-k">+</span> targetImgElement <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
+}</pre>
+        </div>
         
 
 <form id="frm" name="frm">
@@ -562,7 +565,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
-        suneditor.onImageUpload = function () { console.log(suneditor.getImagesInfo()) }
+        suneditor.onImageUpload = function () { console.log(console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)) }
     }
 
     sun_create();

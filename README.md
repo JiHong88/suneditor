@@ -363,7 +363,9 @@ editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
 editor.onDrop = function (e) { console.log('onDrop', e) }
 
 // Called when the image is uploaded or the uploaded image is deleted
-editor.onImageUpload = function (targetImgElement) { console.log('targetImgElement', targetImgElement) }
+editor.onImageUpload = function (targetImgElement, index, isDelete) {
+    console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)
+}
 ```
 
 ## Examples

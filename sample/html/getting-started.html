@@ -304,7 +304,8 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 </div>
 
 <a id="functions" href="#functions"><h4>Functions</h4></a>
-<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-js">
+<pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 
 <span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
 
@@ -364,7 +365,10 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 <span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement<span class="pl-pds">'</span></span>, targetImgElement) }</pre></div>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement :<span class="pl-pds">'</span></span> <span class="pl-k">+</span> targetImgElement <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
+}</pre>
+</div>
     
     </article>
 
