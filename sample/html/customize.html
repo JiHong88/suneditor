@@ -129,11 +129,12 @@
         <h4>Uploaded image file list</h4>
         <table>
             <colgroup>
-                <col width="80%">
+                <col width="70%">
             </colgroup>
             <thead>
-                <th>fileName</th>
-                <th>remove</th>
+                <th>FileName</th>
+                <th>Size</th>
+                <th>Remove</th>
             </thead>
             <tbody id="imageTable">
             </tbody>
@@ -209,6 +210,7 @@ function sun_create () {
             if (!imageList[i]) continue;
 
             list += '<tr><td><a href="javascript:onClickImageList(\'select\',' + i + ')">' + imageList[i].name + '</a></td>' +
+                '<td>' + imageList[i].size + '</td>' +
                 '<td style="text-align: center;"><a href="javascript:onClickImageList(\'delete\',' + i + ')">X</a></td></tr>'
         }
 
