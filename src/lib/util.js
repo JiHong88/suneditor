@@ -539,7 +539,7 @@ const util = {
      */
     removeEmptyNode: function (element) {
         (function recursionFunc(current) {
-            if ((current.textContent.trim().length === 0 || current.textContent === '&#65279') && !/^BR$/i.test(current.nodeName)) {
+            if ((current.textContent.trim().length === 0 || current.textContent === '&#65279') && !/^BR$/i.test(current.nodeName) && (current.firstChild && !/^BR$/i.test(current.firstChild.nodeName))) {
                 current.parentNode.removeChild(current);
             } else {
                 for (let i = 0, len = current.children.length; i < len; i++) {
