@@ -725,7 +725,7 @@ const core = function (context, plugins, lang) {
                     for (let i = 0, len = tempChild.length; i < len; i++) {
                         tempArray.push(tempChild[i]);
                     }
-                    tempCon = tempArray[tempOffset] || tempArray[0] || tempCon.previousElementSibling || tempCon.previousSibling;
+                    tempCon = tempArray[tempOffset - 1] || tempArray[0] || tempCon.previousElementSibling || tempCon.previousSibling;
                 }
                 tempOffset = tempCon.textContent.length;
             }
@@ -763,11 +763,6 @@ const core = function (context, plugins, lang) {
 
                 return false;
             };
-
-            /** break */
-            if (util.isBreak(startCon) && util.isBreak(endCon)) {
-                return;
-            }
 
             /** one node */
             if (startCon === endCon) {
@@ -1068,7 +1063,7 @@ const core = function (context, plugins, lang) {
                     if (validation(child)) {
                         let cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
-                        if (child.nodeType === 1) coverNode = cloneNode;
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
                     recursionFunc(child, coverNode);
                 }
@@ -1166,6 +1161,8 @@ const core = function (context, plugins, lang) {
                             node = newInnerNode;
                         }
 
+                        if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
+
                         pNode.appendChild(newInnerNode);
                         container = textNode;
                         offset = 0;
@@ -1178,7 +1175,7 @@ const core = function (context, plugins, lang) {
                     if (!passNode || validation(child)) {
                         const cloneNode = child.cloneNode(false);
                         node.appendChild(cloneNode);
-                        if (child.nodeType === 1) coverNode = cloneNode;
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -1282,6 +1279,8 @@ const core = function (context, plugins, lang) {
                             node = newInnerNode;
                         }
 
+                        if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
+
                         pNode.insertBefore(newInnerNode, pNode.firstChild);
                         container = textNode;
                         offset = textNode.data.length;
@@ -1294,7 +1293,7 @@ const core = function (context, plugins, lang) {
                     if (!passNode || validation(child)) {
                         const cloneNode = child.cloneNode(false);
                         node.insertBefore(cloneNode, node.firstChild);
-                        if (child.nodeType === 1) coverNode = cloneNode;
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -1970,12 +1969,13 @@ const core = function (context, plugins, lang) {
         onPaste_wysiwyg: function (e) {
             if (!e.clipboardData.getData) return true;
 
-            e.stopPropagation();
-            e.preventDefault();
-            
             const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
-            editor.execCommand('insertHTML', false, cleanData || 'Hello, World!');
-
+            
+            if (cleanData) {
+                editor.execCommand('insertHTML', false, cleanData);
+                e.stopPropagation();
+                e.preventDefault();
+            }
         }
     };
 
