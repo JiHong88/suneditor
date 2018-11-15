@@ -713,7 +713,7 @@ const core = function (context, plugins, lang) {
                 }
             }
 
-            const startCon = tempCon
+            const startCon = tempCon;
             const startOff = tempOffset;
 
             tempCon = range.endContainer;
