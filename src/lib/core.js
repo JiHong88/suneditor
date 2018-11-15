@@ -702,11 +702,10 @@ const core = function (context, plugins, lang) {
             tempOffset = range.startOffset;
 
             if (tempCon.nodeType === 1) {
-                while (tempCon && !/^BR$/i.test(tempCon.nodeName) && tempCon.nodeType === 1) {
+                while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
                     tempChild = tempCon.childNodes;
                     for (let i = 0, len = tempChild.length; i < len; i++) {
-                        // if (/^BR$/i.test(tempChild[i].nodeName) || tempChild[i].textContent.length === 0) tempOffset++;
                         tempArray.push(tempChild[i]);
                     }
                     tempCon = tempArray[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
@@ -720,7 +719,7 @@ const core = function (context, plugins, lang) {
             tempCon = range.endContainer;
             tempOffset = range.endOffset;
             if (tempCon.nodeType === 1) {
-                while (tempCon && !/^BR$/i.test(tempCon.nodeName) && tempCon.nodeType === 1) {
+                while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
                     tempChild = tempCon.childNodes;
                     for (let i = 0, len = tempChild.length; i < len; i++) {
@@ -764,6 +763,11 @@ const core = function (context, plugins, lang) {
 
                 return false;
             };
+
+            /** break */
+            if (util.isBreak(startCon) && util.isBreak(endCon)) {
+                return;
+            }
 
             /** one node */
             if (startCon === endCon) {
