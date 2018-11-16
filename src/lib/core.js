@@ -2018,17 +2018,25 @@ const core = function (context, plugins, lang) {
     const userFunction = {
         /**
          * @description Event functions
+         * @param {Object} event - Event Object
          */
         onScroll: null,
         onClick: null,
         onKeyDown: null,
         onKeyUp: null,
         onDrop: null,
+
+        /**
+         * @description Called when the image is uploaded or the uploaded image is deleted
+         * @param {Element} targetImgElement - Current img element
+         * @param {Number} index - Uploaded index
+         * @param {Boolean} isDelete - Whether or not it was called after the delete operation
+         */
         onImageUpload: null,
 
         /**
          * @description Open a notice area
-         * @param {String} message 
+         * @param {String} message - Notice message
          */
         noticeOpen: function (message) {
             editor.addModule([notice]);
@@ -2079,6 +2087,10 @@ const core = function (context, plugins, lang) {
             return contents;
         },
 
+        /**
+         * @description Gets uploaded images informations
+         * @returns {Array}
+         */
         getImagesInfo: function () {
             return editor._variable._imagesInfo;
         },

@@ -24,6 +24,41 @@
             </div>
             <h3 class="subsection-title">Methods</h3>
 
+
+            <h4 class="name" id="noticeOpen"><span class="type-signature"></span>noticeOpen<span
+                    class="signature">()</span></h4>
+            <div class="description">
+                Open a notice area.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>message</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Notice message</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="noticeClose"><span class="type-signature"></span>noticeClose<span
+                    class="signature">()</span></h4>
+            <div class="description">
+                Close a notice area.
+            </div>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="save"><span class="type-signature"></span>save<span class="signature">()</span><span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -44,6 +79,14 @@
                     class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Gets the contents of the suneditor
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getImagesInfo"><span class="type-signature"></span>getImagesInfo<span
+                    class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+            <div class="description">
+                Gets uploaded images informations
             </div>
             <dl class="details"></dl>
 
@@ -168,6 +211,183 @@
             </div>
             <dl class="details"></dl>
 
+
+
+            <h3 class="subsection-title">Events</h3>
+            <div class="description">
+                It can be redefined by receiving event object as parameter.
+                It is not called in exceptional cases and is called after the default event function has finished.
+            </div>
+
+            <h4 class="name" id="onScroll"><span class="type-signature"></span>onScroll<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Scroll event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onClick"><span class="type-signature"></span>onClick<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Click event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onKeyDown"><span class="type-signature"></span>onKeyDown<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                KeyDown event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onKeyUp"><span class="type-signature"></span>onKeyUp<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                KeyUp event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onDrop"><span class="type-signature"></span>onDrop<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Drop event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onImageUpload"><span class="type-signature"></span>onImageUpload<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called when the image is uploaded or the uploaded image is deleted
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>targetImgElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Current img element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>index</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Uploaded index</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>isDelete</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Whether or not it was called after the delete operation</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
         </article>
     </section>
 </div>
@@ -178,9 +398,12 @@
     <h3>SUNEDITOR.create -></h3>
     <h3>{return functions}</h3>
     <ul>
+        <li><a href="document-user.html#noticeOpen">noticeOpen</a></li>
+        <li><a href="document-user.html#noticeClose">noticeClose</a></li>
         <li><a href="document-user.html#save">save</a></li>
         <li><a href="document-user.html#getContext">getContext</a></li>
         <li><a href="document-user.html#getContents">getContents</a></li>
+        <li><a href="document-user.html#getImagesInfo">getImagesInfo</a></li>
         <li><a href="document-user.html#insertHTML">insertHTML</a></li>
         <li><a href="document-user.html#setContents">setContents</a></li>
         <li><a href="document-user.html#appendContents">appendContents</a></li>
@@ -189,6 +412,16 @@
         <li><a href="document-user.html#show">show</a></li>
         <li><a href="document-user.html#hide">hide</a></li>
         <li><a href="document-user.html#destroy">destroy</a></li>
+    </ul>
+
+    <h3>Useable events</h3>
+    <ul>
+        <li><a href="document-user.html#onScroll">onScroll</a></li>
+        <li><a href="document-user.html#onClick">onClick</a></li>
+        <li><a href="document-user.html#onKeyDown">onKeyDown</a></li>
+        <li><a href="document-user.html#onKeyUp">onKeyUp</a></li>
+        <li><a href="document-user.html#onDrop">onDrop</a></li>
+        <li><a href="document-user.html#onImageUpload">onImageUpload</a></li>
     </ul>
 </nav>
 
