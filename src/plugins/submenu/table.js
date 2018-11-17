@@ -103,7 +103,7 @@ export default {
             tableHTML += '<tr>';
             let tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td><div>&#65279</div></td>';
+                tableHTML += '<td><div>\uFEFF</div></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';
@@ -225,7 +225,7 @@ export default {
             let cells = '';
 
             for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td><div>&#65279</div></td>';
+                cells += '<td><div>\uFEFF</div></td>';
             }
 
             const newRow = contextTable._element.insertRow(rowIndex);
@@ -239,7 +239,7 @@ export default {
             
             for (let i = 0, len = contextTable._trCnt; i < len; i++) {
                 cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>&#65279</div>';
+                cell.innerHTML = '<div>\uFEFF</div>';
             }
         }
 
