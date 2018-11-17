@@ -701,7 +701,7 @@ const core = function (context, plugins, lang) {
             tempCon = range.startContainer;
             tempOffset = range.startOffset;
 
-            if (tempCon.nodeType === 1) {
+            if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
                     tempChild = tempCon.childNodes;
@@ -718,7 +718,7 @@ const core = function (context, plugins, lang) {
 
             tempCon = range.endContainer;
             tempOffset = range.endOffset;
-            if (tempCon.nodeType === 1) {
+            if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
                     tempChild = tempCon.childNodes;
@@ -769,13 +769,21 @@ const core = function (context, plugins, lang) {
                 newNode = appendNode.cloneNode(false);
                 if (!newNode) return;
 
+                let sameContainer;
+                if (util.isBreak(startCon)) {
+                    sameContainer = startCon.parentElement;
+                    util.removeItem(startCon);
+                } else {
+                    sameContainer = startCon;
+                }
+
                 /** No range node selected */
                 if (range.collapsed) {
                     newNode.innerHTML = '&#65279';
-                    if (util.isFormatElement(startCon)) {
-                        startCon.appendChild(newNode);
+                    if (util.isFormatElement(sameContainer)) {
+                        sameContainer.appendChild(newNode);
                     } else {
-                        const parentNode = startCon.nodeType === 3 ? startCon.parentNode : startCon;
+                        const parentNode = sameContainer.nodeType === 3 ? sameContainer.parentNode : sameContainer;
                         const rightNode = commonCon.nodeType === 3 ? commonCon.splitText(endOff) : null;
                         parentNode.insertBefore(newNode, rightNode);
                     }
@@ -787,21 +795,34 @@ const core = function (context, plugins, lang) {
                 }
                 /** Select range node */
                 else {
-                    const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                    const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
                     const startConParent = startCon.parentNode;
 
-                    newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-                    startConParent.insertBefore(newNode, startCon.nextSibling);
-
-                    if (beforeNode.data.length > 0) {
-                        startCon.data = beforeNode.data;
+                    if (startCon.nodeType === 1) {
+                        newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
+                        startConParent.insertBefore(newNode, startCon.nextSibling);
+                        util.removeItem(startCon);
                     } else {
-                        startCon.data = startCon.substringData(0, startOff);
-                    }
-
-                    if (afterNode.data.length > 0) {
-                        startConParent.insertBefore(afterNode, newNode.nextSibling);
+                        const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+    
+                        newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
+    
+                        if (beforeNode.data.length === 0 && afterNode.data.length === 0 && !checkCss(startConParent) && !util.isFormatElement(startConParent)) {
+                            startConParent.parentNode.insertBefore(newNode, startConParent.nextSibling);
+                            util.removeItem(startConParent);
+                        } else {
+                            startConParent.insertBefore(newNode, startCon.nextSibling);
+        
+                            if (beforeNode.data.length > 0) {
+                                startCon.data = beforeNode.data;
+                            } else {
+                                startCon.data = startCon.substringData(0, startOff);
+                            }
+        
+                            if (afterNode.data.length > 0) {
+                                startConParent.insertBefore(afterNode, newNode.nextSibling);
+                            }
+                        }
                     }
 
                     start.container = newNode;
@@ -1182,6 +1203,7 @@ const core = function (context, plugins, lang) {
                 }
             })(element, pNode);
 
+            util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
 
@@ -1300,6 +1322,7 @@ const core = function (context, plugins, lang) {
                 }
             })(element, pNode);
 
+            util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
 
