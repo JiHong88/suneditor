@@ -342,7 +342,14 @@ const core = function (context, plugins, lang) {
          * @returns {Array}
          */
         getSelectedFormatElements: function () {
-            const range = this.getRange();
+            let range = this.getRange();
+
+            if (util.isWysiwygDiv(range.startContainer)) {
+                const children = context.element.wysiwyg.children;
+                this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.length);
+                range = this.getRange();
+            }
+
             const startCon = range.startContainer;
             const endCon = range.endContainer;
             const commonCon = range.commonAncestorContainer;
@@ -385,7 +392,14 @@ const core = function (context, plugins, lang) {
          * @returns {Array}
          */
         getSelectedRangeFormatElements: function () {
-            const range = this.getRange();
+            let range = this.getRange();
+
+            if (util.isWysiwygDiv(range.startContainer)) {
+                const children = context.element.wysiwyg.children;
+                this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.length);
+                range = this.getRange();
+            }
+
             const startCon = range.startContainer;
             const endCon = range.endContainer;
             const commonCon = range.commonAncestorContainer;
@@ -1391,6 +1405,9 @@ const core = function (context, plugins, lang) {
             this.focus();
         },
 
+        /**
+         * @description Remove format of the currently selected range
+         */
         removeFormat: function () {
             let range = this.getRange();
 
@@ -1398,16 +1415,7 @@ const core = function (context, plugins, lang) {
                 const currentEl = range.commonAncestorContainer.parentElement;
                 if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
 
-                this.execCommand('insertHTML', true, '<span>\uFEFF</span>');
-                this._setEditorRange();
-                
-                range  = this.getRange();
-                const tempNode = range.commonAncestorContainer.parentElement;
-                const emptyText = document.createTextNode('\uFEFF');
-
-                tempNode.parentElement.insertBefore(emptyText, tempNode);
-                util.removeItem(tempNode);
-                
+                this.execCommand('insertHTML', false, '\uFEFF');
             } else {
                 this.execCommand('removeFormat', false, null);
             }
