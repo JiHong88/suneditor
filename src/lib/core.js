@@ -1402,7 +1402,7 @@ const core = function (context, plugins, lang) {
         },
 
         /**
-         * @description Remove format of the currently selected range
+         * @description Remove format of the currently selected range (IE, Edge not working)
          */
         removeFormat: function () {
             let range = this.getRange();
