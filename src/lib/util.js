@@ -128,7 +128,7 @@ const util = {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
 
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '\uFEFF') + '</p>';
+        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '\u200B') + '</p>';
 
         return innerHTML;
     },

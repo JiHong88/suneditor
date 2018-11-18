@@ -301,12 +301,12 @@ const core = function (context, plugins, lang) {
 
             const selection = window.getSelection();
 
-            if (selection.rangeCount > 0) {
+            if (selection.removeAllRanges) {
                 selection.removeAllRanges();
             }
 
-            this._variable.range = range;
             selection.addRange(range);
+            this._variable.range = range;
         },
 
         /**
@@ -478,7 +478,7 @@ const core = function (context, plugins, lang) {
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
             const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = document.createElement(oFormatName);
-            oFormat.innerHTML = '\uFEFF';
+            oFormat.innerHTML = '\u200B';
 
             if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
             else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
@@ -553,10 +553,6 @@ const core = function (context, plugins, lang) {
             } catch (e) {
                 parentNode.appendChild(oNode);
             }
-
-            // try {
-            //     this.setRange(oNode, 0, oNode, oNode.textContent.length);
-            // } catch (e) {}
         },
 
         /**
@@ -652,7 +648,7 @@ const core = function (context, plugins, lang) {
 
             if (!rangeLines) {
                 const inner = document.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
-                inner.innerHTML = '\uFEFF';
+                inner.innerHTML = '\u200B';
                 wrapTag.appendChild(inner);
                 this.getSelectionNode().appendChild(wrapTag);
                 return;
@@ -793,7 +789,7 @@ const core = function (context, plugins, lang) {
 
                 /** No range node selected */
                 if (range.collapsed) {
-                    newNode.innerHTML = '\uFEFF';
+                    newNode.innerHTML = '\u200B';
                     if (util.isFormatElement(sameContainer)) {
                         sameContainer.appendChild(newNode);
                     } else {
@@ -1415,8 +1411,21 @@ const core = function (context, plugins, lang) {
                 const currentEl = range.commonAncestorContainer.parentElement;
                 if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
 
-                this.execCommand('insertHTML', false, '\uFEFF');
+                let tempNode = document.createElement('SPAN');
+                tempNode.textContent = '\u200B';
+                tempNode = tempNode.childNodes[0];
+
+                this.insertNode(tempNode);
+                this.setRange(tempNode, 0, tempNode, 1);
+
+                range = this.getRange();
+
+                this.execCommand('styleWithCss', true, null);
+                this.execCommand('removeFormat', false, null);
+
+                this.setRange(tempNode, 1, tempNode, 1);
             } else {
+                this.execCommand('styleWithCss', true, null);
                 this.execCommand('removeFormat', false, null);
             }
         },
@@ -1463,7 +1472,7 @@ const core = function (context, plugins, lang) {
 
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>\uFEFF</p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>\u200B</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
@@ -1824,7 +1833,7 @@ const core = function (context, plugins, lang) {
                     if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && selectionNode.previousSibling === null) {
                         e.preventDefault();
                         e.stopPropagation();
-                        selectionNode.innerHTML = '\uFEFF';
+                        selectionNode.innerHTML = '\u200B';
                         return false;
                     }
                     
@@ -1898,7 +1907,7 @@ const core = function (context, plugins, lang) {
                 e.stopPropagation();
 
                 const oFormatTag = document.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
-                oFormatTag.innerHTML = '\uFEFF';
+                oFormatTag.innerHTML = '\u200B';
 
                 selectionNode.appendChild(oFormatTag);
                 editor.setSelectionNode(oFormatTag);
