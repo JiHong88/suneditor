@@ -231,8 +231,12 @@ const core = function (context, plugins, lang) {
          * @param {String} command - javascript execCommand function property
          * @param {Boolean} showDefaultUI - javascript execCommand function property
          * @param {String} value - javascript execCommand function property
+         * @param {Boolean} styleWithCss = Use styleWithCss
          */
-        execCommand: function (command, showDefaultUI, value) {
+        execCommand: function (command, showDefaultUI, value, styleWithCss) {
+            if (styleWithCss) _d.execCommand('styleWithCss', false, true);
+            else _d.execCommand('styleWithCss', false, false);
+
             _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
         },
 
@@ -1424,13 +1428,10 @@ const core = function (context, plugins, lang) {
 
                 range = this.getRange();
 
-                this.execCommand('styleWithCss', true, null);
-                this.execCommand('removeFormat', false, null);
-
+                this.execCommand('removeFormat', false, null, true);
                 this.setRange(tempNode, 1, tempNode, 1);
             } else {
-                this.execCommand('styleWithCss', true, null);
-                this.execCommand('removeFormat', false, null);
+                this.execCommand('removeFormat', false, null, true);
             }
         },
 
