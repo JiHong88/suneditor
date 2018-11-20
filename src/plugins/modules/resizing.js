@@ -185,7 +185,7 @@ export default {
 
     create_caption: function () {
         const caption = document.createElement('FIGCAPTION');
-        caption.setAttribute('contenteditable', false);
+        caption.setAttribute('contenteditable', true);
         caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
         return caption;
     },
@@ -403,11 +403,11 @@ export default {
             resultW = w;
         }
 
-        if (/^(?:t|b)[^h]$/.test(direction)) {
+        if (/^(t|b)[^h]$/.test(direction)) {
             contextResizing.resizeDiv.style.height = wh + 'px';
             resultH = wh;
         }
-        else if (/^(?:t|b)h$/.test(direction)) {
+        else if (/^(t|b)h$/.test(direction)) {
             contextResizing.resizeDiv.style.height = h + 'px';
             resultH = h;
         }

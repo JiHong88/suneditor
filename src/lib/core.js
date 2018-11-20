@@ -1560,7 +1560,7 @@ const core = function (context, plugins, lang) {
                 '</head>' +
                 '<body>' +
                 '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
-                context.element.wysiwyg.innerHTML + '</div>' +
+                userFunction.getContents() + '</div>' +
                 (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
                 '</html>');
         }
@@ -1781,13 +1781,10 @@ const core = function (context, plugins, lang) {
             event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (figcaption) {
+            if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
                 e.preventDefault();
-
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
-
-                figcaption.addEventListener('blur', event._cancelCaptionEdit);
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
                 if (td) {
@@ -2144,7 +2141,7 @@ const core = function (context, plugins, lang) {
             if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
 
             if (editor._variable.wysiwygActive) {
-                contents = context.element.wysiwyg.innerHTML;
+                contents = context.element.wysiwyg.innerHTML.replace(/(?!<figcaption\s+)(contenteditable="true")\s*(?=[^>]*>)/gi, '');
             } else {
                 contents = context.element.code.value;
             }

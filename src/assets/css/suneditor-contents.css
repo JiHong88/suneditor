@@ -272,7 +272,7 @@
     padding: 0;
 }
 .sun-editor-editable figure.sun-editor-figure-cover * {
-    display: flex;
+    display: block;
 }
 .sun-editor-editable figure.sun-editor-figure-cover figcaption {
     padding: 1em .5em;
@@ -283,9 +283,6 @@
 .sun-editor-editable figure.sun-editor-figure-cover figcaption p{
     line-height: 2;
     margin: 0;
-}
-.sun-editor-editable figure.sun-editor-figure-cover figcaption[contenteditable=true] {
-    outline: 1px dashed #ccc;
 }
 
 /* image */
