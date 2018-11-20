@@ -78,7 +78,7 @@ export default {
 
     /** dialog */
     setDialog: function (user, lang) {
-        const dialog = document.createElement('DIV');
+        const dialog = util.createElement('DIV');
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
 
@@ -295,7 +295,7 @@ export default {
 
     onRender_link: function (imgTag, imgLinkValue, newWindowCheck) {
         if (imgLinkValue.trim().length > 0) {
-            const link = document.createElement('A');
+            const link = util.createElement('A');
             link.href = /^https?:\/\//.test(imgLinkValue) ? imgLinkValue : 'http://' + imgLinkValue;
             link.target = (newWindowCheck ? '_blank' : '');
             link.setAttribute('data-image-link', 'image');
@@ -402,7 +402,7 @@ export default {
 
         const contextImage = this.context.image;
 
-        let oImg = document.createElement('IMG');
+        let oImg = util.createElement('IMG');
         oImg.addEventListener('load', this.plugins.image._onload_image.bind(this, oImg, file));
 
         oImg.src = src;

@@ -44,7 +44,7 @@ export default {
 
     /** dialog */
     setDialog: function (lang) {
-        const dialog = document.createElement('DIV');
+        const dialog = util.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-link';
         dialog.style.display = 'none';
@@ -76,7 +76,7 @@ export default {
 
     /** modify controller button */
     setController_LinkButton: function (lang) {
-        const link_btn = document.createElement('DIV');
+        const link_btn = util.createElement('DIV');
 
         link_btn.className = 'sun-editor-id-link-btn';
         link_btn.style.display = 'none';
@@ -102,11 +102,11 @@ export default {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
             const url = this.context.link.focusElement.value;
-            const anchor = this.context.link.linkAnchorText || this.context.dialog.document.getElementById("linkAnchorText");
+            const anchor = this.context.link.linkAnchorText;
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
             if (!this.context.dialog.updateModal) {
-                const oA = document.createElement('A');
+                const oA = util.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
                 oA.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');

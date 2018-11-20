@@ -60,7 +60,7 @@ export default {
 
     /** resize controller, button (image, iframe) */
     setController_resize: function () {
-        const resize_container = document.createElement('DIV');
+        const resize_container = util.createElement('DIV');
         resize_container.className = 'modal-resize-container';
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
@@ -82,7 +82,7 @@ export default {
     },
 
     setController_button: function (lang) {
-        const resize_button = document.createElement("DIV");
+        const resize_button = util.createElement("DIV");
         resize_button.className = "resize-btn";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
@@ -184,14 +184,14 @@ export default {
     },
 
     create_caption: function () {
-        const caption = document.createElement('FIGCAPTION');
+        const caption = util.createElement('FIGCAPTION');
         caption.setAttribute('contenteditable', true);
         caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
         return caption;
     },
 
     set_cover: function (element) {
-        const cover = document.createElement('FIGURE');
+        const cover = util.createElement('FIGURE');
         cover.className = 'sun-editor-figure-cover';
         cover.appendChild(element);
 
@@ -199,7 +199,7 @@ export default {
     },
 
     set_container: function (cover, className) {
-        const container = document.createElement('DIV');
+        const container = util.createElement('DIV');
         container.className = 'sun-editor-id-comp ' + className;
         container.setAttribute('contenteditable', false);
         container.appendChild(cover);

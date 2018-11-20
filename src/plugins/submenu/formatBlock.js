@@ -26,7 +26,7 @@ export default {
     },
 
     setSubmenu: function (lang) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_block';
         listDiv.style.display = 'none';
@@ -70,7 +70,7 @@ export default {
 
         // blockquote, pre
         if (command === 'range') {
-            const rangeElement = document.createElement(value);
+            const rangeElement = util.createElement(value);
             this.wrapToTags(rangeElement);
             this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
             this.appendFormatTag(rangeElement, util.isCell(this.getSelectionNode()) ? 'DIV' : '');

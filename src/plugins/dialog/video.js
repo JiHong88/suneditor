@@ -71,7 +71,7 @@ export default {
 
     /** dialog */
     setDialog: function (user, lang) {
-        const dialog = document.createElement('DIV');
+        const dialog = util.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-video';
         dialog.style.display = 'none';
@@ -157,7 +157,7 @@ export default {
             }
             /** url */
             else {
-                oIframe = document.createElement('IFRAME');
+                oIframe = util.createElement('IFRAME');
                 /** youtube */
                 if (/youtu\.?be/.test(url)) {
                     url = url.replace('watch?v=', '');
@@ -192,7 +192,7 @@ export default {
                 cover = this.plugins.resizing.set_cover.call(this, oIframe);
 
                 /** resizingDiv */
-                contextVideo._resizingDiv = resizingDiv = document.createElement('DIV');
+                contextVideo._resizingDiv = resizingDiv = util.createElement('DIV');
                 resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
                 cover.appendChild(resizingDiv);
 

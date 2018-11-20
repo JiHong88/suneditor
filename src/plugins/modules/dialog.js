@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'dialog',
     add: function (core) {
@@ -14,14 +16,14 @@ export default {
         context.dialog = {};
 
         /** dialog */
-        let dialog_div = document.createElement('DIV');
+        let dialog_div = util.createElement('DIV');
         dialog_div.className = 'sun-editor-id-dialogBox sun-editor-common';
 
-        let dialog_back = document.createElement('DIV');
+        let dialog_back = util.createElement('DIV');
         dialog_back.className = 'modal-dialog-background sun-editor-id-dialog-back';
         dialog_back.style.display = 'none';
 
-        let dialog_area = document.createElement('DIV');
+        let dialog_area = util.createElement('DIV');
         dialog_area.className = 'modal-dialog sun-editor-id-dialog-modal';
         dialog_area.style.display = 'none';
 

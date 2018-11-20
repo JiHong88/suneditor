@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'notice',
     add: function (core) {
@@ -14,9 +16,9 @@ export default {
         context.notice = {};
 
         /** dialog */
-        let notice_div = document.createElement('DIV');
-        let notice_span = document.createElement('SPAN');
-        let notice_button = document.createElement('BUTTON');
+        let notice_div = util.createElement('DIV');
+        let notice_span = util.createElement('SPAN');
+        let notice_button = util.createElement('BUTTON');
 
         notice_div.className = 'sun-editor-id-notice';
         notice_button.className = 'close';

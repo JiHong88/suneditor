@@ -51,7 +51,7 @@ export default {
     },
 
     setSubmenu: function () {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
         listDiv.className = 'table-content';
         listDiv.style.display = 'none';
 
@@ -67,7 +67,7 @@ export default {
     },
 
     setController_tableEditor: function (lang) {
-        const tableResize = document.createElement('DIV');
+        const tableResize = util.createElement('DIV');
 
         tableResize.className = 'sun-editor-id-table-edit';
         tableResize.style.display = 'none';
@@ -93,7 +93,7 @@ export default {
     },
 
     appendTable: function () {
-        const oTable = document.createElement('TABLE');
+        const oTable = util.createElement('TABLE');
 
         let x = this.context.table._tableXY[0];
         let y = this.context.table._tableXY[1];

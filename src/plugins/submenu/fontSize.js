@@ -26,7 +26,7 @@ export default {
     },
 
     setSubmenu: function (user) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
         listDiv.className = 'layer_editor layer_size';
         listDiv.style.display = 'none';
 
@@ -55,7 +55,7 @@ export default {
         }
 
         util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
-        const newNode = document.createElement('SPAN');
+        const newNode = util.createElement('SPAN');
         newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
         this.wrapRangeToTag(newNode, ['font-size']);
 

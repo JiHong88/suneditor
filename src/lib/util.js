@@ -11,13 +11,15 @@
  * @description utility function
  */
 const util = {
+    _d: document,
+    _w: window,
     /**
      * @description Gets XMLHttpRequest object
      * @returns {Object}
      */
     getXMLHttpRequest: function () {
         /** IE */
-        if (window.ActiveXObject) {
+        if (this._w.ActiveXObject) {
             try {
                 return new ActiveXObject('Msxml2.XMLHTTP');
             } catch (e) {
@@ -29,7 +31,7 @@ const util = {
             }
         }
         /** netscape */
-        else if (window.XMLHttpRequest) {
+        else if (this._w.XMLHttpRequest) {
             return new XMLHttpRequest();
         }
         /** fail */
@@ -54,6 +56,24 @@ const util = {
     },
 
     /**
+     * @description Create Element node
+     * @param {String} elementName - Element name
+     * @returns {Element}
+     */
+    createElement: function (elementName) {
+        return this._d.createElement(elementName);
+    },
+
+    /**
+     * @description Create text node
+     * @param {String} text - text contents
+     * @returns {Node}
+     */
+    createTextNode: function (text) {
+        return this._d.createTextNode(text || '');
+    },
+
+    /**
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param {Array} nameArray - File name array
@@ -74,7 +94,7 @@ const util = {
         const regExp = new RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
         const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
             
-        for (let c = document.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
+        for (let c = this._d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
             if (extRegExp.test(c[i][src])) {
                 pathList.push(c[i]);
             }
@@ -106,7 +126,7 @@ const util = {
         let tag, baseHtml, innerHTML = '';
         contents = contents.trim();
 
-        tag = document.createRange().createContextualFragment(contents).childNodes;
+        tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
         for (let i = 0, len = tag.length; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
@@ -556,7 +576,7 @@ const util = {
      */
     cleanHTML: function (html) {
         const tagsAllowed = new RegExp('^(P|DIV|PRE|H1|H2|H3|H4|H5|H6|B|U|I|STRIKE|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
-        const domTree = document.createRange().createContextualFragment(html).children;
+        const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {

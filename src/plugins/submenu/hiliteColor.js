@@ -7,6 +7,7 @@
  */
 'use strict';
 
+import util from '../../lib/util';
 import colorPicker from '../modules/colorPicker';
 
 export default {
@@ -37,7 +38,7 @@ export default {
     },
 
     setSubmenu: function (colorArea) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
 
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
@@ -76,7 +77,7 @@ export default {
     },
 
     applyColor: function (color) {
-        const newNode = document.createElement('SPAN');
+        const newNode = util.createElement('SPAN');
         newNode.style.backgroundColor = color;
 
         this.wrapRangeToTag(newNode, ['background-color']);

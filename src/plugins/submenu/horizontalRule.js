@@ -26,7 +26,7 @@ export default {
     },
 
     setSubmenu: function (lang) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_line';
         listDiv.style.display = 'none';
@@ -55,7 +55,7 @@ export default {
     },
 
     appendHr: function (className) {
-        const oHr = document.createElement('HR');
+        const oHr = util.createElement('HR');
         oHr.className = className;
 
         this.focus();

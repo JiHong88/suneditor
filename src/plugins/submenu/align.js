@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import util from '../../lib/util';
+
 export default {
     name: 'align',
     add: function (core, targetElement) {
@@ -24,7 +26,7 @@ export default {
     },
 
     setSubmenu: function (lang) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_align';
         listDiv.style.display = 'none';

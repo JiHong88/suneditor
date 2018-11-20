@@ -279,10 +279,10 @@ const _Constructor = {
      * @private
      */
     _createModuleGroup: function (oneModule) {
-        const oDiv = document.createElement('DIV');
+        const oDiv = util.createElement('DIV');
         oDiv.className = 'tool_module' + (oneModule ? '' : ' sun-editor-module-border');
 
-        const oUl = document.createElement('UL');
+        const oUl = util.createElement('UL');
         oUl.className = 'editor_tool';
         oDiv.appendChild(oUl);
 
@@ -303,8 +303,8 @@ const _Constructor = {
      * @private
      */
     _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML) {
-        const oLi = document.createElement('LI');
-        const oButton = document.createElement('BUTTON');
+        const oLi = util.createElement('LI');
+        const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
         oButton.setAttribute('class', 'btn_editor ' + buttonClass);

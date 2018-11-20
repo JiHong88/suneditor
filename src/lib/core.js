@@ -18,6 +18,8 @@ import notice from '../plugins/modules/notice';
  * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
  */
 const core = function (context, plugins, lang) {
+    const _d = document;
+    const _w = window;
     /**
      * @description editor core object
      * should always bind this object when registering an event in the plug-in.
@@ -231,7 +233,7 @@ const core = function (context, plugins, lang) {
          * @param {String} value - javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
-            document.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
+            _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
         },
 
         /**
@@ -256,7 +258,7 @@ const core = function (context, plugins, lang) {
          * @private
          */
         _setEditorRange: function () {
-            const selection = window.getSelection();
+            const selection = _w.getSelection();
             let range = null;
 
             if (selection.rangeCount > 0) {
@@ -281,7 +283,7 @@ const core = function (context, plugins, lang) {
          * @private
          */
         _createDefaultRange: function () {
-            const range = document.createRange();
+            const range = _d.createRange();
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);
             return range;
@@ -295,11 +297,11 @@ const core = function (context, plugins, lang) {
          * @param {Element} endOff - The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
-            const range = document.createRange();
+            const range = _d.createRange();
             range.setStart(startCon, startOff);
             range.setEnd(endCon, endOff);
 
-            const selection = window.getSelection();
+            const selection = _w.getSelection();
 
             if (selection.removeAllRanges) {
                 selection.removeAllRanges();
@@ -477,7 +479,7 @@ const core = function (context, plugins, lang) {
             const formatEl = util.getRangeFormatElement(element) || util.getFormatElement(element);
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
             const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
-            const oFormat = document.createElement(oFormatName);
+            const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = '\u200B';
 
             if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
@@ -604,9 +606,9 @@ const core = function (context, plugins, lang) {
 
                 if (item === startCon) {
                     if (startCon.nodeType === 1) {
-                        beforeNode = document.createTextNode(startCon.textContent);
+                        beforeNode = util.createTextNode(startCon.textContent);
                     } else {
-                        beforeNode = document.createTextNode(startCon.substringData(0, startOff));
+                        beforeNode = util.createTextNode(startCon.substringData(0, startOff));
                     }
 
                     if (beforeNode.length > 0) {
@@ -620,9 +622,9 @@ const core = function (context, plugins, lang) {
 
                 if (item === endCon) {
                     if (endCon.nodeType === 1) {
-                        afterNode = document.createTextNode(endCon.textContent);
+                        afterNode = util.createTextNode(endCon.textContent);
                     } else {
-                        afterNode = document.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                        afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
                     }
 
                     if (afterNode.length > 0) {
@@ -647,7 +649,7 @@ const core = function (context, plugins, lang) {
             const rangeLines = this.getSelectedFormatElements();
 
             if (!rangeLines) {
-                const inner = document.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
+                const inner = util.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
                 inner.innerHTML = '\u200B';
                 wrapTag.appendChild(inner);
                 this.getSelectionNode().appendChild(wrapTag);
@@ -680,7 +682,7 @@ const core = function (context, plugins, lang) {
 
                 if (/^LI$/i.test(line.nodeName)) {
                     if (listParent === null || !/^LI$/i.test(prevNodeName)) {
-                        listParent = document.createElement(line.parentNode.nodeName);
+                        listParent = util.createElement(line.parentNode.nodeName);
                     }
 
                     listParent.appendChild(line);
@@ -812,8 +814,8 @@ const core = function (context, plugins, lang) {
                         startConParent.insertBefore(newNode, startCon.nextSibling);
                         util.removeItem(startCon);
                     } else {
-                        const beforeNode = document.createTextNode(startCon.substringData(0, startOff));
-                        const afterNode = document.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
+                        const beforeNode = util.createTextNode(startCon.substringData(0, startOff));
+                        const afterNode = util.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
     
                         newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
     
@@ -927,8 +929,8 @@ const core = function (context, plugins, lang) {
 
                     // startContainer
                     if (!startPass && child === startContainer) {
-                        const prevNode = document.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
-                        const textNode = document.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+                        const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
+                        const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (startContainer.length - startOffset)));
 
                         if (prevNode.data.length > 0) {
                             node.appendChild(prevNode);
@@ -965,8 +967,8 @@ const core = function (context, plugins, lang) {
                     }
                     // endContainer
                     else if (!endPass && child === endContainer) {
-                        const afterNode = document.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
-                        const textNode = document.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
+                        const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
+                        const textNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
                         if (afterNode.data.length > 0) {
                             newNode = child;
@@ -1161,8 +1163,8 @@ const core = function (context, plugins, lang) {
 
                     // startContainer
                     if (!passNode && child === container) {
-                        const prevNode = document.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
-                        const textNode = document.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
+                        const prevNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
+                        const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
 
                         if (prevNode.data.length > 0) {
                             node.appendChild(prevNode);
@@ -1280,8 +1282,8 @@ const core = function (context, plugins, lang) {
 
                     // endContainer
                     if (!passNode && child === container) {
-                        const afterNode = document.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
-                        const textNode = document.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
+                        const afterNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
+                        const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
 
                         if (afterNode.data.length > 0) {
                             node.insertBefore(afterNode, node.firstChild);
@@ -1411,7 +1413,7 @@ const core = function (context, plugins, lang) {
                 const currentEl = range.commonAncestorContainer.parentElement;
                 if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
 
-                let tempNode = document.createElement('SPAN');
+                let tempNode = util.createElement('SPAN');
                 tempNode.textContent = '\u200B';
                 tempNode = tempNode.childNodes[0];
 
@@ -1505,8 +1507,8 @@ const core = function (context, plugins, lang) {
                 context.element.topArea.style.height = '100%';
                 context.element.topArea.style.zIndex = '2147483647';
 
-                this._variable._bodyOverflow = document.body.style.overflow;
-                document.body.style.overflow = 'hidden';
+                this._variable._bodyOverflow = _d.body.style.overflow;
+                _d.body.style.overflow = 'hidden';
 
                 this._variable._editorAreaOriginCssText = context.element.editorArea.style.cssText;
                 this._variable._wysiwygOriginCssText = context.element.wysiwyg.style.cssText;
@@ -1516,7 +1518,7 @@ const core = function (context, plugins, lang) {
                 context.element.toolbar.style.width = context.element.wysiwyg.style.height = context.element.code.style.height = '100%';
                 context.element.toolbar.style.position = 'relative';
 
-                this._variable.innerHeight_fullScreen = (window.innerHeight - context.element.toolbar.offsetHeight);
+                this._variable.innerHeight_fullScreen = (_w.innerHeight - context.element.toolbar.offsetHeight);
                 context.element.editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
                 util.removeClass(element.firstElementChild, 'icon-expansion');
@@ -1530,7 +1532,7 @@ const core = function (context, plugins, lang) {
                 context.element.toolbar.style.cssText = '';
                 context.element.editorArea.style.cssText = this._variable._editorAreaOriginCssText;
                 context.element.topArea.style.cssText = this._variable._originCssText;
-                document.body.style.overflow = this._variable._bodyOverflow;
+                _d.body.style.overflow = this._variable._bodyOverflow;
 
                 if (context.user.stickyToolbar > -1) {
                     util.removeClass(context.element.toolbar, 'sun-editor-sticky');
@@ -1548,9 +1550,9 @@ const core = function (context, plugins, lang) {
          */
         openWindowContents: function (mode) {
             const isPrint = mode === 'print';
-            const windowObject = window.open('', '_blank');
+            const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            windowObject.document.write('' +
+            windowObject._d.write('' +
                 '<!doctype html><html>' +
                 '<head>' +
                 '<meta charset="utf-8" />' +
@@ -1561,7 +1563,7 @@ const core = function (context, plugins, lang) {
                 '<body>' +
                 '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
                 userFunction.getContents() + '</div>' +
-                (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
+                (isPrint ? '<script>_w.print();</script>' : '') + '</body>' +
                 '</html>');
         }
     };
@@ -1867,7 +1869,7 @@ const core = function (context, plugins, lang) {
                     const lines = editor.getSelectedFormatElements();
 
                     if (!shift) {
-                        const tabText = document.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
+                        const tabText = util.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
                         if (lines.length === 1) {
                             editor.insertNode(tabText);
                             editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
@@ -1903,7 +1905,7 @@ const core = function (context, plugins, lang) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const oFormatTag = document.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
+                const oFormatTag = util.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
                 oFormatTag.innerHTML = '\u200B';
 
                 selectionNode.appendChild(oFormatTag);
@@ -1958,12 +1960,12 @@ const core = function (context, plugins, lang) {
 
             function closureFunc() {
                 context.element.resizeBackground.style.display = 'none';
-                document.removeEventListener('mousemove', event._resize_editor);
-                document.removeEventListener('mouseup', closureFunc);
+                _d.removeEventListener('mousemove', event._resize_editor);
+                _d.removeEventListener('mouseup', closureFunc);
             }
 
-            document.addEventListener('mousemove', event._resize_editor);
-            document.addEventListener('mouseup', closureFunc);
+            _d.addEventListener('mousemove', event._resize_editor);
+            _d.addEventListener('mouseup', closureFunc);
         },
 
         _resize_editor: function (e) {
@@ -1974,7 +1976,7 @@ const core = function (context, plugins, lang) {
 
         onResize_window: function () {
             if (editor._variable.isFullScreen) {
-                editor._variable.innerHeight_fullScreen += (window.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
+                editor._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
             }
             else if (editor._variable._sticky) {
@@ -1991,7 +1993,7 @@ const core = function (context, plugins, lang) {
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const editorTop = element.topArea.offsetTop;
-            const y = (this.scrollY || document.documentElement.scrollTop) + context.user.stickyToolbar;
+            const y = (this.scrollY || _d.documentElement.scrollTop) + context.user.stickyToolbar;
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
@@ -2064,8 +2066,8 @@ const core = function (context, plugins, lang) {
     }
     
     /** window event */
-    window.addEventListener('resize', event.onResize_window, false);
-    if (context.user.stickyToolbar > -1) window.addEventListener('scroll', event.onScroll_window, false);
+    _w.addEventListener('resize', event.onResize_window, false);
+    if (context.user.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
 
     /** add plugin to plugins object */
     if (plugins) {
@@ -2162,7 +2164,7 @@ const core = function (context, plugins, lang) {
          */
         insertHTML: function (html) {
             if (!html.nodeType || html.nodeType !== 1) {
-                const template = document.createElement('template');
+                const template = util.createElement('template');
                 template.innerHTML = html;
                 html = template.content.firstChild;
             }
@@ -2233,15 +2235,25 @@ const core = function (context, plugins, lang) {
          */
         destroy: function () {
             /** remove window event listeners */
-            window.removeEventListener('resize', event.onResize_window);
-            window.removeEventListener('scroll', event.onScroll_window);
+            _w.removeEventListener('resize', event.onResize_window);
+            _w.removeEventListener('scroll', event.onScroll_window);
             
             /** remove element */
             util.removeItem(context.element.topArea);
 
+            this.onScroll = null;
+            this.onClick = null;
+            this.onKeyDown = null;
+            this.onKeyUp = null;
+            this.onDrop = null;
             this.save = null;
+            this.onImageUpload = null;
+            this.noticeOpen = null;
+            this.noticeClose = null;
             this.getContext = null;
             this.getContents = null;
+            this.getImagesInfo = null;
+            this.insertHTML = null;
             this.setContents = null;
             this.appendContents = null;
             this.disabled = null;
@@ -2249,6 +2261,10 @@ const core = function (context, plugins, lang) {
             this.show = null;
             this.hide = null;
             this.destroy = null;
+
+            context = null;
+            plugins = null;
+            lang = null;
         }
     };
 

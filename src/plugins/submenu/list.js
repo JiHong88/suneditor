@@ -26,7 +26,7 @@ export default {
     },
 
     setSubmenu: function (lang) {
-        const listDiv = document.createElement('DIV');
+        const listDiv = util.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_list';
         listDiv.style.display = 'none';
@@ -65,7 +65,7 @@ export default {
             let rightNode = formatElement.nextSibling;
             let pNode = formatElement.parentNode;
 
-            const list = document.createElement(value);
+            const list = util.createElement(value);
             const formatElementList = this.getSelectedFormatElements();
             
             for (let i = 0, len = formatElementList.length, fTag = null; i < len; i++) {
