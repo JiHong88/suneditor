@@ -1552,7 +1552,7 @@ const core = function (context, plugins, lang) {
             const isPrint = mode === 'print';
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            windowObject._d.write('' +
+            windowObject.document.write('' +
                 '<!doctype html><html>' +
                 '<head>' +
                 '<meta charset="utf-8" />' +
@@ -1562,9 +1562,26 @@ const core = function (context, plugins, lang) {
                 '</head>' +
                 '<body>' +
                 '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
-                userFunction.getContents() + '</div>' +
+                this.getContents() + '</div>' +
                 (isPrint ? '<script>_w.print();</script>' : '') + '</body>' +
                 '</html>');
+        },
+
+        /**
+         * @description Gets the current contents
+         * @returns {Object}
+         */
+        getContents: function () {
+            let contents = '';
+
+            if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
+
+            if (editor._variable.wysiwygActive) {
+                contents = context.element.wysiwyg.innerHTML.replace(/(?!<figcaption\s+)(contenteditable="true")\s*(?=[^>]*>)/gi, '');
+            } else {
+                contents = context.element.code.value;
+            }
+            return contents;
         }
     };
 
@@ -2118,11 +2135,7 @@ const core = function (context, plugins, lang) {
          * @description Copying the contents of the editor to the original textarea
          */
         save: function () {
-            if (editor._variable.wysiwygActive) {
-                context.element.originElement.value = context.element.wysiwyg.innerHTML;
-            } else {
-                context.element.originElement.value = context.element.code.value;
-            }
+            context.element.originElement.value = editor.getContents();
         },
 
         /**
@@ -2138,16 +2151,7 @@ const core = function (context, plugins, lang) {
          * @returns {String}
          */
         getContents: function () {
-            let contents = '';
-
-            if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
-
-            if (editor._variable.wysiwygActive) {
-                contents = context.element.wysiwyg.innerHTML.replace(/(?!<figcaption\s+)(contenteditable="true")\s*(?=[^>]*>)/gi, '');
-            } else {
-                contents = context.element.code.value;
-            }
-            return contents;
+            return editor.getContents();
         },
 
         /**
