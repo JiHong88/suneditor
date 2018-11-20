@@ -279,6 +279,7 @@
     margin: 0;
     font-size: 13px;
     background-color: #f3f3f3;
+    outline: none;
 }
 .sun-editor-editable figure.sun-editor-figure-cover figcaption p{
     line-height: 2;
