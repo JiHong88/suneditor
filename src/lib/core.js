@@ -1368,6 +1368,8 @@ const core = function (context, plugins, lang) {
                     break;
                 case 'redo':
                 case 'undo':
+                    this.execCommand(command, false, null);
+                    break;
                 case 'removeFormat':
                     this.removeFormat();
                     break;
