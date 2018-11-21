@@ -1580,11 +1580,23 @@ const core = function (context, plugins, lang) {
             if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
 
             if (editor._variable.wysiwygActive) {
-                contents = context.element.wysiwyg.innerHTML.replace(/(?!<figcaption\s+)(contenteditable="true")\s*(?=[^>]*>)/gi, '');
+                contents = context.element.wysiwyg.innerHTML;
             } else {
-                contents = context.element.code.value;
+                contents = util.convertContentsForEditor(context.element.code.value);
             }
-            return contents;
+
+            const renderHTML = util.createElement('DIV');
+            renderHTML.innerHTML = contents;
+
+            const figcaptions = util.getListChildren(renderHTML, function (current) {
+                return /FIGCAPTION/i.test(current.nodeName);
+            });
+
+            for (let i = 0, len = figcaptions.length; i < len; i++) {
+                figcaptions[i].outerHTML = figcaptions[i].outerHTML.replace(/(?!^<figcaption\s+)(contenteditable="([a-z]+|\s*)")\s*(?=[^>]*>)/i, '');
+            }
+
+            return renderHTML.innerHTML;
         }
     };
 
