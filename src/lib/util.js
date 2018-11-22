@@ -209,7 +209,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TH|TD|OL|UL|PRE)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TABLE|THEAD|TBODY|TH|TR|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
         return false;
     },
 
