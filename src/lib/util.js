@@ -193,7 +193,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, LI)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, LI, CODE)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
@@ -203,8 +203,8 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (blockquote, TH, TD, OL, UL, PRE)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, TABLE, THEAD, TBODY, TH, TR, TD, OL, UL, PRE)
+     * * Range format element is wrap the format element  (P, DIV, H1-6, LI, CODE)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
