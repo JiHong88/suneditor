@@ -707,11 +707,13 @@ const core = function (context, plugins, lang) {
          * @description Copies the node of the argument value and append all selected nodes and insert
          * 1. When there is the same css value node in the selection area, the tag is stripped.
          * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
+         * 3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) wrapRangeToTag(document.createElement('removenode'))
          * @param {Element} appendNode - The dom that will wrap the selected text area
          * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
          */
         wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
             const range = this.getRange();
+            const isRemoveFormat = /removenode/i.test(appendNode.nodeName);
             let tempCon, tempOffset, tempChild, tempArray;
 
             tempCon = range.startContainer;
@@ -765,7 +767,7 @@ const core = function (context, plugins, lang) {
 
             /** tag check function*/
             const checkCss = function (vNode) {
-                if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
+                if (isRemoveFormat || vNode.nodeType === 3 || util.isBreak(vNode)) return true;
 
                 let style = '';
                 if (regExp && vNode.style.cssText.length > 0) {
@@ -785,66 +787,30 @@ const core = function (context, plugins, lang) {
                 newNode = appendNode.cloneNode(false);
                 if (!newNode) return;
 
-                let sameContainer;
-                if (util.isBreak(startCon)) {
-                    sameContainer = startCon.parentElement;
-                    util.removeItem(startCon);
-                } else {
-                    sameContainer = startCon;
-                }
+                const startConParent = startCon.parentNode;
 
-                /** No range node selected */
-                if (range.collapsed) {
-                    newNode.innerHTML = '\u200B';
-                    if (util.isFormatElement(sameContainer)) {
-                        sameContainer.appendChild(newNode);
+                if (startCon.nodeType === 1) {
+                    if (isRemoveFormat) {
+                        newNode = util.createTextNode(startCon.textContent);
                     } else {
-                        const parentNode = sameContainer.nodeType === 3 ? sameContainer.parentNode : sameContainer;
-                        const rightNode = commonCon.nodeType === 3 ? commonCon.splitText(endOff) : null;
-                        parentNode.insertBefore(newNode, rightNode);
-                    }
-
-                    start.container = newNode;
-                    start.offset = 1;
-                    end.container = newNode;
-                    end.offset = 1;
-                }
-                /** Select range node */
-                else {
-                    const startConParent = startCon.parentNode;
-
-                    if (startCon.nodeType === 1) {
                         newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
-                        startConParent.insertBefore(newNode, startCon.nextSibling);
-                        util.removeItem(startCon);
-                    } else {
-                        const beforeNode = util.createTextNode(startCon.substringData(0, startOff));
-                        const afterNode = util.createTextNode(startCon.substringData(endOff, (startCon.length - endOff)));
-    
-                        newNode.innerText = startCon.substringData(startOff, (endOff - startOff));
-    
-                        if (beforeNode.data.length === 0 && afterNode.data.length === 0 && !checkCss(startConParent) && !util.isFormatElement(startConParent)) {
-                            startConParent.parentNode.insertBefore(newNode, startConParent.nextSibling);
-                            util.removeItem(startConParent);
-                        } else {
-                            startConParent.insertBefore(newNode, startCon.nextSibling);
-        
-                            if (beforeNode.data.length > 0) {
-                                startCon.data = beforeNode.data;
-                            } else {
-                                startCon.data = startCon.substringData(0, startOff);
-                            }
-        
-                            if (afterNode.data.length > 0) {
-                                startConParent.insertBefore(afterNode, newNode.nextSibling);
-                            }
-                        }
                     }
+
+                    startConParent.insertBefore(newNode, startCon.nextSibling);
+                    util.removeItem(startCon);
 
                     start.container = newNode;
                     start.offset = 0;
                     end.container = newNode;
                     end.offset = 1;
+                } else {
+                    if (range.collapsed) newNode.innerHTML = '\u200B';
+                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat);
+
+                    start.container = newRange.startContainer;
+                    start.offset = newRange.startOffset;
+                    end.container = newRange.endContainer;
+                    end.offset = newRange.endOffset;
                 }
             }
             /** multiple nodes */
@@ -852,7 +818,7 @@ const core = function (context, plugins, lang) {
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff);
+                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -867,18 +833,18 @@ const core = function (context, plugins, lang) {
 
                     // startCon
                     newNode = appendNode.cloneNode(false);
-                    start = this._wrapLineNodesStart(lineNodes[0], newNode, checkCss, startCon, startOff);
+                    start = this._wrapLineNodesStart(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat);
 
                     // mid
                     for (let i = 1; i < endLength; i++) {
                         newNode = appendNode.cloneNode(false);
-                        this._wrapLineNodes(lineNodes[i], newNode, checkCss);
+                        this._wrapLineNodes(lineNodes[i], newNode, checkCss, isRemoveFormat);
                     }
 
                     // endCon
                     if (endLength > 0) {
                         newNode = appendNode.cloneNode(false);
-                        end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff);
+                        end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat);
                     } else {
                         end = start;
                     }
@@ -898,12 +864,14 @@ const core = function (context, plugins, lang) {
          * @param {Number} startOff - The startOffset property of the selection object.
          * @param {Element} endCon - The endContainer property of the selection object.
          * @param {Number} endOff - The endOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat - Is the remove format command ?
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff) {
+        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat) {
             const el = element;
             const pNode = element.cloneNode(false);
+            const isSameNode = startCon === endCon;
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
@@ -934,7 +902,7 @@ const core = function (context, plugins, lang) {
                     // startContainer
                     if (!startPass && child === startContainer) {
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
-                        const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (startContainer.length - startOffset)));
+                        const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (endOffset - startOffset)));
 
                         if (prevNode.data.length > 0) {
                             node.appendChild(prevNode);
@@ -967,12 +935,13 @@ const core = function (context, plugins, lang) {
                         startPass = true;
 
                         if (newNode !== textNode) newNode.appendChild(startContainer);
-                        continue;
+                        if (!isSameNode) continue;
                     }
+
                     // endContainer
-                    else if (!endPass && child === endContainer) {
+                    if (!endPass && child === endContainer) {
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
-                        const textNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
+                        const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
                         if (afterNode.data.length > 0) {
                             newNode = child;
@@ -1025,6 +994,7 @@ const core = function (context, plugins, lang) {
                         if (newNode !== textNode) newNode.appendChild(endContainer);
                         continue;
                     }
+
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
@@ -1071,6 +1041,12 @@ const core = function (context, plugins, lang) {
                 }
             })(element, pNode);
 
+            if (isRemoveFormat) {
+                startContainer = util.createTextNode(newInnerNode.textContent);
+                pNode.insertBefore(startContainer, newInnerNode);
+                pNode.removeChild(newInnerNode);
+            }
+
             util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
@@ -1078,8 +1054,8 @@ const core = function (context, plugins, lang) {
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: endContainer,
-                endOffset: endOffset
+                endContainer: isRemoveFormat || isSameNode ? startContainer : endContainer,
+                endOffset: isRemoveFormat || isSameNode ? startContainer.textContent.length : endOffset
             };
         },
 
@@ -1088,23 +1064,28 @@ const core = function (context, plugins, lang) {
          * @param {Element} element - The node of the line that contains the selected text node.
          * @param {Element} newInnerNode - The dom that will wrap the selected text area
          * @param {function} validation - Check if the node should be stripped.
+         * @param {Boolean} isRemoveFormat - Is the remove format command ?
          * @private
          */
-        _wrapLineNodes: function (element, newInnerNode, validation) {
-            (function recursionFunc(current, node) {
-                const childNodes = current.childNodes;
-
-                for (let i = 0, len = childNodes.length; i < len; i++) {
-                    let child = childNodes[i];
-                    let coverNode = node;
-                    if (validation(child)) {
-                        let cloneNode = child.cloneNode(false);
-                        node.appendChild(cloneNode);
-                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
+        _wrapLineNodes: function (element, newInnerNode, validation, isRemoveFormat) {
+            if (isRemoveFormat) {
+                newInnerNode = util.createTextNode(element.textContent);
+            } else {
+                (function recursionFunc(current, node) {
+                    const childNodes = current.childNodes;
+    
+                    for (let i = 0, len = childNodes.length; i < len; i++) {
+                        let child = childNodes[i];
+                        let coverNode = node;
+                        if (validation(child)) {
+                            let cloneNode = child.cloneNode(false);
+                            node.appendChild(cloneNode);
+                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
+                        }
+                        recursionFunc(child, coverNode);
                     }
-                    recursionFunc(child, coverNode);
-                }
-            })(element, newInnerNode);
+                })(element, newInnerNode);
+            }
 
             element.innerHTML = '';
             element.appendChild(newInnerNode);
@@ -1117,10 +1098,11 @@ const core = function (context, plugins, lang) {
          * @param {function} validation - Check if the node should be stripped.
          * @param {Element} startCon - The startContainer property of the selection object.
          * @param {Number} startOff - The startOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat - Is the remove format command ?
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff) {
+        _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat) {
             const el = element;
             const pNode = element.cloneNode(false);
 
@@ -1219,6 +1201,12 @@ const core = function (context, plugins, lang) {
                 }
             })(element, pNode);
 
+            if (isRemoveFormat) {
+                container = util.createTextNode(newInnerNode.textContent);
+                pNode.insertBefore(container, newInnerNode);
+                pNode.removeChild(newInnerNode);
+            }
+
             util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
@@ -1236,10 +1224,11 @@ const core = function (context, plugins, lang) {
          * @param {function} validation - Check if the node should be stripped.
          * @param {Element} endCon - The endContainer property of the selection object.
          * @param {Number} endOff - The endOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat - Is the remove format command ?
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff) {
+        _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat) {
             const el = element;
             const pNode = element.cloneNode(false);
 
@@ -1338,6 +1327,13 @@ const core = function (context, plugins, lang) {
                 }
             })(element, pNode);
 
+            if (isRemoveFormat) {
+                container = util.createTextNode(newInnerNode.textContent);
+                offset = container.textContent.length;
+                pNode.insertBefore(container, newInnerNode);
+                pNode.removeChild(newInnerNode);
+            }
+
             util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
@@ -1418,21 +1414,9 @@ const core = function (context, plugins, lang) {
             if (range.collapsed) {
                 const currentEl = range.commonAncestorContainer.parentElement;
                 if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
-
-                let tempNode = util.createElement('SPAN');
-                tempNode.textContent = '\u200B';
-                tempNode = tempNode.childNodes[0];
-
-                this.insertNode(tempNode);
-                this.setRange(tempNode, 0, tempNode, 1);
-
-                range = this.getRange();
-
-                this.execCommand('removeFormat', false, null, true);
-                this.setRange(tempNode, 1, tempNode, 1);
-            } else {
-                this.execCommand('removeFormat', false, null, true);
             }
+            
+            this.wrapRangeToTag(util.createElement('REMOVENODE'));
         },
 
         /**

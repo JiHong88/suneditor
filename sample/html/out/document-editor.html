@@ -960,7 +960,8 @@
             <div class="description">
                 Copies the node of the argument value and append all selected nodes and insert.<br>
                 1. When there is the same css value node in the selection area, the tag is stripped.<br>
-                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments.
+                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments.<br>
+                3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) wrapRangeToTag(document.createElement('removenode'))
             </div>
             <h5>Parameters:</h5>
             <table class="params">
