@@ -80,7 +80,7 @@ export default {
         const newNode = util.createElement('SPAN');
         newNode.style.color = color;
 
-        this.wrapRangeToTag(newNode, ['color']);
+        this.nodeChange(newNode, ['color']);
 
         this.submenuOff();
         this.focus();

@@ -13,6 +13,8 @@
 const util = {
     _d: document,
     _w: window,
+    zeroWidtText: '\u200B',
+
     /**
      * @description Gets XMLHttpRequest object
      * @returns {Object}
@@ -148,7 +150,7 @@ const util = {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
 
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '\u200B') + '</p>';
+        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidtText) + '</p>';
 
         return innerHTML;
     },
@@ -349,7 +351,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (validation(current)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
