@@ -349,7 +349,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (validation(current)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
