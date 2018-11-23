@@ -782,43 +782,30 @@ const core = function (context, plugins, lang) {
                 return false;
             };
 
-            /** one node */
-            if (startCon === endCon) {
+            if (startCon === endCon && startCon.nodeType === 1) {
                 newNode = appendNode.cloneNode(false);
-                if (!newNode) return;
 
-                const startConParent = startCon.parentNode;
-
-                if (startCon.nodeType === 1) {
-                    if (isRemoveFormat) {
-                        newNode = util.createTextNode(startCon.textContent);
-                    } else {
-                        newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
-                    }
-
-                    startConParent.insertBefore(newNode, startCon.nextSibling);
-                    util.removeItem(startCon);
-
-                    start.container = newNode;
-                    start.offset = 0;
-                    end.container = newNode;
-                    end.offset = 1;
+                if (isRemoveFormat) {
+                    newNode = util.createTextNode(startCon.textContent);
                 } else {
-                    if (range.collapsed) newNode.innerHTML = '\u200B';
-                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat);
-
-                    start.container = newRange.startContainer;
-                    start.offset = newRange.startOffset;
-                    end.container = newRange.endContainer;
-                    end.offset = newRange.endOffset;
+                    newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
                 }
+
+                startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
+                util.removeItem(startCon);
+
+                start.container = newNode;
+                start.offset = 0;
+                end.container = newNode;
+                end.offset = 1;
             }
-            /** multiple nodes */
             else {
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat);
+                    if (range.collapsed) newNode.innerHTML = '\u200B';
+
+                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, range.collapsed);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -868,7 +855,7 @@ const core = function (context, plugins, lang) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat) {
+        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, collapsed) {
             const el = element;
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
@@ -1047,6 +1034,13 @@ const core = function (context, plugins, lang) {
                 pNode.removeChild(newInnerNode);
             }
 
+            if (collapsed) {
+
+            } else if (isRemoveFormat || isSameNode) {
+                endContainer = startContainer;
+                endOffset = startContainer.textContent.length;
+            }
+
             util.removeEmptyNode(pNode);
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
@@ -1054,8 +1048,8 @@ const core = function (context, plugins, lang) {
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: isRemoveFormat || isSameNode ? startContainer : endContainer,
-                endOffset: isRemoveFormat || isSameNode ? startContainer.textContent.length : endOffset
+                endContainer: endContainer,
+                endOffset: endOffset
             };
         },
 
