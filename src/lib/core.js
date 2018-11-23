@@ -1065,7 +1065,7 @@ const core = function (context, plugins, lang) {
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat) {
             if (isRemoveFormat) {
-                newInnerNode = util.createTextNode(element.textContent);
+                newInnerNode = util.createTextNode(element.textContent ? element.textContent : util.zeroWidtText);
             } else {
                 (function recursionFunc(current, node) {
                     const childNodes = current.childNodes;
@@ -1203,9 +1203,18 @@ const core = function (context, plugins, lang) {
                 pNode.removeChild(newInnerNode);
             }
 
-            util.removeEmptyNode(pNode);
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            if (pNode.children.length === 0) {
+                if (element.childNodes) {
+                    container = element.childNodes[0];
+                } else {
+                    container = util.createTextNode(util.zeroWidtText);
+                    element.appendChild(container);
+                }
+            } else {
+                util.removeEmptyNode(pNode);
+                element.parentNode.insertBefore(pNode, element);
+                util.removeItem(element);
+            }
 
             return {
                 container: container,
@@ -1330,9 +1339,18 @@ const core = function (context, plugins, lang) {
                 pNode.removeChild(newInnerNode);
             }
 
-            util.removeEmptyNode(pNode);
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            if (pNode.childNodes.length === 0) {
+                if (element.childNodes) {
+                    container = element.childNodes[0];
+                } else {
+                    container = util.createTextNode(util.zeroWidtText);
+                    element.appendChild(container);
+                }
+            } else {
+                util.removeEmptyNode(pNode);
+                element.parentNode.insertBefore(pNode, element);
+                util.removeItem(element);
+            }
 
             return {
                 container: container,
