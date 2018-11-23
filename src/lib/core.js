@@ -2185,7 +2185,7 @@ const core = function (context, plugins, lang) {
             if (!html.nodeType || html.nodeType !== 1) {
                 const template = util.createElement('template');
                 template.innerHTML = html;
-                html = template.content.firstChild;
+                html = template.firstChild || template.content.firstChild;
             }
 
             editor.insertNode(html);
