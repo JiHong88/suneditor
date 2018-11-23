@@ -1035,9 +1035,11 @@ const core = function (context, plugins, lang) {
                 startContainer = util.createTextNode(collapsed ? util.zeroWidtText : newInnerNode.textContent);
                 pNode.insertBefore(startContainer, newInnerNode);
                 pNode.removeChild(newInnerNode);
-            } else if (collapsed) {
+                if (collapsed) startOffset = 1;
+            }
+            else if (collapsed) {
                 startContainer = endContainer = newInnerNode;
-                startOffset = 0;
+                startOffset = 1;
                 endOffset = 1;
             }
 
