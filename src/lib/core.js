@@ -704,7 +704,7 @@ const core = function (context, plugins, lang) {
         },
 
         /**
-         * @description Copies the node of the argument value and append all selected nodes and insert
+         * @description Add the node received as an argument value to the selected area.
          * 1. When there is the same css value node in the selection area, the tag is stripped.
          * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
          * 3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) nodeChange(document.createElement('removenode'))
@@ -803,9 +803,7 @@ const core = function (context, plugins, lang) {
                 /** one line */
                 if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                     newNode = appendNode.cloneNode(false);
-                    if (range.collapsed) newNode.innerHTML = '\u200B';
-
-                    const newRange = this._wrapLineNodesOneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, range.collapsed);
+                    const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, range.collapsed);
 
                     start.container = newRange.startContainer;
                     start.offset = newRange.startOffset;
@@ -820,18 +818,18 @@ const core = function (context, plugins, lang) {
 
                     // startCon
                     newNode = appendNode.cloneNode(false);
-                    start = this._wrapLineNodesStart(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat);
+                    start = this._nodeChange_startLine(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat);
 
                     // mid
                     for (let i = 1; i < endLength; i++) {
                         newNode = appendNode.cloneNode(false);
-                        this._wrapLineNodes(lineNodes[i], newNode, checkCss, isRemoveFormat);
+                        this._nodeChange_middleLine(lineNodes[i], newNode, checkCss, isRemoveFormat);
                     }
 
                     // endCon
                     if (endLength > 0) {
                         newNode = appendNode.cloneNode(false);
-                        end = this._wrapLineNodesEnd(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat);
+                        end = this._nodeChange_endLine(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat);
                     } else {
                         end = start;
                     }
@@ -855,7 +853,7 @@ const core = function (context, plugins, lang) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _wrapLineNodesOneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, collapsed) {
+        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, collapsed) {
             const el = element;
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
@@ -916,7 +914,7 @@ const core = function (context, plugins, lang) {
 
                         newInnerNode.appendChild(childNode);
                         pNode.appendChild(newInnerNode);
-                        
+
                         startContainer = textNode;
                         startOffset = 0;
                         startPass = true;
@@ -978,6 +976,11 @@ const core = function (context, plugins, lang) {
                         endOffset = textNode.data.length;
                         endPass = true;
 
+                        if (!isRemoveFormat && collapsed) {
+                            newInnerNode = textNode;
+                            textNode.textContent = '\u200B';
+                        }
+
                         if (newNode !== textNode) newNode.appendChild(endContainer);
                         continue;
                     }
@@ -1029,16 +1032,13 @@ const core = function (context, plugins, lang) {
             })(element, pNode);
 
             if (isRemoveFormat) {
-                startContainer = util.createTextNode(newInnerNode.textContent);
+                startContainer = util.createTextNode(collapsed ? '\u200B' : newInnerNode.textContent);
                 pNode.insertBefore(startContainer, newInnerNode);
                 pNode.removeChild(newInnerNode);
-            }
-
-            if (collapsed) {
-
-            } else if (isRemoveFormat || isSameNode) {
-                endContainer = startContainer;
-                endOffset = startContainer.textContent.length;
+            } else if (collapsed) {
+                startContainer = endContainer = newInnerNode;
+                startOffset = 0;
+                endOffset = 1;
             }
 
             util.removeEmptyNode(pNode);
@@ -1048,8 +1048,8 @@ const core = function (context, plugins, lang) {
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: endContainer,
-                endOffset: endOffset
+                endContainer: isRemoveFormat ? startContainer : endContainer,
+                endOffset: isRemoveFormat ? startContainer.textContent.length : endOffset
             };
         },
 
@@ -1061,7 +1061,7 @@ const core = function (context, plugins, lang) {
          * @param {Boolean} isRemoveFormat - Is the remove format command ?
          * @private
          */
-        _wrapLineNodes: function (element, newInnerNode, validation, isRemoveFormat) {
+        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat) {
             if (isRemoveFormat) {
                 newInnerNode = util.createTextNode(element.textContent);
             } else {
@@ -1096,7 +1096,7 @@ const core = function (context, plugins, lang) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _wrapLineNodesStart: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat) {
             const el = element;
             const pNode = element.cloneNode(false);
 
@@ -1222,7 +1222,7 @@ const core = function (context, plugins, lang) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _wrapLineNodesEnd: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat) {
+        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat) {
             const el = element;
             const pNode = element.cloneNode(false);
 
