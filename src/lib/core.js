@@ -707,11 +707,11 @@ const core = function (context, plugins, lang) {
          * @description Copies the node of the argument value and append all selected nodes and insert
          * 1. When there is the same css value node in the selection area, the tag is stripped.
          * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
-         * 3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) wrapRangeToTag(document.createElement('removenode'))
+         * 3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) nodeChange(document.createElement('removenode'))
          * @param {Element} appendNode - The dom that will wrap the selected text area
          * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
          */
-        wrapRangeToTag: function (appendNode, checkCSSPropertyArray) {
+        nodeChange: function (appendNode, checkCSSPropertyArray) {
             const range = this.getRange();
             const isRemoveFormat = /removenode/i.test(appendNode.nodeName);
             let tempCon, tempOffset, tempChild, tempArray;
@@ -1410,7 +1410,7 @@ const core = function (context, plugins, lang) {
                 if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
             }
             
-            this.wrapRangeToTag(util.createElement('REMOVENODE'));
+            this.nodeChange(util.createElement('REMOVENODE'));
         },
 
         /**

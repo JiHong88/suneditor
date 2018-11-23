@@ -70,7 +70,7 @@ export default {
         util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         const newNode = util.createElement('SPAN');
         newNode.style.fontFamily = target.getAttribute('data-value');
-        this.wrapRangeToTag(newNode, ['font-family']);
+        this.nodeChange(newNode, ['font-family']);
         
         this.submenuOff();
         this.focus();
