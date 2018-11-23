@@ -887,7 +887,7 @@ const core = function (context, plugins, lang) {
                     // startContainer
                     if (!startPass && child === startContainer) {
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
-                        const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (endOffset - startOffset)));
+                        const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, (endOffset > startOffset ? endOffset - startOffset : startOffset - endOffset)));
 
                         if (prevNode.data.length > 0) {
                             node.appendChild(prevNode);
