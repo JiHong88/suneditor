@@ -1203,7 +1203,7 @@ const core = function (context, plugins, lang) {
                 pNode.removeChild(newInnerNode);
             }
 
-            if (pNode.children.length === 0) {
+            if (!isRemoveFormat && pNode.children.length === 0) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
@@ -1339,7 +1339,7 @@ const core = function (context, plugins, lang) {
                 pNode.removeChild(newInnerNode);
             }
 
-            if (pNode.childNodes.length === 0) {
+            if (!isRemoveFormat && pNode.childNodes.length === 0) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
