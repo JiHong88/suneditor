@@ -103,7 +103,7 @@ export default {
             tableHTML += '<tr>';
             let tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td><div>' + util.zeroWidtText + '</div></td>';
+                tableHTML += '<td><div>' + util.zeroWidthSpace + '</div></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';
@@ -225,7 +225,7 @@ export default {
             let cells = '';
 
             for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td><div>' + util.zeroWidtText + '</div></td>';
+                cells += '<td><div>' + util.zeroWidthSpace + '</div></td>';
             }
 
             const newRow = contextTable._element.insertRow(rowIndex);
@@ -239,7 +239,7 @@ export default {
             
             for (let i = 0, len = contextTable._trCnt; i < len; i++) {
                 cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>' + util.zeroWidtText + '</div>';
+                cell.innerHTML = '<div>' + util.zeroWidthSpace + '</div>';
             }
         }
 

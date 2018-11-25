@@ -484,7 +484,7 @@ const core = function (context, plugins, lang) {
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
             const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
-            oFormat.innerHTML = util.zeroWidtText;
+            oFormat.innerHTML = util.zeroWidthSpace;
 
             if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
             else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
@@ -654,7 +654,7 @@ const core = function (context, plugins, lang) {
 
             if (!rangeLines) {
                 const inner = util.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
-                inner.innerHTML = util.zeroWidtText;
+                inner.innerHTML = util.zeroWidthSpace;
                 wrapTag.appendChild(inner);
                 this.getSelectionNode().appendChild(wrapTag);
                 return;
@@ -978,7 +978,7 @@ const core = function (context, plugins, lang) {
 
                         if (!isRemoveFormat && collapsed) {
                             newInnerNode = textNode;
-                            textNode.textContent = util.zeroWidtText;
+                            textNode.textContent = util.zeroWidthSpace;
                         }
 
                         if (newNode !== textNode) newNode.appendChild(endContainer);
@@ -1032,7 +1032,7 @@ const core = function (context, plugins, lang) {
             })(element, pNode);
 
             if (isRemoveFormat) {
-                startContainer = util.createTextNode(collapsed ? util.zeroWidtText : newInnerNode.textContent);
+                startContainer = util.createTextNode(collapsed ? util.zeroWidthSpace : newInnerNode.textContent);
                 pNode.insertBefore(startContainer, newInnerNode);
                 pNode.removeChild(newInnerNode);
                 if (collapsed) startOffset = 1;
@@ -1065,7 +1065,7 @@ const core = function (context, plugins, lang) {
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat) {
             if (isRemoveFormat) {
-                newInnerNode = util.createTextNode(element.textContent ? element.textContent : util.zeroWidtText);
+                newInnerNode = util.createTextNode(element.textContent ? element.textContent : util.zeroWidthSpace);
             } else {
                 (function recursionFunc(current, node) {
                     const childNodes = current.childNodes;
@@ -1207,7 +1207,7 @@ const core = function (context, plugins, lang) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
-                    container = util.createTextNode(util.zeroWidtText);
+                    container = util.createTextNode(util.zeroWidthSpace);
                     element.appendChild(container);
                 }
             } else {
@@ -1343,7 +1343,7 @@ const core = function (context, plugins, lang) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
-                    container = util.createTextNode(util.zeroWidtText);
+                    container = util.createTextNode(util.zeroWidthSpace);
                     element.appendChild(container);
                 }
             } else {
@@ -1475,7 +1475,7 @@ const core = function (context, plugins, lang) {
 
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>' + util.zeroWidtText + '</p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>' + util.zeroWidthSpace + '</p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
@@ -1862,7 +1862,7 @@ const core = function (context, plugins, lang) {
                     if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && selectionNode.previousSibling === null) {
                         e.preventDefault();
                         e.stopPropagation();
-                        selectionNode.innerHTML = util.zeroWidtText;
+                        selectionNode.innerHTML = util.zeroWidthSpace;
                         return false;
                     }
                     
@@ -1936,7 +1936,7 @@ const core = function (context, plugins, lang) {
                 e.stopPropagation();
 
                 const oFormatTag = util.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
-                oFormatTag.innerHTML = util.zeroWidtText;
+                oFormatTag.innerHTML = util.zeroWidthSpace;
 
                 selectionNode.appendChild(oFormatTag);
                 editor.setSelectionNode(oFormatTag);

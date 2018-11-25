@@ -13,7 +13,11 @@
 const util = {
     _d: document,
     _w: window,
-    zeroWidtText: '\u200B',
+
+    /**
+     * @description Unicode Character 'ZERO WIDTH SPACE'
+     */
+    zeroWidthSpace: '\u200B',
 
     /**
      * @description Gets XMLHttpRequest object
@@ -150,7 +154,7 @@ const util = {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
 
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidtText) + '</p>';
+        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
         return innerHTML;
     },
