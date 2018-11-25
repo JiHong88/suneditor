@@ -231,12 +231,8 @@ const core = function (context, plugins, lang) {
          * @param {String} command - javascript execCommand function property
          * @param {Boolean} showDefaultUI - javascript execCommand function property
          * @param {String} value - javascript execCommand function property
-         * @param {Boolean} styleWithCss = Use styleWithCss
          */
         execCommand: function (command, showDefaultUI, value, styleWithCss) {
-            if (styleWithCss) _d.execCommand('styleWithCss', false, true);
-            else _d.execCommand('styleWithCss', false, false);
-
             _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
         },
 
@@ -850,6 +846,7 @@ const core = function (context, plugins, lang) {
          * @param {Element} endCon - The endContainer property of the selection object.
          * @param {Number} endOff - The endOffset property of the selection object.
          * @param {Boolean} isRemoveFormat - Is the remove format command ?
+         * @param {Boolean} collapsed - range.collapsed
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
