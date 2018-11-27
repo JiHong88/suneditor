@@ -1368,7 +1368,7 @@ const core = function (context, plugins, lang) {
                     this.toggleCodeView();
                     util.toggleClass(target, 'on');
                     break;
-                    case 'fullScreen':
+                case 'fullScreen':
                     this.controllersOff();
                     this.toggleFullScreen(target);
                     util.toggleClass(target, 'on');
@@ -1408,7 +1408,7 @@ const core = function (context, plugins, lang) {
                     this.execCommand(command, false, null);
                     util.toggleClass(target, 'on');
                     break;
-                default :
+                default : // 'bold', 'underline', 'italic', 'strike'
                     this.execCommand(command, false, target.getAttribute('data-value'));
                     util.toggleClass(target, 'on');
             }
