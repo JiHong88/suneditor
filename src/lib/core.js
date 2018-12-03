@@ -1807,6 +1807,27 @@ const core = function (context, plugins, lang) {
             }
 
             editor._setEditorRange();
+
+            if (context.user.inlineToolbar) {
+                const range = editor.getRange();
+                const toolbar = context.element.toolbar;
+
+                if (range.collapsed) {
+                    toolbar.style.display = 'none';
+                } else {
+                    const offset = util.getOffset(editor.getSelectionNode());
+                    var rects = range.getClientRects();
+
+                    toolbar.style.left = (rects[0].left - context.element.wysiwyg.scrollLeft - 20) + 'px';
+                    toolbar.style.top = (rects[0].top + toolbar.offsetHeight - context.element.topArea.offsetHeight) + 'px';
+                    
+                    // context.element._arrow.style.top = offset.top + 'px';
+                    
+                    toolbar.style.display = 'block';
+                    return;
+                }
+            }
+
             event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -2066,6 +2087,22 @@ const core = function (context, plugins, lang) {
                 e.stopPropagation();
                 e.preventDefault();
             }
+        },
+
+        onFocus_wysiwyg: function (e) {
+            // const offset = util.getOffset(editor.getSelectionNode());
+            // const toolbar = context.element.toolbar;
+
+            // // context.element._arrow.style.left = offset.left + 'px';
+            // // context.element._arrow.style.top = offset.top + 'px';
+
+            // toolbar.style.left = (offset.left - context.element.wysiwyg.scrollLeft) + 'px';
+            // toolbar.style.top = (offset.top + toolbar.offsetHeight + 10) + 'px';
+            // toolbar.style.display = 'block';
+        },
+
+        onBlur_wysiwyg: function (e) {
+            context.element.toolbar.style.display = 'none';
         }
     };
 
@@ -2079,6 +2116,12 @@ const core = function (context, plugins, lang) {
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+    
+    /** inlineToolbar */
+    if (context.user.inlineToolbar) {
+        context.element.wysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
+        // context.element.wysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
+    }
 
     /** code view area auto line */
     if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);

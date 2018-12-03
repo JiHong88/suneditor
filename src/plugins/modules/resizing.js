@@ -86,7 +86,7 @@ export default {
         resize_button.className = "resize-btn";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
-            '<div class="arrow"></div>' +
+            '<div class="arrow arrow-up"></div>' +
             '<div class="btn-group sun-editor-id-resize-button-group">' +
             '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
             '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +

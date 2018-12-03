@@ -29,7 +29,8 @@ const _Context = function (element, cons, options) {
             code: cons._codeArea,
             loading: cons._loading,
             resizeBackground: cons._resizeBack,
-            _stickyDummy: cons._stickyDummy
+            _stickyDummy: cons._stickyDummy,
+            _arrow: cons._arrow
         },
         tool: {
             cover: cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
@@ -44,6 +45,7 @@ const _Context = function (element, cons, options) {
             fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
         },
         user: {
+            inlineToolbar: options.inlineToolbar,
             stickyToolbar: options.stickyToolbar,
             resizingBar: options.resizingBar,
             showPathLabel: options.showPathLabel,

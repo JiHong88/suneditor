@@ -98,8 +98,13 @@
 
 /* controller arrow */
 .sun-editor .arrow, .sun-editor .arrow:after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
-.sun-editor .arrow {top:-11px; left:20px !important; margin-left:-11px; border-top-width:0; border-bottom-color:#999; border-bottom-color:rgba(0, 0, 0, .25);}
-.sun-editor .arrow:after {top:1px; margin-left:-11px; content:" "; border-top-width:0; border-bottom-color:#fff;}
+.sun-editor .arrow.arrow-up {top:-11px; left:20px; margin-left:-11px; border-top-width:0; border-bottom-color:#999; border-bottom-color:rgba(0, 0, 0, .25);}
+.sun-editor .arrow.arrow-up:after {top:1px; margin-left:-11px; content:" "; border-top-width:0; border-bottom-color:#fff;}
+.sun-editor .arrow.arrow-down {top:0px; left:0px; margin-left:-11px; border-bottom-width:0; border-top-color:#999; border-top-color:rgba(0, 0, 0, .25);}
+.sun-editor .arrow.arrow-down:after {top:-12px; margin-left:-11px; content:" "; border-bottom-width:0; border-top-color:#fff;}
+
+.sun-editor .sun-editor-id-toolbar .arrow.arrow-up:after {border-bottom-color:#fafafa;}
+.sun-editor .sun-editor-id-toolbar .arrow.arrow-down:after {border-top-color:#fafafa;}
 
 /* tool bar */
 .sun-editor .sun-editor-id-toolbar {display:block; overflow:visible; position:relative; height:auto; padding:4px 3px 0 3px; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:2;}
@@ -108,6 +113,10 @@
 .sun-editor .sun-editor-id-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
 .sun-editor .sun-editor-toolbar-separator-vertical {display:inline-block; height:31px; width:1px; margin:2px; vertical-align:top;}
 
+/* inline tool bar */
+.sun-editor .sun-editor-id-toolbar.sun-inline-toolbar {display:none; position:absolute;}
+
+/* tool bar module */
 .sun-editor .tool_module {display:inline-block;}
 .sun-editor .sun-editor-module-border {border:1px solid #dadada; border-radius:5px;}
 .sun-editor .tool_module_enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}

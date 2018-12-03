@@ -24,8 +24,10 @@ const _Constructor = {
     
         /** user options */
         options.lang = lang;
-        options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
-        options.resizingBar = options.resizingBar === undefined ? true : options.resizingBar;
+        options.inlineToolbar = !!options.inlineToolbar;
+        options.inlineWidth = options.inlineWidth || '500px';
+        options.stickyToolbar = options.inlineToolbar ? -1 : options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.resizingBar = options.inlineToolbar ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.popupDisplay = options.popupDisplay || 'full';
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
@@ -67,7 +69,17 @@ const _Constructor = {
         relative.className = 'sun-editor-container';
     
         /** toolbar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
+        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.inlineToolbar);
+
+        let arrow = null;
+        if (options.inlineToolbar) {
+            tool_bar.element.className += ' sun-inline-toolbar';
+            tool_bar.element.style.width = options.inlineWidth;
+
+            arrow = doc.createElement('DIV');
+            arrow.className = 'arrow arrow-down';
+            tool_bar.element.appendChild(arrow);
+        }
 
         /** sticky toolbar dummy */
         const sticky_dummy = doc.createElement('DIV');
@@ -144,7 +156,8 @@ const _Constructor = {
                 _navigation: navigation,
                 _loading: loading_box,
                 _resizeBack: resize_back,
-                _stickyDummy: sticky_dummy
+                _stickyDummy: sticky_dummy,
+                _arrow: arrow
             },
             options: options,
             plugins: tool_bar.plugins
