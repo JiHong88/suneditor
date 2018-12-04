@@ -46,8 +46,10 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'preview', 'print']
     ],
     width: '100%',
-    inlineToolbar: true
-    ,height: 'auto'
+    inlineToolbar: true,
+    stickyToolbar: 0,
+    inlineWidth: 500,
+    height: 'auto'
 });
 
 ss.onScroll = function (e) {

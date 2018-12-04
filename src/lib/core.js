@@ -137,7 +137,8 @@ const core = function (context, plugins, lang) {
             _codeOriginCssText: '',
             _sticky: false,
             _imagesInfo: [],
-            _imageIndex: 0
+            _imageIndex: 0,
+            _inlineToolbarAttr: {}
         },
 
         /**
@@ -1807,27 +1808,6 @@ const core = function (context, plugins, lang) {
             }
 
             editor._setEditorRange();
-
-            if (context.user.inlineToolbar) {
-                const range = editor.getRange();
-                const toolbar = context.element.toolbar;
-
-                if (range.collapsed) {
-                    toolbar.style.display = 'none';
-                } else {
-                    const offset = util.getOffset(editor.getSelectionNode());
-                    var rects = range.getClientRects();
-
-                    toolbar.style.left = (rects[0].left - context.element.wysiwyg.scrollLeft - 20) + 'px';
-                    toolbar.style.top = (rects[0].top + toolbar.offsetHeight - context.element.topArea.offsetHeight) + 'px';
-                    
-                    // context.element._arrow.style.top = offset.top + 'px';
-                    
-                    toolbar.style.display = 'block';
-                    return;
-                }
-            }
-
             event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -2046,7 +2026,7 @@ const core = function (context, plugins, lang) {
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
-            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop) {
+            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop + (context.user.inlineToolbar ? element.toolbar.offsetHeight : 0)) {
                 if (!editor._variable._sticky) event._onStickyToolbar(element);
                 element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
             }
@@ -2056,18 +2036,21 @@ const core = function (context, plugins, lang) {
         },
 
         _onStickyToolbar: function (element) {
-            element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
-            element._stickyDummy.style.display = 'block';
-            element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
+            if (!context.user.inlineToolbar) {
+                element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
+                element._stickyDummy.style.display = 'block';
+            }
+
             element.toolbar.style.top = context.user.stickyToolbar + 'px';
+            element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
             element._stickyDummy.style.display = 'none';
-            element.toolbar.style.top = '';
-            element.toolbar.style.width = '';
+            element.toolbar.style.top = context.user.inlineToolbar ? editor._variable._inlineToolbarAttr.top : '';
+            element.toolbar.style.width = context.user.inlineToolbar ? editor._variable._inlineToolbarAttr.width : '';;
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = false;
@@ -2090,25 +2073,44 @@ const core = function (context, plugins, lang) {
         },
 
         onFocus_wysiwyg: function (e) {
-            // const offset = util.getOffset(editor.getSelectionNode());
-            // const toolbar = context.element.toolbar;
+            // if (context.user.inlineToolbar) {
+            //     const range = editor.getRange();
+            //     const toolbar = context.element.toolbar;
 
-            // // context.element._arrow.style.left = offset.left + 'px';
-            // // context.element._arrow.style.top = offset.top + 'px';
+            //     if (range.collapsed) {
+            //         toolbar.style.display = 'none';
+            //     } else {
+            //         const offset = util.getOffset(editor.getSelectionNode());
+            //         var rects = range.getClientRects();
 
-            // toolbar.style.left = (offset.left - context.element.wysiwyg.scrollLeft) + 'px';
-            // toolbar.style.top = (offset.top + toolbar.offsetHeight + 10) + 'px';
-            // toolbar.style.display = 'block';
+            //         toolbar.style.left = (rects[0].left - context.element.wysiwyg.scrollLeft - 20) + 'px';
+            //         toolbar.style.top = (rects[0].top + toolbar.offsetHeight - context.element.topArea.offsetHeight) + 'px';
+                    
+            //         // context.element._arrow.style.top = offset.top + 'px';
+                    
+            //         toolbar.style.display = 'block';
+            //         return;
+            //     }
+            // }
+
+            const offset = util.getOffset(editor.getSelectionNode());
+            const toolbar = context.element.toolbar;
+
+            // toolbar.style.left = (-context.element.wysiwyg.scrollLeft) + 'px';
+            toolbar.style.display = 'block';
+            editor._variable._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            editor._variable._inlineToolbarAttr.width = toolbar.offsetWidth + 'px';
         },
 
         onBlur_wysiwyg: function (e) {
-            context.element.toolbar.style.display = 'none';
+            // context.element.toolbar.style.display = 'none';
         }
     };
 
     /** add event listeners */
     /** toolbar event */
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
+    context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault() }, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
@@ -2120,7 +2122,7 @@ const core = function (context, plugins, lang) {
     /** inlineToolbar */
     if (context.user.inlineToolbar) {
         context.element.wysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
-        // context.element.wysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
+        context.element.wysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
     }
 
     /** code view area auto line */

@@ -24,28 +24,36 @@ const _Constructor = {
     
         /** user options */
         options.lang = lang;
+        // toolbar
         options.inlineToolbar = !!options.inlineToolbar;
-        options.inlineWidth = options.inlineWidth || '500px';
-        options.stickyToolbar = options.inlineToolbar ? -1 : options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.inlineWidth = options.inlineWidth ? (/^\d+$/.test(options.inlineWidth) ? options.inlineWidth + 'px' : options.inlineWidth) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        // bottom resizing bar
         options.resizingBar = options.inlineToolbar ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        // popup, editor display
         options.popupDisplay = options.popupDisplay || 'full';
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
+        // size
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        // font, size, color list
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
+        // images
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth || 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadUrl = options.imageUploadUrl || null;
+        // video
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
+        // buttons
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
