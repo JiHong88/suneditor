@@ -75,8 +75,8 @@ const core = function (context, plugins, lang) {
          */
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
-        _isInline: /inline/i.test(context.user.mode),
-        _isBalloon: /balloon/i.test(context.user.mode),
+        _isInline: /inline/i.test(context.option.mode),
+        _isBalloon: /balloon/i.test(context.option.mode),
         _inlineToolbarAttr: {},
 
         /**
@@ -1480,7 +1480,7 @@ const core = function (context, plugins, lang) {
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
-                if (context.user.height === 'auto') context.element.code.style.height = '0px';
+                if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
             }
@@ -1488,7 +1488,7 @@ const core = function (context, plugins, lang) {
                 context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg.innerHTML.trim());
                 context.element.wysiwyg.style.display = 'none';
                 context.element.code.style.display = 'block';
-                if (context.user.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                if (context.option.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
             }
@@ -1536,7 +1536,7 @@ const core = function (context, plugins, lang) {
                 context.element.topArea.style.cssText = this._variable._originCssText;
                 _d.body.style.overflow = this._variable._bodyOverflow;
 
-                if (context.user.stickyToolbar > -1) {
+                if (context.option.stickyToolbar > -1) {
                     util.removeClass(context.element.toolbar, 'sun-editor-sticky');
                     event.onScroll_window();
                 }
@@ -1723,7 +1723,7 @@ const core = function (context, plugins, lang) {
             editor._variable.currentNodes = currentNodes.reverse();
 
             /**  Displays the current node structure to resizingBar */
-            if (context.user.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
+            if (context.option.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
         },
 
         _cancelCaptionEdit: function () {
@@ -2024,14 +2024,14 @@ const core = function (context, plugins, lang) {
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const editorTop = element.topArea.offsetTop - (editor._isInline ? element.toolbar.offsetHeight : 0);
-            const y = (this.scrollY || _d.documentElement.scrollTop) + context.user.stickyToolbar;
+            const y = (this.scrollY || _d.documentElement.scrollTop) + context.option.stickyToolbar;
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
             else if (y + editor._variable.minResizingSize >= editorHeight + editorTop) {
                 if (!editor._variable._sticky) event._onStickyToolbar(element);
-                element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
+                element.toolbar.style.top = (editorHeight + editorTop + context.option.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
                 event._onStickyToolbar(element);
@@ -2044,7 +2044,7 @@ const core = function (context, plugins, lang) {
                 element._stickyDummy.style.display = 'block';
             }
 
-            element.toolbar.style.top = context.user.stickyToolbar + 'px';
+            element.toolbar.style.top = context.option.stickyToolbar + 'px';
             element.toolbar.style.width = editor._isInline ? editor._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = true;
@@ -2089,11 +2089,11 @@ const core = function (context, plugins, lang) {
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
     
     /** code view area auto line */
-    if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
+    if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
 
     /** resizingBar */
     if (context.element.resizingBar) {
-        if (/\d+/.test(context.user.height)) {
+        if (/\d+/.test(context.option.height)) {
             context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
         } else {
             util.addClass(context.element.resizingBar, 'none-resize');
@@ -2105,7 +2105,7 @@ const core = function (context, plugins, lang) {
         function onFocus_wysiwyg () {
             const toolbar = context.element.toolbar;
             toolbar.style.display = 'block';
-            editor._inlineToolbarAttr.width = context.user.toolbarWidth;
+            editor._inlineToolbarAttr.width = context.option.toolbarWidth;
             editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             event.onScroll_window();
         }
@@ -2120,7 +2120,7 @@ const core = function (context, plugins, lang) {
     
     /** window event */
     _w.addEventListener('resize', event.onResize_window, false);
-    if (context.user.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
+    if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
 
     /** add plugin to plugins object */
     if (plugins) {
@@ -2260,7 +2260,7 @@ const core = function (context, plugins, lang) {
          */
         show: function () {
             const topAreaStyle = context.element.topArea.style;
-            if (topAreaStyle.display === 'none') topAreaStyle.display = context.user.display;
+            if (topAreaStyle.display === 'none') topAreaStyle.display = context.option.display;
         },
 
         /**

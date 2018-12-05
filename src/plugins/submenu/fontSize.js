@@ -13,7 +13,7 @@ export default {
     name: 'fontSize',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.context.user));
+        let listDiv = eval(this.setSubmenu(core.context.option));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,12 +25,12 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (user) {
+    setSubmenu: function (option) {
         const listDiv = util.createElement('DIV');
         listDiv.className = 'layer_editor layer_size';
         listDiv.style.display = 'none';
 
-        const sizeList = !user.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : user.fontSize;
+        const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
         let list = '<div class="inner_layer">' +
             '   <ul class="list_editor font_size_list">';

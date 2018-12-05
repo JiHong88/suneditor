@@ -22,23 +22,23 @@ export default {
             _cover: null,
             _element: null,
             _resizingDiv: null,
-            _element_w: context.user.videoWidth,
-            _element_h: context.user.videoHeight,
+            _element_w: context.option.videoWidth,
+            _element_h: context.option.videoHeight,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: context.user.videoWidth,
-            _origin_h: context.user.videoHeight,
+            _origin_w: context.option.videoWidth,
+            _origin_h: context.option.videoHeight,
             _caption: null,
             captionCheckEl: null,
             _captionChecked: false,
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: 'float\\-[a-z]+',
-            _resizing: context.user.videoResizing
+            _resizing: context.option.videoResizing
         };
 
         /** video dialog */
-        let video_dialog = eval(this.setDialog(core.context.user, core.lang));
+        let video_dialog = eval(this.setDialog(core.context.option, core.lang));
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.captionCheckEl = video_dialog.getElementsByClassName('suneditor-id-video-check-caption')[0];
@@ -49,13 +49,13 @@ export default {
         context.video.videoWidth = {};
         context.video.videoHeight = {};
 
-        if (context.user.videoResizing) {
+        if (context.option.videoResizing) {
             context.video.videoWidth = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
             context.video.videoHeight = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
             context.video.proportion = video_dialog.getElementsByClassName('suneditor-id-video-check-proportion')[0];
 
-            context.video.videoWidth.value = context.user.videoWidth;
-            context.video.videoHeight.value = context.user.videoHeight;
+            context.video.videoWidth.value = context.option.videoWidth;
+            context.video.videoHeight.value = context.option.videoHeight;
 
             context.video.videoWidth.addEventListener('change', this.setInputSize.bind(core, 'x'));
             context.video.videoHeight.addEventListener('change', this.setInputSize.bind(core, 'y'));
@@ -70,7 +70,7 @@ export default {
     },
 
     /** dialog */
-    setDialog: function (user, lang) {
+    setDialog: function (option, lang) {
         const dialog = util.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-video';
@@ -89,7 +89,7 @@ export default {
             '           <input class="form-control sun-editor-id-video-url" type="text" />' +
             '       </div>';
 
-            if (user.videoResizing) {
+            if (option.videoResizing) {
                 html += '' +
                 '   <div class="form-group">' +
                 '       <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
@@ -142,8 +142,8 @@ export default {
             if (this.context.video.focusElement.value.trim().length === 0) return false;
 
             const contextVideo = this.context.video;
-            const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.user.videoWidth);
-            const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.user.videoHeight);
+            const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
+            const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
             let resizingDiv = null;
             let oIframe = null;
             let cover = null;
@@ -366,8 +366,8 @@ export default {
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
         
         if (contextVideo._resizing) {
-            contextVideo.videoWidth.value = this.context.user.videoWidth;
-            contextVideo.videoHeight.value = this.context.user.videoHeight;
+            contextVideo.videoWidth.value = this.context.option.videoWidth;
+            contextVideo.videoHeight.value = this.context.option.videoHeight;
             contextVideo.proportion.checked = true;
             contextVideo.proportion.disabled = true;
         }

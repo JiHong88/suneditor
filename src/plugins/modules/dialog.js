@@ -57,7 +57,7 @@ export default {
 
         this.context.dialog.updateModal = update;
 
-        if (this.context.user.popupDisplay === 'full') {
+        if (this.context.option.popupDisplay === 'full') {
             this.context.dialog.modalArea.style.position = 'fixed';
         } else {
             this.context.dialog.modalArea.style.position = 'absolute';

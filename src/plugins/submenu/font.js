@@ -13,7 +13,7 @@ export default {
     name: 'font',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.context.user));
+        let listDiv = eval(this.setSubmenu(core.context.option));
 
         /** add event listeners */
         listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,13 +25,13 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (user) {
+    setSubmenu: function (option) {
         const listDiv = util.createElement('DIV');
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
         let font, text, i, len;
-        let fontList = !user.font ?
+        let fontList = !option.font ?
             [
                 'Arial',
                 'Comic Sans MS',
@@ -41,7 +41,7 @@ export default {
                 'tahoma',
                 'Trebuchet MS,Helvetica',
                 'Verdana'
-            ] : user.font;
+            ] : option.font;
 
         let list = '<div class="inner_layer list_family">' +
             '   <ul class="list_editor sun-editor-list-font-family">';
