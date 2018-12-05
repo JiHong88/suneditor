@@ -47,7 +47,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     ],
     width: '500',
     stickyToolbar: 0,
-    mode: 'inline',
+    mode: 'balloon',
     // toolbarWidth: 1000,
     height: 'auto'
 });

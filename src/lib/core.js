@@ -1811,6 +1811,27 @@ const core = function (context, plugins, lang) {
             }
 
             editor._setEditorRange();
+
+            if (editor._isBalloon) {
+                const range = editor.getRange();
+                const toolbar = context.element.toolbar;
+
+                if (range.collapsed) {
+                    toolbar.style.display = 'none';
+                } else {
+                    const offset = util.getOffset(editor.getSelectionNode());
+                    const rects = range.getClientRects();
+                    
+                    toolbar.style.left = (rects[0].left - context.element.wysiwyg.offsetLeft - context.element.wysiwyg.offsetWidth) + 'px';
+                    toolbar.style.top = (rects[0].top - context.element.wysiwyg.offsetTop - context.element.wysiwyg.offsetHeight) + 'px';
+                    // context.element._arrow.style.top = offset.top + 'px';
+
+                    toolbar.style.display = 'block';
+
+                    return;
+                }
+            }
+
             event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -2110,12 +2131,11 @@ const core = function (context, plugins, lang) {
             event.onScroll_window();
         }
 
-        function onBlur_wysiwyg () {
-            // context.element.toolbar.style.display = 'none';
-        }
-
         context.element.wysiwyg.addEventListener('focus', onFocus_wysiwyg, false);
-        context.element.wysiwyg.addEventListener('blur', onBlur_wysiwyg, false);
+    }
+
+    if (editor._isInline || editor._isBalloon) {
+        context.element.wysiwyg.addEventListener('blur', function () { context.element.toolbar.style.display = 'none'; }, false);
     }
     
     /** window event */

@@ -27,7 +27,7 @@ const _Constructor = {
         // toolbar
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'max-content';
-        options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
         // bottom resizing bar
         options.resizingBar = options.inlineToolbar ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
