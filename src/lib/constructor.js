@@ -25,8 +25,8 @@ const _Constructor = {
         /** user options */
         options.lang = lang;
         // toolbar
-        options.inlineToolbar = !!options.inlineToolbar;
-        options.inlineWidth = options.inlineWidth ? (/^\d+$/.test(options.inlineWidth) ? options.inlineWidth + 'px' : options.inlineWidth) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.mode = options.mode || 'classic'; // classic, inline, balloon
+        options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'max-content';
         options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
         // bottom resizing bar
         options.resizingBar = options.inlineToolbar ? false : options.resizingBar === undefined ? true : options.resizingBar;
@@ -77,16 +77,17 @@ const _Constructor = {
         relative.className = 'sun-editor-container';
     
         /** toolbar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang, options.inlineToolbar);
+        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
 
         let arrow = null;
-        if (options.inlineToolbar) {
+        if (/inline|balloon/i.test(options.mode)) {
             tool_bar.element.className += ' sun-inline-toolbar';
-            tool_bar.element.style.width = options.inlineWidth;
-
-            arrow = doc.createElement('DIV');
-            arrow.className = 'arrow arrow-down';
-            tool_bar.element.appendChild(arrow);
+            tool_bar.element.style.width = options.toolbarWidth;
+            if (/balloon/i.test(options.mode)) {
+                arrow = doc.createElement('DIV');
+                arrow.className = 'arrow arrow-down';
+                tool_bar.element.appendChild(arrow);
+            }
         }
 
         /** sticky toolbar dummy */

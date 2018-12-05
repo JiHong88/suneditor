@@ -45,10 +45,10 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print']
     ],
-    width: '100%',
-    inlineToolbar: true,
+    width: '500',
     stickyToolbar: 0,
-    inlineWidth: 500,
+    mode: 'inline',
+    // toolbarWidth: 1000,
     height: 'auto'
 });
 

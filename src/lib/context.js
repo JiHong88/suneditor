@@ -45,7 +45,8 @@ const _Context = function (element, cons, options) {
             fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
         },
         user: {
-            inlineToolbar: options.inlineToolbar,
+            mode: options.mode,
+            toolbarWidth: options.toolbarWidth,
             stickyToolbar: options.stickyToolbar,
             resizingBar: options.resizingBar,
             showPathLabel: options.showPathLabel,

@@ -75,6 +75,10 @@ const core = function (context, plugins, lang) {
          */
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
+        _isInline: /inline/i.test(context.user.mode),
+        _isBalloon: /balloon/i.test(context.user.mode),
+        _inlineToolbarAttr: {},
+
         /**
          * @description An user event function when image uploaded success or remove image
          * @private
@@ -137,8 +141,7 @@ const core = function (context, plugins, lang) {
             _codeOriginCssText: '',
             _sticky: false,
             _imagesInfo: [],
-            _imageIndex: 0,
-            _inlineToolbarAttr: {}
+            _imageIndex: 0
         },
 
         /**
@@ -2020,13 +2023,13 @@ const core = function (context, plugins, lang) {
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
-            const editorTop = element.topArea.offsetTop;
+            const editorTop = element.topArea.offsetTop - (editor._isInline ? element.toolbar.offsetHeight : 0);
             const y = (this.scrollY || _d.documentElement.scrollTop) + context.user.stickyToolbar;
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
-            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop + (context.user.inlineToolbar ? element.toolbar.offsetHeight : 0)) {
+            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop) {
                 if (!editor._variable._sticky) event._onStickyToolbar(element);
                 element.toolbar.style.top = (editorHeight + editorTop + context.user.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
             }
@@ -2036,21 +2039,21 @@ const core = function (context, plugins, lang) {
         },
 
         _onStickyToolbar: function (element) {
-            if (!context.user.inlineToolbar) {
+            if (!editor._isInline) {
                 element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
                 element._stickyDummy.style.display = 'block';
             }
 
             element.toolbar.style.top = context.user.stickyToolbar + 'px';
-            element.toolbar.style.width = element.toolbar.offsetWidth + 'px';
+            element.toolbar.style.width = editor._isInline ? editor._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
             element._stickyDummy.style.display = 'none';
-            element.toolbar.style.top = context.user.inlineToolbar ? editor._variable._inlineToolbarAttr.top : '';
-            element.toolbar.style.width = context.user.inlineToolbar ? editor._variable._inlineToolbarAttr.width : '';;
+            element.toolbar.style.top = editor._isInline ? editor._inlineToolbarAttr.top : '';
+            element.toolbar.style.width = editor._isInline ? editor._inlineToolbarAttr.width : '';
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
             editor._variable._sticky = false;
@@ -2070,40 +2073,6 @@ const core = function (context, plugins, lang) {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        },
-
-        onFocus_wysiwyg: function (e) {
-            // if (context.user.inlineToolbar) {
-            //     const range = editor.getRange();
-            //     const toolbar = context.element.toolbar;
-
-            //     if (range.collapsed) {
-            //         toolbar.style.display = 'none';
-            //     } else {
-            //         const offset = util.getOffset(editor.getSelectionNode());
-            //         var rects = range.getClientRects();
-
-            //         toolbar.style.left = (rects[0].left - context.element.wysiwyg.scrollLeft - 20) + 'px';
-            //         toolbar.style.top = (rects[0].top + toolbar.offsetHeight - context.element.topArea.offsetHeight) + 'px';
-                    
-            //         // context.element._arrow.style.top = offset.top + 'px';
-                    
-            //         toolbar.style.display = 'block';
-            //         return;
-            //     }
-            // }
-
-            const offset = util.getOffset(editor.getSelectionNode());
-            const toolbar = context.element.toolbar;
-
-            // toolbar.style.left = (-context.element.wysiwyg.scrollLeft) + 'px';
-            toolbar.style.display = 'block';
-            editor._variable._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
-            editor._variable._inlineToolbarAttr.width = toolbar.offsetWidth + 'px';
-        },
-
-        onBlur_wysiwyg: function (e) {
-            // context.element.toolbar.style.display = 'none';
         }
     };
 
@@ -2119,12 +2088,6 @@ const core = function (context, plugins, lang) {
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
     
-    /** inlineToolbar */
-    if (context.user.inlineToolbar) {
-        context.element.wysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
-        context.element.wysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
-    }
-
     /** code view area auto line */
     if (context.user.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
 
@@ -2135,6 +2098,24 @@ const core = function (context, plugins, lang) {
         } else {
             util.addClass(context.element.resizingBar, 'none-resize');
         }
+    }
+
+    /** inlineToolbar */
+    if (editor._isInline) {
+        function onFocus_wysiwyg () {
+            const toolbar = context.element.toolbar;
+            toolbar.style.display = 'block';
+            editor._inlineToolbarAttr.width = context.user.toolbarWidth;
+            editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            event.onScroll_window();
+        }
+
+        function onBlur_wysiwyg () {
+            // context.element.toolbar.style.display = 'none';
+        }
+
+        context.element.wysiwyg.addEventListener('focus', onFocus_wysiwyg, false);
+        context.element.wysiwyg.addEventListener('blur', onBlur_wysiwyg, false);
     }
     
     /** window event */
