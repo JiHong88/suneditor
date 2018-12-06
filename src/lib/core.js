@@ -1819,14 +1819,14 @@ const core = function (context, plugins, lang) {
                 if (range.collapsed) {
                     toolbar.style.display = 'none';
                 } else {
-                    const offset = util.getOffset(editor.getSelectionNode());
-                    const rects = range.getClientRects();
+                    let rects = range.getClientRects();
+                    rects = rects[rects.length - 1];
                     
-                    toolbar.style.left = (rects[0].left - context.element.wysiwyg.offsetLeft - context.element.wysiwyg.offsetWidth) + 'px';
-                    toolbar.style.top = (rects[0].top - context.element.wysiwyg.offsetTop - context.element.wysiwyg.offsetHeight) + 'px';
-                    // context.element._arrow.style.top = offset.top + 'px';
-
                     toolbar.style.display = 'block';
+                    
+                    toolbar.style.left = (rects.left - context.element.topArea.offsetLeft + _w.scrollX - (toolbar.offsetWidth/2)) + 'px';
+                    toolbar.style.top = (rects.bottom - context.element.topArea.offsetTop + _w.scrollY + 10) + 'px';
+                    context.element._arrow.style.left = (toolbar.offsetWidth/2) + 'px';
 
                     return;
                 }

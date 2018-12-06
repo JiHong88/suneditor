@@ -29,7 +29,7 @@ const _Constructor = {
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'max-content';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
         // bottom resizing bar
-        options.resizingBar = options.inlineToolbar ? false : options.resizingBar === undefined ? true : options.resizingBar;
+        options.resizingBar = /inline|balloon/i.test(options.mode) ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         // popup, editor display
         options.popupDisplay = options.popupDisplay || 'full';
@@ -85,7 +85,7 @@ const _Constructor = {
             tool_bar.element.style.width = options.toolbarWidth;
             if (/balloon/i.test(options.mode)) {
                 arrow = doc.createElement('DIV');
-                arrow.className = 'arrow arrow-down';
+                arrow.className = 'arrow arrow-up';
                 tool_bar.element.appendChild(arrow);
             }
         }
