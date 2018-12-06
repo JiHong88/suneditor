@@ -1819,14 +1819,21 @@ const core = function (context, plugins, lang) {
                 if (range.collapsed) {
                     toolbar.style.display = 'none';
                 } else {
+                    const childNodes = util.getListChildNodes(range.commonAncestorContainer);
+                    const selection = _w.getSelection();
+                    const dir = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
+
                     let rects = range.getClientRects();
-                    rects = rects[rects.length - 1];
+                    rects = rects[dir ? 0 : rects.length - 1];
                     
                     toolbar.style.display = 'block';
+
+                    let l = (dir ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbar.offsetWidth / 2;
+                    l += l + toolbar.offsetWidth > context.element.topArea.offsetWidth ? context.element.topArea.offsetWidth - (l + toolbar.offsetWidth) - 20 : 0;
                     
-                    toolbar.style.left = (rects.left - context.element.topArea.offsetLeft + _w.scrollX - (toolbar.offsetWidth/2)) + 'px';
-                    toolbar.style.top = (rects.bottom - context.element.topArea.offsetTop + _w.scrollY + 10) + 'px';
-                    context.element._arrow.style.left = (toolbar.offsetWidth/2) + 'px';
+                    toolbar.style.left = (l < 0 ? 20 : l) + 'px';
+                    toolbar.style.top = ((dir ? rects.top : rects.bottom) - context.element.topArea.offsetTop + _w.scrollY + 10) + 'px';
+                    // context.element._arrow.style.left = (toolbar.offsetWidth + leftPosition) + 'px';
 
                     return;
                 }
