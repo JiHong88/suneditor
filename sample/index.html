@@ -18,6 +18,46 @@
     <link rel="stylesheet" href="css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .tab {
+            overflow: hidden;
+            color: #f4b124;
+            font-weight: bold;
+        }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 45px;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            color: #f5f5f5;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            color: #fff;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding-top: 12px;
+        }
+
+        /* inline editor */
+        .inline-margin {
+            margin-top: 10px;
+        }
+    </style>
     <script type="text/javascript" src="../dist/suneditor.min.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
@@ -55,9 +95,19 @@
     </div>
 </nav>
 
+
 <div class="content" style="max-width: 1265px;">
-    <form name="frm">
-        <textarea id="editor" style="display:none;">
+    <!-- Tab links -->
+    <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'classic')">Classic</button>
+        <button class="tablinks" onclick="openTab(event, 'balloon')">Ballon</button>
+        <button class="tablinks" onclick="openTab(event, 'inline')">Inline</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="classic" class="tabcontent" style="display: block;">
+        <div class="inline-margin"></div>
+        <textarea id="editor_classic" style="display:none;">
             <p><br></p>
             <div class="sun-editor-id-comp sun-editor-id-image-container float-right" contenteditable="false"><figure class="sun-editor-figure-cover" style="margin: auto;"><img src="http://suneditor.com/sample/img/sunset.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
             <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
@@ -66,7 +116,46 @@
             <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>
-    </form>
+    </div>
+
+    <div id="balloon" class="tabcontent">
+        <div class="inline-margin"></div>
+        <textarea id="editor_balloon" style="display:none;">
+            <p><br></p>
+            <div class="sun-editor-id-comp sun-editor-id-image-container float-right" contenteditable="false"><figure class="sun-editor-figure-cover" style="margin: auto;"><img src="http://suneditor.com/sample/img/sunset.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
+            <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
+            <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
+            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
+            <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
+            <p><br></p>
+        </textarea>
+    </div>
+
+    <div id="inline" class="tabcontent">
+        <div class="inline-margin"></div>
+        <textarea id="editor_inline1" style="display:none;">
+            <p><br></p>
+            <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
+            <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
+            <p><br></p>
+        </textarea>
+
+        <div class="inline-margin"></div>
+        <textarea id="editor_inline2" style="display:none;">
+            <p><br></p>
+            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
+            <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
+            <p><br></p>
+        </textarea>
+
+        <div class="inline-margin"></div>
+        <textarea id="editor_inline3" style="display:none;">
+            <p><br></p>
+            <div class="sun-editor-id-comp sun-editor-id-image-container float-right" contenteditable="false"><figure class="sun-editor-figure-cover" style="margin: auto;"><img src="http://suneditor.com/sample/img/sunset.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
+            <p><br></p>
+        </textarea>
+    </div>
+
     <footer>
         <p>Suneditor create by JiHong.Lee</p>
         <p>Based on javascript</p>
@@ -76,7 +165,7 @@
 </div>
 
 <script>
-    SUNEDITOR.create('editor', {
+    SUNEDITOR.create('editor_classic', {
         display: 'block',
         width: '100%',
         height: 'auto',
@@ -94,6 +183,71 @@
             ['preview', 'print']
         ]
     });
+
+    SUNEDITOR.create('editor_balloon', {
+        mode: 'balloon',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['fontColor', 'bold', 'align', 'horizontalRule', 'list', 'table']
+        ]
+    });
+
+    SUNEDITOR.create('editor_inline1', {
+        mode: 'inline',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['font', 'fontSize', 'formatBlock'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript']
+        ]
+    });
+    SUNEDITOR.create('editor_inline2', {
+        mode: 'inline',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['bold', 'underline', 'align', 'horizontalRule', 'list', 'table']
+        ]
+    });
+    SUNEDITOR.create('editor_inline3', {
+        mode: 'inline',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['link', 'image', 'video']
+        ]
+    });
+
+
+    function openTab(evt, tabName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the button that opened the tab
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
 </script>
 </body>
 </html>

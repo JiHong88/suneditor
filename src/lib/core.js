@@ -1870,7 +1870,9 @@ const core = function (context, plugins, lang) {
                 context.element._arrow.style.top = '-11px';
             }
 
-            context.element._arrow.style.left = (toolbar.offsetWidth / 2 + (l < 0 ? l - context.element._arrow.offsetWidth : 0)) + 'px';
+            const arrow_width = context.element._arrow.offsetWidth;
+            const arrow_left = (toolbar.offsetWidth / 2 + (l < 0 ? l - arrow_width : 0));
+            context.element._arrow.style.left = (arrow_left < arrow_width / 2 ? arrow_width / 2 - 1 : arrow_left) + 'px';
         },
 
         _hideBalloonToolbar: function () {
@@ -2132,6 +2134,7 @@ const core = function (context, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault() }, false);
     /** editor area */
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+    context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);

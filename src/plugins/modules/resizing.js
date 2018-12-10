@@ -148,7 +148,7 @@ export default {
         contextResizing.resizeDot.style.display = 'block';
 
         // button group
-        const overLeft = this.context.element.toolbar.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
+        const overLeft = this.context.element.relative.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
         contextResizing.resizeButton.style.top = (h + t + 60) + 'px';
         contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft : 0)) + 'px';
 
