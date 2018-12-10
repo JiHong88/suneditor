@@ -1814,12 +1814,11 @@ const core = function (context, plugins, lang) {
 
             if (editor._isBalloon) {
                 const range = editor.getRange();
-                const toolbar = context.element.toolbar;
 
                 if (range.collapsed) {
-                    toolbar.style.display = 'none';
+                    event._hideBalloonToolbar();
                 } else {
-                    event._setBalloonToolbarPosition(range);
+                    event._showBalloonToolbar(range);
                     return;
                 }
             }
@@ -1844,7 +1843,8 @@ const core = function (context, plugins, lang) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _setBalloonToolbarPosition: function (range) {
+        _showBalloonToolbar: function (range) {
+            const toolbar = context.element.toolbar;
             const childNodes = util.getListChildNodes(range.commonAncestorContainer);
             const selection = _w.getSelection();
             const isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
@@ -1873,12 +1873,20 @@ const core = function (context, plugins, lang) {
             context.element._arrow.style.left = (toolbar.offsetWidth / 2 + (l < 0 ? l - context.element._arrow.offsetWidth : 0)) + 'px';
         },
 
+        _hideBalloonToolbar: function () {
+            context.element.toolbar.style.display = 'none';
+        },
+
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
             e.stopPropagation();
+
+            if (editor._isBalloon) {
+                event._hideBalloonToolbar();
+            }
 
             function shortcutCommand(keyCode) {
                 const key = event._shortcutKeyCode[keyCode];
