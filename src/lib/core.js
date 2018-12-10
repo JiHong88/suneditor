@@ -75,9 +75,23 @@ const core = function (context, plugins, lang) {
          */
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
+        /**
+         * @description Is inline mode?
+         * @private
+         */
         _isInline: /inline/i.test(context.option.mode),
+
+        /**
+         * @description Is balloon mode?
+         * @private
+         */
         _isBalloon: /balloon/i.test(context.option.mode),
-        _inlineToolbarAttr: {},
+
+        /**
+         * @description Required value when using inline mode to sticky toolbar
+         * @private
+         */
+        _inlineToolbarAttr: {width: 0, height: 0},
 
         /**
          * @description An user event function when image uploaded success or remove image
@@ -313,6 +327,7 @@ const core = function (context, plugins, lang) {
 
             selection.addRange(range);
             this._variable.range = range;
+            this._setEditorRange();
         },
 
         /**
@@ -1037,8 +1052,7 @@ const core = function (context, plugins, lang) {
                 pNode.insertBefore(startContainer, newInnerNode);
                 pNode.removeChild(newInnerNode);
                 if (collapsed) startOffset = 1;
-            }
-            else if (collapsed) {
+            } else if (collapsed) {
                 startContainer = endContainer = newInnerNode;
                 startOffset = 1;
                 endOffset = 1;
@@ -1816,7 +1830,7 @@ const core = function (context, plugins, lang) {
                 const range = editor.getRange();
 
                 if (range.collapsed) {
-                    event._hideBalloonToolbar();
+                    event._hideToolbar();
                 } else {
                     event._showBalloonToolbar(range);
                     return;
@@ -1827,13 +1841,13 @@ const core = function (context, plugins, lang) {
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
+                if (editor._isInline) event._showInlineToolbar();
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
                 if (td) {
-    
                     if (editor.controllerArray.length === 0) {
                         editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
                     }
@@ -1875,7 +1889,15 @@ const core = function (context, plugins, lang) {
             context.element._arrow.style.left = (arrow_left < arrow_width / 2 ? arrow_width / 2 - 1 : arrow_left) + 'px';
         },
 
-        _hideBalloonToolbar: function () {
+        _showInlineToolbar: function () {
+            const toolbar = context.element.toolbar;
+            toolbar.style.display = 'block';
+            editor._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
+            editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            event.onScroll_window();
+        },
+
+        _hideToolbar: function () {
             context.element.toolbar.style.display = 'none';
         },
 
@@ -1887,7 +1909,7 @@ const core = function (context, plugins, lang) {
             e.stopPropagation();
 
             if (editor._isBalloon) {
-                event._hideBalloonToolbar();
+                event._hideToolbar();
             }
 
             function shortcutCommand(keyCode) {
@@ -2156,11 +2178,7 @@ const core = function (context, plugins, lang) {
     /** inlineToolbar */
     if (editor._isInline) {
         function onFocus_wysiwyg () {
-            const toolbar = context.element.toolbar;
-            toolbar.style.display = 'block';
-            editor._inlineToolbarAttr.width = context.option.toolbarWidth;
-            editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
-            event.onScroll_window();
+            event._showInlineToolbar();
         }
 
         context.element.wysiwyg.addEventListener('focus', onFocus_wysiwyg, false);
