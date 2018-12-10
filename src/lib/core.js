@@ -1806,6 +1806,7 @@ const core = function (context, plugins, lang) {
             }
 
             editor._setEditorRange();
+            event._findButtonEffectTag();
 
             if (editor._isBalloon) {
                 const range = editor.getRange();
@@ -1817,8 +1818,6 @@ const core = function (context, plugins, lang) {
                     return;
                 }
             }
-
-            event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
