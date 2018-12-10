@@ -797,57 +797,38 @@ const core = function (context, plugins, lang) {
                 return false;
             };
 
-            if (startCon === endCon && startCon.nodeType === 1) {
+            /** one line */
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                 newNode = appendNode.cloneNode(false);
+                const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, range.collapsed);
 
-                if (isRemoveFormat) {
-                    newNode = util.createTextNode(startCon.textContent);
-                } else {
-                    newNode.innerHTML = checkCss(startCon) ? startCon.outerHTML : startCon.innerHTML;
-                }
-
-                startCon.parentNode.insertBefore(newNode, startCon.nextSibling);
-                util.removeItem(startCon);
-
-                start.container = newNode;
-                start.offset = 0;
-                end.container = newNode;
-                end.offset = 1;
+                start.container = newRange.startContainer;
+                start.offset = newRange.startOffset;
+                end.container = newRange.endContainer;
+                end.offset = newRange.endOffset;
             }
+            /** multi line */
             else {
-                /** one line */
-                if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
-                    newNode = appendNode.cloneNode(false);
-                    const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, range.collapsed);
+                // get line nodes
+                const lineNodes = this.getSelectedFormatElements();
+                const endLength = lineNodes.length - 1;
 
-                    start.container = newRange.startContainer;
-                    start.offset = newRange.startOffset;
-                    end.container = newRange.endContainer;
-                    end.offset = newRange.endOffset;
+                // startCon
+                newNode = appendNode.cloneNode(false);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat);
+
+                // mid
+                for (let i = 1; i < endLength; i++) {
+                    newNode = appendNode.cloneNode(false);
+                    this._nodeChange_middleLine(lineNodes[i], newNode, checkCss, isRemoveFormat);
                 }
-                /** multi line */
-                else {
-                    // get line nodes
-                    const lineNodes = this.getSelectedFormatElements();
-                    const endLength = lineNodes.length - 1;
 
-                    // startCon
+                // endCon
+                if (endLength > 0) {
                     newNode = appendNode.cloneNode(false);
-                    start = this._nodeChange_startLine(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat);
-
-                    // mid
-                    for (let i = 1; i < endLength; i++) {
-                        newNode = appendNode.cloneNode(false);
-                        this._nodeChange_middleLine(lineNodes[i], newNode, checkCss, isRemoveFormat);
-                    }
-
-                    // endCon
-                    if (endLength > 0) {
-                        newNode = appendNode.cloneNode(false);
-                        end = this._nodeChange_endLine(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat);
-                    } else {
-                        end = start;
-                    }
+                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat);
+                } else {
+                    end = start;
                 }
             }
 
