@@ -2072,6 +2072,8 @@ const core = function (context, plugins, lang) {
         },
 
         onResize_window: function () {
+            if (context.element.topArea.offsetWidth === 0) return;
+
             if (editor._variable.isFullScreen) {
                 editor._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
@@ -2085,7 +2087,7 @@ const core = function (context, plugins, lang) {
         },
 
         onScroll_window: function () {
-            if (editor._variable.isFullScreen) return;
+            if (editor._variable.isFullScreen || context.element.topArea.offsetWidth === 0) return;
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
@@ -2147,9 +2149,9 @@ const core = function (context, plugins, lang) {
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault() }, false);
     /** editor area */
-    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
