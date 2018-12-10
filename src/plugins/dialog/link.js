@@ -81,7 +81,7 @@ export default {
         link_btn.className = 'sun-editor-id-link-btn';
         link_btn.style.display = 'none';
         link_btn.innerHTML = '' +
-            '<div class="arrow"></div>' +
+            '<div class="arrow arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="btn-group">' +
             '     <button type="button" data-command="update" tabindex="-1" title="' + lang.controller.edit + '"><div class="icon-link"></div></button>' +

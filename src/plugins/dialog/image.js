@@ -27,7 +27,7 @@ export default {
             _element_h: 1,
             _element_l: 0,
             _element_t: 0,
-            _origin_w: context.user.imageWidth === 'auto' ? '' : context.user.imageWidth,
+            _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
             _origin_h: '',
             _altText: '',
             _caption: null,
@@ -38,12 +38,12 @@ export default {
             _proportionChecked: true,
             _floatClassRegExp: 'float\\-[a-z]+',
             _xmlHttp: null,
-            _resizing: context.user.imageResizing,
-            _defaultAuto: context.user.imageWidth === 'auto' ? true : false
+            _resizing: context.option.imageResizing,
+            _defaultAuto: context.option.imageWidth === 'auto' ? true : false
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog(core.context.user, core.lang));
+        let image_dialog = eval(this.setDialog(core.context.option, core.lang));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -58,11 +58,11 @@ export default {
         
         context.image.imageX = {};
         context.image.imageY = {};
-        if (context.user.imageResizing) {
+        if (context.option.imageResizing) {
             context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
             context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
             context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
-            context.image.imageX.value = context.user.imageWidth;
+            context.image.imageX.value = context.option.imageWidth;
             
             context.image.imageX.addEventListener('change', this.setInputSize.bind(core, 'x'));
             context.image.imageY.addEventListener('change', this.setInputSize.bind(core, 'y'));
@@ -77,7 +77,7 @@ export default {
     },
 
     /** dialog */
-    setDialog: function (user, lang) {
+    setDialog: function (option, lang) {
         const dialog = util.createElement('DIV');
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
@@ -97,7 +97,7 @@ export default {
             '   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
             '       <div class="modal-body">';
 
-            if (user.imageFileInput) {
+            if (option.imageFileInput) {
                 html += '' +
                     '   <div class="form-group">' +
                     '       <label>' + lang.dialogBox.imageBox.file + '</label>' +
@@ -105,7 +105,7 @@ export default {
                     '   </div>' ;
             }
 
-            if (user.imageUrlInput) {
+            if (option.imageUrlInput) {
                 html += '' +
                     '   <div class="form-group">' +
                     '       <label>' + lang.dialogBox.imageBox.url + '</label>' +
@@ -118,11 +118,11 @@ export default {
             '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="form-control sun-editor-id-image-alt" type="text" />' +
             '           </div>';
 
-            if (user.imageResizing) {
+            if (option.imageResizing) {
                 html += '' +
                 '       <div class="form-group">' +
                 '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (user.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
+                '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
                 '           <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                 '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
                 '       </div>' ;
@@ -200,7 +200,7 @@ export default {
     onRender_imgInput: function () {
         const submitAction = function (files) {
             if (files.length > 0) {
-                const imageUploadUrl = this.context.user.imageUploadUrl;
+                const imageUploadUrl = this.context.option.imageUploadUrl;
                 const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
                 if (imageUploadUrl !== null && imageUploadUrl.length > 0) {
@@ -681,10 +681,10 @@ export default {
         this.plugins.image.openTab.call(this, 'init');
 
         if (contextImage._resizing) {
-            const autoWidth = this.context.user.imageWidth === 'auto';
+            const autoWidth = this.context.option.imageWidth === 'auto';
 
             contextImage.proportion.checked = false;
-            contextImage.imageX.value = autoWidth ? '' : this.context.user.imageWidth;
+            contextImage.imageX.value = autoWidth ? '' : this.context.option.imageWidth;
             contextImage.imageY.value = '';
             contextImage.imageX.disabled = autoWidth;
             contextImage.imageY.disabled = true;

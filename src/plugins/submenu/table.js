@@ -72,7 +72,7 @@ export default {
         tableResize.className = 'sun-editor-id-table-edit';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
-            '<div class="arrow"></div>' +
+            '<div class="arrow arrow-up"></div>' +
             '<div>' +
             '   <div class="btn-group">' +
             '     <button type="button" data-command="insert" data-value="row" data-option="up" title="' + lang.controller.insertRowAbove + '"><div class="icon-insert-row-above"></div></button>' +

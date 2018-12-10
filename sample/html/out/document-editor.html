@@ -204,49 +204,140 @@
                     <td class="description last">font size button element</td>
                 </tr>
                 <tr style="color:#f42424;">
-                    <td class="name"><code style="color:#f42424;">user</code></td>
+                    <td class="name"><code style="color:#f42424;">option</code></td>
                     <td class="type">
                         <span class="param-type">Json</span>
                     </td>
-                    <td class="description last">user options (Contains sub-options)</td>
+                    <td class="description last">inserted options (Contains sub-options)</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoX</code></td>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;mode</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The mode of the editor (classic, inline, balloon)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;toolbarWidth</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">
+                        The width of the toolbar.<br>
+                        Applies only when the editor mode is 'inline' or 'balloon' mode.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;stickyToolbar</code></td>
                     <td class="type">
                         <span class="param-type">Number</span>
                     </td>
-                    <td class="description last">video default width</td>
+                    <td class="description last">Reference height value that should be changed to sticky toolbar mode</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoY</code></td>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;resizingBar</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Show the bottom resizing bar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;showPathLabel</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Displays the current node structure to resizingBar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;popupDisplay</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Size of background area when activating dialog window ('full'||'local')</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;display</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The display property of editor</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;width</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The width size of the editor (px)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;height</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The height size of the editor (px)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;minHeight</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The min-height size of the editor (px)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;maxHeight</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The max-height size of the editor (px)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;font</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Change default font-family array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSize</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Change default font-size array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;colorList</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Change default color array of color picker</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageResizing</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Can resize the image</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageWidth</code></td>
                     <td class="type">
                         <span class="param-type">Number</span>
                     </td>
-                    <td class="description last">video default height</td>
+                    <td class="description last">The default width size of the image frame</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageFileInput</code></td>
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">Choose whether to create a file input tag in the image upload window (true)</td>
+                    <td class="description last">Choose whether to create a file input tag in the image upload window</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageUrlInput</code></td>
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">
-                        Choose whether to create a image url input tag in the image upload window (true)<br>
-                        If the value of imageFileInput is false, it will be unconditionally true
-                    </td>
-                </tr>
-                <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageSize</code></td>
-                    <td class="type">
-                        <span class="param-type">Number</span>
-                    </td>
-                    <td class="description last">image default size</td>
+                    <td class="description last">Choose whether to create a image url input tag in the image upload window</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;imageUploadUrl</code></td>
@@ -256,35 +347,25 @@
                     <td class="description last">The image upload to server mapping address</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;font</code></td>
-                    <td class="type">
-                        <span class="param-type">Array</span>
-                    </td>
-                    <td class="description last">Font list of submenu</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSize</code></td>
-                    <td class="type">
-                        <span class="param-type">Array</span>
-                    </td>
-                    <td class="description last">Font size list of submenu</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;height</code></td>
-                    <td class="type">
-                        <span class="param-type">Number</span>
-                    </td>
-                    <td class="description last">
-                        The height value entered by the user or the height value of
-                        the "textarea" when the suneditor is created
-                    </td>
-                </tr>
-                <tr>
-                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;showPathLabel</code></td>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoResizing</code></td>
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">Displays the current node structure to resizebar</td>
+                    <td class="description last">Can resize the video iframe</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoWidth</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">The default width size of the video frame</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;videoHeight</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">The default heigth size of the video frame</td>
                 </tr>
                 </tbody>
             </table>

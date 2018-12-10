@@ -24,26 +24,36 @@ const _Constructor = {
     
         /** user options */
         options.lang = lang;
-        options.stickyToolbar = options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
-        options.resizingBar = options.resizingBar === undefined ? true : options.resizingBar;
+        // toolbar
+        options.mode = options.mode || 'classic'; // classic, inline, balloon
+        options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'max-content';
+        options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        // bottom resizing bar
+        options.resizingBar = /inline|balloon/i.test(options.mode) ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        // popup, editor display
         options.popupDisplay = options.popupDisplay || 'full';
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
+        // size
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        // font, size, color list
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.colorList = options.colorList || null;
+        // images
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth || 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadUrl = options.imageUploadUrl || null;
+        // video
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
+        // buttons
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -68,6 +78,17 @@ const _Constructor = {
     
         /** toolbar */
         const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
+
+        let arrow = null;
+        if (/inline|balloon/i.test(options.mode)) {
+            tool_bar.element.className += ' sun-inline-toolbar';
+            tool_bar.element.style.width = options.toolbarWidth;
+            if (/balloon/i.test(options.mode)) {
+                arrow = doc.createElement('DIV');
+                arrow.className = 'arrow';
+                tool_bar.element.appendChild(arrow);
+            }
+        }
 
         /** sticky toolbar dummy */
         const sticky_dummy = doc.createElement('DIV');
@@ -144,7 +165,8 @@ const _Constructor = {
                 _navigation: navigation,
                 _loading: loading_box,
                 _resizeBack: resize_back,
-                _stickyDummy: sticky_dummy
+                _stickyDummy: sticky_dummy,
+                _arrow: arrow
             },
             options: options,
             plugins: tool_bar.plugins

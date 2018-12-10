@@ -466,7 +466,7 @@ const util = {
     getOffset: function (element) {
         let tableOffsetLeft = 0;
         let tableOffsetTop = 0;
-        let tableElement = element;
+        let tableElement = element.nodeType === 3 ? element.parentElement : element;
 
         while (!this.isWysiwygDiv(tableElement.parentNode)) {
             if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {

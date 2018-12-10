@@ -11,7 +11,7 @@
  * @description Elements and variables you should have
  * @param {HTMLElement} element - textarea element
  * @param {object} cons - Toolbar element you created
- * @param {json} options - user options
+ * @param {json} options - Inserted options
  * @returns Elements, variables of the editor
  * @private
  */
@@ -29,7 +29,8 @@ const _Context = function (element, cons, options) {
             code: cons._codeArea,
             loading: cons._loading,
             resizeBackground: cons._resizeBack,
-            _stickyDummy: cons._stickyDummy
+            _stickyDummy: cons._stickyDummy,
+            _arrow: cons._arrow
         },
         tool: {
             cover: cons._toolBar.getElementsByClassName('sun-editor-id-toolbar-cover')[0],
@@ -43,7 +44,9 @@ const _Context = function (element, cons, options) {
             format: cons._toolBar.getElementsByClassName('sun-editor-font-format')[0],
             fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
         },
-        user: {
+        option: {
+            mode: options.mode,
+            toolbarWidth: options.toolbarWidth,
             stickyToolbar: options.stickyToolbar,
             resizingBar: options.resizingBar,
             showPathLabel: options.showPathLabel,

@@ -75,6 +75,9 @@
 ]               <span class="pl-k">:</span> Plugins <span class="pl-smi">array</span>.                                    <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 lang            <span class="pl-k">:</span> language object. (en, ko) default <span class="pl-k">:</span> English {<span class="pl-c1">Object</span>}
+mode            <span class="pl-k">:</span> The mode <span class="pl-k">of</span> the <span class="pl-en">editor</span> (<span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span>). <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
+toolbarWidth    <span class="pl-k">:</span> The width <span class="pl-k">of</span> the <span class="pl-smi">toolbar</span>. <span class="pl-smi">Applies</span> only when the editor mode is 
+                    <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span> <span class="pl-smi">mode</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>max-content<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
 stickyToolbar   <span class="pl-k">:</span> Reference height value that should be changed to sticky toolbar mode.
                     It can also be used when there is another fixed toolbar at the top.
                     <span class="pl-c1">Set</span> to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
@@ -134,36 +137,6 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
                     [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
                 ]</pre>
 </div>
-
-        <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleOptions<span class="pl-pds">'</span></span>,{
-        fontSize <span class="pl-k">:</span> [
-            <span class="pl-c1">8</span>, <span class="pl-c1">10</span>, <span class="pl-c1">14</span>, <span class="pl-c1">18</span>, <span class="pl-c1">24</span>, <span class="pl-c1">36</span>
-        ],
-        font <span class="pl-k">:</span> [
-            <span class="pl-s"><span class="pl-pds">'</span>Arial<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>tahoma<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>Courier New,Courier<span class="pl-pds">'</span></span>
-        ],
-        width <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span>,
-        height <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
-        videoWidth <span class="pl-k">:</span> <span class="pl-c1">360</span>,
-        videoHeight <span class="pl-k">:</span> <span class="pl-c1">115</span>,
-        imageWidth <span class="pl-k">:</span> <span class="pl-c1">150</span>,
-        popupDisplay<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>,
-        resizingBar<span class="pl-k">:</span> <span class="pl-c1">false</span>,
-        buttonList <span class="pl-k">:</span> [
-            [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>,
-            <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-        ],
-});</pre></div>
         <p></p>
         <textarea id="exampleOptions" style="width:100%; height:200px;">
             <div><span style="color: rgb(0, 130, 153);"><b>SUNEDITOR</b></span><b>.<span style="color: rgb(61, 0, 153);">create</span></b>(<span style="color: rgb(152, 0, 0);">'exampleOptions'</span>, {</div>

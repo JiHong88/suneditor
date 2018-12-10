@@ -271,9 +271,6 @@
     margin: 0;
     padding: 0;
 }
-.sun-editor-editable figure.sun-editor-figure-cover * {
-    display: block;
-}
 .sun-editor-editable figure.sun-editor-figure-cover figcaption {
     padding: 1em .5em;
     margin: 0;
@@ -287,9 +284,6 @@
 }
 
 /* image */
-.sun-editor-editable .sun-editor-id-image-container a {
-    display: block;
-}
 .sun-editor-editable .sun-editor-id-image-container a img {
     padding: 1px;
     margin: 1px;
