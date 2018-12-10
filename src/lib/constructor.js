@@ -85,7 +85,7 @@ const _Constructor = {
             tool_bar.element.style.width = options.toolbarWidth;
             if (/balloon/i.test(options.mode)) {
                 arrow = doc.createElement('DIV');
-                arrow.className = 'arrow arrow-up';
+                arrow.className = 'arrow';
                 tool_bar.element.appendChild(arrow);
             }
         }

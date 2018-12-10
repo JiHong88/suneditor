@@ -1819,22 +1819,7 @@ const core = function (context, plugins, lang) {
                 if (range.collapsed) {
                     toolbar.style.display = 'none';
                 } else {
-                    const childNodes = util.getListChildNodes(range.commonAncestorContainer);
-                    const selection = _w.getSelection();
-                    const dir = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
-
-                    let rects = range.getClientRects();
-                    rects = rects[dir ? 0 : rects.length - 1];
-                    
-                    toolbar.style.display = 'block';
-
-                    let l = (dir ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbar.offsetWidth / 2;
-                    l += l + toolbar.offsetWidth > context.element.topArea.offsetWidth ? context.element.topArea.offsetWidth - (l + toolbar.offsetWidth) - 20 : 0;
-                    
-                    toolbar.style.left = (l < 0 ? 20 : l) + 'px';
-                    toolbar.style.top = ((dir ? rects.top : rects.bottom) - context.element.topArea.offsetTop + _w.scrollY + 10) + 'px';
-                    // context.element._arrow.style.left = (toolbar.offsetWidth + leftPosition) + 'px';
-
+                    event._setBalloonToolbarPosition(range);
                     return;
                 }
             }
@@ -1857,6 +1842,35 @@ const core = function (context, plugins, lang) {
             }
 
             if (userFunction.onClick) userFunction.onClick(e);
+        },
+
+        _setBalloonToolbarPosition: function (range) {
+            const childNodes = util.getListChildNodes(range.commonAncestorContainer);
+            const selection = _w.getSelection();
+            const isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
+
+            let rects = range.getClientRects();
+            rects = rects[isDirTop ? 0 : rects.length - 1];
+            
+            toolbar.style.display = 'block';
+
+            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbar.offsetWidth / 2;
+            let t = (isDirTop ? rects.top - toolbar.offsetHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + _w.scrollY;
+            
+            toolbar.style.left = (l < 0 ? 20 : l) + 'px';
+            toolbar.style.top = (t) + 'px';
+
+            if (isDirTop) {
+                util.removeClass(context.element._arrow, 'arrow-up');
+                util.addClass(context.element._arrow, 'arrow-down');
+                context.element._arrow.style.top = (toolbar.offsetHeight) + 'px';
+            } else {
+                util.removeClass(context.element._arrow, 'arrow-down');
+                util.addClass(context.element._arrow, 'arrow-up');
+                context.element._arrow.style.top = '-11px';
+            }
+
+            context.element._arrow.style.left = (toolbar.offsetWidth / 2 + (l < 0 ? l - context.element._arrow.offsetWidth : 0)) + 'px';
         },
 
         onKeyDown_wysiwyg: function (e) {
