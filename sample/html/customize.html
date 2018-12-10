@@ -58,6 +58,16 @@
 <div class="content">
     <article class="markdown-body entry-content">
         <div style="background-color: #f3f3f3; padding: 20px; user-select: none;">
+            <label>mode : &nbsp;&nbsp;</label>
+            <label>Classic&nbsp;&nbsp;<input type="radio" value="classic" name="mode" checked></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>Balloon&nbsp;&nbsp;<input type="radio" value="balloon" name="mode"></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>Inline&nbsp;&nbsp;<input type="radio" value="inline" name="mode"></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+
+            <label><input type="checkbox" id="toolbarWidth">&nbsp;&nbsp;toolbarWidth</label>
+            <input type="text" id="toolbarWidth_value" placeholder="Number, ...px, ...%">
+            <br><br>
+
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -157,8 +167,10 @@ function sun_create () {
     if (editor) editor.destroy();
 
     imageTable.innerHTML = '';
-    
+
     editor = SUNEDITOR.create('sample_editor', {
+        mode: document.querySelector('input[name="mode"]:checked').value,
+        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
         resizingBar: document.getElementById('resizingBar').checked,
