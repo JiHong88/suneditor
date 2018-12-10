@@ -1065,8 +1065,8 @@ const core = function (context, plugins, lang) {
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: isRemoveFormat ? startContainer : endContainer,
-                endOffset: isRemoveFormat ? startContainer.textContent.length : endOffset
+                endContainer: isRemoveFormat || !endContainer.textContent ? startContainer : endContainer,
+                endOffset: isRemoveFormat || !endContainer.textContent ? startContainer.textContent.length : endOffset
             };
         },
 
@@ -1832,7 +1832,7 @@ const core = function (context, plugins, lang) {
                 if (range.collapsed) {
                     event._hideToolbar();
                 } else {
-                    event._showBalloonToolbar(range);
+                    event._showToolbarBalloon(range);
                     return;
                 }
             }
@@ -1846,12 +1846,10 @@ const core = function (context, plugins, lang) {
                 figcaption.focus();
 
                 if (editor._isInline && !editor._inlineToolbarAttr.isShow) {
-                    editor._inlineToolbarAttr.isShow = true;
-                    event._showInlineToolbar();
+                    event._showToolbarInline();
 
                     const hideToolbar = function () {
                         event._hideToolbar();
-                        editor._inlineToolbarAttr.isShow = false;
                         _d.removeEventListener('click', hideToolbar);
                     }
 
@@ -1869,7 +1867,7 @@ const core = function (context, plugins, lang) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _showBalloonToolbar: function (range) {
+        _showToolbarBalloon: function (range) {
             const toolbar = context.element.toolbar;
             const childNodes = util.getListChildNodes(range.commonAncestorContainer);
             const selection = _w.getSelection();
@@ -1901,16 +1899,18 @@ const core = function (context, plugins, lang) {
             context.element._arrow.style.left = (arrow_left < arrow_width / 2 ? arrow_width / 2 - 1 : arrow_left) + 'px';
         },
 
-        _showInlineToolbar: function () {
+        _showToolbarInline: function () {
             const toolbar = context.element.toolbar;
             toolbar.style.display = 'block';
             editor._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
             editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             event.onScroll_window();
+            editor._inlineToolbarAttr.isShow = true;
         },
 
         _hideToolbar: function () {
             context.element.toolbar.style.display = 'none';
+            editor._inlineToolbarAttr.isShow = false;
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -2189,15 +2189,11 @@ const core = function (context, plugins, lang) {
 
     /** inlineToolbar */
     if (editor._isInline) {
-        function onFocus_wysiwyg () {
-            event._showInlineToolbar();
-        }
-
-        context.element.wysiwyg.addEventListener('focus', onFocus_wysiwyg, false);
+        context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
     }
 
     if (editor._isInline || editor._isBalloon) {
-        context.element.wysiwyg.addEventListener('blur', function () { context.element.toolbar.style.display = 'none'; }, false);
+        context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
     }
     
     /** window event */
