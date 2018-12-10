@@ -91,7 +91,7 @@ const core = function (context, plugins, lang) {
          * @description Required value when using inline mode to sticky toolbar
          * @private
          */
-        _inlineToolbarAttr: {width: 0, height: 0},
+        _inlineToolbarAttr: {width: 0, height: 0, isShow: false},
 
         /**
          * @description An user event function when image uploaded success or remove image
@@ -1841,10 +1841,22 @@ const core = function (context, plugins, lang) {
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
-                if (editor._isInline) event._showInlineToolbar();
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
+
+                if (editor._isInline && !editor._inlineToolbarAttr.isShow) {
+                    editor._inlineToolbarAttr.isShow = true;
+                    event._showInlineToolbar();
+
+                    const hideToolbar = function () {
+                        event._hideToolbar();
+                        editor._inlineToolbarAttr.isShow = false;
+                        _d.removeEventListener('click', hideToolbar);
+                    }
+
+                    _d.addEventListener('click', hideToolbar);
+                }
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
                 if (td) {
