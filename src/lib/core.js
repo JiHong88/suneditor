@@ -724,7 +724,7 @@ const core = function (context, plugins, lang) {
          * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
          * 3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) nodeChange(document.createElement('removenode'))
          * @param {Element} appendNode - The dom that will wrap the selected text area
-         * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family']...])
+         * @param {Array} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
          */
         nodeChange: function (appendNode, checkCSSPropertyArray) {
             const range = this.getRange();
@@ -748,7 +748,7 @@ const core = function (context, plugins, lang) {
                         }
                     }
     
-                    if (checkCnt === checkCSSPropertyArray.length) return;
+                    if (checkCnt >= checkCSSPropertyArray.length) return;
                 }
             }
 
