@@ -731,6 +731,28 @@ const core = function (context, plugins, lang) {
             const isRemoveFormat = /removenode/i.test(appendNode.nodeName);
             let tempCon, tempOffset, tempChild, tempArray;
 
+            /* checked same style property */
+            if (range.startContainer === range.endContainer) {
+                let sNode = range.startContainer;
+                if (isRemoveFormat) {
+                    if (util.getFormatElement(sNode) === sNode.parentNode) return;
+                } else {
+                    let checkCnt = 0;
+
+                    for (let i = 0; i < checkCSSPropertyArray.length; i++) {
+                        while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
+                            if (sNode.nodeType === 1 && sNode.style[checkCSSPropertyArray[i]] === appendNode.style[checkCSSPropertyArray[i]]) {
+                                checkCnt++;
+                            }
+                            sNode = sNode.parentNode;
+                        }
+                    }
+    
+                    if (checkCnt === checkCSSPropertyArray.length) return;
+                }
+            }
+
+            /* find text node */
             tempCon = range.startContainer;
             tempOffset = range.startOffset;
 
@@ -1419,13 +1441,6 @@ const core = function (context, plugins, lang) {
          * @description Remove format of the currently selected range (IE, Edge not working)
          */
         removeFormat: function () {
-            let range = this.getRange();
-
-            if (range.collapsed) {
-                const currentEl = range.commonAncestorContainer.parentElement;
-                if (util.isFormatElement(currentEl) || util.isRangeFormatElement(currentEl) || util.isWysiwygDiv(currentEl)) return;
-            }
-            
             this.nodeChange(util.createElement('REMOVENODE'));
         },
 
