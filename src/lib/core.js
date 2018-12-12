@@ -127,8 +127,6 @@ const core = function (context, plugins, lang) {
 
         /**
          * @description Variables used internally in editor operation
-         * @property {(Element|null)} selectionNode - Contains selection node
-         * @property {(Object|null)} range - The current range object
          * @property {Boolean} wysiwygActive - The wysiwyg frame or code view state
          * @property {Boolean} isFullScreen - State of full screen
          * @property {Number} innerHeight_fullScreen - InnerHeight in editor when in full screen
@@ -139,8 +137,6 @@ const core = function (context, plugins, lang) {
          * @private
          */
         _variable: {
-            selectionNode: null,
-            range: null,
             wysiwygActive: true,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
@@ -267,44 +263,7 @@ const core = function (context, plugins, lang) {
                 context.element.wysiwyg.focus();
             }
 
-            this._setEditorRange();
             event._findButtonEffectTag();
-        },
-
-        /**
-         * @description Saving the range object and the currently selected node of editor
-         * @private
-         */
-        _setEditorRange: function () {
-            const selection = _w.getSelection();
-            let range = null;
-
-            if (selection.rangeCount > 0) {
-                range = selection.getRangeAt(0);
-            }
-            else {
-                range = this._createDefaultRange();
-            }
-
-            this._variable.range = range;
-
-            if (range.collapsed) {
-                this.setSelectionNode(range.commonAncestorContainer);
-            } else {
-                this.setSelectionNode(selection.extentNode || selection.anchorNode);
-            }
-        },
-
-        /**
-         * @description Return the range object of editor's first child node
-         * @returns {Object}
-         * @private
-         */
-        _createDefaultRange: function () {
-            const range = _d.createRange();
-            range.setStart(context.element.wysiwyg.firstChild, 0);
-            range.setEnd(context.element.wysiwyg.firstChild, 0);
-            return range;
         },
 
         /**
@@ -326,8 +285,7 @@ const core = function (context, plugins, lang) {
             }
 
             selection.addRange(range);
-            this._variable.range = range;
-            this._setEditorRange();
+            this._editorRange();
         },
 
         /**
@@ -335,15 +293,7 @@ const core = function (context, plugins, lang) {
          * @returns {Object}
          */
         getRange: function () {
-            return this._variable.range || this._createDefaultRange();
-        },
-
-        /**
-         * @description Set the selected node. (Used by getSelectionNode function)
-         * @param {Node} node - node object
-         */
-        setSelectionNode: function (node) {
-            this._variable.selectionNode = node;
+            return this._editorRange().range;
         },
 
         /**
@@ -351,11 +301,48 @@ const core = function (context, plugins, lang) {
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (this._variable.selectionNode) {
-                return this._variable.selectionNode;
+            return this._editorRange().selectionNode || context.element.wysiwyg.firstChild;
+        },
+
+        /**
+         * @description Saving the range object and the currently selected node of editor
+         * @returns {Object, Element}
+         * @private
+         */
+        _editorRange: function () {
+            const selection = _w.getSelection();
+            let range = null;
+            let selectionNode = null;
+
+            if (selection.rangeCount > 0) {
+                range = selection.getRangeAt(0);
+            }
+            else {
+                range = this._createDefaultRange();
             }
 
-            return context.element.wysiwyg.firstChild;
+            if (range.collapsed) {
+                selectionNode = range.commonAncestorContainer;
+            } else {
+                selectionNode = selection.extentNode || selection.anchorNode;
+            }
+
+            return {
+                range: range,
+                selectionNode: selectionNode
+            };
+        },
+
+        /**
+         * @description Return the range object of editor's first child node
+         * @returns {Object}
+         * @private
+         */
+        _createDefaultRange: function () {
+            const range = _d.createRange();
+            range.setStart(context.element.wysiwyg.firstChild, 0);
+            range.setEnd(context.element.wysiwyg.firstChild, 0);
+            return range;
         },
 
         /**
@@ -759,9 +746,9 @@ const core = function (context, plugins, lang) {
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
-                    tempChild = tempCon.childNodes;
+                    tempChild = util.getListChildNodes(tempCon);
                     for (let i = 0, len = tempChild.length; i < len; i++) {
-                        tempArray.push(tempChild[i]);
+                        if (tempChild[i].nodeType === 3) tempArray.push(tempChild[i]);
                     }
                     tempCon = tempArray[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
                     tempOffset = 0;
@@ -776,9 +763,9 @@ const core = function (context, plugins, lang) {
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
-                    tempChild = tempCon.childNodes;
+                    tempChild = util.getListChildNodes(tempCon);
                     for (let i = 0, len = tempChild.length; i < len; i++) {
-                        tempArray.push(tempChild[i]);
+                        if (tempChild[i].nodeType === 3) tempArray.push(tempChild[i]);
                     }
                     tempCon = tempArray[tempOffset - 1] || tempArray[0] || tempCon.previousElementSibling || tempCon.previousSibling || startCon;
                 }
@@ -789,6 +776,7 @@ const core = function (context, plugins, lang) {
             const endOff = tempOffset;
             const commonCon = range.commonAncestorContainer;
             const newNodeName = appendNode.nodeName;
+            this.setRange(startCon, startOff, endCon, endOff);
 
             let start = {}, end = {};
             let newNode, regExp;
@@ -1788,6 +1776,19 @@ const core = function (context, plugins, lang) {
             }
         },
 
+        onMouseUp_wysiwyg: function () {
+            event._findButtonEffectTag();
+
+            if (editor._isBalloon) {
+                if (editor.getRange().collapsed) {
+                    event._hideToolbar();
+                } else {
+                    event._showToolbarBalloon();
+                    return;
+                }
+            }
+        },
+
         onClick_wysiwyg: function (e) {
             e.stopPropagation();
             const targetElement = e.target;
@@ -1818,18 +1819,6 @@ const core = function (context, plugins, lang) {
                 });
 
                 return;
-            }
-
-            editor._setEditorRange();
-            event._findButtonEffectTag();
-
-            if (editor._isBalloon) {
-                if (editor.getRange().collapsed) {
-                    event._hideToolbar();
-                } else {
-                    event._showToolbarBalloon();
-                    return;
-                }
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -1871,7 +1860,7 @@ const core = function (context, plugins, lang) {
                 isDirTop = selection.focusOffset < selection.anchorOffset;
             } else {
                 const childNodes = util.getListChildNodes(range.commonAncestorContainer);
-                isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
+                isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode);
             }
 
             let rects = range.getClientRects();
@@ -2020,7 +2009,6 @@ const core = function (context, plugins, lang) {
         },
 
         onKeyUp_wysiwyg: function (e) {
-            editor._setEditorRange();
             editor.controllersOff();
             const selectionNode = editor.getSelectionNode();
 
@@ -2038,14 +2026,12 @@ const core = function (context, plugins, lang) {
                 oFormatTag.innerHTML = util.zeroWidthSpace;
 
                 selectionNode.appendChild(oFormatTag);
-                editor.setSelectionNode(oFormatTag);
                 editor.setRange(oFormatTag, 0, oFormatTag, 0);
                 return;
             }
 
             if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
                 editor.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
-                editor._setEditorRange();
                 event._findButtonEffectTag();
                 return;
             }
@@ -2182,6 +2168,7 @@ const core = function (context, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
     /** editor area */
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
+    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);

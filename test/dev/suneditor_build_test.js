@@ -14,7 +14,7 @@ suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
     buttonList: [
         [
-        'formatBlock',
+        'formatBlock', 'fontColor', 'fontSize',
         'bold', 'underline', 'italic', 'strike',
         'removeFormat', 'table',
         'link',
