@@ -1776,9 +1776,13 @@ const core = function (context, plugins, lang) {
             }
         },
 
-        onMouseUp_wysiwyg: function () {
-            event._findButtonEffectTag();
+        onMouseDown_wysiwyg: function (e) {
+            e.stopPropagation();
+            editor.submenuOff();
+        },
 
+        onMouseUp_wysiwyg: function (e) {
+            e.stopPropagation();
             if (editor._isBalloon) {
                 if (editor.getRange().collapsed) {
                     event._hideToolbar();
@@ -1792,7 +1796,6 @@ const core = function (context, plugins, lang) {
         onClick_wysiwyg: function (e) {
             e.stopPropagation();
             const targetElement = e.target;
-            editor.submenuOff();
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
@@ -1820,6 +1823,8 @@ const core = function (context, plugins, lang) {
 
                 return;
             }
+
+            event._findButtonEffectTag();
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
@@ -2168,6 +2173,7 @@ const core = function (context, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
     /** editor area */
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
+    context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
