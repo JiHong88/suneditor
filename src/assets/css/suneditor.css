@@ -205,8 +205,8 @@
 .sun-editor .sub-form-group button {float:right; width:auto; height:100%; background-color:#bbd5e0; border-color: #a2bfcc; outline: 0 none; padding: 0 15px 0 15px;}
 
 /* editor area */
-.sun-editor .sun-editor-id-editorArea {position:static; width:100%; overflow: auto; z-index:1; -webkit-overflow-scrolling:touch;}
-.sun-editor .sun-editor-id-editorArea .input_editor {width:100%; height:auto; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
+.sun-editor .sun-editor-id-editorArea {position:static; width:100%; height:auto; overflow:hidden; z-index:1;}
+.sun-editor .sun-editor-id-editorArea .input_editor {width:100%; height:100%; overflow:auto; -webkit-overflow-scrolling:touch; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
 .sun-editor .sun-editor-id-editorArea .input_editor:focus {outline:none;}
 .sun-editor .sun-editor-id-editorArea .sun-editor-id-code {background-color:#191919; color:#fff; font-family: Helvetica Neue, sans-serif; font-size:13px; word-break:break-all; padding:0; margin:0;}
 

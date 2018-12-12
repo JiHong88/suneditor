@@ -97,9 +97,6 @@ const _Constructor = {
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
         editor_div.className = 'sun-editor-id-editorArea';
-        editor_div.style.height = options.height;
-        editor_div.style.minHeight = options.minHeight;
-        editor_div.style.maxHeight = options.maxHeight;
     
         /** wysiwyg div */
         const wysiwyg_div = doc.createElement('DIV');
@@ -108,6 +105,9 @@ const _Constructor = {
         wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
         wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
+        wysiwyg_div.style.height = options.height;
+        wysiwyg_div.style.minHeight = options.minHeight;
+        wysiwyg_div.style.maxHeight = options.maxHeight;
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
