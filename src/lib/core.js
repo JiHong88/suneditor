@@ -1883,8 +1883,8 @@ const core = function (context, plugins, lang) {
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbarWidth / 2;
-            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + _w.scrollY;
+            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
+            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + (_w.scrollY || _d.documentElement.scrollTop);
 
             const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
             
