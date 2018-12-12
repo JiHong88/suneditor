@@ -607,7 +607,7 @@ export default {
         this.plugins.image.cancelPercentAttr.call(this);
 
         contextImage._element.style.maxWidth = '100%';
-        contextImage._element.style.width = '';
+        contextImage._element.style.width = '100%';
         contextImage._element.style.height = '';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
