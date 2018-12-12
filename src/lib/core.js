@@ -1824,12 +1824,10 @@ const core = function (context, plugins, lang) {
             event._findButtonEffectTag();
 
             if (editor._isBalloon) {
-                const range = editor.getRange();
-
-                if (range.collapsed) {
+                if (editor.getRange().collapsed) {
                     event._hideToolbar();
                 } else {
-                    event._showToolbarBalloon(range);
+                    event._showToolbarBalloon();
                     return;
                 }
             }
@@ -1862,7 +1860,8 @@ const core = function (context, plugins, lang) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _showToolbarBalloon: function (range) {
+        _showToolbarBalloon: function () {
+            const range = editor.getRange();
             const padding = 20;
             const toolbar = context.element.toolbar;
             const selection = _w.getSelection();
@@ -1944,7 +1943,7 @@ const core = function (context, plugins, lang) {
 
             /** Shortcuts */
             if (ctrl && !/^(?:16|17|18)$/.test(keyCode)) {
-                if (!(shift && keyCode !== 83) && shortcutCommand(keyCode)) {
+                if (!(!shift && keyCode === 83) && shortcutCommand(keyCode)) {
                     e.preventDefault();
                     return;
                 }
@@ -2024,6 +2023,11 @@ const core = function (context, plugins, lang) {
             editor._setEditorRange();
             editor.controllersOff();
             const selectionNode = editor.getSelectionNode();
+
+            if (editor._isBalloon && !editor.getRange().collapsed) {
+                event._showToolbarBalloon();
+                return;
+            }
 
             /** when format tag deleted */
             if (e.keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent.length === 0) {
