@@ -2100,7 +2100,7 @@ const core = function (context, plugins, lang) {
         },
 
         onResize_window: function () {
-            if (context.element.topArea.offsetWidth === 0) return;
+            if (context.element.toolbar.offsetWidth === 0) return;
 
             if (editor._variable.isFullScreen) {
                 editor._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
@@ -2115,7 +2115,7 @@ const core = function (context, plugins, lang) {
         },
 
         onScroll_window: function () {
-            if (editor._variable.isFullScreen || context.element.topArea.offsetWidth === 0) return;
+            if (editor._variable.isFullScreen || context.element.toolbar.offsetWidth === 0) return;
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
