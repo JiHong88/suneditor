@@ -21,7 +21,7 @@ suneditor.create(document.getElementById('editor'), {
         ]
     ],
     height: 'auto',
-    // width: '500px',
+    width: '500px',
     mode: 'balloon',
     stickyToolbar: '0',
     videoResizing: false,

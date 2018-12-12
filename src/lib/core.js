@@ -250,7 +250,7 @@ const core = function (context, plugins, lang) {
          * @param {Boolean} showDefaultUI - javascript execCommand function property
          * @param {String} value - javascript execCommand function property
          */
-        execCommand: function (command, showDefaultUI, value, styleWithCss) {
+        execCommand: function (command, showDefaultUI, value) {
             _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
         },
 
@@ -1846,7 +1846,7 @@ const core = function (context, plugins, lang) {
                     const hideToolbar = function () {
                         event._hideToolbar();
                         _d.removeEventListener('click', hideToolbar);
-                    }
+                    };
 
                     _d.addEventListener('click', hideToolbar);
                 }
@@ -1863,26 +1863,38 @@ const core = function (context, plugins, lang) {
         },
 
         _showToolbarBalloon: function (range) {
+            const padding = 20;
             const toolbar = context.element.toolbar;
-            const childNodes = util.getListChildNodes(range.commonAncestorContainer);
             const selection = _w.getSelection();
-            const isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
+
+            let isDirTop;
+            if (selection.focusNode === selection.anchorNode) {
+                isDirTop = selection.focusOffset < selection.anchorOffset;
+            } else {
+                const childNodes = util.getListChildNodes(range.commonAncestorContainer);
+                isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode)
+            }
 
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
             
             toolbar.style.display = 'block';
 
-            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbar.offsetWidth / 2;
-            let t = (isDirTop ? rects.top - toolbar.offsetHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + _w.scrollY;
+            const toolbarWidth = toolbar.offsetWidth;
+            const toolbarHeight = toolbar.offsetHeight;
+
+            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + _w.scrollX - toolbarWidth / 2;
+            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + _w.scrollY;
+
+            const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
             
-            toolbar.style.left = (l < 0 ? 20 : l) + 'px';
+            toolbar.style.left = (l < 0 ? padding : overRight < 0 ? l : l - overRight - padding) + 'px';
             toolbar.style.top = (t) + 'px';
 
             if (isDirTop) {
                 util.removeClass(context.element._arrow, 'arrow-up');
                 util.addClass(context.element._arrow, 'arrow-down');
-                context.element._arrow.style.top = (toolbar.offsetHeight) + 'px';
+                context.element._arrow.style.top = (toolbarHeight) + 'px';
             } else {
                 util.removeClass(context.element._arrow, 'arrow-down');
                 util.addClass(context.element._arrow, 'arrow-up');
@@ -1890,8 +1902,9 @@ const core = function (context, plugins, lang) {
             }
 
             const arrow_width = context.element._arrow.offsetWidth;
-            const arrow_left = (toolbar.offsetWidth / 2 + (l < 0 ? l - arrow_width : 0));
-            context.element._arrow.style.left = (arrow_left < arrow_width / 2 ? arrow_width / 2 - 1 : arrow_left) + 'px';
+            const arrow_left = (toolbarWidth / 2 + (l < 0 ? l - arrow_width : overRight < 0 ? 0 : overRight + arrow_width));
+            const arrow_point_width = arrow_width / 2;
+            context.element._arrow.style.left = (arrow_left < arrow_point_width ? arrow_point_width : arrow_left + arrow_point_width >= toolbarWidth ? arrow_left - arrow_point_width : arrow_left) + 'px';
         },
 
         _showToolbarInline: function () {
@@ -2162,7 +2175,7 @@ const core = function (context, plugins, lang) {
     /** add event listeners */
     /** toolbar event */
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
-    context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault() }, false);
+    context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
     /** editor area */
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
