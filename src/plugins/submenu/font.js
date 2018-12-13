@@ -43,7 +43,7 @@ export default {
                 'Verdana'
             ] : option.font;
 
-        let list = '<div class="inner_layer list_family">' +
+        let list = '<div class="sun-editor-submenu inner_layer list_family">' +
             '   <ul class="list_editor sun-editor-list-font-family">';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];

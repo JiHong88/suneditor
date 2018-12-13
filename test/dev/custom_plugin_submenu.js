@@ -42,7 +42,7 @@ export default {
     setSubmenu: function () {
         const listDiv = document.createElement('DIV');
 
-        listDiv.className = 'layer_editor layer_align';
+        listDiv.className = 'sun-editor-submenu layer_editor layer_align';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +

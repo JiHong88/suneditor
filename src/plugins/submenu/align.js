@@ -31,7 +31,7 @@ export default {
         listDiv.className = 'layer_editor layer_align';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer">' +
+            '<div class="sun-editor-submenu inner_layer">' +
             '   <ul class="list_editor">' +
             '       <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" title="' + lang.toolbar.alignLeft + '"><span class="img_editor icon-align-left"></span>' + lang.toolbar.alignLeft + '</button></li>' +
             '       <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" title="' + lang.toolbar.alignCenter + '"><span class="img_editor icon-align-center"></span>' + lang.toolbar.alignCenter + '</button></li>' +

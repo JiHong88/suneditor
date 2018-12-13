@@ -27,7 +27,7 @@ export default {
 
     setSubmenu: function (option) {
         const listDiv = util.createElement('DIV');
-        listDiv.className = 'layer_editor layer_size';
+        listDiv.className = 'sun-editor-submenu layer_editor layer_size';
         listDiv.style.display = 'none';
 
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;

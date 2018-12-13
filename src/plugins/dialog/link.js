@@ -29,6 +29,7 @@ export default {
         let link_button = eval(this.setController_LinkButton(core.lang));
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
+        link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
         link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
@@ -148,7 +149,7 @@ export default {
         
         linkBtn.style.display = 'block';
 
-        this.controllerArray = [linkBtn];
+        this.controllersOn(linkBtn);
     },
 
     onClick_linkBtn: function (e) {

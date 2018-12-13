@@ -40,7 +40,7 @@ export default {
     setSubmenu: function (colorArea) {
         const listDiv = util.createElement('DIV');
 
-        listDiv.className = 'layer_editor';
+        listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
         listDiv.innerHTML = colorArea;
 

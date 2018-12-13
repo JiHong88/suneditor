@@ -51,9 +51,21 @@ const core = function (context, plugins, lang) {
         dialogForm: null,
 
         /**
+         * @description current subment name
+         * @private
+         */
+        _submenuName: '',
+
+        /**
          * @description submenu element
          */
         submenu: null,
+
+        /**
+         * @description binded submenuOff method
+         * @private
+         */
+        _bindedSubmenuOff: null,
 
         /**
          * @description active button element in submenu
@@ -66,9 +78,10 @@ const core = function (context, plugins, lang) {
         controllerArray: [],
 
         /**
-         * @description The functions array to be executed when the controllersOff function is executed ex) init function of table plugin
+         * @description binded controllersOff method
+         * @private
          */
-        controllerFunction: [],
+        _bindControllersOff: null,
 
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
@@ -144,6 +157,8 @@ const core = function (context, plugins, lang) {
             tabSize: 4,
             minResizingSize: 65,
             currentNodes: [],
+            _range: null,
+            _selectionNode: null,
             _originCssText: context.element.topArea.style.cssText,
             _bodyOverflow: '',
             _editorAreaOriginCssText: '',
@@ -191,7 +206,7 @@ const core = function (context, plugins, lang) {
          * @param {Element} element - Submenu element to call
          */
         submenuOn: function (element) {
-            const submenuName = element.getAttribute('data-command');
+            const submenuName = this._submenuName = element.getAttribute('data-command');
             if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
 
             this.submenu = element.nextElementSibling;
@@ -202,6 +217,9 @@ const core = function (context, plugins, lang) {
             const overLeft = this.context.element.toolbar.offsetWidth - (element.parentElement.offsetLeft + this.submenu.offsetWidth);
             if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
             else this.submenu.style.left = '1px';
+
+            this._bindedSubmenuOff = this.submenuOff.bind(this);
+            _d.addEventListener('mousedown', this._bindedSubmenuOff, false);
         },
 
         /**
@@ -209,10 +227,12 @@ const core = function (context, plugins, lang) {
          */
         submenuOff: function () {
             if (this.submenu) {
+                this._submenuName = '';
                 this.submenu.style.display = 'none';
                 this.submenu = null;
                 util.removeClass(this.submenuActiveButton, 'on');
                 this.submenuActiveButton = null;
+                _d.removeEventListener('mousedown', this._bindedSubmenuOff);
             }
 
             this.controllersOff();
@@ -221,22 +241,29 @@ const core = function (context, plugins, lang) {
         /**
          * @description Disable controller in editor area (link button, image resize button)
          */
+        controllersOn: function () {
+            for (let i = 0; i < arguments.length; i++) {
+                arguments[i].style.display = 'block';
+                this.controllerArray[i] = arguments[i];
+            }
+
+            this._bindControllersOff = this.controllersOff.bind(this);
+            _d.addEventListener('mousedown', this._bindControllersOff, false);
+        },
+
+        /**
+         * @description Disable controller in editor area (link button, image resize button)
+         */
         controllersOff: function () {
             const len = this.controllerArray.length;
-            const fLen = this.controllerFunction.length;
 
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     this.controllerArray[i].style.display = 'none';
                 }
-                this.controllerArray = [];
-            }
 
-            if (fLen > 0) {
-                for (let i = 0; i < fLen; i++) {
-                    this.controllerFunction[i]();
-                }
-                this.controllerFunction = [];
+                this.controllerArray = [];
+                _d.removeEventListener('mousedown', this._bindControllersOff);
             }
         },
 
@@ -293,7 +320,7 @@ const core = function (context, plugins, lang) {
          * @returns {Object}
          */
         getRange: function () {
-            return this._editorRange().range;
+            return this._variable._range || this._createDefaultRange();
         },
 
         /**
@@ -301,16 +328,17 @@ const core = function (context, plugins, lang) {
          * @returns {Node}
          */
         getSelectionNode: function () {
-            return this._editorRange().selectionNode || context.element.wysiwyg.firstChild;
+            return this._variable._selectionNode || context.element.wysiwyg.firstChild;
         },
 
         /**
          * @description Saving the range object and the currently selected node of editor
-         * @returns {Object, Element}
          * @private
          */
         _editorRange: function () {
             const selection = _w.getSelection();
+            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg')) return;
+            
             let range = null;
             let selectionNode = null;
 
@@ -321,16 +349,15 @@ const core = function (context, plugins, lang) {
                 range = this._createDefaultRange();
             }
 
+            this._variable._range = range;
+
             if (range.collapsed) {
                 selectionNode = range.commonAncestorContainer;
             } else {
                 selectionNode = selection.extentNode || selection.anchorNode;
             }
 
-            return {
-                range: range,
-                selectionNode: selectionNode
-            };
+            this._variable._selectionNode = selectionNode;
         },
 
         /**
@@ -1729,6 +1756,24 @@ const core = function (context, plugins, lang) {
             this.removeEventListener('blur', event._cancelCaptionEdit);
         },
 
+        onMouseDown_toolbar: function (e) {
+            e.preventDefault();
+
+            let target = e.target;
+            let command = target.getAttribute('data-command');
+            let className = target.className;
+
+            while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
+                target = target.parentNode;
+                command = target.getAttribute('data-command');
+                className = target.className;
+            }
+
+            if (command === editor._submenuName || util.getParentElement(target, '.sun-editor-submenu')) {
+                e.stopPropagation();
+            }
+        },
+
         onClick_toolbar: function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1751,7 +1796,6 @@ const core = function (context, plugins, lang) {
             /** Dialog, Submenu */
             if (display) {
                 if (/submenu/.test(display) && (target.nextElementSibling === null || target !== editor.submenuActiveButton)) {
-                    editor.submenuOff();
                     editor.callPlugin(command, function () {
                         editor.submenuOn(target);
                     });
@@ -1763,11 +1807,8 @@ const core = function (context, plugins, lang) {
                     });
                 }
 
-                editor.submenuOff();
                 return;
             }
-
-            editor.submenuOff();
 
             /** default command */
             if (command) {
@@ -1776,9 +1817,14 @@ const core = function (context, plugins, lang) {
             }
         },
 
-        onMouseDown_wysiwyg: function (e) {
-            e.stopPropagation();
-            editor.submenuOff();
+        onMouseUp_wysiwyg: function () {
+            editor._editorRange();
+
+            if (editor._isBalloon) {
+                const range = editor.getRange();
+                if (range.collapsed) event._hideToolbar();
+                else event._showToolbarBalloon(range);
+            }
         },
 
         onClick_wysiwyg: function (e) {
@@ -2157,11 +2203,11 @@ const core = function (context, plugins, lang) {
 
     /** add event listeners */
     /** toolbar event */
+    context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
-    context.element.toolbar.addEventListener('mousedown', function (e) { e.preventDefault(); }, false);
     /** editor area */
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
-    context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
@@ -2184,17 +2230,6 @@ const core = function (context, plugins, lang) {
     /** inline editor */
     if (editor._isInline) {
         context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
-    }
-
-    /** balloon editor */
-    if (editor._isBalloon) {
-        function onMouseUp_wysiwyg () {
-            const range = editor.getRange();
-            if (range.collapsed) event._hideToolbar();
-            else event._showToolbarBalloon(range);
-        }
-        
-        context.element.wysiwyg.addEventListener('mouseup', onMouseUp_wysiwyg, false);
     }
 
     if (editor._isInline || editor._isBalloon) {

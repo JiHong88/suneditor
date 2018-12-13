@@ -28,7 +28,7 @@ export default {
     setSubmenu: function (lang) {
         const listDiv = util.createElement('DIV');
 
-        listDiv.className = 'layer_editor layer_line';
+        listDiv.className = 'sun-editor-submenu layer_editor layer_line';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +

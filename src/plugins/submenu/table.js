@@ -36,6 +36,7 @@ export default {
         /** set resizing */
         let resizeDiv = eval(this.setController_tableEditor(core.lang));
         context.table.resizeDiv = resizeDiv;
+        resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
         tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core));
@@ -52,7 +53,7 @@ export default {
 
     setSubmenu: function () {
         const listDiv = util.createElement('DIV');
-        listDiv.className = 'table-content';
+        listDiv.className = 'sun-editor-submenu table-content';
         listDiv.style.display = 'none';
 
         listDiv.innerHTML = '' +
@@ -174,14 +175,14 @@ export default {
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
+        this.plugins.table.init.call(this);
         const contextTable = this.context.table;
         const resizeDiv = contextTable.resizeDiv;
         
         this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
         resizeDiv.style.display = 'block';
 
-        this.controllerArray = [resizeDiv];
-        this.controllerFunction = [this.plugins.table.init.bind(this)];
+        this.controllersOn(resizeDiv);
     },
 
     setPositionControllerDiv: function (tdElement, reset) {

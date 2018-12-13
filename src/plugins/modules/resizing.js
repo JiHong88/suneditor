@@ -35,6 +35,7 @@ export default {
 
         let resize_button = eval(this.setController_button(core.lang));
         context.resizing.resizeButton = resize_button;
+        resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         let resize_handles = context.resizing.resizeHandles = resize_div_container.querySelectorAll('.sun-editor-name-resize-handle');
         context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
@@ -143,9 +144,7 @@ export default {
             resizeHandles[i].style.display = resizeDisplay;
         }
 
-        contextResizing.resizeContainer.style.display = 'block';
-        contextResizing.resizeButton.style.display = 'block';
-        contextResizing.resizeDot.style.display = 'block';
+        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
 
         // button group
         const overLeft = this.context.element.relative.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
@@ -154,8 +153,6 @@ export default {
 
         contextResizing._resize_w = w;
         contextResizing._resize_h = h;
-
-        this.controllerArray = [contextResizing.resizeContainer, contextResizing.resizeButton];
 
         const originSize = (targetElement.getAttribute('origin-size') || '').split(',');
         contextResizing._origin_w = originSize[0] || targetElement.naturalWidth;
@@ -365,7 +362,6 @@ export default {
         e.stopPropagation();
         e.preventDefault();
 
-        contextResizing.resizeDot.style.display = 'none';
         contextResizing._resizeClientX = e.clientX;
         contextResizing._resizeClientY = e.clientY;
         this.context.element.resizeBackground.style.display = 'block';
