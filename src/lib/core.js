@@ -775,10 +775,16 @@ const core = function (context, plugins, lang) {
                     tempArray = [];
                     tempChild = util.getListChildNodes(tempCon);
                     for (let i = 0, len = tempChild.length; i < len; i++) {
-                        if (tempChild[i].nodeType === 3) tempArray.push(tempChild[i]);
+                        tempArray.push(tempChild[i]);
                     }
                     tempCon = tempArray[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
                     tempOffset = 0;
+                }
+
+                if (util.isBreak(tempCon)) {
+                    const emptyText = util.createTextNode(util.zeroWidthSpace);
+                    tempCon.parentNode.insertBefore(emptyText, tempCon);
+                    tempCon = emptyText;
                 }
             }
 
@@ -792,11 +798,18 @@ const core = function (context, plugins, lang) {
                     tempArray = [];
                     tempChild = util.getListChildNodes(tempCon);
                     for (let i = 0, len = tempChild.length; i < len; i++) {
-                        if (tempChild[i].nodeType === 3) tempArray.push(tempChild[i]);
+                        tempArray.push(tempChild[i]);
                     }
                     tempCon = tempArray[tempOffset - 1] || tempArray[0] || tempCon.previousElementSibling || tempCon.previousSibling || startCon;
                 }
                 tempOffset = tempCon.textContent.length;
+
+                if (util.isBreak(tempCon)) {
+                    const emptyText = util.createTextNode(util.zeroWidthSpace);
+                    tempCon.parentNode.insertBefore(emptyText, tempCon);
+                    tempCon = emptyText;
+                    tempOffset = 0;
+                }
             }
 
             const endCon = tempCon;
