@@ -1781,18 +1781,6 @@ const core = function (context, plugins, lang) {
             editor.submenuOff();
         },
 
-        onMouseUp_wysiwyg: function (e) {
-            e.stopPropagation();
-            if (editor._isBalloon) {
-                if (editor.getRange().collapsed) {
-                    event._hideToolbar();
-                } else {
-                    event._showToolbarBalloon();
-                    return;
-                }
-            }
-        },
-
         onClick_wysiwyg: function (e) {
             e.stopPropagation();
             const targetElement = e.target;
@@ -1854,8 +1842,8 @@ const core = function (context, plugins, lang) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _showToolbarBalloon: function () {
-            const range = editor.getRange();
+        _showToolbarBalloon: function (rangeObj) {
+            const range = rangeObj || editor.getRange();
             const padding = 20;
             const toolbar = context.element.toolbar;
             const selection = _w.getSelection();
@@ -2174,7 +2162,6 @@ const core = function (context, plugins, lang) {
     /** editor area */
     context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
     context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
@@ -2194,9 +2181,20 @@ const core = function (context, plugins, lang) {
         }
     }
 
-    /** inlineToolbar */
+    /** inline editor */
     if (editor._isInline) {
         context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
+    }
+
+    /** balloon editor */
+    if (editor._isBalloon) {
+        function onMouseUp_wysiwyg () {
+            const range = editor.getRange();
+            if (range.collapsed) event._hideToolbar();
+            else event._showToolbarBalloon(range);
+        }
+        
+        context.element.wysiwyg.addEventListener('mouseup', onMouseUp_wysiwyg, false);
     }
 
     if (editor._isInline || editor._isBalloon) {
