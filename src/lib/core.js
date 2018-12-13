@@ -1757,21 +1757,28 @@ const core = function (context, plugins, lang) {
         },
 
         onMouseDown_toolbar: function (e) {
+            editor._editorRange();
             e.preventDefault();
 
             let target = e.target;
-            let command = target.getAttribute('data-command');
-            let className = target.className;
 
-            while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
-                target = target.parentNode;
-                command = target.getAttribute('data-command');
-                className = target.className;
-            }
-
-            if (command === editor._submenuName || util.getParentElement(target, '.sun-editor-submenu')) {
+            if (util.getParentElement(target, '.sun-editor-submenu')) {
                 e.stopPropagation();
+            } else {
+                let command = target.getAttribute('data-command');
+                let className = target.className;
+    
+                while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
+                    target = target.parentNode;
+                    command = target.getAttribute('data-command');
+                    className = target.className;
+                }
+    
+                if (command === editor._submenuName) {
+                    e.stopPropagation();
+                }
             }
+
         },
 
         onClick_toolbar: function (e) {
@@ -1805,8 +1812,10 @@ const core = function (context, plugins, lang) {
                     editor.callPlugin(command, function () {
                         editor.plugins.dialog.open.call(editor, command, false);
                     });
+                    return;
                 }
 
+                editor.submenuOff();
                 return;
             }
 
@@ -1953,7 +1962,6 @@ const core = function (context, plugins, lang) {
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
-            e.stopPropagation();
 
             if (editor._isBalloon) {
                 event._hideToolbar();
@@ -2049,6 +2057,7 @@ const core = function (context, plugins, lang) {
 
         onKeyUp_wysiwyg: function (e) {
             editor.controllersOff();
+            editor._editorRange();
             const selectionNode = editor.getSelectionNode();
 
             if (editor._isBalloon && !editor.getRange().collapsed) {

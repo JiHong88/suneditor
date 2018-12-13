@@ -19,7 +19,7 @@
 }
 
 /** controllers on tag */
-.sun-editor-editable a, .sun-editor-editable td, .sun-editor-editable th, 
+.sun-editor-editable td, .sun-editor-editable th, 
 .sun-editor-editable figure, .sun-editor-editable figcaption, .sun-editor-editable img, 
 .sun-editor-editable iframe {
     position: relative;
@@ -267,7 +267,6 @@
 .sun-editor-editable figure.sun-editor-figure-cover {
     display: block;
     outline: none;
-    line-height: 0;
     margin: 0;
     padding: 0;
 }
