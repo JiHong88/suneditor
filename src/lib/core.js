@@ -767,13 +767,14 @@ const core = function (context, plugins, lang) {
             }
 
             /* find text node */
-            tempCon = range.startContainer;
+            // startContainer
+            tempCon = util.isWysiwygDiv(range.startContainer) ? context.element.wysiwyg.firstChild : range.startContainer;
             tempOffset = range.startOffset;
 
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
-                    tempChild = util.getListChildNodes(tempCon);
+                    tempChild = tempCon.childNodes;
                     for (let i = 0, len = tempChild.length; i < len; i++) {
                         tempArray.push(tempChild[i]);
                     }
@@ -791,16 +792,18 @@ const core = function (context, plugins, lang) {
             const startCon = tempCon;
             const startOff = tempOffset;
 
-            tempCon = range.endContainer;
+            // endContainer
+            tempCon = util.isWysiwygDiv(range.endContainer) ? context.element.wysiwyg.lastChild : range.endContainer;
             tempOffset = range.endOffset;
+
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                     tempArray = [];
-                    tempChild = util.getListChildNodes(tempCon);
+                    tempChild = tempCon.childNodes;
                     for (let i = 0, len = tempChild.length; i < len; i++) {
                         tempArray.push(tempChild[i]);
                     }
-                    tempCon = tempArray[tempOffset - 1] || tempArray[0] || tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+                    tempCon = tempArray[tempOffset - 1] || !/FIGURE/i.test(tempArray[0].nodeName) ? tempArray[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
                 }
                 tempOffset = tempCon.textContent.length;
 
@@ -1841,7 +1844,7 @@ const core = function (context, plugins, lang) {
 
         onMouseUp_wysiwyg: function () {
             editor._editorRange();
-
+            
             if (editor._isBalloon) {
                 const range = editor.getRange();
                 if (range.collapsed) event._hideToolbar();
@@ -2069,8 +2072,8 @@ const core = function (context, plugins, lang) {
         },
 
         onKeyUp_wysiwyg: function (e) {
-            editor.controllersOff();
             editor._editorRange();
+            editor.controllersOff();
             const selectionNode = editor.getSelectionNode();
 
             if (editor._isBalloon && !editor.getRange().collapsed) {

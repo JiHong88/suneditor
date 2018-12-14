@@ -151,7 +151,7 @@ editor.create(document.getElementById('editor2'), {
 });
 editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor,
+        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize,
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
