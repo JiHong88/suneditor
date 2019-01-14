@@ -1708,7 +1708,7 @@ const core = function (context, plugins, lang) {
                     /** font size */
                     if (selectionParent.style.fontSize.length > 0) {
                         commandMapNodes.push('SIZE');
-                        util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize.match(/\d+/)[0]);
+                        util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
                         findSize = false;
                     }
                 }
