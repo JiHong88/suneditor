@@ -140,6 +140,7 @@ const editor = suneditor.init({
         plugins.horizontalRule,
         plugins.list,
         plugins.table,
+        plugins.link,
         custom_plugin_submenu
     ],
     width: '100%',
