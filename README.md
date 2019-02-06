@@ -16,8 +16,13 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 The Suneditor is based on pure javascript, with no dependencies.
 Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
 
+- Paste from Word and Excel.
+- Paste images and modify. (server upload or using base64 encoding)
+- Media embeds.
+- Many other features : )
+
 Supported Browser -
-Chrome, Opera, Firefox, Edge, IE 11, Safari(macOS, IOS), Mobile web.
+Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
 ```
 
 #### npm
