@@ -81,7 +81,7 @@ export default {
             '     <button type="button" data-command="delete" data-value="row" title="' + lang.controller.deleteRow + '"><div class="icon-delete-row"></div></button>' +
             '   </div>' +
             '</div>' +
-            '<div style="margin-top: -5px;">' +
+            '<div>' +
             '   <div class="btn-group">' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="left" title="' + lang.controller.insertColumnBefore + '"><div class="icon-insert-column-left"></div></button>' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="right" title="' + lang.controller.insertColumnAfter + '"><div class="icon-insert-column-right"></div></button>' +

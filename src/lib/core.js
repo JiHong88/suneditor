@@ -1816,6 +1816,8 @@ const core = function (context, plugins, lang) {
             if (!command && !display) return;
             if (target.disabled) return;
             
+            editor.focus();
+            
             /** Dialog, Submenu */
             if (display) {
                 if (/submenu/.test(display) && (target.nextElementSibling === null || target !== editor.submenuActiveButton)) {
@@ -1837,7 +1839,6 @@ const core = function (context, plugins, lang) {
 
             /** default command */
             if (command) {
-                editor.focus();
                 editor.commandHandler(target, command);
             }
         },
