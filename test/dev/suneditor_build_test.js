@@ -10,7 +10,7 @@ import { ko } from '../../src/lang';
 import custom_plugin_submenu from './custom_plugin_submenu';
 
 
-suneditor.create(document.getElementById('editor'), {
+let s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
     buttonList: [
         [
@@ -27,6 +27,16 @@ suneditor.create(document.getElementById('editor'), {
     videoResizing: false,
     imageWidth: 150
 });
+
+window.sun_destroy1 = function () {
+    s1.destroy();
+}
+
+window.sun_create1 = function () {
+    s1 = suneditor.create('editor', {
+    });
+}
+
 
 let ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
@@ -146,11 +156,20 @@ const editor = suneditor.init({
     width: '100%',
 });
 
-editor.create(document.getElementById('editor2'), {
+let s2 = editor.create(document.getElementById('editor2'), {
     minHeight: '150px',
     maxHeight: '500px',
 });
-editor.create(document.getElementsByName('editor3')[0], {
+window.sun_destroy2 = function () {
+    s2.destroy();
+}
+
+window.sun_create2 = function () {
+    s2 = suneditor.create('editor2', {
+    });
+}
+
+let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
         ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize,
             {
@@ -176,3 +195,11 @@ editor.create(document.getElementsByName('editor3')[0], {
     stickyToolbar: false,
     popupDisplay: 'local'
 });
+window.sun_destroy3 = function () {
+    s3.destroy();
+}
+
+window.sun_create3 = function () {
+    s3 = suneditor.create(document.getElementsByName('editor3')[0], {
+    });
+}

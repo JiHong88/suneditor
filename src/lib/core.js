@@ -11,7 +11,7 @@ import util from './util';
 import notice from '../plugins/modules/notice';
 
 /**
- * @description SunEditor core closure
+ * @description SunEditor core function
  * @param context
  * @param plugins
  * @param lang
