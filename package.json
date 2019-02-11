@@ -49,10 +49,11 @@
     "karma": "^3.1.4",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.2",
+    "lodash": ">=4.17.11",
     "mini-css-extract-plugin": "^0.4.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "url-loader": "^1.1.2",
-    "webpack": "^4.29.1",
+    "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14",
     "webpack-merge": "^4.2.1"
