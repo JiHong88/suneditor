@@ -331,6 +331,16 @@ editor.getContext();
 editor.getContents();
 
 // Gets a list of images uploaded to the editor
+/** 
+ * {
+ *  src: imgage src
+ *  index: data index
+ *  name: file name
+ *  size: file size
+ *  select: select function
+ *  delete: delete function
+ * }
+ **/
 editor.getImagesInfo();
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position

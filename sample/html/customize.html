@@ -220,6 +220,7 @@ function sun_create () {
 
         for (i = 0; i < imageList.length; i++) {
             if (!imageList[i]) continue;
+            console.log('imageList', imageList)
 
             list += '<tr><td><a href="javascript:onClickImageList(\'select\',' + i + ')">' + imageList[i].name + '</a></td>' +
                 '<td>' + imageList[i].size + '</td>' +

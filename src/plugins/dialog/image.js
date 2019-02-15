@@ -368,6 +368,7 @@ export default {
             oImg.setAttribute('data-index', dataIndex);
 
             this._variable._imagesInfo[dataIndex] = {
+                src: oImg.src,
                 index: dataIndex,
                 name: file.name,
                 size: file.size,
