@@ -202,8 +202,11 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span style="color: rgb(152, 0, 0);"> '/' </span><span style="color: rgb(53, 53, 53); font-weight: bold; font-style: italic;">// Line break</span></div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'</span>],</div>
-            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'</span>]</div>
-            <div>&nbsp; &nbsp; ]</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save'</span>]</div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; <span>callBackSave</span> : <span style="color: rgb(0, 51, 153);">function</span> (<span style="color: rgb(152, 0, 0);">contents</span>) {</div>
+            <div>&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: rgb(0, 51, 153);">console</span>.<span style="color: rgb(0, 130, 153);">log</span>(<span style="color: rgb(152, 0, 0);">contents</span>);</div>
+            <div>&nbsp; &nbsp; }</div>
             <div>});</div>
         </textarea>
 
@@ -365,8 +368,11 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'],
             '/', //Line break
             ['fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'],
-            ['link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print']
-        ]
+            ['link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save']
+        ],
+        callBackSave: function (contents) {
+            console.log(contents)
+        }
     });
 
     var suneditor = null;
