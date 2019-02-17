@@ -146,8 +146,13 @@ suneditor.create('sample', {
         ['align', 'horizontalRule', 'list', 'table'],
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
-    ]
+        ['preview', 'print'],
+        ['save']
+    ],
+    // Callback functions that is called when the Save button is clicked
+    callBackSave: function (contents) {
+        alert(contents)
+    }
 })
 
 // You can also load what you want
@@ -183,7 +188,8 @@ suneditor.create('sample', {
         [align, horizontalRule, list, table],
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
+        ['preview', 'print'],
+        ['save']
     ],
 })
 ```
@@ -211,7 +217,7 @@ const initEditor = suneditor.init({
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print']
+        'preview', 'print', 'save']
     ]
 });
 
