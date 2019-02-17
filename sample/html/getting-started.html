@@ -290,6 +290,8 @@ videoResizing   <span class="pl-k">:</span> Can resize the video <span class="pl
 videoWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.         <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
 videoHeight     <span class="pl-k">:</span> The default heigth size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is clicked. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Function</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
                 default<span class="pl-k">:</span> [
                     [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
@@ -302,7 +304,8 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
                     <span class="pl-c"><span class="pl-c">//</span> ['align', 'horizontalRule', 'list', 'table'],</span>
                     <span class="pl-c"><span class="pl-c">//</span> ['link', 'image', 'video'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
-                    [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
+                    [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
+                    <span class="pl-c"><span class="pl-c">//</span> ['save']</span>
                 ]</pre>
 </div>
 

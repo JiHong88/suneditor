@@ -53,6 +53,8 @@ const _Constructor = {
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
+        // callBack function
+        // options.callBackSave = options.callBackSave;
         // buttons
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
@@ -242,6 +244,10 @@ const _Constructor = {
 
             print: ['', lang.toolbar.print, 'print', '',
                 '<div class="icon-print"></div>'
+            ],
+
+            save: ['', lang.toolbar.save, 'save', '',
+                '<div class="icon-save"></div>'
             ],
 
             /** plugins - submenu */

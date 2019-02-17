@@ -159,6 +159,18 @@ const editor = suneditor.init({
 let s2 = editor.create(document.getElementById('editor2'), {
     minHeight: '150px',
     maxHeight: '500px',
+    buttonList: [
+        ['undo', 'redo', 'save'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        ['indent', 'outdent'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print']
+    ],
+    callBackSave: function (contents) {
+        alert(contents)
+    }
+        
 });
 window.sun_destroy2 = function () {
     s2.destroy();

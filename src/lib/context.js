@@ -65,7 +65,8 @@ const _Context = function (element, cons, options) {
             imageUploadUrl: options.imageUploadUrl,
             videoResizing: options.videoResizing,
             videoWidth: options.videoWidth,
-            videoHeight: options.videoHeight
+            videoHeight: options.videoHeight,
+            callBackSave: options.callBackSave
         }
     };
 };

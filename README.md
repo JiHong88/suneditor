@@ -23,6 +23,9 @@ Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your 
 
 Supported Browser -
 Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
+
+Supported Languages
+KO, EN, DE
 ```
 
 #### npm
@@ -293,6 +296,8 @@ videoResizing   : Can resize the video iframe.                       default: tr
 videoWidth      : The default width size of the video frame.         default: 560 {Number}
 videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
 ------------------------------------------------------------------------------------------------------------------
+callBackSave    : Callback functions that is called when the Save button is clicked. default: null {Function}
+------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
                 default: [
                     ['undo', 'redo'],
@@ -305,7 +310,8 @@ buttonList      : Defines button list to array {Array}
                     // ['align', 'horizontalRule', 'list', 'table'],
                     // ['link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
-                    ['preview', 'print']
+                    ['preview', 'print'],
+                    // ['save'],
                 ]
 ```
 
