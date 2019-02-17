@@ -9,6 +9,7 @@
 
 export default {
     toolbar: {
+        save: 'Save',
         font: 'Font',
         formats: 'Formats',
         fontSize: 'Size',

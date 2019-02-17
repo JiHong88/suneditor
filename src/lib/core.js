@@ -1460,6 +1460,13 @@ const core = function (context, plugins, lang) {
                     this.execCommand(command, false, null);
                     util.toggleClass(target, 'on');
                     break;
+                case 'save':
+                    if (typeof context.option.callBackSave === 'function') {
+                        context.option.callBackSave(this.getContents());
+                    } else {
+                        throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave)');
+                    }
+                    break;
                 default : // 'bold', 'underline', 'italic', 'strike'
                     this.execCommand(command, false, target.getAttribute('data-value'));
                     util.toggleClass(target, 'on');

@@ -9,6 +9,7 @@
 
 export default {
     toolbar: {
+        save: '저장',
         font: '글꼴',
         formats: '문단 형식',
         fontSize: '크기',
