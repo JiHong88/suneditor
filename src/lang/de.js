@@ -72,7 +72,7 @@ export default {
         },
         caption: 'Beschreibung eingeben',
         close: 'Schließen',
-        submitButton: 'Absenden',
+        submitButton: 'Übernehmen',
         revertButton: 'Rückgängig',
         proportion: 'Seitenverhältnis beibehalten',
         width: 'Breite',
