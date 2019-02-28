@@ -111,7 +111,7 @@ const core = function (context, plugins, lang) {
          * @private
          */
         _imageUpload: function (targetImgElement, index, isDelete) {
-            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement, index, isDelete);
+            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement, index * 1, isDelete);
         },
 
         /**
