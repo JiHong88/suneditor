@@ -283,8 +283,9 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>, <span class="pl-smi">imageInfo</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement :<span class="pl-pds">'</span></span> <span class="pl-k">+</span> targetImgElement <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(imageInfo)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement<span class="pl-pds">'</span></span>, targetImgElement)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>imageInfo<span class="pl-pds">'</span></span>, imageInfo)
 }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
@@ -458,7 +459,11 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
-        suneditor.onImageUpload = function (targetImgElement, index, isDelete) { console.log(console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)) }
+        suneditor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) { 
+            console.log('targetImgElement', targetImgElement)
+            console.log('index : ' + index + ', isDelete : ' + isDelete)
+            console.log('imageInfo', imageInfo)
+        }
     }
 
     sun_create();
