@@ -1,8 +1,9 @@
 'use strict';
 
-import en from './en';
-import ko from './ko';
 import de from './de';
+import en from './en';
+import ja from './ja';
+import ko from './ko';
 
-export { en, ko, de };
-export default { en, ko, de };
+export { de, en, ja, ko };
+export default { de, en, ja, ko };
