@@ -358,7 +358,6 @@ export default {
     },
 
     _onload_image: function (oImg, file) {
-        if (/\d+/.test(oImg.style.width)) oImg.style.height = oImg.offsetHeight + 'px';
         oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
         oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
 
