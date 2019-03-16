@@ -282,7 +282,7 @@ imageUploadUrl  <span class="pl-k">:</span> The image upload to server mapping <
                     ex) <span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
                     When not used, it enters base64 data
                     <span class="pl-k">return</span> {
-                        <span class="pl-s"><span class="pl-pds">"</span>errorMessage<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>insert error message<span class="pl-pds">"</span></span>,
+                            <span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>insert error message<span class="pl-pds">"</span></span>,
                             <span class="pl-s"><span class="pl-pds">"</span>result<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
                                 {
                                     <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/download/editorImg/test_image.jpg<span class="pl-pds">"</span></span>,
@@ -377,8 +377,15 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 <span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>) {
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>, <span class="pl-smi">imageInfo</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement :<span class="pl-pds">'</span></span> <span class="pl-k">+</span> targetImgElement <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, index : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> index <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>, isDelete : <span class="pl-pds">'</span></span> <span class="pl-k">+</span> isDelete)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(imageInfo)
+}
+
+<span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
+<span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
+    <span class="pl-c1">alert</span>(errorMessage)
 }</pre>
 </div>
     

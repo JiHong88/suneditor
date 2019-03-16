@@ -213,14 +213,16 @@ function sun_create () {
         ]
     });
 
-    editor.onImageUpload = function (targetImgElement, index, isDelete) {
+    editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {
         var imageList = editor.getImagesInfo();
         var list = '';
         var i;
 
+        console.log('imageInfo', imageInfo);
+        console.log('imageList', imageList)
+
         for (i = 0; i < imageList.length; i++) {
             if (!imageList[i]) continue;
-            console.log('imageList', imageList)
 
             list += '<tr><td><a href="javascript:onClickImageList(\'select\',' + i + ')">' + imageList[i].name + '</a></td>' +
                 '<td>' + imageList[i].size + '</td>' +

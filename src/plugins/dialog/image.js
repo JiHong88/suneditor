@@ -203,7 +203,7 @@ export default {
                 const imageUploadUrl = this.context.option.imageUploadUrl;
                 const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
-                if (imageUploadUrl !== null && imageUploadUrl.length > 0) {
+                if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
                     const formData = new FormData();
 
                     for (let i = 0; i < filesLen; i++) {
@@ -261,7 +261,9 @@ export default {
 
                 if (response.errorMessage) {
                     this.closeLoading();
-                    notice.open.call(this, response.errorMessage);
+                    if (this._imageUploadError(response.errorMessage, response.result)) {
+                        notice.open.call(this, response.errorMessage);
+                    }
                 } else {
                     const fileList = response.result;
                     for (let i = 0, len = (update && fileList.length > 0 ? 1 : fileList.length); i < len; i++) {
@@ -386,13 +388,11 @@ export default {
             oImg.setAttribute('data-file-size', file.size);
         }
         else {
-            const imgInfo = this._variable._imagesInfo[dataIndex];
-
-            imgInfo.name = oImg.getAttribute("data-file-name");
-            imgInfo.size = oImg.getAttribute("data-file-size") * 1;
+            this._variable._imagesInfo[dataIndex].oImg.getAttribute("data-file-name");
+            this._variable._imagesInfo[dataIndex].oImg.getAttribute("data-file-size") * 1;
         }
 
-        this._imageUpload(oImg, dataIndex, false);
+        this._imageUpload(oImg, dataIndex, false, this._variable._imagesInfo[dataIndex]);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {

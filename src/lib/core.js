@@ -110,8 +110,17 @@ const core = function (context, plugins, lang) {
          * @description An user event function when image uploaded success or remove image
          * @private
          */
-        _imageUpload: function (targetImgElement, index, isDelete) {
-            if (userFunction.onImageUpload) userFunction.onImageUpload(targetImgElement, index * 1, isDelete);
+        _imageUpload: function (targetImgElement, index, isDelete, imageInfo) {
+            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, isDelete, imageInfo);
+        },
+
+        /**
+         * @description An user event function when image upload failed
+         * @private
+         */
+        _imageUploadError: function (errorMessage, result) {
+            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result);
+            return true
         },
 
         /**
@@ -2298,8 +2307,16 @@ const core = function (context, plugins, lang) {
          * @param {Element} targetImgElement - Current img element
          * @param {Number} index - Uploaded index
          * @param {Boolean} isDelete - Whether or not it was called after the delete operation
+         * @param {Object} imageInfo - Image info object
          */
         onImageUpload: null,
+
+        /**
+         * @description Called when the image is upload failed
+         * @param {String} errorMessage - Error message
+         * @param {Object} result - Result info Object
+         */
+        onImageUploadError: null,
 
         /**
          * @description Open a notice area
@@ -2439,6 +2456,7 @@ const core = function (context, plugins, lang) {
             this.onDrop = null;
             this.save = null;
             this.onImageUpload = null;
+            this.onImageUploadError = null;
             this.noticeOpen = null;
             this.noticeClose = null;
             this.getContext = null;

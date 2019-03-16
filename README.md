@@ -25,7 +25,7 @@ Supported Browser -
 Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
 
 Supported Languages
-KO, EN, DE
+DE, EN, JA, KO
 ```
 
 #### npm
@@ -288,7 +288,7 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data
                   return {
-                      "errorMessage": "insert error message",
+                            "errorMessage": "insert error message",
                             "result": [
                                 {
                                     "url": "/download/editorImg/test_image.jpg",
@@ -392,9 +392,16 @@ editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
 
 editor.onDrop = function (e) { console.log('onDrop', e) }
 
-// Called when the image is uploaded or the uploaded image is deleted
-editor.onImageUpload = function (targetImgElement, index, isDelete) {
+// Called when the image is uploaded or the uploaded image is deleted.
+editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {
     console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)
+    console.log(imageInfo)
+}
+
+// Called when the image is upload failed.
+// If you return false, the default notices are not called.
+editor.onImageUploadError = function (errorMessage, result) {
+    alert(errorMessage)
 }
 ```
 
