@@ -301,11 +301,15 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
 videoWidth      : The default width size of the video frame.         default: 560 {Number}
 videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+youtubeQuery    : The default youtube Query String of the video frame. default: '' {String}
+                  It takes precedence over the value you enter manually
+                  ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
+                    // https://developers.google.com/youtube/player_parameters
 ------------------------------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. default: null {Function}
 ------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
-                default: [
+                  default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -318,7 +322,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save'],
-                ]
+                  ]
 ```
 
 ### Functions

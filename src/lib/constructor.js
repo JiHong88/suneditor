@@ -53,6 +53,7 @@ const _Constructor = {
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
+        options.youtubeQuery = options.youtubeQuery || '';
         // callBack function
         // options.callBackSave = options.callBackSave;
         // buttons

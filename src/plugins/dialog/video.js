@@ -34,7 +34,8 @@ export default {
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: 'float\\-[a-z]+',
-            _resizing: context.option.videoResizing
+            _resizing: context.option.videoResizing,
+            _youtubeQuery: context.option.youtubeQuery
         };
 
         /** video dialog */
@@ -163,6 +164,15 @@ export default {
                     url = url.replace('watch?v=', '');
                     if (!/^\/\/.+\/embed\//.test(url)) {
                         url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
+                    }
+
+                    if (contextVideo._youtubeQuery.length > 0) {
+                        if (/\?/.test(url)) {
+                            const splitUrl = url.split('?');
+                            url = splitUrl[0] + '?' + contextVideo._youtubeQuery + '&' + splitUrl[1];
+                        } else {
+                            url += '?' + contextVideo._youtubeQuery;
+                        }
                     }
                 }
                 oIframe.src = url;
