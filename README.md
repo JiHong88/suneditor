@@ -301,8 +301,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
 videoWidth      : The default width size of the video frame.         default: 560 {Number}
 videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
-youtubeQuery    : The default youtube Query String of the video frame. default: '' {String}
-                  It takes precedence over the value you enter manually
+youtubeQuery    : The query string of a YouTube embedded URL.            default: '' {String}
+                  It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
 ------------------------------------------------------------------------------------------------------------------
