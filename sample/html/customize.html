@@ -131,6 +131,9 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoHeight">&nbsp;&nbsp;videoHeight</label>
             <input type="text" id="videoHeight_value" placeholder="Number">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
+            <input type="text" id="youtubeQuery_value" placeholder="String">
         </div>
         <br>
         <button type="button" class="btn btn-lg" onclick="sun_create()">Create</button>
@@ -199,6 +202,7 @@ function sun_create () {
         videoResizing: document.getElementById('videoResizing').checked,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
+        youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : null,
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
