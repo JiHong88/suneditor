@@ -25,7 +25,7 @@ Supported Browser -
 Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
 
 Supported Languages
-DE, EN, JA, KO
+DE, EN, JA, KO, ZH_CN
 ```
 
 #### npm
@@ -254,7 +254,7 @@ plugins: [
     video
 ]               : Plugins array.                                    default: null {Array}
 ------------------------------------------------------------------------------------------------------------------
-lang            : language object. (en, ko) default : English {Object}
+lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode. default: 'max-content' {Number|String}
