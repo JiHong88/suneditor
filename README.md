@@ -101,11 +101,12 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {en, ko} from 'suneditor/src/lang'
-import lang from 'suneditor/src/lang'
-import de from 'suneditor/src/lang/de'
 import {align, font, fontSize, fontColor, hiliteColor,
         horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+// How to import language files (default: en)
+import lang from 'suneditor/src/lang'
+import {en, ko} from 'suneditor/src/lang'
+import de from 'suneditor/src/lang/de'
 
 suneditor.create('sample', {
     plugins: [
@@ -128,7 +129,7 @@ suneditor.create('sample', {
         ['align', 'horizontalRule', 'list', 'table'],
         ['link', 'image', 'video']
     ],
-    lang: ko
+    lang: lang['ko']
 });
 ```
 
