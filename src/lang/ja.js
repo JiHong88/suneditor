@@ -5,6 +5,8 @@
  * Copyright 2019 JiHong Lee.
  * MIT license.
  */
+'use strict';
+
 (function (global, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?
@@ -19,8 +21,6 @@
         factory(global);
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
-    'use strict';
-
     const lang = {
         toolbar: {
             save: '保存',
@@ -118,10 +118,10 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {}
+            window.SUNEDITOR_LANG = {};
         }
 
-        window.SUNEDITOR_LANG['ja'] = lang;
+        window.SUNEDITOR_LANG.ja = lang;
     }
 
     return lang;

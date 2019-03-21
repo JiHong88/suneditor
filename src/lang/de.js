@@ -21,8 +21,6 @@
         factory(global);
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
-    'use strict';
-
     const lang = {
         toolbar: {
             save: 'Speichern',
@@ -120,10 +118,10 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {}
+            window.SUNEDITOR_LANG = {};
         }
 
-        window.SUNEDITOR_LANG['de'] = lang;
+        window.SUNEDITOR_LANG.de = lang;
     }
 
     return lang;

@@ -120,7 +120,7 @@ const core = function (context, plugins, lang) {
          */
         _imageUploadError: function (errorMessage, result) {
             if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result);
-            return true
+            return true;
         },
 
         /**
