@@ -1790,7 +1790,6 @@ const core = function (context, plugins, lang) {
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
-            editor._editorRange();
 
             if (util.getParentElement(target, '.sun-editor-submenu')) {
                 e.stopPropagation();
