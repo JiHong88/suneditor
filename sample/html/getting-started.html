@@ -56,7 +56,8 @@
     <article class="markdown-body entry-content" itemprop="text">
 <a id="include" href="#include"><h4>1. Include JS/CSS</h4></a>
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../src/lang/ko.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
 
     <a id="target" href="#target"><h4>2. Target a element</h4></a>
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span class="pl-ent">textarea</span>&gt;</pre></div>
@@ -69,7 +70,9 @@
 <span class="pl-c"><span class="pl-c">//</span> ID or DOM object</span>
 <span class="pl-k">const</span> <span class="pl-c1">suneditor</span> <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>((<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>) <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>),{
     <span class="pl-c"><span class="pl-c">//</span> All of the plugins are loaded in the "window.SUNEDITOR" object in dist/suneditor.min.js file</span>
-    <span class="pl-c"><span class="pl-c">//</span> insert options</span>
+    <span class="pl-c"><span class="pl-c">//</span> Insert options</span>
+    <span class="pl-c"><span class="pl-c">//</span> Language global object</span>
+    lang<span class="pl-k">:</span> <span class="pl-c1">SUNEDITOR_LANG</span>[<span class="pl-s"><span class="pl-pds">'</span>ko<span class="pl-pds">'</span></span>]
 });</pre></div>
 
 <a id="contentsDisplay" href="#contentsDisplay"><h4>4. Contents display</h4></a>
@@ -101,6 +104,8 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> {<span class="pl-smi">en</span>, <span class="pl-smi">ko</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> lang <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> de <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang/de<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> {<span class="pl-smi">align</span>, <span class="pl-smi">font</span>, <span class="pl-smi">fontSize</span>, <span class="pl-smi">fontColor</span>, <span class="pl-smi">hiliteColor</span>,
         <span class="pl-smi">horizontalRule</span>, <span class="pl-smi">list</span>, <span class="pl-smi">table</span>, <span class="pl-smi">formatBlock</span>, <span class="pl-smi">link</span>, <span class="pl-smi">image</span>, <span class="pl-smi">video</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
 

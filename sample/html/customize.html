@@ -19,6 +19,11 @@
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
     <script src="../../dist/suneditor.min.js"></script>
+    <script src="../../src/lang/de.js"></script>
+    <script src="../../src/lang/en.js"></script>
+    <script src="../../src/lang/ja.js"></script>
+    <script src="../../src/lang/ko.js"></script>
+    <script src="../../src/lang/zh_cn.js"></script>
     <script>
         $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
             $('#stargazers').html(' Stargazers ' + data.stargazers_count);
@@ -62,6 +67,14 @@
             <label>Classic&nbsp;&nbsp;<input type="radio" value="classic" name="mode" checked></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label>Balloon&nbsp;&nbsp;<input type="radio" value="balloon" name="mode"></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label>Inline&nbsp;&nbsp;<input type="radio" value="inline" name="mode"></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label>Language&nbsp;&nbsp;</label>
+            <select id="language">
+                <option value="de">de</option>
+                <option value="en" selected>en</option>
+                <option value="ja">ja</option>
+                <option value="ko">ko</option>
+                <option value="zh_cn">zh_cn</option>
+            </select>
             <br><br>
 
             <label><input type="checkbox" id="toolbarWidth">&nbsp;&nbsp;toolbarWidth</label>
@@ -164,6 +177,7 @@
 
 <script>
 var imageTable = document.getElementById('imageTable');
+var langSelect = document.getElementById('language');
 var editor = null;
 
 function sun_create () {
@@ -214,7 +228,8 @@ function sun_create () {
             'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print']
-        ]
+        ],
+        lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
     });
 
     editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {

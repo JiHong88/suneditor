@@ -46,6 +46,7 @@ $ bower install --save suneditor
 ```html
 <link href="../dist/suneditor.min.css" rel="stylesheet" type="text/css">
 <script src="../dist/suneditor.min.js"></script>
+<script src="../src/lang/ko.js"></script>
 ```
 
 ### 2. Target Element
@@ -62,7 +63,9 @@ $ bower install --save suneditor
 // ID or DOM object
 const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),{
     // All of the plugins are loaded in the "window.SUNEDITOR" object in dist/suneditor.min.js file
-    // insert options
+    // Insert options
+    // Language global object
+    lang: SUNEDITOR_LANG['ko']
 });
 ```
 
@@ -99,6 +102,8 @@ suneditor.create('sample', {
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 import {en, ko} from 'suneditor/src/lang'
+import lang from 'suneditor/src/lang'
+import de from 'suneditor/src/lang/de'
 import {align, font, fontSize, fontColor, hiliteColor,
         horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
