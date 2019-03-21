@@ -15,7 +15,7 @@ import notice from '../plugins/modules/notice';
  * @param context
  * @param plugins
  * @param lang
- * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+ * @returns {Object} UserFunction Object
  */
 const core = function (context, plugins, lang) {
     const _d = document;
