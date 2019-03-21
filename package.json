@@ -3,7 +3,7 @@
   "sideEffects": [
     "./src/assets/css/*.css"
   ],
-  "version": "2.12.0",
+  "version": "2.12.1",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
   "keywords": [

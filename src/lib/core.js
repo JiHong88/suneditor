@@ -1789,14 +1789,13 @@ const core = function (context, plugins, lang) {
         },
 
         onMouseDown_toolbar: function (e) {
-            editor._editorRange();
-            e.preventDefault();
-
             let target = e.target;
+            editor._editorRange();
 
             if (util.getParentElement(target, '.sun-editor-submenu')) {
                 e.stopPropagation();
             } else {
+                e.preventDefault();
                 let command = target.getAttribute('data-command');
                 let className = target.className;
     
@@ -1810,7 +1809,6 @@ const core = function (context, plugins, lang) {
                     e.stopPropagation();
                 }
             }
-
         },
 
         onClick_toolbar: function (e) {
