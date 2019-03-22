@@ -67,11 +67,13 @@ export default {
         fillColor = colorPicker.isHexColor(fillColor) ? fillColor : colorPicker.rgb2hex(fillColor);
 
         const colorList = this.context.colorPicker._colorList;
-        for (let i = 0, len = colorList.length; i < len; i++) {
-            if (fillColor === colorList[i].getAttribute('data-value')) {
-                colorList[i].style.border = '2px dashed #000';
-            } else {
-                colorList[i].style.border = '';
+        if (colorList) {
+            for (let i = 0, len = colorList.length; i < len; i++) {
+                if (fillColor === colorList[i].getAttribute('data-value')) {
+                    colorList[i].style.border = '2px dashed #000';
+                } else {
+                    colorList[i].style.border = '';
+                }
             }
         }
 
