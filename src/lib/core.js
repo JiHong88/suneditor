@@ -1622,7 +1622,7 @@ const core = function (context, plugins, lang) {
                 '<body>' +
                 '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
                 this.getContents() + '</div>' +
-                (isPrint ? '<script>_w.print();</script>' : '') + '</body>' +
+                (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
                 '</html>');
         },
 
