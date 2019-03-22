@@ -107,6 +107,12 @@ const core = function (context, plugins, lang) {
         _inlineToolbarAttr: {width: 0, height: 0, isShow: false},
 
         /**
+         * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to submenu
+         * @private
+         */
+        _notHideToolbar: false,
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -242,9 +248,11 @@ const core = function (context, plugins, lang) {
                 util.removeClass(this.submenuActiveButton, 'on');
                 this.submenuActiveButton = null;
                 _d.removeEventListener('mousedown', this._bindedSubmenuOff);
+                this._notHideToolbar = false;
             }
 
             this.controllersOff();
+            this.focus();
         },
 
         /**
@@ -1793,6 +1801,7 @@ const core = function (context, plugins, lang) {
 
             if (util.getParentElement(target, '.sun-editor-submenu')) {
                 e.stopPropagation();
+                editor._notHideToolbar = true;
             } else {
                 e.preventDefault();
                 let command = target.getAttribute('data-command');
@@ -1910,10 +1919,10 @@ const core = function (context, plugins, lang) {
 
                     const hideToolbar = function () {
                         event._hideToolbar();
-                        _d.removeEventListener('click', hideToolbar);
+                        figcaption.removeEventListener('blur', hideToolbar);
                     };
 
-                    _d.addEventListener('click', hideToolbar);
+                    figcaption.addEventListener('blur', hideToolbar);
                 }
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
@@ -1983,8 +1992,12 @@ const core = function (context, plugins, lang) {
         },
 
         _hideToolbar: function () {
-            context.element.toolbar.style.display = 'none';
-            editor._inlineToolbarAttr.isShow = false;
+            if (!editor._notHideToolbar) {
+                context.element.toolbar.style.display = 'none';
+                editor._inlineToolbarAttr.isShow = false;
+            }
+
+            editor._notHideToolbar = false;
         },
 
         onKeyDown_wysiwyg: function (e) {

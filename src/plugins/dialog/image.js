@@ -530,7 +530,7 @@ export default {
         if (isNewContainer) {
             const existElement = util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
-            util.removeItem(existElement);
+            util.removeItem(contextImage._element);
         }
 
         // transform
