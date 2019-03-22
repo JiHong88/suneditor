@@ -189,7 +189,7 @@
 .sun-editor .table-display {padding-left:5px;}
 
 /* table edit, resizing */
-.sun-editor .sun-editor-id-table-edit {position:absolute; width:165px; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .sun-editor-id-table-edit {position:absolute; z-index:1; width:165px; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 
 /** color selector */
 .sun-editor .layer_editor .pallet_color_selector {display:flex; width:285px; height:auto;}
@@ -254,7 +254,7 @@
 @keyframes spinner {to {transform: rotate(360deg);}}
 
 /* resize button */
-.sun-editor .resize-btn {position:absolute; display:none; top:0; left:0; margin-top:-50px !important; padding:0 0 2px 0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .resize-btn {position:absolute; display:none; z-index:1; top:0; left:0; margin-top:-50px !important; padding:0 0 2px 0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 /* button group */
 .sun-editor .btn-group {position:relative; display:flex; vertical-align:middle; padding:2px 2px 2px 0;}
 .sun-editor .btn-group button {position:relative; height:32px; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px !important; padding:5px 10px !important; font-size:12px !important; line-height:1.5 !important; border:1px solid rgba(0, 0, 0, .2) !important; border-radius:4px !important; background-color:#fff !important; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation;}
@@ -263,7 +263,7 @@
 .sun-editor .btn-group button:hover, .sun-editor .resize-btn button:focus {background-color:#d4e3ea !important; border-color:#bbd5e0 !important; outline:0 none !important;}
 
 /* resize div (image, iframe) */
-.sun-editor .modal-resize-container {position:absolute; display:none; border:1px solid #a2bfcc;}
+.sun-editor .modal-resize-container {position:absolute; display:none; z-index:1; border:1px solid #a2bfcc;}
 .sun-editor .modal-resize-container .modal-resize {position:absolute; display:inline-block; background-color:#a2bfcc; opacity:0.3;}
 .sun-editor .modal-resize-container .resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
 .sun-editor .modal-resize-container .resize-dot > div {position:absolute; width:7px; height:7px; background-color:#a2bfcc; border:1px solid black;}
@@ -278,7 +278,7 @@
 .sun-editor .modal-resize-container .resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:#F00; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;}
 
 /* link controller button */
-.sun-editor .sun-editor-id-link-btn {position:absolute; top:0; left:0; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .sun-editor-id-link-btn {position:absolute; z-index:1; top:0; left:0; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:6px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .sun-editor .sun-editor-id-link-btn:before, .sun-editor .sun-editor-id-link-btn:after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .sun-editor-id-link-btn .link-content {padding:0; margin:0;}
 .sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}

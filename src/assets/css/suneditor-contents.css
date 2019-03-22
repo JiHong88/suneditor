@@ -250,9 +250,6 @@
 .sun-editor-editable table td {
     border: 1px solid #ccc; padding:8px;
 }
-.sun-editor-editable table td.sun-editor-selected-cell {
-    outline: 2px solid #8baab7;
-}
 
 /** component (image, iframe video) */
 .sun-editor-editable .sun-editor-id-comp {

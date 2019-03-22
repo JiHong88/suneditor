@@ -159,9 +159,6 @@ export default {
 
     init: function () {
         const contextTable = this.context.table;
-        
-        if (contextTable._tdElement) util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
-
         contextTable._element = null;
         contextTable._tdElement = null;
         contextTable._trElement = null;
@@ -199,8 +196,6 @@ export default {
         }
 
         if (contextTable._tdElement !== tdElement) {
-            if (contextTable._tdElement) util.removeClass(contextTable._tdElement, 'sun-editor-selected-cell');
-            util.addClass(tdElement, 'sun-editor-selected-cell');
             contextTable._tdElement = tdElement;
             contextTable._trElement = tdElement.parentNode;
         }
