@@ -18,7 +18,8 @@ export default {
         const context = core.context;
         context.fontColor = {
             previewEl: null,
-            colorInput: null
+            colorInput: null,
+            colorList: null
         };
 
         /** set submenu */
@@ -29,6 +30,8 @@ export default {
         context.fontColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
         listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+
+        context.fontColor.colorList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -49,11 +52,13 @@ export default {
 
     on: function () {
         const contextPicker = this.context.colorPicker;
+        const contextFontColor = this.context.fontColor;
 
-        contextPicker._colorInput = this.context.fontColor.colorInput;
+        contextPicker._colorInput = contextFontColor.colorInput;
         contextPicker._defaultColor = '#000000';
         contextPicker._styleProperty = 'color';
-
+        contextPicker._colorList = contextFontColor.colorList;
+        
         this.plugins.colorPicker.init.call(this, this.getSelectionNode(), null);
     },
 

@@ -18,7 +18,8 @@ export default {
         const context = core.context;
         context.hiliteColor = {
             previewEl: null,
-            colorInput: null
+            colorInput: null,
+            colorList: null
         };
 
         /** set submenu */
@@ -29,6 +30,8 @@ export default {
         context.hiliteColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
         listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+
+        context.hiliteColor.colorList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -49,11 +52,13 @@ export default {
 
     on: function () {
         const contextPicker = this.context.colorPicker;
+        const contextHiliteColor = this.context.hiliteColor;
 
-        contextPicker._colorInput = this.context.hiliteColor.colorInput;
+        contextPicker._colorInput = contextHiliteColor.colorInput;
         contextPicker._defaultColor = '#FFFFFF';
         contextPicker._styleProperty = 'backgroundColor';
-
+        contextPicker._colorList = contextHiliteColor.colorList;
+        
         this.plugins.colorPicker.init.call(this, this.getSelectionNode(), null);
     },
 

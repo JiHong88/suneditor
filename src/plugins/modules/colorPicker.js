@@ -18,7 +18,8 @@ export default {
             _colorInput: '',
             _defaultColor: '#000',
             _styleProperty: 'color',
-            _currentColor: ''
+            _currentColor: '',
+            _colorList: []
         };
 
         /** set submenu */
@@ -64,6 +65,15 @@ export default {
         const colorPicker = this.plugins.colorPicker;
         let fillColor = color ? color : colorPicker.getColorInNode.call(this, node) || this.context.colorPicker._defaultColor;
         fillColor = colorPicker.isHexColor(fillColor) ? fillColor : colorPicker.rgb2hex(fillColor);
+
+        const colorList = this.context.colorPicker._colorList;
+        for (let i = 0, len = colorList.length; i < len; i++) {
+            if (fillColor === colorList[i].getAttribute('data-value')) {
+                colorList[i].style.border = '2px dashed #000';
+            } else {
+                colorList[i].style.border = '';
+            }
+        }
 
         colorPicker.setInputText.call(this, fillColor);
     },
