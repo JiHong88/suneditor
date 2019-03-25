@@ -44,7 +44,7 @@ $ bower install --save suneditor
 **<a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>**
 ### 1. Include
 ```html
-<link href="../dist/suneditor.min.css" rel="stylesheet" type="text/css">
+<link href="../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
 <script src="../dist/suneditor.min.js"></script>
 <script src="../src/lang/ko.js"></script>
 ```
