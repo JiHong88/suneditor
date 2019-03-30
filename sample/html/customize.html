@@ -7,35 +7,19 @@
     <meta name="keywords" content="wysiwyg,editor,javascript,suneditor,wysiwyg eidtor,rich text editor,html editor,contenteditable,위지위그 에디터 웹에디터">
     <meta name="description" content="Pure javascript wysiwyg web editor" />
     <title>Suneditor</title>
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="../bootstrap/bootstrap.css" media="all">
-    <script type="text/javascript" src="../bootstrap/tether.min.js"></script>
-    <script type="text/javascript" src="../bootstrap/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="../bootstrap/bootstrap.min.js"></script>
-    <!-- main css -->
+    <!-- sample css -->
+    <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="../css/github.css">
     <link rel="stylesheet" href="../css/github-frameworks.css">
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
-    <script src="../../dist/suneditor.min.js"></script>
-    <script src="../../src/lang/de.js"></script>
-    <script src="../../src/lang/en.js"></script>
-    <script src="../../src/lang/ja.js"></script>
-    <script src="../../src/lang/ko.js"></script>
-    <script src="../../src/lang/zh_cn.js"></script>
-    <script>
-        $.getJSON('https://api.github.com/repos/JiHong88/SunEditor', function(data) {
-            $('#stargazers').html(' Stargazers ' + data.stargazers_count);
-        });
-    </script>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
 <nav class="navbar navbar-inverse">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <button type="button" class="navbar-toggle collapsed" aria-expanded="false" onclick="buttonToggle()">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -53,7 +37,7 @@
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li>&nbsp;&nbsp;</li>
                 <li>
-                    <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Stargazers 00</a>
+                    <a href="https://github.com/JiHong88/SunEditor" target="_blank" id="stargazers" class="github-cat" title="go to github"> Star 00</a>
                 </li>
             </ul>
         </div>
@@ -175,6 +159,13 @@
     </footer>
 </div>
 
+<script src="../js/common.js"></script>
+<script src="../../dist/suneditor.min.js"></script>
+<script src="../../src/lang/de.js"></script>
+<script src="../../src/lang/en.js"></script>
+<script src="../../src/lang/ja.js"></script>
+<script src="../../src/lang/ko.js"></script>
+<script src="../../src/lang/zh_cn.js"></script>
 <script>
 var imageTable = document.getElementById('imageTable');
 var langSelect = document.getElementById('language');

@@ -1,9 +1,7 @@
-// import '../src/assets/css/suneditor.css'
-// import '../src/assets/css/suneditor-contents.css'
 'use strict';
 
-import suneditor from '../src/suneditor';
-import custom_plugin_submenu from '../test/dev/custom_plugin_submenu';
+import suneditor from '../../src/suneditor';
+import custom_plugin_submenu from '../../test/dev/custom_plugin_submenu';
 
 suneditor.create(document.getElementById('ex_submenu'), {
     plugins: [
