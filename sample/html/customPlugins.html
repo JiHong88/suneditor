@@ -163,6 +163,65 @@
 
 <script src="../js/common.js"></script>
 <script src="../../dist/suneditor.min.js"></script>
-<script src="../build/suneditor.customize.js"></script>
+<script>
+    var pluginObject = {
+        name: 'custom_plugin_submenu',
+        add: function (core, targetElement) {
+
+            const context = core.context;
+            context.custom = {
+                textElement: null
+            };
+
+            let listDiv = eval(this.setSubmenu.call(core));
+
+            context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
+
+            listDiv.getElementsByTagName('BUTTON')[0].addEventListener('click', this.onClick.bind(core));
+            context.custom.textElement.addEventListener('mousedown', function () {
+
+            });
+
+            targetElement.parentNode.appendChild(listDiv);
+        },
+        setSubmenu: function () {
+            const listDiv = this.util.createElement('DIV');
+
+            listDiv.className = 'sun-editor-submenu layer_editor layer_align';
+            listDiv.style.display = 'none';
+            listDiv.innerHTML = '' +
+                '<div class="inner_layer">' +
+                '   <ul class="list_editor">' +
+                '       <li><input type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+                '       <li><button type="button" class="btn_editor" title="Append text">Append text</button></li>' +
+                '   </ul>' +
+                '</div>';
+
+            return listDiv;
+        },
+        onClick: function () {
+            const value = this.util.createTextNode(this.context.custom.textElement.value);
+            this.insertNode(value);
+            this.focus();
+        }
+    };
+
+    SUNEDITOR.create(document.getElementById('ex_submenu'), {
+        plugins: [pluginObject],
+        buttonList: [
+            ['undo', 'redo'],
+            [
+                {
+                    name: 'custom_plugin_submenu', 
+                    dataCommand: 'custom_plugin_submenu',
+                    buttonClass:'btn_editor', 
+                    title:'Custom plugin of the submenu', 
+                    dataDisplay:'submenu',
+                    innerHTML:'<div class="icon-map-pin"></div>'
+                }
+            ]
+        ]
+    });
+</script>
 </body>
 </html>
