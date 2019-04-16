@@ -17,16 +17,10 @@ export default {
         };
 
         // Generate submenu HTML
-        let listDiv = eval(this.setSubmenu(core.lang));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         // Input tag caching
         context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
-
-        // In addition to the button, elements that should operate within the submenu, such as focus,
-        // must call stopPropagation in the mousedown event to prevent the toolbar from executing events.
-        context.custom.textElement.addEventListener('mousedown', function (e) {
-            e.stopPropagation();
-        });
 
         // You must bind "core" object when registering an event.
         /** add event listeners */
@@ -40,7 +34,7 @@ export default {
     },
 
     setSubmenu: function () {
-        const listDiv = document.createElement('DIV');
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor layer_align';
         listDiv.style.display = 'none';
@@ -57,7 +51,7 @@ export default {
 
     onClick: function () {
         // Get Input value
-        const value = document.createTextNode(this.context.custom.textElement.value);
+        const value = this.util.createTextNode(this.context.custom.textElement.value);
 
         // insert
         this.insertNode(value);

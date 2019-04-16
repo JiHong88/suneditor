@@ -22,8 +22,6 @@ suneditor.create(document.getElementById('ex_submenu'), {
                 title:'Custom plugin of the submenu', 
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
-                // 'full' or '' (Only applies to dialog plugin.)
-                displayOption:'',
                 // HTML to be append to button
                 innerHTML:'<div class="icon-map-pin"></div>'
             }

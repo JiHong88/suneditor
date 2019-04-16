@@ -183,7 +183,8 @@ window.sun_create2 = function () {
 
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize,
+        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
+        [
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
@@ -196,11 +197,10 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 title:'Custom plugin of the submenu', 
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
-                // 'full' or '' (Only applies to dialog plugin.)
-                displayOption:'',
                 // HTML to be append to button
                 innerHTML:'<div class="icon-map-pin"></div>'
-            }]
+            }
+        ]
     ],
     lang: ko,
     width: '100%',

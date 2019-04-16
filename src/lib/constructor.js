@@ -398,7 +398,7 @@ const _Constructor = {
                             plugins[pluginName] = button;
                         } else {
                             pluginName = button.name;
-                            module = [button.className, button.title, button.dataCommand, button.dataDisplay, button.displayOption, button.innerHTML];
+                            module = [button.buttonClass, button.title, button.dataCommand, button.dataDisplay, button.innerHTML];
                         }
                     } else {
                         module = defaultButtonList[button];
