@@ -75,30 +75,23 @@
         };
 
         <span class="pl-c"><span class="pl-c">//</span> Generate submenu HTML</span>
-        <span class="pl-k">let</span> listDiv <span class="pl-k">=</span> <span class="pl-c1">eval</span>(<span class="pl-c1">this</span>.<span class="pl-en">setSubmenu</span>(<span class="pl-smi">core</span>.<span class="pl-c1">lang</span>));
+        <span class="pl-c"><span class="pl-c">//</span> Always bind "core" when calling a plugin function</span>
+        <span class="pl-k">let</span> listDiv <span class="pl-k">=</span> <span class="pl-c1">eval</span>(<span class="pl-c1">this</span>.<span class="pl-en">setSubmenu</span>.<span class="pl-c1">call</span>(<span class="pl-smi">core</span>));
 
         <span class="pl-c"><span class="pl-c">//</span> Input tag caching</span>
         <span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span> <span class="pl-k">=</span> <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>INPUT<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>];
 
-        <span class="pl-c"><span class="pl-c">//</span> In addition to the button, elements that should operate within the submenu, such as focus,</span>
-        <span class="pl-c"><span class="pl-c">//</span> must call stopPropagation in the mousedown event to prevent the toolbar from executing events.</span>
-        <span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
-            <span class="pl-smi">e</span>.<span class="pl-c1">stopPropagation</span>();
-        })
-
         <span class="pl-c"><span class="pl-c">//</span> You must bind "core" object when registering an event.</span>
         <span class="pl-c"><span class="pl-c">/**</span> add event listeners <span class="pl-c">*/</span></span>
         <span class="pl-smi">listDiv</span>.<span class="pl-c1">getElementsByTagName</span>(<span class="pl-s"><span class="pl-pds">'</span>BUTTON<span class="pl-pds">'</span></span>)[<span class="pl-c1">0</span>].<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>click<span class="pl-pds">'</span></span>, <span class="pl-c1">this</span>.<span class="pl-smi">onClick</span>.<span class="pl-en">bind</span>(core));
-        <span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>mousedown<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> () {
-
-        })
 
         <span class="pl-c"><span class="pl-c">/**</span> append html <span class="pl-c">*/</span></span>
         <span class="pl-smi">targetElement</span>.<span class="pl-c1">parentNode</span>.<span class="pl-c1">appendChild</span>(listDiv);
     },
 
-    <span class="pl-en">setSubmenu</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">lang</span>) {
-        <span class="pl-k">const</span> <span class="pl-c1">listDiv</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">'</span>DIV<span class="pl-pds">'</span></span>);
+    <span class="pl-en">setSubmenu</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+        <span class="pl-k">const</span> <span class="pl-c1">lang</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">lang</span>;
+        <span class="pl-k">const</span> <span class="pl-c1">listDiv</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">util</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">'</span>DIV<span class="pl-pds">'</span></span>);
 
         <span class="pl-smi">listDiv</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>layer_editor layer_align<span class="pl-pds">'</span></span>;
         <span class="pl-smi">listDiv</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
@@ -115,13 +108,13 @@
 
     <span class="pl-en">onClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
         <span class="pl-c"><span class="pl-c">//</span> Get Input value</span>
-        <span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">createTextNode</span>(<span class="pl-c1">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">value</span>);
+        <span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">util</span>.<span class="pl-c1">createTextNode</span>(<span class="pl-c1">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">value</span>);
 
         <span class="pl-c"><span class="pl-c">//</span> insert</span>
-        <span class="pl-c1">this</span>.<span class="pl-c1">insertNode</span>(value);
+        <span class="pl-c1">this</span>.<span class="pl-en">insertNode</span>(value);
 
         <span class="pl-c"><span class="pl-c">//</span> focus</span>
-        <span class="pl-c1">this</span>.<span class="pl-c1">focus</span>();
+        <span class="pl-c1">this</span>.<span class="pl-en">focus</span>();
     }
 }</pre></div>
 
@@ -129,6 +122,7 @@
 <span class="pl-k">import</span> <span class="pl-smi">custom_plugin_submenu</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>../test/custom_plugin_submenu<span class="pl-pds">'</span></span>
 
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>ex_submenu<span class="pl-pds">'</span></span>), {
+    plugins<span class="pl-k">:</span> [<span class="pl-smi">custom_plugin_submenu</span>],
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
         [
@@ -145,8 +139,6 @@
                 title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Custom plugin of the submenu<span class="pl-pds">'</span></span>, 
                 <span class="pl-c"><span class="pl-c">//</span> 'submenu' or 'dialog' or '' (command button)</span>
                 dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
-                <span class="pl-c"><span class="pl-c">//</span> 'full' or '' (Only applies to dialog plugin.)</span>
-                displayOption<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
                 <span class="pl-c"><span class="pl-c">//</span> HTML to be append to button</span>
                 innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="icon-map-pin"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
             }
