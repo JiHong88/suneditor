@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
 import colorPicker from '../modules/colorPicker';
 
 export default {
@@ -23,7 +22,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(context.colorPicker.colorListHTML));
+        let listDiv = eval(this.setSubmenu.call(core));
         context.fontColor.colorInput = listDiv.getElementsByClassName('sun-editor-id-submenu-color-input')[0];
 
         /** add event listeners */
@@ -40,8 +39,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (colorArea) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const colorArea = this.context.colorPicker.colorListHTML;
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
@@ -82,7 +82,7 @@ export default {
     },
 
     applyColor: function (color) {
-        const newNode = util.createElement('SPAN');
+        const newNode = this.util.createElement('SPAN');
         newNode.style.color = color;
 
         this.nodeChange(newNode, ['color']);

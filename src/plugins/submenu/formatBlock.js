@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'formatBlock',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.lang));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(core));
@@ -25,8 +23,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (lang) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const lang = this.lang;
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor layer_block';
         listDiv.style.display = 'none';
@@ -70,15 +69,15 @@ export default {
 
         // blockquote, pre
         if (command === 'range') {
-            const rangeElement = util.createElement(value);
+            const rangeElement = this.util.createElement(value);
             this.wrapToTags(rangeElement);
             this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
-            this.appendFormatTag(rangeElement, util.isCell(this.getSelectionNode()) ? 'DIV' : '');
+            this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
         }
         // others
         else {
             this.execCommand('formatBlock', false, value);
-            util.changeTxt(this.commandMap.FORMAT, value);
+            this.util.changeTxt(this.commandMap.FORMAT, value);
         }
 
         this.submenuOff();

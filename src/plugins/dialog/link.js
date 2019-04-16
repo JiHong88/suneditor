@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
 import dialog from '../modules/dialog';
 
 export default {
@@ -19,14 +18,14 @@ export default {
         context.link = {};
 
         /** link dialog */
-        let link_dialog = eval(this.setDialog(core.lang));
+        let link_dialog = eval(this.setDialog.call(core));
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
         context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
         context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
 
         /** link button */
-        let link_button = eval(this.setController_LinkButton(core.lang));
+        let link_button = eval(this.setController_LinkButton.call(core));
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
         link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
@@ -44,8 +43,9 @@ export default {
     },
 
     /** dialog */
-    setDialog: function (lang) {
-        const dialog = util.createElement('DIV');
+    setDialog: function () {
+        const lang = this.lang;
+        const dialog = this.util.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-link';
         dialog.style.display = 'none';
@@ -76,8 +76,9 @@ export default {
     },
 
     /** modify controller button */
-    setController_LinkButton: function (lang) {
-        const link_btn = util.createElement('DIV');
+    setController_LinkButton: function () {
+        const lang = this.lang;
+        const link_btn = this.util.createElement('DIV');
 
         link_btn.className = 'sun-editor-id-link-btn';
         link_btn.style.display = 'none';
@@ -107,7 +108,7 @@ export default {
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
             if (!this.context.dialog.updateModal) {
-                const oA = util.createElement('A');
+                const oA = this.util.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
                 oA.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
@@ -143,7 +144,7 @@ export default {
         linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
-        const offset = util.getOffset(selectionATag);
+        const offset = this.util.getOffset(selectionATag);
         linkBtn.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
         
@@ -168,7 +169,7 @@ export default {
         }
         else {
             /** delete */
-            util.removeItem(this.context.link._linkAnchor);
+            this.util.removeItem(this.context.link._linkAnchor);
             this.context.link._linkAnchor = null;
             this.focus();
         }

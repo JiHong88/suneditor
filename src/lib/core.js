@@ -36,6 +36,11 @@ const core = function (context, plugins, lang) {
         plugins: {},
 
         /**
+         * @description Util object
+         */
+        util: util,
+
+        /**
          * @description Whether the plugin is initialized
          */
         initPlugins: {},

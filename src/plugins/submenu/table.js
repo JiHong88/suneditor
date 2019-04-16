@@ -7,8 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'table',
     add: function (core, targetElement) {
@@ -26,7 +24,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = eval(this.setSubmenu());
+        let listDiv = eval(this.setSubmenu.call(core));
         let tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
 
         context.table.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
@@ -34,7 +32,7 @@ export default {
         context.table.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
 
         /** set resizing */
-        let resizeDiv = eval(this.setController_tableEditor(core.lang));
+        let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
@@ -52,7 +50,7 @@ export default {
     },
 
     setSubmenu: function () {
-        const listDiv = util.createElement('DIV');
+        const listDiv = this.util.createElement('DIV');
         listDiv.className = 'sun-editor-submenu table-content';
         listDiv.style.display = 'none';
 
@@ -67,8 +65,9 @@ export default {
         return listDiv;
     },
 
-    setController_tableEditor: function (lang) {
-        const tableResize = util.createElement('DIV');
+    setController_tableEditor: function () {
+        const lang = this.lang;
+        const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'sun-editor-id-table-edit';
         tableResize.style.display = 'none';
@@ -94,7 +93,7 @@ export default {
     },
 
     appendTable: function () {
-        const oTable = util.createElement('TABLE');
+        const oTable = this.util.createElement('TABLE');
 
         let x = this.context.table._tableXY[0];
         let y = this.context.table._tableXY[1];
@@ -104,7 +103,7 @@ export default {
             tableHTML += '<tr>';
             let tdCnt = x;
             while (tdCnt > 0) {
-                tableHTML += '<td><div>' + util.zeroWidthSpace + '</div></td>';
+                tableHTML += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
                 --tdCnt;
             }
             tableHTML += '</tr>';
@@ -114,9 +113,9 @@ export default {
 
         oTable.innerHTML = tableHTML;
 
-        const formatEl = util.getFormatElement(this.getSelectionNode());
+        const formatEl = this.util.getFormatElement(this.getSelectionNode());
 
-        this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? util.getRangeFormatElement(formatEl) : formatEl);
+        this.insertNode(oTable, /^LI$/i.test(formatEl.nodeName) ? this.util.getRangeFormatElement(formatEl) : formatEl);
         this.appendFormatTag(oTable);
         this.focus();
 
@@ -138,7 +137,7 @@ export default {
         this.context.table.tableUnHighlight.style.width = x_u + 'em';
         this.context.table.tableUnHighlight.style.height = y_u + 'em';
 
-        util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
+        this.util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
         this.context.table._tableXY = [x, y];
     },
 
@@ -153,7 +152,7 @@ export default {
         unHighlight.width = '5em';
         unHighlight.height = '5em';
 
-        util.changeTxt(this.context.table.tableDisplay, '1 x 1');
+        this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
         this.submenuOff();
     },
 
@@ -208,7 +207,7 @@ export default {
             contextTable._tdCnt = contextTable._trElement.cells.length;
         }
 
-        const offset = util.getOffset(tdElement);
+        const offset = this.util.getOffset(tdElement);
         resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
     },
@@ -221,7 +220,7 @@ export default {
             let cells = '';
 
             for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td><div>' + util.zeroWidthSpace + '</div></td>';
+                cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
             }
 
             const newRow = contextTable._element.insertRow(rowIndex);
@@ -235,7 +234,7 @@ export default {
             
             for (let i = 0, len = contextTable._trCnt; i < len; i++) {
                 cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>' + util.zeroWidthSpace + '</div>';
+                cell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
             }
         }
 
@@ -282,7 +281,7 @@ export default {
                 this.plugins.table.deleteRowCell.call(this, value);
                 break;
             case 'remove':
-            util.removeItem(contextTable._element);
+            this.util.removeItem(contextTable._element);
             this.controllersOff();
             this.focus();
         }

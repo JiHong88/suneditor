@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'list',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.lang));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,8 +23,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (lang) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const lang = this.lang;
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor layer_list';
         listDiv.style.display = 'none';
@@ -55,7 +54,7 @@ export default {
             target = target.parentNode;
         }
 
-        const formatElement = util.getFormatElement(this.getSelectionNode());
+        const formatElement = this.util.getFormatElement(this.getSelectionNode());
 
         if (/^LI$/i.test(formatElement.tagName)) {
             const cancel = formatElement.parentNode.tagName === value;
@@ -65,7 +64,7 @@ export default {
             let rightNode = formatElement.nextSibling;
             let pNode = formatElement.parentNode;
 
-            const list = util.createElement(value);
+            const list = this.util.createElement(value);
             const formatElementList = this.getSelectedFormatElements();
             
             for (let i = 0, len = formatElementList.length, fTag = null; i < len; i++) {
@@ -77,7 +76,7 @@ export default {
                 }
 
                 list.innerHTML += '<li>' + fTag.innerHTML + '</li>';
-                util.removeItem(fTag);
+                this.util.removeItem(fTag);
             }
 
             pNode.insertBefore(list, rightNode);

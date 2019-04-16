@@ -7,8 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'colorPicker',
     add: function (core) {
@@ -91,15 +89,15 @@ export default {
     },
 
     getColorInNode: function (node) {
-        let findedColor = '';
+        let findColor = '';
         const styleProperty = this.context.colorPicker._styleProperty;
 
-        while (!util.isWysiwygDiv(node) && findedColor.length === 0) {
-            if (node.nodeType === 1 && node.style[styleProperty]) findedColor = node.style[styleProperty];
+        while (!this.util.isWysiwygDiv(node) && findColor.length === 0) {
+            if (node.nodeType === 1 && node.style[styleProperty]) findColor = node.style[styleProperty];
             node = node.parentNode;
         }
 
-        return findedColor;
+        return findColor;
     },
 
     /**

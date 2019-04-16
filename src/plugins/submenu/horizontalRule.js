@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'horizontalRule',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.lang));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulePick.bind(core));
@@ -25,8 +23,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (lang) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const lang = this.lang;
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor layer_line';
         listDiv.style.display = 'none';
@@ -55,11 +54,11 @@ export default {
     },
 
     appendHr: function (className) {
-        const oHr = util.createElement('HR');
+        const oHr = this.util.createElement('HR');
         oHr.className = className;
 
         this.focus();
-        this.insertNode(oHr, util.getFormatElement(this.getSelectionNode()));
+        this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
 
         const oNode = this.appendFormatTag(oHr);
         this.setRange(oNode, 0, oNode, 0);

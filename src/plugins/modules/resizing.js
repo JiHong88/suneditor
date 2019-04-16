@@ -7,8 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'resizing',
     add: function (core) {
@@ -26,14 +24,14 @@ export default {
         };
 
         /** resize controller, button */
-        let resize_div_container = eval(this.setController_resize());
+        let resize_div_container = eval(this.setController_resize.call(core));
         context.resizing.resizeContainer = resize_div_container;
 
         context.resizing.resizeDiv = resize_div_container.getElementsByClassName('modal-resize')[0];
         context.resizing.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
         context.resizing.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
 
-        let resize_button = eval(this.setController_button(core.lang));
+        let resize_button = eval(this.setController_button.call(core));
         context.resizing.resizeButton = resize_button;
         resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
@@ -61,7 +59,8 @@ export default {
 
     /** resize controller, button (image, iframe) */
     setController_resize: function () {
-        const resize_container = util.createElement('DIV');
+        const resize_container = this.util.createElement('DIV');
+        
         resize_container.className = 'modal-resize-container';
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
@@ -82,8 +81,10 @@ export default {
         return resize_container;
     },
 
-    setController_button: function (lang) {
-        const resize_button = util.createElement("DIV");
+    setController_button: function () {
+        const lang = this.lang;
+        const resize_button = this.util.createElement("DIV");
+
         resize_button.className = "resize-btn";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
@@ -113,7 +114,7 @@ export default {
 
         const resizeContainer = contextResizing.resizeContainer;
         const resizeDiv = contextResizing.resizeDiv;
-        const offset = util.getOffset(targetElement);
+        const offset = this.util.getOffset(targetElement);
 
         const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 
@@ -134,7 +135,7 @@ export default {
 
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
-        util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
 
         const resizeDisplay = this.context[plugin]._resizing ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
@@ -181,14 +182,14 @@ export default {
     },
 
     create_caption: function () {
-        const caption = util.createElement('FIGCAPTION');
+        const caption = this.util.createElement('FIGCAPTION');
         caption.setAttribute('contenteditable', true);
         caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
         return caption;
     },
 
     set_cover: function (element) {
-        const cover = util.createElement('FIGURE');
+        const cover = this.util.createElement('FIGURE');
         cover.className = 'sun-editor-figure-cover';
         cover.appendChild(element);
 
@@ -196,7 +197,7 @@ export default {
     },
 
     set_container: function (cover, className) {
-        const container = util.createElement('DIV');
+        const container = this.util.createElement('DIV');
         container.className = 'sun-editor-id-comp ' + className;
         container.setAttribute('contenteditable', false);
         container.appendChild(cover);
@@ -291,7 +292,7 @@ export default {
     },
 
     setTransformSize: function (element) {
-        const cover = util.getParentElement(element, '.sun-editor-figure-cover');
+        const cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -317,7 +318,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, util.getChildElement(util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
+        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -410,6 +411,6 @@ export default {
 
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
-        util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
     }
 };

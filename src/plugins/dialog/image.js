@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
 import notice from '../modules/notice';
@@ -43,7 +42,7 @@ export default {
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog(core.context.option, core.lang));
+        let image_dialog = eval(this.setDialog.call(core));
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
         context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
@@ -77,8 +76,11 @@ export default {
     },
 
     /** dialog */
-    setDialog: function (option, lang) {
-        const dialog = util.createElement('DIV');
+    setDialog: function () {
+        const option = this.context.option;
+        const lang = this.lang;
+        const dialog = this.util.createElement('DIV');
+
         dialog.className = 'modal-content sun-editor-id-dialog-image';
         dialog.style.display = 'none';
 
@@ -180,12 +182,12 @@ export default {
         // Get all elements with class="tablinks" and remove the class "active"
         tabLinks = modal.getElementsByClassName('sun-editor-id-tab-link');
         for (i = 0; i < tabLinks.length; i++) {
-            util.removeClass(tabLinks[i], 'active');
+            this.util.removeClass(tabLinks[i], 'active');
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
         modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
-        util.addClass(targetElement, 'active');
+        this.util.addClass(targetElement, 'active');
 
         // focus
         if (tabName === 'image') {
@@ -210,7 +212,7 @@ export default {
                         formData.append('file-' + i, files[i]);
                     }
 
-                    this.context.image._xmlHttp = util.getXMLHttpRequest();
+                    this.context.image._xmlHttp = this.util.getXMLHttpRequest();
                     this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
                     this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                     this.context.image._xmlHttp.send(formData);
@@ -297,7 +299,7 @@ export default {
 
     onRender_link: function (imgTag, imgLinkValue, newWindowCheck) {
         if (imgLinkValue.trim().length > 0) {
-            const link = util.createElement('A');
+            const link = this.util.createElement('A');
             link.href = /^https?:\/\//.test(imgLinkValue) ? imgLinkValue : 'http://' + imgLinkValue;
             link.target = (newWindowCheck ? '_blank' : '');
             link.setAttribute('data-image-link', 'image');
@@ -402,13 +404,13 @@ export default {
 
         const contextImage = this.context.image;
 
-        let oImg = util.createElement('IMG');
+        let oImg = this.util.createElement('IMG');
         oImg.addEventListener('load', this.plugins.image._onload_image.bind(this, oImg, file));
 
         oImg.src = src;
         oImg.setAttribute('data-align', align);
         oImg.alt = contextImage._altText;
-        oImg = this.plugins.image.onRender_link(oImg, linkValue, linkNewWindow);
+        oImg = this.plugins.image.onRender_link.call(this, oImg, linkValue, linkNewWindow);
         oImg.setAttribute('data-rotate', '0');
 
         if (contextImage._resizing) {
@@ -433,8 +435,8 @@ export default {
             cover.style.margin = '0';
         }
         
-        util.removeClass(container, contextImage._floatClassRegExp);
-        util.addClass(container, 'float-' + align);
+        this.util.removeClass(container, contextImage._floatClassRegExp);
+        this.util.addClass(container, 'float-' + align);
 
         if (!contextImage._resizing || !/\d+/.test(width)) {
             this.context.resizing._resize_plugin = 'image';
@@ -444,7 +446,7 @@ export default {
             this.plugins.image.setAutoSize.call(this);
         }
 
-        this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
+        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
         this.appendFormatTag(container);
     },
 
@@ -490,7 +492,7 @@ export default {
             }
         } else {
             if (contextImage._caption) {
-                util.removeItem(contextImage._caption);
+                this.util.removeItem(contextImage._caption);
                 contextImage._caption = null;
             }
         }
@@ -502,8 +504,8 @@ export default {
             cover.style.margin = '0';
         }
 
-        util.removeClass(container, this.context.image._floatClassRegExp);
-        util.addClass(container, 'float-' + contextImage._align);
+        this.util.removeClass(container, this.context.image._floatClassRegExp);
+        this.util.addClass(container, 'float-' + contextImage._align);
         imageEl.setAttribute('data-align', contextImage._align);
 
         // link
@@ -513,7 +515,7 @@ export default {
                 contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
                 imageEl.setAttribute('data-image-link', linkValue);
             } else {
-                let newEl = this.plugins.image.onRender_link(imageEl, linkValue, this.context.image.imgLinkNewWindowCheck.checked);
+                let newEl = this.plugins.image.onRender_link.call(this, imageEl, linkValue, this.context.image.imgLinkNewWindowCheck.checked);
                 cover.insertBefore(newEl, contextImage._caption);
             }
         }
@@ -528,9 +530,9 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = util.getFormatElement(contextImage._element);
+            const existElement = this.util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
-            util.removeItem(contextImage._element);
+            this.util.removeItem(contextImage._element);
         }
 
         // transform
@@ -551,9 +553,9 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
-        contextImage._cover = util.getParentElement(element, '.sun-editor-figure-cover');
-        contextImage._container = util.getParentElement(element, '.sun-editor-id-image-container');
-        contextImage._caption = util.getChildElement(contextImage._cover, 'FIGCAPTION');
+        contextImage._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        contextImage._container = this.util.getParentElement(element, '.sun-editor-id-image-container');
+        contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
         contextImage._element_w = size.w;
@@ -624,8 +626,8 @@ export default {
         contextImage._element.style.height = '';
 
         if (/100/.test(w)) {
-            util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-            util.addClass(contextImage._container, 'float-center');
+            this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+            this.util.addClass(contextImage._container, 'float-center');
         }
     },
 
@@ -638,8 +640,8 @@ export default {
         contextImage._container.style.width = '';
         contextImage._container.style.height = '';
 
-        util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-        util.addClass(contextImage._container, 'float-' + contextImage._align);
+        this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+        this.util.addClass(contextImage._container, 'float-' + contextImage._align);
     },
 
     resetAlign: function () {
@@ -648,16 +650,16 @@ export default {
         contextImage._element.setAttribute('data-align', '');
         contextImage._align = 'none';
         contextImage._cover.style.margin = '0';
-        util.removeClass(contextImage._container, contextImage._floatClassRegExp);
+        this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
     },
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
 
         const dataIndex = imageEl.getAttribute('data-index');
         
-        util.removeItem(imageContainer);
+        this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
 
         this.controllersOff();

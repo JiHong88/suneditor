@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'align',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.lang));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,8 +23,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (lang) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const lang = this.lang;
+        const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'layer_editor layer_align';
         listDiv.style.display = 'none';

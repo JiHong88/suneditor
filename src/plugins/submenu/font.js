@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'font',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.context.option));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,8 +23,10 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (option) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const option = this.context.option;
+        const listDiv = this.util.createElement('DIV');
+
         listDiv.className = 'layer_editor';
         listDiv.style.display = 'none';
 
@@ -67,8 +67,8 @@ export default {
 
         const target = e.target;
 
-        util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
-        const newNode = util.createElement('SPAN');
+        this.util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
+        const newNode = this.util.createElement('SPAN');
         newNode.style.fontFamily = target.getAttribute('data-value');
         this.nodeChange(newNode, ['font-family']);
         

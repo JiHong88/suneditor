@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import util from '../../lib/util';
-
 export default {
     name: 'fontSize',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu(core.context.option));
+        let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
@@ -25,8 +23,10 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function (option) {
-        const listDiv = util.createElement('DIV');
+    setSubmenu: function () {
+        const option = this.context.option;
+        const listDiv = this.util.createElement('DIV');
+
         listDiv.className = 'sun-editor-submenu layer_editor layer_size';
         listDiv.style.display = 'none';
 
@@ -54,8 +54,8 @@ export default {
             return false;
         }
 
-        util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
-        const newNode = util.createElement('SPAN');
+        this.util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
+        const newNode = this.util.createElement('SPAN');
         newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
         this.nodeChange(newNode, ['font-size']);
 

@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import util from '../../lib/util';
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
 
@@ -39,7 +38,7 @@ export default {
         };
 
         /** video dialog */
-        let video_dialog = eval(this.setDialog(core.context.option, core.lang));
+        let video_dialog = eval(this.setDialog.call(core));
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
         context.video.captionCheckEl = video_dialog.getElementsByClassName('suneditor-id-video-check-caption')[0];
@@ -71,8 +70,10 @@ export default {
     },
 
     /** dialog */
-    setDialog: function (option, lang) {
-        const dialog = util.createElement('DIV');
+    setDialog: function () {
+        const option = this.context.option;
+        const lang = this.lang;
+        const dialog = this.util.createElement('DIV');
 
         dialog.className = 'modal-content sun-editor-id-dialog-video';
         dialog.style.display = 'none';
@@ -158,7 +159,7 @@ export default {
             }
             /** url */
             else {
-                oIframe = util.createElement('IFRAME');
+                oIframe = this.util.createElement('IFRAME');
                 /** youtube */
                 if (/youtu\.?be/.test(url)) {
                     url = url.replace('watch?v=', '');
@@ -182,7 +183,7 @@ export default {
             if (this.context.dialog.updateModal) {
                 contextVideo._element.src = oIframe.src;
                 container = contextVideo._container;
-                cover = util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
+                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
                 oIframe = contextVideo._element;
                 resizingDiv = contextVideo._resizingDiv;
             }
@@ -202,7 +203,7 @@ export default {
                 cover = this.plugins.resizing.set_cover.call(this, oIframe);
 
                 /** resizingDiv */
-                contextVideo._resizingDiv = resizingDiv = util.createElement('DIV');
+                contextVideo._resizingDiv = resizingDiv = this.util.createElement('DIV');
                 resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
                 cover.appendChild(resizingDiv);
 
@@ -225,7 +226,7 @@ export default {
                 }
             } else {
                 if (contextVideo._caption) {
-                    util.removeItem(contextVideo._caption);
+                    this.util.removeItem(contextVideo._caption);
                     contextVideo._caption = null;
                 }
             }
@@ -242,12 +243,12 @@ export default {
                 cover.style.margin = '0';
             }
             
-            util.removeClass(container, this.context.video._floatClassRegExp);
-            util.addClass(container, 'float-' + contextVideo._align);
+            this.util.removeClass(container, this.context.video._floatClassRegExp);
+            this.util.addClass(container, 'float-' + contextVideo._align);
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {
-                this.insertNode(container, util.getFormatElement(this.getSelectionNode()));
+                this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
                 this.appendFormatTag(container);
             } else if((contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
@@ -278,10 +279,10 @@ export default {
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
-        contextVideo._cover = util.getParentElement(element, '.sun-editor-figure-cover');
-        contextVideo._container = util.getParentElement(element, '.sun-editor-id-iframe-container');
-        contextVideo._caption = util.getChildElement(contextVideo._cover, 'FIGCAPTION');
-        contextVideo._resizingDiv = util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
+        contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
+        contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
+        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -337,8 +338,8 @@ export default {
         contextVideo._element.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
 
         if (/100/.test(w)) {
-            util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-            util.addClass(contextVideo._container, 'float-center');
+            this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+            this.util.addClass(contextVideo._container, 'float-center');
         }
     },
 
@@ -350,8 +351,8 @@ export default {
         contextVideo._container.style.width = '';
         contextVideo._container.style.height = '';
 
-        util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-        util.addClass(contextVideo._container, 'float-' + contextVideo._align);
+        this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
+        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
     },
 
     resetAlign: function () {
@@ -360,11 +361,11 @@ export default {
         contextVideo._element.setAttribute('data-align', '');
         contextVideo._align = 'none';
         contextVideo._cover.style.margin = '0';
-        util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
+        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
     },
 
     destroy: function () {
-        util.removeItem(this.context.video._container);
+        this.util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
         this.controllersOff();
     },
