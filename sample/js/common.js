@@ -21,8 +21,6 @@ var xhr = function () {
 xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            console.log('response', document.getElementById('stargazers'))
             document.getElementById('stargazers').innerText = ' Star ' + JSON.parse(xhr.responseText).stargazers_count;
         }
     }

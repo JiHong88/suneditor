@@ -61,7 +61,6 @@
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "build:customize": "webpack --config webpack.customize.ex.js",
     "lint": "jshint src",
     "test": "karma start"
   }
