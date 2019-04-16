@@ -2,6 +2,7 @@
 .sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
+    line-height: 1.5;
     color: #000;
     text-align: left;
     background-color: #fff;
@@ -15,6 +16,8 @@
     font-size: inherit;
     color: inherit;
     background-color: inherit;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
