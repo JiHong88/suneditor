@@ -172,13 +172,15 @@
 .sun-editor .layer_editor.layer_line {left:0; width:158px;}
 
 .sun-editor .btn_edit {width:100%; height:28px; padding:0 14px; margin-left:0; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
-.sun-editor .btn_font {width:100px; text-align:left; text-indent:7px; padding:0;}
-.sun-editor .btn_format {width:90px; text-align:left; text-indent:7px; padding:0;}
-.sun-editor .btn_size {width:70px; text-align:left; text-indent:7px; padding:0;}
 
-.sun-editor .btn_font .txt {width:65px; float:left;}
-.sun-editor .btn_format .txt {width:55px; float:left;}
-.sun-editor .btn_size .txt {width:35px; float:left;}
+.sun-editor .btn_edit_select {width:auto; display:flex; text-align:left; padding:4px 6px;}
+.sun-editor .btn_edit_select .txt {flex:5; float:left;}
+.sun-editor .btn_edit_select .icon-arrow-down {flex:1; float:right;}
+
+.sun-editor .btn_edit_select.btn_font {width:100px;}
+.sun-editor .btn_edit_select.btn_format {width:80px;}
+.sun-editor .btn_edit_select.btn_size {width:80px;}
+
 
 /* table selector */
 .sun-editor .table-content {position:absolute; top:34px; left:1px; z-index:3; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
