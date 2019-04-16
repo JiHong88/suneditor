@@ -389,8 +389,8 @@ export default {
             oImg.setAttribute('data-file-size', file.size);
         }
         else {
-            this._variable._imagesInfo[dataIndex].oImg.getAttribute("data-file-name");
-            this._variable._imagesInfo[dataIndex].oImg.getAttribute("data-file-size") * 1;
+            this._variable._imagesInfo[dataIndex].name = oImg.getAttribute("data-file-name");
+            this._variable._imagesInfo[dataIndex].size = oImg.getAttribute("data-file-size") * 1;
         }
 
         this._imageUpload(oImg, dataIndex, false, this._variable._imagesInfo[dataIndex]);
@@ -536,7 +536,7 @@ export default {
         }
 
         // transform
-        if ((contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked)) {
+        if (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked)) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
     },
