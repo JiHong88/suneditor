@@ -450,7 +450,7 @@ export default {
         this.appendFormatTag(container);
     },
 
-    update_image: function () {
+    update_image: function (init) {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
         let imageEl = contextImage._element;
@@ -536,7 +536,7 @@ export default {
         }
 
         // transform
-        if (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked)) {
+        if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
     },

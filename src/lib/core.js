@@ -1892,7 +1892,7 @@ const core = function (context, plugins, lang) {
                     
                     if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
                         editor.plugins.image.openModify.call(editor, true);
-                        editor.plugins.image.update_image.call(editor);
+                        editor.plugins.image.update_image.call(editor, true);
                         editor.controllersOff();
                     }
                 });
