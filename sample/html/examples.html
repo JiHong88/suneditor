@@ -299,21 +299,21 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
                 <p><br></p>
             </textarea>
             <p></p>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_noticeClose()">noticeClose</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_save()">save</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContext()">getContext</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getContents()">getContents</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_getImagesInfo()">getImagesInfo</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_setContents('set contents')">setContents</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_appendContents('append contents')">AppendContents</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_disabled()">Disabled</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_enabled()">Enabled</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_hide()">Hide</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_show()">Show</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_destroy()">Destroy</button>
-            <button type="button" class="btn btn-lg btn-danger" onclick="sun_create()">Create</button>
+            <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
+            <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
+            <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
+            <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
+            <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
+            <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
+            <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
+            <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
+            <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
+            <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
+            <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
+            <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
+            <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
+            <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
+            <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         </form>
         
     </article>
@@ -440,14 +440,15 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
     function sun_create() {
         suneditor = SUNEDITOR.create('exampleFunction', {
             buttonList: [
-            ['undo', 'redo'],
-            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-            ['removeFormat'],
-            ['indent', 'outdent'],
-            ['fullScreen', 'showBlocks', 'codeView'],
-            ['preview', 'print'],
-            ['image']
-        ]
+                ['undo', 'redo'],
+                ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                ['removeFormat'],
+                ['indent', 'outdent'],
+                ['fullScreen', 'showBlocks', 'codeView'],
+                ['preview', 'print'],
+                ['image']
+            ],
+            width: '100%'
         });
 
         suneditor.onScroll = function (e) { console.log('onScroll', e); }
