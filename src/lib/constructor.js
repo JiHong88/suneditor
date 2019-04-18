@@ -231,11 +231,11 @@ const _Constructor = {
                 '<div class="icon-code-view"></div>'
             ],
 
-            undo: ['code-view-enabled', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '',
+            undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '',
                 '<div class="icon-undo"></div>'
             ],
 
-            redo: ['code-view-enabled', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '',
+            redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '',
                 '<div class="icon-redo"></div>'
             ],
 
