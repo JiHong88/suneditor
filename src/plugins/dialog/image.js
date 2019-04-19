@@ -530,7 +530,7 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.getFormatElement(contextImage._element);
+            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? contextImage._element : this.util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(contextImage._element);
         }
@@ -539,6 +539,8 @@ export default {
         if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
+
+        if (init) this.plugins.image.init.call(this);
     },
 
     sizeRevert: function () {

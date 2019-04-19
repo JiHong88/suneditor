@@ -83,15 +83,15 @@ const core = function (context, plugins, lang) {
         controllerArray: [],
 
         /**
+         * @description An array of buttons whose class name is not "code-view-enabled"
+         */
+        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+
+        /**
          * @description binded controllersOff method
          * @private
          */
         _bindControllersOff: null,
-
-        /**
-         * @description An array of buttons whose class name is not "code-view-enabled"
-         */
-        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
          * @description Is inline mode?
@@ -1893,7 +1893,6 @@ const core = function (context, plugins, lang) {
                     if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
                         editor.plugins.image.openModify.call(editor, true);
                         editor.plugins.image.update_image.call(editor, true);
-                        editor.controllersOff();
                     }
                 });
 
@@ -2392,7 +2391,12 @@ const core = function (context, plugins, lang) {
                 html = template.firstChild || template.content.firstChild;
             }
 
-            editor.insertNode(html);
+            let rightNode = null;
+            if (util.isFormatElement(html) || /^(?:IMG|IFRAME)$/i.test(html.nodeName)) {
+                rightNode = util.getFormatElement(editor.getSelectionNode());
+            }
+
+            editor.insertNode(html, rightNode);
             editor.focus();
         },
 
@@ -2485,10 +2489,6 @@ const core = function (context, plugins, lang) {
             this.show = null;
             this.hide = null;
             this.destroy = null;
-
-            context = null;
-            plugins = null;
-            lang = null;
         }
     };
 
