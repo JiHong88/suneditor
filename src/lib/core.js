@@ -140,83 +140,6 @@ export default function (context, plugins, lang) {
         },
 
         /**
-         * @description History object for undo, redo
-         * @private
-         */
-        _history2: {
-            delay: false,
-            stack: {
-                undo: [],
-                redo: []
-            },
-            _createHistoryPath: function (node) {
-                const pathEl = [];
-    
-                util.getAncestor(node, function (el) {
-                    if (!util.isWysiwygDiv(el) && el.nodeType !== 3) {
-                        pathEl.push(el);
-                    }
-
-                    return false;
-                })
-                
-                return pathEl.map(util.getPositionIndex).reverse();
-            },
-            push: function (current) {
-                if (this.delay) return;
-                this.delay = true;
-
-                _w.setTimeout(function () {
-                    if (current === this.stack.undo[this.stack.undo.length - 1]) return;
-                    
-                    const range = core.getRange();
-                    this.stack.undo.push({
-                        html: current,
-                        s: {
-                            path: this._createHistoryPath(range.startContainer),
-                            offset: range.startOffset
-                        },
-                        e: {
-                            path: this._createHistoryPath(range.endContainer),
-                            offset: range.endOffset
-                        }
-                    });
-
-                    this.delay = false;
-                }.bind(this), 500);
-            },
-            getNodeFromStack: function (offsets) {
-                let current = context.element.wysiwyg;
-                for (let i = 0, len = offsets.length; i < len; i++) {
-                    if (current.childNodes.length <= offsets[i]) {
-                    current = current.childNodes[current.childNodes.length - 1];
-                    } else {
-                    current = current.childNodes[offsets[i]];
-                    }
-                }
-                return current;
-            },
-            setContentsFromStack: function (item) {
-                context.element.wysiwyg.innerHTML = item.html;
-                core.setRange(this.getNodeFromStack(item.s.path), item.s.offset, this.getNodeFromStack(item.e.path), item.e.offset);
-            },
-            undo: function () {
-                const item = this.stack.undo.pop();
-                if (item) {
-                    this.stack.redo.push(item);
-                    this.setContentsFromStack(item);
-                }
-            },
-            redo: function () {
-                const item = this.stack.redo.pop();
-                if (item) {
-                    this.stack.undo.push(item);
-                    this.setContentsFromStack(item);
-                }
-            }
-        },
-
-        /**
          * @description Elements that need to change text or className for each selection change
          * @property {Element} FORMAT - format button
          * @property {Element} FONT - font family button
@@ -1533,7 +1456,6 @@ export default function (context, plugins, lang) {
                 case 'outdent':
                     this.indent(command);
                     break;
-                
                 case 'undo':
                     history.undo();
                     break;
@@ -2221,8 +2143,9 @@ export default function (context, plugins, lang) {
             }
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
+
             /** push to history stack */
-            history.push(core.getContents());
+            history.push();
         },
 
         onScroll_wysiwyg: function (e) {
@@ -2347,14 +2270,13 @@ export default function (context, plugins, lang) {
     /**
      * @description excute history function
      */
-    const history = new _history(core, core.getContents());
+    const history = _history(core);
 
     /** add event listeners */
     /** toolbar event */
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    // context.element.relative.addEventListener('click', core.focus.bind(core), false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
