@@ -35,11 +35,11 @@ export default {
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="P" title="' + lang.toolbar.tag_p + '"><p style="font-size:13px; height:22px; line-height:1.5;">' + lang.toolbar.tag_p + '</p></button></li>' +
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="DIV" title="' + lang.toolbar.tag_div + '"><div style="font-size:13px; height:22px; line-height:1.5;">' + lang.toolbar.tag_div + '</div></button></li>' +
             '       <li><button type="button" class="btn_edit" data-command="range" data-value="BLOCKQUOTE" title="' + lang.toolbar.tag_quote + '">' +
-            '               <blockquote style="font-size:13px; height:22px; line-height:1.5; border-style:solid; border-color:#8baab7; padding-left:20px; border-left-width:5px;">' + lang.toolbar.tag_quote + '</blockquote>' +
+            '               <blockquote class="quote_ex">' + lang.toolbar.tag_quote + '</blockquote>' +
             '           </button>' +
             '       </li>' +
             '       <li><button type="button" class="btn_edit" data-command="range" data-value="PRE" title="' + lang.toolbar.pre + '">' +
-            '               <pre style="font-size:13px; padding:8px; background-color:#f6f8fa; border:1px solid #dce5e5; border-radius:3px;">' + lang.toolbar.pre + '</pre>' +
+            '               <pre class="pre_ex">' + lang.toolbar.pre + '</pre>' +
             '           </button>' +
             '       </li>' +
             '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H1" title="' + lang.toolbar.tag_h + ' 1" style="height:40px;"><h1>' + lang.toolbar.tag_h + ' 1</h1></button></li>' +

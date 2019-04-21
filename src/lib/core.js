@@ -7,24 +7,29 @@
  */
 'use strict';
 
-import util from './util';
+import _history from './history';
+import _util from './util';
 import notice from '../plugins/modules/notice';
 
 /**
- * @description SunEditor core function
+ * @description SunEditor constuctor function.
+ * create core object and event registration.
+ * core, event, userFunction
  * @param context
  * @param plugins
  * @param lang
  * @returns {Object} UserFunction Object
  */
-const core = function (context, plugins, lang) {
+export default function (context, plugins, lang) {
     const _d = document;
     const _w = window;
+    const util = _util;
+
     /**
      * @description editor core object
      * should always bind this object when registering an event in the plug-in.
      */
-    const editor = {
+    const core = {
         /**
          * @description Elements and user options parameters of the suneditor
          */
@@ -83,15 +88,20 @@ const core = function (context, plugins, lang) {
         controllerArray: [],
 
         /**
+         * @description An array of buttons whose class name is not "code-view-enabled"
+         */
+        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+
+        /**
+         * @description History object for undo, redo
+         */
+        history: null,
+
+        /**
          * @description binded controllersOff method
          * @private
          */
         _bindControllersOff: null,
-
-        /**
-         * @description An array of buttons whose class name is not "code-view-enabled"
-         */
-        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
          * @description Is inline mode?
@@ -609,6 +619,9 @@ const core = function (context, plugins, lang) {
                 parentNode.insertBefore(oNode, rightNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
+            } finally {
+                // history stack
+                this.history.push();
             }
         },
 
@@ -692,6 +705,9 @@ const core = function (context, plugins, lang) {
                 }
 
                 util.removeItem(item);
+
+                // history stack
+                this.history.push();
             }
         },
 
@@ -752,6 +768,9 @@ const core = function (context, plugins, lang) {
 
             pElement.insertBefore(wrapTag, beforeTag);
             if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
+
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -909,6 +928,9 @@ const core = function (context, plugins, lang) {
 
             // set range
             this.setRange(start.container, start.offset, end.container, end.offset);
+
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -1431,7 +1453,7 @@ const core = function (context, plugins, lang) {
 
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
-         * (redo, undo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+         * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
          * @param {Element} target - The element of command button
          * @param {String} command - Property of command button (data-value)
          */
@@ -1451,9 +1473,11 @@ const core = function (context, plugins, lang) {
                 case 'outdent':
                     this.indent(command);
                     break;
-                case 'redo':
                 case 'undo':
-                    this.execCommand(command, false, null);
+                    this.history.undo();
+                    break;
+                case 'redo':
+                    this.history.redo();
                     break;
                 case 'removeFormat':
                     this.removeFormat();
@@ -1495,6 +1519,9 @@ const core = function (context, plugins, lang) {
             }
 
             this.focus();
+            
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -1648,7 +1675,7 @@ const core = function (context, plugins, lang) {
 
             if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
 
-            if (editor._variable.wysiwygActive) {
+            if (core._variable.wysiwygActive) {
                 contents = context.element.wysiwyg.innerHTML;
             } else {
                 contents = util.convertContentsForEditor(context.element.code.value);
@@ -1673,15 +1700,60 @@ const core = function (context, plugins, lang) {
      * @description event function
      */
     const event = {
-        _shortcutKeyCode: {
-            66: ['bold', 'B'],
-            83: ['strikethrough', 'STRIKE'],
-            85: ['underline', 'U'],
-            73: ['italic', 'I'],
-            89: ['redo'],
-            90: ['undo'],
-            219: ['outdent'],
-            221: ['indent']
+        _keyCode: {
+            66: 'B',
+            83: 'S',
+            85: 'U',
+            73: 'I',
+            89: 'Y',
+            90: 'Z',
+            219: '[',
+            221: ']'
+        },
+
+        _shortcutCommand: function (keyCode, shift) {
+            let command = null;
+            const keyStr = event._keyCode[keyCode];
+
+            switch (keyStr) {
+                case 'B':
+                    command = ['bold', 'B'];
+                    break;
+                case 'S':
+                    if (shift) {
+                        command = ['strikethrough', 'STRIKE'];
+                    }
+                    break;
+                case 'U':
+                    command = ['underline', 'U'];
+                    break;
+                case 'I':
+                    command = ['italic', 'I'];
+                    break;
+                case 'Z':
+                    if (shift) {
+                        command = ['redo'];
+                    } else {
+                        command = ['undo'];
+                    }
+                    break;
+                case 'Y':
+                    command = ['redo'];
+                    break;
+                case '[':
+                    command = ['outdent'];
+                    break;
+                case ']':
+                    command = ['indent'];
+                    break;
+            }
+
+            if (!command) return false;
+
+            core.commandHandler(util.getFormatElement(core.getSelectionNode()), command[0]);
+            util.toggleClass(core.commandMap[command[1]], 'on');
+
+            return true;
         },
 
         _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
@@ -1689,7 +1761,7 @@ const core = function (context, plugins, lang) {
         _changeButtonClassTagCheck: new RegExp('^(?:B|U|I|STRIKE|SUB|SUP)$'),
 
         _findButtonEffectTag: function () {
-            const commandMap = editor.commandMap;
+            const commandMap = core.commandMap;
             const classOnCheck = this._changeButtonClassTagCheck;
             const commandMapNodes = [];
             const currentNodes = [];
@@ -1698,7 +1770,7 @@ const core = function (context, plugins, lang) {
             let findB = true, findI = true, findU = true, findS = true;
             let cssText = '', nodeName = '';
 
-            for (let selectionParent = editor.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
+            for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
                 if (!selectionParent) break;
                 if (selectionParent.nodeType !== 1) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
@@ -1722,14 +1794,14 @@ const core = function (context, plugins, lang) {
 
                 /** A */
                 if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
-                    if (!context.link || editor.controllerArray[0] !== context.link.linkBtn) {
-                        editor.callPlugin('link', function () {
-                            editor.plugins.link.call_controller_linkButton.call(editor, selectionParent);
+                    if (!context.link || core.controllerArray[0] !== context.link.linkBtn) {
+                        core.callPlugin('link', function () {
+                            core.plugins.link.call_controller_linkButton.call(core, selectionParent);
                         });
                     }
                     findA = false;
-                } else if (findA && context.link && editor.controllerArray[0] === context.link.linkBtn) {
-                    editor.controllersOff();
+                } else if (findA && context.link && core.controllerArray[0] === context.link.linkBtn) {
+                    core.controllersOff();
                 }
 
                 /** SPAN */
@@ -1765,7 +1837,7 @@ const core = function (context, plugins, lang) {
             }
 
             /** A Tag edit controller off */
-            if (findA) editor.controllersOff();
+            if (findA) core.controllersOff();
 
             /** toggle class on */
             for (let i = 0; i < commandMapNodes.length; i++) {
@@ -1778,7 +1850,7 @@ const core = function (context, plugins, lang) {
             /** remove class, display text */
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
-                if (/^FONT/i.test(key)) {
+                if (/^FONT$/i.test(key)) {
                     util.changeTxt(commandMap[key], lang.toolbar.font);
                 }
                 else if (/^SIZE$/i.test(key)) {
@@ -1790,10 +1862,10 @@ const core = function (context, plugins, lang) {
             }
 
             /** save current nodes */
-            editor._variable.currentNodes = currentNodes.reverse();
+            core._variable.currentNodes = currentNodes.reverse();
 
             /**  Displays the current node structure to resizingBar */
-            if (context.option.showPathLabel) context.element.navigation.textContent = editor._variable.currentNodes.join(' > ');
+            if (context.option.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(' > ');
         },
 
         _cancelCaptionEdit: function () {
@@ -1806,7 +1878,7 @@ const core = function (context, plugins, lang) {
 
             if (util.getParentElement(target, '.sun-editor-submenu')) {
                 e.stopPropagation();
-                editor._notHideToolbar = true;
+                core._notHideToolbar = true;
             } else {
                 e.preventDefault();
                 let command = target.getAttribute('data-command');
@@ -1818,7 +1890,7 @@ const core = function (context, plugins, lang) {
                     className = target.className;
                 }
     
-                if (command === editor._submenuName) {
+                if (command === core._submenuName) {
                     e.stopPropagation();
                 }
             }
@@ -1843,38 +1915,38 @@ const core = function (context, plugins, lang) {
             if (!command && !display) return;
             if (target.disabled) return;
             
-            editor.focus();
+            core.focus();
             
             /** Dialog, Submenu */
             if (display) {
-                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== editor.submenuActiveButton)) {
-                    editor.callPlugin(command, function () {
-                        editor.submenuOn(target);
+                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== core.submenuActiveButton)) {
+                    core.callPlugin(command, function () {
+                        core.submenuOn(target);
                     });
                     return;
                 }
                 else if (/dialog/.test(display)) {
-                    editor.callPlugin(command, function () {
-                        editor.plugins.dialog.open.call(editor, command, false);
+                    core.callPlugin(command, function () {
+                        core.plugins.dialog.open.call(core, command, false);
                     });
                     return;
                 }
 
-                editor.submenuOff();
+                core.submenuOff();
                 return;
             }
 
             /** default command */
             if (command) {
-                editor.commandHandler(target, command);
+                core.commandHandler(target, command);
             }
         },
 
         onMouseUp_wysiwyg: function () {
-            editor._editorRange();
+            core._editorRange();
             
-            if (editor._isBalloon) {
-                const range = editor.getRange();
+            if (core._isBalloon) {
+                const range = core.getRange();
                 if (range.collapsed) event._hideToolbar();
                 else event._showToolbarBalloon(range);
             }
@@ -1886,14 +1958,13 @@ const core = function (context, plugins, lang) {
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
-                editor.callPlugin('image', function () {
-                    const size = editor.plugins.resizing.call_controller_resize.call(editor, targetElement, 'image');
-                    editor.plugins.image.onModifyMode.call(editor, targetElement, size);
+                core.callPlugin('image', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
+                    core.plugins.image.onModifyMode.call(core, targetElement, size);
                     
                     if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
-                        editor.plugins.image.openModify.call(editor, true);
-                        editor.plugins.image.update_image.call(editor, true);
-                        editor.controllersOff();
+                        core.plugins.image.openModify.call(core, true);
+                        core.plugins.image.update_image.call(core, true);
                     }
                 });
 
@@ -1902,10 +1973,10 @@ const core = function (context, plugins, lang) {
 
             if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
-                editor.callPlugin('video', function () {
+                core.callPlugin('video', function () {
                     const iframe = util.getChildElement(targetElement.parentNode, 'iframe');
-                    const size = editor.plugins.resizing.call_controller_resize.call(editor, iframe, 'video');
-                    editor.plugins.video.onModifyMode.call(editor, iframe, size);
+                    const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
+                    core.plugins.video.onModifyMode.call(core, iframe, size);
                 });
 
                 return;
@@ -1919,7 +1990,7 @@ const core = function (context, plugins, lang) {
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
 
-                if (editor._isInline && !editor._inlineToolbarAttr.isShow) {
+                if (core._isInline && !core._inlineToolbarAttr.isShow) {
                     event._showToolbarInline();
 
                     const hideToolbar = function () {
@@ -1932,8 +2003,8 @@ const core = function (context, plugins, lang) {
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
                 if (td) {
-                    if (editor.controllerArray.length === 0) {
-                        editor.callPlugin('table', editor.plugins.table.call_controller_tableEdit.bind(editor, td));
+                    if (core.controllerArray.length === 0) {
+                        core.callPlugin('table', core.plugins.table.call_controller_tableEdit.bind(core, td));
                     }
                 }
             }
@@ -1942,7 +2013,7 @@ const core = function (context, plugins, lang) {
         },
 
         _showToolbarBalloon: function (rangeObj) {
-            const range = rangeObj || editor.getRange();
+            const range = rangeObj || core.getRange();
             const padding = 20;
             const toolbar = context.element.toolbar;
             const selection = _w.getSelection();
@@ -1990,19 +2061,19 @@ const core = function (context, plugins, lang) {
         _showToolbarInline: function () {
             const toolbar = context.element.toolbar;
             toolbar.style.display = 'block';
-            editor._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
-            editor._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            core._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
+            core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             event.onScroll_window();
-            editor._inlineToolbarAttr.isShow = true;
+            core._inlineToolbarAttr.isShow = true;
         },
 
         _hideToolbar: function () {
-            if (!editor._notHideToolbar) {
+            if (!core._notHideToolbar) {
                 context.element.toolbar.style.display = 'none';
-                editor._inlineToolbarAttr.isShow = false;
+                core._inlineToolbarAttr.isShow = false;
             }
 
-            editor._notHideToolbar = false;
+            core._notHideToolbar = false;
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -2011,30 +2082,19 @@ const core = function (context, plugins, lang) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            if (editor._isBalloon) {
+            if (core._isBalloon) {
                 event._hideToolbar();
             }
 
-            function shortcutCommand(keyCode) {
-                const key = event._shortcutKeyCode[keyCode];
-                if (!key) return false;
-
-                editor.commandHandler(util.getFormatElement(editor.getSelectionNode()), key[0]);
-                util.toggleClass(editor.commandMap[key[1]], 'on');
-
-                return true;
-            }
-
             /** Shortcuts */
-            if (ctrl && !/^(?:16|17|18)$/.test(keyCode)) {
-                if (!(!shift && keyCode === 83) && shortcutCommand(keyCode)) {
-                    e.preventDefault();
-                    return;
-                }
+            if (ctrl && event._shortcutCommand(keyCode, shift)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
             }
 
             /** default key action */
-            const selectionNode = editor.getSelectionNode();
+            const selectionNode = core.getSelectionNode();
             switch (keyCode) {
                 case 8: /**backspace key*/
                     if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && selectionNode.previousSibling === null) {
@@ -2050,9 +2110,9 @@ const core = function (context, plugins, lang) {
                     e.preventDefault();
                     if (ctrl || alt) break;
 
-                    editor.controllersOff();
+                    core.controllersOff();
 
-                    let currentNode = selectionNode || editor.getSelectionNode();
+                    let currentNode = selectionNode || core.getSelectionNode();
                     while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
@@ -2068,19 +2128,19 @@ const core = function (context, plugins, lang) {
                         const moveCell = cells[idx];
                         if (!moveCell) return false;
 
-                        editor.setRange(moveCell, 0, moveCell, 0);
+                        core.setRange(moveCell, 0, moveCell, 0);
 
                         break;
                     }
 
                     /** format Tag */
-                    const lines = editor.getSelectedFormatElements();
+                    const lines = core.getSelectedFormatElements();
 
                     if (!shift) {
-                        const tabText = util.createTextNode(new Array(editor._variable.tabSize + 1).join('\u00A0'));
+                        const tabText = util.createTextNode(new Array(core._variable.tabSize + 1).join('\u00A0'));
                         if (lines.length === 1) {
-                            editor.insertNode(tabText);
-                            editor.setRange(tabText, editor._variable.tabSize, tabText, editor._variable.tabSize);
+                            core.insertNode(tabText);
+                            core.setRange(tabText, core._variable.tabSize, tabText, core._variable.tabSize);
                         } else {
                             for (let i = 0, len = lines.length; i < len; i++) {
                                 lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
@@ -2104,11 +2164,11 @@ const core = function (context, plugins, lang) {
         },
 
         onKeyUp_wysiwyg: function (e) {
-            editor._editorRange();
-            editor.controllersOff();
-            const selectionNode = editor.getSelectionNode();
+            core._editorRange();
+            core.controllersOff();
+            const selectionNode = core.getSelectionNode();
 
-            if (editor._isBalloon && !editor.getRange().collapsed) {
+            if (core._isBalloon && !core.getRange().collapsed) {
                 event._showToolbarBalloon();
                 return;
             }
@@ -2118,16 +2178,16 @@ const core = function (context, plugins, lang) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const oFormatTag = util.createElement(util.isFormatElement(editor._variable.currentNodes[0]) ? editor._variable.currentNodes[0] : 'P');
+                const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : 'P');
                 oFormatTag.innerHTML = util.zeroWidthSpace;
 
                 selectionNode.appendChild(oFormatTag);
-                editor.setRange(oFormatTag, 0, oFormatTag, 0);
+                core.setRange(oFormatTag, 0, oFormatTag, 0);
                 return;
             }
 
             if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
-                editor.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
+                core.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
                 event._findButtonEffectTag();
                 return;
             }
@@ -2137,10 +2197,13 @@ const core = function (context, plugins, lang) {
             }
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
+
+            // history stack
+            core.history.push();
         },
 
         onScroll_wysiwyg: function (e) {
-            editor.controllersOff();
+            core.controllersOff();
             if (userFunction.onScroll) userFunction.onScroll(e);
         },
 
@@ -2151,11 +2214,11 @@ const core = function (context, plugins, lang) {
                 e.stopPropagation();
                 e.preventDefault();
                 
-                editor.focus();
+                core.focus();
     
-                editor.callPlugin('image', function () {
+                core.callPlugin('image', function () {
                     context.image.imgInputFile.files = files;
-                    editor.plugins.image.onRender_imgInput.call(editor);
+                    core.plugins.image.onRender_imgInput.call(core);
                     context.image.imgInputFile.files = null;
                 });
             }
@@ -2166,7 +2229,7 @@ const core = function (context, plugins, lang) {
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
 
-            editor._variable.resizeClientY = e.clientY;
+            core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
             function closureFunc() {
@@ -2180,40 +2243,40 @@ const core = function (context, plugins, lang) {
         },
 
         _resize_editor: function (e) {
-            const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - editor._variable.resizeClientY);
-            context.element.wysiwyg.style.height = context.element.code.style.height = (resizeInterval < editor._variable.minResizingSize ? editor._variable.minResizingSize : resizeInterval) + 'px';
-            editor._variable.resizeClientY = e.clientY;
+            const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - core._variable.resizeClientY);
+            context.element.wysiwyg.style.height = context.element.code.style.height = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval) + 'px';
+            core._variable.resizeClientY = e.clientY;
         },
 
         onResize_window: function () {
             if (context.element.toolbar.offsetWidth === 0) return;
 
-            if (editor._variable.isFullScreen) {
-                editor._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - editor._variable.innerHeight_fullScreen;
-                context.element.editorArea.style.height = editor._variable.innerHeight_fullScreen + 'px';
+            if (core._variable.isFullScreen) {
+                core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
+                context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
             }
-            else if (editor._variable._sticky) {
+            else if (core._variable._sticky) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
 
-            editor.controllersOff();
+            core.controllersOff();
         },
 
         onScroll_window: function () {
-            if (editor._variable.isFullScreen || context.element.toolbar.offsetWidth === 0) return;
+            if (core._variable.isFullScreen || context.element.toolbar.offsetWidth === 0) return;
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
-            const editorTop = element.topArea.offsetTop - (editor._isInline ? element.toolbar.offsetHeight : 0);
+            const editorTop = element.topArea.offsetTop - (core._isInline ? element.toolbar.offsetHeight : 0);
             const y = (this.scrollY || _d.documentElement.scrollTop) + context.option.stickyToolbar;
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
-            else if (y + editor._variable.minResizingSize >= editorHeight + editorTop) {
-                if (!editor._variable._sticky) event._onStickyToolbar(element);
-                element.toolbar.style.top = (editorHeight + editorTop + context.option.stickyToolbar -y - editor._variable.minResizingSize) + 'px';
+            else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
+                if (!core._variable._sticky) event._onStickyToolbar(element);
+                element.toolbar.style.top = (editorHeight + editorTop + context.option.stickyToolbar -y - core._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
                 event._onStickyToolbar(element);
@@ -2221,24 +2284,24 @@ const core = function (context, plugins, lang) {
         },
 
         _onStickyToolbar: function (element) {
-            if (!editor._isInline) {
+            if (!core._isInline) {
                 element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
                 element._stickyDummy.style.display = 'block';
             }
 
             element.toolbar.style.top = context.option.stickyToolbar + 'px';
-            element.toolbar.style.width = editor._isInline ? editor._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
+            element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
-            editor._variable._sticky = true;
+            core._variable._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
             element._stickyDummy.style.display = 'none';
-            element.toolbar.style.top = editor._isInline ? editor._inlineToolbarAttr.top : '';
-            element.toolbar.style.width = editor._isInline ? editor._inlineToolbarAttr.width : '';
+            element.toolbar.style.top = core._isInline ? core._inlineToolbarAttr.top : '';
+            element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : '';
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
-            editor._variable._sticky = false;
+            core._variable._sticky = false;
         },
 
         _codeViewAutoScroll: function () {
@@ -2251,19 +2314,21 @@ const core = function (context, plugins, lang) {
             const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
             
             if (cleanData) {
-                editor.execCommand('insertHTML', false, cleanData);
+                core.execCommand('insertHTML', false, cleanData);
                 e.stopPropagation();
                 e.preventDefault();
             }
         }
     };
 
+    /** excute history function */
+    core.history = _history(core);
+
     /** add event listeners */
     /** toolbar event */
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    context.element.relative.addEventListener('click', editor.focus.bind(editor), false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
@@ -2285,11 +2350,11 @@ const core = function (context, plugins, lang) {
     }
 
     /** inline editor */
-    if (editor._isInline) {
+    if (core._isInline) {
         context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
     }
 
-    if (editor._isInline || editor._isBalloon) {
+    if (core._isInline || core._isBalloon) {
         context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
     }
     
@@ -2301,7 +2366,7 @@ const core = function (context, plugins, lang) {
     if (plugins) {
         Object.keys(plugins).map(function(key) {
             let plugin = plugins[key];
-            editor.plugins[plugin.name] = util.copyObj(plugin);
+            core.plugins[plugin.name] = util.copyObj(plugin);
         });
     }
 
@@ -2338,23 +2403,23 @@ const core = function (context, plugins, lang) {
          * @param {String} message - Notice message
          */
         noticeOpen: function (message) {
-            editor.addModule([notice]);
-            notice.open.call(editor, message);
+            core.addModule([notice]);
+            notice.open.call(core, message);
         },
 
         /**
          * @description Close a notice area
          */
         noticeClose: function () {
-            editor.addModule([notice]);
-            notice.close.call(editor);
+            core.addModule([notice]);
+            notice.close.call(core);
         },
 
         /**
          * @description Copying the contents of the editor to the original textarea
          */
         save: function () {
-            context.element.originElement.value = editor.getContents();
+            context.element.originElement.value = core.getContents();
         },
 
         /**
@@ -2370,7 +2435,7 @@ const core = function (context, plugins, lang) {
          * @returns {String}
          */
         getContents: function () {
-            return editor.getContents();
+            return core.getContents();
         },
 
         /**
@@ -2378,7 +2443,7 @@ const core = function (context, plugins, lang) {
          * @returns {Array}
          */
         getImagesInfo: function () {
-            return editor._variable._imagesInfo;
+            return core._variable._imagesInfo;
         },
 
         /**
@@ -2392,8 +2457,13 @@ const core = function (context, plugins, lang) {
                 html = template.firstChild || template.content.firstChild;
             }
 
-            editor.insertNode(html);
-            editor.focus();
+            let rightNode = null;
+            if (util.isFormatElement(html) || /^(?:IMG|IFRAME)$/i.test(html.nodeName)) {
+                rightNode = util.getFormatElement(core.getSelectionNode());
+            }
+
+            core.insertNode(html, rightNode);
+            core.focus();
         },
 
         /**
@@ -2401,11 +2471,14 @@ const core = function (context, plugins, lang) {
          * @param {String} contents - Contents to Input
          */
         setContents: function (contents) {
-            if (editor._variable.wysiwygActive) {
+            if (core._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML = util.convertContentsForEditor(contents);
             } else {
                 context.element.code.value = contents;
             }
+
+            // history stack
+            core.history.push();
         },
 
         /**
@@ -2413,11 +2486,14 @@ const core = function (context, plugins, lang) {
          * @param {String} contents - Contents to Input
          */
         appendContents: function (contents) {
-            if (editor._variable.wysiwygActive) {
+            if (core._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
             } else {
                 context.element.code.value += contents;
             }
+
+            // history stack
+            core.history.push();
         },
 
         /**
@@ -2464,6 +2540,10 @@ const core = function (context, plugins, lang) {
             /** remove element */
             util.removeItem(context.element.topArea);
 
+            /** empty history stack */
+            core.history.stack = null;
+
+            /** empty user object */
             this.onScroll = null;
             this.onClick = null;
             this.onKeyDown = null;
@@ -2485,14 +2565,8 @@ const core = function (context, plugins, lang) {
             this.show = null;
             this.hide = null;
             this.destroy = null;
-
-            context = null;
-            plugins = null;
-            lang = null;
         }
     };
 
     return userFunction;
-};
-
-export default core;
+}

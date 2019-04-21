@@ -126,7 +126,7 @@ export default {
                 '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
                 '           <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
+                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
                 '       </div>' ;
             }
 
@@ -530,7 +530,7 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.getFormatElement(contextImage._element);
+            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? contextImage._element : this.util.getFormatElement(contextImage._element);
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(contextImage._element);
         }
@@ -539,6 +539,8 @@ export default {
         if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
+
+        if (init) this.plugins.image.init.call(this);
     },
 
     sizeRevert: function () {

@@ -300,6 +300,19 @@ const util = {
     },
 
     /**
+     * @description Get index from parent
+     * @param {Element} element - Element
+     * @returns {Number}
+     */
+    getPositionIndex: function (element) {
+        let idx = 0;
+        while (element = element.previousSibling) {
+            idx += 1;
+        }
+        return idx;
+    },
+
+    /**
      * @description Check the node is a table cell
      * @param {Element} node - Nodes to check
      * @returns {Boolean}
@@ -404,7 +417,7 @@ const util = {
             };
         }
 
-        while (element && (element.nodeType === 3 || !check(element))) {
+        while (element && !check(element)) {
             if (this.isWysiwygDiv(element)) {
                 return null;
             }
