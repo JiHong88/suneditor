@@ -10,6 +10,8 @@
 const history = function (core) {
     const _w = window;
     const editor = core.context.element.wysiwyg;
+    const sec = 500;
+    let delay = 0;
     let stackIndex = 0;
     let stack = [{
         contents: core.getContents(),
@@ -56,31 +58,48 @@ const history = function (core) {
         core.setRange(getNodeFromStack(item.s.path), item.s.offset, getNodeFromStack(item.e.path), item.e.offset);
     }
 
+    function pushStack () {
+        const current = core.getContents();
+        if (!current || current === stack[stackIndex].contents) return;
+
+        stackIndex++;
+        const range = core.getRange();
+
+        if (stack.length > stackIndex) {
+            stack = stack.slice(0, stackIndex);
+        }
+
+        stack[stackIndex] = {
+            contents: current,
+            s: {
+                path: createHistoryPath(range.startContainer),
+                offset: range.startOffset
+            },
+            e: {
+                path: createHistoryPath(range.endContainer),
+                offset: range.endOffset
+            }
+        };
+    }
+
     return {
         push: function () {
-            _w.setTimeout(function () {
-                const current = core.getContents();
-                if (!current || current === stack[stackIndex].contents) return;
+            if (delay > 0) {
+                delay += sec/10;
+                return;
+            }
 
-                stackIndex++;
-                const range = core.getRange();
+            delay = sec;
 
-                if (stack.length > stackIndex) {
-                    stack = stack.slice(0, stackIndex);
-                }
+            const interval = _w.setInterval(function () {
+                delay -= sec;
+                if (delay > 0 && delay < sec * 2) return;
 
-                stack[stackIndex] = {
-                    contents: current,
-                    s: {
-                        path: createHistoryPath(range.startContainer),
-                        offset: range.startOffset
-                    },
-                    e: {
-                        path: createHistoryPath(range.endContainer),
-                        offset: range.endOffset
-                    }
-                };
-            });
+                pushStack();
+                _w.clearInterval(interval);
+
+                delay = 0;
+            }, sec);
         },
         undo: function () {
             if (stackIndex > 0) {
