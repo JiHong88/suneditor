@@ -183,19 +183,19 @@ const _Constructor = {
     _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '(Ctrl+B)', 'bold', '',
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'bold', '',
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '(Ctrl+U)', 'underline', '',
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'underline', '',
                 '<div class="icon-underline"></div>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '(Ctrl+I)', 'italic', '',
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'italic', '',
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '(Ctrl+SHIFT+S)', 'strikethrough', '',
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'strikethrough', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
@@ -211,11 +211,11 @@ const _Constructor = {
                 '<div class="icon-erase"></div>'
             ],
 
-            indent: ['', lang.toolbar.indent + '(Ctrl + ])', 'indent', '',
+            indent: ['', lang.toolbar.indent + '([CTRL,⌘]+])', 'indent', '',
                 '<div class="icon-indent-right"></div>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + '(Ctrl + [)', 'outdent', '',
+            outdent: ['', lang.toolbar.outdent + '([CTRL,⌘]+[)', 'outdent', '',
                 '<div class="icon-indent-left"></div>'
             ],
 
@@ -231,11 +231,11 @@ const _Constructor = {
                 '<div class="icon-code-view"></div>'
             ],
 
-            undo: ['', lang.toolbar.undo + ' (Ctrl+Z)', 'undo', '',
+            undo: ['', lang.toolbar.undo + ' ([CTRL,⌘]+Z)', 'undo', '',
                 '<div class="icon-undo"></div>'
             ],
 
-            redo: ['', lang.toolbar.redo + ' (Ctrl+Y)', 'redo', '',
+            redo: ['', lang.toolbar.redo + ' ([CTRL,⌘]+Y / [CTRL,⌘]+SHIFT+Z)', 'redo', '',
                 '<div class="icon-redo"></div>'
             ],
 
