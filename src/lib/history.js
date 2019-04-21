@@ -83,6 +83,9 @@ const history = function (core) {
     }
 
     return {
+        /**
+         * @description Saving the current status to the history object stack
+         */
         push: function () {
             if (delay > 0) {
                 delay += sec/10;
@@ -101,23 +104,32 @@ const history = function (core) {
                 delay = 0;
             }, sec);
         },
+        /**
+         * @description Undo function
+         */
         undo: function () {
             if (stackIndex > 0) {
                 stackIndex--;
                 setContentsFromStack();
             }
         },
+        /**
+         * @description Redo function
+         */
         redo: function () {
             if (stack.length - 1 > stackIndex) {
                 stackIndex++;
                 setContentsFromStack();
             }
         },
+        /**
+         * @description Reset the history object
+         */
         reset: function () {
             stackIndex = 0;
             stack = stack[stackIndex];
         }
-    }
-};
+    };
+}
 
 export default history;

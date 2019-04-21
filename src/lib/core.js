@@ -93,7 +93,7 @@ export default function (context, plugins, lang) {
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
-         * @description History object
+         * @description History object for undo, redo
          */
         history: null,
 
@@ -2569,4 +2569,4 @@ export default function (context, plugins, lang) {
     };
 
     return userFunction;
-};
+}

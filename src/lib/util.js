@@ -301,7 +301,8 @@ const util = {
 
     /**
      * @description Get index from parent
-     * @param {Element} element 
+     * @param {Element} element - Element
+     * @returns {Number}
      */
     getPositionIndex: function (element) {
         let idx = 0;
