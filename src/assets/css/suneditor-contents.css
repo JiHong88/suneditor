@@ -1,6 +1,7 @@
-/* used color #000 , #fff , #CCC */
-/* #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* #c7deff , #80bdff , #3f9dff , #4592ff */
+/* used color #000 , #fff , #CCC, #f9f9f9 */
+/* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
+/* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
+/* red color #b94a48 , #f2dede , #eed3d7 */
 
 /* suneditor contents */
 .sun-editor-editable {
@@ -67,7 +68,7 @@
     color: #333;
     word-break: break-all;
     word-wrap: break-word;
-    background-color: #f1f1f1;
+    background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
     overflow: auto;

@@ -1,6 +1,7 @@
-/* used color #000 , #fff , #CCC */
-/* #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* #c7deff , #80bdff , #3f9dff , #4592ff */
+/* used color #000 , #fff , #CCC, #f9f9f9 */
+/* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
+/* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
+/* red color #b94a48 , #f2dede , #eed3d7 */
 
 /* suneditor main */
 .sun-editor {width:auto; height:auto; z-index:2147483647; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; text-align:left; background-color:#FFF; user-select:none; -o-user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -ms-user-select:none;}
@@ -162,7 +163,7 @@
 .sun-editor .layer_editor .format_list .txt_size36 {padding:4px 10px 15px; line-height:36px;}
 .sun-editor .layer_editor .format_list .txt_size36 {padding:4px 10px 15px; line-height:36px;}
 .sun-editor .layer_editor .format_list .quote_ex {font-size:13px; height:22px; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding-left:20px; border-left-width:5px;}
-.sun-editor .layer_editor .format_list .pre_ex {font-size:13px; padding:8px; background-color:#f1f1f1; border:1px solid #e1e1e1; border-radius:2px;}
+.sun-editor .layer_editor .format_list .pre_ex {font-size:13px; padding:8px; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /** font size list */
 .sun-editor .layer_editor .font_size_list {left:0; width:140px;}
 .sun-editor .layer_editor .font_size_list .btn_edit {height:auto; margin:0 0 7px 0 !important; padding:2px 10px 5px; line-height:normal !important;}
@@ -200,8 +201,8 @@
 .sun-editor .table-content {position:absolute; top:34px; left:1px; z-index:3; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .table-data-form {font-size:18px; padding:0 5px;}
 .sun-editor .table-picker {position:absolute !important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
-.sun-editor .table-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OEE2QjczMzdCN0VGMTFFODg3MENEMDIzNTU4M0UyQzciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OEE2QjczMzZCN0VGMTFFODg3MENEMDIzNTU4M0UyQzciIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTggKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NDM2MjRFMUVCN0VFMTFFODg2RkM4MEYzQTg4MjU3RTkiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NDM2MjRFMUZCN0VFMTFFODg2RkM4MEYzQTg4MjU3RTkiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz5dMgLsAAAARUlEQVR42mL8//8/AzUAC4joWb2DbNNKQj0Y4QaBgIaKMsmG3LhzF85mYqASGDVo1KBRgwjnfvQMSA5gpFZ5RDWvAQQYAKYZD7SDi983AAAAAElFTkSuQmCC') repeat;}
-.sun-editor .table-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:5em; height:5em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat;}
+.sun-editor .table-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('../img/highlighted.png') repeat;}
+.sun-editor .table-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:5em; height:5em; background:url('../img/unhighlighted.png') repeat;}
 .sun-editor .table-display {padding-left:5px;}
 
 /* table edit, resizing */
