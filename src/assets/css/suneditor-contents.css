@@ -1,3 +1,7 @@
+/* used color #000 , #fff , #CCC */
+/* #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
+/* #c7deff , #80bdff , #3f9dff , #4592ff */
+
 /* suneditor contents */
 .sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
@@ -63,9 +67,9 @@
     color: #333;
     word-break: break-all;
     word-wrap: break-word;
-    background-color: #f6f8fa;
-    border: 1px solid #dce5e5;
-    border-radius: 3px;
+    background-color: #f1f1f1;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
     overflow: auto;
 }
 
@@ -139,16 +143,16 @@
     border-left-width: 5px;
 }
 .sun-editor-editable blockquote {
-    border-color: #8baab7;
+    border-color: #b1b1b1;
 }
 .sun-editor-editable blockquote blockquote {
-    border-color: #a2bfcc;
+    border-color: #c1c1c1;
 }
 .sun-editor-editable blockquote blockquote blockquote {
-    border-color: #bbd5e0;
+    border-color: #d1d1d1;
 }
 .sun-editor-editable blockquote blockquote blockquote blockquote {
-    border-color: #d4e3ea;
+    border-color: #e1e1e1;
 }
 
 /* h1 */
@@ -231,7 +235,7 @@
 .sun-editor-editable img.inner-link {
     padding: 1px;
     margin: 1px;
-    outline: 1px solid #a2bfcc;
+    outline: 1px solid #d1d1d1;
 }
 
 /* table */
@@ -286,7 +290,7 @@
 .sun-editor-editable .sun-editor-id-image-container a img {
     padding: 1px;
     margin: 1px;
-    outline: 1px solid #8baab7;
+    outline: 1px solid #e1e1e1;
 }
 
 /** video iframe tags */
@@ -308,7 +312,7 @@
 
 /** show blocks */
 .sun-editor-show-block p, .sun-editor-show-block div, .sun-editor-show-block h1, .sun-editor-show-block h2, .sun-editor-show-block h3, .sun-editor-show-block h4, .sun-editor-show-block h5, .sun-editor-show-block h6 {
-    border: 1px dashed #a2bfcc;
+    border: 1px dashed #3f9dff;
     padding: 10px 8px 8px 8px;
 }
 .sun-editor-show-block p {
