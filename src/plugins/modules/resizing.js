@@ -274,6 +274,9 @@ export default {
         else if (/delete/.test(command)) {
             contextPlugin.destroy.call(this);
         }
+
+        // history stack
+        this.history.push();
     },
 
     resetTransform: function (element) {
@@ -373,6 +376,8 @@ export default {
             this.plugins.resizing.cancel_controller_resize.call(this);
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
+            // history stack
+            this.history.push();
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);

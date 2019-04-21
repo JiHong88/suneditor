@@ -14,7 +14,7 @@ import notice from '../plugins/modules/notice';
 /**
  * @description SunEditor constuctor function.
  * create core object and event registration.
- * core, event, history, userFunction
+ * core, event, userFunction
  * @param context
  * @param plugins
  * @param lang
@@ -91,6 +91,11 @@ export default function (context, plugins, lang) {
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
         codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+
+        /**
+         * @description History object
+         */
+        history: null,
 
         /**
          * @description binded controllersOff method
@@ -614,6 +619,9 @@ export default function (context, plugins, lang) {
                 parentNode.insertBefore(oNode, rightNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
+            } finally {
+                // history stack
+                this.history.push();
             }
         },
 
@@ -697,6 +705,9 @@ export default function (context, plugins, lang) {
                 }
 
                 util.removeItem(item);
+
+                // history stack
+                this.history.push();
             }
         },
 
@@ -757,6 +768,9 @@ export default function (context, plugins, lang) {
 
             pElement.insertBefore(wrapTag, beforeTag);
             if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
+
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -914,6 +928,9 @@ export default function (context, plugins, lang) {
 
             // set range
             this.setRange(start.container, start.offset, end.container, end.offset);
+
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -1457,10 +1474,10 @@ export default function (context, plugins, lang) {
                     this.indent(command);
                     break;
                 case 'undo':
-                    history.undo();
+                    this.history.undo();
                     break;
                 case 'redo':
-                    history.redo();
+                    this.history.redo();
                     break;
                 case 'removeFormat':
                     this.removeFormat();
@@ -1502,6 +1519,9 @@ export default function (context, plugins, lang) {
             }
 
             this.focus();
+            
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -1680,15 +1700,60 @@ export default function (context, plugins, lang) {
      * @description event function
      */
     const event = {
-        _shortcutKeyCode: {
-            66: ['bold', 'B'],
-            83: ['strikethrough', 'STRIKE'],
-            85: ['underline', 'U'],
-            73: ['italic', 'I'],
-            89: ['redo'],
-            90: ['undo'],
-            219: ['outdent'],
-            221: ['indent']
+        _keyCode: {
+            66: 'B',
+            83: 'S',
+            85: 'U',
+            73: 'I',
+            89: 'Y',
+            90: 'Z',
+            219: '[',
+            221: ']'
+        },
+
+        _shortcutCommand: function (keyCode, shift) {
+            let command = null;
+            const keyStr = event._keyCode[keyCode];
+
+            switch (keyStr) {
+                case 'B':
+                    command = ['bold', 'B'];
+                    break;
+                case 'S':
+                    if (shift) {
+                        command = ['strikethrough', 'STRIKE'];
+                    }
+                    break;
+                case 'U':
+                    command = ['underline', 'U'];
+                    break;
+                case 'I':
+                    command = ['italic', 'I'];
+                    break;
+                case 'Z':
+                    if (shift) {
+                        command = ['redo'];
+                    } else {
+                        command = ['undo'];
+                    }
+                    break;
+                case 'Y':
+                    command = ['redo'];
+                    break;
+                case '[':
+                    command = ['outdent'];
+                    break;
+                case ']':
+                    command = ['indent'];
+                    break;
+            }
+
+            if (!command) return false;
+
+            core.commandHandler(util.getFormatElement(core.getSelectionNode()), command[0]);
+            util.toggleClass(core.commandMap[command[1]], 'on');
+
+            return true;
         },
 
         _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
@@ -2021,22 +2086,11 @@ export default function (context, plugins, lang) {
                 event._hideToolbar();
             }
 
-            function shortcutCommand(keyCode) {
-                const key = event._shortcutKeyCode[keyCode];
-                if (!key) return false;
-
-                core.commandHandler(util.getFormatElement(core.getSelectionNode()), key[0]);
-                util.toggleClass(core.commandMap[key[1]], 'on');
-
-                return true;
-            }
-
             /** Shortcuts */
-            if (ctrl && !/^(?:16|17|18)$/.test(keyCode)) {
-                if (!(!shift && keyCode === 83) && shortcutCommand(keyCode)) {
-                    e.preventDefault();
-                    return;
-                }
+            if (ctrl && event._shortcutCommand(keyCode, shift)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
             }
 
             /** default key action */
@@ -2144,8 +2198,8 @@ export default function (context, plugins, lang) {
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
 
-            /** push to history stack */
-            history.push();
+            // history stack
+            core.history.push();
         },
 
         onScroll_wysiwyg: function (e) {
@@ -2267,10 +2321,8 @@ export default function (context, plugins, lang) {
         }
     };
 
-    /**
-     * @description excute history function
-     */
-    const history = _history(core);
+    /** excute history function */
+    core.history = _history(core);
 
     /** add event listeners */
     /** toolbar event */
@@ -2424,6 +2476,9 @@ export default function (context, plugins, lang) {
             } else {
                 context.element.code.value = contents;
             }
+
+            // history stack
+            core.history.push();
         },
 
         /**
@@ -2436,6 +2491,9 @@ export default function (context, plugins, lang) {
             } else {
                 context.element.code.value += contents;
             }
+
+            // history stack
+            core.history.push();
         },
 
         /**
@@ -2482,6 +2540,10 @@ export default function (context, plugins, lang) {
             /** remove element */
             util.removeItem(context.element.topArea);
 
+            /** empty history stack */
+            core.history.stack = null;
+
+            /** empty user object */
             this.onScroll = null;
             this.onClick = null;
             this.onKeyDown = null;

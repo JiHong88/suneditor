@@ -8,6 +8,7 @@
 'use strict';
 
 const history = function (core) {
+    const _w = window;
     const editor = core.context.element.wysiwyg;
     let stackIndex = 0;
     let stack = [{
@@ -57,30 +58,29 @@ const history = function (core) {
 
     return {
         push: function () {
-            const current = core.getContents();
-            if (current === stack[stackIndex].contents) return;
+            _w.setTimeout(function () {
+                const current = core.getContents();
+                if (!current || current === stack[stackIndex].contents) return;
 
-            stackIndex++;
-            const range = core.getRange();
+                stackIndex++;
+                const range = core.getRange();
 
-            console.log('stack', stack)
-            console.log('stackIndex', stackIndex)
-
-            if (stack.length > stackIndex) {
-                stack = stack.slice(0, stackIndex);
-            }
-
-            stack[stackIndex] = {
-                contents: current,
-                s: {
-                    path: createHistoryPath(range.startContainer),
-                    offset: range.startOffset
-                },
-                e: {
-                    path: createHistoryPath(range.endContainer),
-                    offset: range.endOffset
+                if (stack.length > stackIndex) {
+                    stack = stack.slice(0, stackIndex);
                 }
-            };
+
+                stack[stackIndex] = {
+                    contents: current,
+                    s: {
+                        path: createHistoryPath(range.startContainer),
+                        offset: range.startOffset
+                    },
+                    e: {
+                        path: createHistoryPath(range.endContainer),
+                        offset: range.endOffset
+                    }
+                };
+            });
         },
         undo: function () {
             if (stackIndex > 0) {
@@ -93,6 +93,10 @@ const history = function (core) {
                 stackIndex++;
                 setContentsFromStack();
             }
+        },
+        reset: function () {
+            stackIndex = 0;
+            stack = stack[stackIndex];
         }
     }
 };
