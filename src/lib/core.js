@@ -236,6 +236,8 @@ export default function (context, plugins, lang) {
          * @param {Element} element - Submenu element to call
          */
         submenuOn: function (element) {
+            if (this._bindedSubmenuOff) this._bindedSubmenuOff();
+
             const submenuName = this._submenuName = element.getAttribute('data-command');
             if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
 
@@ -256,17 +258,18 @@ export default function (context, plugins, lang) {
          * @description Disable submenu
          */
         submenuOff: function () {
+            _d.removeEventListener('mousedown', this._bindedSubmenuOff);
+            this._bindedSubmenuOff = null;
+
             if (this.submenu) {
                 this._submenuName = '';
                 this.submenu.style.display = 'none';
                 this.submenu = null;
                 util.removeClass(this.submenuActiveButton, 'on');
                 this.submenuActiveButton = null;
-                _d.removeEventListener('mousedown', this._bindedSubmenuOff);
                 this._notHideToolbar = false;
             }
-
-            this.controllersOff();
+            
             this.focus();
         },
 
@@ -274,6 +277,8 @@ export default function (context, plugins, lang) {
          * @description Disable controller in editor area (link button, image resize button)
          */
         controllersOn: function () {
+            if (this._bindControllersOff) this._bindControllersOff();
+
             for (let i = 0; i < arguments.length; i++) {
                 arguments[i].style.display = 'block';
                 this.controllerArray[i] = arguments[i];
@@ -281,21 +286,24 @@ export default function (context, plugins, lang) {
 
             this._bindControllersOff = this.controllersOff.bind(this);
             _d.addEventListener('mousedown', this._bindControllersOff, false);
+            _d.addEventListener('keydown', this._bindControllersOff, false);
         },
 
         /**
          * @description Disable controller in editor area (link button, image resize button)
          */
-        controllersOff: function () {
-            const len = this.controllerArray.length;
+        controllersOff: function (e) {
+            _d.removeEventListener('mousedown', this._bindControllersOff);
+            _d.removeEventListener('keydown', this._bindControllersOff);
+            this._bindControllersOff = null;
 
+            const len = this.controllerArray.length;
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     this.controllerArray[i].style.display = 'none';
                 }
 
                 this.controllerArray = [];
-                _d.removeEventListener('mousedown', this._bindControllersOff);
             }
         },
 
@@ -1460,12 +1468,10 @@ export default function (context, plugins, lang) {
         commandHandler: function (target, command) {
             switch (command) {
                 case 'codeView':
-                    this.controllersOff();
                     this.toggleCodeView();
                     util.toggleClass(target, 'on');
                     break;
                 case 'fullScreen':
-                    this.controllersOff();
                     this.toggleFullScreen(target);
                     util.toggleClass(target, 'on');
                     break;
@@ -1700,9 +1706,9 @@ export default function (context, plugins, lang) {
      * @description event function
      */
     const event = {
-        _directionKeyKeyCode: new RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
-        _changeButtonClassTagCheck: new RegExp('^(B|U|I|STRIKE|SUB|SUP)$'),
+        _directionKeyKeyCode: new RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
         _keyCodeIgnoreRegExp: new RegExp('^(1[6-8]|20|3[3-9]|40|45|144|145)$'),
+        _changeButtonClassTagCheck: new RegExp('^(B|U|I|STRIKE|SUB|SUP)$'),
         _keyCodeShortcut: {
             66: 'B',
             83: 'S',
@@ -1834,9 +1840,6 @@ export default function (context, plugins, lang) {
 
                 commandMapNodes.push((/^STRONG$/.test(nodeName) ? 'B' : /^EM$/.test(nodeName) ? 'I' : nodeName));
             }
-
-            /** A Tag edit controller off */
-            if (findA) core.controllersOff();
 
             /** toggle class on */
             for (let i = 0; i < commandMapNodes.length; i++) {
@@ -2096,21 +2099,28 @@ export default function (context, plugins, lang) {
             const selectionNode = core.getSelectionNode();
             switch (keyCode) {
                 case 8: /**backspace key*/
-                    if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && selectionNode.previousSibling === null) {
+                    if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = util.zeroWidthSpace;
                         return false;
                     }
 
-
-                    const formatEl = util.getFormatElement(selectionNode);
+                    let formatEl = util.getFormatElement(selectionNode);
                     const rangeEl = util.getRangeFormatElement(formatEl);
-                    if (formatEl && rangeEl && !formatEl.previousSibling) {
-                        if (rangeEl.textContent === '' || util.onlyZeroWidthSpace(rangeEl.textContent)) {
-                            const newFormat = core.appendFormatTag(rangeEl);
+                    if (rangeEl && formatEl && !formatEl.previousSibling) {
+                        if (util.onlyZeroWidthSpace(rangeEl.textContent.trim())) {
+                            formatEl = core.appendFormatTag(rangeEl);
                             util.removeItem(rangeEl);
-                            core.setRange(newFormat, 0, newFormat, 1);
+                            core.setRange(formatEl, 0, formatEl, 1);
+                        }
+                    }
+
+                    if (selectionNode.previousSibling) {
+                        const previousEl = formatEl.previousSibling;
+                        const range = core.getRange();
+                        if (util.isComponent(previousEl) && (range.startOffset === 0 || range.endOffset === 0)) {
+                            util.removeItem(previousEl);
                         }
                     }
                     
@@ -2122,7 +2132,7 @@ export default function (context, plugins, lang) {
 
                     core.controllersOff();
 
-                    let currentNode = selectionNode || core.getSelectionNode();
+                    let currentNode = selectionNode;
                     while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
                     }
@@ -2175,7 +2185,6 @@ export default function (context, plugins, lang) {
 
         onKeyUp_wysiwyg: function (e) {
             core._editorRange();
-            core.controllersOff();
             const selectionNode = core.getSelectionNode();
             const keyCode = e.keyCode;
 
@@ -2272,8 +2281,6 @@ export default function (context, plugins, lang) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
-
-            core.controllersOff();
         },
 
         onScroll_window: function () {

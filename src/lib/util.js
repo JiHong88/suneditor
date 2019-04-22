@@ -21,12 +21,12 @@ const util = {
     zeroWidthSpace: '\u200B',
 
     /**
-     * @description A method that checks to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+     * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
      * @param {String} text - String value
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
-        return this._onlyZeroWidthRegExp.test(text);
+        return text === '' || this._onlyZeroWidthRegExp.test(text);
     },
 
     /**
@@ -214,7 +214,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !this.isComponent(element)) return true;
         return false;
     },
 
@@ -227,6 +227,15 @@ const util = {
     isRangeFormatElement: function (element) {
         if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|THEAD|TBODY|TH|TR|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
         return false;
+    },
+
+    /**
+     * @description It is judged whether it is the component(img, iframe cover) element - "div.sun-editor-id-comp"
+     * @param {Element} element - The element to check
+     * @returns {Boolean}
+     */
+    isComponent: function (element) {
+        return element && /sun-editor-id-comp/.test(element.className);
     },
 
     /**
