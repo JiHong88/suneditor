@@ -1525,9 +1525,6 @@ export default function (context, plugins, lang) {
             }
 
             this.focus();
-            
-            // history stack
-            this.history.push();
         },
 
         /**
@@ -1707,7 +1704,7 @@ export default function (context, plugins, lang) {
      */
     const event = {
         _directionKeyKeyCode: new RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _keyCodeIgnoreRegExp: new RegExp('^(1[6-8]|20|3[3-9]|40|45|144|145)$'),
+        _historyIgnoreRegExp: new RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
         _changeButtonClassTagCheck: new RegExp('^(B|U|I|STRIKE|SUB|SUP)$'),
         _keyCodeShortcut: {
             66: 'B',
@@ -2219,7 +2216,7 @@ export default function (context, plugins, lang) {
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
 
             // history stack
-            if (!event._keyCodeIgnoreRegExp.test(keyCode)) {
+            if (!event._historyIgnoreRegExp.test(keyCode)) {
                 core.history.push();
             }
         },
