@@ -204,7 +204,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !/sun-editor-id-comp/.test(element.className)) return true;
         return false;
     },
 
@@ -215,7 +215,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(?:BLOCKQUOTE|TABLE|THEAD|TBODY|TH|TR|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|THEAD|TBODY|TH|TR|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -318,7 +318,7 @@ const util = {
      * @returns {Boolean}
      */
     isCell: function (node) {
-        return node && /^(?:TD|TH)$/i.test(node.nodeName);
+        return node && /^(TD|TH)$/i.test(node.nodeName);
     },
 
     /**

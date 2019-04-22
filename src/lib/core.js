@@ -1700,7 +1700,10 @@ export default function (context, plugins, lang) {
      * @description event function
      */
     const event = {
-        _keyCode: {
+        _directionKeyKeyCode: new RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
+        _changeButtonClassTagCheck: new RegExp('^(B|U|I|STRIKE|SUB|SUP)$'),
+        _keyCodeIgnoreRegExp: new RegExp('^(1[6-8]|20|3[3-9]|40|45|144|145)$'),
+        _keyCodeShortcut: {
             66: 'B',
             83: 'S',
             85: 'U',
@@ -1713,7 +1716,7 @@ export default function (context, plugins, lang) {
 
         _shortcutCommand: function (keyCode, shift) {
             let command = null;
-            const keyStr = event._keyCode[keyCode];
+            const keyStr = event._keyCodeShortcut[keyCode];
 
             switch (keyStr) {
                 case 'B':
@@ -1755,10 +1758,6 @@ export default function (context, plugins, lang) {
 
             return true;
         },
-
-        _directionKeyKeyCode: new RegExp('^(?:8|13|32|46|33|34|35|36|37|38|39|40|98|100|102|104)$'),
-
-        _changeButtonClassTagCheck: new RegExp('^(?:B|U|I|STRIKE|SUB|SUP)$'),
 
         _findButtonEffectTag: function () {
             const commandMap = core.commandMap;
@@ -2167,6 +2166,7 @@ export default function (context, plugins, lang) {
             core._editorRange();
             core.controllersOff();
             const selectionNode = core.getSelectionNode();
+            const keyCode = e.keyCode;
 
             if (core._isBalloon && !core.getRange().collapsed) {
                 event._showToolbarBalloon();
@@ -2174,7 +2174,7 @@ export default function (context, plugins, lang) {
             }
 
             /** when format tag deleted */
-            if (e.keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent.length === 0) {
+            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent.length === 0) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -2192,14 +2192,16 @@ export default function (context, plugins, lang) {
                 return;
             }
 
-            if (event._directionKeyKeyCode.test(e.keyCode)) {
+            if (event._directionKeyKeyCode.test(keyCode)) {
                 event._findButtonEffectTag();
             }
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
 
             // history stack
-            core.history.push();
+            if (!event._keyCodeIgnoreRegExp.test(keyCode)) {
+                core.history.push();
+            }
         },
 
         onScroll_wysiwyg: function (e) {
@@ -2458,7 +2460,7 @@ export default function (context, plugins, lang) {
             }
 
             let rightNode = null;
-            if (util.isFormatElement(html) || /^(?:IMG|IFRAME)$/i.test(html.nodeName)) {
+            if (util.isFormatElement(html) || /^(IMG|IFRAME)$/i.test(html.nodeName)) {
                 rightNode = util.getFormatElement(core.getSelectionNode());
             }
 
