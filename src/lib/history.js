@@ -104,6 +104,7 @@ const history = function (core) {
                 delay = 0;
             }, sec);
         },
+
         /**
          * @description Undo function
          */
@@ -113,6 +114,7 @@ const history = function (core) {
                 setContentsFromStack();
             }
         },
+
         /**
          * @description Redo function
          */
@@ -122,6 +124,7 @@ const history = function (core) {
                 setContentsFromStack();
             }
         },
+        
         /**
          * @description Reset the history object
          */

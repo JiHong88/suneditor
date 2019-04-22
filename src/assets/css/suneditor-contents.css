@@ -62,7 +62,7 @@
 .sun-editor-editable pre {
     display: block;
     padding: 8px;
-    margin: 0;
+    margin: 0 0 10px;
     font-size: 13px;
     line-height: 1.45;
     color: #333;
@@ -263,6 +263,7 @@
 .sun-editor-editable .sun-editor-id-comp {
     display: flex;
     padding: 1px;
+    margin: 0 0 10px;
 }
 .sun-editor-editable[contenteditable=true] .sun-editor-id-comp {
     outline: 1px dashed #ccc;

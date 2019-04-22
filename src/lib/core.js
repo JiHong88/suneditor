@@ -2102,6 +2102,17 @@ export default function (context, plugins, lang) {
                         selectionNode.innerHTML = util.zeroWidthSpace;
                         return false;
                     }
+
+
+                    const formatEl = util.getFormatElement(selectionNode);
+                    const rangeEl = util.getRangeFormatElement(formatEl);
+                    if (formatEl && rangeEl && !formatEl.previousSibling) {
+                        if (rangeEl.textContent === '' || util.onlyZeroWidthSpace(rangeEl.textContent)) {
+                            const newFormat = core.appendFormatTag(rangeEl);
+                            util.removeItem(rangeEl);
+                            core.setRange(newFormat, 0, newFormat, 1);
+                        }
+                    }
                     
                     break;
                 case 9:
@@ -2174,7 +2185,7 @@ export default function (context, plugins, lang) {
             }
 
             /** when format tag deleted */
-            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent.length === 0) {
+            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && context.element.wysiwyg.textContent === '') {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -2366,7 +2377,7 @@ export default function (context, plugins, lang) {
 
     /** add plugin to plugins object */
     if (plugins) {
-        Object.keys(plugins).map(function(key) {
+        _w.Object.keys(plugins).map(function(key) {
             let plugin = plugins[key];
             core.plugins[plugin.name] = util.copyObj(plugin);
         });

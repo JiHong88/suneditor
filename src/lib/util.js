@@ -13,11 +13,21 @@
 const util = {
     _d: document,
     _w: window,
+    _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
      * @description Unicode Character 'ZERO WIDTH SPACE'
      */
     zeroWidthSpace: '\u200B',
+
+    /**
+     * @description A method that checks to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+     * @param {String} text - String value
+     * @returns {Boolean}
+     */
+    onlyZeroWidthSpace: function (text) {
+        return this._onlyZeroWidthRegExp.test(text);
+    },
 
     /**
      * @description Gets XMLHttpRequest object
@@ -227,7 +237,7 @@ const util = {
     getFormatElement: function (element) {
         if (!element) return null;
 
-        while (!this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+        while (element && !this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
             element = element.parentNode;
         }
 
@@ -250,7 +260,7 @@ const util = {
     getRangeFormatElement: function (element) {
         if (!element) return null;
 
-        while (!this.isRangeFormatElement(element) && !this.isWysiwygDiv(element)) {
+        while (element && !this.isRangeFormatElement(element) && !this.isWysiwygDiv(element)) {
             element = element.parentNode;
         }
 
