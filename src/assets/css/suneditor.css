@@ -284,15 +284,16 @@
 .sun-editor .modal-resize-container {position:absolute; display:none; z-index:1; border:1px solid #80bdff;}
 .sun-editor .modal-resize-container .modal-resize {position:absolute; display:inline-block; background-color:#c7deff; opacity:0.3;}
 .sun-editor .modal-resize-container .resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
-.sun-editor .modal-resize-container .resize-dot > div {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}
-.sun-editor .modal-resize-container .resize-dot > .tl {top:-5px; left:-5px; cursor:nw-resize;}
-.sun-editor .modal-resize-container .resize-dot > .tr {top:-5px; right:-5px; cursor:ne-resize;}
-.sun-editor .modal-resize-container .resize-dot > .bl {bottom:-5px; left:-5px; cursor:sw-resize;}
-.sun-editor .modal-resize-container .resize-dot > .br {right:-5px; bottom:-5px; cursor:se-resize;}
-.sun-editor .modal-resize-container .resize-dot > .lw {left:-7px; bottom:50%; cursor:w-resize;}
-.sun-editor .modal-resize-container .resize-dot > .th {left:50%; top:-7px; cursor:n-resize;}
-.sun-editor .modal-resize-container .resize-dot > .rw {right:-7px; bottom:50%; cursor:e-resize;}
-.sun-editor .modal-resize-container .resize-dot > .bh {right:50%; bottom:-7px; cursor:s-resize;}
+.sun-editor .modal-resize-container .resize-dot > div.line-move-dot {position:absolute; width:15px; height:15px; top:-14px; left:4px; cursor:move; background-color:transparent; border:1px solid #b1b1b1;}
+.sun-editor .modal-resize-container .resize-dot > span {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}
+.sun-editor .modal-resize-container .resize-dot > span.tl {top:-5px; left:-5px; cursor:nw-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.tr {top:-5px; right:-5px; cursor:ne-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.bl {bottom:-5px; left:-5px; cursor:sw-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.br {right:-5px; bottom:-5px; cursor:se-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.lw {left:-7px; bottom:50%; cursor:w-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.th {left:50%; top:-7px; cursor:n-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.rw {right:-7px; bottom:50%; cursor:e-resize;}
+.sun-editor .modal-resize-container .resize-dot > span.bh {right:50%; bottom:-7px; cursor:s-resize;}
 .sun-editor .modal-resize-container .resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:white; background-color:#000; border-radius:2px;}
 
 /* link controller button */

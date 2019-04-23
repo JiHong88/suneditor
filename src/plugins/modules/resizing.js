@@ -20,7 +20,9 @@ export default {
             _origin_w: 0,
             _origin_h: 0,
             _rotateVertical: false,
-            _resize_direction: ''
+            _resize_direction: '',
+            _move_path: null,
+            _isChange: false
         };
 
         /** resize controller, button */
@@ -39,6 +41,7 @@ export default {
         context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
 
         /** add event listeners */
+        resize_div_container.getElementsByClassName('line-move-dot')[0].addEventListener('mousedown', this.onMouseDown_move_handle.bind(core));
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -68,14 +71,15 @@ export default {
             '   <div class="resize-display"></div>' +
             '</div>' +
             '<div class="resize-dot">' +
-            '   <div class="tl sun-editor-name-resize-handle"></div>' +
-            '   <div class="tr sun-editor-name-resize-handle"></div>' +
-            '   <div class="bl sun-editor-name-resize-handle"></div>' +
-            '   <div class="br sun-editor-name-resize-handle"></div>' +
-            '   <div class="lw sun-editor-name-resize-handle"></div>' +
-            '   <div class="th sun-editor-name-resize-handle"></div>' +
-            '   <div class="rw sun-editor-name-resize-handle"></div>' +
-            '   <div class="bh sun-editor-name-resize-handle"></div>' +
+            '   <div class="line-move-dot"></div>' +
+            '   <span class="tl sun-editor-name-resize-handle"></span>' +
+            '   <span class="tr sun-editor-name-resize-handle"></span>' +
+            '   <span class="bl sun-editor-name-resize-handle"></span>' +
+            '   <span class="br sun-editor-name-resize-handle"></span>' +
+            '   <span class="lw sun-editor-name-resize-handle"></span>' +
+            '   <span class="th sun-editor-name-resize-handle"></span>' +
+            '   <span class="rw sun-editor-name-resize-handle"></span>' +
+            '   <span class="bh sun-editor-name-resize-handle"></span>' +
             '</div>';
 
         return resize_container;
@@ -179,6 +183,16 @@ export default {
         this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
         
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
+    },
+
+    cancel_controller_move: function () {
+        const path = this.context.resizing._move_path;
+        const parentPath = path.parentNode;
+        const container = this.context[this.context.resizing._resize_plugin]._container;
+        if (!path && !parentPath && path !== container) return;
+
+        this.controllersOff();
+        parentPath.insertBefore(container, path);
     },
 
     create_caption: function () {
@@ -360,6 +374,36 @@ export default {
         }
     },
 
+    // moving
+    onMouseDown_move_handle: function (e) {
+        const contextResizing = this.context.resizing;
+        e.stopPropagation();
+        e.preventDefault();
+
+        const closureFunc_bind = function closureFunc() {
+            const change = contextResizing._isChange;
+            contextResizing._isChange = false;
+
+            this.context.element.wysiwyg.removeEventListener('mousemove', moving_element_bind);
+            document.removeEventListener('mouseup', closureFunc_bind);
+
+            // container move
+            this.plugins.resizing.cancel_controller_move.call(this);
+            // history stack
+            if (change) this.history.push();
+        }.bind(this);
+
+        const moving_element_bind = this.plugins.resizing.moving_element.bind(this, contextResizing);
+        this.context.element.wysiwyg.addEventListener('mousemove', moving_element_bind);
+        document.addEventListener('mouseup', closureFunc_bind);
+    },
+
+    moving_element: function (contextResizing, e) {
+        const path = contextResizing._move_path = this.util.getFormatElement(e.target);
+        console.log('moving', path);
+    },
+
+    // resizing
     onMouseDown_resize_handle: function (e) {
         const contextResizing = this.context.resizing;
         const direction = contextResizing._resize_direction = e.target.classList[0];
@@ -373,15 +417,19 @@ export default {
         contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
         const closureFunc_bind = function closureFunc() {
-            this.plugins.resizing.cancel_controller_resize.call(this);
+            const change = contextResizing._isChange;
+            contextResizing._isChange = false;
+
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
+
+            // element resize
+            this.plugins.resizing.cancel_controller_resize.call(this);
             // history stack
-            this.history.push();
+            if (change) this.history.push();
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
-
         document.addEventListener('mousemove', resizing_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
     },
@@ -417,5 +465,6 @@ export default {
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
         this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        contextResizing._isChange = true;
     }
 };
