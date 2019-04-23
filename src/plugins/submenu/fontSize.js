@@ -54,9 +54,11 @@ export default {
             return false;
         }
 
-        this.util.changeTxt(this.context.tool.fontSize, e.target.getAttribute('data-value'));
+        const value = e.target.getAttribute('data-value') + 'px';
+
+        this.util.changeTxt(this.context.tool.fontSize, value);
         const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = e.target.getAttribute('data-value') + 'px';
+        newNode.style.fontSize = value;
         this.nodeChange(newNode, ['font-size']);
 
         this.submenuOff();

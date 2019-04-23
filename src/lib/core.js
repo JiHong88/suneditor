@@ -329,8 +329,6 @@ export default function (context, plugins, lang) {
             } else {
                 context.element.wysiwyg.focus();
             }
-
-            event._findButtonEffectTag();
         },
 
         /**
@@ -1756,9 +1754,7 @@ export default function (context, plugins, lang) {
 
             if (!command) return false;
 
-            core.commandHandler(util.getFormatElement(core.getSelectionNode()), command[0]);
-            util.toggleClass(core.commandMap[command[1]], 'on');
-
+            core.commandHandler(core.commandMap[command[1]], command[0]);
             return true;
         },
 
