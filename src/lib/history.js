@@ -56,6 +56,7 @@ const history = function (core) {
         const item = stack[stackIndex];
         editor.innerHTML = item.contents;
         core.setRange(getNodeFromStack(item.s.path), item.s.offset, getNodeFromStack(item.e.path), item.e.offset);
+        core.focus();
     }
 
     function pushStack () {

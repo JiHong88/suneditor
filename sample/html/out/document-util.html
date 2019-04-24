@@ -325,7 +325,7 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                Get format element of the argument value (P, DIV, H[1-6], LI)
+                If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -352,7 +352,7 @@
             <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
-                Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
+                If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">

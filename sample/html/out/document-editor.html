@@ -1055,10 +1055,11 @@
             <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, checkCSSPropertyText)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Add the node received as an argument value to the selected area.<br>
+                Add or delete the node received as an argument value to the selected area.<br>
                 1. When there is the same css value node in the selection area, the tag is stripped.<br>
-                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments.<br>
-                3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) nodeChange(document.createElement('removenode'))
+                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments<br>
+                3. Tags with the same name as the values in the "removeNodeArray" array are deleted.<br>
+                4. The "appendNode" and "removeNodeArray" argument values can be given at the same time.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1073,16 +1074,23 @@
                 <tr>
                     <td class="name"><code>appendNode</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
+                        <span class="param-type">Element|null</span>
                     </td>
-                    <td class="description last">The dom that will wrap the selected text area</td>
+                    <td class="description last">The element to be added to the selection</td>
                 </tr>
                 <tr>
                     <td class="name"><code>checkCSSPropertyArray</code></td>
                     <td class="type">
-                        <span class="param-type">Array</span>
+                        <span class="param-type">Array|null</span>
                     </td>
                     <td class="description last">The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>removeNodeArray</code></td>
+                    <td class="type">
+                        <span class="param-type">Array|null</span>
+                    </td>
+                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array. (['span'], ['b', 'u']...])</td>
                 </tr>
                 </tbody>
             </table>

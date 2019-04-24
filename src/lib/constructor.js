@@ -183,27 +183,27 @@ const _Constructor = {
     _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'bold', '',
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'STRONG', '',
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'underline', '',
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'U', '',
                 '<div class="icon-underline"></div>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'italic', '',
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'EM', '',
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'strikethrough', '',
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'S', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
-            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '',
+            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'SUB', '',
                 '<div class="icon-subscript"></div>'
             ],
 
-            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '',
+            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'SUP', '',
                 '<div class="icon-superscript"></div>'
             ],
 

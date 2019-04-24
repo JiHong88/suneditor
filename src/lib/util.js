@@ -16,6 +16,19 @@ const util = {
     _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
+     * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
+     * @param {String} text 
+     * @returns {String}
+     * @private
+     */
+    _textTagConvertor: function (text) {
+        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'strike': 's'}
+        return text.replace(/(?!<\/?)(pre|blockquote|b|strong|i|em|strike|s|u|sub|sup|li|ol|ul|hr|table|tr|a)\s*(?:style|class|dir|xmlns|[a-z]+-[a-z\-]+|[a-z]+\:[a-z]+)?\s*(?:=\s?"[^>^"]*")?\s*(?=>)/ig, function (m, t) {
+            return (typeof ec[t] === 'string') ? ec[t] : t;
+        });
+    },
+
+    /**
      * @description Unicode Character 'ZERO WIDTH SPACE'
      */
     zeroWidthSpace: '\u200B',
@@ -166,7 +179,7 @@ const util = {
 
         if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
-        return innerHTML;
+        return this._textTagConvertor(innerHTML);
     },
 
     /**
@@ -214,7 +227,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !this.isComponent(element)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -239,41 +252,39 @@ const util = {
     },
 
     /**
-     * @description Get format element of the argument value (P, DIV, H[1-6], LI)
+     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */
     getFormatElement: function (element) {
         if (!element) return null;
 
-        while (element && !this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isRangeFormatElement(element)) element.firstElementChild;
+            if (this.isFormatElement(element)) return element;
+
             element = element.parentNode;
         }
-
-        if (this.isWysiwygDiv(element) || this.isRangeFormatElement(element)) {
-            const firstFormatElement = this.getListChildren(element, function (current) {
-                return this.isFormatElement(current);
-            }.bind(this))[0];
-
-            return firstFormatElement;
-        }
-
-        return element;
+        
+        return null;
     },
 
     /**
-     * @description Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
+     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element|null}
      */
     getRangeFormatElement: function (element) {
         if (!element) return null;
 
-        while (element && !this.isRangeFormatElement(element) && !this.isWysiwygDiv(element)) {
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isRangeFormatElement(element)) return element;
             element = element.parentNode;
         }
 
-        return this.isWysiwygDiv(element) ? null : element;
+        return null;
     },
 
     /**
@@ -597,14 +608,20 @@ const util = {
      */
     removeEmptyNode: function (element) {
         (function recursionFunc(current) {
-            if (current.textContent.trim().length === 0 && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
-                current.parentNode && current.parentNode.removeChild(current);
+            if (current !== element && util.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
+                if (current.parentNode) {
+                    current.parentNode.removeChild(current);
+                    return -1;
+                }
             } else {
-                for (let i = 0, len = current.children.length; i < len; i++) {
-                    if (!current.children[i]) continue;
-                    recursionFunc(current.children[i]);
+                const children = current.children;
+                for (let i = 0, len = children.length, r = 0; i < len; i++) {
+                    if (!children[i + r]) continue;
+                    r += recursionFunc(children[i + r]);
                 }
             }
+
+            return 0;
         })(element);
     },
 
@@ -613,17 +630,20 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        const tagsAllowed = new RegExp('^(P|DIV|PRE|H1|H2|H3|H4|H5|H6|B|U|I|STRIKE|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
+        const tagsAllowed = new RegExp('^(P|DIV|PRE|H[1-6]|B|STRONG|U|I|EM|STRIKE|S|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '').replace(/<[a-zA-Z]+\:[a-zA-Z]+.*>(\n|.)*<\/[a-zA-Z]+\:[a-zA-Z]+>/g, '').replace(/\s(?:style|class|dir|xmlns|data-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*/ig, '').replace(/<\/?(?:span|font)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '').replace(/<\/?[a-z]+:[a-z]+\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '');
+                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
+                    .replace(/<[a-zA-Z]+\:[a-zA-Z]+.*>(\n|.)*<\/[a-zA-Z]+\:[a-zA-Z]+>/g, '')
+                    .replace(/\s(?:style|class|dir|xmlns|[a-z]+-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?/ig, '')
+                    .replace(/<\/?(?!P|DIV|PRE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|TABLE|TBODY|TR|TD|BR|HR|A|IMG|IFRAME)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '');
             }
         }
 
-        return cleanHTML || html;
+        return (cleanHTML || html);
     }
 };
 
