@@ -55,8 +55,6 @@ export default {
         }
 
         const value = e.target.getAttribute('data-value') + 'px';
-
-        this.util.changeTxt(this.context.tool.fontSize, value);
         const newNode = this.util.createElement('SPAN');
         newNode.style.fontSize = value;
         this.nodeChange(newNode, ['font-size']);

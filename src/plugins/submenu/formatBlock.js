@@ -77,7 +77,6 @@ export default {
         // others
         else {
             this.execCommand('formatBlock', false, value);
-            this.util.changeTxt(this.commandMap.FORMAT, value);
         }
 
         this.submenuOff();

@@ -67,7 +67,6 @@ export default {
 
         const target = e.target;
 
-        this.util.changeTxt(this.context.tool.font, target.getAttribute('data-txt'));
         const newNode = this.util.createElement('SPAN');
         newNode.style.fontFamily = target.getAttribute('data-value');
         this.nodeChange(newNode, ['font-family']);

@@ -530,7 +530,9 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? contextImage._element : this.util.getFormatElement(contextImage._element);
+            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? 
+                contextImage._element : 
+                this.util.getFormatElement(contextImage._element) || contextImage._element;
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(contextImage._element);
         }

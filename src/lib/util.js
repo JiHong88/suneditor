@@ -630,17 +630,17 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        const tagsAllowed = new RegExp('^(P|DIV|PRE|H[1-6]|B|STRONG|U|I|EM|STRIKE|S|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
+        // const tagsAllowed = new RegExp('^(P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
-            if (tagsAllowed.test(domTree[i].nodeName)) {
+            // if (tagsAllowed.test(domTree[i].nodeName)) {
                 cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
                     .replace(/<[a-zA-Z]+\:[a-zA-Z]+.*>(\n|.)*<\/[a-zA-Z]+\:[a-zA-Z]+>/g, '')
-                    .replace(/\s(?:style|class|dir|xmlns|[a-z]+-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?/ig, '')
-                    .replace(/<\/?(?!P|DIV|PRE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|TABLE|TBODY|TR|TD|BR|HR|A|IMG|IFRAME)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '');
-            }
+                    .replace(/\s(?:style|class|width|height|dir|xmlns|contenteditable|[a-z]+\-[a-z\-]+)\s*(?:="?[^>^"]*"?)?/ig, '')
+                    .replace(/<\/?(?!P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE|TBODY|TR|TD)\s*(?:[a-z\-]+)?\s*(?:="?[^>^"]*"?)?\s*>/ig, '');
+            // }
         }
 
         return (cleanHTML || html);
