@@ -21,10 +21,10 @@ const util = {
      * @returns {String}
      * @private
      */
-    _textTagConvertor: function (text) {
+    _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'strike': 's'}
-        return text.replace(/<(pre|blockquote|h[1-6]|strong|b|em|var|i|s|strike|u|sub|sup|ol|ul|dl|li|hr|table|tbody|tr)\s+(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
-            return '<' + ((typeof ec[t] === 'string') ? ec[t] : t);
+        return text.replace(/\b(?!<\/?)(pre|blockquote|h[1-6]|strong|b|em|var|i|s|strike|u|sub|sup|ol|ul|dl|li|hr|table|tbody|tr)\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
+            return (typeof ec[t] === 'string') ? ec[t] : t;
         });
     },
 
@@ -179,7 +179,7 @@ const util = {
 
         if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
-        return this._textTagConvertor(innerHTML);
+        return this._tagConvertor(innerHTML);
     },
 
     /**
@@ -636,14 +636,14 @@ const util = {
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (!tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
+                cleanHTML += domTree[i].outerHTML
                     .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-                    .replace(/(?!<[a-z])(\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?)+(?=>)/g, '')
+                    .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
                     .replace(/<\/?\b(?!br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td)[^>]+>/g, '');
             }
         }
 
-        return this._textTagConvertor(cleanHTML || html);
+        return this._tagConvertor(cleanHTML || html);
     }
 };
 

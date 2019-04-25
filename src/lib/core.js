@@ -2169,7 +2169,7 @@ export default function (context, plugins, lang) {
                         return false;
                     }
 
-                    let formatEl = util.getFormatElement(selectionNode);
+                    let formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
                     const rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !formatEl.previousSibling) {
                         if (util.onlyZeroWidthSpace(rangeEl.textContent.trim())) {
