@@ -54,6 +54,8 @@ export default {
             target = target.parentNode;
         }
 
+        if (!command || !value) return;
+
         const formatElement = this.util.getFormatElement(this.getSelectionNode());
 
         if (/^LI$/i.test(formatElement.tagName)) {

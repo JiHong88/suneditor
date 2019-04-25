@@ -63,7 +63,8 @@ export default {
     },
 
     onChangeInput: function (e) {
-        this.plugins.colorPicker.setCurrentColor.call(this, '#' + e.target.value);
+        const value = e.target.value.trim();
+        this.plugins.colorPicker.setCurrentColor.call(this, !value ? '' : '#' + value);
     },
 
     submit: function () {
@@ -74,17 +75,14 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
         this.plugins.fontColor.applyColor.call(this, e.target.getAttribute('data-value'));
     },
 
     applyColor: function (color) {
+        if (!color) return;
+
         const newNode = this.util.createElement('SPAN');
         newNode.style.color = color;
-
         this.nodeChange(newNode, ['color']);
 
         this.submenuOff();

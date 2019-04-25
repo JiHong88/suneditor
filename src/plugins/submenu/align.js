@@ -48,11 +48,13 @@ export default {
 
         let target = e.target;
         let command = null;
-        
+
         while (!command && !/UL/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             target = target.parentNode;
         }
+
+        if (!command) return;
 
         this.focus();
         this.execCommand(command, false, null);

@@ -76,7 +76,9 @@ export default {
             target = target.parentNode;
         }
 
-        this.plugins.horizontalRule.appendHr.call(this,value);
+        if (!value) return;
+
+        this.plugins.horizontalRule.appendHr.call(this, value);
 
         this.submenuOff();
         this.focus();

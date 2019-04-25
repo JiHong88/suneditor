@@ -336,7 +336,7 @@ const _Constructor = {
         const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'btn_editor ' + buttonClass);
+        oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu ' : ' ') + buttonClass);
         oButton.setAttribute('title', title);
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);

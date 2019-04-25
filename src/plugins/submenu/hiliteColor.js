@@ -74,17 +74,14 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
         this.plugins.hiliteColor.applyColor.call(this, e.target.getAttribute('data-value'));
     },
 
     applyColor: function (color) {
+        if (!color) return;
+        
         const newNode = this.util.createElement('SPAN');
         newNode.style.backgroundColor = color;
-
         this.nodeChange(newNode, ['background-color']);
         
         this.submenuOff();

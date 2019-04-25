@@ -4,13 +4,13 @@
 /* red color #b94a48 , #f2dede , #eed3d7 */
 
 /* suneditor main */
-.sun-editor {width:auto; height:auto; z-index:2147483647; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; text-align:left; background-color:#FFF; user-select:none; -o-user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -ms-user-select:none;}
+.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue, sans-serif; border:1px solid #dadada; text-align:left; background-color:#FFF; user-select:none; -o-user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -ms-user-select:none;}
 .sun-editor * {box-sizing:border-box;  -webkit-user-drag:none;}
 .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5;}
 .sun-editor-common body, .sun-editor-common div, .sun-editor-common dl, .sun-editor-common dt, .sun-editor-common dd, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common li,
 .sun-editor-common h1, .sun-editor-common h2, .sun-editor-common h3, .sun-editor-common h4, .sun-editor-common h5, .sun-editor-common h6, .sun-editor-common pre, .sun-editor-common code,
 .sun-editor-common form, .sun-editor-common fieldset, .sun-editor-common legend, .sun-editor-common textarea, .sun-editor-common p, .sun-editor-common blockquote, .sun-editor-common th,
-.sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0; color:#000 !important;}
+.sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0;}
 .sun-editor-common dl, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common menu, .sun-editor-common li {list-style: none !important;}
 .sun-editor-common hr {margin:6px 0 6px 0 !important;}
 .sun-editor textarea {resize:none !important; border:0 !important;}
@@ -42,7 +42,6 @@
     font-weight: normal;
     text-rendering:auto;
     font-size: 15px;
-    color: #000;
 }
 .sun-editor .sun-editor-id-toolbar [class*='icon-']:before {
     line-height: 2.1;
@@ -129,18 +128,28 @@
 .sun-editor .editor_tool {float:left; padding:0; margin:0;}
 .sun-editor .editor_tool li {position:relative; float:left; padding:0; margin:0;}
 
-/** .btn_editor button effect */
+/** button */
 .sun-editor .btn_editor {overflow:hidden; float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; font-size:12px; line-height:27px;}
 .sun-editor .btn_editor:enabled:hover, .sun-editor .btn_editor:enabled:focus {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
-.sun-editor .btn_editor:enabled:active {background-color:#e1e1e1; border-color:#d1d1d1; -webkit-box-shadow: inset 0 3px 5px #d1d1d1; box-shadow: inset 0 3px 5px #d1d1d1;}
-/** .btn_editor.on button effect */
-.sun-editor .btn_editor:enabled.on {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
-.sun-editor .btn_editor:enabled.on:hover, .sun-editor .btn_editor:enabled.on:focus {background-color: #d1d1d1; border-color: #b1b1b1; outline: 0 none;}
-.sun-editor .btn_editor:enabled.on:active {background-color:#d1d1d1; border-color:#b1b1b1; -webkit-box-shadow: inset 0 3px 5px #b1b1b1; box-shadow: inset 0 3px 5px #b1b1b1;}
+.sun-editor .btn_editor:enabled:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow: inset 0 3px 5px #c1c1c1; box-shadow: inset 0 3px 5px #c1c1c1;}
 
-/** .btn_edit button effect */
-.sun-editor .btn_edit:enabled:hover, .sun-editor .btn_edit:enabled:focus {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
-.sun-editor .btn_edit:enabled:active {background-color:#e1e1e1; border-color:#d1d1d1; -webkit-box-shadow: inset 0 3px 5px #d1d1d1; box-shadow: inset 0 3px 5px #d1d1d1;}
+/** command button on*/
+.sun-editor .btn_editor:enabled.on:not(.btn_submenu) {color: #4592ff; outline: 0 none;}
+.sun-editor .btn_editor:enabled.on:not(.btn_submenu):hover, .sun-editor .btn_editor:enabled.on:not(.btn_submenu):focus {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
+.sun-editor .btn_editor:enabled.on:not(.btn_submenu):active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow: inset 0 3px 5px #c1c1c1; box-shadow: inset 0 3px 5px #c1c1c1;}
+
+/** submenu button on */
+.sun-editor .btn_editor:enabled.on.btn_submenu {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
+.sun-editor .btn_editor:enabled.on.btn_submenu:hover, .sun-editor .btn_editor:enabled.on.btn_submenu:focus {background-color: #d1d1d1; border-color: #c1c1c1; outline: 0 none;}
+.sun-editor .btn_editor:enabled.on.btn_submenu:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow: inset 0 3px 5px #b1b1b1; box-shadow: inset 0 3px 5px #b1b1b1;}
+/** submenu list button */
+.sun-editor .btn_edit:hover, .sun-editor .btn_edit:focus {background-color: #e1e1e1; border-color: #d1d1d1; outline: 0 none;}
+.sun-editor .btn_edit:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow: inset 0 3px 5px #c1c1c1; box-shadow: inset 0 3px 5px #c1c1c1;}
+
+/** primary button */
+.sun-editor .btn-primary {background-color:#c7deff; border:1px solid #80bdff;}
+.sun-editor .btn-primary:hover, .sun-editor .modal-dialog .btn-primary:focus {background-color:#80bdff !important; border-color:#3f9dff !important; outline:0 none !important;}
+.sun-editor .btn-primary:active {background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow: inset 0 3px 5px #4592ff; box-shadow: inset 0 3px 5px #4592ff;}
 
 /** disabled buttons, icon blur */
 .sun-editor .btn_editor:disabled, .sun-editor .btn_editor:disabled *, .sun-editor .btn_edit:disabled, .sun-editor :disabled [class*='icon-']:before {cursor:default; background:#fafafa; color:transparent; text-shadow:0 0 3px #ccc;}
@@ -150,7 +159,6 @@
 .sun-editor .layer_editor.layer_size {max-height:300px;}
 .sun-editor .layer_editor .write_place .inp_txt {float:left; width:100%; height:23px; margin-top:0; font-size:12px; text-indent:6px; border:0 none; outline:0 none;}
 .sun-editor .layer_editor button {margin:0 !important; overflow: hidden; width:100%;}
-.sun-editor .layer_editor button:hover, .sun-editor .editor_tool .layer_editor button:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 /** font family list */
 .sun-editor .layer_editor .list_family {left:0; width:156px;}
 .sun-editor .layer_editor .list_family .default {border-bottom:1px solid #CCC;}
@@ -218,9 +226,9 @@
 /** submenu form group (color selector) */
 .sun-editor .sub-form-group {height:34px; padding:0 7px 7px 7px;}
 .sun-editor .sub-form-group label {display:inline-block; font-weight:bold; font-size:14px; letter-spacing:1px;}
-.sun-editor .sub-form-group input {display:inline-block; width:130px; font-size:14px; border-bottom:5px solid #b1b1b1; text-transform:uppercase;}
-.sun-editor .sub-form-group input:focus {outline:none;}
-.sun-editor .sub-form-group button {float:right; width:auto; height:100%; background-color:#d1d1d1; border-color: #c1c1c1; outline: 0 none; padding: 0 15px 0 15px;}
+.sun-editor .sub-form-group input {display:inline-block; width:130px; font-size:14px; border-bottom:2px solid #b1b1b1; text-transform:uppercase;}
+.sun-editor .sub-form-group input:focus {outline:none; border-bottom:3px solid #b1b1b1;}
+.sun-editor .sub-form-group button {float:right; width:auto; height:100%; padding: 0 15px 0 15px;}
 
 /* editor area */
 .sun-editor .sun-editor-id-editorArea {position:static; width:100%; height:auto; overflow:hidden; z-index:1;}
@@ -258,10 +266,7 @@
 .sun-editor .modal-dialog .modal-footer {padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
 .sun-editor .modal-dialog .modal-content .btn {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; background-image:none; border-radius:2px;}
 .sun-editor .modal-dialog .modal-radio {margin-left:12px; margin-right:5px;}
-/* dialog - submit button */
-.sun-editor .modal-dialog .btn-primary {background-color:#c7deff; border:1px solid #80bdff;}
-.sun-editor .modal-dialog .btn-primary:hover, .sun-editor .modal-dialog .btn-primary:focus {background-color:#80bdff !important; border-color:#3f9dff !important; outline:0 none !important;}
-.sun-editor .modal-dialog .btn-primary:active {background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow: inset 0 3px 5px #4592ff; box-shadow: inset 0 3px 5px #4592ff;}
+
 /* dialog - revert button */
 .sun-editor .modal-dialog .btn-revert:hover, .sun-editor .modal-dialog .btn-revert:focus {background-color:#c7deff !important; border-color:#80bdff !important; outline:0 none !important;}
 .sun-editor .modal-dialog .btn-revert:active {background-color:#80bdff; border-color:#3f9dff; -webkit-box-shadow: inset 0 3px 5px #3f9dff; box-shadow: inset 0 3px 5px #3f9dff;}

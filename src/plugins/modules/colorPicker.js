@@ -52,7 +52,7 @@ export default {
             '<form class="sub-form-group">' +
             '   <label>#</label>' +
             '   <input type="text" maxlength="6" class="sun-editor-id-submenu-color-input" />' +
-            '   <button type="submit" data-command="100" class="sun-editor-id-submenu-color-submit" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '   <button type="submit" class="btn-primary sun-editor-id-submenu-color-submit" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '</form>' +
             '</div>';
 

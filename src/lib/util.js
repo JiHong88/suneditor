@@ -23,8 +23,8 @@ const util = {
      */
     _textTagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'strike': 's'}
-        return text.replace(/(?!<\/?)(pre|blockquote|b|strong|i|em|strike|s|u|sub|sup|li|ol|ul|hr|table|tr|a)\s*(?:style|class|dir|xmlns|[a-z]+-[a-z\-]+|[a-z]+\:[a-z]+)?\s*(?:=\s?"[^>^"]*")?\s*(?=>)/ig, function (m, t) {
-            return (typeof ec[t] === 'string') ? ec[t] : t;
+        return text.replace(/<(pre|blockquote|h[1-6]|strong|b|em|var|i|s|strike|u|sub|sup|ol|ul|dl|li|hr|table|tbody|tr)\s+(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
+            return '<' + ((typeof ec[t] === 'string') ? ec[t] : t);
         });
     },
 
@@ -630,17 +630,19 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        // const tagsAllowed = new RegExp('^(P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE)$', 'i');
+        const tagsAllowed = new RegExp('^(meta|script|link|style)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
-            // if (tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
-                    .replace(/<[a-zA-Z]+\:[a-zA-Z]+.*>(\n|.)*<\/[a-zA-Z]+\:[a-zA-Z]+>/g, '')
-                    .replace(/\s(?:style|class|width|height|dir|xmlns|contenteditable|[a-z]+\-[a-z\-]+)\s*(?:="?[^>^"]*"?)?/ig, '')
-                    .replace(/<\/?(?!P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE|TBODY|TR|TD)\s*(?:[a-z\-]+)?\s*(?:="?[^>^"]*"?)?\s*>/ig, '');
-            // }
+            if (!tagsAllowed.test(domTree[i].nodeName)) {
+                if (this.isFormatElement(domTree[i]) || this.isRangeFormatElement(domTree[i])) {
+                    cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
+                        .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
+                        .replace(/\s(?:style|class|id|name|width|height|dir|xmlns|contenteditable|[a-z]+\-[a-z\-]+)\s*(?:="?[^>^"]*"?)?/ig, '')
+                        .replace(/<\/?(?!P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE|TBODY|TR|TD)\s*(?:[a-z\-]+)?\s*(?:="?[^>^"]*"?)?\s*>/ig, '');
+                }
+            }
         }
 
         return (cleanHTML || html);

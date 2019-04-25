@@ -67,6 +67,8 @@ export default {
             target = target.parentNode;
         }
 
+        if (!command || !value) return;
+
         // blockquote, pre
         if (command === 'range') {
             const rangeElement = this.util.createElement(value);

@@ -58,9 +58,7 @@ export default {
     },
 
     pickup: function (e) {
-        if (!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
+        if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
         e.preventDefault();
         e.stopPropagation();

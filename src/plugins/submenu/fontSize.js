@@ -47,12 +47,10 @@ export default {
     },
 
     pickup: function (e) {
+        if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+        
         e.preventDefault();
         e.stopPropagation();
-
-        if (!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
 
         const value = e.target.getAttribute('data-value') + 'px';
         const newNode = this.util.createElement('SPAN');
