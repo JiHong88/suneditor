@@ -630,22 +630,20 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        const tagsAllowed = new RegExp('^(meta|script|link|style)$', 'i');
+        const tagsAllowed = new RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (!tagsAllowed.test(domTree[i].nodeName)) {
-                if (this.isFormatElement(domTree[i]) || this.isRangeFormatElement(domTree[i])) {
-                    cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
-                        .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-                        .replace(/\s(?:style|class|id|name|width|height|dir|xmlns|contenteditable|[a-z]+\-[a-z\-]+)\s*(?:="?[^>^"]*"?)?/ig, '')
-                        .replace(/<\/?(?!P|DIV|PRE|BLOCKQUOTE|H[1-6]|B|STRONG|U|I|VAR|EM|STRIKE|S|SUB|SUP|OL|UL|LI|BR|HR|A|FIGURE|FIGCAPTION|IMG|IFRAME|TABLE|TBODY|TR|TD)\s*(?:[a-z\-]+)?\s*(?:="?[^>^"]*"?)?\s*>/ig, '');
-                }
+                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '')
+                    .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
+                    .replace(/(?!<[a-z])(\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?)+(?=>)/g, '')
+                    .replace(/<\/?\b(?!br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td)[^>]+>/g, '');
             }
         }
 
-        return (cleanHTML || html);
+        return this._textTagConvertor(cleanHTML || html);
     }
 };
 
