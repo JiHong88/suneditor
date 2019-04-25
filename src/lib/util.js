@@ -120,8 +120,8 @@ const util = {
             fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
         }
 
-        const regExp = new RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
-        const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const regExp = new this._w.RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const extRegExp = new this._w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
             
         for (let c = this._d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
             if (extRegExp.test(c[i][src])) {
@@ -441,7 +441,7 @@ const util = {
                 query = '^' + query + '$';
             }
 
-            const regExp = new RegExp(query, 'i');
+            const regExp = new this._w.RegExp(query, 'i');
             check = function (el) {
                 return regExp.test(el[attr]);
             };
@@ -488,7 +488,7 @@ const util = {
                 query = '^' + query + '$';
             }
 
-            const regExp = new RegExp(query, 'i');
+            const regExp = new this._w.RegExp(query, 'i');
             check = function (el) {
                 return regExp.test(el[attr]);
             };
@@ -555,7 +555,7 @@ const util = {
     addClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) return;
 
         element.className += ' ' + className;
@@ -569,7 +569,7 @@ const util = {
     removeClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         element.className = element.className.replace(check, ' ').trim();
     },
 
@@ -581,7 +581,7 @@ const util = {
     toggleClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) {
             element.className = element.className.replace(check, ' ').trim();
         }
@@ -630,7 +630,7 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        const tagsAllowed = new RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
+        const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
@@ -639,7 +639,7 @@ const util = {
                 cleanHTML += domTree[i].outerHTML
                     .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
                     .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
-                    .replace(/<\/?\b(?!br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td)[^>]+>/g, '');
+                    .replace(/<\/?((?!br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td)[^>^<])+>/g, '');
             }
         }
 

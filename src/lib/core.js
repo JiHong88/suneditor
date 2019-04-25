@@ -888,7 +888,7 @@ export default function (context, plugins, lang) {
                     regExp += '|' + checkCSSPropertyArray[i];
                 }
                 regExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                regExp = new RegExp(regExp, 'ig');
+                regExp = new _w.RegExp(regExp, 'ig');
             }
 
             if (removeNodeArray) {
@@ -897,7 +897,7 @@ export default function (context, plugins, lang) {
                     removeRegExp += '|' + removeNodeArray[i];
                 }
                 removeRegExp += ')$';
-                removeRegExp = new RegExp(removeRegExp, 'i');
+                removeRegExp = new _w.RegExp(removeRegExp, 'i');
             }
 
             /** tag check function*/
@@ -1009,7 +1009,7 @@ export default function (context, plugins, lang) {
             let pCurrent, newNode, appendNode, cssText;
 
             function checkCss (vNode) {
-                const regExp = new RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
+                const regExp = new _w.RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
                 let style = '';
 
                 if (regExp && vNode.style.cssText.length > 0) {
@@ -1791,9 +1791,9 @@ export default function (context, plugins, lang) {
      * @description event function
      */
     const event = {
-        _directionKeyKeyCode: new RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreRegExp: new RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new RegExp('^(STRONG|U|EM|S|SUB|SUP)$'),
+        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
+        _historyIgnoreRegExp: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|U|EM|S|SUB|SUP)$'),
         _keyCodeShortcut: {
             66: 'B',
             83: 'S',
