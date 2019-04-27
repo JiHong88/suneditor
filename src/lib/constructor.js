@@ -252,14 +252,14 @@ const _Constructor = {
             ],
 
             /** plugins - submenu */
-            font: ['btn_edit_select btn_font', lang.toolbar.font, 'font', 'submenu',
+            font: ['btn_editor_select btn_font', lang.toolbar.font, 'font', 'submenu',
                 '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
             ],
-            formatBlock: ['btn_edit_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
+            formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
                 '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
             ],
 
-            fontSize: ['btn_edit_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
+            fontSize: ['btn_editor_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
                 '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
             ],
 

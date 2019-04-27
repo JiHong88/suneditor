@@ -782,17 +782,19 @@ export default function (context, plugins, lang) {
         },
 
         /**
-         * @description Add or delete the node received as an argument value to the selected area.
-         * 1. When there is the same css value node in the selection area, the tag is stripped.
-         * 2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments
-         * 3. Tags with the same name as the values in the "removeNodeArray" array are deleted.
-         * 4. The "appendNode" and "removeNodeArray" argument values can be given at the same time.
-         * @param {Element|null} appendNode - The element to be added to the selection.
-         * @param {Array|null} checkCSSPropertyArray - The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
-         * @param {Array|null} removeNodeArray - An array of node names from which to remove types, Removes all formats when there is an empty array. (['span'], ['b', 'u']...])
+         * @description Adds a node to the selected region, or deletes the node.
+         * 1. If there is a node in the "appendNode" argument, "appendNode" is added to the selection range.
+         * 2. If the "appendNode" argument has a null value, the node is modified without adding a new node.
+         * 3. Styles such as the style property of the "styleArray" argument will be deleted.
+         * 4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.
+         * 5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
+         * @param {Element|null} appendNode - The element to be added to the selection. If it is null, delete the node.
+         * @param {Array|null} styleArray - The style attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
+         * @param {Array|null} removeNodeArray - An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
          */
-        nodeChange: function (appendNode, checkCSSPropertyArray, removeNodeArray) {
-            checkCSSPropertyArray = checkCSSPropertyArray && checkCSSPropertyArray.length > 0 ? checkCSSPropertyArray : false;
+        nodeChange: function (appendNode, styleArray, removeNodeArray) {
+            styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
+            removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
             this._editorRange();
             
             /* selected node validation check */
@@ -809,8 +811,8 @@ export default function (context, plugins, lang) {
             }
             
             const range = this.getRange();
-            const isRemoveFormat = removeNodeArray && removeNodeArray.length === 0;
-            const isRemoveNode = !appendNode && removeNodeArray;
+            const isRemoveNode = !appendNode;
+            const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let tempCon, tempOffset, tempChild, tempArray;
 
             if (isRemoveNode) {
@@ -818,23 +820,23 @@ export default function (context, plugins, lang) {
             }
 
             /* checked same style property */
-            if (range.startContainer === range.endContainer) {
+            if (!isRemoveNode && range.startContainer === range.endContainer) {
                 let sNode = range.startContainer;
                 if (isRemoveFormat) {
                     if (util.getFormatElement(sNode) === sNode.parentNode) return;
-                } else if (checkCSSPropertyArray.length > 0) {
+                } else if (styleArray.length > 0) {
                     let checkCnt = 0;
 
-                    for (let i = 0; i < checkCSSPropertyArray.length; i++) {
+                    for (let i = 0; i < styleArray.length; i++) {
                         while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
-                            if (sNode.nodeType === 1 && sNode.style[checkCSSPropertyArray[i]] === appendNode.style[checkCSSPropertyArray[i]]) {
+                            if (sNode.nodeType === 1 && sNode.style[styleArray[i]] === appendNode.style[styleArray[i]]) {
                                 checkCnt++;
                             }
                             sNode = sNode.parentNode;
                         }
                     }
     
-                    if (checkCnt >= checkCSSPropertyArray.length) return;
+                    if (checkCnt >= styleArray.length) return;
                 }
             }
 
@@ -894,15 +896,15 @@ export default function (context, plugins, lang) {
             this.setRange(startCon, startOff, endCon, endOff);
 
             let start = {}, end = {};
-            let newNode, regExp, removeRegExp;
+            let newNode, styleRegExp, removeRegExp;
 
-            if (checkCSSPropertyArray) {
-                regExp = '(?:;|^|\\s)(?:' + checkCSSPropertyArray[0];
-                for (let i = 1; i < checkCSSPropertyArray.length; i++) {
-                    regExp += '|' + checkCSSPropertyArray[i];
+            if (styleArray) {
+                styleRegExp = '(?:;|^|\\s)(?:' + styleArray[0];
+                for (let i = 1; i < styleArray.length; i++) {
+                    styleRegExp += '|' + styleArray[i];
                 }
-                regExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                regExp = new _w.RegExp(regExp, 'ig');
+                styleRegExp += ')\\s*:[^;]*\\s*(?:;|$)';
+                styleRegExp = new _w.RegExp(styleRegExp, 'ig');
             }
 
             if (removeNodeArray) {
@@ -916,20 +918,36 @@ export default function (context, plugins, lang) {
 
             /** tag check function*/
             const checkCss = function (vNode) {
+                // all path
                 if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
+                // all remove
                 if (isRemoveFormat) return false;
-                if (removeRegExp) {
-                    if (removeRegExp.test(vNode.nodeName)) return false;
-                    else return true;
-                }
 
+                // style regexp
+                const originStyle = vNode.style.cssText;
                 let style = '';
-                if (regExp && vNode.style.cssText.length > 0) {
-                    style = vNode.style.cssText.replace(regExp, '').trim();
+                if (styleRegExp && originStyle.length > 0) {
+                    style = originStyle.replace(styleRegExp, '').trim();
                 }
 
-                if (style.length > 0 || vNode.nodeName !== newNodeName) {
-                    if (vNode.style.cssText.length > 0) vNode.style.cssText = style;
+                // remove
+                if (isRemoveNode) {
+                    if (styleRegExp && removeRegExp) {
+                        if (!style && removeRegExp.test(vNode.nodeName)) return false;
+                    }
+
+                    if (styleRegExp && !style && originStyle) {
+                        return false;
+                    }
+
+                    if (removeRegExp && removeRegExp.test(vNode.nodeName)) {
+                        return false;
+                    }
+                }
+
+                // change
+                if (style || vNode.nodeName !== newNodeName) {
+                    if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
                     return true;
                 }
 
@@ -1617,7 +1635,7 @@ export default function (context, plugins, lang) {
          * @description Remove format of the currently selected range
          */
         removeFormat: function () {
-            this.nodeChange(null, null, []);
+            this.nodeChange();
         },
 
         /**

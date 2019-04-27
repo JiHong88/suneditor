@@ -1055,11 +1055,12 @@
             <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, checkCSSPropertyText)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Add or delete the node received as an argument value to the selected area.<br>
-                1. When there is the same css value node in the selection area, the tag is stripped.<br>
-                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments<br>
-                3. Tags with the same name as the values in the "removeNodeArray" array are deleted.<br>
-                4. The "appendNode" and "removeNodeArray" argument values can be given at the same time.
+                Adds a node to the selected region, or deletes the node.<br>
+                1. If there is a node in the "appendNode" argument, "appendNode" is added to the selection range.<br>
+                2. If the "appendNode" argument has a null value, the node is modified without adding a new node.<br>
+                3. Styles such as the style property of the "styleArray" argument will be deleted.<br>
+                4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.<br>
+                5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1090,7 +1091,7 @@
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array. (['span'], ['b', 'u']...])</td>
+                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])</td>
                 </tr>
                 </tbody>
             </table>

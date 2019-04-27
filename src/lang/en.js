@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: 'Default',
             save: 'Save',
             font: 'Font',
             formats: 'Formats',

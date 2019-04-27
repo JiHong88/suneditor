@@ -25,6 +25,7 @@ export default {
 
     setSubmenu: function () {
         const option = this.context.option;
+        const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'sun-editor-submenu layer_editor layer_size';
@@ -33,7 +34,8 @@ export default {
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
         let list = '<div class="inner_layer">' +
-            '   <ul class="list_editor font_size_list">';
+            '   <ul class="list_editor font_size_list">' +
+            '       <li><button type="button" class="default_value btn_edit" title="' + lang.toolbar.default + '">' + lang.toolbar.default + '</button></li>';
         for (let i = 0, len = sizeList.length; i < len; i++) {
             const size = sizeList[i];
             list += '<li><button type="button" class="btn_edit" data-value="' + size + '" title="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
@@ -52,10 +54,15 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const value = e.target.getAttribute('data-value') + 'px';
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = value;
-        this.nodeChange(newNode, ['font-size']);
+        const value = e.target.getAttribute('data-value');
+
+        if (value) {
+            const newNode = this.util.createElement('SPAN');
+            newNode.style.fontSize = value + 'px';
+            this.nodeChange(newNode, ['font-size']);
+        } else {
+            this.nodeChange(null, ['font-size']);
+        }
 
         this.submenuOff();
         this.focus();

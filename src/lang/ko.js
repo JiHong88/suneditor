@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: '기본값',
             save: '저장',
             font: '글꼴',
             formats: '문단 형식',

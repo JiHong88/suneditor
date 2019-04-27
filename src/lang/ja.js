@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: 'デフォルト',
             save: '保存',
             font: 'フォント',
             formats: '段落形式',

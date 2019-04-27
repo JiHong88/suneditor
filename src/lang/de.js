@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: 'Standard',
             save: 'Speichern',
             font: 'Schriftart',
             formats: 'Format',

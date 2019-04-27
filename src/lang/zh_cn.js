@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: '默认',
             save: '保存',
             font: '字体',
             formats: '格式',
