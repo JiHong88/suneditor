@@ -792,8 +792,22 @@ export default function (context, plugins, lang) {
          * @param {Array|null} removeNodeArray - An array of node names from which to remove types, Removes all formats when there is an empty array. (['span'], ['b', 'u']...])
          */
         nodeChange: function (appendNode, checkCSSPropertyArray, removeNodeArray) {
-            this._editorRange();
             checkCSSPropertyArray = checkCSSPropertyArray && checkCSSPropertyArray.length > 0 ? checkCSSPropertyArray : false;
+            this._editorRange();
+            
+            /* selected node validation check */
+            const formatEl = util.getFormatElement(this.getSelectionNode());
+            if (!formatEl || (function (element) {
+                const children = element.children;
+                for (let i = 0, len = children.length; i < len; i++) {
+                    if (util.isRangeFormatElement(children[i])) return true;
+                }
+                return false;
+            })(formatEl)) {
+                core.execCommand('formatBlock', false, util.isWysiwygDiv(formatEl) ? 'P' : 'DIV');
+                this._editorRange();
+            }
+            
             const range = this.getRange();
             const isRemoveFormat = removeNodeArray && removeNodeArray.length === 0;
             const isRemoveNode = !appendNode && removeNodeArray;
@@ -2269,9 +2283,9 @@ export default function (context, plugins, lang) {
                 return;
             }
 
-            if ((util.isWysiwygDiv(selectionNode.parentElement) || util.isRangeFormatElement(selectionNode.parentElement)) && selectionNode.nodeType === 3) {
+            if (!util.getFormatElement(selectionNode) && selectionNode.nodeType === 3) {
                 core.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
-                event._findButtonEffectTag();
+                core.focus();
                 return;
             }
 

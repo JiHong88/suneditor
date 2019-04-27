@@ -12,6 +12,7 @@
     text-align: left;
     background-color: #fff;
     word-break: normal;
+    word-wrap: break-word;
     padding: 16px;
     margin: 0;
 }
@@ -70,8 +71,6 @@
     font-size: 13px;
     line-height: 1.45;
     color: #333;
-    word-break: break-all;
-    word-wrap: break-word;
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
@@ -247,7 +246,6 @@
     border: 1px solid rgb(204, 204, 204);
     width: 100%;
     max-width: 100%;
-    word-break: keep-all;
     margin-bottom: 20px;
     background-color: transparent;
     border-spacing: 0;
@@ -281,7 +279,7 @@
     padding: 1em .5em;
     margin: 0;
     font-size: 13px;
-    background-color: #f3f3f3;
+    background-color: #f9f9f9;
     outline: none;
 }
 .sun-editor-editable figure.sun-editor-figure-cover figcaption p{
