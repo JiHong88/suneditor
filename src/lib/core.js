@@ -150,9 +150,9 @@ export default function (context, plugins, lang) {
          * @property {Element} FONT - font family button
          * @property {Element} SIZE - font size button
          * @property {Element} STRONG - bold button
-         * @property {Element} U - underline button
+         * @property {Element} INS - underline button
          * @property {Element} EM - italic button
-         * @property {Element} S - strike button
+         * @property {Element} DEL - strike button
          * @property {Element} SUB - subscript button
          * @property {Element} SUP - superscript button
          */
@@ -161,9 +161,9 @@ export default function (context, plugins, lang) {
             FONT: context.tool.font,
             SIZE: context.tool.fontSize,
             STRONG: context.tool.bold,
-            U: context.tool.underline,
+            INS: context.tool.underline,
             EM: context.tool.italic,
-            S: context.tool.strike,
+            DEL: context.tool.strike,
             SUB: context.tool.subscript,
             SUP: context.tool.superscript
         },
@@ -1617,7 +1617,7 @@ export default function (context, plugins, lang) {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
                     break;
-                default : // 'STRONG', 'U', 'EM', 'S', 'SUB', 'SUP'
+                default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
                     const on = util.hasClass(this.commandMap[command], 'on');
 
                     if (command === 'SUB' && util.hasClass(context.tool.superscript, 'on')) {
@@ -1825,7 +1825,7 @@ export default function (context, plugins, lang) {
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
         _historyIgnoreRegExp: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|U|EM|S|SUB|SUP)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
         _keyCodeShortcut: {
             66: 'B',
             83: 'S',
@@ -1930,7 +1930,7 @@ export default function (context, plugins, lang) {
                     findSize = false;
                 }
 
-                /** strong, u, em, s, sub, sup */
+                /** strong, ins, em, del, sub, sup */
                 if (classOnCheck.test(nodeName)) {
                     commandMapNodes.push(nodeName);
                 }

@@ -187,7 +187,7 @@ const _Constructor = {
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'U', '',
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'INS', '',
                 '<div class="icon-underline"></div>'
             ],
 
@@ -195,7 +195,7 @@ const _Constructor = {
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'S', '',
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'DEL', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
