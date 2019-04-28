@@ -28,6 +28,7 @@ export default {
         /** add event listeners */
         context.hiliteColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
         listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
+        listDiv.getElementsByClassName('sun-editor-id-submenu-color-default')[0].addEventListener('click', this.remove.bind(core));
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
 
         context.hiliteColor.colorList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
@@ -64,6 +65,12 @@ export default {
 
     onChangeInput: function (e) {
         this.plugins.colorPicker.setCurrentColor.call(this, '#' + e.target.value);
+    },
+
+    remove: function () {
+        this.nodeChange(null, ['background-color']);
+        this.submenuOff();
+        this.focus();
     },
 
     submit: function () {

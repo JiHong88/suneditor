@@ -146,9 +146,11 @@ export default function (context, plugins, lang) {
 
         /**
          * @description Elements that need to change text or className for each selection change
-         * @property {Element} FORMAT - format button
-         * @property {Element} FONT - font family button
-         * @property {Element} SIZE - font size button
+         * @property {Element} FORMAT - format button > span.txt
+         * @property {Element} FONT - font family button > span.txt
+         * @property {Element} SIZE - font size button > span.txt
+         * @property {Element} ALIGN - align button > div.icon
+         * @property {Element} LI - list button
          * @property {Element} STRONG - bold button
          * @property {Element} INS - underline button
          * @property {Element} EM - italic button
@@ -160,6 +162,8 @@ export default function (context, plugins, lang) {
             FORMAT: context.tool.format,
             FONT: context.tool.font,
             SIZE: context.tool.fontSize,
+            ALIGN: context.tool.align,
+            LI: context.tool.list,
             STRONG: context.tool.bold,
             INS: context.tool.underline,
             EM: context.tool.italic,
@@ -330,6 +334,7 @@ export default function (context, plugins, lang) {
                 context.element.wysiwyg.focus();
             }
 
+            this._editorRange();
             event._findButtonEffectTag();
         },
 
@@ -620,7 +625,6 @@ export default function (context, plugins, lang) {
             }
             else {
                 parentNode = rightNode.parentNode;
-                rightNode = rightNode.nextSibling;
             }
 
             try {
@@ -721,17 +725,17 @@ export default function (context, plugins, lang) {
 
         /**
          * @description appended all selected format Element to the argument element and insert
-         * @param {Element} wrapTag - Element of wrap the arguments
+         * @param {Element} rangeElement - Element of wrap the arguments (PRE, BLOCKQUOTE...)
          */
-        wrapToTags: function (wrapTag) {
+        applyRangeFormatElement: function (rangeElement) {
             const range = this.getRange();
             const rangeLines = this.getSelectedFormatElements();
 
             if (!rangeLines) {
                 const inner = util.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
                 inner.innerHTML = util.zeroWidthSpace;
-                wrapTag.appendChild(inner);
-                this.getSelectionNode().appendChild(wrapTag);
+                rangeElement.appendChild(inner);
+                this.getSelectionNode().appendChild(rangeElement);
                 return;
             }
 
@@ -765,20 +769,89 @@ export default function (context, plugins, lang) {
                     }
 
                     listParent.appendChild(line);
-                    if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) wrapTag.appendChild(listParent);
+                    if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) rangeElement.appendChild(listParent);
                 }
                 else {
-                    wrapTag.appendChild(line);
+                    rangeElement.appendChild(line);
                 }
 
                 prevNodeName = line.nodeName;
             }
 
-            pElement.insertBefore(wrapTag, beforeTag);
+            pElement.insertBefore(rangeElement, beforeTag);
             if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
+
+            const lastChild = rangeElement.lastElementChild;
+            const len = lastChild.childNodes.length;
+            if (rangeLines.length === 1) {
+                this.setRange(lastChild, len, lastChild, len);
+            } else {
+                this.setRange(rangeElement.firstElementChild, 0, lastChild, len);
+            }
 
             // history stack
             this.history.push();
+        },
+
+        /**
+         * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
+         * When "selectedFormats" is null, all elements are detached.
+         * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
+         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove
+         */
+        detachRangeFormatElement: function (rangeElement, selectedFormats) {
+            let rNode = null;
+            let lastRangeNode = null;
+            const children = rangeElement.children;
+            let rangeEl = rangeElement.cloneNode(false);
+
+            for (let i = 0, len = children.length, insNode; i < len; i++) {
+                insNode = children[i];
+                if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
+                    insNode = insNode.cloneNode(true);
+                    rangeEl.appendChild(insNode);
+                }
+                else {
+                    if (rangeEl.children.length > 0) {
+                        this.insertNode(rangeEl, rangeElement);
+                        rangeEl = rangeElement.cloneNode(false);
+                    }
+
+                    if (/^LI$/i.test(insNode.nodeName)) {
+                        const inner = insNode.innerHTML;
+                        insNode = util.createElement('P');
+                        insNode.innerHTML = inner;
+                    } else {
+                        insNode = insNode.cloneNode(true);
+                    }
+
+                    this.insertNode(insNode, rangeElement);
+
+                    if (selectedFormats) {
+                        lastRangeNode = insNode;
+                        if (!rNode) {
+                            rNode = insNode;
+                        }
+                    }
+                }
+            }
+
+            if (rangeEl.children.length > 0) {
+                this.insertNode(rangeEl, rangeElement);
+                rangeEl = rangeElement.cloneNode(false);
+            }
+
+            if (!selectedFormats) {
+                this.setRange(rangeElement.nextElementSibling, 0, rangeElement.nextElementSibling, 0);
+            } else {
+                const len = lastRangeNode.childNodes.length;
+                this.setRange(rNode, (lastRangeNode === rNode ? len : 0), lastRangeNode, len);
+            }
+
+            util.removeItem(rangeElement);
+
+            this.history.push();
+            event._findButtonEffectTag();
         },
 
         /**
@@ -820,7 +893,7 @@ export default function (context, plugins, lang) {
             }
 
             /* checked same style property */
-            if (!isRemoveNode && range.startContainer === range.endContainer) {
+            if (!isRemoveFormat && range.startContainer === range.endContainer) {
                 let sNode = range.startContainer;
                 if (isRemoveFormat) {
                     if (util.getFormatElement(sNode) === sNode.parentNode) return;
@@ -829,14 +902,15 @@ export default function (context, plugins, lang) {
 
                     for (let i = 0; i < styleArray.length; i++) {
                         while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
-                            if (sNode.nodeType === 1 && sNode.style[styleArray[i]] === appendNode.style[styleArray[i]]) {
+                            if (sNode.nodeType === 1 && (isRemoveNode ? sNode.style[styleArray[i]] : sNode.style[styleArray[i]] === appendNode.style[styleArray[i]])) {
                                 checkCnt++;
                             }
                             sNode = sNode.parentNode;
                         }
                     }
     
-                    if (checkCnt >= styleArray.length) return;
+                    if (!isRemoveNode && checkCnt >= styleArray.length) return;
+                    if (isRemoveNode && checkCnt === 0) return;
                 }
             }
 
@@ -916,8 +990,8 @@ export default function (context, plugins, lang) {
                 removeRegExp = new _w.RegExp(removeRegExp, 'i');
             }
 
-            /** tag check function*/
-            const checkCss = function (vNode) {
+            /** validation check function*/
+            const validation = function (vNode) {
                 // all path
                 if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
                 // all remove
@@ -957,7 +1031,7 @@ export default function (context, plugins, lang) {
             /** one line */
             if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
                 newNode = appendNode.cloneNode(false);
-                const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, checkCss, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
+                const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
 
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
@@ -972,18 +1046,18 @@ export default function (context, plugins, lang) {
 
                 // startCon
                 newNode = appendNode.cloneNode(false);
-                start = this._nodeChange_startLine(lineNodes[0], newNode, checkCss, startCon, startOff, isRemoveFormat, isRemoveNode);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode);
 
                 // mid
                 for (let i = 1; i < endLength; i++) {
                     newNode = appendNode.cloneNode(false);
-                    this._nodeChange_middleLine(lineNodes[i], newNode, checkCss, isRemoveFormat, isRemoveNode);
+                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode);
                 }
 
                 // endCon
                 if (endLength > 0) {
                     newNode = appendNode.cloneNode(false);
-                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, checkCss, endCon, endOff, isRemoveFormat, isRemoveNode);
+                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode);
                 } else {
                     end = start;
                 }
@@ -1886,7 +1960,7 @@ export default function (context, plugins, lang) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            let findFormat = true, findFont = true, findSize = true, findA = true;
+            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findA = true;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -1896,19 +1970,49 @@ export default function (context, plugins, lang) {
                 currentNodes.push(nodeName);
 
                 /** Format */
-                if (findFormat && util.isFormatElement(selectionParent)) {
-                    commandMapNodes.push('FORMAT');
-                    util.changeTxt(commandMap.FORMAT, nodeName);
-                    findFormat = false;
+                if (util.isFormatElement(selectionParent)) {
+                    /* Format block */
+                    if (findFormat) {
+                        commandMapNodes.push('FORMAT');
+                        util.changeTxt(commandMap.FORMAT, nodeName);
+                        findFormat = false;
+                    }
+
+                    /* Align */
+                    const textAlign = selectionParent.style.textAlign;
+                    if (findAlign && textAlign) {
+                        commandMapNodes.push('ALIGN');
+                        commandMap.ALIGN.className = 'icon-align-' + textAlign;
+                        commandMap.ALIGN.setAttribute('data-focus', textAlign);
+                        findAlign = false;
+                    }
+
+                    /* List */
+                    if (findList && /^LI$/.test(nodeName)) {
+                        commandMapNodes.push('LI');
+                        // commandMap.ALIGN.className = 'icon-align-' + textAlign;
+                        commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
+                        findList = false;
+                    }
+
                     continue;
                 }
 
                 /** Font */
-                if (findFont && (selectionParent.style.fontFamily.length > 0 || (selectionParent.face && selectionParent.face.length > 0))) {
+                if (findFont && selectionParent.style.fontFamily.length > 0) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
                     util.changeTxt(commandMap.FONT, selectFont);
+                    commandMap.FONT.setAttribute('title', selectFont);
                     findFont = false;
+                }
+
+                /** Size */
+                if (findSize && selectionParent.style.fontSize.length > 0) {
+                    commandMapNodes.push('SIZE');
+                    util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
+                    commandMap.SIZE.setAttribute('title', selectionParent.style.fontSize.match(/\d+/)[0]);
+                    findSize = false;
                 }
 
                 /** A */
@@ -1921,13 +2025,6 @@ export default function (context, plugins, lang) {
                     findA = false;
                 } else if (findA && context.link && core.controllerArray[0] === context.link.linkBtn) {
                     core.controllersOff();
-                }
-
-                /** Size */
-                if (findSize && selectionParent.style.fontSize.length > 0) {
-                    commandMapNodes.push('SIZE');
-                    util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
-                    findSize = false;
                 }
 
                 /** strong, ins, em, del, sub, sup */
@@ -1947,11 +2044,20 @@ export default function (context, plugins, lang) {
             /** remove class, display text */
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
-                if (/^FONT$/i.test(key)) {
-                    util.changeTxt(commandMap[key], lang.toolbar.font);
+                if (commandMap.FONT && /^FONT$/i.test(key)) {
+                    util.changeTxt(commandMap.FONT, lang.toolbar.font);
+                    commandMap.FONT.removeAttribute('title');
                 }
-                else if (/^SIZE$/i.test(key)) {
-                    util.changeTxt(commandMap[key], lang.toolbar.fontSize);
+                else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
+                    util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
+                    commandMap.SIZE.removeAttribute('title');
+                }
+                else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
+                    commandMap.ALIGN.className = 'icon-align-left';
+                    commandMap.ALIGN.removeAttribute('data-focus');
+                }
+                else if (commandMap.LI && /^LI$/i.test(key)) {
+                    commandMap.LI.removeAttribute('data-focus');
                 }
                 else {
                     util.removeClass(commandMap[key], 'on');
@@ -2194,7 +2300,7 @@ export default function (context, plugins, lang) {
             const selectionNode = core.getSelectionNode();
             switch (keyCode) {
                 case 8: /**backspace key*/
-                    if (util.isFormatElement(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
+                    if (util.isFormatElement(selectionNode) && !/^LI$/i.test(selectionNode.nodeName) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = util.zeroWidthSpace;
@@ -2203,11 +2309,10 @@ export default function (context, plugins, lang) {
 
                     let formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
                     const rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl && !formatEl.previousSibling) {
-                        if (util.onlyZeroWidthSpace(rangeEl.textContent.trim())) {
-                            formatEl = core.appendFormatTag(rangeEl);
-                            util.removeItem(rangeEl);
-                            core.setRange(formatEl, 0, formatEl, 1);
+                    if (rangeEl && formatEl) {
+                        const range = core.getRange();
+                        if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
+                            core.detachRangeFormatElement(rangeEl);
                         }
                     }
 

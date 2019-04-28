@@ -43,7 +43,7 @@
             alignLeft: '左揃え',
             alignRight: '右揃え',
             alignCenter: '中央揃え',
-            justifyFull: '両端揃え',
+            alignJustify: '両端揃え',
             list: 'リスト',
             orderList: '数値ブリット',
             unorderList: '円形ブリット',

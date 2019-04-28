@@ -187,21 +187,35 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font family button element</td>
+                    <td class="description last">font family button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;format</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">format button element</td>
+                    <td class="description last">format button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSize</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font size button element</td>
+                    <td class="description last">font size button > span.txt</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;align</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">align button > div.icon</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;list</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">list button element</td>
                 </tr>
                 <tr style="color:#f42424;">
                     <td class="name"><code style="color:#f42424;">option</code></td>
@@ -529,45 +543,59 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">format button</td>
+                    <td class="description last">format button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>FONT</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font family button</td>
+                    <td class="description last">font family button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>SIZE</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font size button</td>
+                    <td class="description last">font size button > span.txt</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>B</code></td>
+                    <td class="name"><code>ALIGN</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">align button > div.icon</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>LI</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">list button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>STRONG</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">bold button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>U</code></td>
+                    <td class="name"><code>INS</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">underline button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>I</code></td>
+                    <td class="name"><code>EM</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">italic button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>STRIKE</code></td>
+                    <td class="name"><code>DEL</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
@@ -1025,7 +1053,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="wrapToTags"><span class="type-signature"></span>wrapToTags<span class="signature">(wrapTag)</span><span
+            <h4 class="name" id="applyRangeFormatElement"><span class="type-signature"></span>applyRangeFormatElement<span class="signature">(rangeElement)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 appended all selected format Element to the argument element and insert
@@ -1041,11 +1069,46 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>wrapTag</code></td>
+                    <td class="name"><code>rangeElement</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Element of wrap the arguments</td>
+                    <td class="description last">Element of wrap the arguments (PRE, BLOCKQUOTE...)</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="detachRangeFormatElement"><span class="type-signature"></span>detachRangeFormatElement<span class="signature">(rangeElement, selectedFormats)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)<br>
+                When "selectedFormats" is null, all elements are detached.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>rangeElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Range format element (PRE, BLOCKQUOTE, OL, UL...)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>selectedFormats</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|null</span>
+                    </td>
+                    <td class="description last">Array of format elements (P, DIV, LI...) to remove</td>
                 </tr>
                 </tbody>
             </table>
@@ -1287,7 +1350,8 @@
         <li><a href="document-editor.html#appendFormatTag">appendFormatTag</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
-        <li><a href="document-editor.html#wrapToTags">wrapToTags</a></li>
+        <li><a href="document-editor.html#applyRangeFormatElement">applyRangeFormatElement</a></li>
+        <li><a href="document-editor.html#detachRangeFormatElement">detachRangeFormatElement</a></li>
         <li><a href="document-editor.html#nodeChange">nodeChange</a></li>
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>

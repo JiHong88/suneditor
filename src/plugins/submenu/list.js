@@ -10,11 +10,19 @@
 export default {
     name: 'list',
     add: function (core, targetElement) {
+        const context = core.context;
+        context.list = {
+            _list: [],
+            currentList: ''
+        };
+
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+
+        context.list._list = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -27,7 +35,7 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor layer_list';
+        listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
@@ -38,6 +46,24 @@ export default {
             '</div>';
 
         return listDiv;
+    },
+
+    on: function () {
+        const listContext = this.context.list;
+        const list = listContext._list;
+        const currentList = this.commandMap.LI.getAttribute('data-focus') || '';
+
+        if (currentList !== listContext.currentList) {
+            for (let i = 0, len = list.length; i < len; i++) {
+                if (currentList === list[i].getAttribute('data-value')) {
+                    this.util.addClass(list[i], 'on');
+                } else {
+                    this.util.removeClass(list[i], 'on');
+                }
+            }
+
+            listContext.currentList = currentList;
+        }
     },
 
     pickup: function (e) {
@@ -57,15 +83,25 @@ export default {
         if (!command || !value) return;
 
         const formatElement = this.util.getFormatElement(this.getSelectionNode());
+        const selectedFormsts = this.getSelectedFormatElements();
+        let isRemove = true;
 
-        if (/^LI$/i.test(formatElement.tagName)) {
+        for (let i = 0, len = selectedFormsts.length; i < len; i++) {
+            if (!/^LI$/i.test(selectedFormsts[i].tagName)) {
+                isRemove = false;
+                break;
+            }
+        }
+
+        if (isRemove) {
             const cancel = formatElement.parentNode.tagName === value;
-            this.execCommand(command, false, null);
-            if (cancel) this.execCommand('formatBlock', false, 'DIV');
+            if (cancel) {
+                this.detachRangeFormatElement(this.util.getRangeFormatElement(formatElement), selectedFormsts);
+            } else {
+                this.execCommand(command, false, null);
+            }
         } else {
             let rightNode = formatElement.nextSibling;
-            let pNode = formatElement.parentNode;
-
             const list = this.util.createElement(value);
             const formatElementList = this.getSelectedFormatElements();
             
@@ -74,14 +110,21 @@ export default {
 
                 if (i === len - 1) {
                     rightNode = fTag.nextSibling;
-                    pNode = fTag.parentNode;
                 }
 
                 list.innerHTML += '<li>' + fTag.innerHTML + '</li>';
                 this.util.removeItem(fTag);
             }
 
-            pNode.insertBefore(list, rightNode);
+            this.insertNode(list, rightNode);
+
+            const last = list.lastElementChild;
+            if (selectedFormsts.length > 1) {
+                this.setRange(list.firstElementChild, 0, last, last.childNodes.length);
+            } else {
+                const len = last.childNodes.length;
+                this.setRange(last, len, last, len);
+            }
         }
 
         this.submenuOff();

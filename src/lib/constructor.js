@@ -253,14 +253,14 @@ const _Constructor = {
 
             /** plugins - submenu */
             font: ['btn_editor_select btn_font', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
+                '<span class="txt sun-editor-id-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
             ],
             formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
+                '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
             ],
 
             fontSize: ['btn_editor_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
+                '<span class="txt sun-editor-id-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
@@ -272,10 +272,10 @@ const _Constructor = {
             ],
 
             align: ['btn_align', lang.toolbar.align, 'align', 'submenu',
-                '<div class="icon-align-left"></div>'
+                '<div class="icon-align-left sun-editor-id-align"></div>'
             ],
 
-            list: ['', lang.toolbar.list, 'list', 'submenu',
+            list: ['sun-editor-id-list', lang.toolbar.list, 'list', 'submenu',
                 '<div class="icon-list-number"></div>'
             ],
 

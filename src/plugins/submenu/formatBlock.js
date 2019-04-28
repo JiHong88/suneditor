@@ -27,7 +27,7 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor layer_block';
+        listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
@@ -72,8 +72,7 @@ export default {
         // blockquote, pre
         if (command === 'range') {
             const rangeElement = this.util.createElement(value);
-            this.wrapToTags(rangeElement);
-            this.setRange(rangeElement.firstChild, 0, rangeElement.firstChild, 0);
+            this.applyRangeFormatElement(rangeElement);
             this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
         }
         // others

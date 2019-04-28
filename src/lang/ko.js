@@ -43,7 +43,7 @@
             alignLeft: '왼쪽 정렬',
             alignRight: '오른쪽 정렬',
             alignCenter: '가운데 정렬',
-            justifyFull: '양쪽 정렬',
+            alignJustify: '양쪽 정렬',
             list: '리스트',
             orderList: '숫자형 불릿',
             unorderList: '원형 불릿',

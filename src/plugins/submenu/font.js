@@ -10,11 +10,19 @@
 export default {
     name: 'font',
     add: function (core, targetElement) {
+        const context = core.context;
+        context.font = {
+            _fontList: [],
+            currentFont: ''
+        };
+
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
         listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(core));
+
+        context.font._fontList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -36,17 +44,17 @@ export default {
             [
                 'Arial',
                 'Comic Sans MS',
-                'Courier New,Courier',
-                'Impact,Charcoal,sans-serif',
+                'Courier New',
+                'Impact',
                 'Georgia',
                 'tahoma',
-                'Trebuchet MS,Helvetica',
+                'Trebuchet MS',
                 'Verdana'
             ] : option.font;
 
         let list = '<div class="sun-editor-submenu inner_layer list_family">' +
-            '   <ul class="list_editor sun-editor-list-font-family">' +
-            '       <li><button type="button" class="default_value btn_edit" title="' + lang.toolbar.default + '">' + lang.toolbar.default + '</button></li>';
+            '   <ul class="list_editor">' +
+            '       <li><button type="button" class="default_value btn_edit" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
             text = font.split(',')[0];
@@ -57,6 +65,24 @@ export default {
         listDiv.innerHTML = list;
 
         return listDiv;
+    },
+
+    on: function () {
+        const fontContext = this.context.font;
+        const fontList = fontContext._fontList;
+        const currentFont = this.commandMap.FONT.getAttribute('title') || '';
+
+        if (currentFont !== fontContext.currentFont) {
+            for (let i = 0, len = fontList.length; i < len; i++) {
+                if (currentFont === fontList[i].getAttribute('data-value')) {
+                    this.util.addClass(fontList[i], 'on');
+                } else {
+                    this.util.removeClass(fontList[i], 'on');
+                }
+            }
+
+            fontContext.currentFont = currentFont;
+        }
     },
 
     pickup: function (e) {

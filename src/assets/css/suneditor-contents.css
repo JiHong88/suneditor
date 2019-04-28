@@ -1,4 +1,5 @@
 /* used color #000 , #fff , #CCC, #f9f9f9 */
+/* font color #333, background color: #fff */
 /* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
 /* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
 /* red color #b94a48 , #f2dede , #eed3d7 */
@@ -8,7 +9,7 @@
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
     line-height: 1.5;
-    color: #000;
+    color: #333;
     text-align: left;
     background-color: #fff;
     word-break: normal;
