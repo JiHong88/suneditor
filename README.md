@@ -44,6 +44,8 @@ $ bower install --save suneditor
 **<a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>**
 ### 1. Include
 ```html
+<!-- <link href="../src/assets/css/suneditor.css" rel="stylesheet" type="text/css"> -->
+<!-- <link href="../src/assets/css/suneditor-contents.css" rel="stylesheet" type="text/css"> -->
 <link href="../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
 <script src="../dist/suneditor.min.js"></script>
 <script src="../src/lang/ko.js"></script>
@@ -84,11 +86,9 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 
 ### 1. Default options
 ```javascript
-import 'suneditor/dist/css/suneditor.min.css'
-// or
 // import 'suneditor/src/assets/css/suneditor.css'
 // import 'suneditor/src/assets/css/suneditor-contents.css'
-
+import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 
 // The default button list is created.

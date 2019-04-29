@@ -44,7 +44,9 @@
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
 <a id="include" href="#include"><h4>1. Include JS/CSS</h4></a>
-<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/css/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
+<div class="highlight highlight-text-html-basic"><pre><span class="pl-c"><span class="pl-c">&lt;!--</span> &lt;link href="../src/assets/css/suneditor.css" rel="stylesheet" type="text/css"&gt; <span class="pl-c">--&gt;</span></span>
+<span class="pl-c"><span class="pl-c">&lt;!--</span> &lt;link href="../src/assets/css/suneditor-contents.css" rel="stylesheet" type="text/css"&gt; <span class="pl-c">--&gt;</span></span>
+&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/css/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../src/lang/ko.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
 
@@ -77,10 +79,9 @@ In "suneditor-contents.css", you can define the style of all the tags created in
     <h4>Use import statement</h4>
     <p></p>
 <a id="defaultOptions" href="#defaultOptions"><h4>1. Default options</h4></a>
-<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
-<span class="pl-c"><span class="pl-c">//</span> or</span>
-<span class="pl-c"><span class="pl-c">//</span> import 'suneditor/src/assets/css/suneditor.css'</span>
+<div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">//</span> import 'suneditor/src/assets/css/suneditor.css'</span>
 <span class="pl-c"><span class="pl-c">//</span> import 'suneditor/src/assets/css/suneditor-contents.css'</span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 
