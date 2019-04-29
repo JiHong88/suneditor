@@ -89,7 +89,6 @@ const history = function (core) {
         push: function () {
             if (pushDelay) {
                 _w.clearTimeout(pushDelay);
-                pushDelay = null;
             }
 
             pushDelay = _w.setTimeout(function () {

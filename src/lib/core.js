@@ -20,7 +20,7 @@ import notice from '../plugins/modules/notice';
  * @param lang
  * @returns {Object} UserFunction Object
  */
-export default function (context, plugins, lang) {
+export default function (context, pluginCallButtons, plugins, lang) {
     const _d = document;
     const _w = window;
     const util = _util;
@@ -38,7 +38,7 @@ export default function (context, plugins, lang) {
         /**
          * @description loaded plugins
          */
-        plugins: {},
+        plugins: plugins || {},
 
         /**
          * @description Util object
@@ -213,7 +213,7 @@ export default function (context, plugins, lang) {
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
-                this.plugins[pluginName].add(this, this.plugins[pluginName].buttonElement);
+                this.plugins[pluginName].add(this, pluginCallButtons[pluginName]);
                 this.initPlugins[pluginName] = true;
             }
                 
@@ -229,7 +229,7 @@ export default function (context, plugins, lang) {
             for (let i = 0, len = moduleArray.length; i < len; i++) {
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
-                    this.plugins[moduleName] = util.copyObj(moduleArray[i]);
+                    this.plugins[moduleName] = moduleArray[i];
                     this.plugins[moduleName].add(this);
                 }
             }
@@ -2580,6 +2580,7 @@ export default function (context, plugins, lang) {
         context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
     }
 
+    /** inline, balloon editor */
     if (core._isInline || core._isBalloon) {
         context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
     }
@@ -2587,14 +2588,6 @@ export default function (context, plugins, lang) {
     /** window event */
     _w.addEventListener('resize', event.onResize_window, false);
     if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
-
-    /** add plugin to plugins object */
-    if (plugins) {
-        _w.Object.keys(plugins).map(function(key) {
-            let plugin = plugins[key];
-            core.plugins[plugin.name] = util.copyObj(plugin);
-        });
-    }
 
     /** User function */
     const userFunction = {
@@ -2766,31 +2759,14 @@ export default function (context, plugins, lang) {
             /** remove element */
             util.removeItem(context.element.topArea);
 
-            /** empty history stack */
-            core.history.stack = null;
-
-            /** empty user object */
-            this.onScroll = null;
-            this.onClick = null;
-            this.onKeyDown = null;
-            this.onKeyUp = null;
-            this.onDrop = null;
-            this.save = null;
-            this.onImageUpload = null;
-            this.onImageUploadError = null;
-            this.noticeOpen = null;
-            this.noticeClose = null;
-            this.getContext = null;
-            this.getContents = null;
-            this.getImagesInfo = null;
-            this.insertHTML = null;
-            this.setContents = null;
-            this.appendContents = null;
-            this.disabled = null;
-            this.enabled = null;
-            this.show = null;
-            this.hide = null;
-            this.destroy = null;
+            /** remove object property */
+            _w.Object.keys(core).forEach(function(key) {delete core[key]});
+            _w.Object.keys(event).forEach(function(key) {delete event[key]});
+            _w.Object.keys(context).forEach(function(key) {delete context[key]});
+            _w.Object.keys(pluginCallButtons).forEach(function(key) {delete pluginCallButtons[key]});
+            
+            /** remove user object */
+            _w.Object.keys(this).forEach(function(key) {delete this[key]}.bind(this));
         }
     };
 

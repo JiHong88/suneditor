@@ -172,7 +172,8 @@ const _Constructor = {
                 _arrow: arrow
             },
             options: options,
-            plugins: tool_bar.plugins
+            plugins: tool_bar.plugins,
+            pluginCallButtons: tool_bar.pluginCallButtons
         };
     },
 
@@ -365,9 +366,10 @@ const _Constructor = {
 
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang);
+        const pluginCallButtons = {};
         const plugins = {};
         if (_plugins) {
-            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(e) { return _plugins[e]; });
+            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
             for (let i = 0, len = pluginsValues.length; i < len; i++) {
                 plugins[pluginsValues[i].name] = pluginsValues[i];
             }
@@ -409,7 +411,7 @@ const _Constructor = {
                     moduleElement.ul.appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {
-                        plugins[pluginName].buttonElement = buttonElement.button;
+                        pluginCallButtons[pluginName] = buttonElement.button;
                     }
                 }
 
@@ -432,7 +434,8 @@ const _Constructor = {
 
         return {
             'element': tool_bar,
-            'plugins': plugins
+            'plugins': plugins,
+            'pluginCallButtons': pluginCallButtons
         };
     }
 };

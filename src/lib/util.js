@@ -70,21 +70,6 @@ const util = {
     },
 
     /**
-     * @description Copies object
-     * @param {Object} obj - Object to be copy
-     * @returns {Object}
-     */
-    copyObj: function (obj) {
-        const copy = {};
-
-        for (let attr in obj) {
-            copy[attr] = obj[attr];
-        }
-
-        return copy;
-    },
-
-    /**
      * @description Create Element node
      * @param {String} elementName - Element name
      * @returns {Element}

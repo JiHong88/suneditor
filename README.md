@@ -388,6 +388,7 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
+editor = null;
 
 // Event functions
 // It can be redefined by receiving event object as parameter.
