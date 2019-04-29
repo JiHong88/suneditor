@@ -41,7 +41,6 @@ export default {
         context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
 
         /** add event listeners */
-        resize_div_container.getElementsByClassName('line-move-dot')[0].addEventListener('mousedown', this.onMouseDown_move_handle.bind(core));
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -71,7 +70,6 @@ export default {
             '   <div class="resize-display"></div>' +
             '</div>' +
             '<div class="resize-dot">' +
-            '   <div class="line-move-dot"></div>' +
             '   <span class="tl sun-editor-name-resize-handle"></span>' +
             '   <span class="tr sun-editor-name-resize-handle"></span>' +
             '   <span class="bl sun-editor-name-resize-handle"></span>' +
@@ -169,30 +167,6 @@ export default {
             t: t,
             l: l
         };
-    },
-
-    cancel_controller_resize: function () {
-        const isVertical = this.context.resizing._rotateVertical;
-        this.controllersOff();
-        this.context.element.resizeBackground.style.display = 'none';
-
-        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
-        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
-
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
-        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
-        
-        this.plugins[this.context.resizing._resize_plugin].init.call(this);
-    },
-
-    cancel_controller_move: function () {
-        const path = this.context.resizing._move_path;
-        const parentPath = path.parentNode;
-        const container = this.context[this.context.resizing._resize_plugin]._container;
-        if (!path && !parentPath && path !== container) return;
-
-        this.controllersOff();
-        parentPath.insertBefore(container, path);
     },
 
     create_caption: function () {
@@ -374,35 +348,6 @@ export default {
         }
     },
 
-    // moving
-    onMouseDown_move_handle: function (e) {
-        const contextResizing = this.context.resizing;
-        e.stopPropagation();
-        e.preventDefault();
-
-        const closureFunc_bind = function closureFunc() {
-            const change = contextResizing._isChange;
-            contextResizing._isChange = false;
-
-            this.context.element.wysiwyg.removeEventListener('mousemove', moving_element_bind);
-            document.removeEventListener('mouseup', closureFunc_bind);
-
-            // container move
-            this.plugins.resizing.cancel_controller_move.call(this);
-            // history stack
-            if (change) this.history.push();
-        }.bind(this);
-
-        const moving_element_bind = this.plugins.resizing.moving_element.bind(this, contextResizing);
-        this.context.element.wysiwyg.addEventListener('mousemove', moving_element_bind);
-        document.addEventListener('mouseup', closureFunc_bind);
-    },
-
-    moving_element: function (contextResizing, e) {
-        const path = contextResizing._move_path = this.util.getFormatElement(e.target);
-        console.log('moving', path);
-    },
-
     // resizing
     onMouseDown_resize_handle: function (e) {
         const contextResizing = this.context.resizing;
@@ -466,5 +411,19 @@ export default {
         contextResizing._resize_h = resultH;
         this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
         contextResizing._isChange = true;
+    },
+
+    cancel_controller_resize: function () {
+        const isVertical = this.context.resizing._rotateVertical;
+        this.controllersOff();
+        this.context.element.resizeBackground.style.display = 'none';
+
+        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
+        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
+
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
+        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
+        
+        this.plugins[this.context.resizing._resize_plugin].init.call(this);
     }
 };
