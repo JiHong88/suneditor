@@ -56,20 +56,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
         lang: lang,
 
         /**
-         * @description dialog element
+         * @description submenu element
          */
-        dialogForm: null,
+        submenu: null,
 
         /**
          * @description current subment name
          * @private
          */
         _submenuName: '',
-
-        /**
-         * @description submenu element
-         */
-        submenu: null,
 
         /**
          * @description binded submenuOff method
@@ -2759,7 +2754,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             /** remove element */
             util.removeItem(context.element.topArea);
 
-            /** remove object property */
+            /** remove object reference */
             _w.Object.keys(core).forEach(function(key) {delete core[key]});
             _w.Object.keys(event).forEach(function(key) {delete event[key]});
             _w.Object.keys(context).forEach(function(key) {delete context[key]});
