@@ -116,15 +116,17 @@ export default {
                 this.util.removeItem(fTag);
             }
 
-            this.insertNode(list, rightNode);
+            this.context.element.wysiwyg.insertBefore(list, rightNode);
 
-            const last = list.lastElementChild;
+            const edge = this.util.getEdgeChildNodes(list.firstElementChild, list.lastElementChild);
             if (selectedFormsts.length > 1) {
-                this.setRange(list.firstElementChild, 0, last, last.childNodes.length);
+                this.setRange(edge.sc, 0, edge.ec, edge.ec.length);
             } else {
-                const len = last.childNodes.length;
-                this.setRange(last, len, last, len);
+                this.setRange(edge.ec, edge.ec.length, edge.ec, edge.ec.length);
             }
+
+            // history stack
+            this.history.push();
         }
 
         this.submenuOff();

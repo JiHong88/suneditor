@@ -119,6 +119,9 @@ export default {
                 this.context.link._linkAnchor.href = url;
                 this.context.link._linkAnchor.textContent = anchorText;
                 this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
+                // history stack
+                this.history.push();
+                // set range
                 this.setRange(this.context.link._linkAnchor.childNodes[0], 0, this.context.link._linkAnchor.childNodes[0], this.context.link._linkAnchor.textContent.length);
             }
 

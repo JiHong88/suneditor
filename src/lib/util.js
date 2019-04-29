@@ -502,6 +502,28 @@ const util = {
     },
 
     /**
+     * @description 1. The first node of all the child nodes of the "first" element is returned.
+     * 2. The last node of all the child nodes of the "last" element is returned.
+     * 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
+     * { sc: "first", ec: "last" }
+     * @param {Element} first - First element
+     * @param {Element|null} last - Last element
+     * @returns {Object}
+     */
+    getEdgeChildNodes: function (first, last) {
+        if (!first) return;
+        if (!last) last = first;
+
+        while (first.nodeType === 1) first = first.firstChild;
+        while (last.nodeType === 1) last = last.lastChild;
+
+        return {
+            sc: first,
+            ec: last
+        }
+    },
+
+    /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
      * @param {Element} element - Element node
      * @returns {Object}

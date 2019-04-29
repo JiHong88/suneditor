@@ -894,7 +894,7 @@
 
 
             <h4 class="name" id="getRange"><span class="type-signature"></span>getRange<span class="signature">()</span><span
-                class="type-signature"></span> &rarr; {Object}</h4>
+                class="type-signature"></span><span class="type-signature"> &rarr; {Object}</span></h4>
             <div class="description">
                 Get current range object
             </div>
@@ -1014,7 +1014,8 @@
             <h4 class="name" id="insertNode"><span class="type-signature"></span>insertNode<span class="signature">(oNode, rightNode)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Delete selected node and insert argument value node
+                Deletes the selected area and inserts the node.<br>
+                If the "afterNode" exists, it is inserted after the "afterNode"
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1034,7 +1035,7 @@
                     <td class="description last">Node to be inserted</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>rightNode</code></td>
+                    <td class="name"><code>afterNode</code></td>
                     <td class="type">
                         <span class="param-type">Element | null</span>
                     </td>

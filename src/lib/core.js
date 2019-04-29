@@ -319,6 +319,8 @@ export default function (context, plugins, lang) {
          */
         execCommand: function (command, showDefaultUI, value) {
             _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -568,14 +570,15 @@ export default function (context, plugins, lang) {
 
         /**
          * @description Delete selected node and insert argument value node
+         * If the "afterNode" exists, it is inserted after the "afterNode"
          * @param {Element} oNode - Node to be inserted
-         * @param {(Element|null)} rightNode - If the node exists, it is inserted after the node
+         * @param {(Element|null)} afterNode - If the node exists, it is inserted after the node
          */
-        insertNode: function (oNode, rightNode) {
+        insertNode: function (oNode, afterNode) {
             const range = this.getRange();
             let parentNode = null;
 
-            if (!rightNode) {
+            if (!afterNode) {
                 const startCon = range.startContainer;
                 const startOff = range.startOffset;
                 const endCon = range.endContainer;
@@ -590,13 +593,13 @@ export default function (context, plugins, lang) {
                 /** No Select range node */
                 if (range.collapsed) {
                     if (commonCon.nodeType === 3) {
-                        rightNode = commonCon.splitText(endOff);
+                        afterNode = commonCon.splitText(endOff);
                     }
                     else {
                         if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
                             parentNode.removeChild(parentNode.lastChild);
                         }
-                        rightNode = null;
+                        afterNode = null;
                     }
                 }
                 /** Select range nodes */
@@ -604,8 +607,8 @@ export default function (context, plugins, lang) {
                     const isSameContainer = startCon === endCon;
 
                     if (isSameContainer) {
-                        if (this.isEdgePoint(endCon, endOff)) rightNode = endCon.nextSibling;
-                        else rightNode = endCon.splitText(endOff);
+                        if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
+                        else afterNode = endCon.splitText(endOff);
 
                         let removeNode = startCon;
                         if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
@@ -615,20 +618,21 @@ export default function (context, plugins, lang) {
                     else {
                         this.removeNode();
                         parentNode = commonCon;
-                        rightNode = endCon;
+                        afterNode = endCon;
 
-                        while (rightNode.parentNode !== commonCon) {
-                            rightNode = rightNode.parentNode;
+                        while (afterNode.parentNode !== commonCon) {
+                            afterNode = afterNode.parentNode;
                         }
                     }
                 }
             }
             else {
-                parentNode = rightNode.parentNode;
+                parentNode = afterNode.parentNode;
+                afterNode = afterNode.nextElementSibling;
             }
 
             try {
-                parentNode.insertBefore(oNode, rightNode);
+                parentNode.insertBefore(oNode, afterNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
@@ -781,12 +785,11 @@ export default function (context, plugins, lang) {
             pElement.insertBefore(rangeElement, beforeTag);
             if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
 
-            const lastChild = rangeElement.lastElementChild;
-            const len = lastChild.childNodes.length;
-            if (rangeLines.length === 1) {
-                this.setRange(lastChild, len, lastChild, len);
+            const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
+            if (rangeLines.length > 1) {
+                this.setRange(edge.sc, 0, edge.ec, edge.ec.length);
             } else {
-                this.setRange(rangeElement.firstElementChild, 0, lastChild, len);
+                this.setRange(edge.ec, edge.ec.length, edge.ec, edge.ec.length);
             }
 
             // history stack
@@ -837,18 +840,21 @@ export default function (context, plugins, lang) {
             }
 
             if (rangeEl.children.length > 0) {
-                this.insertNode(rangeEl, rangeElement);
+                rangeElement.parentNode.insertBefore(rangeEl, rangeElement.nextElementSibling);
                 rangeEl = rangeElement.cloneNode(false);
             }
 
-            if (!selectedFormats) {
-                this.setRange(rangeElement.nextElementSibling, 0, rangeElement.nextElementSibling, 0);
-            } else {
-                const len = lastRangeNode.childNodes.length;
-                this.setRange(rNode, (lastRangeNode === rNode ? len : 0), lastRangeNode, len);
-            }
-
+            const nextEl = rangeElement.nextElementSibling;
             util.removeItem(rangeElement);
+
+            if (!selectedFormats) {
+                const edge = this.util.getEdgeChildNodes(nextEl);
+                this.setRange(edge.sc, 0, edge.sc, 0);
+            } else {
+                const edge = this.util.getEdgeChildNodes(rNode, lastRangeNode);
+                const sameNode = lastRangeNode === rNode;
+                this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
+            }
 
             this.history.push();
             event._findButtonEffectTag();
@@ -1921,11 +1927,11 @@ export default function (context, plugins, lang) {
                     break;
                 case 'S':
                     if (shift) {
-                        command = 'S';
+                        command = 'DEL';
                     }
                     break;
                 case 'U':
-                    command = 'U';
+                    command = 'INS';
                     break;
                 case 'I':
                     command = 'EM';
@@ -2677,12 +2683,12 @@ export default function (context, plugins, lang) {
                 html = template.firstChild || template.content.firstChild;
             }
 
-            let rightNode = null;
+            let afterNode = null;
             if (util.isFormatElement(html) || /^(IMG|IFRAME)$/i.test(html.nodeName)) {
-                rightNode = util.getFormatElement(core.getSelectionNode());
+                afterNode = util.getFormatElement(core.getSelectionNode());
             }
 
-            core.insertNode(html, rightNode);
+            core.insertNode(html, afterNode);
             core.focus();
         },
 

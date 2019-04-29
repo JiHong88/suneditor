@@ -255,6 +255,8 @@ export default {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
             }
 
+            // history stack
+            this.history.push();
         }.bind(this);
 
         try {

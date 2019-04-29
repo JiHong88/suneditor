@@ -542,6 +542,8 @@ export default {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
 
+        // history stack
+        this.history.push();
         if (init) this.plugins.image.init.call(this);
     },
 
