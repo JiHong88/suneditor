@@ -69,7 +69,6 @@
     display: block;
     padding: 8px;
     margin: 0 0 10px;
-    font-size: 13px;
     line-height: 1.45;
     color: #333;
     background-color: #f9f9f9;
@@ -190,6 +189,7 @@
 /* h4 */
 .sun-editor-editable h4 {
     display: block;
+    font-size: 1em;
     margin-block-start: 1.33em;
     margin-block-end: 1.33em;
     margin-inline-start: 0px;
@@ -279,7 +279,6 @@
 .sun-editor-editable figure.sun-editor-figure-cover figcaption {
     padding: 1em .5em;
     margin: 0;
-    font-size: 13px;
     background-color: #f9f9f9;
     outline: none;
 }
