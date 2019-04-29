@@ -1966,7 +1966,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
                 if (!selectionParent) break;
-                if (selectionParent.nodeType !== 1) continue;
+                if (selectionParent.nodeType !== 1 || util.isBreak(selectionParent)) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 

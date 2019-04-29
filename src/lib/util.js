@@ -499,12 +499,12 @@ const util = {
         if (!first) return;
         if (!last) last = first;
 
-        while (first.nodeType === 1) first = first.firstChild;
-        while (last.nodeType === 1) last = last.lastChild;
+        while (first && first.nodeType === 1 && !this.isBreak(first)) first = first.firstChild;
+        while (last && last.nodeType === 1 && !this.isBreak(last)) last = last.lastChild;
 
         return {
             sc: first,
-            ec: last
+            ec: last || first
         }
     },
 
