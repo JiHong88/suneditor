@@ -75,17 +75,38 @@ export default {
             '<div class="arrow arrow-up"></div>' +
             '<div>' +
             '   <div class="btn-group">' +
-            '     <button type="button" data-command="insert" data-value="row" data-option="up" title="' + lang.controller.insertRowAbove + '"><div class="icon-insert-row-above"></div></button>' +
-            '     <button type="button" data-command="insert" data-value="row" data-option="down" title="' + lang.controller.insertRowBelow + '"><div class="icon-insert-row-below"></div></button>' +
-            '     <button type="button" data-command="delete" data-value="row" title="' + lang.controller.deleteRow + '"><div class="icon-delete-row"></div></button>' +
+            '       <button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
+            '           <i class="icon-insert-row-above"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
+            '           <i class="icon-insert-row-below"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
+            '           <i class="icon-delete-row"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
+            '       </button>' +
             '   </div>' +
             '</div>' +
             '<div>' +
             '   <div class="btn-group">' +
-            '     <button type="button" data-command="insert" data-value="cell" data-option="left" title="' + lang.controller.insertColumnBefore + '"><div class="icon-insert-column-left"></div></button>' +
-            '     <button type="button" data-command="insert" data-value="cell" data-option="right" title="' + lang.controller.insertColumnAfter + '"><div class="icon-insert-column-right"></div></button>' +
-            '     <button type="button" data-command="delete" data-value="cell" title="' + lang.controller.deleteColumn + '"><div class="icon-delete-column"></div></button>' +
-            '     <button type="button" data-command="remove" title="' + lang.controller.remove + '"><div class="icon-delete"></div></button>' +
+            '     <button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
+            '       <i class="icon-insert-column-left"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
+            '           <i class="icon-insert-column-right"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
+            '           <i class="icon-delete-column"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="remove" class="se-tooltip">' +
+            '           <i class="icon-delete"></i>' +
+            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '       </button>' +
             '   </div>' +
             '</div>';
 

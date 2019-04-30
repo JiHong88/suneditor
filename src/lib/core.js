@@ -1991,7 +1991,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     /* List */
                     if (findList && /^LI$/.test(nodeName)) {
                         commandMapNodes.push('LI');
-                        // commandMap.ALIGN.className = 'icon-align-' + textAlign;
                         commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
                         findList = false;
                     }

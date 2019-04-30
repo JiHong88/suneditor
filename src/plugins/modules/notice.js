@@ -22,7 +22,7 @@ export default {
         notice_button.className = 'close';
         notice_button.setAttribute('aria-label', 'Close');
         notice_button.setAttribute('title', core.lang.dialogBox.close);
-        notice_button.innerHTML = '<div aria-hidden="true" data-command="close" class="icon-cancel"></div>';
+        notice_button.innerHTML = '<i aria-hidden="true" data-command="close" class="icon-cancel"></i>';
         
         notice_div.appendChild(notice_span);
         notice_div.appendChild(notice_button);

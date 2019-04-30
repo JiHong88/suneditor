@@ -203,7 +203,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
                 // HTML to be append to button
-                innerHTML:'<div class="icon-map-pin"></div>'
+                innerHTML:'<i class="icon-map-pin"></i>'
             }
         ]
     ],

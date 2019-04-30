@@ -40,8 +40,8 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
-            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="OL" title="' + lang.toolbar.orderList + '"><div class="icon-list-number"></div></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="UL" title="' + lang.toolbar.unorderList + '"><div class="icon-list-bullets"></div></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-command="insertOrderedList" data-value="OL" title="' + lang.toolbar.orderList + '"><i class="icon-list-number"></i></button></li>' +
+            '       <li><button type="button" class="btn_edit" data-command="insertUnorderedList" data-value="UL" title="' + lang.toolbar.unorderList + '"><i class="icon-list-bullets"></i></button></li>' +
             '   </ul>' +
             '</div>';
 

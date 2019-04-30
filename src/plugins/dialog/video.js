@@ -81,7 +81,7 @@ export default {
             '<form class="editor_video">' +
             '   <div class="modal-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
+            '           <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.videoBox.title + '</h5>' +
             '   </div>' +
@@ -97,7 +97,7 @@ export default {
                 '       <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '       <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
                 '       <label><input type="checkbox" class="suneditor-id-video-check-proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-video-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
+                '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-video-revert-button" style="float: right;"><i class="icon-revert"></i></button>' +
                 '   </div>';
             }
 
