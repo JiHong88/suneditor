@@ -27,10 +27,10 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor layer_line';
+        listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer">' +
+            '<div class="inner_layer layer_line">' +
             '   <ul class="list_editor">' +
             '       <li>' +
             '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="solid" title="' + lang.toolbar.hr_solid + '">' +
@@ -76,7 +76,9 @@ export default {
             target = target.parentNode;
         }
 
-        this.plugins.horizontalRule.appendHr.call(this,value);
+        if (!value) return;
+
+        this.plugins.horizontalRule.appendHr.call(this, value);
 
         this.submenuOff();
         this.focus();

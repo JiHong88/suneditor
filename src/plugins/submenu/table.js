@@ -281,10 +281,12 @@ export default {
                 this.plugins.table.deleteRowCell.call(this, value);
                 break;
             case 'remove':
-            this.util.removeItem(contextTable._element);
-            this.controllersOff();
-            this.focus();
+                this.util.removeItem(contextTable._element);
+                this.controllersOff();
+                this.focus();
         }
 
+        // history stack
+        this.history.push();
     }
 };

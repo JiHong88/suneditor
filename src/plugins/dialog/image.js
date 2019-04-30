@@ -530,7 +530,9 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? contextImage._element : this.util.getFormatElement(contextImage._element);
+            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? 
+                contextImage._element : 
+                this.util.getFormatElement(contextImage._element) || contextImage._element;
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(contextImage._element);
         }
@@ -540,6 +542,8 @@ export default {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
 
+        // history stack
+        this.history.push();
         if (init) this.plugins.image.init.call(this);
     },
 

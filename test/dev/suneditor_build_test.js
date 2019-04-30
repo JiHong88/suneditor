@@ -41,10 +41,9 @@ window.sun_create1 = function () {
 let ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
     buttonList: [
-        ['undo', 'redo',
+        ['undo', 'redo','removeFormat',
         'font', 'fontSize', 'formatBlock',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'removeFormat',
         'fontColor', 'hiliteColor',
         'indent', 'outdent',
         'align', 'horizontalRule', 'list', 'table',
@@ -157,15 +156,21 @@ const editor = suneditor.init({
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
+    plugins: plugins,
     minHeight: '150px',
     maxHeight: '500px',
     buttonList: [
-        ['undo', 'redo', 'save'],
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
+        ['fontColor', 'hiliteColor'],
         ['indent', 'outdent'],
+        ['align', 'horizontalRule', 'list', 'table'],
+        ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print']
+        ['preview', 'print'],
+        ['save'],
     ],
     callBackSave: function (contents) {
         alert(contents)

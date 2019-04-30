@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: 'デフォルト',
             save: '保存',
             font: 'フォント',
             formats: '段落形式',
@@ -42,7 +43,7 @@
             alignLeft: '左揃え',
             alignRight: '右揃え',
             alignCenter: '中央揃え',
-            justifyFull: '両端揃え',
+            alignJustify: '両端揃え',
             list: 'リスト',
             orderList: '数値ブリット',
             unorderList: '円形ブリット',

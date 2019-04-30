@@ -11,22 +11,22 @@
 }
 
 footer {
-    color: #ffebc1 !important;
+    color: #ffebc1;
     bottom: 0;
     margin-top: 30px;
 }
 
-h4 {
-    color: #f4b124 !important;
+.content .sub-title {
+    color: #f4b124;
 }
 
-button {
-    margin-bottom: 10px !important;
+.content button {
+    margin-bottom: 10px;
 }
 
 /** github-cat*/
 .github-cat {
-     color: #0d2636 !important;
+     color: #0d2636;
      font-family: initial;
  }
 
@@ -43,7 +43,7 @@ button {
 }
 
 .github-cat:hover, .github-cat:focus {
-    color: #fff !important;
+    color: #fff;
 }
 
 .github-cat:hover::before {

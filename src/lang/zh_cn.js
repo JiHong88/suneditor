@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: '默认',
             save: '保存',
             font: '字体',
             formats: '格式',
@@ -42,7 +43,7 @@
             alignLeft: '左对齐',
             alignRight: '右对齐',
             alignCenter: '居中',
-            justifyFull: '两端对齐',
+            alignJustify: '两端对齐',
             list: '名单',
             orderList: '编号',
             unorderList: '项目符号',

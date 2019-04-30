@@ -23,6 +23,7 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
         toolbar: {
+            default: 'Standard',
             save: 'Speichern',
             font: 'Schriftart',
             formats: 'Format',
@@ -42,7 +43,7 @@
             alignLeft: 'Links ausrichten',
             alignRight: 'Rechts ausrichten',
             alignCenter: 'Zentriert ausrichten',
-            justifyFull: 'Blocksatz',
+            alignJustify: 'Blocksatz',
             list: 'Liste',
             orderList: 'Nummerierte Liste',
             unorderList: 'Aufzählung',

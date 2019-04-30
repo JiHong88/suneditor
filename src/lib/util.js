@@ -16,6 +16,19 @@ const util = {
     _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
+     * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
+     * @param {String} text 
+     * @returns {String}
+     * @private
+     */
+    _tagConvertor: function (text) {
+        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'}
+        return text.replace(/\b(?!<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr|table|tbody|tr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
+            return (typeof ec[t] === 'string') ? ec[t] : t;
+        });
+    },
+
+    /**
      * @description Unicode Character 'ZERO WIDTH SPACE'
      */
     zeroWidthSpace: '\u200B',
@@ -57,21 +70,6 @@ const util = {
     },
 
     /**
-     * @description Copies object
-     * @param {Object} obj - Object to be copy
-     * @returns {Object}
-     */
-    copyObj: function (obj) {
-        const copy = {};
-
-        for (let attr in obj) {
-            copy[attr] = obj[attr];
-        }
-
-        return copy;
-    },
-
-    /**
      * @description Create Element node
      * @param {String} elementName - Element name
      * @returns {Element}
@@ -107,8 +105,8 @@ const util = {
             fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
         }
 
-        const regExp = new RegExp('(^|.*[\\\\\/])' + fileName + '(\\.[^\\\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
-        const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const regExp = new this._w.RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+        const extRegExp = new this._w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
             
         for (let c = this._d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
             if (extRegExp.test(c[i][src])) {
@@ -166,7 +164,7 @@ const util = {
 
         if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
-        return innerHTML;
+        return this._tagConvertor(innerHTML);
     },
 
     /**
@@ -214,7 +212,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName) && !this.isComponent(element)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -239,41 +237,39 @@ const util = {
     },
 
     /**
-     * @description Get format element of the argument value (P, DIV, H[1-6], LI)
+     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element}
      */
     getFormatElement: function (element) {
         if (!element) return null;
 
-        while (element && !this.isFormatElement(element) && !this.isWysiwygDiv(element.parentNode)) {
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isRangeFormatElement(element)) element.firstElementChild;
+            if (this.isFormatElement(element)) return element;
+
             element = element.parentNode;
         }
-
-        if (this.isWysiwygDiv(element) || this.isRangeFormatElement(element)) {
-            const firstFormatElement = this.getListChildren(element, function (current) {
-                return this.isFormatElement(current);
-            }.bind(this))[0];
-
-            return firstFormatElement;
-        }
-
-        return element;
+        
+        return null;
     },
 
     /**
-     * @description Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
+     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @returns {Element|null}
      */
     getRangeFormatElement: function (element) {
         if (!element) return null;
 
-        while (element && !this.isRangeFormatElement(element) && !this.isWysiwygDiv(element)) {
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isRangeFormatElement(element)) return element;
             element = element.parentNode;
         }
 
-        return this.isWysiwygDiv(element) ? null : element;
+        return null;
     },
 
     /**
@@ -430,7 +426,7 @@ const util = {
                 query = '^' + query + '$';
             }
 
-            const regExp = new RegExp(query, 'i');
+            const regExp = new this._w.RegExp(query, 'i');
             check = function (el) {
                 return regExp.test(el[attr]);
             };
@@ -477,7 +473,7 @@ const util = {
                 query = '^' + query + '$';
             }
 
-            const regExp = new RegExp(query, 'i');
+            const regExp = new this._w.RegExp(query, 'i');
             check = function (el) {
                 return regExp.test(el[attr]);
             };
@@ -488,6 +484,28 @@ const util = {
         });
 
         return childList[0];
+    },
+
+    /**
+     * @description 1. The first node of all the child nodes of the "first" element is returned.
+     * 2. The last node of all the child nodes of the "last" element is returned.
+     * 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
+     * { sc: "first", ec: "last" }
+     * @param {Element} first - First element
+     * @param {Element|null} last - Last element
+     * @returns {Object}
+     */
+    getEdgeChildNodes: function (first, last) {
+        if (!first) return;
+        if (!last) last = first;
+
+        while (first && first.nodeType === 1 && !this.isBreak(first)) first = first.firstChild;
+        while (last && last.nodeType === 1 && !this.isBreak(last)) last = last.lastChild;
+
+        return {
+            sc: first,
+            ec: last || first
+        }
     },
 
     /**
@@ -544,7 +562,7 @@ const util = {
     addClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) return;
 
         element.className += ' ' + className;
@@ -558,7 +576,7 @@ const util = {
     removeClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         element.className = element.className.replace(check, ' ').trim();
     },
 
@@ -570,7 +588,7 @@ const util = {
     toggleClass: function (element, className) {
         if (!element) return;
 
-        const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) {
             element.className = element.className.replace(check, ' ').trim();
         }
@@ -597,14 +615,20 @@ const util = {
      */
     removeEmptyNode: function (element) {
         (function recursionFunc(current) {
-            if (current.textContent.trim().length === 0 && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
-                current.parentNode && current.parentNode.removeChild(current);
+            if (current !== element && util.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
+                if (current.parentNode) {
+                    current.parentNode.removeChild(current);
+                    return -1;
+                }
             } else {
-                for (let i = 0, len = current.children.length; i < len; i++) {
-                    if (!current.children[i]) continue;
-                    recursionFunc(current.children[i]);
+                const children = current.children;
+                for (let i = 0, len = children.length, r = 0; i < len; i++) {
+                    if (!children[i + r]) continue;
+                    r += recursionFunc(children[i + r]);
                 }
             }
+
+            return 0;
         })(element);
     },
 
@@ -613,18 +637,39 @@ const util = {
      * @param {String} html - HTML string
      */
     cleanHTML: function (html) {
-        const tagsAllowed = new RegExp('^(P|DIV|PRE|H1|H2|H3|H4|H5|H6|B|U|I|STRIKE|SUB|SUP|OL|UL|TABLE|BR|HR|A|IMG|IFRAME)$', 'i');
+        const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).children;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
-            if (tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML.replace(/<!--(.*?)-->/g, '').replace(/<[a-zA-Z]+\:[a-zA-Z]+.*>(\n|.)*<\/[a-zA-Z]+\:[a-zA-Z]+>/g, '').replace(/\s(?:style|class|dir|xmlns|data-[a-z\-]+)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*/ig, '').replace(/<\/?(?:span|font)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '').replace(/<\/?[a-z]+:[a-z]+\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/ig, '');
+            if (!tagsAllowed.test(domTree[i].nodeName)) {
+                cleanHTML += domTree[i].outerHTML
+                    .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
+                    .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
+                    .replace(this._deleteExclusionTags, '');
             }
         }
 
-        return cleanHTML || html;
-    }
+        return this._tagConvertor(cleanHTML || html);
+    },
+
+    /**
+     * @description Delete Exclusion tags regexp object
+     * @returns {Object}
+     * @private
+     */
+    _deleteExclusionTags: (function () {
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td'.split('|');
+        let regStr = '<\/?(';
+
+        for (let i = 0, len = exclusionTags.length; i < len; i++) {
+            regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
+        }
+
+        regStr += '[^>^<])+>';
+
+        return new RegExp(regStr, 'g');
+    })()
 };
 
 export default util;

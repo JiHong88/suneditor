@@ -172,7 +172,8 @@ const _Constructor = {
                 _arrow: arrow
             },
             options: options,
-            plugins: tool_bar.plugins
+            plugins: tool_bar.plugins,
+            pluginCallButtons: tool_bar.pluginCallButtons
         };
     },
 
@@ -183,27 +184,27 @@ const _Constructor = {
     _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'bold', '',
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'STRONG', '',
                 '<div class="icon-bold"></div>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'underline', '',
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'INS', '',
                 '<div class="icon-underline"></div>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'italic', '',
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'EM', '',
                 '<div class="icon-italic"></div>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'strikethrough', '',
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'DEL', '',
                 '<div class="icon-strokethrough"></div>'
             ],
 
-            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'subscript', '',
+            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'SUB', '',
                 '<div class="icon-subscript"></div>'
             ],
 
-            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'superscript', '',
+            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'SUP', '',
                 '<div class="icon-superscript"></div>'
             ],
 
@@ -252,15 +253,15 @@ const _Constructor = {
             ],
 
             /** plugins - submenu */
-            font: ['btn_edit_select btn_font', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt sun-editor-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
+            font: ['btn_editor_select btn_font', lang.toolbar.font, 'font', 'submenu',
+                '<span class="txt sun-editor-id-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
             ],
-            formatBlock: ['btn_edit_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt sun-editor-font-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
+            formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
+                '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
             ],
 
-            fontSize: ['btn_edit_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt sun-editor-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
+            fontSize: ['btn_editor_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
+                '<span class="txt sun-editor-id-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
@@ -272,10 +273,10 @@ const _Constructor = {
             ],
 
             align: ['btn_align', lang.toolbar.align, 'align', 'submenu',
-                '<div class="icon-align-left"></div>'
+                '<div class="icon-align-left sun-editor-id-align"></div>'
             ],
 
-            list: ['', lang.toolbar.list, 'list', 'submenu',
+            list: ['sun-editor-id-list', lang.toolbar.list, 'list', 'submenu',
                 '<div class="icon-list-number"></div>'
             ],
 
@@ -336,7 +337,7 @@ const _Constructor = {
         const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'btn_editor ' + buttonClass);
+        oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu ' : ' ') + buttonClass);
         oButton.setAttribute('title', title);
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
@@ -365,9 +366,10 @@ const _Constructor = {
 
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang);
+        const pluginCallButtons = {};
         const plugins = {};
         if (_plugins) {
-            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(e) { return _plugins[e]; });
+            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
             for (let i = 0, len = pluginsValues.length; i < len; i++) {
                 plugins[pluginsValues[i].name] = pluginsValues[i];
             }
@@ -409,7 +411,7 @@ const _Constructor = {
                     moduleElement.ul.appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {
-                        plugins[pluginName].buttonElement = buttonElement.button;
+                        pluginCallButtons[pluginName] = buttonElement.button;
                     }
                 }
 
@@ -432,7 +434,8 @@ const _Constructor = {
 
         return {
             'element': tool_bar,
-            'plugins': plugins
+            'plugins': plugins,
+            'pluginCallButtons': pluginCallButtons
         };
     }
 };

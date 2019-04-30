@@ -40,9 +40,11 @@ const _Context = function (element, cons, options) {
             strike: cons._toolBar.getElementsByClassName('sun-editor-id-strike')[0],
             subscript: cons._toolBar.getElementsByClassName('sun-editor-id-subscript')[0],
             superscript: cons._toolBar.getElementsByClassName('sun-editor-id-superscript')[0],
-            font: cons._toolBar.getElementsByClassName('sun-editor-font-family')[0],
-            format: cons._toolBar.getElementsByClassName('sun-editor-font-format')[0],
-            fontSize: cons._toolBar.getElementsByClassName('sun-editor-font-size')[0]
+            font: cons._toolBar.getElementsByClassName('sun-editor-id-font-family')[0],
+            format: cons._toolBar.getElementsByClassName('sun-editor-id-format')[0],
+            fontSize: cons._toolBar.getElementsByClassName('sun-editor-id-font-size')[0],
+            align: cons._toolBar.getElementsByClassName('sun-editor-id-align')[0],
+            list: cons._toolBar.getElementsByClassName('sun-editor-id-list')[0]
         },
         option: {
             mode: options.mode,

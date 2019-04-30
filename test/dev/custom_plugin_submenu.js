@@ -36,12 +36,12 @@ export default {
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor layer_align';
+        listDiv.className = 'sun-editor-submenu layer_editor';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer">' +
+            '<div class="inner_layer layer_align">' +
             '   <ul class="list_editor">' +
-            '       <li><input type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+            '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
             '       <li><button type="button" class="btn_editor" title="Append text">Append text</button></li>' +
             '   </ul>' +
             '</div>';
@@ -55,6 +55,12 @@ export default {
 
         // insert
         this.insertNode(value);
+
+        // set range
+        this.setRange(value, value.length, value, value.length);
+
+        // submenu off
+        this.submenuOff();
 
         // focus
         this.focus();

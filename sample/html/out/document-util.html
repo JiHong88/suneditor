@@ -70,33 +70,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="copyObj"><span class="type-signature"></span>copyObj<span
-                class="signature">(obj)</span><span class="type-signature"> &rarr; {Object}</span></h4>
-            <div class="description">
-                Copies object
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>obj</code></td>
-                    <td class="type">
-                        <span class="param-type">Object</span>
-                    </td>
-                    <td class="description last">Object to be copy</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span
                 class="signature">(obj)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
@@ -325,7 +298,7 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                Get format element of the argument value (P, DIV, H[1-6], LI)
+                If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -352,7 +325,7 @@
             <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
-                Get range format element of the argument value (blockquote, TABLE, TR, TD, OL, UL, PRE)
+                If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -711,6 +684,44 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="getEdgeChildNodes"><span class="type-signature"></span>getEdgeChildNodes<span
+                class="signature">(first, last)</span><span class="type-signature"> &rarr; {Object}</span>
+        </h4>
+        <div class="description">
+            1. The first node of all the child nodes of the "first" element is returned.<br>
+            2. The last node of all the child nodes of the "last" element is returned.<br>
+            3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.<br>
+            { sc: "first", ec: "last" }
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>first</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">First element</td>
+            </tr>
+            <tr>
+                <td class="name"><code>last</code></td>
+                <td class="type">
+                    <span class="param-type">Element | null</span>
+                </td>
+                <td class="description last">Last element</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="getOffset"><span class="type-signature"></span>getOffset<span
                 class="signature">(element)</span><span class="type-signature"> &rarr; {Object}</span>
         </h4>
@@ -977,7 +988,6 @@
         <li><b>Methods</b></li>
         <li><a href="document-util.html#onlyZeroWidthSpace">onlyZeroWidthSpace</a></li>
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
-        <li><a href="document-util.html#copyObj">copyObj</a></li>
         <li><a href="document-util.html#createElement">createElement</a></li>
         <li><a href="document-util.html#createTextNode">createTextNode</a></li>
         <li><a href="document-util.html#getIncludePath">getIncludePath</a></li>
@@ -998,6 +1008,7 @@
         <li><a href="document-util.html#getListChildNodes">getListChildNodes</a></li>
         <li><a href="document-util.html#getParentElement">getParentElement</a></li>
         <li><a href="document-util.html#getChildElement">getChildElement</a></li>
+        <li><a href="document-util.html#getEdgeChildNodes">getEdgeChildNodes</a></li>
         <li><a href="document-util.html#getOffset">getOffset</a></li>
         <li><a href="document-util.html#changeTxt">changeTxt</a></li>
         <li><a href="document-util.html#hasClass">hasClass</a></li>

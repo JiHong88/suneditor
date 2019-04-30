@@ -10,8 +10,7 @@
 const history = function (core) {
     const _w = window;
     const editor = core.context.element.wysiwyg;
-    const sec = 500;
-    let delay = 0;
+    let pushDelay = null;
     let stackIndex = 0;
     let stack = [{
         contents: core.getContents(),
@@ -56,6 +55,7 @@ const history = function (core) {
         const item = stack[stackIndex];
         editor.innerHTML = item.contents;
         core.setRange(getNodeFromStack(item.s.path), item.s.offset, getNodeFromStack(item.e.path), item.e.offset);
+        core.focus();
     }
 
     function pushStack () {
@@ -87,22 +87,15 @@ const history = function (core) {
          * @description Saving the current status to the history object stack
          */
         push: function () {
-            if (delay > 0) {
-                delay += sec/10;
-                return;
+            if (pushDelay) {
+                _w.clearTimeout(pushDelay);
             }
 
-            delay = sec;
-
-            const interval = _w.setInterval(function () {
-                delay -= sec;
-                if (delay > 0 && delay < sec * 2) return;
-
+            pushDelay = _w.setTimeout(function () {
+                _w.clearTimeout(pushDelay);
+                pushDelay = null;
                 pushStack();
-                _w.clearInterval(interval);
-
-                delay = 0;
-            }, sec);
+            }, 500);
         },
 
         /**

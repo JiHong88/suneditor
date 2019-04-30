@@ -187,21 +187,35 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font family button element</td>
+                    <td class="description last">font family button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;format</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">format button element</td>
+                    <td class="description last">format button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;fontSize</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font size button element</td>
+                    <td class="description last">font size button > span.txt</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;align</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">align button > div.icon</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>&nbsp;&nbsp;&nbsp;&nbsp;list</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">list button element</td>
                 </tr>
                 <tr style="color:#f42424;">
                     <td class="name"><code style="color:#f42424;">option</code></td>
@@ -411,14 +425,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="dialogForm"><span class="type-signature"></span>dialogForm<span
-                    class="type-signature"></span></h4>
-            <div class="description">
-                dialog element
-            </div>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="submenu"><span class="type-signature"></span>submenu<span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -529,45 +535,59 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">format button</td>
+                    <td class="description last">format button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>FONT</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font family button</td>
+                    <td class="description last">font family button > span.txt</td>
                 </tr>
                 <tr>
                     <td class="name"><code>SIZE</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">font size button</td>
+                    <td class="description last">font size button > span.txt</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>B</code></td>
+                    <td class="name"><code>ALIGN</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">align button > div.icon</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>LI</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">list button</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>STRONG</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">bold button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>U</code></td>
+                    <td class="name"><code>INS</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">underline button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>I</code></td>
+                    <td class="name"><code>EM</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">italic button</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>STRIKE</code></td>
+                    <td class="name"><code>DEL</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
@@ -866,7 +886,7 @@
 
 
             <h4 class="name" id="getRange"><span class="type-signature"></span>getRange<span class="signature">()</span><span
-                class="type-signature"></span> &rarr; {Object}</h4>
+                class="type-signature"></span><span class="type-signature"> &rarr; {Object}</span></h4>
             <div class="description">
                 Get current range object
             </div>
@@ -986,7 +1006,8 @@
             <h4 class="name" id="insertNode"><span class="type-signature"></span>insertNode<span class="signature">(oNode, rightNode)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Delete selected node and insert argument value node
+                Deletes the selected area and inserts the node.<br>
+                If the "afterNode" exists, it is inserted after the "afterNode"
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1006,7 +1027,7 @@
                     <td class="description last">Node to be inserted</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>rightNode</code></td>
+                    <td class="name"><code>afterNode</code></td>
                     <td class="type">
                         <span class="param-type">Element | null</span>
                     </td>
@@ -1025,7 +1046,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="wrapToTags"><span class="type-signature"></span>wrapToTags<span class="signature">(wrapTag)</span><span
+            <h4 class="name" id="applyRangeFormatElement"><span class="type-signature"></span>applyRangeFormatElement<span class="signature">(rangeElement)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 appended all selected format Element to the argument element and insert
@@ -1041,11 +1062,46 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>wrapTag</code></td>
+                    <td class="name"><code>rangeElement</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Element of wrap the arguments</td>
+                    <td class="description last">Element of wrap the arguments (PRE, BLOCKQUOTE...)</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="detachRangeFormatElement"><span class="type-signature"></span>detachRangeFormatElement<span class="signature">(rangeElement, selectedFormats)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)<br>
+                When "selectedFormats" is null, all elements are detached.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>rangeElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Range format element (PRE, BLOCKQUOTE, OL, UL...)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>selectedFormats</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|null</span>
+                    </td>
+                    <td class="description last">Array of format elements (P, DIV, LI...) to remove</td>
                 </tr>
                 </tbody>
             </table>
@@ -1055,10 +1111,12 @@
             <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, checkCSSPropertyText)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Add the node received as an argument value to the selected area.<br>
-                1. When there is the same css value node in the selection area, the tag is stripped.<br>
-                2. If there is another css value other thanCss attribute values received as arguments on the node, removed only Css attribute values received as arguments.<br>
-                3. If you pass an element whose node name is "removenode" as an argument value, it performs a type removal operation. ex) nodeChange(document.createElement('removenode'))
+                Adds a node to the selected region, or deletes the node.<br>
+                1. If there is a node in the "appendNode" argument, "appendNode" is added to the selection range.<br>
+                2. If the "appendNode" argument has a null value, the node is modified without adding a new node.<br>
+                3. Styles such as the style property of the "styleArray" argument will be deleted.<br>
+                4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.<br>
+                5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1073,16 +1131,23 @@
                 <tr>
                     <td class="name"><code>appendNode</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
+                        <span class="param-type">Element|null</span>
                     </td>
-                    <td class="description last">The dom that will wrap the selected text area</td>
+                    <td class="description last">The element to be added to the selection</td>
                 </tr>
                 <tr>
                     <td class="name"><code>checkCSSPropertyArray</code></td>
                     <td class="type">
-                        <span class="param-type">Array</span>
+                        <span class="param-type">Array|null</span>
                     </td>
                     <td class="description last">The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>removeNodeArray</code></td>
+                    <td class="type">
+                        <span class="param-type">Array|null</span>
+                    </td>
+                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])</td>
                 </tr>
                 </tbody>
             </table>
@@ -1250,7 +1315,6 @@
         <li><a href="document-editor.html#plugins">plugins</a></li>
         <li><a href="document-editor.html#util">util</a></li>
         <li><a href="document-editor.html#lang">lang</a></li>
-        <li><a href="document-editor.html#dialogForm">dialogForm</a></li>
         <li><a href="document-editor.html#submenu">submenu</a></li>
         <li><a href="document-editor.html#submenuActiveButton">submenuActiveButton</a></li>
         <li><a href="document-editor.html#controllerArray">controllerArray</a></li>
@@ -1278,7 +1342,8 @@
         <li><a href="document-editor.html#appendFormatTag">appendFormatTag</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
-        <li><a href="document-editor.html#wrapToTags">wrapToTags</a></li>
+        <li><a href="document-editor.html#applyRangeFormatElement">applyRangeFormatElement</a></li>
+        <li><a href="document-editor.html#detachRangeFormatElement">detachRangeFormatElement</a></li>
         <li><a href="document-editor.html#nodeChange">nodeChange</a></li>
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>

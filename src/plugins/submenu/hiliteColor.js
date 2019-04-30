@@ -28,6 +28,7 @@ export default {
         /** add event listeners */
         context.hiliteColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
         listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
+        listDiv.getElementsByClassName('sun-editor-id-submenu-color-default')[0].addEventListener('click', this.remove.bind(core));
         listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
 
         context.hiliteColor.colorList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
@@ -66,6 +67,12 @@ export default {
         this.plugins.colorPicker.setCurrentColor.call(this, '#' + e.target.value);
     },
 
+    remove: function () {
+        this.nodeChange(null, ['background-color']);
+        this.submenuOff();
+        this.focus();
+    },
+
     submit: function () {
         this.plugins.hiliteColor.applyColor.call(this, this.context.colorPicker._currentColor);
     },
@@ -74,17 +81,14 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!/^BUTTON$/i.test(e.target.tagName)) {
-            return false;
-        }
-
         this.plugins.hiliteColor.applyColor.call(this, e.target.getAttribute('data-value'));
     },
 
     applyColor: function (color) {
+        if (!color) return;
+        
         const newNode = this.util.createElement('SPAN');
         newNode.style.backgroundColor = color;
-
         this.nodeChange(newNode, ['background-color']);
         
         this.submenuOff();

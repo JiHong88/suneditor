@@ -20,7 +20,9 @@ export default {
             _origin_w: 0,
             _origin_h: 0,
             _rotateVertical: false,
-            _resize_direction: ''
+            _resize_direction: '',
+            _move_path: null,
+            _isChange: false
         };
 
         /** resize controller, button */
@@ -68,14 +70,14 @@ export default {
             '   <div class="resize-display"></div>' +
             '</div>' +
             '<div class="resize-dot">' +
-            '   <div class="tl sun-editor-name-resize-handle"></div>' +
-            '   <div class="tr sun-editor-name-resize-handle"></div>' +
-            '   <div class="bl sun-editor-name-resize-handle"></div>' +
-            '   <div class="br sun-editor-name-resize-handle"></div>' +
-            '   <div class="lw sun-editor-name-resize-handle"></div>' +
-            '   <div class="th sun-editor-name-resize-handle"></div>' +
-            '   <div class="rw sun-editor-name-resize-handle"></div>' +
-            '   <div class="bh sun-editor-name-resize-handle"></div>' +
+            '   <span class="tl sun-editor-name-resize-handle"></span>' +
+            '   <span class="tr sun-editor-name-resize-handle"></span>' +
+            '   <span class="bl sun-editor-name-resize-handle"></span>' +
+            '   <span class="br sun-editor-name-resize-handle"></span>' +
+            '   <span class="lw sun-editor-name-resize-handle"></span>' +
+            '   <span class="th sun-editor-name-resize-handle"></span>' +
+            '   <span class="rw sun-editor-name-resize-handle"></span>' +
+            '   <span class="bh sun-editor-name-resize-handle"></span>' +
             '</div>';
 
         return resize_container;
@@ -85,7 +87,7 @@ export default {
         const lang = this.lang;
         const resize_button = this.util.createElement("DIV");
 
-        resize_button.className = "resize-btn";
+        resize_button.className = "controller-resizing";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="arrow arrow-up"></div>' +
@@ -165,20 +167,6 @@ export default {
             t: t,
             l: l
         };
-    },
-
-    cancel_controller_resize: function () {
-        const isVertical = this.context.resizing._rotateVertical;
-        this.controllersOff();
-        this.context.element.resizeBackground.style.display = 'none';
-
-        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
-        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
-
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
-        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
-        
-        this.plugins[this.context.resizing._resize_plugin].init.call(this);
     },
 
     create_caption: function () {
@@ -360,6 +348,7 @@ export default {
         }
     },
 
+    // resizing
     onMouseDown_resize_handle: function (e) {
         const contextResizing = this.context.resizing;
         const direction = contextResizing._resize_direction = e.target.classList[0];
@@ -373,15 +362,19 @@ export default {
         contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
         const closureFunc_bind = function closureFunc() {
-            this.plugins.resizing.cancel_controller_resize.call(this);
+            const change = contextResizing._isChange;
+            contextResizing._isChange = false;
+
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
+
+            // element resize
+            this.plugins.resizing.cancel_controller_resize.call(this);
             // history stack
-            this.history.push();
+            if (change) this.history.push();
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
-
         document.addEventListener('mousemove', resizing_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
     },
@@ -417,5 +410,20 @@ export default {
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
         this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        contextResizing._isChange = true;
+    },
+
+    cancel_controller_resize: function () {
+        const isVertical = this.context.resizing._rotateVertical;
+        this.controllersOff();
+        this.context.element.resizeBackground.style.display = 'none';
+
+        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
+        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
+
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
+        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
+        
+        this.plugins[this.context.resizing._resize_plugin].init.call(this);
     }
 };

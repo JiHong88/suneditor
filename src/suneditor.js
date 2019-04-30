@@ -7,7 +7,6 @@
  */
 'use strict';
 
-import util from './lib/util';
 import core from './lib/core';
 import _Constructor from './lib/constructor';
 import _Context from './lib/context';
@@ -22,12 +21,10 @@ export default {
      * @returns {function}
      */
     init: function (init_options) {
-        const self = this;
-
         return {
             create: function (idOrElement, options) {
-                return self.create(idOrElement, options, init_options);
-            }
+                return this.create(idOrElement, options, init_options);
+            }.bind(this)
         };
     },
 
@@ -40,8 +37,7 @@ export default {
     create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
-            // options = Object.assign(util.copyObj(_init_options), options);
-            options =  [util.copyObj(_init_options), options].reduce(function (init, option) {
+            options =  [_init_options, options].reduce(function (init, option) {
                             Object.keys(option).forEach(function (key) {
                                 init[key] = option[key];
                             });
@@ -75,6 +71,6 @@ export default {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), cons.plugins, cons.options.lang);
+        return core(_Context(element, cons.constructed, cons.options), cons.pluginCallButtons, cons.plugins, cons.options.lang);
     }
 };
