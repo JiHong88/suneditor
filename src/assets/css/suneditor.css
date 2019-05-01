@@ -202,7 +202,7 @@
 .sun-editor .layer_editor .format_list .quote_ex {font-size:13px; height:22px; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding-left:7px; border-left-width:5px;}
 .sun-editor .layer_editor .format_list .pre_ex {font-size:13px; padding:4px 11px; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /* submenu layer - font size */
-.sun-editor .layer_editor .layer_size {max-height:300px; overflow-y:auto;}
+.sun-editor .layer_editor .layer_size {max-height:300px; overflow-x:hidden; overflow-y:auto;}
 .sun-editor .layer_editor .font_size_list {width:140px;}
 .sun-editor .layer_editor .font_size_list .btn_edit {height:auto; min-height:32px; line-height:normal;}
 /* submenu layer - hr */
