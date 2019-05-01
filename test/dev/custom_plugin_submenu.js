@@ -42,7 +42,12 @@ export default {
             '<div class="inner_layer layer_align">' +
             '   <ul class="list_editor">' +
             '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
-            '       <li><button type="button" class="btn_editor" title="Append text">Append text</button></li>' +
+            '       <li><button type="button" class="btn_editor se-tooltip">' +
+            '               <span>OK</span>' +
+            '               <span class="se-tooltip-span">' +
+            '                   <span class="se-tooltip-text">Append text</span>' +
+            '               </span>' +
+            '       </button></li>' +
             '   </ul>' +
             '</div>';
 
