@@ -33,18 +33,21 @@ export default {
             '<div class="inner_layer layer_line">' +
             '   <ul class="list_editor">' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="solid" title="' + lang.toolbar.hr_solid + '">' +
+            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="solid">' +
             '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_solid + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dotted" title="' + lang.toolbar.hr_dotted + '">' +
+            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dotted">' +
             '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_dotted + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line" data-command="horizontalRule" data-value="dashed" title="' + lang.toolbar.hr_dashed + '">' +
+            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dashed">' +
             '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
+            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_dashed + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '   </ul>' +
