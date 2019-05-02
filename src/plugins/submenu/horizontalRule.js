@@ -35,19 +35,19 @@ export default {
             '       <li>' +
             '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="solid">' +
             '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_solid + '</span></span>' +
+            '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_solid + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
             '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dotted">' +
             '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_dotted + '</span></span>' +
+            '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dotted + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
             '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dashed">' +
             '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
-            '               <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.toolbar.hr_dashed + '</span></span>' +
+            '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dashed + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '   </ul>' +

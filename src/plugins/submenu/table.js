@@ -77,15 +77,15 @@ export default {
             '   <div class="btn-group">' +
             '       <button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
             '           <i class="icon-insert-row-above"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
             '           <i class="icon-insert-row-below"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
             '           <i class="icon-delete-row"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
             '   </div>' +
             '</div>' +
@@ -93,19 +93,19 @@ export default {
             '   <div class="btn-group">' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
             '       <i class="icon-insert-column-left"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
             '           <i class="icon-insert-column-right"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
             '           <i class="icon-delete-column"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="remove" class="se-tooltip">' +
             '           <i class="icon-delete"></i>' +
-            '           <span class="se-tooltip-span"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
             '       </button>' +
             '   </div>' +
             '</div>';

@@ -143,6 +143,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Elements that need to change text or className for each selection change
          * @property {Element} FORMAT - format button > span.txt
          * @property {Element} FONT - font family button > span.txt
+         * @property {Element} FONT_TOOLTIP - font family tooltip element
          * @property {Element} SIZE - font size button > span.txt
          * @property {Element} ALIGN - align button > div.icon
          * @property {Element} LI - list button
@@ -156,6 +157,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         commandMap: {
             FORMAT: context.tool.format,
             FONT: context.tool.font,
+            FONT_TOOLTIP: context.tool.fontTooltip,
             SIZE: context.tool.fontSize,
             ALIGN: context.tool.align,
             LI: context.tool.list,
@@ -2003,7 +2005,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
                     util.changeTxt(commandMap.FONT, selectFont);
-                    commandMap.FONT.setAttribute('title', selectFont);
+                    util.changeTxt(commandMap.FONT_TOOLTIP, selectFont);
                     findFont = false;
                 }
 
@@ -2011,7 +2013,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (findSize && selectionParent.style.fontSize.length > 0) {
                     commandMapNodes.push('SIZE');
                     util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
-                    commandMap.SIZE.setAttribute('title', selectionParent.style.fontSize.match(/\d+/)[0]);
                     findSize = false;
                 }
 
@@ -2046,11 +2047,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 if (commandMap.FONT && /^FONT$/i.test(key)) {
                     util.changeTxt(commandMap.FONT, lang.toolbar.font);
-                    commandMap.FONT.removeAttribute('title');
+                    util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
                 }
                 else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
                     util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
-                    commandMap.SIZE.removeAttribute('title');
                 }
                 else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
                     commandMap.ALIGN.className = 'icon-align-left';

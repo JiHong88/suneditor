@@ -44,7 +44,7 @@ export default {
             '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
             '       <li><button type="button" class="btn_editor se-tooltip">' +
             '               <span>OK</span>' +
-            '               <span class="se-tooltip-span">' +
+            '               <span class="se-tooltip-inner">' +
             '                   <span class="se-tooltip-text">Append text</span>' +
             '               </span>' +
             '       </button></li>' +

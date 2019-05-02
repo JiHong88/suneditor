@@ -253,8 +253,8 @@ const _Constructor = {
             ],
 
             /** plugins - submenu */
-            font: ['btn_editor_select btn_font', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt sun-editor-id-font-family">' + lang.toolbar.font + '</span><i class="icon-arrow-down"></i>'
+            font: ['btn_editor_select btn_font sun-editor-id-font-family', lang.toolbar.font, 'font', 'submenu',
+                '<span class="txt">' + lang.toolbar.font + '</span><i class="icon-arrow-down"></i>'
             ],
             formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
                 '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><i class="icon-arrow-down"></i>'
@@ -340,7 +340,7 @@ const _Constructor = {
         oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu' : '') + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
-        innerHTML += '<span class="se-tooltip-span"><span class="se-tooltip-text">' + title + '</span></span>';
+        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
         
         oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
