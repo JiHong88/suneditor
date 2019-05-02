@@ -33,7 +33,7 @@
     font-weight: normal;
     font-style: normal;
 }
-.sun-editor [class*='icon-']:before {
+.sun-editor [class*='icon-']::before {
     -moz-osx-font-smoothing:grayscale;
     -webkit-font-smoothing:antialiased;
     font-family: 'Suneditor-icon';
@@ -44,59 +44,59 @@
     text-rendering:auto;
     font-size: 15px;
 }
-.sun-editor .sun-editor-id-toolbar [class*='icon-']:before {
+.sun-editor .sun-editor-id-toolbar [class*='icon-']::before {
     line-height: 2.1;
 }
-.sun-editor .icon-align-justify:before{content:'\0041';}
-.sun-editor .icon-align-left:before{content:'\0042';}
-.sun-editor .icon-align-right:before{content:'\0043';}
-.sun-editor .icon-align-center:before{content:'\0044';}
-.sun-editor .icon-underline:before{content:'\0045';}
-.sun-editor .icon-bold:before{content:'\0046';}
-.sun-editor .icon-italic:before{content:'\0047';}
-.sun-editor .icon-strokethrough:before{content:'\0048';}
-.sun-editor .icon-subscript:before{content:'\0049';}
-.sun-editor .icon-superscript:before{content:'\004a';}
-.sun-editor .icon-redo:before{content:'\004b';}
-.sun-editor .icon-undo:before{content:'\004c';}
-.sun-editor .icon-erase:before{content:'\004d';}
-.sun-editor .icon-fontColor:before{content:'\004e';}
-.sun-editor .icon-hiliteColor:before{content:'\004f';}
-.sun-editor .icon-indent-left:before{content:'\0050';}
-.sun-editor .icon-indent-right:before{content:'\0051';}
-.sun-editor .icon-list-bullets:before{content:'\0052';}
-.sun-editor .icon-list-number:before{content:'\0053';}
-.sun-editor .icon-grid:before{content:'\0054';}
-.sun-editor .icon-code-view:before{content:'\0055';}
-.sun-editor .icon-preview:before{content:'\0056';}
-.sun-editor .icon-showBlocks:before{content:'\0057';}
-.sun-editor .icon-expansion:before{content:'\0058';}
-.sun-editor .icon-reduction:before{content:'\0059';}
-.sun-editor .icon-image:before{content:'\005a';}
-.sun-editor .icon-link:before{content:'\0061';}
-.sun-editor .icon-video:before{content:'\0062';}
-.sun-editor .icon-print:before{content:'\0063';}
-.sun-editor .icon-modify:before{content:'\0064';}
-.sun-editor .icon-revert:before{content:'\0065';}
-.sun-editor .icon-arrow-down:before{content:'\0066'; font-size: 10px;}
-.sun-editor .icon-map-pin:before{content:'\0067';}
-.sun-editor .icon-cancel:before{content:'\0068'; font-size:10px;}
-.sun-editor .icon-hr:before{content:'\0069';}
-.sun-editor .icon-insert-column-right:before{content:'\006a';}
-.sun-editor .icon-insert-row-below:before{content:'\006b';}
-.sun-editor .icon-insert-row-above:before{content:'\006c';}
-.sun-editor .icon-insert-column-left:before{content:'\006d';}
-.sun-editor .icon-delete-row:before{content:'\006e';}
-.sun-editor .icon-delete-column:before{content:'\006f';}
-.sun-editor .icon-quote:before{content:'\0070';}
-.sun-editor .icon-empty-file:before{content:'\0071';}
-.sun-editor .icon-paragraph:before{content:'\0072';}
-.sun-editor .icon-delete:before{content:'\0073';}
-.sun-editor .icon-rotate-left:before{content:'\0074';}
-.sun-editor .icon-rotate-right:before{content:'\0075';}
-.sun-editor .icon-mirror-horizontal:before{content:'\0076';}
-.sun-editor .icon-mirror-vertical:before{content:'\0077';}
-.sun-editor .icon-save:before{content:'\0078';}
+.sun-editor .icon-align-justify::before{content:'\0041';}
+.sun-editor .icon-align-left::before{content:'\0042';}
+.sun-editor .icon-align-right::before{content:'\0043';}
+.sun-editor .icon-align-center::before{content:'\0044';}
+.sun-editor .icon-underline::before{content:'\0045';}
+.sun-editor .icon-bold::before{content:'\0046';}
+.sun-editor .icon-italic::before{content:'\0047';}
+.sun-editor .icon-strokethrough::before{content:'\0048';}
+.sun-editor .icon-subscript::before{content:'\0049';}
+.sun-editor .icon-superscript::before{content:'\004a';}
+.sun-editor .icon-redo::before{content:'\004b';}
+.sun-editor .icon-undo::before{content:'\004c';}
+.sun-editor .icon-erase::before{content:'\004d';}
+.sun-editor .icon-fontColor::before{content:'\004e';}
+.sun-editor .icon-hiliteColor::before{content:'\004f';}
+.sun-editor .icon-indent-left::before{content:'\0050';}
+.sun-editor .icon-indent-right::before{content:'\0051';}
+.sun-editor .icon-list-bullets::before{content:'\0052';}
+.sun-editor .icon-list-number::before{content:'\0053';}
+.sun-editor .icon-grid::before{content:'\0054';}
+.sun-editor .icon-code-view::before{content:'\0055';}
+.sun-editor .icon-preview::before{content:'\0056';}
+.sun-editor .icon-showBlocks::before{content:'\0057';}
+.sun-editor .icon-expansion::before{content:'\0058';}
+.sun-editor .icon-reduction::before{content:'\0059';}
+.sun-editor .icon-image::before{content:'\005a';}
+.sun-editor .icon-link::before{content:'\0061';}
+.sun-editor .icon-video::before{content:'\0062';}
+.sun-editor .icon-print::before{content:'\0063';}
+.sun-editor .icon-modify::before{content:'\0064';}
+.sun-editor .icon-revert::before{content:'\0065';}
+.sun-editor .icon-arrow-down::before{content:'\0066'; font-size: 10px;}
+.sun-editor .icon-map-pin::before{content:'\0067';}
+.sun-editor .icon-cancel::before{content:'\0068'; font-size:10px;}
+.sun-editor .icon-hr::before{content:'\0069';}
+.sun-editor .icon-insert-column-right::before{content:'\006a';}
+.sun-editor .icon-insert-row-below::before{content:'\006b';}
+.sun-editor .icon-insert-row-above::before{content:'\006c';}
+.sun-editor .icon-insert-column-left::before{content:'\006d';}
+.sun-editor .icon-delete-row::before{content:'\006e';}
+.sun-editor .icon-delete-column::before{content:'\006f';}
+.sun-editor .icon-quote::before{content:'\0070';}
+.sun-editor .icon-empty-file::before{content:'\0071';}
+.sun-editor .icon-paragraph::before{content:'\0072';}
+.sun-editor .icon-delete::before{content:'\0073';}
+.sun-editor .icon-rotate-left::before{content:'\0074';}
+.sun-editor .icon-rotate-right::before{content:'\0075';}
+.sun-editor .icon-mirror-horizontal::before{content:'\0076';}
+.sun-editor .icon-mirror-vertical::before{content:'\0077';}
+.sun-editor .icon-save::before{content:'\0078';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .arrow, .sun-editor .arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
@@ -165,7 +165,7 @@
 .sun-editor .btn_editor:enabled.on.btn_submenu:hover, .sun-editor .btn_editor:enabled.on.btn_submenu:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
 .sun-editor .btn_editor:enabled.on.btn_submenu:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
 /* disabled buttons, icon blur */
-.sun-editor .btn_editor:disabled, .sun-editor .btn_editor:disabled *, .sun-editor .btn_edit:disabled, .sun-editor :disabled [class*='icon-']:before {cursor:default; background:#fafafa; color:transparent; text-shadow:0 0 3px #ccc;}
+.sun-editor .btn_editor:disabled, .sun-editor .btn_editor:disabled *, .sun-editor .btn_edit:disabled, .sun-editor :disabled [class*='icon-']::before {cursor:default; background:#fafafa; color:transparent; text-shadow:0 0 3px #ccc;}
 
 /** --- submenu layer ---------------------------------------------------------- */
 .sun-editor .layer_editor {display:none; position:absolute; top:37px; z-index:3; left:1px; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
@@ -303,7 +303,7 @@
 .sun-editor .sun-editor-id-table-edit {position:absolute; overflow:visible; z-index:1; width:165px; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:2px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 /* controller - link */
 .sun-editor .sun-editor-id-link-btn {position:absolute; overflow:visible; z-index:1; top:0; left:0; display:none; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:2px; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
-.sun-editor .sun-editor-id-link-btn:before, .sun-editor .sun-editor-id-link-btn::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
+.sun-editor .sun-editor-id-link-btn::before, .sun-editor .sun-editor-id-link-btn::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .sun-editor-id-link-btn .link-content {padding:0; margin:0;}
 .sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
