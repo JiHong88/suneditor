@@ -61,7 +61,7 @@ const _Constructor = {
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
-            ['indent', 'outdent'],
+            ['outdent', 'indent'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
@@ -216,7 +216,7 @@ const _Constructor = {
                 '<i class="icon-indent-right"></i>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
+            outdent: ['sun-editor-id-outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
                 '<i class="icon-indent-left"></i>'
             ],
 
@@ -232,12 +232,12 @@ const _Constructor = {
                 '<i class="icon-code-view"></i>'
             ],
 
-            undo: ['', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
-                '<i class="icon-undo"></i>'
+            undo: ['sun-editor-id-undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
+                '<i class="icon-undo"></i>', true
             ],
 
-            redo: ['', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
-                '<i class="icon-redo"></i>'
+            redo: ['sun-editor-id-redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
+                '<i class="icon-redo"></i>', true
             ],
 
             preview: ['', lang.toolbar.preview, 'preview', '',
@@ -248,8 +248,8 @@ const _Constructor = {
                 '<i class="icon-print"></i>'
             ],
 
-            save: ['', lang.toolbar.save, 'save', '',
-                '<i class="icon-save"></i>'
+            save: ['sun-editor-id-save', lang.toolbar.save, 'save', '',
+                '<i class="icon-save"></i>', true
             ],
 
             /** plugins - submenu */
@@ -329,10 +329,11 @@ const _Constructor = {
      * @param {string} dataCommand - The data-command property of the button
      * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
      * @param {string} innerHTML - Html in button
+     * @param {string} _disabled - Button disabled
      * @returns {Element}
      * @private
      */
-    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML) {
+    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled) {
         const oLi = util.createElement('LI');
         const oButton = util.createElement('BUTTON');
 
@@ -341,6 +342,8 @@ const _Constructor = {
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
+
+        if (_disabled) oButton.setAttribute('disabled', true);
         
         oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
@@ -408,7 +411,7 @@ const _Constructor = {
                         pluginName = button;
                     }
 
-                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4]);
+                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
                     moduleElement.ul.appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {

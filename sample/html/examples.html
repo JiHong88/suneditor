@@ -114,7 +114,7 @@ youtubeQuery    <span class="pl-k">:</span> The query string <span class="pl-k">
                   ex) <span class="pl-s"><span class="pl-pds">'</span>autoplay=1&amp;mute=1&amp;enablejsapi=1&amp;controls=0&amp;rel=0&amp;modestbranding=1<span class="pl-pds">'</span></span>
                   <span class="pl-c"><span class="pl-c">//</span> https://developers.google.com/youtube/player_parameters</span>
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Function</span>}
+callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span style="color: rgb(0, 130, 153);">userFunction</span>.<span style="color: rgb(61, 0, 153);">save</span> {<span class="pl-c1">Function</span>}
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
                   default<span class="pl-k">:</span> [
@@ -155,7 +155,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',</span></div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'removeFormat',</span></div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fontColor', 'hiliteColor',</span><span style="color: rgb(152, 0, 0);">﻿</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'indent', 'outdent',</span><span style="color: rgb(152, 0, 0);">&nbsp;</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'outdent', 'indent',</span><span style="color: rgb(152, 0, 0);">&nbsp;</span></div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'align', 'horizontalRule', 'list', 'table',</span></div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'link', 'image', 'video',</span></div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fullScreen', 'showBlocks', 'codeView',</span></div>
@@ -194,7 +194,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'undo', 'redo', 'font', 'fontSize', 'formatBlock'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span style="color: rgb(152, 0, 0);"> '/' </span><span style="color: rgb(53, 53, 53); font-weight: bold; font-style: italic;">// Line break</span></div>
-            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'</span>],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'fontColor', 'hiliteColor', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'table'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save'</span>]</div>
             <div>&nbsp; &nbsp; ],</div>
             <div>&nbsp; &nbsp; <span>callBackSave</span> : <span style="color: rgb(0, 51, 153);">function</span> (<span style="color: rgb(152, 0, 0);">contents</span>) {</div>
@@ -274,6 +274,8 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
 
+<span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
+
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>, <span class="pl-smi">imageInfo</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>targetImgElement<span class="pl-pds">'</span></span>, targetImgElement)
@@ -351,7 +353,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
             'removeFormat',
             'fontColor', 'hiliteColor',
-            'indent', 'outdent',
+            'outdent', 'indent',
             'align', 'horizontalRule', 'list', 'table',
             'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
@@ -371,7 +373,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             ['undo', 'redo', 'font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'removeFormat'],
             '/', //Line break
-            ['fontColor', 'hiliteColor', 'indent', 'outdent', 'align', 'horizontalRule', 'list', 'table'],
+            ['fontColor', 'hiliteColor', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'table'],
             ['link', 'image', 'video', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save']
         ],
         callBackSave: function (contents) {
@@ -444,7 +446,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
                 ['undo', 'redo'],
                 ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                 ['removeFormat'],
-                ['indent', 'outdent'],
+                ['outdent', 'indent'],
                 ['fullScreen', 'showBlocks', 'codeView'],
                 ['preview', 'print'],
                 ['image']
@@ -457,6 +459,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
+        suneditor.onChange = function (contents) { console.log('onChange', contents) }
         suneditor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) { 
             console.log('targetImgElement', targetImgElement)
             console.log('index : ' + index + ', isDelete : ' + isDelete)

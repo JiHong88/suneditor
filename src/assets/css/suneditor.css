@@ -167,7 +167,7 @@
 .sun-editor .btn_editor:enabled.on.btn_submenu:hover, .sun-editor .btn_editor:enabled.on.btn_submenu:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
 .sun-editor .btn_editor:enabled.on.btn_submenu:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
 /* disabled buttons, icon blur */
-.sun-editor .btn_editor:disabled, .sun-editor .btn_editor:disabled *, .sun-editor .btn_edit:disabled, .sun-editor :disabled [class*='icon-']::before {cursor:default; background:#fafafa; color:transparent; text-shadow:0 0 3px #ccc;}
+.sun-editor .btn_editor:disabled, .sun-editor .btn_editor:disabled *, .sun-editor .btn_edit:disabled, .sun-editor :disabled [class*='icon-']::before {cursor:default; background:#fafafa; color:#bdbdbd;}
 
 /** --- submenu layer ---------------------------------------------------------- */
 .sun-editor .layer_editor {display:none; position:absolute; top:37px; z-index:3; left:1px; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
@@ -315,7 +315,7 @@
 
 /** --- tooltip */
 .sun-editor .se-tooltip {position:relative; display:inline-block; overflow:visible;}
-.sun-editor .se-tooltip .se-tooltip-inner {visibility:hidden; position:absolute; display:block; width:auto; top:120%; left:50%; opacity:0; z-index:1; line-height:1.5; transition:opacity 0.5s; margin:0; padding:0; bottom:auto; float:none; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
+.sun-editor .se-tooltip .se-tooltip-inner {visibility:hidden; position:absolute; display:block; width:auto; top:120%; left:50%; background:transparent; opacity:0; z-index:1; line-height:1.5; transition:opacity 0.5s; margin:0; padding:0; bottom:auto; float:none; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text {position:relative; display:inline-block; width:auto; left:-50%; font-size:0.9em; margin:0; padding:4px 6px; border-radius:2px; background-color:#333; color:#fff; text-align:center; line-height:unset; white-space:nowrap; cursor:auto;}
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text::after {content:""; position:absolute; bottom:100%; left:50%; margin-left:-5px; border-width:5px; border-style:solid; border-color:transparent transparent #333 transparent;}
 .sun-editor .se-tooltip:hover .se-tooltip-inner {visibility:visible; opacity:1;}

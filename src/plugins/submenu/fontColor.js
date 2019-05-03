@@ -56,7 +56,7 @@ export default {
         const contextFontColor = this.context.fontColor;
 
         contextPicker._colorInput = contextFontColor.colorInput;
-        contextPicker._defaultColor = '#333';
+        contextPicker._defaultColor = '#333333';
         contextPicker._styleProperty = 'color';
         contextPicker._colorList = contextFontColor.colorList;
         

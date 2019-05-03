@@ -45,7 +45,11 @@ const _Context = function (element, cons, options) {
             format: cons._toolBar.getElementsByClassName('sun-editor-id-format')[0],
             fontSize: cons._toolBar.getElementsByClassName('sun-editor-id-font-size')[0],
             align: cons._toolBar.getElementsByClassName('sun-editor-id-align')[0],
-            list: cons._toolBar.getElementsByClassName('sun-editor-id-list')[0]
+            list: cons._toolBar.getElementsByClassName('sun-editor-id-list')[0],
+            undo: cons._toolBar.getElementsByClassName('sun-editor-id-undo')[0],
+            redo: cons._toolBar.getElementsByClassName('sun-editor-id-redo')[0],
+            save: cons._toolBar.getElementsByClassName('sun-editor-id-save')[0],
+            outdent: cons._toolBar.getElementsByClassName('sun-editor-id-outdent')[0]
         },
         option: {
             mode: options.mode,

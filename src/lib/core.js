@@ -153,6 +153,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @property {Element} DEL - strike button
          * @property {Element} SUB - subscript button
          * @property {Element} SUP - superscript button
+         * @property {Element} OUTDENT - outdent button
          */
         commandMap: {
             FORMAT: context.tool.format,
@@ -166,7 +167,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             EM: context.tool.italic,
             DEL: context.tool.strike,
             SUB: context.tool.subscript,
-            SUP: context.tool.superscript
+            SUP: context.tool.superscript,
+            OUTDENT: context.tool.outdent
         },
 
         /**
@@ -1690,16 +1692,21 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 case 'save':
                     if (typeof context.option.callBackSave === 'function') {
                         context.option.callBackSave(this.getContents());
+                    } else if (typeof userFunction.save === 'function') {
+                        userFunction.save();
                     } else {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
+
+                    if (context.tool.save) context.tool.save.setAttribute('disabled', true);
+
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
                     const on = util.hasClass(this.commandMap[command], 'on');
 
-                    if (command === 'SUB' && util.hasClass(context.tool.superscript, 'on')) {
+                    if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'on')) {
                         this.nodeChange(null, null, ['SUP']);
-                    } else if (command === 'SUP' && util.hasClass(context.tool.subscript, 'on')) {
+                    } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'on')) {
                         this.nodeChange(null, null, ['SUB']);
                     }
 
@@ -1736,6 +1743,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
     
                 p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
             }
+
+            event._findButtonEffectTag();
+            // history stack
+            this.history.push();
         },
 
         /**
@@ -1963,7 +1974,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findA = true;
+            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -1995,6 +2006,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         commandMapNodes.push('LI');
                         commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
                         findList = false;
+                    }
+
+                    /* Outdent */
+                    if (findOutdent && selectionParent.style.marginLeft && selectionParent.style.marginLeft.match(/\d+/)[0] * 1 > 0) {
+                        commandMapNodes.push('OUTDENT');
+                        commandMap.OUTDENT.removeAttribute('disabled');
+                        findOutdent = false;
                     }
 
                     continue;
@@ -2058,6 +2076,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
                 else if (commandMap.LI && /^LI$/i.test(key)) {
                     commandMap.LI.removeAttribute('data-focus');
+                }
+                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                    commandMap.OUTDENT.setAttribute('disabled', true);
                 }
                 else {
                     util.removeClass(commandMap[key], 'on');
@@ -2309,7 +2330,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     let formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
                     const rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl) {
+                    if (rangeEl && formatEl && /^TD$/i.test(formatEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             core.detachRangeFormatElement(rangeEl);
@@ -2538,50 +2559,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 e.stopPropagation();
                 e.preventDefault();
             }
+        },
+
+        _onChange_historyStack: function (stackIndex) {
+            if (context.tool.save) context.tool.save.removeAttribute('disabled');
+            if (userFunction.onChange) userFunction.onChange(core.getContents());
         }
     };
-
-    /** excute history function */
-    core.history = _history(core);
-
-    /** add event listeners */
-    /** toolbar event */
-    context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
-    context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
-    /** editor area */
-    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
-    
-    /** code view area auto line */
-    if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
-
-    /** resizingBar */
-    if (context.element.resizingBar) {
-        if (/\d+/.test(context.option.height)) {
-            context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
-        } else {
-            util.addClass(context.element.resizingBar, 'none-resize');
-        }
-    }
-
-    /** inline editor */
-    if (core._isInline) {
-        context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
-    }
-
-    /** inline, balloon editor */
-    if (core._isInline || core._isBalloon) {
-        context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
-    }
-    
-    /** window event */
-    _w.addEventListener('resize', event.onResize_window, false);
-    if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
 
     /** User function */
     const userFunction = {
@@ -2594,6 +2578,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         onKeyDown: null,
         onKeyUp: null,
         onDrop: null,
+        onChange: null,
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
@@ -2763,6 +2748,48 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _w.Object.keys(this).forEach(function(key) {delete this[key]}.bind(this));
         }
     };
+
+    /** excute history function */
+    core.history = _history(core, event._onChange_historyStack);
+
+    /** add event listeners */
+    /** toolbar event */
+    context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
+    context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
+    /** editor area */
+    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+    
+    /** code view area auto line */
+    if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
+
+    /** resizingBar */
+    if (context.element.resizingBar) {
+        if (/\d+/.test(context.option.height)) {
+            context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
+        } else {
+            util.addClass(context.element.resizingBar, 'none-resize');
+        }
+    }
+
+    /** inline editor */
+    if (core._isInline) {
+        context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
+    }
+
+    /** inline, balloon editor */
+    if (core._isInline || core._isBalloon) {
+        context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
+    }
+    
+    /** window event */
+    _w.addEventListener('resize', event.onResize_window, false);
+    if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
 
     return userFunction;
 }
