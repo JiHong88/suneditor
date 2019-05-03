@@ -53,7 +53,7 @@ export default {
             '<form class="editor_link">' +
             '   <div class="modal-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
+            '           <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.linkBox.title + '</h5>' +
             '   </div>' +
@@ -86,8 +86,14 @@ export default {
             '<div class="arrow arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="btn-group">' +
-            '     <button type="button" data-command="update" tabindex="-1" title="' + lang.controller.edit + '"><div class="icon-link"></div></button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" title="' + lang.controller.remove + '"><div class="icon-delete"></div></button>' +
+            '     <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
+            '       <i class="icon-link"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+            '   </button>' +
+            '     <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
+            '       <i class="icon-delete"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '   </button>' +
             '   </div>' +
             '</div>';
 
@@ -145,6 +151,7 @@ export default {
         const linkBtn = this.context.link.linkBtn;
 
         linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
+        linkBtn.getElementsByTagName('A')[0].title = selectionATag.textContent;
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
         const offset = this.util.getOffset(selectionATag);

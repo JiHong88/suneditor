@@ -92,19 +92,52 @@ export default {
         resize_button.innerHTML = '' +
             '<div class="arrow arrow-up"></div>' +
             '<div class="btn-group sun-editor-id-resize-button-group">' +
-            '   <button type="button" data-command="percent" data-value="1" title="' + lang.controller.resize100 + '"><span class="note-fontsize-10">100%</span></button>' +
-            '   <button type="button" data-command="percent" data-value="0.75" title="' + lang.controller.resize75 + '"><span class="note-fontsize-10">75%</span></button>' +
-            '   <button type="button" data-command="percent" data-value="0.5" title="' + lang.controller.resize50 + '"><span class="note-fontsize-10">50%</span></button>' +
-            '   <button type="button" data-command="percent" data-value="0.25" title="' + lang.controller.resize25 + '"><span class="note-fontsize-10">25%</span></button>' +
-            '   <button type="button" data-command="rotate" data-value="-90" title="' + lang.controller.rotateLeft + '"><div class="icon-rotate-left"></div></button>' +
-            '   <button type="button" data-command="rotate" data-value="90" title="' + lang.controller.rotateRight + '"><div class="icon-rotate-right"></div></button>' +
+            '   <button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
+            '       <span class="note-fontsize-10">100%</span>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
+            '       <span class="note-fontsize-10">75%</span>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
+            '       <span class="note-fontsize-10">50%</span>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
+            '       <span class="note-fontsize-10">25%</span>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
+            '       <i class="icon-rotate-left"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
+            '       <i class="icon-rotate-right"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
+            '   </button>' +
             '</div>' +
             '<div class="btn-group">' +
-            '   <button type="button" data-command="mirror" data-value="h" title="' + lang.controller.mirrorHorizontal + '"><div class="icon-mirror-horizontal"></div></button>' +
-            '   <button type="button" data-command="mirror" data-value="v" title="' + lang.controller.mirrorVertical + '"><div class="icon-mirror-vertical"></div></button>' +
-            '   <button type="button" data-command="revert" title="' + lang.dialogBox.revertButton + '"><div class="icon-revert"></div></button>' +
-            '   <button type="button" data-command="update" title="' + lang.controller.edit + '"><div class="icon-modify"></div></button>' +
-            '   <button type="button" data-command="delete" title="' + lang.controller.remove + '"><div aria-hidden="true" class="icon-delete"></div></button>' +
+            '   <button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
+            '       <i class="icon-mirror-horizontal"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
+            '       <i class="icon-mirror-vertical"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="revert" class="se-tooltip">' +
+            '       <i class="icon-revert"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="update" class="se-tooltip">' +
+            '       <i class="icon-modify"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+            '   </button>' +
+            '   <button type="button" data-command="delete" class="se-tooltip">' +
+            '       <i class="icon-delete"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '   </button>' +
             '</div>';
 
         return resize_button;

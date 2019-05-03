@@ -61,7 +61,7 @@ const _Constructor = {
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
-            ['indent', 'outdent'],
+            ['outdent', 'indent'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
@@ -184,121 +184,121 @@ const _Constructor = {
     _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + '([CTRL,⌘]+B)', 'STRONG', '',
-                '<div class="icon-bold"></div>'
+            bold: ['sun-editor-id-bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
+                '<i class="icon-bold"></i>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + '([CTRL,⌘]+U)', 'INS', '',
-                '<div class="icon-underline"></div>'
+            underline: ['sun-editor-id-underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '',
+                '<i class="icon-underline"></i>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + '([CTRL,⌘]+I)', 'EM', '',
-                '<div class="icon-italic"></div>'
+            italic: ['sun-editor-id-italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '',
+                '<i class="icon-italic"></i>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + '([CTRL,⌘]+SHIFT+S)', 'DEL', '',
-                '<div class="icon-strokethrough"></div>'
+            strike: ['sun-editor-id-strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '',
+                '<i class="icon-strokethrough"></i>'
             ],
 
             subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'SUB', '',
-                '<div class="icon-subscript"></div>'
+                '<i class="icon-subscript"></i>'
             ],
 
             superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'SUP', '',
-                '<div class="icon-superscript"></div>'
+                '<i class="icon-superscript"></i>'
             ],
 
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '',
-                '<div class="icon-erase"></div>'
+                '<i class="icon-erase"></i>'
             ],
 
-            indent: ['', lang.toolbar.indent + '([CTRL,⌘]+])', 'indent', '',
-                '<div class="icon-indent-right"></div>'
+            indent: ['', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
+                '<i class="icon-indent-right"></i>'
             ],
 
-            outdent: ['', lang.toolbar.outdent + '([CTRL,⌘]+[)', 'outdent', '',
-                '<div class="icon-indent-left"></div>'
+            outdent: ['sun-editor-id-outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
+                '<i class="icon-indent-left"></i>'
             ],
 
             fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '',
-                '<div class="icon-expansion"></div>'
+                '<i class="icon-expansion"></i>'
             ],
 
             showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '',
-                '<div class="icon-showBlocks"></div>'
+                '<i class="icon-showBlocks"></i>'
             ],
 
             codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '',
-                '<div class="icon-code-view"></div>'
+                '<i class="icon-code-view"></i>'
             ],
 
-            undo: ['', lang.toolbar.undo + ' ([CTRL,⌘]+Z)', 'undo', '',
-                '<div class="icon-undo"></div>'
+            undo: ['sun-editor-id-undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
+                '<i class="icon-undo"></i>', true
             ],
 
-            redo: ['', lang.toolbar.redo + ' ([CTRL,⌘]+Y / [CTRL,⌘]+SHIFT+Z)', 'redo', '',
-                '<div class="icon-redo"></div>'
+            redo: ['sun-editor-id-redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
+                '<i class="icon-redo"></i>', true
             ],
 
             preview: ['', lang.toolbar.preview, 'preview', '',
-                '<div class="icon-preview"></div>'
+                '<i class="icon-preview"></i>'
             ],
 
             print: ['', lang.toolbar.print, 'print', '',
-                '<div class="icon-print"></div>'
+                '<i class="icon-print"></i>'
             ],
 
-            save: ['', lang.toolbar.save, 'save', '',
-                '<div class="icon-save"></div>'
+            save: ['sun-editor-id-save', lang.toolbar.save, 'save', '',
+                '<i class="icon-save"></i>', true
             ],
 
             /** plugins - submenu */
-            font: ['btn_editor_select btn_font', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt sun-editor-id-font-family">' + lang.toolbar.font + '</span><span class="icon-arrow-down"></span>'
+            font: ['btn_editor_select btn_font sun-editor-id-font-family', lang.toolbar.font, 'font', 'submenu',
+                '<span class="txt">' + lang.toolbar.font + '</span><i class="icon-arrow-down"></i>'
             ],
             formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><span class="icon-arrow-down"></span>'
+                '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><i class="icon-arrow-down"></i>'
             ],
 
             fontSize: ['btn_editor_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt sun-editor-id-font-size">' + lang.toolbar.fontSize + '</span><span class="icon-arrow-down"></span>'
+                '<span class="txt sun-editor-id-font-size">' + lang.toolbar.fontSize + '</span><i class="icon-arrow-down"></i>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
-                '<div class="icon-fontColor"></div>'
+                '<i class="icon-fontColor"></i>'
             ],
 
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
-                '<div class="icon-hiliteColor"></div>'
+                '<i class="icon-hiliteColor"></i>'
             ],
 
             align: ['btn_align', lang.toolbar.align, 'align', 'submenu',
-                '<div class="icon-align-left sun-editor-id-align"></div>'
+                '<i class="icon-align-left sun-editor-id-align"></i>'
             ],
 
             list: ['sun-editor-id-list', lang.toolbar.list, 'list', 'submenu',
-                '<div class="icon-list-number"></div>'
+                '<i class="icon-list-number"></i>'
             ],
 
             horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu',
-                '<div class="icon-hr"></div>'
+                '<i class="icon-hr"></i>'
             ],
 
             table: ['', lang.toolbar.table, 'table', 'submenu',
-                '<div class="icon-grid"></div>'
+                '<i class="icon-grid"></i>'
             ],
 
             /** plugins - dialog */
             link: ['', lang.toolbar.link, 'link', 'dialog',
-                '<div class="icon-link"></div>'
+                '<i class="icon-link"></i>'
             ],
 
             image: ['', lang.toolbar.image, 'image', 'dialog',
-                '<div class="icon-image"></div>'
+                '<i class="icon-image"></i>'
             ],
 
             video: ['', lang.toolbar.video, 'video', 'dialog',
-                '<div class="icon-video"></div>'
+                '<i class="icon-video"></i>'
             ]
         };
     },
@@ -329,18 +329,22 @@ const _Constructor = {
      * @param {string} dataCommand - The data-command property of the button
      * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
      * @param {string} innerHTML - Html in button
+     * @param {string} _disabled - Button disabled
      * @returns {Element}
      * @private
      */
-    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML) {
+    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled) {
         const oLi = util.createElement('LI');
         const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu ' : ' ') + buttonClass);
-        oButton.setAttribute('title', title);
+        oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu' : '') + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
+
+        if (_disabled) oButton.setAttribute('disabled', true);
+        
         oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
 
@@ -407,7 +411,7 @@ const _Constructor = {
                         pluginName = button;
                     }
 
-                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4]);
+                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
                     moduleElement.ul.appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {

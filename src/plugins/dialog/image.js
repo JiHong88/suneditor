@@ -87,7 +87,7 @@ export default {
         let html = '' +
             '<div class="modal-header">' +
             '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '       <div aria-hidden="true" data-command="close" class="icon-cancel"></div>' +
+            '       <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
             '   </button>' +
             '   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
             '</div>' +
@@ -126,7 +126,7 @@ export default {
                 '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
                 '           <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-image-revert-button" style="float: right;"><div class="icon-revert"></div></button>' +
+                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-image-revert-button" style="float: right;"><i class="icon-revert"></i></button>' +
                 '       </div>' ;
             }
 

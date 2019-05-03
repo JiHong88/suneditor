@@ -98,7 +98,12 @@
             <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="inner_layer layer_align"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>   &lt;ul class="list_editor"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;input class="form-control" type="text" style="width: 100%; border: 1px solid #CCC;" /&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="btn_editor" title="Append text"&gt;Append text&lt;/button&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="btn_editor se-tooltip"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>           &lt;span&gt;OK&lt;/span&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>           &lt;span class="se-tooltip-inner"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>               &lt;span class="se-tooltip-text"&gt;Append text&lt;/span&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>           &lt;/span&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;/button&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>   &lt;/ul&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>&lt;/div&gt;<span class="pl-pds">'</span></span>;
 
@@ -137,15 +142,15 @@
                 <span class="pl-c"><span class="pl-c">//</span> name of the plugin to be recognized by the toolbar.</span>
                 <span class="pl-c"><span class="pl-c">//</span> It must be the same as the name attribute of the plugin </span>
                 dataCommand<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>custom_plugin_submenu<span class="pl-pds">'</span></span>,
-                <span class="pl-c"><span class="pl-c">//</span> button's class ("btn_editor" class is registered, basic button click css is applied.)</span>
+                <span class="pl-c"><span class="pl-c">//</span> The class name of the button to add</span>
                 <span class="pl-c"><span class="pl-c">//</span> ** If you want to enable it even in code view mode, add a "code-view-enabled" class **</span>
-                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>btn_editor<span class="pl-pds">'</span></span>, 
+                buttonClass<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>, 
                 <span class="pl-c"><span class="pl-c">//</span> HTML title attribute</span>
                 title<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>Custom plugin of the submenu<span class="pl-pds">'</span></span>, 
                 <span class="pl-c"><span class="pl-c">//</span> 'submenu' or 'dialog' or '' (command button)</span>
                 dataDisplay<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>submenu<span class="pl-pds">'</span></span>,
                 <span class="pl-c"><span class="pl-c">//</span> HTML to be append to button</span>
-                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;div class="icon-map-pin"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span>
+                innerHTML<span class="pl-k">:</span><span class="pl-s"><span class="pl-pds">'</span>&lt;i class="icon-checked"&gt;&lt;/i&gt;<span class="pl-pds">'</span></span>
             }
         ]
     ]
@@ -199,7 +204,12 @@
                 '<div class="inner_layer layer_align">' +
                 '   <ul class="list_editor">' +
                 '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
-                '       <li><button type="button" class="btn_editor" title="Append text">Append text</button></li>' +
+                '       <li><button type="button" class="btn_editor se-tooltip">' +
+                '               <span>OK</span>' +
+                '               <span class="se-tooltip-inner">' +
+                '                   <span class="se-tooltip-text">Append text</span>' +
+                '               </span>' +
+                '       </button></li>' +
                 '   </ul>' +
                 '</div>';
 
@@ -224,10 +234,10 @@
                 {
                     name: 'custom_plugin_submenu', 
                     dataCommand: 'custom_plugin_submenu',
-                    buttonClass:'btn_editor', 
+                    buttonClass:'', 
                     title:'Custom plugin of the submenu', 
                     dataDisplay:'submenu',
-                    innerHTML:'<div class="icon-map-pin"></div>'
+                    innerHTML:'<i class="icon-checked"></i>'
                 }
             ]
         ]

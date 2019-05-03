@@ -146,6 +146,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
         [<span class="pl-s"><span class="pl-pds">'</span>save<span class="pl-pds">'</span></span>]
     ],
     <span class="pl-c"><span class="pl-c">//</span> Callback functions that is called when the Save button is clicked</span>
+    <span class="pl-c"><span class="pl-c">//</span> default: userFunction.save</span>
     <span class="pl-en">callBackSave</span><span class="pl-k">:</span><span class="pl-k">function</span> (<span class="pl-smi">contents</span>) {
         <span class="pl-en">alert</span>(contents);
     }
@@ -295,7 +296,7 @@ youtubeQuery    <span class="pl-k">:</span> The query string <span class="pl-k">
                   ex) <span class="pl-s"><span class="pl-pds">'</span>autoplay=1&amp;mute=1&amp;enablejsapi=1&amp;controls=0&amp;rel=0&amp;modestbranding=1<span class="pl-pds">'</span></span>
                     <span class="pl-c"><span class="pl-c">//</span> https://developers.google.com/youtube/player_parameters</span>
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Function</span>}
+callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span style="color: rgb(0, 130, 153);">userFunction</span>.<span style="color: rgb(61, 0, 153);">save</span> {<span class="pl-c1">Function</span>}
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
                   default<span class="pl-k">:</span> [
@@ -374,6 +375,8 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 <span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
+
+<span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">isDelete</span>, <span class="pl-smi">imageInfo</span>) {

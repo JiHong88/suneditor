@@ -53,7 +53,7 @@ export default {
             '   <label>#</label>' +
             '   <input type="text" maxlength="6" class="sun-editor-id-submenu-color-input" />' +
             '   <button type="submit" class="btn-primary sun-editor-id-submenu-color-submit" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   <button type="button" class="btn_editor sun-editor-id-submenu-color-default" title="' + lang.toolbar.removeFormat + '"><div class="icon-erase"></div></button>' +
+            '   <button type="button" class="btn_editor sun-editor-id-submenu-color-default" title="' + lang.toolbar.removeFormat + '"><i class="icon-erase"></i></button>' +
             '</form>' +
             '</div>';
 

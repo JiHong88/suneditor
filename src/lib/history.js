@@ -7,9 +7,11 @@
  */
 'use strict';
 
-const history = function (core) {
+const history = function (core, change) {
     const _w = window;
     const editor = core.context.element.wysiwyg;
+    const undo = core.context.tool.undo;
+    const redo = core.context.tool.redo;
     let pushDelay = null;
     let stackIndex = 0;
     let stack = [{
@@ -54,8 +56,23 @@ const history = function (core) {
     function setContentsFromStack () {
         const item = stack[stackIndex];
         editor.innerHTML = item.contents;
+
         core.setRange(getNodeFromStack(item.s.path), item.s.offset, getNodeFromStack(item.e.path), item.e.offset);
         core.focus();
+
+        if (stackIndex === 0) {
+            if (undo) undo.setAttribute('disabled', true);
+            if (redo) redo.removeAttribute('disabled');
+        } else if (stackIndex === stack.length - 1) {
+            if (undo) undo.removeAttribute('disabled');
+            if (redo) redo.setAttribute('disabled', true);
+        } else {
+            if (undo) undo.removeAttribute('disabled');
+            if (redo) redo.removeAttribute('disabled');
+        }
+
+        // onChange
+        change();
     }
 
     function pushStack () {
@@ -67,6 +84,7 @@ const history = function (core) {
 
         if (stack.length > stackIndex) {
             stack = stack.slice(0, stackIndex);
+            if (redo) redo.setAttribute('disabled', true);
         }
 
         stack[stackIndex] = {
@@ -80,6 +98,11 @@ const history = function (core) {
                 offset: range.endOffset
             }
         };
+
+        if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
+
+        // onChange
+        change();
     }
 
     return {

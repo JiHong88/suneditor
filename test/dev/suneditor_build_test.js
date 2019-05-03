@@ -45,17 +45,20 @@ let ss = suneditor.create(document.getElementById('editor1'), {
         'font', 'fontSize', 'formatBlock',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor',
-        'indent', 'outdent',
+        'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print']
+        'preview', 'print', 'save']
     ],
     width: '100%',
     stickyToolbar: 0,
     mode: 'inline',
     toolbarWidth: 800,
-    height: 'auto'
+    height: 'auto',
+    // callBackSave: (contents) => {
+    //     console.log('callback')
+    // }
 });
 
 ss.onScroll = function (e) {
@@ -73,6 +76,10 @@ ss.onKeyUp = function (e) {
 ss.onDrop = function (e) {
     console.log('onDrop', e);
 };
+
+ss.onChange = function (contents) {
+    console.log('change')
+}
 
 ss.onImageUpload = function () {
     console.log(ss.getImagesInfo());
@@ -165,7 +172,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
         ['fontColor', 'hiliteColor'],
-        ['indent', 'outdent'],
+        ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'table'],
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
@@ -203,7 +210,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
                 // HTML to be append to button
-                innerHTML:'<div class="icon-map-pin"></div>'
+                innerHTML:'<i class="icon-checked"></i>'
             }
         ]
     ],

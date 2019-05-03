@@ -148,7 +148,7 @@ suneditor.create('sample', {
         ['removeFormat'],
         '/', // Line break
         ['fontColor', 'hiliteColor'],
-        ['indent', 'outdent'],
+        ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'table'],
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
@@ -156,6 +156,7 @@ suneditor.create('sample', {
         ['save']
     ],
     // Callback functions that is called when the Save button is clicked
+    // default: userFunction.save
     callBackSave: function (contents) {
         alert(contents)
     }
@@ -190,7 +191,7 @@ suneditor.create('sample', {
         ['removeFormat'],
         '/', // Line break
         [fontColor, hiliteColor],
-        ['indent', 'outdent'],
+        ['outdent', 'indent'],
         [align, horizontalRule, list, table],
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
@@ -219,7 +220,7 @@ const initEditor = suneditor.init({
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'removeFormat',
         'fontColor', 'hiliteColor',
-        'indent', 'outdent',
+        'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
@@ -236,7 +237,7 @@ initEditor.create('sample_2', {
         ['undo', 'redo'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
-        ['indent', 'outdent'],
+        ['outdent', 'indent'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
     ]
@@ -312,7 +313,7 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
 ------------------------------------------------------------------------------------------------------------------
-callBackSave    : Callback functions that is called when the Save button is clicked. default: null {Function}
+callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
 ------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
                   default: [
@@ -322,7 +323,7 @@ buttonList      : Defines button list to array {Array}
                     ['removeFormat'],
                     // '/', Line break
                     // ['fontColor', 'hiliteColor'],
-                    ['indent', 'outdent'],
+                    ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'table'],
                     // ['link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
@@ -402,6 +403,8 @@ editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
 editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
 
 editor.onDrop = function (e) { console.log('onDrop', e) }
+
+editor.onChange = function (contents) { console.log('onChange', contents) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
 editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {
