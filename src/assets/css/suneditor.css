@@ -74,14 +74,14 @@
 .sun-editor .icon-reduction::before{content:'\0059';}
 .sun-editor .icon-image::before{content:'\005a';}
 .sun-editor .icon-link::before{content:'\0061';}
-.sun-editor .icon-video::before{content:'\0062';}
+.sun-editor .icon-sun::before{content:'\0062';}
 .sun-editor .icon-print::before{content:'\0063';}
 .sun-editor .icon-modify::before{content:'\0064';}
 .sun-editor .icon-revert::before{content:'\0065';}
 .sun-editor .icon-arrow-down::before{content:'\0066'; font-size: 10px;}
-.sun-editor .icon-map-pin::before{content:'\0067';}
+.sun-editor .icon-video::before{content:'\0067';}
 .sun-editor .icon-cancel::before{content:'\0068'; font-size:10px;}
-.sun-editor .icon-hr::before{content:'\0069';}
+.sun-editor .icon-exclamation::before{content:'\0069';}
 .sun-editor .icon-insert-column-right::before{content:'\006a';}
 .sun-editor .icon-insert-row-below::before{content:'\006b';}
 .sun-editor .icon-insert-row-above::before{content:'\006c';}
@@ -97,6 +97,8 @@
 .sun-editor .icon-mirror-horizontal::before{content:'\0076';}
 .sun-editor .icon-mirror-vertical::before{content:'\0077';}
 .sun-editor .icon-save::before{content:'\0078';}
+.sun-editor .icon-hr::before{content:'\0079';}
+.sun-editor .icon-checked::before{content:'\007a';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .arrow, .sun-editor .arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
