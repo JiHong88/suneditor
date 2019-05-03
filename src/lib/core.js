@@ -557,7 +557,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         appendFormatTag: function (element, formatNodeName) {
             const formatEl = element;
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) && !/^LI$/.test(currentFormatEl.nodeName) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = util.zeroWidthSpace;
 
@@ -2319,8 +2319,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             /** default key action */
             const selectionNode = core.getSelectionNode();
+            let formatEl, rangeEl;
             switch (keyCode) {
-                case 8: /**backspace key*/
+                case 8: /** backspace key */
                     if (util.isFormatElement(selectionNode) && !/^LI$/i.test(selectionNode.nodeName) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2328,9 +2329,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         return false;
                     }
 
-                    let formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
-                    const rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl && /^TD$/i.test(formatEl.nodeName)) {
+                    formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
+                    rangeEl = util.getRangeFormatElement(formatEl);
+                    if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             core.detachRangeFormatElement(rangeEl);
@@ -2346,8 +2347,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
                     
                     break;
-                case 9:
-                    /**tab key*/
+                case 9: /** tab key */
                     e.preventDefault();
                     if (ctrl || alt) break;
 
@@ -2374,7 +2374,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         break;
                     }
 
-                    /** format Tag */
                     const lines = core.getSelectedFormatElements();
 
                     if (!shift) {
@@ -2395,6 +2394,20 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             } else if (/^\s{1,4}/.test(child.textContent)) {
                                 child.textContent = child.textContent.replace(/^\s{1,4}/, '');
                             }
+                        }
+                    }
+
+                    break;
+                case 13: /** enter key */
+                    formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
+                    rangeEl = util.getRangeFormatElement(formatEl);
+                    if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
+                        const range = core.getRange();
+                        if (!range.commonAncestorContainer.nextSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
+                            e.preventDefault();
+                            util.removeItem(formatEl);
+                            formatEl = core.appendFormatTag(rangeEl, 'P');
+                            core.setRange(formatEl, 1, formatEl, 1);
                         }
                     }
 

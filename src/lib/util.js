@@ -207,12 +207,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, LI, CODE)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|CODE)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI)$/i.test(element.nodeName)) return true;
         return false;
     },
 
