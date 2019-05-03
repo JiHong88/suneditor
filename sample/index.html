@@ -17,6 +17,8 @@
             overflow: hidden;
             color: #f4b124;
             font-weight: bold;
+            border-bottom: 2px solid #f4b124;
+            border-radius: 2px;
         }
 
         /* Style the buttons that are used to open the tab content */
@@ -29,6 +31,9 @@
             padding: 14px 35px;
             transition: 0.3s;
             font-size: 16px;
+            border-top-left-radius: 2px;
+            border-top-right-radius: 2px;
+            margin: 0;
         }
 
         /* Change background color of buttons on hover */
@@ -39,6 +44,7 @@
         /* Create an active/current tablink class */
         .tab button.active {
             color: #fff;
+            background-color: #f4b124;
         }
 
         /* Style the tab content */
@@ -180,7 +186,7 @@
         height: 'auto',
         popupDisplay: 'full',
         buttonList: [
-            ['fontColor', 'bold', 'align', 'horizontalRule', 'list', 'table']
+            ['fontSize', 'fontColor', 'bold', 'align', 'horizontalRule', 'table']
         ]
     });
 
