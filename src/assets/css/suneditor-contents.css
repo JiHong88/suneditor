@@ -253,6 +253,11 @@
     border-spacing: 0;
     border-collapse: collapse;
 }
+.sun-editor-editable table th {
+    background-color: #e1e1e1;
+    border: 1px solid #aaa;
+}
+
 .sun-editor-editable table tr {
     border: 1px solid #ccc;
 }
