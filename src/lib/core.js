@@ -2333,7 +2333,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
-                        if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
+                        if (!range.commonAncestorContainer.previousSibling && range.commonAncestorContainer.nodeType === 1 && range.startOffset === 0 && range.endOffset === 0) {
                             core.detachRangeFormatElement(rangeEl);
                         }
                     }

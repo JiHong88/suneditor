@@ -644,11 +644,13 @@ const util = {
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (!tagsAllowed.test(domTree[i].nodeName)) {
                 cleanHTML += domTree[i].outerHTML
-                    .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-                    .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
-                    .replace(this._deleteExclusionTags, '');
             }
         }
+
+        cleanHTML = cleanHTML
+            .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
+            .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
+            .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
     },

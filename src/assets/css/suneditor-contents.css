@@ -70,7 +70,7 @@
     padding: 8px;
     margin: 0 0 10px;
     line-height: 1.45;
-    color: #333;
+    color: #666;
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
@@ -131,6 +131,7 @@
 /* blockquote */
 .sun-editor-editable blockquote {
     display: block;
+    color: #999;
     margin-block-start: 1em;
     margin-block-end: 1em;
     margin-inline-start: 40px;
@@ -291,7 +292,7 @@
 .sun-editor-editable .sun-editor-id-image-container a img {
     padding: 1px;
     margin: 1px;
-    outline: 1px solid #e1e1e1;
+    outline: 1px solid #4592ff;
 }
 
 /** video iframe tags */

@@ -25,7 +25,7 @@ Supported Browser -
 Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
 
 Supported Languages
-DE, EN, JA, KO, ZH_CN
+DE, EN, FR, JA, KO, ZH_CN
 ```
 
 #### npm

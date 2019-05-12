@@ -23,17 +23,5 @@ module.exports = merge(common, {
 		new MiniCssExtractPlugin({
 			filename: 'css/suneditor.min.css'
 		})
-	],
-
-	module: {
-		rules: [
-			{
-				test: /\.css$/,
-				use: [
-					MiniCssExtractPlugin.loader,
-					'css-loader'
-				]
-			}
-		]
-	}
+	]
 });

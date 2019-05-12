@@ -30,17 +30,5 @@ module.exports = merge(common, {
 			template: './test/dev/suneditor_build_test.html',
 			inject: true
 		}),
-	],
-
-	module: {
-		rules: [
-			{
-				test: /\.css$/,
-				use: [
-					MiniCssExtractPlugin.loader,
-					'css-loader'
-				]
-			}
-		]
-	}
+	]
 });
