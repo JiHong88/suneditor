@@ -1986,7 +1986,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 /** Format */
                 if (util.isFormatElement(selectionParent)) {
                     /* Format block */
-                    if (findFormat) {
+                    if (findFormat && commandMap.FORMAT) {
                         commandMapNodes.push('FORMAT');
                         util.changeTxt(commandMap.FORMAT, nodeName);
                         findFormat = false;
@@ -1994,7 +1994,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     /* Align */
                     const textAlign = selectionParent.style.textAlign;
-                    if (findAlign && textAlign) {
+                    if (findAlign && textAlign && commandMap.ALIGN) {
                         commandMapNodes.push('ALIGN');
                         commandMap.ALIGN.className = 'icon-align-' + textAlign;
                         commandMap.ALIGN.setAttribute('data-focus', textAlign);
@@ -2002,14 +2002,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     /* List */
-                    if (findList && /^LI$/.test(nodeName)) {
+                    if (findList && /^LI$/.test(nodeName) && commandMap.LI) {
                         commandMapNodes.push('LI');
                         commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
                         findList = false;
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && selectionParent.style.marginLeft.match(/\d+/)[0] * 1 > 0) {
+                    if (findOutdent && selectionParent.style.marginLeft && selectionParent.style.marginLeft.match(/\d+/)[0] * 1 > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;
@@ -2019,7 +2019,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
 
                 /** Font */
-                if (findFont && selectionParent.style.fontFamily.length > 0) {
+                if (findFont && selectionParent.style.fontFamily.length > 0 && commandMap.FONT) {
                     commandMapNodes.push('FONT');
                     const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
                     util.changeTxt(commandMap.FONT, selectFont);
@@ -2028,7 +2028,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
 
                 /** Size */
-                if (findSize && selectionParent.style.fontSize.length > 0) {
+                if (findSize && selectionParent.style.fontSize.length > 0 && commandMap.SIZE) {
                     commandMapNodes.push('SIZE');
                     util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
                     findSize = false;
@@ -2067,17 +2067,17 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     util.changeTxt(commandMap.FONT, lang.toolbar.font);
                     util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
                 }
-                else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
+                else if (/^SIZE$/i.test(key)) {
                     util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
                 }
-                else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
+                else if (/^ALIGN$/i.test(key)) {
                     commandMap.ALIGN.className = 'icon-align-left';
                     commandMap.ALIGN.removeAttribute('data-focus');
                 }
-                else if (commandMap.LI && /^LI$/i.test(key)) {
+                else if (/^LI$/i.test(key)) {
                     commandMap.LI.removeAttribute('data-focus');
                 }
-                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                else if (/^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
                 }
                 else {
