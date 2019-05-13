@@ -118,7 +118,7 @@ export default {
                     rightNode = fTag.nextSibling;
                 }
 
-                list.innerHTML += '<li>' + fTag.innerHTML + '</li>';
+                list.innerHTML += '<li>' + (this.util.isComponent(fTag) ? fTag.outerHTML : fTag.innerHTML) + '</li>';
                 this.util.removeItem(fTag);
             }
 

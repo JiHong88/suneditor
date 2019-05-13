@@ -56,6 +56,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'inline',
     toolbarWidth: 800,
     height: 'auto',
+    tableWidth: 'auto'
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }

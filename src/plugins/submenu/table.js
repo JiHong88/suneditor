@@ -115,6 +115,9 @@ export default {
 
     appendTable: function () {
         const oTable = this.util.createElement('TABLE');
+        if (/auto/i.test(this.context.option.tableWidth)) {
+            this.util.addClass(oTable, 'se-table__auto');
+        }
 
         let x = this.context.table._tableXY[0];
         let y = this.context.table._tableXY[1];

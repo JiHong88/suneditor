@@ -1913,7 +1913,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             });
 
             for (let i = 0, len = figcaptions.length; i < len; i++) {
-                figcaptions[i].outerHTML = figcaptions[i].removeAttribute('contenteditable');
+                figcaptions[i].removeAttribute('contenteditable');
             }
 
             return renderHTML.innerHTML;
