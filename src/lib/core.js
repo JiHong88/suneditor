@@ -1773,8 +1773,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
 
-                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?!\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
-                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?!\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block;');
+                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
+                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block;');
 
                 if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
@@ -1785,8 +1785,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 context.element.code.style.display = 'block';
                 context.element.wysiwyg.style.display = 'none';
 
-                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?!\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block');
-                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?!\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
+                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block');
+                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
 
                 if (context.option.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 this._variable.wysiwygActive = false;
@@ -1903,7 +1903,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             });
 
             for (let i = 0, len = figcaptions.length; i < len; i++) {
-                figcaptions[i].outerHTML = figcaptions[i].outerHTML.replace(/(?!^<figcaption\s+)(contenteditable="([a-z]+|\s*)")\s*(?=[^>]*>)/i, '');
+                figcaptions[i].outerHTML = figcaptions[i].removeAttribute('contenteditable');
             }
 
             return renderHTML.innerHTML;
@@ -2066,21 +2066,22 @@ export default function (context, pluginCallButtons, plugins, lang) {
             /** remove class, display text */
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
+                
                 if (commandMap.FONT && /^FONT$/i.test(key)) {
                     util.changeTxt(commandMap.FONT, lang.toolbar.font);
                     util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
                 }
-                else if (/^SIZE$/i.test(key)) {
+                else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
                     util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
                 }
-                else if (/^ALIGN$/i.test(key)) {
+                else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
                     commandMap.ALIGN.className = 'icon-align-left';
                     commandMap.ALIGN.removeAttribute('data-focus');
                 }
-                else if (/^LI$/i.test(key)) {
+                else if (commandMap.LI && /^LI$/i.test(key)) {
                     commandMap.LI.removeAttribute('data-focus');
                 }
-                else if (/^OUTDENT$/i.test(key)) {
+                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
                 }
                 else {

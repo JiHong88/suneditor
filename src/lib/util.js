@@ -23,7 +23,7 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'}
-        return text.replace(/\b(?!<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr|table|tbody|tr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
+        return text.replace(/\b(?<=<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr|table)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
             return (typeof ec[t] === 'string') ? ec[t] : t;
         });
     },
@@ -649,7 +649,7 @@ const util = {
 
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-            .replace(/(?!<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
+            .replace(/(?<=<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
             .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
@@ -661,7 +661,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|tbody|tr|td'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|thead|tbody|th|tr|td'.split('|');
         let regStr = '<\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
