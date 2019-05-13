@@ -1815,6 +1815,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 topArea.style.height = '100%';
                 topArea.style.zIndex = '2147483647';
 
+                context.element._stickyDummy.style.display = 'none';
+                util.removeClass(toolbar, "sun-editor-sticky");
+
                 this._variable._bodyOverflow = _d.body.style.overflow;
                 _d.body.style.overflow = 'hidden';
 
