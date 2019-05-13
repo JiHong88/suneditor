@@ -198,6 +198,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
             _sticky: false,
+            _fullScreenSticky: false,
             _imagesInfo: [],
             _imageIndex: 0
         },
@@ -427,7 +428,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (util.isWysiwygDiv(range.startContainer)) {
                 const children = context.element.wysiwyg.children;
-                this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.length);
+                this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
                 range = this.getRange();
             }
 
@@ -1815,8 +1816,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 topArea.style.height = '100%';
                 topArea.style.zIndex = '2147483647';
 
-                context.element._stickyDummy.style.display = 'none';
-                util.removeClass(toolbar, "sun-editor-sticky");
+                if (context.element._stickyDummy.style.display !== 'none') {
+                    this._variable._fullScreenSticky = true;
+                    context.element._stickyDummy.style.display = 'none';
+                    util.removeClass(toolbar, "sun-editor-sticky");
+                }
 
                 this._variable._bodyOverflow = _d.body.style.overflow;
                 _d.body.style.overflow = 'hidden';
@@ -1850,6 +1854,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (context.option.stickyToolbar > -1) {
                     util.removeClass(toolbar, 'sun-editor-sticky');
                     event.onScroll_window();
+                }
+
+                if (this._variable._fullScreenSticky) {
+                    this._variable._fullScreenSticky = false;
+                    context.element._stickyDummy.style.display = 'block';
+                    util.addClass(toolbar, "sun-editor-sticky");
                 }
 
                 util.removeClass(element.firstElementChild, 'icon-reduction');
@@ -2401,6 +2411,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         }
                     }
 
+                    // history stack
+                    core.history.push();
+
                     break;
                 case 13: /** enter key */
                     formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
@@ -2412,6 +2425,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             util.removeItem(formatEl);
                             formatEl = core.appendFormatTag(rangeEl, 'P');
                             core.setRange(formatEl, 1, formatEl, 1);
+
+                            // history stack
+                            core.history.push();
                         }
                     }
 
