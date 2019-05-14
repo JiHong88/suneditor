@@ -109,10 +109,9 @@ export default {
         } else {
             let rightNode = formatElement.nextSibling;
             const list = this.util.createElement(value);
-            const formatElementList = this.getSelectedFormatElements();
             
-            for (let i = 0, len = formatElementList.length, fTag = null; i < len; i++) {
-                fTag = formatElementList[i];
+            for (let i = 0, len = selectedFormsts.length, fTag = null; i < len; i++) {
+                fTag = selectedFormsts[i];
 
                 if (i === len - 1) {
                     rightNode = fTag.nextSibling;
