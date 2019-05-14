@@ -55,7 +55,7 @@ const _Constructor = {
         options.videoHeight = options.videoHeight || 315;
         options.youtubeQuery = options.youtubeQuery || '';
         // table
-        options.tableWidth = /^(100|auto)$/i.test(options.tableWidth) ? options.tableWidth : '100'
+        options.tableWidth = options.tableWidth || '100%'
         
         // callBack function
         // options.callBackSave = options.callBackSave;

@@ -313,6 +313,8 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
 ------------------------------------------------------------------------------------------------------------------
+tableWidth      : The width style property of table.                 default: '100%' {String}
+------------------------------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
 ------------------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}

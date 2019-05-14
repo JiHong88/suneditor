@@ -114,6 +114,8 @@ youtubeQuery    <span class="pl-k">:</span> The query string <span class="pl-k">
                   ex) <span class="pl-s"><span class="pl-pds">'</span>autoplay=1&amp;mute=1&amp;enablejsapi=1&amp;controls=0&amp;rel=0&amp;modestbranding=1<span class="pl-pds">'</span></span>
                   <span class="pl-c"><span class="pl-c">//</span> https://developers.google.com/youtube/player_parameters</span>
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
+tableWidth      <span class="pl-k">:</span> The width style property <span class="pl-k">of</span> <span class="pl-smi">table</span>.                 <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
+<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span style="color: rgb(0, 130, 153);">userFunction</span>.<span style="color: rgb(61, 0, 153);">save</span> {<span class="pl-c1">Function</span>}
 <span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
 buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
@@ -147,6 +149,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
             <div>&nbsp; &nbsp; videoWidth : <span style="color: rgb(0, 51, 153);">360</span>,</div>
             <div>&nbsp; &nbsp; videoHeight : <span style="color: rgb(0, 51, 153);">115</span>,</div>
             <div>&nbsp; &nbsp; youtubeQuery : <span style="color: rgb(152, 0, 0);">'autoplay=1&mute=1&enablejsapi=1'</span>,</div>
+            <div>&nbsp; &nbsp; tableWidth : <span style="color: rgb(152, 0, 0);">'50%'</span>,</div>
             <div>&nbsp; &nbsp; imageWidth : <span style="color: rgb(0, 51, 153);">150,</span></div>
             <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'local'</span>,</div>
             <div>&nbsp; &nbsp; resizingBar : <span style="color: rgb(0, 130, 153);">false</span>,</div>
@@ -345,6 +348,7 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         videoWidth : 360,
         videoHeight : 115,
         youtubeQuery : 'autoplay=1&mute=1&enablejsapi=1',
+        tableWidth : '50%',
         imageWidth : 150,
         popupDisplay: 'local',
         resizingBar: false,
