@@ -428,6 +428,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (util.isWysiwygDiv(range.startContainer)) {
                 const children = context.element.wysiwyg.children;
+
+                if (children.length === 0) return null;
                 this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
                 range = this.getRange();
             }
@@ -477,8 +479,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let range = this.getRange();
 
             if (util.isWysiwygDiv(range.startContainer)) {
-                const children = context.element.wysiwyg.children;
-                this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.length);
+                const children = util.getListChildren(context.element.wysiwyg, function (current) {
+                    return this.util.isRangeFormatElement(current);
+                }.bind(this));
+
+                if (!children) return null;
+                this.setRange(children[0], 0, children[children.length - 1], 0);
                 range = this.getRange();
             }
 
@@ -801,14 +807,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * When "selectedFormats" is null, all elements are detached.
          * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
          * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove
+         * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object.
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats) {
+        detachRangeFormatElement: function (rangeElement, selectedFormats, notHistory) {
             let rNode = null;
             let lastRangeNode = null;
             const children = rangeElement.children;
             let rangeEl = rangeElement.cloneNode(false);
 
-            for (let i = 0, len = children.length, insNode; i < len; i++) {
+            for (let i = children.length - 1, insNode; 0 <= i; i--) {
                 insNode = children[i];
                 if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
                     insNode = insNode.cloneNode(true);
@@ -847,11 +854,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const nextEl = rangeElement.nextElementSibling;
             util.removeItem(rangeElement);
 
+            const edge = selectedFormats ? this.util.getEdgeChildNodes(rNode, lastRangeNode) : this.util.getEdgeChildNodes(nextEl);
+            if (notHistory) return edge;
+
             if (!selectedFormats) {
-                const edge = this.util.getEdgeChildNodes(nextEl);
                 this.setRange(edge.sc, 0, edge.sc, 0);
             } else {
-                const edge = this.util.getEdgeChildNodes(rNode, lastRangeNode);
                 const sameNode = lastRangeNode === rNode;
                 this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
             }
@@ -2347,7 +2355,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
-                        if (!range.commonAncestorContainer.previousSibling && range.commonAncestorContainer.nodeType === 1 && range.startOffset === 0 && range.endOffset === 0) {
+                        if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             core.detachRangeFormatElement(rangeEl);
                         }
                     }

@@ -40,11 +40,11 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="inner_layer">' +
             '   <ul class="list_editor">' +
-            '       <li><button type="button" class="btn_edit se-tooltip" data-command="insertOrderedList" data-value="OL">' +
+            '       <li><button type="button" class="btn_edit se-tooltip" data-command="OL">' +
             '           <i class="icon-list-number"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
             '       </button></li>' +
-            '       <li><button type="button" class="btn_edit se-tooltip" data-command="insertUnorderedList" data-value="UL">' +
+            '       <li><button type="button" class="btn_edit se-tooltip" data-command="UL">' +
             '           <i class="icon-list-bullets"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
             '       </button></li>' +
@@ -61,7 +61,7 @@ export default {
 
         if (currentList !== listContext.currentList) {
             for (let i = 0, len = list.length; i < len; i++) {
-                if (currentList === list[i].getAttribute('data-value')) {
+                if (currentList === list[i].getAttribute('data-command')) {
                     this.util.addClass(list[i], 'on');
                 } else {
                     this.util.removeClass(list[i], 'on');
@@ -78,19 +78,19 @@ export default {
 
         let target = e.target;
         let command = '';
-        let value = '';
 
         while (!command && !/^UL$/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
-            value = target.getAttribute('data-value');
             target = target.parentNode;
         }
 
-        if (!command || !value) return;
+        if (!command) return;
 
         const formatElement = this.util.getFormatElement(this.getSelectionNode());
         const selectedFormsts = this.getSelectedFormatElements();
         let isRemove = true;
+        let edgeFirst = null;
+        let edgeLast = null;
 
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
             if (!/^LI$/i.test(selectedFormsts[i].tagName)) {
@@ -100,39 +100,87 @@ export default {
         }
 
         if (isRemove) {
-            const cancel = formatElement.parentNode.tagName === value;
+            const cancel = formatElement.parentNode.tagName === command;
             if (cancel) {
-                this.detachRangeFormatElement(this.util.getRangeFormatElement(formatElement), selectedFormsts);
-            } else {
-                this.execCommand(command, false, null);
-            }
-        } else {
-            let rightNode = formatElement.nextSibling;
-            const list = this.util.createElement(value);
-            
-            for (let i = 0, len = selectedFormsts.length, fTag = null; i < len; i++) {
-                fTag = selectedFormsts[i];
+                let rangeArr;
+                for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
+                    if (!r) {
+                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                        rangeArr = {r: r, f: [selectedFormsts[i]]};
+                    } else {
+                        if (r !== this.util.getRangeFormatElement(selectedFormsts[i])) {
+                            const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, true);
+                            if (!edgeFirst) edgeFirst = edge;
 
-                if (i === len - 1) {
-                    rightNode = fTag.nextSibling;
+                            r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                            rangeArr = {r: r, f: [selectedFormsts[i]]};
+                        } else {
+                            rangeArr.f.push(selectedFormsts[i])
+                        }
+                    }
+
+                    if (i === len - 1) {
+                        edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, true);
+                        if (!edgeFirst) edgeFirst = edgeLast;
+                    }
+                }
+            } else {
+                let firstList = null;
+                let lastList = null;
+
+                for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
+                    if (!r) {
+                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                    } else if (r !== this.util.getRangeFormatElement(selectedFormsts[i])) {
+                        r.parentNode.insertBefore(eval(r.outerHTML.replace(/\b(?<=<\/?)(ol|ul)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, command)), r);
+
+                        if (!firstList) firstList = r;
+                        this.util.removeItem(r);
+                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                    }
+
+                    if (i === len - 1) {
+                        r.outerHTML = r.outerHTML.replace(/\b(?<=<\/?)(ol|ul)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, command);
+                        lastList = r;
+                        if (!firstList) firstList = lastList;
+                        this.util.removeItem(r);
+                    }
                 }
 
+                edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstElementChild, lastList.lastElementChild);
+            }
+        } else {
+            let list = this.util.createElement(command);
+            let firstList = null;
+            let lastList = null;
+            
+            for (let i = 0, len = selectedFormsts.length, fTag, next; i < len; i++) {
+                fTag = selectedFormsts[i];
+                next = selectedFormsts[i + 1];
                 list.innerHTML += '<li>' + (this.util.isComponent(fTag) ? fTag.outerHTML : fTag.innerHTML) + '</li>';
+
+                if (i === len - 1) lastList = list;
+                if (i === len - 1 || !next || fTag.parentNode !== next.parentNode || this.util.isRangeFormatElement(fTag.nextSibling)) {
+                    if (!firstList) firstList = list;
+
+                    fTag.parentNode.insertBefore(list, fTag.nextSibling);
+                    list = this.util.createElement(command);
+                }
+
                 this.util.removeItem(fTag);
             }
 
-            this.context.element.wysiwyg.insertBefore(list, rightNode);
-
-            const edge = this.util.getEdgeChildNodes(list.firstElementChild, list.lastElementChild);
-            if (selectedFormsts.length > 1) {
-                this.setRange(edge.sc, 0, edge.ec, edge.ec.length);
-            } else {
-                this.setRange(edge.ec, edge.ec.length, edge.ec, edge.ec.length);
-            }
-
-            // history stack
-            this.history.push();
+            edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstElementChild, lastList.lastElementChild);
         }
+
+        if (selectedFormsts.length > 1) {
+            this.setRange(edgeFirst.sc, 0, edgeLast.ec, edgeLast.ec.length);
+        } else {
+            this.setRange(edgeFirst.ec, edgeFirst.ec.length, edgeLast.ec, edgeLast.ec.length);
+        }
+
+        // history stack
+        this.history.push();
 
         this.submenuOff();
         this.focus();
