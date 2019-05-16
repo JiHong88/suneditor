@@ -807,7 +807,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * When "selectedFormats" is null, all elements are detached.
          * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
          * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove
-         * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object.
+         * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, notHistory) {
             let rNode = null;
@@ -2355,7 +2355,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
-                        if (!range.commonAncestorContainer.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
+                        if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             core.detachRangeFormatElement(rangeEl);
                         }
                     }

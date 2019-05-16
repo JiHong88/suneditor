@@ -103,6 +103,7 @@ export default {
             const cancel = formatElement.parentNode.tagName === command;
             if (cancel) {
                 let rangeArr;
+                
                 for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
                     if (!r) {
                         r = this.util.getRangeFormatElement(selectedFormsts[i]);
@@ -127,22 +128,29 @@ export default {
             } else {
                 let firstList = null;
                 let lastList = null;
+                let tempList = null;
 
                 for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
                     if (!r) {
                         r = this.util.getRangeFormatElement(selectedFormsts[i]);
                     } else if (r !== this.util.getRangeFormatElement(selectedFormsts[i])) {
-                        r.parentNode.insertBefore(eval(r.outerHTML.replace(/\b(?<=<\/?)(ol|ul)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, command)), r);
+                        tempList = this.util.createElement(command);
+                        tempList.innerHTML = r.innerHTML;
 
-                        if (!firstList) firstList = r;
+                        if (!firstList) firstList = tempList;
+                        r.parentNode.insertBefore(tempList, r);
+                        
                         this.util.removeItem(r);
                         r = this.util.getRangeFormatElement(selectedFormsts[i]);
                     }
 
                     if (i === len - 1) {
-                        r.outerHTML = r.outerHTML.replace(/\b(?<=<\/?)(ol|ul)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, command);
-                        lastList = r;
+                        lastList = this.util.createElement(command);
+                        lastList.innerHTML = r.innerHTML;
+
                         if (!firstList) firstList = lastList;
+                        r.parentNode.insertBefore(lastList, r);
+                        
                         this.util.removeItem(r);
                     }
                 }
