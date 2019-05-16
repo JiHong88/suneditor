@@ -806,61 +806,90 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
          * When "selectedFormats" is null, all elements are detached.
          * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
-         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove
+         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove. If null, Applies to all elements
+         * @param {Element|null} newRangeElement - The node(rangeElement) to replace the currently wrapped node.
+         * @param {Boolean} remove - Delete without detached.
          * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats, notHistory) {
-            let lastNode = null;
+        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistory) {
             let firstNode = null;
+            let lastNode = null;
             const children = rangeElement.children;
+            const parent = rangeElement.parentNode;
             let rangeEl = rangeElement.cloneNode(false);
+            
+            const newList = util.isList(newRangeElement);
+            let insertedNew = false;
 
-            for (let i = children.length - 1, insNode; 0 <= i; i--) {
+            for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
+                if (remove) {
+                    lastNode = rangeEl;
+
+                    if (!firstNode) {
+                        firstNode = rangeEl;
+                    }
+                }
+
                 if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
+                    if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
                     insNode = insNode.cloneNode(true);
                     rangeEl.appendChild(insNode);
                 }
                 else {
-                    if (rangeEl.children.length > 0) {
-                        this.insertNode(rangeEl, rangeElement);
-                        rangeEl = rangeElement.cloneNode(false);
+                    if (rangeEl && rangeEl.children.length > 0) {
+                        parent.insertBefore(rangeEl, rangeElement);
+                        rangeEl = null;
                     }
 
-                    if (/^LI$/i.test(insNode.nodeName)) {
+                    if (!newList && /^LI$/i.test(insNode.nodeName)) {
                         const inner = insNode.innerHTML;
-                        insNode = util.createElement('P');
+                        insNode = /^TD$/i.test(rangeElement.parentNode.nodeName) ? util.createElement('DIV') : util.createElement('P');
                         insNode.innerHTML = inner;
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
 
-                    this.insertNode(insNode, rangeElement);
-
-                    if (selectedFormats) {
-                        firstNode = insNode;
-                        if (!lastNode) {
+                    if (!remove) {
+                        if (newRangeElement) {
+                            if (!insertedNew) {
+                                parent.insertBefore(newRangeElement, rangeElement);
+                                insertedNew = true;
+                            }
+                            newRangeElement.appendChild(insNode);
+                        } else {
+                            parent.insertBefore(insNode, rangeElement);
+                        }
+                        
+                        if (selectedFormats) {
                             lastNode = insNode;
+                            if (!firstNode) {
+                                firstNode = insNode;
+                            }
+                        } else if (!firstNode) {
+                            firstNode = lastNode = insNode;
                         }
                     }
+                    
                 }
             }
 
-            if (rangeEl.children.length > 0) {
+            if (rangeEl && rangeEl.children.length > 0) {
                 rangeElement.parentNode.insertBefore(rangeEl, rangeElement.nextElementSibling);
             }
 
-            const nextEl = rangeElement.nextElementSibling;
             util.removeItem(rangeElement);
 
-            const edge = selectedFormats ? this.util.getEdgeChildNodes(firstNode, lastNode) : this.util.getEdgeChildNodes(nextEl);
+            const edge = remove ? null : this.util.getEdgeChildNodes(firstNode, lastNode);
             if (notHistory) return edge;
 
-            if (!selectedFormats) {
-                this.setRange(edge.sc, 0, edge.sc, 0);
-            } else {
-                const sameNode = firstNode === lastNode;
-                this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
+            if (!remove && edge) {
+                if (!selectedFormats) {
+                    this.setRange(edge.sc, 0, edge.sc, 0);
+                } else {
+                    const sameNode = firstNode === lastNode;
+                    this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
+                }
             }
 
             this.history.push();
@@ -2355,7 +2384,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
-                            core.detachRangeFormatElement(rangeEl);
+                            e.preventDefault();
+                            core.detachRangeFormatElement(rangeEl, null, null, false, false);
                         }
                     }
 

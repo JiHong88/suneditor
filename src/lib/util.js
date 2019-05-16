@@ -328,7 +328,16 @@ const util = {
     },
 
     /**
-     * @description Check the node is a table cell
+     * @description Check the node is a list (ol, ul)
+     * @param {Element} node - Nodes to check
+     * @returns {Boolean}
+     */
+    isList: function (node) {
+        return node && /^(OL|UL)$/i.test(node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a table cell (td, th)
      * @param {Element} node - Nodes to check
      * @returns {Boolean}
      */

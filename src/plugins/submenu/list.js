@@ -86,7 +86,7 @@ export default {
 
         if (!command) return;
 
-        const formatElement = this.util.getFormatElement(this.getSelectionNode());
+        const currentRangeList = this.util.getFormatElement(this.getSelectionNode()).parentNode;
         const selectedFormsts = this.getSelectedFormatElements();
         let isRemove = true;
         let edgeFirst = null;
@@ -100,69 +100,39 @@ export default {
         }
 
         if (isRemove) {
-            const cancel = formatElement.parentNode.tagName === command;
-            if (cancel) {
-                let rangeArr;
-                
-                for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
-                    o = this.util.getRangeFormatElement(selectedFormsts[i]);
-                    if (!r) {
+            const cancel = currentRangeList.tagName === command;
+            let rangeArr, tempList;
+
+            if (!cancel) tempList = this.util.createElement(command);
+
+            for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
+                o = this.util.getRangeFormatElement(selectedFormsts[i]);
+                if (!r) {
+                    r = o;
+                    rangeArr = {r: r, f: [selectedFormsts[i]]};
+                } else {
+                    if (r !== o) {
+                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
+                        if (!edgeFirst) edgeFirst = edge;
+                        if (!cancel) tempList = this.util.createElement(command);
                         r = o;
                         rangeArr = {r: r, f: [selectedFormsts[i]]};
                     } else {
-                        if (r !== o) {
-                            const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, true);
-                            if (!edgeFirst) edgeFirst = edge;
-
-                            r = o;
-                            rangeArr = {r: r, f: [selectedFormsts[i]]};
-                        } else {
-                            rangeArr.f.push(selectedFormsts[i])
-                        }
-                    }
-
-                    if (i === len - 1) {
-                        edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, true);
-                        if (!edgeFirst) edgeFirst = edgeLast;
-                    }
-                }
-            } else {
-                let firstList = null;
-                let lastList = null;
-                let tempList = null;
-
-                for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
-                    o = this.util.getRangeFormatElement(selectedFormsts[i]);
-                    if (!r) {
-                        r = o;
-                    } else if (r !== o) {
-                        tempList = this.util.createElement(command);
-                        tempList.innerHTML = r.innerHTML;
-                        
-                        if (!firstList) firstList = tempList;
-                        r.parentNode.insertBefore(tempList, r);
-                        
-                        this.util.removeItem(r);
-                        r = o;
-                    }
-
-                    if (i === len - 1) {
-                        lastList = this.util.createElement(command);
-                        lastList.innerHTML = r.innerHTML;
-
-                        if (!firstList) firstList = lastList;
-                        r.parentNode.insertBefore(lastList, r);
-                        
-                        this.util.removeItem(r);
+                        rangeArr.f.push(selectedFormsts[i])
                     }
                 }
 
-                edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstElementChild, lastList.lastElementChild);
+                if (i === len - 1) {
+                    edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
+                    if (!edgeFirst) edgeFirst = edgeLast;
+                }
             }
         } else {
             let list = this.util.createElement(command);
             let firstList = null;
             let lastList = null;
+            const mergeTop = !selectedFormsts[0].previousSibling && (currentRangeList.previousSibling && currentRangeList.previousSibling.tagName === command);
+            const mergeBottom = !selectedFormsts[selectedFormsts.length - 1].nextSibling && (currentRangeList.nextSibling && currentRangeList.nextSibling.tagName === command);
             
             for (let i = 0, len = selectedFormsts.length, fTag, next; i < len; i++) {
                 fTag = selectedFormsts[i];
