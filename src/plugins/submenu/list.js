@@ -104,16 +104,17 @@ export default {
             if (cancel) {
                 let rangeArr;
                 
-                for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
+                for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
+                    o = this.util.getRangeFormatElement(selectedFormsts[i]);
                     if (!r) {
-                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                        r = o;
                         rangeArr = {r: r, f: [selectedFormsts[i]]};
                     } else {
-                        if (r !== this.util.getRangeFormatElement(selectedFormsts[i])) {
+                        if (r !== o) {
                             const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, true);
                             if (!edgeFirst) edgeFirst = edge;
 
-                            r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                            r = o;
                             rangeArr = {r: r, f: [selectedFormsts[i]]};
                         } else {
                             rangeArr.f.push(selectedFormsts[i])
@@ -130,18 +131,19 @@ export default {
                 let lastList = null;
                 let tempList = null;
 
-                for (let i = 0, len = selectedFormsts.length, r; i < len; i++) {
+                for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
+                    o = this.util.getRangeFormatElement(selectedFormsts[i]);
                     if (!r) {
-                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
-                    } else if (r !== this.util.getRangeFormatElement(selectedFormsts[i])) {
+                        r = o;
+                    } else if (r !== o) {
                         tempList = this.util.createElement(command);
                         tempList.innerHTML = r.innerHTML;
-
+                        
                         if (!firstList) firstList = tempList;
                         r.parentNode.insertBefore(tempList, r);
                         
                         this.util.removeItem(r);
-                        r = this.util.getRangeFormatElement(selectedFormsts[i]);
+                        r = o;
                     }
 
                     if (i === len - 1) {

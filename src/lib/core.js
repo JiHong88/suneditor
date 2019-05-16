@@ -810,8 +810,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, notHistory) {
-            let rNode = null;
-            let lastRangeNode = null;
+            let lastNode = null;
+            let firstNode = null;
             const children = rangeElement.children;
             let rangeEl = rangeElement.cloneNode(false);
 
@@ -838,9 +838,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     this.insertNode(insNode, rangeElement);
 
                     if (selectedFormats) {
-                        lastRangeNode = insNode;
-                        if (!rNode) {
-                            rNode = insNode;
+                        firstNode = insNode;
+                        if (!lastNode) {
+                            lastNode = insNode;
                         }
                     }
                 }
@@ -848,19 +848,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (rangeEl.children.length > 0) {
                 rangeElement.parentNode.insertBefore(rangeEl, rangeElement.nextElementSibling);
-                rangeEl = rangeElement.cloneNode(false);
             }
 
             const nextEl = rangeElement.nextElementSibling;
             util.removeItem(rangeElement);
 
-            const edge = selectedFormats ? this.util.getEdgeChildNodes(rNode, lastRangeNode) : this.util.getEdgeChildNodes(nextEl);
+            const edge = selectedFormats ? this.util.getEdgeChildNodes(firstNode, lastNode) : this.util.getEdgeChildNodes(nextEl);
             if (notHistory) return edge;
 
             if (!selectedFormats) {
                 this.setRange(edge.sc, 0, edge.sc, 0);
             } else {
-                const sameNode = lastRangeNode === rNode;
+                const sameNode = firstNode === lastNode;
                 this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
             }
 
