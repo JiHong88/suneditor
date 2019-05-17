@@ -83,7 +83,7 @@ export default {
         const lang = this.lang;
         const tableResize = this.util.createElement('DIV');
 
-        tableResize.className = 'sun-editor-id-table';
+        tableResize.className = 'se-controller sun-editor-id-table';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div>' +
@@ -106,7 +106,7 @@ export default {
         const lang = this.lang;
         const tableResize = this.util.createElement('DIV');
 
-        tableResize.className = 'sun-editor-id-table-edit';
+        tableResize.className = 'se-controller sun-editor-id-table-edit';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div class="arrow arrow-up"></div>' +

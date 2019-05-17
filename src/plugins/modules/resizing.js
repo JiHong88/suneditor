@@ -87,7 +87,7 @@ export default {
         const lang = this.lang;
         const resize_button = this.util.createElement("DIV");
 
-        resize_button.className = "controller-resizing";
+        resize_button.className = "se-controller controller-resizing";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="arrow arrow-up"></div>' +

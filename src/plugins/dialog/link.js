@@ -80,7 +80,7 @@ export default {
         const lang = this.lang;
         const link_btn = this.util.createElement('DIV');
 
-        link_btn.className = 'sun-editor-id-link-btn';
+        link_btn.className = 'se-controller sun-editor-id-link-btn';
         link_btn.style.display = 'none';
         link_btn.innerHTML = '' +
             '<div class="arrow arrow-up"></div>' +
