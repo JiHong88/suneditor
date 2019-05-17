@@ -124,7 +124,7 @@ export default {
                         r = o;
                         rangeArr = {r: r, f: [selectedFormsts[i]]};
                     } else {
-                        rangeArr.f.push(selectedFormsts[i])
+                        rangeArr.f.push(selectedFormsts[i]);
                     }
                 }
 

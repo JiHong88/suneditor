@@ -7,7 +7,7 @@
  */
 'use strict';
 
-const history = function (core, change) {
+export default function (core, change) {
     const _w = window;
     const editor = core.context.element.wysiwyg;
     const undo = core.context.tool.undo;
@@ -150,5 +150,3 @@ const history = function (core, change) {
         }
     };
 }
-
-export default history;

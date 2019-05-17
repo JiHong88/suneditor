@@ -235,7 +235,7 @@ export default {
         resizeDiv.style.display = 'block';
 
         const tableElement = contextTable._element;
-        const offset = this.util.getOffset(tableElement)
+        const offset = this.util.getOffset(tableElement);
 
         contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
         this.plugins.table.resizeTable.call(this);
@@ -330,16 +330,16 @@ export default {
         const icon =  contextTable.resizeIcon;
         const span = contextTable.resizeText;
 
-        let removeClass = 'icon-expansion'
-        let addClass = 'icon-reduction'
+        let removeClass = 'icon-expansion';
+        let addClass = 'icon-reduction';
         let text = contextTable.minText;
-        let width = '100%'
+        let width = '100%';
 
         if (!contextTable._maxWidth) {
-            removeClass = 'icon-reduction'
-            addClass = 'icon-expansion'
+            removeClass = 'icon-reduction';
+            addClass = 'icon-expansion';
             text = contextTable.maxText;
-            width = 'auto'
+            width = 'auto';
         }
         
         this.util.removeClass(icon, removeClass);

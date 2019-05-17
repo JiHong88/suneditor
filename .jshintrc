@@ -13,6 +13,7 @@
     "shadow": true,
     "expr": true,
     "strict": "global",
+    "validthis": true,
     "node": true,
     "globals": {
         "ActiveXObject": true,

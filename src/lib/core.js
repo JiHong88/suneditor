@@ -296,7 +296,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description Disable controller in editor area (link button, image resize button)
          */
-        controllersOff: function (e) {
+        controllersOff: function () {
             _d.removeEventListener('mousedown', this._bindControllersOff);
             _d.removeEventListener('keydown', this._bindControllersOff);
             this._bindControllersOff = null;
@@ -779,7 +779,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     lineArr.push(line);
 
                     if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
-                        const edge = this.detachRangeFormatElement(line.parentNode, lineArr, null, true, true)
+                        const edge = this.detachRangeFormatElement(line.parentNode, lineArr, null, true, true);
                         beforeTag = edge.ec;
                         pElement = edge.cc;
                         rangeElement.appendChild(listParent);
@@ -833,7 +833,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (remove) {
                     if (i === 0) {
                         if (!selectedFormats || selectedFormats.length === len || selectedFormats[selectedFormats.length - 1] === children[len - 1]) {
-                            firstNode = rangeElement.previousSibling
+                            firstNode = rangeElement.previousSibling;
                         } else {
                             firstNode = rangeEl;
                         }
@@ -2645,7 +2645,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
         },
 
-        _onChange_historyStack: function (stackIndex) {
+        _onChange_historyStack: function () {
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (userFunction.onChange) userFunction.onChange(core.getContents());
         }
@@ -2823,13 +2823,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            _w.Object.keys(core).forEach(function(key) {delete core[key]});
-            _w.Object.keys(event).forEach(function(key) {delete event[key]});
-            _w.Object.keys(context).forEach(function(key) {delete context[key]});
-            _w.Object.keys(pluginCallButtons).forEach(function(key) {delete pluginCallButtons[key]});
+            _w.Object.keys(core).forEach(function(key) {delete core[key];});
+            _w.Object.keys(event).forEach(function(key) {delete event[key];});
+            _w.Object.keys(context).forEach(function(key) {delete context[key];});
+            _w.Object.keys(pluginCallButtons).forEach(function(key) {delete pluginCallButtons[key];});
             
             /** remove user object */
-            _w.Object.keys(this).forEach(function(key) {delete this[key]}.bind(this));
+            _w.Object.keys(this).forEach(function(key) {delete this[key];}.bind(this));
         }
     };
 

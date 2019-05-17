@@ -22,7 +22,7 @@ const util = {
      * @private
      */
     _tagConvertor: function (text) {
-        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'}
+        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
         return text.replace(/\b(?<=<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
             return (typeof ec[t] === 'string') ? ec[t] : t;
         });
@@ -321,7 +321,7 @@ const util = {
      */
     getPositionIndex: function (element) {
         let idx = 0;
-        while (element = element.previousSibling) {
+        while (!!(element = element.previousSibling)) {
             idx += 1;
         }
         return idx;
@@ -523,7 +523,7 @@ const util = {
         return {
             sc: first,
             ec: last || first
-        }
+        };
     },
 
     /**
@@ -661,7 +661,7 @@ const util = {
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (!tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML
+                cleanHTML += domTree[i].outerHTML;
             }
         }
 
