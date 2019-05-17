@@ -227,12 +227,12 @@
 .sun-editor .layer_editor .pallet_color_selector .list_color button.on {border:2px dashed #fff;}
 .sun-editor .layer_editor .pallet_color_selector .list_color button:hover, .sun-editor .layer_editor .list_color button:focus {border:2px solid #fff;}
 /* submenu layer - form group (color selector) */
-.sun-editor .sub-form-group {height:38px; padding:0 7px 7px 7px;}
+.sun-editor .sub-form-group {height:auto; padding:0 7px 7px 7px;}
 .sun-editor .sub-form-group label {display:inline-block; font-weight:bold; font-size:14px; letter-spacing:1px;}
-.sun-editor .sub-form-group input {display:inline-block; width:121px; font-size:14px; margin:0 8px 0 0; border-bottom:2px solid #b1b1b1; text-transform:uppercase;}
+.sun-editor .sub-form-group input {display:inline-block; width:auto; height:35px; font-size:14px; margin:0; padding:4px; border-bottom:2px solid #b1b1b1; text-transform:uppercase;}
 .sun-editor .sub-form-group input:focus {outline:none; border-bottom:3px solid #b1b1b1;}
-.sun-editor .sub-form-group button {float:right; width:auto; height:100%; padding:0 15px;}
-.sun-editor .sub-form-group button.btn_editor {float:none; width:35px; padding:0; border:1px solid #ccc;}
+.sun-editor .sub-form-group button {float:right; width:35px; height:35px; padding:0; margin:0 0 0 4px !important;}
+.sun-editor .sub-form-group button.btn_editor {border:1px solid #ccc;}
 
 /** --- editor area */
 .sun-editor .sun-editor-id-editorArea {position:static; width:100%; height:auto; overflow:hidden; z-index:1;}
