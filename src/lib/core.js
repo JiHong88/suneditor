@@ -768,24 +768,26 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             let listParent = null;
             let line = null;
-            let prevNode = null;
+            const lineArr = [];
             
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 line = rangeLines[i];
 
                 if (util.isListCell(line)) {
-                    if (listParent === null || !util.isListCell(prevNode)) {
-                        listParent = util.createElement(line.parentNode.nodeName);
-                    }
+                    if (listParent === null) listParent = util.createElement(line.parentNode.nodeName);
+                    listParent.innerHTML += line.outerHTML;
+                    lineArr.push(line);
 
-                    listParent.appendChild(line);
-                    if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) rangeElement.appendChild(listParent);
+                    if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
+                        const edge = this.detachRangeFormatElement(line.parentNode, lineArr, null, true, true)
+                        beforeTag = edge.ec;
+                        pElement = edge.cc;
+                        rangeElement.appendChild(listParent);
+                    }
                 }
                 else {
                     rangeElement.appendChild(line);
                 }
-
-                prevNode = line;
             }
 
             pElement.insertBefore(rangeElement, beforeTag);
@@ -804,18 +806,23 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
-         * When "selectedFormats" is null, all elements are detached.
+         * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling}.
          * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
-         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove. If null, Applies to all elements
+         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove.
+         * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
          * @param {Element|null} newRangeElement - The node(rangeElement) to replace the currently wrapped node.
          * @param {Boolean} remove - Delete without detached.
          * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistory) {
-            let firstNode = null;
-            let lastNode = null;
+            const range = this.getRange();
+            const so = range.startOffset;
+            const eo = range.endOffset;
+
             const children = rangeElement.children;
             const parent = rangeElement.parentNode;
+            let firstNode = null;
+            let lastNode = null;
             let rangeEl = rangeElement.cloneNode(false);
             
             const newList = util.isList(newRangeElement);
@@ -824,10 +831,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
             for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
                 if (remove) {
-                    lastNode = rangeEl;
-
-                    if (!firstNode) {
-                        firstNode = rangeEl;
+                    if (i === 0) {
+                        if (!selectedFormats || selectedFormats.length === len || selectedFormats[selectedFormats.length - 1] === children[len - 1]) {
+                            firstNode = rangeElement.previousSibling
+                        } else {
+                            firstNode = rangeEl;
+                        }
                     }
                 }
 
@@ -874,21 +883,26 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
+            const rangeParent = rangeElement.parentNode;
             if (rangeEl && rangeEl.children.length > 0) {
-                rangeElement.parentNode.insertBefore(rangeEl, rangeElement.nextElementSibling);
+                rangeParent.insertBefore(rangeEl, rangeElement.nextElementSibling);
             }
 
             util.removeItem(rangeElement);
 
-            const edge = remove ? null : this.util.getEdgeChildNodes(firstNode, lastNode);
+            const edge = remove ? {
+                cc: rangeParent,
+                sc: firstNode,
+                ec: firstNode ? firstNode.nextSibling ? firstNode.nextSibling : firstNode : rangeEl && rangeEl.children.length > 0 ? rangeEl.nextSibling : null
+            } : this.util.getEdgeChildNodes(firstNode, lastNode);
+
             if (notHistory) return edge;
 
             if (!remove && edge) {
                 if (!selectedFormats) {
                     this.setRange(edge.sc, 0, edge.sc, 0);
                 } else {
-                    const sameNode = firstNode === lastNode;
-                    this.setRange((sameNode ? edge.ec : edge.sc), (sameNode ? edge.ec.length : 0), edge.ec, edge.ec.length);
+                    this.setRange(edge.sc, so, edge.ec, eo);
                 }
             }
 
@@ -2385,7 +2399,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
-                            core.detachRangeFormatElement(rangeEl, null, null, false, false);
+                            core.detachRangeFormatElement(rangeEl, util.isListCell(formatEl) ? [formatEl] : null, null, false, false);
                         }
                     }
 

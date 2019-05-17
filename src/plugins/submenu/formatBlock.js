@@ -73,7 +73,10 @@ export default {
         if (command === 'range') {
             const rangeElement = this.util.createElement(value);
             this.applyRangeFormatElement(rangeElement);
-            this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
+            
+            if (!this.util.isListCell(this.util.getFormatElement(this.getSelectionNode()))) {
+                this.appendFormatTag(rangeElement, this.util.isCell(this.getSelectionNode()) ? 'DIV' : '');
+            }
         }
         // others
         else {

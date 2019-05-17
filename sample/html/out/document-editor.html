@@ -1126,7 +1126,7 @@
                     class="type-signature"></span></h4>
             <div class="description">
                 The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)<br>
-                When "selectedFormats" is null, all elements are detached.
+                When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling}.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1150,7 +1150,8 @@
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">Array of format elements (P, DIV, LI...) to remove. If null, Applies to all elements.</td>
+                    <td class="description last">Array of format elements (P, DIV, LI...) to remove.<br>
+                        If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}</td>
                 </tr>
                 <tr>
                     <td class="name"><code>newRangeElement</code></td>
