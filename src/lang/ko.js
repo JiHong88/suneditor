@@ -55,7 +55,7 @@
             link: '링크',
             image: '이미지',
             video: '동영상',
-            fullScreen: '전체화면',
+            fullScreen: '전체 화면',
             showBlocks: '블록 보기',
             codeView: 'HTML 편집',
             undo: '실행 취소',
@@ -113,7 +113,9 @@
             mirrorHorizontal: '좌우 반전',
             mirrorVertical: '상하 반전',
             rotateLeft: '왼쪽으로 회전',
-            rotateRight: '오른쪽으로 회전'
+            rotateRight: '오른쪽으로 회전',
+            maxSize: '최대화',
+            minSize: '최소화'
         }
     };
 

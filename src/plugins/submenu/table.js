@@ -20,7 +20,12 @@ export default {
             _trIndex: 0,
             _tdCnt: 0,
             _trCnt: 0,
-            _tableXY: []
+            _tableXY: [],
+            _maxWidth: true,
+            resizeIcon: null,
+            resizeText: null,
+            maxText: core.lang.controller.maxSize,
+            minText: core.lang.controller.minSize
         };
 
         /** set submenu */
@@ -31,6 +36,13 @@ export default {
         context.table.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
         context.table.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
 
+        /** set table controller */
+        let tableController = eval(this.setController_table.call(core));
+        context.table.tableController = tableController;
+        context.table.resizeIcon = tableController.querySelector('button > i');
+        context.table.resizeText = tableController.querySelector('button > span > span');
+        tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+
         /** set resizing */
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
@@ -39,14 +51,16 @@ export default {
         /** add event listeners */
         tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core));
         tablePicker.addEventListener('click', this.appendTable.bind(core));
-        resizeDiv.addEventListener('click', this.onClick_resizeDiv.bind(core));
+        resizeDiv.addEventListener('click', this.onClick_tableController.bind(core));
+        tableController.addEventListener('click', this.onClick_tableController.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
         context.element.relative.appendChild(resizeDiv);
+        context.element.relative.appendChild(tableController);
 
         /** empty memory */
-        listDiv = null, tablePicker = null, resizeDiv = null;
+        listDiv = null, tablePicker = null, resizeDiv = null, tableController = null;
     },
 
     setSubmenu: function () {
@@ -63,6 +77,29 @@ export default {
             '<div class="table-display sun-editor-table-display">1 x 1</div>';
 
         return listDiv;
+    },
+
+    setController_table: function () {
+        const lang = this.lang;
+        const tableResize = this.util.createElement('DIV');
+
+        tableResize.className = 'sun-editor-id-table';
+        tableResize.style.display = 'none';
+        tableResize.innerHTML = '' +
+            '<div>' +
+            '   <div class="btn-group">' +
+            '       <button type="button" data-command="resize" data-option="up" class="se-tooltip">' +
+            '           <i class="icon-expansion"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="remove" class="se-tooltip">' +
+            '           <i class="icon-delete"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '       </button>' +
+            '   </div>' +
+            '</div>';
+
+        return tableResize;
     },
 
     setController_tableEditor: function () {
@@ -102,10 +139,6 @@ export default {
             '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
             '           <i class="icon-delete-column"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="remove" class="se-tooltip">' +
-            '           <i class="icon-delete"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
             '       </button>' +
             '   </div>' +
             '</div>';
@@ -188,6 +221,7 @@ export default {
         contextTable._trCnt = 0;
         contextTable._tdCnt = 0;
         contextTable._tableXY = [];
+        contextTable._maxWidth = true;
     },
 
     /** table edit controller */
@@ -195,11 +229,21 @@ export default {
         this.plugins.table.init.call(this);
         const contextTable = this.context.table;
         const resizeDiv = contextTable.resizeDiv;
+        const tableController = contextTable.tableController;
         
         this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
         resizeDiv.style.display = 'block';
 
-        this.controllersOn(resizeDiv);
+        const tableElement = contextTable._element;
+        const offset = this.util.getOffset(tableElement)
+
+        contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
+        this.plugins.table.resizeTable.call(this);
+        tableController.style.left = (offset.left + tableElement.offsetLeft - this.context.element.wysiwyg.scrollLeft) + 'px';
+        tableController.style.display = 'block';
+        tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
+
+        this.controllersOn(resizeDiv, tableController);
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -281,13 +325,36 @@ export default {
         this.controllersOff();
     },
 
-    onClick_resizeDiv: function (e) {
-        e.stopPropagation();
-        const target = e.target;
+    resizeTable: function () {
+        const contextTable = this.context.table;
+        const icon =  contextTable.resizeIcon;
+        const span = contextTable.resizeText;
 
-        const command = target.getAttribute('data-command') || target.parentNode.getAttribute('data-command');
-        const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
-        const option = target.getAttribute('data-option') || target.parentNode.getAttribute('data-option');
+        let removeClass = 'icon-expansion'
+        let addClass = 'icon-reduction'
+        let text = contextTable.minText;
+        let width = '100%'
+
+        if (!contextTable._maxWidth) {
+            removeClass = 'icon-reduction'
+            addClass = 'icon-expansion'
+            text = contextTable.maxText;
+            width = 'auto'
+        }
+        
+        this.util.removeClass(icon, removeClass);
+        this.util.addClass(icon, addClass);
+        this.util.changeTxt(span, text);
+        contextTable._element.style.width = width;
+    },
+
+    onClick_tableController: function (e) {
+        e.stopPropagation();
+        const target = e.target.getAttribute('data-command') ? e.target : e.target.parentNode;
+
+        const command = target.getAttribute('data-command');
+        const value = target.getAttribute('data-value');
+        const option = target.getAttribute('data-option');
         
         if (!command) return;
 
@@ -300,6 +367,11 @@ export default {
                 break;
             case 'delete':
                 this.plugins.table.deleteRowCell.call(this, value);
+                break;
+            case 'resize':
+                contextTable.resizeDiv.style.display = 'none';
+                contextTable._maxWidth = !contextTable._maxWidth;
+                this.plugins.table.resizeTable.call(this);
                 break;
             case 'remove':
                 this.util.removeItem(contextTable._element);

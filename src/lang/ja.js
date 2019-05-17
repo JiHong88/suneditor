@@ -113,7 +113,9 @@
             mirrorHorizontal: '左右反転',
             mirrorVertical: '上下反転',
             rotateLeft: '左に回転',
-            rotateRight: '右に回転'
+            rotateRight: '右に回転',
+            maxSize: '最大サイズ',
+            minSize: '最小サイズ'
         }
     };
 

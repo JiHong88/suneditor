@@ -113,7 +113,9 @@
             mirrorHorizontal: '翻转左右',
             mirrorVertical: '翻转上下',
             rotateLeft: '向左旋转',
-            rotateRight: '向右旋转'
+            rotateRight: '向右旋转',
+            maxSize: '最大尺寸',
+            minSize: '最小尺寸'
         }
     };
 

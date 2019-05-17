@@ -113,7 +113,9 @@
             mirrorHorizontal: 'Mirror, Horizontal',
             mirrorVertical: 'Mirror, Vertical',
             rotateLeft: 'Rotate left',
-            rotateRight: 'Rotate right'
+            rotateRight: 'Rotate right',
+            maxSize: 'Max size',
+            minSize: 'Min size'
         }
     };
 

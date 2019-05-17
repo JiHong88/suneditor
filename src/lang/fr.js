@@ -113,7 +113,9 @@
             mirrorHorizontal: 'Mirroir, Horizontal',
             mirrorVertical: 'Mirroir, Vertical',
             rotateLeft: 'Rotation à gauche',
-            rotateRight: 'Rotation à droite'
+            rotateRight: 'Rotation à droite',
+            maxSize: 'Taille max',
+            minSize: 'Taille min'
         }
     };
 
