@@ -73,7 +73,6 @@ const _Context = function (element, cons, options) {
             videoResizing: options.videoResizing,
             videoWidth: options.videoWidth,
             videoHeight: options.videoHeight,
-            tableWidth: options.tableWidth,
             youtubeQuery: options.youtubeQuery.replace('?', ''),
             callBackSave: options.callBackSave
         }

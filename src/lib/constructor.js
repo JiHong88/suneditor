@@ -54,9 +54,6 @@ const _Constructor = {
         options.videoWidth = options.videoWidth || 560;
         options.videoHeight = options.videoHeight || 315;
         options.youtubeQuery = options.youtubeQuery || '';
-        // table
-        options.tableWidth = options.tableWidth || '100%'
-        
         // callBack function
         // options.callBackSave = options.callBackSave;
         // buttons

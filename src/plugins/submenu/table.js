@@ -115,7 +115,6 @@ export default {
 
     appendTable: function () {
         const oTable = this.util.createElement('TABLE');
-        oTable.style.width = this.context.option.tableWidth;
 
         let x = this.context.table._tableXY[0];
         let y = this.context.table._tableXY[1];
