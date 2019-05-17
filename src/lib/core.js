@@ -564,7 +564,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         appendFormatTag: function (element, formatNodeName) {
             const formatEl = element;
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) && !/^LI$/.test(currentFormatEl.nodeName) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) && !util.isListCell(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = util.zeroWidthSpace;
 
@@ -768,24 +768,24 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             let listParent = null;
             let line = null;
-            let prevNodeName = '';
+            let prevNode = null;
             
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 line = rangeLines[i];
 
-                if (/^LI$/i.test(line.nodeName)) {
-                    if (listParent === null || !/^LI$/i.test(prevNodeName)) {
+                if (util.isListCell(line)) {
+                    if (listParent === null || !util.isListCell(prevNode)) {
                         listParent = util.createElement(line.parentNode.nodeName);
                     }
 
                     listParent.appendChild(line);
-                    if (i === len - 1 || !/^LI$/i.test(rangeLines[i + 1].nodeName)) rangeElement.appendChild(listParent);
+                    if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) rangeElement.appendChild(listParent);
                 }
                 else {
                     rangeElement.appendChild(line);
                 }
 
-                prevNodeName = line.nodeName;
+                prevNode = line;
             }
 
             pElement.insertBefore(rangeElement, beforeTag);
@@ -842,9 +842,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         rangeEl = null;
                     }
 
-                    if (!newList && /^LI$/i.test(insNode.nodeName)) {
+                    if (!newList && util.isListCell(insNode)) {
                         const inner = insNode.innerHTML;
-                        insNode = /^TD$/i.test(rangeElement.parentNode.nodeName) ? util.createElement('DIV') : util.createElement('P');
+                        insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
                         insNode.innerHTML = inner;
                     } else {
                         insNode = insNode.cloneNode(true);
@@ -2051,7 +2051,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     /* List */
-                    if (findList && /^LI$/.test(nodeName) && commandMap.LI) {
+                    if (findList && util.isListCell(nodeName) && commandMap.LI) {
                         commandMapNodes.push('LI');
                         commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
                         findList = false;
@@ -2124,7 +2124,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     commandMap.ALIGN.className = 'icon-align-left';
                     commandMap.ALIGN.removeAttribute('data-focus');
                 }
-                else if (commandMap.LI && /^LI$/i.test(key)) {
+                else if (commandMap.LI && util.isListCell(key)) {
                     commandMap.LI.removeAttribute('data-focus');
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -2372,7 +2372,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let formatEl, rangeEl;
             switch (keyCode) {
                 case 8: /** backspace key */
-                    if (util.isFormatElement(selectionNode) && !/^LI$/i.test(selectionNode.nodeName) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
+                    if (util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = util.zeroWidthSpace;
@@ -2381,7 +2381,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
                     rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
+                    if (rangeEl && formatEl && !util.isCell(rangeEl)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
@@ -2455,7 +2455,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 case 13: /** enter key */
                     formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
                     rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl && !/^TD$/i.test(rangeEl.nodeName)) {
+                    if (rangeEl && formatEl && !util.isCell(rangeEl)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();

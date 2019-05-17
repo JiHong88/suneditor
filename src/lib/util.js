@@ -329,34 +329,43 @@ const util = {
 
     /**
      * @description Check the node is a list (ol, ul)
-     * @param {Element} node - Nodes to check
+     * @param {Element|String} node - Nodes to check
      * @returns {Boolean}
      */
     isList: function (node) {
-        return node && /^(OL|UL)$/i.test(node.nodeName);
+        return node && /^(OL|UL)$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a list cell (li)
+     * @param {Element|String} node - Nodes to check
+     * @returns {Boolean}
+     */
+    isListCell: function (node) {
+        return node && /^LI$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
      * @description Check the node is a table cell (td, th)
-     * @param {Element} node - Nodes to check
+     * @param {Element|String} node - Nodes to check
      * @returns {Boolean}
      */
     isCell: function (node) {
-        return node && /^(TD|TH)$/i.test(node.nodeName);
+        return node && /^(TD|TH)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
      * @description Check the node is a break node (BR)
-     * @param {Element} node - Nodes to check
+     * @param {Element|String} node - Nodes to check
      * @returns {Boolean}
      */
     isBreak: function (node) {
-        return node && /^BR$/i.test(node.nodeName);
+        return node && /^BR$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
      * @description Get all child nodes of the argument value element (Without text node)
-     * @param {Element} element - element to get child node
+     * @param {Element|String} element - element to get child node
      * @param {(function|null)} validation - Conditional function
      * @returns {Array}
      */

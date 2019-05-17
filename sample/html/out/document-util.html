@@ -496,9 +496,36 @@
             <tr>
                 <td class="name"><code>node</code></td>
                 <td class="type">
-                    <span class="param-type">Element</span>
+                    <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes to check</td>
+                <td class="description last">Nodes or node name to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isList"><span class="type-signature"></span>isListCell<span class="signature">(node)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Check the node is a list cell (li)
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Element|String</span>
+                </td>
+                <td class="description last">Nodes or node name to check</td>
             </tr>
             </tbody>
         </table>
@@ -523,9 +550,9 @@
             <tr>
                 <td class="name"><code>node</code></td>
                 <td class="type">
-                    <span class="param-type">Element</span>
+                    <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes to check</td>
+                <td class="description last">Nodes or node name to check</td>
             </tr>
             </tbody>
         </table>
@@ -550,9 +577,9 @@
             <tr>
                 <td class="name"><code>node</code></td>
                 <td class="type">
-                    <span class="param-type">Element</span>
+                    <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes to scan</td>
+                <td class="description last">Nodes or node name to check</td>
             </tr>
             </tbody>
         </table>
@@ -1030,6 +1057,7 @@
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
+        <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isCell">isCell</a></li>
         <li><a href="document-util.html#isBreak">isBreak</a></li>
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
