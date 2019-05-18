@@ -450,8 +450,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             let startLine = util.getFormatElement(startCon);
             let endLine = util.getFormatElement(endCon);
-            let startIdx = 0;
-            let endIdx = 0;
+            let startIdx = null;
+            let endIdx = null;
 
             for (let i = 0, len = lineNodes.length; i < len; i++) {
                 if (startLine === lineNodes[i]) {
@@ -463,6 +463,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
                 }
             }
+
+            if (startIdx === null) startIdx = 0;
+            if (endIdx === null) endIdx = lineNodes.length - 1;
 
             for (let i = startIdx; i <= endIdx; i++) {
                 rangeFormatElements.push(lineNodes[i]);
@@ -774,12 +777,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 line = rangeLines[i];
 
                 if (util.isListCell(line)) {
-                    if (listParent === null) listParent = util.createElement(line.parentNode.nodeName);
+                    const originParent = line.parentNode;
+                    if (listParent === null) listParent = util.createElement(originParent.nodeName);
+
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
+                    this.util.removeItem(line);
 
                     if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
-                        const edge = this.detachRangeFormatElement(line.parentNode, lineArr, null, true, true);
+                        const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
                         beforeTag = edge.ec;
                         pElement = edge.cc;
                         rangeElement.appendChild(listParent);

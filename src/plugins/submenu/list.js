@@ -86,7 +86,6 @@ export default {
 
         if (!command) return;
 
-        const currentFormat = this.util.getFormatElement(this.getSelectionNode());
         const selectedFormsts = this.getSelectedFormatElements();
         let isRemove = true;
         let edgeFirst = null;
@@ -106,7 +105,8 @@ export default {
         }
 
         if (isRemove && (!topEl || command !== topEl.tagName) && (!bottomEl || command !== bottomEl.tagName)) {
-            const cancel = currentFormat.parentNode.tagName === command;
+            const currentFormat = this.util.getFormatElement(this.getSelectionNode());
+            const cancel = currentFormat ? currentFormat.parentNode.tagName === command : selectedFormsts[0];
             let rangeArr, tempList;
 
             if (!cancel) tempList = this.util.createElement(command);
