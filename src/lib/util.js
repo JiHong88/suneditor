@@ -187,7 +187,7 @@ const util = {
                     recursionFunc(node);
                     html += '</' + tag + '>\n';
                 } else {
-                    html += node.nodeType !== 1 ? /^\n+$/.test(node.data) ? '' : node.data : node.outerHTML + '\n';
+                    html += node.nodeType === 3 ? /^\n+$/.test(node.data) ? '' : node.data : node.outerHTML + '\n';
                 }
             }
 
