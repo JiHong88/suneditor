@@ -782,7 +782,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
-                    this.util.removeItem(line);
 
                     if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
@@ -1838,7 +1837,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this.focus();
             }
             else {
-                context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg.innerHTML.trim());
+                context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
                 context.element.code.style.display = 'block';
                 context.element.wysiwyg.style.display = 'none';
 

@@ -168,32 +168,32 @@ const util = {
     },
 
     /**
-     * @description Converts HTML string into a format that can be placed in an editor of code view mode
-     * @param {String} html - HTML string
+     * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
+     * @param {Element} wysiwygDiv - WYSIWYG element (context.element.wysiwyg)
      * @returns {String}
      */
-    convertHTMLForCodeView: function (html) {
-        return html.replace(/\s*<(?:li|td)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>/gi, this._insertIndent)
-                    .replace(/<\/?(?:blockquote|hr|ol|ul|table|tbody|thead|th|tr)\s*(?:[a-z\-]+)?\s*(?:="?[^>]*"?)?\s*>(?=[^\n])/gi, this._insertLineBreak)
-                    .replace(/<\/(?:p|div|h[1-6]|li|td|pre)>(?=[^\n])/gi, this._insertLineBreak);
-    },
+    convertHTMLForCodeView: function (wysiwygDiv) {
+        let html = '';
+        const reg = this._w.RegExp;
 
-    /**
-     * @description Add a line break to the open tag
-     * @param {String} matchTag - matched tag string
-     * @returns {String}
-     */
-    _insertIndent: function (matchTag) {
-        return '  ' + matchTag.trim();
-    },
+        (function recursionFunc (element) {
+            const children = element.childNodes;
 
-    /**
-     * @description Add a line breaks to the tags
-     * @param {String} matchTag - matched tag string
-     * @returns {String}
-     */
-    _insertLineBreak: function (matchTag) {
-        return matchTag + '\n';
+            for (let i = 0, len = children.length, node; i < len; i++) {
+                node = children[i];
+                if (/^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|OL|UL|FIGCAPTION)$/i.test(node.nodeName)) {
+                    const tag = node.nodeName.toLowerCase();
+                    html += node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + '\n';
+                    recursionFunc(node);
+                    html += '</' + tag + '>\n';
+                } else {
+                    html += node.nodeType !== 1 ? /^\n+$/.test(node.data) ? '' : node.data : node.outerHTML + '\n';
+                }
+            }
+
+        }(wysiwygDiv));
+
+        return html;
     },
 
     /**
@@ -223,7 +223,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|THEAD|TBODY|TH|TR|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
         return false;
     },
 
