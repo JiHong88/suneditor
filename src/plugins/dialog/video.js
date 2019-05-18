@@ -44,7 +44,7 @@ export default {
         context.video.captionCheckEl = video_dialog.getElementsByClassName('suneditor-id-video-check-caption')[0];
 
         /** add event listeners */
-        video_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        video_dialog.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
 
         context.video.videoWidth = {};
         context.video.videoHeight = {};
@@ -113,7 +113,7 @@ export default {
             '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
             '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 

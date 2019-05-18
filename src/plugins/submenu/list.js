@@ -88,7 +88,7 @@ export default {
 
         const currentFormat = this.util.getFormatElement(this.getSelectionNode());
         const selectedFormsts = this.getSelectedFormatElements();
-        let isRemove = false;
+        let isRemove = true;
         let edgeFirst = null;
         let edgeLast = null;
         
@@ -99,8 +99,8 @@ export default {
         const bottomEl = this.util.isListCell(lastSel) && !lastSel.nextSibling ? lastSel.parentNode.nextSibling : lastSel.nextSibling;
 
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            if (this.util.isListCell(selectedFormsts[i].tagName)) {
-                isRemove = true;
+            if (!this.util.isListCell(selectedFormsts[i].tagName)) {
+                isRemove = false;
                 break;
             }
         }
@@ -113,6 +113,8 @@ export default {
 
             for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
                 o = this.util.getRangeFormatElement(selectedFormsts[i]);
+                if (!o || !this.util.isList(o)) continue;
+
                 if (!r) {
                     r = o;
                     rangeArr = {r: r, f: [selectedFormsts[i]]};

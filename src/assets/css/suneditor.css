@@ -115,9 +115,9 @@
 .sun-editor .sun-editor-container {position:relative; width:100%; height:100%;}
 
 /** --- primary button */
-.sun-editor .btn-primary {color:#000; background-color:#c7deff; border:1px solid #80bdff; border-radius:2px;}
-.sun-editor .btn-primary:hover, .sun-editor .btn-primary:focus {color:#000; background-color:#80bdff; border-color:#3f9dff; outline:0 none;}
-.sun-editor .btn-primary:active {color:#fff; background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
+.sun-editor .se-btn-primary {color:#000; background-color:#c7deff; border:1px solid #80bdff; border-radius:2px;}
+.sun-editor .se-btn-primary:hover, .sun-editor .se-btn-primary:focus {color:#000; background-color:#80bdff; border-color:#3f9dff; outline:0 none;}
+.sun-editor .se-btn-primary:active {color:#fff; background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 
 /** --- common button */
 .sun-editor .btn_editor {float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; padding:0; font-size:12px; line-height:27px;}
@@ -309,7 +309,7 @@
 .sun-editor .sun-editor-id-link-btn {padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .sun-editor-id-link-btn::before, .sun-editor .sun-editor-id-link-btn::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .sun-editor-id-link-btn .link-content {padding:0; margin:0;}
-.sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
+.sun-editor .sun-editor-id-link-btn .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
 /** --- notice */
 .sun-editor .sun-editor-id-notice {position:relative; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7;}

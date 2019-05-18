@@ -31,7 +31,7 @@ export default {
         link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        link_dialog.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        link_dialog.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
         link_button.addEventListener('click', this.onClick_linkBtn.bind(core));
 
         /** append html */
@@ -68,7 +68,7 @@ export default {
             '       <label><input type="checkbox" class="sun-editor-id-link-check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '   </div>' +
             '   <div class="modal-footer">' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-link" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-link" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 

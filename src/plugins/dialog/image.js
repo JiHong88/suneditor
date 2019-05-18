@@ -53,7 +53,7 @@ export default {
 
         /** add event listeners */
         context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
-        context.image.modal.getElementsByClassName('btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        context.image.modal.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
         
         context.image.imageX = {};
         context.image.imageY = {};
@@ -151,7 +151,7 @@ export default {
             '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
             '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn btn-primary sun-editor-id-submit-image" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-image" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 

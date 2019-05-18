@@ -52,7 +52,7 @@ export default {
             '<form class="sub-form-group">' +
             '   <label>#</label>' +
             '   <input type="text" maxlength="6" class="sun-editor-id-submenu-color-input" />' +
-            '   <button type="submit" class="btn-primary sun-editor-id-submenu-color-submit se-tooltip">' +
+            '   <button type="submit" class="se-btn-primary sun-editor-id-submenu-color-submit se-tooltip">' +
             '       <i class="icon-checked"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.submitButton + '</span></span>' +
             '   </button>' +
