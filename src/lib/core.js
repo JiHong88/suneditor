@@ -785,8 +785,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
-                        beforeTag = edge.ec;
-                        pElement = edge.cc;
+                        if (i === len - 1) {
+                            beforeTag = edge.ec;
+                            pElement = edge.cc;
+                        }
                         rangeElement.appendChild(listParent);
                     }
                 }
@@ -2516,9 +2518,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 return;
             }
 
-            if (!util.getFormatElement(selectionNode) && selectionNode.nodeType === 3) {
+            const formatEl = util.getFormatElement(selectionNode);
+            if ((!formatEl || util.isComponent(formatEl)) && selectionNode.nodeType === 3) {
                 core.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
-                core.focus();
                 return;
             }
 

@@ -205,7 +205,7 @@ export default {
     create_caption: function () {
         const caption = this.util.createElement('FIGCAPTION');
         caption.setAttribute('contenteditable', true);
-        caption.innerHTML = '<p>' + this.lang.dialogBox.caption + '</p>';
+        caption.innerHTML = '<div>' + this.lang.dialogBox.caption + '</div>';
         return caption;
     },
 

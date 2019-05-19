@@ -128,7 +128,7 @@ const _Constructor = {
         }
     
         /** navigation */
-        const navigation = doc.createElement('SPAN');
+        const navigation = doc.createElement('DIV');
         navigation.className = 'sun-editor-id-navigation sun-editor-common';
     
         /** loading box */
