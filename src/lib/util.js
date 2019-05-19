@@ -217,13 +217,13 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, TABLE, THEAD, TBODY, TH, TR, TD, OL, UL, PRE)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI, CODE)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|TH|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
         return false;
     },
 

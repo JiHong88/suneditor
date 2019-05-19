@@ -421,9 +421,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Returns a "formatElement"(P, DIV, H[1-6], LI) array from the currently selected range.
+         * @param {Function|null} validation - The validation function. (Replaces the default validation function-util.isFormatElement(current))
          * @returns {Array}
          */
-        getSelectedFormatElements: function () {
+        getSelectedFormatElements: function (validation) {
             let range = this.getRange();
 
             if (util.isWysiwygDiv(range.startContainer)) {
@@ -443,7 +444,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             // get line nodes
             const lineNodes = util.getListChildren(commonCon, function (current) {
-                return util.isFormatElement(current);
+                return validation ? validation(current) : util.isFormatElement(current);
             });
 
             if (startCon === endCon) return lineNodes[0];
@@ -476,9 +477,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Returns a "rangeFormatElement"(blockquote, TABLE, TR, TD, OL, UL, PRE) array from the currently selected range.
+         * @param {Function|null} validation - The validation function. (Replaces the default validation function-util.isRangeFormatElement(current))
          * @returns {Array}
          */
-        getSelectedRangeFormatElements: function () {
+        getSelectedRangeFormatElements: function (validation) {
             let range = this.getRange();
 
             if (util.isWysiwygDiv(range.startContainer)) {
@@ -504,7 +506,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             // get range Elements
             const rangeElements = util.getListChildren(commonCon, function (current) {
-                return util.isRangeFormatElement(current);
+                return validation ? validation(current) : util.isRangeFormatElement(current);
             });
 
             if (startCon === endCon) return rangeElements[0];
@@ -742,7 +744,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         applyRangeFormatElement: function (rangeElement) {
             const range = this.getRange();
-            const rangeLines = this.getSelectedFormatElements();
+            const rangeLines = this.getSelectedFormatElements(function (current) {
+                return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE')) || /^TABLE$/i.test(current.nodeName);
+            });
 
             if (!rangeLines) {
                 const inner = util.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
@@ -783,7 +787,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
 
-                    if (i === len - 1 || !util.isListCell(rangeLines[i + 1])) {
+                    if (i === len - 1 || originParent !== rangeLines[i + 1].parentNode) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
                         if (i === len - 1) {
                             beforeTag = edge.ec;
@@ -839,7 +843,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 insNode = children[i];
                 if (remove) {
                     if (i === 0) {
-                        if (!selectedFormats || selectedFormats.length === len || selectedFormats[selectedFormats.length - 1] === children[len - 1]) {
+                        if (!selectedFormats || selectedFormats.length === len) {
                             firstNode = rangeElement.previousSibling;
                         } else {
                             firstNode = rangeEl;
@@ -900,7 +904,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const edge = remove ? {
                 cc: rangeParent,
                 sc: firstNode,
-                ec: firstNode ? firstNode.nextSibling ? firstNode.nextSibling : firstNode : rangeEl && rangeEl.children.length > 0 ? rangeEl.nextSibling : null
+                ec: firstNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl.nextSibling : null
             } : this.util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistory) return edge;
