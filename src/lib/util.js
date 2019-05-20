@@ -706,7 +706,15 @@ const util = {
 
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-            .replace(/(?<=<[a-z]+)\s+(?:style|class|id|name|width|height|index|for|dir|xmlns|contenteditable|on[a-zA-Z]|[a-z]+\-[a-z\-]+)\s*(?:=\s?"?[^>^"]*"?)?(?=[^<]*>)/g, '')
+            .replace(/(<[a-z]+)[^>]*(?=>)/g, function (m, t) {
+                const v = m.match(/((?:colspan|rowspan|target|href|src)\s*=\s*"[^"]*")/ig);
+                if (v) {
+                    for (let i = 0, len = v.length; i < len; i++) {
+                        t += ' ' + v[i];
+                    }
+                }
+                return t;
+            })
             .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
