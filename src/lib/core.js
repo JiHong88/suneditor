@@ -1784,8 +1784,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
 
-                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
-                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block;');
+                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
                 if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
@@ -1796,8 +1796,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 context.element.code.style.display = 'block';
                 context.element.wysiwyg.style.display = 'none';
 
-                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'block');
-                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(?<=\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'none');
+                this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+                this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
                 if (context.option.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 this._variable.wysiwygActive = false;
