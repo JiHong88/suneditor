@@ -23,8 +23,8 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/\b(?<=<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t) {
-            return (typeof ec[t] === 'string') ? ec[t] : t;
+        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+            return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
 
