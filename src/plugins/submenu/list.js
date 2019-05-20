@@ -86,7 +86,7 @@ export default {
 
         if (!command) return;
 
-        const selectedFormsts = this.getSelectedFormatElements();
+        const selectedFormsts = this.getSelectedElements();
         let isRemove = true;
         let edgeFirst = null;
         let edgeLast = null;

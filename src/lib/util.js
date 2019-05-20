@@ -217,13 +217,13 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, LI, CODE)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|TABLE|TH|TD|OL|UL|PRE|FIGCAPTION)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName)) return true;
         return false;
     },
 
@@ -239,15 +239,19 @@ const util = {
     /**
      * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation - Additional validation function.
      * @returns {Element}
      */
-    getFormatElement: function (element) {
+    getFormatElement: function (element, validation) {
         if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
 
         while (element) {
             if (this.isWysiwygDiv(element)) return null;
             if (this.isRangeFormatElement(element)) element.firstElementChild;
-            if (this.isFormatElement(element)) return element;
+            if (this.isFormatElement(element) && validation(element)) return element;
 
             element = element.parentNode;
         }
@@ -258,14 +262,18 @@ const util = {
     /**
      * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation - Additional validation function.
      * @returns {Element|null}
      */
-    getRangeFormatElement: function (element) {
+    getRangeFormatElement: function (element, validation) {
         if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
 
         while (element) {
             if (this.isWysiwygDiv(element)) return null;
-            if (this.isRangeFormatElement(element)) return element;
+            if (this.isRangeFormatElement(element) && validation(element)) return element;
             element = element.parentNode;
         }
 
@@ -343,6 +351,15 @@ const util = {
      */
     isListCell: function (node) {
         return node && /^LI$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a table (table, thead, tbody, tr)
+     * @param {Element|String} node - Nodes to check
+     * @returns {Boolean}
+     */
+    isTable: function (node) {
+        return node && /^(TABLE|THEAD|TBODY|TR)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
@@ -620,11 +637,33 @@ const util = {
      * @param {Element} item - Element to be remove
      */
     removeItem: function (item) {
+        if (!item) return;
+
         try {
             item.remove();
         } catch (e) {
             item.parentNode.removeChild(item);
         }
+    },
+
+    /**
+     * @description Delete all parent nodes that match the condition
+     * @param {Element} item - Element to be remove
+     * @param {Function} validation - Validation function
+     */
+    removeItemAllParent: function (item, validation) {
+        if (!item) return;
+        const inst = this;
+
+        (function recursionFunc (element) {
+            if (!inst.isWysiwygDiv(element)) {
+                const parent = element.parentNode;
+                if (parent && validation(element)) {
+                    inst.removeItem(element);
+                    recursionFunc(parent);
+                }
+            }
+        }(item));
     },
 
     /**

@@ -424,7 +424,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Function|null} validation - The validation function. (Replaces the default validation function-util.isFormatElement(current))
          * @returns {Array}
          */
-        getSelectedFormatElements: function (validation) {
+        getSelectedElements: function (validation) {
             let range = this.getRange();
 
             if (util.isWysiwygDiv(range.startContainer)) {
@@ -453,13 +453,23 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let endLine = util.getFormatElement(endCon);
             let startIdx = null;
             let endIdx = null;
+            
+            const onlyTable = function (current) {
+                return !util.isCell(current) && (util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true);
+            };
+            const startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
+            const endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
+            const sameRange = startRangeEl === endRangeEl;
+            
+            for (let i = 0, len = lineNodes.length, line; i < len; i++) {
+                line = lineNodes[i];
 
-            for (let i = 0, len = lineNodes.length; i < len; i++) {
-                if (startLine === lineNodes[i]) {
+                if (startLine === line || (!sameRange && line === startRangeEl)) {
                     startIdx = i;
                     continue;
                 }
-                if (endLine === lineNodes[i]) {
+
+                if (endLine === line || (!sameRange && line === endRangeEl)) {
                     endIdx = i;
                     break;
                 }
@@ -470,65 +480,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             for (let i = startIdx; i <= endIdx; i++) {
                 rangeFormatElements.push(lineNodes[i]);
-            }
-
-            return rangeFormatElements;
-        },
-
-        /**
-         * @description Returns a "rangeFormatElement"(blockquote, TABLE, TR, TD, OL, UL, PRE) array from the currently selected range.
-         * @param {Function|null} validation - The validation function. (Replaces the default validation function-util.isRangeFormatElement(current))
-         * @returns {Array}
-         */
-        getSelectedRangeFormatElements: function (validation) {
-            let range = this.getRange();
-
-            if (util.isWysiwygDiv(range.startContainer)) {
-                const children = util.getListChildren(context.element.wysiwyg, function (current) {
-                    return this.util.isRangeFormatElement(current);
-                }.bind(this));
-
-                if (!children) return null;
-                this.setRange(children[0], 0, children[children.length - 1], 0);
-                range = this.getRange();
-            }
-
-            const startCon = range.startContainer;
-            const endCon = range.endContainer;
-            const commonCon = range.commonAncestorContainer;
-            const rangeFormatElements = [];
-
-            if (util.isRangeFormatElement(commonCon)) return [commonCon];
-            if (!util.isWysiwygDiv(commonCon)) {
-                const el = util.getRangeFormatElement(commonCon);
-                return el ? [el] : [];
-            }
-
-            // get range Elements
-            const rangeElements = util.getListChildren(commonCon, function (current) {
-                return validation ? validation(current) : util.isRangeFormatElement(current);
-            });
-
-            if (startCon === endCon) return rangeElements[0];
-
-            let startLine = util.getRangeFormatElement(startCon);
-            let endLine = util.getRangeFormatElement(endCon);
-            let startIdx = 0;
-            let endIdx = 0;
-
-            for (let i = 0, len = rangeElements.length; i < len; i++) {
-                if (startLine === rangeElements[i]) {
-                    startIdx = i;
-                    continue;
-                }
-                if (endLine === rangeElements[i]) {
-                    endIdx = i;
-                    break;
-                }
-            }
-
-            for (let i = startIdx; i <= endIdx; i++) {
-                if (rangeElements[i]) rangeFormatElements.push(rangeElements[i]);
             }
 
             return rangeFormatElements;
@@ -739,22 +690,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description appended all selected format Element to the argument element and insert
+         * @description Appended all selected format Element to the argument element and insert
          * @param {Element} rangeElement - Element of wrap the arguments (PRE, BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            const range = this.getRange();
-            const rangeLines = this.getSelectedFormatElements(function (current) {
-                return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE')) || /^TABLE$/i.test(current.nodeName);
-            });
+            const rangeValidation = util.isTable(this.getRange().commonAncestorContainer) ?
+                function (current) { return util.isFormatElement(current); } :
+                function (current) { return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE')) || /^TABLE$/i.test(current.nodeName); };
+            const rangeLines = this.getSelectedElements(rangeValidation);
 
-            if (!rangeLines) {
-                const inner = util.createElement(util.isCell(this.getSelectionNode()) ? 'DIV' : 'P');
-                inner.innerHTML = util.zeroWidthSpace;
-                rangeElement.appendChild(inner);
-                this.getSelectionNode().appendChild(rangeElement);
-                return;
-            }
+            if (!rangeLines || rangeLines.length === 0) return;
 
             let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
@@ -774,14 +719,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             let listParent = null;
-            let line = null;
             const lineArr = [];
+            const emptyNode = function (current) {
+                return current.children.length === 0 || current.textContent.length === 0;
+            };
             
-            for (let i = 0, len = rangeLines.length; i < len; i++) {
+            for (let i = 0, len = rangeLines.length, line, originParent; i < len; i++) {
                 line = rangeLines[i];
+                originParent = line.parentNode;
 
                 if (util.isListCell(line)) {
-                    const originParent = line.parentNode;
                     if (listParent === null) listParent = util.createElement(originParent.nodeName);
 
                     listParent.innerHTML += line.outerHTML;
@@ -799,10 +746,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 else {
                     rangeElement.appendChild(line);
                 }
+
+                if (pElement !== originParent) {
+                    util.removeItemAllParent(originParent, emptyNode);
+                }
             }
 
             pElement.insertBefore(rangeElement, beforeTag);
-            if (!range.collapsed && (util.isRangeFormatElement(range.startContainer) || util.isRangeFormatElement(range.endContainer))) util.removeEmptyNode(pElement);
 
             const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
             if (rangeLines.length > 1) {
@@ -841,13 +791,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
-                if (remove) {
-                    if (i === 0) {
-                        if (!selectedFormats || selectedFormats.length === len) {
-                            firstNode = rangeElement.previousSibling;
-                        } else {
-                            firstNode = rangeEl;
-                        }
+                if (remove && i === 0) {
+                    if (!selectedFormats || selectedFormats.length === len || selectedFormats[0] === insNode) {
+                        firstNode = rangeElement.previousSibling;
+                    } else {
+                        firstNode = rangeEl;
                     }
                 }
 
@@ -895,8 +843,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             const rangeParent = rangeElement.parentNode;
+            const rangeRight = rangeElement.nextSibling;
             if (rangeEl && rangeEl.children.length > 0) {
-                rangeParent.insertBefore(rangeEl, rangeElement.nextElementSibling);
+                rangeParent.insertBefore(rangeEl, rangeRight);
             }
 
             util.removeItem(rangeElement);
@@ -904,7 +853,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const edge = remove ? {
                 cc: rangeParent,
                 sc: firstNode,
-                ec: firstNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl.nextSibling : null
+                ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
             } : this.util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistory) return edge;
@@ -1108,7 +1057,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             /** multi line */
             else {
                 // get line nodes
-                const lineNodes = this.getSelectedFormatElements();
+                const lineNodes = this.getSelectedElements();
                 const endLength = lineNodes.length - 1;
 
                 // startCon
@@ -1790,7 +1739,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param command {String} - Separator ("indent" or "outdent")
          */
         indent: function (command) {
-            const rangeLines = this.getSelectedFormatElements();
+            const rangeLines = this.getSelectedElements();
             let p, margin;
 
             for (let i = 0, len = rangeLines.length; i < len; i++) {
@@ -2450,7 +2399,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         break;
                     }
 
-                    const lines = core.getSelectedFormatElements();
+                    const lines = core.getSelectedElements();
 
                     if (!shift) {
                         const tabText = util.createTextNode(new Array(core._variable.tabSize + 1).join('\u00A0'));

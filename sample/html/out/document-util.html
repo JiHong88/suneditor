@@ -270,8 +270,8 @@
             <h4 class="name" id="isRangeFormatElement"><span class="type-signature"></span>isRangeFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the range format element. (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE)<br>
-                Range format element is wrap the format element  (P, DIV, H1-6, LI, CODE)
+                It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)<br>
+                Range format element is wrap the format element  (P, DIV, H1-6, LI)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -296,7 +296,7 @@
 
 
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
-                class="signature">(element)</span><span class="type-signature"> &rarr; {Element}</span></h4>
+                class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
                 If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
             </div>
@@ -317,13 +317,20 @@
                     </td>
                     <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
                 </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Additional validation function.</td>
+                </tr>
                 </tbody>
             </table>
             <dl class="details"></dl>
 
 
             <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
-                class="signature">(element)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
+                class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
                 If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
             </div>
@@ -343,6 +350,13 @@
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Additional validation function.</td>
                 </tr>
                 </tbody>
             </table>
@@ -505,10 +519,37 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="isList"><span class="type-signature"></span>isListCell<span class="signature">(node)</span><span
+        <h4 class="name" id="isListCell"><span class="type-signature"></span>isListCell<span class="signature">(node)</span><span
                 class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
             Check the node is a list cell (li)
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Element|String</span>
+                </td>
+                <td class="description last">Nodes or node name to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isTable"><span class="type-signature"></span>isTable<span class="signature">(node)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Check the node is a list table (table, thead, tbody, tr)
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1002,6 +1043,40 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="removeItemAllParent"><span class="type-signature"></span>removeItemAllParent<span class="signature">(item, validation)</span><span
+                class="type-signature"></span></h4>
+        <div class="description">
+            Delete all parent nodes that match the condition
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>item</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element to be remove</td>
+            </tr>
+            <tr>
+                <td class="name"><code>validation</code></td>
+                <td class="type">
+                    <span class="param-type">Function</span>
+                </td>
+                <td class="description last">Validation function</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="removeEmptyNode"><span class="type-signature"></span>removeEmptyNode<span class="signature">(element)</span><span
                 class="type-signature"></span></h4>
         <div class="description">
@@ -1058,6 +1133,7 @@
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
+        <li><a href="document-util.html#isTable">isTable</a></li>
         <li><a href="document-util.html#isCell">isCell</a></li>
         <li><a href="document-util.html#isBreak">isBreak</a></li>
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
@@ -1072,6 +1148,7 @@
         <li><a href="document-util.html#removeClass">removeClass</a></li>
         <li><a href="document-util.html#toggleClass">toggleClass</a></li>
         <li><a href="document-util.html#removeItem">removeItem</a></li>
+        <li><a href="document-util.html#removeItemAllParent">removeItemAllParent</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
     </ul>
 </nav>
