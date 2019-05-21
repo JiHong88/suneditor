@@ -212,7 +212,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !this.isComponent(element)) return true;
         return false;
     },
 

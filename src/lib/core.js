@@ -2375,8 +2375,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         return false;
                     }
 
-                    formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
-                    rangeEl = util.getRangeFormatElement(formatEl);
+                    formatEl = util.getFormatElement(selectionNode) || selectionNode;
+                    rangeEl = util.getRangeFormatElement(selectionNode);
                     if (rangeEl && formatEl && !util.isCell(rangeEl)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
@@ -2385,7 +2385,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         }
                     }
 
-                    if (selectionNode.previousSibling) {
+                    if (formatEl.previousSibling) {
                         const previousEl = formatEl.previousSibling;
                         const range = core.getRange();
                         if (util.isComponent(previousEl) && (range.startOffset === 0 || range.endOffset === 0)) {
@@ -2449,7 +2449,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     break;
                 case 13: /** enter key */
-                    formatEl = util.getFormatElement(selectionNode) || context.element.wysiwyg.firstElementChild;
+                    formatEl = util.getFormatElement(selectionNode);
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !util.isCell(rangeEl)) {
                         const range = core.getRange();
