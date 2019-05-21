@@ -726,10 +726,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const removeItems = function (parent, origin, before) {
                 let cc = null;
                 if (parent !== origin) {
-                   cc = util.removeItemAllParent(origin, function (current) {
-                       const text = current.textContent.trim();
-                        return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-                    });
+                   cc = util.removeItemAllParents(origin);
                 }
 
                 return cc ? cc.ec : before;
@@ -2455,9 +2452,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
-                            util.removeItem(formatEl);
-                            formatEl = core.appendFormatTag(rangeEl);
-                            core.setRange(formatEl, 1, formatEl, 1);
+                            const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
+                            util.removeItemAllParents(formatEl);
+                            core.setRange(newEl, 1, newEl, 1);
 
                             // history stack
                             core.history.push();

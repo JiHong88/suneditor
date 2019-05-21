@@ -668,12 +668,18 @@ const util = {
      * @description Delete all parent nodes that match the condition.
      * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
      * @param {Element} item - Element to be remove
-     * @param {Function} validation - Validation function
+     * @param {Function|null} validation - Validation function. default(Deleted if it only have breakLine and blanks)
      * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
      */
-    removeItemAllParent: function (item, validation) {
+    removeItemAllParents: function (item, validation) {
         if (!item) return null;
         let cc = null;
+        if (!validation) {
+            validation = function (current) {
+                const text = current.textContent.trim();
+                return text.length === 0 || /^(\n|\u200B)+$/.test(text);
+            };
+        }
 
         (function recursionFunc (element) {
             if (!util.isWysiwygDiv(element)) {
