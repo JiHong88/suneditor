@@ -520,7 +520,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         appendFormatTag: function (element, formatNodeName) {
             const formatEl = element;
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) && !util.isListCell(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = util.zeroWidthSpace;
 
@@ -694,12 +694,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Element} rangeElement - Element of wrap the arguments (PRE, BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            const rangeValidation = util.isTable(this.getRange().commonAncestorContainer) ?
-                function (current) { return util.isFormatElement(current); } :
-                function (current) { return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE') && !util.getParentElement(current, util.isComponent)) 
-                    || /^TABLE$/i.test(current.nodeName) ||  util.isComponent(current);
-                };
-            const rangeLines = this.getSelectedElements(rangeValidation);
+            const commonCon = this.getRange().commonAncestorContainer;
+            const rangeLines = util.isTable(commonCon) ? 
+                [util.getRangeFormatElement(commonCon)] :
+                this.getSelectedElements(function (current) {
+                    return (util.isFormatElement(current) && !util.getParentElement(current, util.isComponent)) || util.isComponent(current);
+                });
 
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -740,7 +740,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 originParent = line.parentNode;
                 depth = util.getElementDepth(line);
 
-                if (util.isListCell(line)) {
+                if (util.isList(originParent)) {
                     if (listParent === null) listParent = util.createElement(originParent.nodeName);
 
                     listParent.innerHTML += line.outerHTML;
@@ -2456,7 +2456,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         if (!range.commonAncestorContainer.nextSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             util.removeItem(formatEl);
-                            formatEl = core.appendFormatTag(rangeEl, 'P');
+                            formatEl = core.appendFormatTag(rangeEl);
                             core.setRange(formatEl, 1, formatEl, 1);
 
                             // history stack

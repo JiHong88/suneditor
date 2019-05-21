@@ -248,7 +248,7 @@
     border: 1px solid rgb(204, 204, 204);
     width: 100%;
     max-width: 100%;
-    margin-bottom: 20px;
+    margin: 0 0 10px;
     background-color: transparent;
     border-spacing: 0;
     border-collapse: collapse;

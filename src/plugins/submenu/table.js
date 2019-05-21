@@ -169,7 +169,7 @@ export default {
 
         const formatEl = this.util.getFormatElement(this.getSelectionNode());
 
-        this.insertNode(oTable, this.util.isListCell(formatEl.nodeName) ? this.util.getRangeFormatElement(formatEl) : formatEl);
+        this.insertNode(oTable, formatEl);
         this.appendFormatTag(oTable);
         this.focus();
 

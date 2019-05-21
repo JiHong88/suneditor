@@ -228,12 +228,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover) element - "div.sun-editor-id-comp"
+     * @description It is judged whether it is the component(img, iframe cover, table) element - ".sun-editor-id-comp"
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
-        return element && /sun-editor-id-comp/.test(element.className);
+        return element && (/sun-editor-id-comp/.test(element.className) || /^TABLE$/.test(element.nodeName));
     },
 
     /**
@@ -260,7 +260,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TR, TD, OL, UL, PRE), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
      * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation - Additional validation function.
      * @returns {Element|null}
@@ -273,7 +273,7 @@ const util = {
 
         while (element) {
             if (this.isWysiwygDiv(element)) return null;
-            if (this.isRangeFormatElement(element) && validation(element)) return element;
+            if (this.isRangeFormatElement(element) && !/^(THEAD|TBODY|TR)$/i.test(element.nodeName) && validation(element)) return element;
             element = element.parentNode;
         }
 
