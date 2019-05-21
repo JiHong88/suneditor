@@ -718,15 +718,24 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 pElement = standTag.parentNode;
             }
 
+            let parentDepth = util.getElementDepth(standTag);
             let listParent = null;
             const lineArr = [];
-            const emptyNode = function (current) {
-                return current.children.length === 0 || current.textContent.length === 0;
+            const removeItems = function (parent, origin, before) {
+                let cc = null;
+                if (parent !== origin) {
+                   cc = util.removeItemAllParent(origin, function (current) {
+                        return current.textContent.length === 0 || /^(\n|\u200B)+$/.test(current.textContent);
+                    });
+                }
+
+                return cc ? cc.ec : before;
             };
             
-            for (let i = 0, len = rangeLines.length, line, originParent; i < len; i++) {
+            for (let i = 0, len = rangeLines.length, line, originParent, depth; i < len; i++) {
                 line = rangeLines[i];
                 originParent = line.parentNode;
+                depth = util.getElementDepth(line);
 
                 if (util.isListCell(line)) {
                     if (listParent === null) listParent = util.createElement(originParent.nodeName);
@@ -736,23 +745,32 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (i === len - 1 || originParent !== rangeLines[i + 1].parentNode) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
-                        if (i === len - 1) {
+
+                        if (parentDepth >= depth) {
+                            parentDepth = depth;
+                            beforeTag = removeItems(originParent, edge.cc, edge.ec);
+                            if (beforeTag) pElement = beforeTag.parentNode;
+                        } else if (pElement === edge.cc) {
                             beforeTag = edge.ec;
-                            pElement = edge.cc;
                         }
+
                         rangeElement.appendChild(listParent);
                     }
                 }
                 else {
-                    rangeElement.appendChild(line);
-                }
+                    if (parentDepth >= depth) {
+                        parentDepth = depth;
+                        beforeTag = removeItems(pElement, originParent, line.nextSibling);
+                        if (beforeTag) pElement = beforeTag.parentNode;
+                    }
 
-                if (pElement !== originParent) {
-                    util.removeItemAllParent(originParent, emptyNode);
+                    rangeElement.appendChild(line);
+                    removeItems(pElement, originParent);
                 }
             }
 
             pElement.insertBefore(rangeElement, beforeTag);
+            removeItems(rangeElement, beforeTag);
 
             const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
             if (rangeLines.length > 1) {

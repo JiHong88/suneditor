@@ -431,6 +431,24 @@ const util = {
     },
 
     /**
+     * @description Returns the number of parents nodes.
+     * "0" when the parent node is the WYSIWYG area.
+     * @param {Element} element - The element to check
+     * @returns {Number}
+     */
+    getElementDepth: function (element) {
+        let depth = 0;
+        element = element.parentNode
+
+        while (element && !this.isWysiwygDiv(element)) {
+            depth += 1;
+            element = element.parentNode
+        }
+
+        return depth;
+    },
+
+    /**
      * @description Get the parent element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
@@ -647,23 +665,31 @@ const util = {
     },
 
     /**
-     * @description Delete all parent nodes that match the condition
+     * @description Delete all parent nodes that match the condition.
+     * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
      * @param {Element} item - Element to be remove
      * @param {Function} validation - Validation function
+     * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
      */
     removeItemAllParent: function (item, validation) {
-        if (!item) return;
-        const inst = this;
+        if (!item) return null;
+        let cc = null;
 
         (function recursionFunc (element) {
-            if (!inst.isWysiwygDiv(element)) {
+            if (!util.isWysiwygDiv(element)) {
                 const parent = element.parentNode;
                 if (parent && validation(element)) {
-                    inst.removeItem(element);
+                    cc = {
+                        sc: element.previousElementSibling,
+                        ec: element.nextElementSibling
+                    }
+                    util.removeItem(element);
                     recursionFunc(parent);
                 }
             }
         }(item));
+
+        return cc;
     },
 
     /**

@@ -701,6 +701,35 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="getElementDepth"><span class="type-signature"></span>getElementDepth<span
+                class="signature">(element)</span><span class="type-signature"> &rarr; {Number}</span>
+        </h4>
+        <div class="description">
+            Returns the number of parents nodes.<br>
+            "0" when the parent node is the WYSIWYG area.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">The element to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="getParentElement"><span class="type-signature"></span>getParentElement<span
                 class="signature">(element, query)</span><span class="type-signature"> &rarr; {Element}</span>
         </h4>
@@ -1044,9 +1073,10 @@
 
 
         <h4 class="name" id="removeItemAllParent"><span class="type-signature"></span>removeItemAllParent<span class="signature">(item, validation)</span><span
-                class="type-signature"></span></h4>
+            class="type-signature"> &rarr; {Object|null}</span></h4>
         <div class="description">
-            Delete all parent nodes that match the condition
+            Delete all parent nodes that match the condition.<br>
+            Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1138,6 +1168,7 @@
         <li><a href="document-util.html#isBreak">isBreak</a></li>
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
         <li><a href="document-util.html#getListChildNodes">getListChildNodes</a></li>
+        <li><a href="document-util.html#getElementDepth">getElementDepth</a></li>
         <li><a href="document-util.html#getParentElement">getParentElement</a></li>
         <li><a href="document-util.html#getChildElement">getChildElement</a></li>
         <li><a href="document-util.html#getEdgeChildNodes">getEdgeChildNodes</a></li>

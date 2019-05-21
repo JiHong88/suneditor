@@ -120,9 +120,9 @@ export default {
                     rangeArr = {r: r, f: [selectedFormsts[i]]};
                 } else {
                     if (r !== o) {
-                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f,tempList, false, true);
+                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
                         if (!edgeFirst) edgeFirst = edge;
-                        if (!cancel) tempList = this.util.createElement(command);
+                        if (!cancel && this.util.getRangeFormatElement(selectedFormsts[i+1]) !== o) tempList = this.util.createElement(command);
                         r = o;
                         rangeArr = {r: r, f: [selectedFormsts[i]]};
                     } else {
@@ -160,7 +160,7 @@ export default {
 
                     if (!mergeTop) {
                         parentTag.insertBefore(list, siblingTag);
-                        if (!mergeBottom) list = this.util.createElement(command);
+                        if (!mergeBottom && this.util.getRangeFormatElement(next) !== this.util.getRangeFormatElement(fTag)) list = this.util.createElement(command);
                     }
                 }
 
