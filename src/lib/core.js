@@ -696,7 +696,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
         applyRangeFormatElement: function (rangeElement) {
             const rangeValidation = util.isTable(this.getRange().commonAncestorContainer) ?
                 function (current) { return util.isFormatElement(current); } :
-                function (current) { return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE')) || /^TABLE$/i.test(current.nodeName); };
+                function (current) { return (util.isFormatElement(current) && !util.getParentElement(current, 'TABLE') && !util.getParentElement(current, util.isComponent)) 
+                    || /^TABLE$/i.test(current.nodeName) ||  util.isComponent(current);
+                };
             const rangeLines = this.getSelectedElements(rangeValidation);
 
             if (!rangeLines || rangeLines.length === 0) return;
@@ -725,14 +727,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 let cc = null;
                 if (parent !== origin) {
                    cc = util.removeItemAllParent(origin, function (current) {
-                        return current.textContent.length === 0 || /^(\n|\u200B)+$/.test(current.textContent);
+                       const text = current.textContent.trim();
+                        return text.length === 0 || /^(\n|\u200B)+$/.test(text);
                     });
                 }
 
                 return cc ? cc.ec : before;
             };
             
-            for (let i = 0, len = rangeLines.length, line, originParent, depth; i < len; i++) {
+            for (let i = 0, len = rangeLines.length, line, originParent, depth, before; i < len; i++) {
                 line = rangeLines[i];
                 originParent = line.parentNode;
                 depth = util.getElementDepth(line);
@@ -765,7 +768,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     rangeElement.appendChild(line);
-                    removeItems(pElement, originParent);
+                    before = removeItems(pElement, originParent);
+                    if (before !== undefined) beforeTag = before;
                 }
             }
 
