@@ -1530,6 +1530,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             } else {
                 util.removeEmptyNode(pNode);
+                if (util.onlyZeroWidthSpace(pNode.textContent)) {
+                    container = pNode.firstChild;
+                    offset = 0;
+                }
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
             }
@@ -1671,6 +1675,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             } else {
                 util.removeEmptyNode(pNode);
+                if (util.onlyZeroWidthSpace(pNode.textContent)) {
+                    container = pNode.firstChild;
+                    offset = 0;
+                }
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
             }

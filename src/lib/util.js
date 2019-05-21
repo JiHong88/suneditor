@@ -719,6 +719,8 @@ const util = {
 
             return 0;
         })(element);
+
+        if (element.childNodes.length == 0) element.innerHTML = this.zeroWidthSpace;
     },
 
     /**
