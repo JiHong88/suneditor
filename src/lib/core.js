@@ -2442,7 +2442,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             core.history.push();
                         }
                     }
-                    
                     break;
                 case 9: /** tab key */
                     e.preventDefault();
@@ -2467,7 +2466,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         if (!moveCell) return false;
 
                         core.setRange(moveCell, 0, moveCell, 0);
-
                         break;
                     }
 
@@ -2496,7 +2494,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     // history stack
                     core.history.push();
-
                     break;
                 case 13: /** enter key */
                     formatEl = util.getFormatElement(selectionNode);
@@ -2508,12 +2505,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
-
-                            // history stack
-                            core.history.push();
                         }
+                    } else if (/^FIGCAPTION$/i.test(rangeEl.nodeName) && util.getParentElement(rangeEl, util.isList)) {
+                        e.preventDefault();
+                        formatEl = core.appendFormatTag(formatEl);
+                        core.setRange(formatEl, 0, formatEl, 0);
                     }
-
                     break;
             }
 
