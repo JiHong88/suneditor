@@ -1112,6 +1112,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @private
          */
         _stripRemoveNode: function (element, removeNode) {
+            if (!removeNode || removeNode.nodeType === 3) return;
             const children = removeNode.childNodes;
 
             while (children[0]) {
@@ -1677,7 +1678,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 util.removeEmptyNode(pNode);
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
-                    offset = 0;
+                    offset = container.textContent.length;
                 }
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
@@ -1697,6 +1698,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         commandHandler: function (target, command) {
             switch (command) {
+                case 'selectAll':
+                    const wysiwyg = context.element.wysiwyg;
+                    this.setRange(wysiwyg.firstChild, 0, wysiwyg.lastChild, wysiwyg.lastChild.textContent.length);
+                    break;
                 case 'codeView':
                     this.toggleCodeView();
                     util.toggleClass(target, 'on');
@@ -1965,6 +1970,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         _historyIgnoreRegExp: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
         _keyCodeShortcut: {
+            65: 'A',
             66: 'B',
             83: 'S',
             85: 'U',
@@ -1980,6 +1986,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const keyStr = event._keyCodeShortcut[keyCode];
 
             switch (keyStr) {
+                case 'A':
+                    command = 'selectAll';
+                    break;
                 case 'B':
                     command = 'STRONG';
                     break;
