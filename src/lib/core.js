@@ -2423,7 +2423,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         return false;
                     }
 
-                    if (rangeEl && formatEl && !util.isCell(rangeEl)) {
+                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && (!formatEl.previousSibling || formatEl.previousSibling.textContent.length === 0) && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
