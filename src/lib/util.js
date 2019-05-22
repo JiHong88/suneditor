@@ -35,10 +35,11 @@ const util = {
 
     /**
      * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
-     * @param {String} text - String value
+     * @param {String|Node} text - String value or Node
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
+        if (typeof text !== 'string') text = text.textContent;
         return text === '' || this._onlyZeroWidthRegExp.test(text);
     },
 
