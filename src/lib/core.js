@@ -914,24 +914,28 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Array|null} removeNodeArray - An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray) {
+            const range = this.getRange();
+            const commonCon = range.commonAncestorContainer;
+            
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
             this._editorRange();
             
             /* selected node validation check */
             const formatEl = util.getFormatElement(this.getSelectionNode());
-            if (!formatEl || (function (element) {
-                const children = element.children;
-                for (let i = 0, len = children.length; i < len; i++) {
-                    if (util.isRangeFormatElement(children[i])) return true;
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
+                if (!formatEl || (function (element) {
+                    const children = element.children;
+                    for (let i = 0, len = children.length; i < len; i++) {
+                        if (util.isRangeFormatElement(children[i])) return true;
+                    }
+                    return false;
+                })(formatEl)) {
+                    core.execCommand('formatBlock', false, util.isWysiwygDiv(formatEl) ? 'P' : 'DIV');
+                    this._editorRange();
                 }
-                return false;
-            })(formatEl)) {
-                core.execCommand('formatBlock', false, util.isWysiwygDiv(formatEl) ? 'P' : 'DIV');
-                this._editorRange();
             }
             
-            const range = this.getRange();
             const isRemoveNode = !appendNode;
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let tempCon, tempOffset, tempChild, tempArray;
@@ -1013,7 +1017,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             const endCon = tempCon;
             const endOff = tempOffset;
-            const commonCon = range.commonAncestorContainer;
             const newNodeName = appendNode.nodeName;
             this.setRange(startCon, startOff, endCon, endOff);
 
