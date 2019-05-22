@@ -2402,15 +2402,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
             formatEl = util.getFormatElement(selectionNode) || selectionNode;
             rangeEl = util.getRangeFormatElement(selectionNode);
             if (formatEl.nodeType === 3 || formatEl === rangeEl) {
-                if (util.isList(rangeEl) && keyCode !== 8 && keyCode !== 46) {
-                    const li = util.createElement('LI');
-                    rangeEl.insertBefore(li, selectionNode.nextElementSibling);
-                    core.setRange(li, 0, li, 0);
+                if (rangeEl && (util.isList(rangeEl) || /^PRE$/i.test(rangeEl.nodeName)) && keyCode !== 8 && keyCode !== 46) {
+                    const newTag = util.createElement(util.isList(rangeEl) ? 'LI' : 'P');
+                    newTag.innerHTML = util.zeroWidthSpace;
+                    rangeEl.insertBefore(newTag, selectionNode.nextElementSibling);
+                    core.setRange(newTag, 0, newTag, 0);
                 } else {
                     core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
                     core.focus();
                 }
-
                 return;
             }
             
@@ -2497,7 +2497,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 case 13: /** enter key */
                     formatEl = util.getFormatElement(selectionNode);
                     rangeEl = util.getRangeFormatElement(formatEl);
-                    if (rangeEl && formatEl && !util.isCell(rangeEl)) {
+                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
