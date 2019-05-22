@@ -190,14 +190,14 @@ export default {
             edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
         }
 
-        if (selectedFormsts.length > 1) {
-            this.setRange(edgeFirst.sc, 0, edgeLast.ec, edgeLast.ec.length);
-        } else {
-            this.setRange(edgeFirst.ec, edgeFirst.ec.length, edgeLast.ec, edgeLast.ec.length);
-        }
-
         // history stack
         this.history.push();
+
+        if (selectedFormsts.length > 1) {
+            this.setRange(edgeFirst.sc, 0, edgeLast.ec, edgeLast.ec.textContent.length);
+        } else {
+            this.setRange(edgeFirst.ec, edgeFirst.ec.textContent.length, edgeLast.ec, edgeLast.ec.textContent.length);
+        }
 
         this.submenuOff();
         this.focus();

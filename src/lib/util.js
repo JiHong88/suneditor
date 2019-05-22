@@ -283,7 +283,7 @@ const util = {
 
     /**
      * @description Get the index of the argument value in the element array
-     * @param {array} array - element array
+     * @param {Array} array - element array
      * @param {Element} element - Element to find index
      * @returns {Number}
      */
@@ -301,7 +301,7 @@ const util = {
 
     /**
      * @description Get the next index of the argument value in the element array
-     * @param {array} array - element array
+     * @param {Array} array - element array
      * @param {Element} item - Element to find index
      * @returns {Number}
      */
@@ -313,7 +313,7 @@ const util = {
 
     /**
      * @description Get the previous index of the argument value in the element array
-     * @param {array} array - element array
+     * @param {Array} array - element array
      * @param {Element} item - Element to find index
      * @returns {Number}
      */
@@ -502,11 +502,12 @@ const util = {
      * Returns null if not found.
      * @param {Node} element - Reference element
      * @param {String|Function} query - Query String (tagName, .className, #ID, :name) or validation function.
+     * @param {Boolean} last - If true returns the last node among the found child nodes. (default: first node)
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
      */
-    getChildElement: function (element, query) {
+    getChildElement: function (element, query, last) {
         let check;
 
         if (typeof query === 'function') {
@@ -533,11 +534,11 @@ const util = {
             };
         }
 
-        const childList = this.getListChildren(element, function (current) {
+        const childList = this.getListChildNodes(element, function (current) {
             return check(current);
         });
 
-        return childList[0];
+        return childList[last ? childList.length - 1 : 0];
     },
 
     /**

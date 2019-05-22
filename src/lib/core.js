@@ -348,6 +348,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Element} endOff - The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
+            if (!startCon || !endCon) return;
+            
             const range = _d.createRange();
             range.setStart(startCon, startOff);
             range.setEnd(endCon, endOff);
@@ -748,10 +750,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                         if (parentDepth >= depth) {
                             parentDepth = depth;
-                            beforeTag = removeItems(originParent, edge.cc, edge.ec);
+                            pElement = edge.cc;
+                            beforeTag = removeItems(pElement, originParent, edge.ec);
                             if (beforeTag) pElement = beforeTag.parentNode;
                         } else if (pElement === edge.cc) {
                             beforeTag = edge.ec;
+                        }
+
+                        if (pElement !== edge.cc) {
+                            before = removeItems(pElement, edge.ec);
+                            if (before !== undefined) beforeTag = before;
                         }
 
                         rangeElement.appendChild(listParent);
@@ -763,25 +771,28 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         beforeTag = removeItems(pElement, originParent, line.nextSibling);
                         if (beforeTag) pElement = beforeTag.parentNode;
                     }
-
+                    
                     rangeElement.appendChild(line);
-                    before = removeItems(pElement, originParent);
-                    if (before !== undefined) beforeTag = before;
+
+                    if (pElement !== originParent) {
+                        before = removeItems(pElement, originParent);
+                        if (before !== undefined) beforeTag = before;
+                    }
                 }
             }
 
             pElement.insertBefore(rangeElement, beforeTag);
             removeItems(rangeElement, beforeTag);
 
-            const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
-            if (rangeLines.length > 1) {
-                this.setRange(edge.sc, 0, edge.ec, edge.ec.length);
-            } else {
-                this.setRange(edge.ec, edge.ec.length, edge.ec, edge.ec.length);
-            }
-
             // history stack
             this.history.push();
+
+            const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
+            if (rangeLines.length > 1) {
+                this.setRange(edge.sc, 0, edge.ec, edge.ec.textContent.length);
+            } else {
+                this.setRange(edge.ec, edge.ec.textContent.length, edge.ec, edge.ec.textContent.length);
+            }
         },
 
         /**
@@ -876,6 +887,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             } : this.util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistory) return edge;
+            
+            // history stack
+            this.history.push();
 
             if (!remove && edge) {
                 if (!selectedFormats) {
@@ -884,8 +898,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     this.setRange(edge.sc, so, edge.ec, eo);
                 }
             }
-
-            this.history.push();
+            
             event._findButtonEffectTag();
         },
 
@@ -1700,7 +1713,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             switch (command) {
                 case 'selectAll':
                     const wysiwyg = context.element.wysiwyg;
-                    this.setRange(wysiwyg.firstChild, 0, wysiwyg.lastChild, wysiwyg.lastChild.textContent.length);
+                    const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; });
+                    const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+                    this.setRange(first, 0, last, last.textContent.length);
                     break;
                 case 'codeView':
                     this.toggleCodeView();
@@ -2374,12 +2389,19 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (ctrl && event._shortcutCommand(keyCode, shift)) {
                 e.preventDefault();
                 e.stopPropagation();
-                return;
+                return false;
             }
 
             /** default key action */
             const selectionNode = core.getSelectionNode();
             let formatEl, rangeEl;
+
+            formatEl = util.getFormatElement(selectionNode);
+            if (!formatEl && selectionNode.nodeType === 3) {
+                rangeEl = util.getRangeFormatElement(selectionNode);
+                core.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : rangeEl && util.isList(rangeEl) ? 'LI' : 'DIV');
+            }
+            
             switch (keyCode) {
                 case 8: /** backspace key */
                     if (util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
@@ -2393,7 +2415,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     rangeEl = util.getRangeFormatElement(selectionNode);
                     if (rangeEl && formatEl && !util.isCell(rangeEl)) {
                         const range = core.getRange();
-                        if (!range.commonAncestorContainer.previousSibling && !formatEl.previousSibling && range.startOffset === 0 && range.endOffset === 0) {
+                        if (!range.commonAncestorContainer.previousSibling && (!formatEl.previousSibling || formatEl.previousSibling.textContent.length === 0) && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
                             core.detachRangeFormatElement(rangeEl, util.isListCell(formatEl) ? [formatEl] : null, null, false, false);
                         }
@@ -2504,12 +2526,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 selectionNode.appendChild(oFormatTag);
                 core.setRange(oFormatTag, 0, oFormatTag, 0);
-                return;
-            }
-
-            const formatEl = util.getFormatElement(selectionNode);
-            if ((!formatEl || util.isComponent(formatEl)) && selectionNode.nodeType === 3) {
-                core.execCommand('formatBlock', false, util.isWysiwygDiv(selectionNode.parentElement) ? 'P' : 'DIV');
                 return;
             }
 
