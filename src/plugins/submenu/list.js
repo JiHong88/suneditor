@@ -86,9 +86,12 @@ export default {
 
         if (!command) return;
 
-        const selectedFormsts = this.getSelectedElements(function (current) {
+        const commonCon = this.getRange().commonAncestorContainer;
+        const selectedFormsts = this.util.isTable(commonCon) ? this.getSelectedElements() : this.getSelectedElements(function (current) {
             return (this.isFormatElement(current) && !this.getParentElement(current, this.isComponent)) || this.isComponent(current);
         }.bind(this.util));
+
+        if (!selectedFormsts || selectedFormsts.length === 0) return;
 
         const passComponent = function (current) {
             return !this.isComponent(current);

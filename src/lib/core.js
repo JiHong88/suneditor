@@ -457,7 +457,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let endIdx = null;
             
             const onlyTable = function (current) {
-                return !util.isCell(current) && (util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true);
+                return util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
             };
             const startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
             const endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
@@ -697,11 +697,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         applyRangeFormatElement: function (rangeElement) {
             const commonCon = this.getRange().commonAncestorContainer;
-            const rangeLines = util.isTable(commonCon) ? 
+            const myComponent = util.getParentElement(commonCon, util.isComponent);
+            const rangeLines = util.isTable(commonCon) && !util.isCell(commonCon) ? 
                 [util.getRangeFormatElement(commonCon)] :
-                this.getSelectedElements(function (current) {
-                    return (util.isFormatElement(current) && !util.getParentElement(current, util.isComponent)) || util.isComponent(current);
-                });
+                util.isCell(commonCon) ?
+                    this.getSelectedElements() :
+                    this.getSelectedElements(function (current) {
+                        const component = util.getParentElement(current, util.isComponent);
+                        return (util.isFormatElement(current) && (!component || component === myComponent)) || util.isComponent(current);
+                    });
 
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -727,7 +731,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const lineArr = [];
             const removeItems = function (parent, origin, before) {
                 let cc = null;
-                if (parent !== origin) {
+                if (parent !== origin && !util.isTable(origin)) {
                    cc = util.removeItemAllParents(origin);
                 }
 

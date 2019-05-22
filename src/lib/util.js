@@ -355,12 +355,12 @@ const util = {
     },
 
     /**
-     * @description Check the node is a table (table, thead, tbody, tr)
+     * @description Check the node is a table (table, thead, tbody, tr, th, td)
      * @param {Element|String} node - Nodes to check
      * @returns {Boolean}
      */
     isTable: function (node) {
-        return node && /^(TABLE|THEAD|TBODY|TR)$/i.test(typeof node === 'string' ? node : node.nodeName);
+        return node && /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
