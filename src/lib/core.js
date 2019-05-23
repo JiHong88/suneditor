@@ -536,7 +536,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
          * @param {Element} oNode - Node to be inserted
-         * @param {(Element|null)} afterNode - If the node exists, it is inserted after the node
+         * @param {Element|null} afterNode - If the node exists, it is inserted after the node
          */
         insertNode: function (oNode, afterNode) {
             const range = this.getRange();
@@ -2401,11 +2401,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             /** default key action */
             const selectionNode = core.getSelectionNode();
+            const range = core.getRange();
+            const selectRange = range.startContainer !== range.endContainer;
             let formatEl, rangeEl;
 
             formatEl = util.getFormatElement(selectionNode) || selectionNode;
             rangeEl = util.getRangeFormatElement(selectionNode);
-            if (formatEl.nodeType === 3 || formatEl === rangeEl) {
+            if (!selectRange && (formatEl.nodeType === 3 || formatEl === rangeEl)) {
                 if (rangeEl && (util.isList(rangeEl) || /^PRE$/i.test(rangeEl.nodeName)) && keyCode !== 8 && keyCode !== 46) {
                     const newTag = util.createElement(util.isList(rangeEl) ? 'LI' : 'P');
                     newTag.innerHTML = util.zeroWidthSpace;
@@ -2420,6 +2422,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             
             switch (keyCode) {
                 case 8: /** backspace key */
+                    if (selectRange) break;
                     if (util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2496,6 +2499,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     core.history.push();
                     break;
                 case 13: /** enter key */
+                    if (selectRange) break;
                     formatEl = util.getFormatElement(selectionNode);
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {

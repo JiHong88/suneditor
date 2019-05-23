@@ -324,16 +324,43 @@ const util = {
     },
 
     /**
-     * @description Get index from parent
-     * @param {Element} element - Element
+     * @description Returns the index compared to other sibling nodes.
+     * @param {Node} node - Node to find index
      * @returns {Number}
      */
-    getPositionIndex: function (element) {
+    getPositionIndex: function (node) {
         let idx = 0;
-        while (!!(element = element.previousSibling)) {
+        while (!!(node = node.previousSibling)) {
             idx += 1;
         }
         return idx;
+    },
+
+    getNodePath: function (node, parentNode) {
+        const path = [];
+
+        this.getParentElement(node, function (el) {
+            if (el !== parentNode && !this.isWysiwygDiv(el)) path.push(el);
+            return false;
+        }.bind(this));
+        
+        return path.map(this.getPositionIndex).reverse();
+    },
+
+    getNodeFromPath: function (offsets, parentNode) {
+        let current = parentNode;
+        let nodes;
+
+        for (let i = 0, len = offsets.length; i < len; i++) {
+            nodes = current.childNodes;
+            if (nodes.length <= offsets[i]) {
+                current = nodes[nodes.length - 1];
+            } else {
+                current = nodes[offsets[i]];
+            }
+        }
+
+        return current;
     },
 
     /**

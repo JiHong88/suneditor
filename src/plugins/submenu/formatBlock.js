@@ -76,7 +76,72 @@ export default {
         }
         // others
         else {
-            this.execCommand('formatBlock', false, value);
+            let range = this.getRange();
+            let selectedFormsts = this.getSelectedElements();
+            if (selectedFormsts.length === 0) return;
+
+            let first = selectedFormsts[0];
+            let last = selectedFormsts[selectedFormsts.length - 1];
+            const firstPath = this.util.getNodePath(range.startContainer, first);
+            const lastPath = this.util.getNodePath(range.endContainer, last);
+            
+            let rangeArr = {};
+            let listFirst = false;
+            for (let i = 0, len = selectedFormsts.length, r, o, lastIndex; i < len; i++) {
+                lastIndex = i === len - 1;
+                o = this.util.getRangeFormatElement(selectedFormsts[i]);
+                if (!r && this.util.isList(o)) {
+                    r = o;
+                    rangeArr = {r: r, f: [selectedFormsts[i]]};
+                    if (i === 0) listFirst = true;
+                } else if (this.util.isList(r)) {
+                    if (r !== o) {
+                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
+                        if (listFirst) {
+                            first = edge.sc;
+                            listFirst = false;
+                        }
+                        if (lastIndex) last = edge.ec;
+                        r = null;
+                    } else {
+                        rangeArr.f.push(selectedFormsts[i]);
+                    }
+                }
+
+                if (lastIndex && this.util.isList(r)) {
+                    const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
+                    if (lastIndex) {
+                        last = edge.ec;
+                        if (listFirst) first = last;
+                    }
+                }
+            }
+
+            first = this.util.getNodeFromPath(firstPath, first);
+            last = this.util.getNodeFromPath(lastPath, last);
+            this.setRange(first, range.startOffset, last, range.endOffset);
+
+            selectedFormsts = this.getSelectedElements();
+            first = selectedFormsts[0];
+            last = selectedFormsts[selectedFormsts.length - 1];
+            for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
+                node = selectedFormsts[i];
+                if (node.nodeName.toUpperCase() === value) continue;
+
+                newFormat = this.util.createElement(value);
+                newFormat.innerHTML = node.innerHTML;
+                node.parentNode.insertBefore(newFormat, node);
+                this.util.removeItem(node);
+
+                if (i === 0) first = newFormat;
+                if (i === len - 1) last = newFormat;
+            }
+
+            first = this.util.getNodeFromPath(firstPath, first);
+            last = this.util.getNodeFromPath(lastPath, last);
+            this.setRange(first, range.startOffset, last, range.endOffset);
+
+            // this.execCommand('formatBlock', false, value);
         }
 
         this.submenuOff();
