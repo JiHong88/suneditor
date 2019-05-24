@@ -482,11 +482,11 @@ const util = {
      */
     getElementDepth: function (element) {
         let depth = 0;
-        element = element.parentNode
+        element = element.parentNode;
 
         while (element && !this.isWysiwygDiv(element)) {
             depth += 1;
-            element = element.parentNode
+            element = element.parentNode;
         }
 
         return depth;
@@ -733,7 +733,7 @@ const util = {
                     cc = {
                         sc: element.previousElementSibling,
                         ec: element.nextElementSibling
-                    }
+                    };
                     util.removeItem(element);
                     recursionFunc(parent);
                 }
@@ -765,7 +765,7 @@ const util = {
             return 0;
         })(element);
 
-        if (element.childNodes.length == 0) element.innerHTML = this.zeroWidthSpace;
+        if (element.childNodes.length === 0) element.innerHTML = this.zeroWidthSpace;
     },
 
     /**

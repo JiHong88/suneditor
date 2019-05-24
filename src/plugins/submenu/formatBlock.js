@@ -76,11 +76,13 @@ export default {
         }
         // others
         else {
-            let range = this.getRange();
+            const range = this.getRange();
+            const startOffset = range.startOffset;
+            const endOffset = range.endOffset;
             let selectedFormsts = this.getSelectedElements(function (current) {
                 return this.isFormatElement(current) || this.isComponent(current);
             }.bind(this.util));
-            
+
             if (selectedFormsts.length === 0) return;
 
             let first = selectedFormsts[0];
@@ -123,7 +125,7 @@ export default {
             }
 
             // change format tag
-            this.setRange(this.util.getNodeFromPath(firstPath, first), range.startOffset, this.util.getNodeFromPath(lastPath, last), range.endOffset);
+            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
             selectedFormsts = this.getSelectedElements();
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
@@ -139,10 +141,9 @@ export default {
                 if (i === len - 1) last = newFormat || node;
             }
 
-            this.setRange(this.util.getNodeFromPath(firstPath, first), range.startOffset, this.util.getNodeFromPath(lastPath, last), range.endOffset);
+            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
         }
 
         this.submenuOff();
-        this.focus();
     }
 };

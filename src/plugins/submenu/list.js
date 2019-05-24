@@ -87,8 +87,12 @@ export default {
         if (!command) return;
 
         const commonCon = this.getRange().commonAncestorContainer;
-        const selectedFormsts = this.util.isTable(commonCon) ? this.getSelectedElements() : this.getSelectedElements(function (current) {
-            return (this.isFormatElement(current) && !this.getParentElement(current, this.isComponent)) || this.isComponent(current);
+        const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
+        const selectedFormsts = this.util.isTable(commonCon) ? 
+            this.getSelectedElements() :
+            this.getSelectedElements(function (current) {
+                const component = this.getParentElement(current, this.isComponent);
+                return (this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current);
         }.bind(this.util));
 
         if (!selectedFormsts || selectedFormsts.length === 0) return;
@@ -104,8 +108,8 @@ export default {
         // merge
         const firstSel = selectedFormsts[0];
         const lastSel = selectedFormsts[selectedFormsts.length - 1];
-        const topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousSibling ? firstSel.parentNode.previousSibling : firstSel.previousSibling;
-        const bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextSibling ? lastSel.parentNode.nextSibling : lastSel.nextSibling;
+        let topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
+        let bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
             if (!this.util.isListCell(selectedFormsts[i]) && !this.util.isComponent(selectedFormsts[i])) {
@@ -146,30 +150,36 @@ export default {
                 }
             }
         } else {
+            const topElParent = topEl.parentNode;
+            const bottomElParent = bottomEl.parentNode;
+            topEl = topEl && topElParent.nodeName === command && topElParent.parentNode === bottomElParent ? topElParent : topEl;
+            bottomEl = bottomEl && bottomElParent.nodeName === command && bottomElParent.parentNode === topEl.parentNode ? bottomElParent : bottomEl;
+
             const mergeTop = topEl && topEl.tagName === command;
             const mergeBottom = bottomEl && bottomEl.tagName === command;
+            
             let list = mergeTop ? topEl : this.util.createElement(command);
             let firstList = null;
             let lastList = null;
             let topNumber = null;
             let bottomNumber = null;
             
-            for (let i = 0, len = selectedFormsts.length, fTag, isCell, next, parentTag, siblingTag, rangeTag; i < len; i++) {
+            for (let i = 0, len = selectedFormsts.length, fTag, isCell, next, originParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormsts[i];
                 next = selectedFormsts[i + 1];
+                originParent = fTag.parentNode;
                 isCell = this.util.isListCell(fTag) || this.util.isComponent(fTag);
-                rangeTag = this.util.isRangeFormatElement(fTag.parentNode) ? fTag.parentNode : null;
-                parentTag = isCell ? fTag.parentNode.parentNode : fTag.parentNode;
-                siblingTag = isCell ? fTag.parentNode.nextSibling : fTag.nextSibling;
+                rangeTag = this.util.isRangeFormatElement(originParent) ? originParent : null;
+                parentTag = isCell ? originParent.parentNode : originParent;
+                siblingTag = isCell ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
                 list.innerHTML += isCell ? fTag.outerHTML : '<li>' + fTag.innerHTML + '</li>';
                 if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 
-                if (i === len - 1) lastList = list;
-                if (i === len - 1 || !next || parentTag !== next.parentNode || this.util.isRangeFormatElement(siblingTag)) {
+                if (!next) lastList = list;
+                if (!next || parentTag !== next.parentNode || this.util.isRangeFormatElement(siblingTag)) {
                     if (!firstList) firstList = list;
-
-                    if (!mergeTop) {
+                    if (!mergeTop && !(next && this.util.isList(next.parentNode))) {
                         parentTag.insertBefore(list, siblingTag);
                         if (!mergeBottom && this.util.getRangeFormatElement(next, passComponent) !== this.util.getRangeFormatElement(fTag, passComponent)) list = this.util.createElement(command);
                     }
