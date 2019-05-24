@@ -349,6 +349,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
+            if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
+            if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             
             const range = _d.createRange();
             range.setStart(startCon, startOff);
@@ -772,8 +774,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 else {
                     if (parentDepth >= depth) {
                         parentDepth = depth;
-                        beforeTag = removeItems(pElement, originParent, line.nextSibling);
-                        if (beforeTag) pElement = beforeTag.parentNode;
+                        pElement = originParent;
+                        beforeTag = line.nextSibling;
                     }
                     
                     rangeElement.appendChild(line);
@@ -2510,7 +2512,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                         }
-                    } else if (/^FIGCAPTION$/i.test(rangeEl.nodeName) && util.getParentElement(rangeEl, util.isList)) {
+                    } else if (rangeEl && /^FIGCAPTION$/i.test(rangeEl.nodeName) && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl);
                         core.setRange(formatEl, 0, formatEl, 0);

@@ -284,7 +284,7 @@ const util = {
     /**
      * @description Get the index of the argument value in the element array
      * @param {Array} array - element array
-     * @param {Element} element - Element to find index
+     * @param {Element} element - The element to find index
      * @returns {Number}
      */
     getArrayIndex: function (array, element) {
@@ -302,7 +302,7 @@ const util = {
     /**
      * @description Get the next index of the argument value in the element array
      * @param {Array} array - element array
-     * @param {Element} item - Element to find index
+     * @param {Element} item - The element to find index
      * @returns {Number}
      */
     nextIdx: function (array, item) {
@@ -313,8 +313,8 @@ const util = {
 
     /**
      * @description Get the previous index of the argument value in the element array
-     * @param {Array} array - element array
-     * @param {Element} item - Element to find index
+     * @param {Array} array - Element array
+     * @param {Element} item - The element to find index
      * @returns {Number}
      */
     prevIdx: function (array, item) {
@@ -325,7 +325,7 @@ const util = {
 
     /**
      * @description Returns the index compared to other sibling nodes.
-     * @param {Node} node - Node to find index
+     * @param {Node} node - The Node to find index
      * @returns {Number}
      */
     getPositionIndex: function (node) {
@@ -336,23 +336,39 @@ const util = {
         return idx;
     },
 
+    /**
+     * @description Returns the position of the "node" in the "parentNode" in a numerical array.
+     * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
+     * @param {Node} node - The Node to find position path
+     * @param {Element|null} parentNode - Parent node. If null, wysiwyg div area
+     * @returns {Array}
+     */
     getNodePath: function (node, parentNode) {
         const path = [];
+        let finds = true;
 
         this.getParentElement(node, function (el) {
-            if (el !== parentNode && !this.isWysiwygDiv(el)) path.push(el);
+            if (el === parentNode) finds = false;
+            if (finds && !this.isWysiwygDiv(el)) path.push(el);
             return false;
         }.bind(this));
         
         return path.map(this.getPositionIndex).reverse();
     },
 
+    /**
+     * @description Returns the node in the location of the path array obtained from "util.getNodePath".
+     * @param {Array} offsets - Position array, array obtained from "util.getNodePath"
+     * @param {Element} parentNode - Base parent element
+     * @returns {Element}
+     */
     getNodeFromPath: function (offsets, parentNode) {
         let current = parentNode;
         let nodes;
 
         for (let i = 0, len = offsets.length; i < len; i++) {
             nodes = current.childNodes;
+            if (nodes.length === 0) break;
             if (nodes.length <= offsets[i]) {
                 current = nodes[nodes.length - 1];
             } else {
@@ -365,7 +381,7 @@ const util = {
 
     /**
      * @description Check the node is a list (ol, ul)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isList: function (node) {
@@ -374,7 +390,7 @@ const util = {
 
     /**
      * @description Check the node is a list cell (li)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isListCell: function (node) {
@@ -383,7 +399,7 @@ const util = {
 
     /**
      * @description Check the node is a table (table, thead, tbody, tr, th, td)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isTable: function (node) {
@@ -392,7 +408,7 @@ const util = {
 
     /**
      * @description Check the node is a table cell (td, th)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isCell: function (node) {
@@ -401,7 +417,7 @@ const util = {
 
     /**
      * @description Check the node is a break node (BR)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isBreak: function (node) {

@@ -117,7 +117,7 @@
                     <td class="type">
                         <span class="param-type">String</span>
                     </td>
-                    <td class="description last">text contents</td>
+                    <td class="description last">Text contents</td>
                 </tr>
                 </tbody>
             </table>
@@ -179,7 +179,7 @@
                     <td class="type">
                         <span class="param-type">String</span>
                     </td>
-                    <td class="description last">contents</td>
+                    <td class="description last">Contents</td>
                 </tr>
                 </tbody>
             </table>
@@ -519,6 +519,75 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode)</span><span
+                class="type-signature"> &rarr; {Array}</span></h4>
+        <div class="description">
+            Returns the position of the "node" in the "parentNode" in a numerical array.<br>
+            ex) &lt;p&gt;&lt;span&gt;aa&lt;/span&gt;&lt;span&gt;bb&lt;/span&gt;&lt;/p&gt; : <span class="type-signature">(node: "bb", parentNode: "&lt;P&gt;") &rarr; [1, 0]</span>
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">The Node to find position path</td>
+            </tr>
+            <tr>
+                <td class="name"><code>parentNode</code></td>
+                <td class="type">
+                    <span class="param-type">Element|null</span>
+                </td>
+                <td class="description last">Parent node. If null, wysiwyg div area</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="getNodeFromPath"><span class="type-signature"></span>getNodeFromPath<span class="signature">(node, parentNode)</span><span
+                class="type-signature"> &rarr; {Array}</span></h4>
+        <div class="description">
+            Returns the node in the location of the path array obtained from "util.getNodePath".
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>offsets</code></td>
+                <td class="type">
+                    <span class="param-type">Array</span>
+                </td>
+                <td class="description last">Position array, array obtained from "util.getNodePath"</td>
+            </tr>
+            <tr>
+                <td class="name"><code>parentNode</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Base parent element</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="isList"><span class="type-signature"></span>isList<span class="signature">(node)</span><span
                 class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
@@ -539,7 +608,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -566,7 +635,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -593,7 +662,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -620,7 +689,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -647,7 +716,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -1196,6 +1265,8 @@
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
+        <li><a href="document-util.html#getNodePath">getNodePath</a></li>
+        <li><a href="document-util.html#getNodeFromPath">getNodeFromPath</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isTable">isTable</a></li>
