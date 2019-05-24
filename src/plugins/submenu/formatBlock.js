@@ -126,7 +126,7 @@ export default {
 
                 if (lastIndex && this.util.isList(r)) {
                     const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
-                    if (listLast) {
+                    if (listLast || len === 1) {
                         last = edge.ec;
                         if (listFirst) first = last;
                     }
