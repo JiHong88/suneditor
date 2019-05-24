@@ -69,6 +69,7 @@ const _Context = function (element, cons, options) {
             imageWidth: options.imageWidth,
             imageFileInput: options.imageFileInput,
             imageUrlInput: options.imageUrlInput,
+            imageUploadHeader: options.imageUploadHeader,
             imageUploadUrl: options.imageUploadUrl,
             videoResizing: options.videoResizing,
             videoWidth: options.videoWidth,

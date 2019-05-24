@@ -48,6 +48,7 @@ const _Constructor = {
         options.imageWidth = options.imageWidth || 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
+        options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         // video
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
