@@ -150,10 +150,10 @@ export default {
                 }
             }
         } else {
-            const topElParent = topEl.parentNode;
-            const bottomElParent = bottomEl.parentNode;
-            topEl = topEl && topElParent.nodeName === command && topElParent.parentNode === bottomElParent ? topElParent : topEl;
-            bottomEl = bottomEl && bottomElParent.nodeName === command && bottomElParent.parentNode === topEl.parentNode ? bottomElParent : bottomEl;
+            const topElParent = topEl ? topEl.parentNode : topEl;
+            const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
+            topEl = topElParent && !this.util.isWysiwygDiv(topElParent) && topElParent.nodeName === command && topElParent.parentNode === bottomElParent ? topElParent : topEl;
+            bottomEl = bottomElParent && !this.util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === command && bottomElParent.parentNode === topEl.parentNode ? bottomElParent : bottomEl;
 
             const mergeTop = topEl && topEl.tagName === command;
             const mergeBottom = bottomEl && bottomEl.tagName === command;
@@ -179,18 +179,19 @@ export default {
                 if (!next) lastList = list;
                 if (!next || parentTag !== next.parentNode || this.util.isRangeFormatElement(siblingTag)) {
                     if (!firstList) firstList = list;
-                    if (!mergeTop && !(next && this.util.isList(next.parentNode))) {
-                        parentTag.insertBefore(list, siblingTag);
-                        if (!mergeBottom && this.util.getRangeFormatElement(next, passComponent) !== this.util.getRangeFormatElement(fTag, passComponent)) list = this.util.createElement(command);
+                    if ((!mergeTop || !next || parentTag !== next.parentNode) && !(next && this.util.isList(next.parentNode) && next.parentNode === originParent)) {
+                        if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
                     }
                 }
+
+                if (!mergeBottom && this.util.getRangeFormatElement(next, passComponent) !== this.util.getRangeFormatElement(fTag, passComponent)) list = this.util.createElement(command);
 
                 this.util.removeItem(fTag);
                 if (rangeTag && rangeTag.children.length === 0) this.util.removeItem(rangeTag);
             }
 
             if (topNumber) {
-                firstList = list.children[topNumber];
+                firstList = firstList.children[topNumber];
             }
 
             if (mergeBottom) {
