@@ -142,6 +142,8 @@ export default {
             }
 
             this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
+            // history stack
+            this.history.push();
         }
 
         this.submenuOff();
