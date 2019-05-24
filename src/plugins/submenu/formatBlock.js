@@ -93,6 +93,7 @@ export default {
             // remove list
             let rangeArr = {};
             let listFirst = false;
+            let listLast = false;
             for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
                 lastIndex = i === len - 1;
                 o = this.util.getRangeFormatElement(selectedFormsts[i]);
@@ -109,15 +110,23 @@ export default {
                             listFirst = false;
                         }
                         if (lastIndex) last = edge.ec;
-                        r = null;
+
+                        if (isList) {
+                            r = o;
+                            rangeArr = {r: r, f: [selectedFormsts[i]]};
+                            if (lastIndex) listLast = true;
+                        } else {
+                            r = null;
+                        }
                     } else {
                         rangeArr.f.push(selectedFormsts[i]);
+                        if (lastIndex) listLast = true;
                     }
                 }
 
                 if (lastIndex && this.util.isList(r)) {
                     const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
-                    if (lastIndex) {
+                    if (listLast) {
                         last = edge.ec;
                         if (listFirst) first = last;
                     }
@@ -130,7 +139,7 @@ export default {
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
                 
-                if (node.nodeName.toUpperCase() !== value) {
+                if (node.nodeName !== value) {
                     newFormat = this.util.createElement(value);
                     newFormat.innerHTML = node.innerHTML;
                     node.parentNode.insertBefore(newFormat, node);
