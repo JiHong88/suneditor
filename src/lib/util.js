@@ -437,7 +437,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (element !== current && validation(current)) {
+            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
                 children.push(current);
             }
 
@@ -462,7 +462,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (element !== current && validation(current)) {
+            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
                 children.push(current);
             }
 

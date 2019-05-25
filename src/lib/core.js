@@ -769,6 +769,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         }
 
                         rangeElement.appendChild(listParent);
+                        listParent = null;
                     }
                 }
                 else {

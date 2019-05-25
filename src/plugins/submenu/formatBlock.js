@@ -149,6 +149,7 @@ export default {
 
                 if (i === 0) first = newFormat || node;
                 if (i === len - 1) last = newFormat || node;
+                newFormat = null;
             }
 
             this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
