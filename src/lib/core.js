@@ -2513,8 +2513,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
+                            break;
                         }
-                    } else if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
+                    }
+                    if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl);
                         core.setRange(formatEl, 0, formatEl, 0);
