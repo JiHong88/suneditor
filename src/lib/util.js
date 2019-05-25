@@ -229,12 +229,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover, table) element - ".sun-editor-id-comp"
+     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".sun-editor-id-comp"
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
-        return element && (/sun-editor-id-comp/.test(element.className) || /^TABLE$/.test(element.nodeName));
+        return element && (/sun-editor-id-comp/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
     },
 
     /**
