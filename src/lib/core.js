@@ -751,7 +751,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
 
-                    if (i === len - 1 || originParent !== rangeLines[i + 1].parentNode) {
+                    if (i === len - 1 || !this.util.getParentElement(rangeLines[i + 1], function (current) { return current === originParent; })) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
 
                         if (parentDepth >= depth) {
@@ -2504,6 +2504,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (selectRange) break;
                     formatEl = util.getFormatElement(selectionNode);
                     rangeEl = util.getRangeFormatElement(formatEl);
+                    const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
@@ -2512,7 +2513,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                         }
-                    } else if (rangeEl && /^FIGCAPTION$/i.test(rangeEl.nodeName) && util.getParentElement(rangeEl, util.isList)) {
+                    } else if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl);
                         core.setRange(formatEl, 0, formatEl, 0);
