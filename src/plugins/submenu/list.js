@@ -144,6 +144,11 @@ export default {
                 }
 
                 if (i === len - 1) {
+                    const next = selectedFormsts[i].nextElementSibling;
+                    if (this.util.isComponent(next)) {
+                        rangeArr.f.push(next);
+                    }
+
                     edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
                     if (!edgeFirst) edgeFirst = edgeLast;
                 }
@@ -174,10 +179,10 @@ export default {
                 nextParent = next ? next.parentNode : null;
                 isCell = this.util.isListCell(fTag) || this.util.isComponent(fTag);
                 rangeTag = this.util.isRangeFormatElement(originParent) ? originParent : null;
-                parentTag = isCell ? originParent.parentNode : originParent;
+                parentTag = isCell && !this.util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
                 siblingTag = isCell ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
-                newCell = this.util.createElement('LI');
+                newCell = this.util.isComponent(fTag) ? fTag.cloneNode() : this.util.createElement('LI');
                 newCell.innerHTML = fTag.innerHTML;
                 list.appendChild(newCell);
 

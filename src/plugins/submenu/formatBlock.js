@@ -94,9 +94,10 @@ export default {
             let rangeArr = {};
             let listFirst = false;
             let listLast = false;
+            const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
             for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
                 lastIndex = i === len - 1;
-                o = this.util.getRangeFormatElement(selectedFormsts[i]);
+                o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
                 isList = this.util.isList(o);
                 if (!r && isList) {
                     r = o;
@@ -128,7 +129,7 @@ export default {
                     const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
                     if (listLast || len === 1) {
                         last = edge.ec;
-                        if (listFirst) first = last;
+                        if (listFirst) first = edge.sc || last;
                     }
                 }
             }
