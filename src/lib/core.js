@@ -535,9 +535,33 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
+         * @description The method to insert a element. (component : table, hr, image, video)
+         * This method is add the element and insert the following lines.
+         * When used in a tag in "LI", it is inserted into the LI tag.
+         * Returns the next line added.
+         * @param {Element} element - Element to be inserted
+         * @returns {Element}
+         */
+        insertComponent: function (element) {
+            let oNode = null;
+            const formatEl = this.util.getFormatElement(this.getSelectionNode());
+
+            if (util.isListCell(formatEl)) {
+                this.insertNode(element, this.getSelectionNode());
+                oNode = util.createElement('LI');
+                formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
+            } else {
+                this.insertNode(element, formatEl);
+                oNode = this.appendFormatTag(element);
+            }
+
+            return oNode;
+        },
+
+        /**
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
-         * @param {Element} oNode - Node to be inserted
+         * @param {Element} oNode - Element to be inserted
          * @param {Element|null} afterNode - If the node exists, it is inserted after the node
          */
         insertNode: function (oNode, afterNode) {
@@ -702,12 +726,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const myComponent = util.getParentElement(commonCon, util.isComponent);
             const rangeLines = util.isTable(commonCon) && !util.isCell(commonCon) ? 
                 [util.getRangeFormatElement(commonCon)] :
-                util.isCell(commonCon) ?
-                    this.getSelectedElements() :
-                    this.getSelectedElements(function (current) {
-                        const component = util.getParentElement(current, util.isComponent);
-                        return (util.isFormatElement(current) && (!component || component === myComponent)) || util.isComponent(current);
-                    });
+                this.getSelectedElements(function (current) {
+                    const component = util.getParentElement(current, util.isComponent);
+                    return (util.isFormatElement(current) || util.isComponent(current)) && (!component || component === myComponent);
+                });
 
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -2437,8 +2459,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && (!formatEl.previousSibling || formatEl.previousSibling.textContent.length === 0) && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
-                            const detachRange = util.isListCell(formatEl) ? util.isComponent(formatEl.nextElementSibling) ? [formatEl, formatEl.nextElementSibling] : [formatEl] : null;
-                            core.detachRangeFormatElement(rangeEl, detachRange, null, false, false);
+                            core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
                         }
                     } else if (formatEl.previousSibling) {
                         const previousEl = formatEl.previousSibling;

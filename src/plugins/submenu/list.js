@@ -177,26 +177,20 @@ export default {
                 next = selectedFormsts[i + 1];
                 originParent = fTag.parentNode;
                 nextParent = next ? next.parentNode : null;
-                isCell = this.util.isListCell(fTag) || this.util.isComponent(fTag);
+                isCell = this.util.isListCell(fTag);
                 rangeTag = this.util.isRangeFormatElement(originParent) ? originParent : null;
                 parentTag = isCell && !this.util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
                 siblingTag = isCell && !this.util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
-                newCell = this.util.isComponent(fTag) ? fTag.cloneNode() : this.util.createElement('LI');
-                newCell.innerHTML = fTag.innerHTML;
+                newCell = this.util.createElement('LI');
+                newCell.innerHTML = this.util.isComponent(fTag) ? fTag.outerHTML : fTag.innerHTML;
                 list.appendChild(newCell);
 
                 if (!next) lastList = list;
                 if (!next || parentTag !== nextParent || this.util.isRangeFormatElement(siblingTag)) {
                     if (!firstList) firstList = list;
                     if ((!mergeTop || !next || parentTag !== nextParent) && !(next && this.util.isList(nextParent) && nextParent === originParent)) {
-                        if (list.parentNode !== parentTag) {
-                            if (this.util.isComponent(list.children[0])) {
-                                newCell = this.util.createElement('LI');
-                                list.insertBefore(newCell, list.children[0]);
-                            }
-                            parentTag.insertBefore(list, siblingTag);
-                        }
+                        if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
                     }
                 }
 

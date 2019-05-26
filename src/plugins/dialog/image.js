@@ -452,8 +452,7 @@ export default {
             this.plugins.image.setAutoSize.call(this);
         }
 
-        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-        this.appendFormatTag(container);
+        this.insertComponent(container);
     },
 
     update_image: function (init) {

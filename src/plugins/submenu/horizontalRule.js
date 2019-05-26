@@ -61,8 +61,7 @@ export default {
         oHr.className = className;
         this.focus();
 
-        this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
-        const oNode = this.appendFormatTag(oHr);
+        let oNode = this.insertComponent(oHr);
         this.setRange(oNode, 0, oNode, 0);
     },
 

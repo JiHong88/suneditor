@@ -248,8 +248,7 @@ export default {
             oIframe.setAttribute('data-align', contextVideo._align);
 
             if (!this.context.dialog.updateModal) {
-                this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-                this.appendFormatTag(container);
+                this.insertComponent(container);
             }
             else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
                 this.plugins.resizing.setTransformSize.call(this, oIframe);
