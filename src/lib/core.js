@@ -2437,7 +2437,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.previousSibling && (!formatEl.previousSibling || formatEl.previousSibling.textContent.length === 0) && range.startOffset === 0 && range.endOffset === 0) {
                             e.preventDefault();
-                            core.detachRangeFormatElement(rangeEl, util.isListCell(formatEl) ? [formatEl] : null, null, false, false);
+                            const detachRange = util.isListCell(formatEl) ? util.isComponent(formatEl.nextElementSibling) ? [formatEl, formatEl.nextElementSibling] : [formatEl] : null;
+                            core.detachRangeFormatElement(rangeEl, detachRange, null, false, false);
                         }
                     } else if (formatEl.previousSibling) {
                         const previousEl = formatEl.previousSibling;
