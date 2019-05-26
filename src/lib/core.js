@@ -1322,7 +1322,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            recursionFunc(child, child);
+                            if (util.isComponent(child)) {
+                                newInnerNode = newInnerNode.cloneNode(false);
+                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(newInnerNode);
+                            } else {
+                                recursionFunc(child, child);
+                            }
                             continue;
                         }
 
@@ -1427,11 +1433,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     for (let i = 0, len = childNodes.length; i < len; i++) {
                         let child = childNodes[i];
                         let coverNode = node;
-                        if (validation(child)) {
+
+                        if (util.isComponent(child)) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(child.cloneNode(true));
+                            pNode.appendChild(newInnerNode);
+                            continue;
+                        } else if (validation(child)) {
                             let cloneNode = child.cloneNode(false);
                             node.appendChild(cloneNode);
                             if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                         }
+
                         recursionFunc(child, coverNode);
                     }
                 })(element, newInnerNode);
@@ -1475,7 +1488,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            recursionFunc(child, child);
+                            if (util.isComponent(child)) {
+                                newInnerNode = newInnerNode.cloneNode(false);
+                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(newInnerNode);
+                            } else {
+                                recursionFunc(child, child);
+                            }
                             continue;
                         }
 
@@ -1619,7 +1638,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            recursionFunc(child, child);
+                            if (util.isComponent(child)) {
+                                newInnerNode = newInnerNode.cloneNode(false);
+                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(newInnerNode);
+                            } else {
+                                recursionFunc(child, child);
+                            }
                             continue;
                         }
 

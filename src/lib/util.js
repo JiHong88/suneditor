@@ -748,8 +748,11 @@ const util = {
      * @param {Element} element - Element node
      */
     removeEmptyNode: function (element) {
+        const inst = this;
+        
         (function recursionFunc(current) {
-            if (current !== element && util.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
+                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.getParentElement(current, 'TABLE') && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
