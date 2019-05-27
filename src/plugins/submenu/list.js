@@ -92,7 +92,8 @@ export default {
             this.getSelectedElements() :
             this.getSelectedElements(function (current) {
                 const component = this.getParentElement(current, this.isComponent);
-                return (this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current);
+                const format = this.getFormatElement(component);
+                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format === this.getFormatElement(component));
         }.bind(this.util));
 
         if (!selectedFormsts || selectedFormsts.length === 0) return;
@@ -108,15 +109,17 @@ export default {
         let bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            if (!this.util.isListCell(selectedFormsts[i]) && !this.util.isComponent(selectedFormsts[i])) {
+            if (!this.util.isList(this.util.getRangeFormatElement(selectedFormsts[i], function (current) {
+                return this.getRangeFormatElement(current) && current !== selectedFormsts[i];
+            }.bind(this.util)))) {
                 isRemove = false;
                 break;
             }
         }
 
         if (isRemove && (!topEl || command !== topEl.tagName) && (!bottomEl || command !== bottomEl.tagName)) {
-            const currentFormat = this.util.getFormatElement(this.getSelectionNode());
-            const cancel = currentFormat ? currentFormat.parentNode.tagName === command : selectedFormsts[0];
+            const currentFormat = this.util.getRangeFormatElement(this.getSelectionNode());
+            const cancel = currentFormat && currentFormat.tagName === command;
             let rangeArr, tempList;
             const passComponent = function (current) {
                 return !this.isComponent(current);
@@ -130,25 +133,20 @@ export default {
 
                 if (!r) {
                     r = o;
-                    rangeArr = {r: r, f: [selectedFormsts[i]]};
+                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                 } else {
                     if (r !== o) {
                         const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
                         if (!edgeFirst) edgeFirst = edge;
                         if (!cancel) tempList = this.util.createElement(command);
                         r = o;
-                        rangeArr = {r: r, f: [selectedFormsts[i]]};
+                        rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                     } else {
-                        rangeArr.f.push(selectedFormsts[i]);
+                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
                     }
                 }
 
                 if (i === len - 1) {
-                    const next = selectedFormsts[i].nextElementSibling;
-                    if (this.util.isComponent(next)) {
-                        rangeArr.f.push(next);
-                    }
-
                     edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
                     if (!edgeFirst) edgeFirst = edgeLast;
                 }

@@ -101,7 +101,7 @@ export default {
                 isList = this.util.isList(o);
                 if (!r && isList) {
                     r = o;
-                    rangeArr = {r: r, f: [selectedFormsts[i]]};
+                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                     if (i === 0) listFirst = true;
                 } else if (r && isList) {
                     if (r !== o) {
@@ -114,13 +114,13 @@ export default {
 
                         if (isList) {
                             r = o;
-                            rangeArr = {r: r, f: [selectedFormsts[i]]};
+                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                             if (lastIndex) listLast = true;
                         } else {
                             r = null;
                         }
                     } else {
-                        rangeArr.f.push(selectedFormsts[i]);
+                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
                         if (lastIndex) listLast = true;
                     }
                 }
