@@ -444,14 +444,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const commonCon = range.commonAncestorContainer;
             const rangeFormatElements = [];
 
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) return [util.getFormatElement(commonCon)];
-
             // get line nodes
             const lineNodes = util.getListChildren(commonCon, function (current) {
                 return validation ? validation(current) : util.isFormatElement(current);
             });
 
-            if (startCon === endCon) return lineNodes[0];
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) lineNodes.unshift(util.getFormatElement(commonCon));
+            if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
             let startLine = util.getFormatElement(startCon);
             let endLine = util.getFormatElement(endCon);
@@ -952,7 +951,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             
             /* selected node validation check */
             const formatEl = util.getFormatElement(this.getSelectionNode());
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon) && !util.isFormatElement(commonCon)) {
                 if (!formatEl || (function (element) {
                     const children = element.children;
                     for (let i = 0, len = children.length; i < len; i++) {
@@ -1018,8 +1017,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            const startCon = tempCon;
-            const startOff = tempOffset;
+            let startCon = tempCon;
+            let startOff = tempOffset;
 
             // endContainer
             tempCon = util.isWysiwygDiv(range.endContainer) ? context.element.wysiwyg.lastChild : range.endContainer;
@@ -1044,8 +1043,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            const endCon = tempCon;
-            const endOff = tempOffset;
+            let endCon = tempCon;
+            let endOff = tempOffset;
             const newNodeName = appendNode.nodeName;
             this.setRange(startCon, startOff, endCon, endOff);
 
@@ -1108,10 +1107,23 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 return false;
             };
 
+            // get line nodes
+            const lineNodes = this.getSelectedElements();
+
+            if (!util.getFormatElement(startCon)) {
+                startCon = util.getChildElement(lineNodes[0], function (current) { return current.nodeType === 3; });
+                startOff = 0;
+            }
+
+            if (!util.getFormatElement(endCon)) {
+                endCon = util.getChildElement(lineNodes[lineNodes.length - 1], function (current) { return current.nodeType === 3; });
+                endOff = endCon.textContent.length;
+            }
+
             /** one line */
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) {
+            if (lineNodes.length === 1) {
                 newNode = appendNode.cloneNode(false);
-                const newRange = this._nodeChange_oneLine(util.getFormatElement(commonCon), newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
+                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
 
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
@@ -1120,8 +1132,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
             /** multi line */
             else {
-                // get line nodes
-                const lineNodes = this.getSelectedElements();
                 const endLength = lineNodes.length - 1;
 
                 // startCon
@@ -1211,6 +1221,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     let child = childNodes[i];
+                    if (!child) continue;
                     let coverNode = node;
                     let cloneNode;
 
@@ -1324,8 +1335,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
                             if (util.isComponent(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                i--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -1432,12 +1444,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
     
                     for (let i = 0, len = childNodes.length; i < len; i++) {
                         let child = childNodes[i];
+                        if (!child) continue;
                         let coverNode = node;
 
                         if (util.isComponent(child)) {
-                            newInnerNode = newInnerNode.cloneNode(false);
-                            pNode.appendChild(child.cloneNode(true));
                             pNode.appendChild(newInnerNode);
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(child);
+                            pNode.appendChild(newInnerNode);
+                            i--;
                             continue;
                         } else if (validation(child)) {
                             let cloneNode = child.cloneNode(false);
@@ -1456,7 +1471,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this._stripRemoveNode(pNode, newInnerNode);
             }
 
-            element.outerHTML = pNode.outerHTML;
+            element.parentNode.insertBefore(pNode, element);
+            util.removeItem(element);
         },
 
         /**
@@ -1484,14 +1500,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 const childNodes = current.childNodes;
                 for (let i = 0, len = childNodes.length; i < len; i++) {
                     const child = childNodes[i];
+                    if (!child) continue;
                     let coverNode = node;
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             if (util.isComponent(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                i--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -1634,14 +1652,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 const childNodes = current.childNodes;
                 for (let i = childNodes.length -1; 0 <= i; i--) {
                     const child = childNodes[i];
+                    if (!child) continue;
                     let coverNode = node;
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             if (util.isComponent(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                i--;
                             } else {
                                 recursionFunc(child, child);
                             }
