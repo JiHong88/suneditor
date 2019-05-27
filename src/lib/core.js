@@ -1318,7 +1318,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (util.isComponent(child)) {
+                            if (util.isComponent(child) || util.isFormatElement(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1438,7 +1438,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (!child) continue;
                     let coverNode = node;
 
-                    if (util.isComponent(child)) {
+                    if (util.isComponent(child) || util.isFormatElement(child)) {
                         pNode.appendChild(newInnerNode);
                         newInnerNode = newInnerNode.cloneNode(false);
                         pNode.appendChild(child);
@@ -1506,7 +1506,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isComponent(child)) {
+                            if (util.isComponent(child) || util.isFormatElement(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1666,7 +1666,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isComponent(child)) {
+                            if (util.isComponent(child) || util.isFormatElement(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
