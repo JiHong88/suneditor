@@ -418,6 +418,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _createDefaultRange: function () {
             const range = _d.createRange();
+            if (!context.element.wysiwyg.firstChild) this.execCommand('formatBlock', false, 'P');
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);
             return range;
@@ -2477,7 +2478,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             formatEl = util.getFormatElement(selectionNode) || selectionNode;
             rangeEl = util.getRangeFormatElement(selectionNode);
-            if (!selectRange && (formatEl.nodeType === 3 || formatEl === rangeEl)) {
+            if (!selectRange && (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl)) {
                 if (rangeEl && (util.isList(rangeEl) || /^PRE$/i.test(rangeEl.nodeName)) && keyCode !== 8 && keyCode !== 46) {
                     const newTag = util.createElement(util.isList(rangeEl) ? 'LI' : 'P');
                     newTag.innerHTML = util.zeroWidthSpace;
