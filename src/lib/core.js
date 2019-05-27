@@ -944,26 +944,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray) {
             const range = this.getRange();
-            const commonCon = range.commonAncestorContainer;
-            
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
             this._editorRange();
-            
-            /* selected node validation check */
-            const formatEl = util.getFormatElement(this.getSelectionNode());
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon) && !util.isFormatElement(commonCon)) {
-                if (!formatEl || (function (element) {
-                    const children = element.children;
-                    for (let i = 0, len = children.length; i < len; i++) {
-                        if (util.isRangeFormatElement(children[i])) return true;
-                    }
-                    return false;
-                })(formatEl)) {
-                    core.execCommand('formatBlock', false, util.isWysiwygDiv(formatEl) ? 'P' : 'DIV');
-                    this._editorRange();
-                }
-            }
             
             const isRemoveNode = !appendNode;
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
@@ -1196,6 +1179,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed) {
             const el = element;
             const nNode = newInnerNode;
+            const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
             let startContainer = startCon;
@@ -1338,6 +1322,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                nNodeArray.push(newInnerNode);
                                 i--;
                             } else {
                                 recursionFunc(child, child);
@@ -1387,19 +1372,26 @@ export default function (context, pluginCallButtons, plugins, lang) {
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
-                startContainer = util.createTextNode(collapsed ? util.zeroWidthSpace : newInnerNode.textContent);
-                pNode.insertBefore(startContainer, newInnerNode);
-                pNode.removeChild(newInnerNode);
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(collapsed ? util.zeroWidthSpace : removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+
+                    if (i === 0) startContainer = textNode;
+                }
                 if (collapsed) startOffset = 1;
             } else {
                 if (isRemoveNode) {
-                    let removeNode = newInnerNode;
-                    if (collapsed) {
-                        while(removeNode !== nNode) {
-                            removeNode = removeNode.parentNode;
+                    for (let i = 0; i < nNodeArray.length; i++) {
+                        let removeNode = nNodeArray[i];
+                        if (collapsed) {
+                            while(removeNode !== nNode) {
+                                removeNode = removeNode.parentNode;
+                            }
                         }
+                        this._stripRemoveNode(pNode, removeNode);
                     }
-                    this._stripRemoveNode(pNode, removeNode);
                 }
                 
                 if (collapsed) {
@@ -1436,40 +1428,47 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode) {
             const pNode = element.cloneNode(false);
+            const nNodeArray = [newInnerNode];
 
-            if (isRemoveFormat && isRemoveNode) {
-                newInnerNode = util.createTextNode(element.textContent ? element.textContent : util.zeroWidthSpace);
-            } else {
-                (function recursionFunc(current, node) {
-                    const childNodes = current.childNodes;
-    
-                    for (let i = 0, len = childNodes.length; i < len; i++) {
-                        let child = childNodes[i];
-                        if (!child) continue;
-                        let coverNode = node;
+            (function recursionFunc(current, node) {
+                const childNodes = current.childNodes;
 
-                        if (util.isComponent(child)) {
-                            pNode.appendChild(newInnerNode);
-                            newInnerNode = newInnerNode.cloneNode(false);
-                            pNode.appendChild(child);
-                            pNode.appendChild(newInnerNode);
-                            i--;
-                            continue;
-                        } else if (validation(child)) {
-                            let cloneNode = child.cloneNode(false);
-                            node.appendChild(cloneNode);
-                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
-                        }
+                for (let i = 0, len = childNodes.length; i < len; i++) {
+                    let child = childNodes[i];
+                    if (!child) continue;
+                    let coverNode = node;
 
-                        recursionFunc(child, coverNode);
+                    if (util.isComponent(child)) {
+                        pNode.appendChild(newInnerNode);
+                        newInnerNode = newInnerNode.cloneNode(false);
+                        pNode.appendChild(child);
+                        pNode.appendChild(newInnerNode);
+                        nNodeArray.push(newInnerNode);
+                        i--;
+                        continue;
+                    } else if (validation(child)) {
+                        let cloneNode = child.cloneNode(false);
+                        node.appendChild(cloneNode);
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
                     }
-                })(element, newInnerNode);
-            }
+
+                    recursionFunc(child, coverNode);
+                }
+            })(element, newInnerNode);
 
             pNode.appendChild(newInnerNode);
 
-            if (isRemoveNode) {
-                this._stripRemoveNode(pNode, newInnerNode);
+            if (isRemoveFormat && isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+                }
+            } else if (isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                }
             }
 
             element.parentNode.insertBefore(pNode, element);
@@ -1490,6 +1489,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode) {
             const el = element;
+            const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
 
             let container = startCon;
@@ -1510,6 +1510,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                nNodeArray.push(newInnerNode);
                                 i--;
                             } else {
                                 recursionFunc(child, child);
@@ -1598,11 +1599,17 @@ export default function (context, pluginCallButtons, plugins, lang) {
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
-                container = util.createTextNode(newInnerNode.textContent);
-                pNode.insertBefore(container, newInnerNode);
-                pNode.removeChild(newInnerNode);
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+                    if (i === 0) container = textNode;
+                }
             } else if (isRemoveNode) {
-                this._stripRemoveNode(pNode, newInnerNode);
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                }
             }
 
             if (!isRemoveFormat && pNode.children.length === 0) {
@@ -1642,6 +1649,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode) {
             const el = element;
+            const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
 
             let container = endCon;
@@ -1662,6 +1670,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
+                                nNodeArray.push(newInnerNode);
                                 i--;
                             } else {
                                 recursionFunc(child, child);
@@ -1750,12 +1759,21 @@ export default function (context, pluginCallButtons, plugins, lang) {
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
-                container = util.createTextNode(newInnerNode.textContent);
-                offset = container.textContent.length;
-                pNode.insertBefore(container, newInnerNode);
-                pNode.removeChild(newInnerNode);
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+
+                    if (i === nNodeArray.length - 1) {
+                        container = textNode;
+                        offset = textNode.textContent.length;
+                    }
+                }
             } else if (isRemoveNode) {
-                this._stripRemoveNode(pNode, newInnerNode);
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                }
             }
 
             if (!isRemoveFormat && pNode.childNodes.length === 0) {
