@@ -752,7 +752,7 @@ const util = {
         
         (function recursionFunc(current) {
             if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
-                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.getParentElement(current, 'TABLE') && !inst.isComponent(current)) {
+                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
@@ -760,7 +760,7 @@ const util = {
             } else {
                 const children = current.children;
                 for (let i = 0, len = children.length, r = 0; i < len; i++) {
-                    if (!children[i + r]) continue;
+                    if (!children[i + r] || inst.isComponent(children[i + r])) continue;
                     r += recursionFunc(children[i + r]);
                 }
             }

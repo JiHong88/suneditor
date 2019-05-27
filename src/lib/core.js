@@ -544,12 +544,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         insertComponent: function (element) {
             let oNode = null;
-            const formatEl = this.util.getFormatElement(this.getSelectionNode());
+            const formatEl = util.getFormatElement(this.getSelectionNode());
 
             if (util.isListCell(formatEl)) {
                 this.insertNode(element, this.getSelectionNode());
                 oNode = util.createElement('LI');
                 formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
+                element.parentElement.insertBefore(util.createTextNode(util.zeroWidthSpace), element.nextSibling);
             } else {
                 this.insertNode(element, formatEl);
                 oNode = this.appendFormatTag(element);
@@ -1104,37 +1105,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 endOff = endCon.textContent.length;
             }
 
-            /** one line */
-            if (lineNodes.length === 1) {
-                newNode = appendNode.cloneNode(false);
-                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
+            
+            const oneLine = util.getFormatElement(startCon) === util.getFormatElement(endCon);
+            const endLength = lineNodes.length - (oneLine ? 0 : 1);
 
+            // node Changes
+            newNode = appendNode.cloneNode(false);
+            // startCon
+            if (oneLine) {
+                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
-            }
-            /** multi line */
-            else {
-                const endLength = lineNodes.length - 1;
-
-                // startCon
-                newNode = appendNode.cloneNode(false);
+            } else {
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode);
+            }
 
-                // mid
-                for (let i = 1; i < endLength; i++) {
-                    newNode = appendNode.cloneNode(false);
-                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode);
-                }
+            // mid
+            for (let i = 1; i < endLength; i++) {
+                newNode = appendNode.cloneNode(false);
+                this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode);
+            }
 
-                // endCon
-                if (endLength > 0) {
-                    newNode = appendNode.cloneNode(false);
-                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode);
-                } else {
-                    end = start;
-                }
+            // endCon
+            if (endLength > 1 && !oneLine) {
+                newNode = appendNode.cloneNode(false);
+                end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode);
+            } else if (!oneLine) {
+                end = start;
             }
 
             // set range
@@ -2512,23 +2511,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
             switch (keyCode) {
                 case 8: /** backspace key */
                     if (selectRange) break;
-                    if (util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling) {
+                    if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = util.zeroWidthSpace;
                         return false;
                     }
 
-                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-                        const range = core.getRange();
-                        if (!range.commonAncestorContainer.previousSibling && (!formatEl.previousSibling || formatEl.previousSibling.textContent.length === 0) && range.startOffset === 0 && range.endOffset === 0) {
-                            e.preventDefault();
-                            core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                    const commonCon = range.commonAncestorContainer;
+                    if (range.startOffset === 0 && range.endOffset === 0) {
+                        if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                            let detach = true;
+                            let comm = commonCon;
+                            while (comm && comm !== formatEl && !util.isWysiwygDiv(comm)) {
+                                if (comm.previousSibling) {
+                                    detach = false;
+                                    break;
+                                }
+                                comm = comm.parentNode;
+                            }
+    
+                            if (detach) {
+                                e.preventDefault();
+                                core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                                break;
+                            }
                         }
-                    } else if (formatEl.previousSibling) {
-                        const previousEl = formatEl.previousSibling;
-                        const range = core.getRange();
-                        if (util.isComponent(previousEl) && (range.startOffset === 0 || range.endOffset === 0)) {
+                        
+                        if (util.isComponent(commonCon.previousSibling)) {
+                            const previousEl = commonCon.previousSibling;
                             util.removeItem(previousEl);
                             // history stack
                             core.history.push();
