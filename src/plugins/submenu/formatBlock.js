@@ -79,8 +79,13 @@ export default {
             const range = this.getRange();
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
+            
+            const commonCon = this.getRange().commonAncestorContainer;
+            const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
             let selectedFormsts = this.getSelectedElements(function (current) {
-                return this.isFormatElement(current) || this.isComponent(current);
+                const component = this.getParentElement(current, this.isComponent);
+                const format = this.getFormatElement(component);
+                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
             }.bind(this.util));
 
             if (selectedFormsts.length === 0) return;

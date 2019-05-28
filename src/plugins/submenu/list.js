@@ -93,7 +93,7 @@ export default {
             this.getSelectedElements(function (current) {
                 const component = this.getParentElement(current, this.isComponent);
                 const format = this.getFormatElement(component);
-                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format === this.getFormatElement(component));
+                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
         }.bind(this.util));
 
         if (!selectedFormsts || selectedFormsts.length === 0) return;
@@ -172,6 +172,10 @@ export default {
             
             for (let i = 0, len = selectedFormsts.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormsts[i];
+                if (/^\n+$/.test(fTag.textContent) || fTag.textContent.length === 0) {
+                    this.util.removeItem(fTag);
+                    continue;
+                }
                 next = selectedFormsts[i + 1];
                 originParent = fTag.parentNode;
                 nextParent = next ? next.parentNode : null;

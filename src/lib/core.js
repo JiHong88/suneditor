@@ -871,14 +871,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        const inners = insNode.childNodes;
+                        const inner = insNode.innerHTML;
                         insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
-                        for (let c = 0, cLen = inners.length, inner; c < cLen; c++) {
-                            inner = inners[c];
-                            insNode.innerHTML += inner.nodeType !== 1 || util.isBreak(inner)? 
-                                inner.textContent.length > 0 ? inner.textContent : util.zeroWidthSpace : 
-                                this.util.isFormatElement(inner) ? inner.innerHTML : inner.outerHTML;
-                        }
+                        insNode.innerHTML = inner;
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
@@ -1937,9 +1932,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
-                
-                // history stack
-                this.history.push();
             }
             else {
                 context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
@@ -2528,7 +2520,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     const commonCon = range.commonAncestorContainer;
                     if (range.startOffset === 0 && range.endOffset === 0) {
-                        if (rangeEl && formatEl && !formatEl.previousElementSibling && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                        if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                             let detach = true;
                             let comm = commonCon;
                             while (comm && comm !== formatEl && !util.isWysiwygDiv(comm)) {
