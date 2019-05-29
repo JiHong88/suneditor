@@ -545,12 +545,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
         insertComponent: function (element) {
             let oNode = null;
             const formatEl = util.getFormatElement(this.getSelectionNode());
+            const li = util.isListCell(formatEl);
 
             if (util.isListCell(formatEl)) {
-                this.insertNode(element, this.getSelectionNode());
+                const newLi = util.createElement('LI');
+                newLi.appendChild(element);
+                formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
+
                 oNode = util.createElement('LI');
-                formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
-                element.parentElement.insertBefore(util.createTextNode(util.zeroWidthSpace), element.nextSibling);
+                formatEl.parentNode.insertBefore(oNode, newLi.nextElementSibling);
             } else {
                 this.insertNode(element, formatEl);
                 oNode = this.appendFormatTag(element);
@@ -1129,7 +1132,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             // endCon
-            if (endLength > 1 && !oneLine) {
+            if (endLength > 0 && !oneLine) {
                 newNode = appendNode.cloneNode(false);
                 end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode);
             } else if (!oneLine) {
@@ -1317,7 +1320,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (util.isComponent(child) || util.isFormatElement(child)) {
+                            if (util.ignoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1437,7 +1440,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (!child) continue;
                     let coverNode = node;
 
-                    if (util.isComponent(child) || util.isFormatElement(child)) {
+                    if (util.ignoreNodeChange(child)) {
                         pNode.appendChild(newInnerNode);
                         newInnerNode = newInnerNode.cloneNode(false);
                         pNode.appendChild(child);
@@ -1505,7 +1508,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isComponent(child) || util.isFormatElement(child)) {
+                            if (util.ignoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1665,7 +1668,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isComponent(child) || util.isFormatElement(child)) {
+                            if (util.ignoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -2519,32 +2522,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     const commonCon = range.commonAncestorContainer;
-                    if (range.startOffset === 0 && range.endOffset === 0) {
-                        if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-                            let detach = true;
-                            let comm = commonCon;
-                            while (comm && comm !== formatEl && !util.isWysiwygDiv(comm)) {
-                                if (comm.previousSibling) {
-                                    detach = false;
-                                    break;
-                                }
-                                comm = comm.parentNode;
-                            }
-    
-                            if (detach) {
-                                e.preventDefault();
-                                core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
-                                break;
-                            }
-                        }
-                        
-                        if (util.isComponent(commonCon.previousSibling)) {
-                            const previousEl = commonCon.previousSibling;
-                            util.removeItem(previousEl);
-                            // history stack
-                            core.history.push();
-                        }
+                    if (range.startOffset === 0 && range.endOffset === 0 && util.isComponent(commonCon.previousSibling)) {
+                        const previousEl = commonCon.previousSibling;
+                        util.removeItem(previousEl);
+                        // history stack
+                        core.history.push();
                     }
+
                     break;
                 case 9: /** tab key */
                     e.preventDefault();
@@ -2618,6 +2602,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         formatEl = core.appendFormatTag(formatEl);
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
+                    
                     break;
             }
 

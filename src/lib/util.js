@@ -23,7 +23,7 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|ol|ul|dl|li|hr|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -165,7 +165,7 @@ const util = {
 
         if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
-        return this._tagConvertor(innerHTML);
+        return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
     },
 
     /**
@@ -772,8 +772,18 @@ const util = {
     },
 
     /**
+     * @description Nodes that need to be added without modification when changing text nodes (util.isComponent, util.isFormatElement, img, video)
+     * @param {Element} element - Element to check
+     * @returns {Boolean}
+     */
+    ignoreNodeChange: function (element) {
+        return util.isComponent(element) || util.isFormatElement(element) || /^(IMG|VIDEO)$/i.test(element.nodeName);
+    },
+
+    /**
      * @description Gets the clean HTML code for editor
      * @param {String} html - HTML string
+     * @returns {String}
      */
     cleanHTML: function (html) {
         const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
@@ -808,7 +818,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|thead|tbody|th|tr|td'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|img|iframe|video|table|thead|tbody|th|tr|td|a|b|strong|var|i|em|u|ins|s|strike|del|sub|sup'.split('|');
         let regStr = '<\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
