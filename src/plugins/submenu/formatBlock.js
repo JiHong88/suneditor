@@ -80,13 +80,19 @@ export default {
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
             
-            const commonCon = this.getRange().commonAncestorContainer;
-            const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
-            let selectedFormsts = this.getSelectedElements(function (current) {
-                const component = this.getParentElement(current, this.isComponent);
-                const format = this.getFormatElement(component);
-                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
-            }.bind(this.util));
+            const getSelectedFormats = function () {
+                const commonCon = this.getRange().commonAncestorContainer;
+                const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
+                let selectedFormsts = this.getSelectedElements(function (current) {
+                    const component = this.getParentElement(current, this.isComponent);
+                    const format = this.getFormatElement(component);
+                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
+                }.bind(this.util));
+
+                return selectedFormsts;
+            }.bind(this);
+
+            let selectedFormsts = getSelectedFormats();
 
             if (selectedFormsts.length === 0) return;
 
@@ -141,11 +147,11 @@ export default {
 
             // change format tag
             this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            selectedFormsts = this.getSelectedElements();
+            selectedFormsts = getSelectedFormats();
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
                 
-                if (node.nodeName !== value) {
+                if (node.nodeName !== value && !this.util.isComponent(node)) {
                     newFormat = this.util.createElement(value);
                     newFormat.innerHTML = node.innerHTML;
                     node.parentNode.insertBefore(newFormat, node);

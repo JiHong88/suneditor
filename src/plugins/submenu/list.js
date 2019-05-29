@@ -172,7 +172,7 @@ export default {
             
             for (let i = 0, len = selectedFormsts.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormsts[i];
-                if (/^\n+$/.test(fTag.textContent) || fTag.textContent.length === 0) {
+                if (fTag.childNodes.length === 0) {
                     this.util.removeItem(fTag);
                     continue;
                 }

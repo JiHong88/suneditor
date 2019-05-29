@@ -732,7 +732,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 [util.getRangeFormatElement(commonCon)] :
                 this.getSelectedElements(function (current) {
                     const component = util.getParentElement(current, util.isComponent);
-                    return (util.isFormatElement(current) || util.isComponent(current)) && (!component || component === myComponent);
+                    return (util.isFormatElement(current) || util.isComponent(current)) && (!component || component !== myComponent);
                 });
 
             if (!rangeLines || rangeLines.length === 0) return;
@@ -852,6 +852,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const newList = util.isList(newRangeElement);
             let insertedNew = false;
 
+            function appendNode (parent, insNode, sibling) {
+                const children = insNode.childNodes;
+                let format = insNode.cloneNode(false);
+                let first = null;
+                let c = null;
+
+                while (children[0]) {
+                    c = children[0];
+                    if (util.ignoreNodeChange(c)) {
+                        if (format.childNodes.length > 0) {
+                            if (!first) first = format;
+                            parent.insertBefore(format, sibling);
+                            format = insNode.cloneNode(false);
+                        }
+                        parent.insertBefore(c, sibling);
+                        if (!first) first = c;
+                    } else {
+                        format.appendChild(c);
+                    }
+                }
+
+                if (format.childNodes.length > 0) {
+                    parent.insertBefore(format, sibling);
+                    if (!first) first = format;
+                }
+
+                return first;
+            }
+
             for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
                 if (remove && i === 0) {
@@ -887,9 +916,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 parent.insertBefore(newRangeElement, rangeElement);
                                 insertedNew = true;
                             }
-                            newRangeElement.appendChild(insNode);
+                            insNode = appendNode(newRangeElement, insNode, null);
                         } else {
-                            parent.insertBefore(insNode, rangeElement);
+                            insNode = appendNode(parent, insNode, rangeElement);
                         }
                         
                         if (selectedFormats) {
@@ -2522,11 +2551,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     const commonCon = range.commonAncestorContainer;
-                    if (range.startOffset === 0 && range.endOffset === 0 && util.isComponent(commonCon.previousSibling)) {
-                        const previousEl = commonCon.previousSibling;
-                        util.removeItem(previousEl);
-                        // history stack
-                        core.history.push();
+                    if (range.startOffset === 0 && range.endOffset === 0) {
+                        if (range.startOffset === 0 && range.endOffset === 0) {
+                            if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                                let detach = true;
+                                let comm = commonCon;
+                                while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
+                                    if (comm.previousSibling) {
+                                        detach = false;
+                                        break;
+                                    }
+                                    comm = comm.parentNode;
+                                }
+
+                                if (detach) {
+                                    e.preventDefault();
+                                    core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                                    // history stack
+                                    core.history.push();
+                                    break;
+                                }	
+                            }	
+
+                            if (util.isComponent(commonCon.previousSibling)) {	
+                                const previousEl = commonCon.previousSibling;	
+                                util.removeItem(previousEl);	
+                                // history stack	
+                                core.history.push();	
+                            }
+                        }
                     }
 
                     break;
