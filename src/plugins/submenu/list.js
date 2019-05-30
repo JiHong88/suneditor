@@ -163,7 +163,7 @@ export default {
             
             for (let i = 0, len = selectedFormsts.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormsts[i];
-                if (fTag.childNodes.length === 0) {
+                if (fTag.childNodes.length === 0 && !this.util.ignoreNodeChange(fTag)) {
                     this.util.removeItem(fTag);
                     continue;
                 }
@@ -176,7 +176,13 @@ export default {
                 siblingTag = isCell && !this.util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
                 newCell = this.util.createElement('LI');
-                newCell.innerHTML = this.util.isComponent(fTag) ? fTag.outerHTML : fTag.innerHTML;
+                if (this.util.isComponent(fTag)) {
+                    if (!/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace));
+                    newCell.innerHTML += fTag.outerHTML;
+                    if (/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace))
+                } else {
+                    newCell.innerHTML = fTag.innerHTML;
+                }
                 list.appendChild(newCell);
 
                 if (!next) lastList = list;
