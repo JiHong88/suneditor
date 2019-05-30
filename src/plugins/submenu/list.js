@@ -86,16 +86,7 @@ export default {
 
         if (!command) return;
 
-        const commonCon = this.getRange().commonAncestorContainer;
-        const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
-        const selectedFormsts = this.util.isTable(commonCon) ? 
-            this.getSelectedElements() :
-            this.getSelectedElements(function (current) {
-                const component = this.getParentElement(current, this.isComponent);
-                const format = this.getFormatElement(component);
-                return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
-        }.bind(this.util));
-
+        const selectedFormsts = this.getSelectedElementsAndComponents();
         if (!selectedFormsts || selectedFormsts.length === 0) return;
 
         let isRemove = true;

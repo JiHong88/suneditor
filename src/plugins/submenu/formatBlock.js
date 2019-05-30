@@ -79,21 +79,8 @@ export default {
             const range = this.getRange();
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
-            
-            const getSelectedFormats = function () {
-                const commonCon = this.getRange().commonAncestorContainer;
-                const myComponent = this.util.getParentElement(commonCon, this.util.isComponent);
-                let selectedFormsts = this.getSelectedElements(function (current) {
-                    const component = this.getParentElement(current, this.isComponent);
-                    const format = this.getFormatElement(component);
-                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
-                }.bind(this.util));
 
-                return selectedFormsts;
-            }.bind(this);
-
-            let selectedFormsts = getSelectedFormats();
-
+            let selectedFormsts = this.getSelectedElementsAndComponents();
             if (selectedFormsts.length === 0) return;
 
             let first = selectedFormsts[0];
@@ -147,7 +134,7 @@ export default {
 
             // change format tag
             this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            selectedFormsts = getSelectedFormats();
+            selectedFormsts = this.getSelectedElementsAndComponents();
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
                 

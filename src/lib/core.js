@@ -490,6 +490,25 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
+         * @description Get format elements and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
+         * If some of the component are included in the selection, get the entire that component.
+         * @returns {Array}
+         */
+        getSelectedElementsAndComponents: function () {
+            const commonCon = this.getRange().commonAncestorContainer;
+            const myComponent = util.getParentElement(commonCon, util.isComponent);
+            const selectedLines = util.isTable(commonCon) ? 
+                this.getSelectedElements() :
+                this.getSelectedElements(function (current) {
+                    const component = this.getParentElement(current, this.isComponent);
+                    const format = this.getFormatElement(component);
+                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
+                }.bind(util));
+
+            return selectedLines;
+        },
+
+        /**
          * @description Determine if this offset is the edge offset of container
          * @param {Object} container - The container property of the selection object.
          * @param {Number} offset - The offset property of the selection object.
@@ -535,8 +554,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description The method to insert a element. (component : table, hr, image, video)
-         * This method is add the element and insert the following lines.
+         * @description The method to insert a element. (used elements : table, hr, image, video)
+         * This method is add the element next line and insert the new line.
          * When used in a tag in "LI", it is inserted into the LI tag.
          * Returns the next line added.
          * @param {Element} element - Element to be inserted
@@ -545,15 +564,20 @@ export default function (context, pluginCallButtons, plugins, lang) {
         insertComponent: function (element) {
             let oNode = null;
             const formatEl = util.getFormatElement(this.getSelectionNode());
-            const li = util.isListCell(formatEl);
 
             if (util.isListCell(formatEl)) {
-                const newLi = util.createElement('LI');
-                newLi.appendChild(element);
-                formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
-
-                oNode = util.createElement('LI');
-                formatEl.parentNode.insertBefore(oNode, newLi.nextElementSibling);
+                if (/^HR$/i.test(element.nodeName)) {
+                    const newLi = util.createElement('LI');
+                    const textNode = util.createTextNode(util.zeroWidthSpace);
+                    newLi.appendChild(element);
+                    newLi.appendChild(textNode);
+                    formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
+                    this.setRange(textNode, 1, textNode, 1);
+                } else {
+                    this.insertNode(element, this.getSelectionNode());
+                    oNode = util.createElement('LI');
+                    formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
+                }
             } else {
                 this.insertNode(element, formatEl);
                 oNode = this.appendFormatTag(element);
@@ -726,15 +750,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Element} rangeElement - Element of wrap the arguments (PRE, BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            const commonCon = this.getRange().commonAncestorContainer;
-            const myComponent = util.getParentElement(commonCon, util.isComponent);
-            const rangeLines = util.isTable(commonCon) && !util.isCell(commonCon) ? 
-                [util.getRangeFormatElement(commonCon)] :
-                this.getSelectedElements(function (current) {
-                    const component = util.getParentElement(current, util.isComponent);
-                    return (util.isFormatElement(current) || util.isComponent(current)) && (!component || component !== myComponent);
-                });
-
+            const rangeLines = this.getSelectedElementsAndComponents();
             if (!rangeLines || rangeLines.length === 0) return;
 
             let last  = rangeLines[rangeLines.length - 1];
