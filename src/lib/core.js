@@ -61,6 +61,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
         submenu: null,
 
         /**
+         * @description current resizing component name
+         * @private
+         */
+        _resizingName: '',
+
+        /**
          * @description current subment name
          * @private
          */
@@ -309,6 +315,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 this.controllerArray = [];
             }
+
+            this._resizingName = '';
         },
 
         /**
@@ -501,8 +509,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this.getSelectedElements() :
                 this.getSelectedElements(function (current) {
                     const component = this.getParentElement(current, this.isComponent);
-                    const format = this.getFormatElement(component);
-                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || this.isComponent(current)) && (!format || format !== this.getFormatElement(component));
+                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || (this.isComponent(current) && !this.getFormatElement(current)));
                 }.bind(util));
 
             return selectedLines;
@@ -876,7 +883,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util.ignoreNodeChange(c)) {
+                    if (util.ignoreNodeChange(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
@@ -2555,10 +2562,17 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
                 return;
             }
-            
+
+            const resizingName = core._resizingName;
             switch (keyCode) {
                 case 8: /** backspace key */
                     if (selectRange) break;
+                    if (resizingName) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        core.plugins[resizingName].destroy.call(core);
+                    }
+
                     if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -2598,6 +2612,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         }
                     }
 
+                    break;
+                case 46: /** delete key */
+                    if (resizingName) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        core.plugins[resizingName].destroy.call(core);
+                    }
+
+                    if (util.onlyZeroWidthSpace(formatEl)) {
+                        let nextEl = formatEl.nextElementSibling;
+                        if (util.isComponent(nextEl)) {
+                            e.preventDefault();
+                            util.removeItem(formatEl);
+                            
+                            if (util.hasClass(nextEl, 'sun-editor-id-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
+                                e.stopPropagation();
+                                nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
+                                core.callPlugin('image', function () {
+                                    const size = core.plugins.resizing.call_controller_resize.call(core, nextEl, 'image');
+                                    core.plugins.image.onModifyMode.call(core, nextEl, size);
+                                    
+                                    if (!util.getParentElement(nextEl, '.sun-editor-id-image-container')) {
+                                        core.plugins.image.openModify.call(core, true);
+                                        core.plugins.image.update_image.call(core, true);
+                                    }
+                                });
+                            }
+                        }
+                    }
                     break;
                 case 9: /** tab key */
                     e.preventDefault();
@@ -2666,10 +2709,33 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             break;
                         }
                     }
+
                     if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl);
                         core.setRange(formatEl, 0, formatEl, 0);
+                    }
+
+                    if (resizingName) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const compContext = context[resizingName];
+                        const container = compContext._container;
+                        const sibling = container.previousElementSibling || container.nextElementSibling;
+                        let newEl = null;
+                        if (util.isListCell(container.parentNode)) {
+                            newEl = util.createElement('BR');
+                        } else {
+                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : 'P');
+                            newEl.innerHTML = util.zeroWidthSpace;
+                        }
+
+                        container.parentNode.insertBefore(newEl, container);
+                        
+                        core.callPlugin(resizingName, function () {
+                            const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
+                            core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
+                        });
                     }
                     
                     break;

@@ -549,7 +549,12 @@ export default {
 
         // history stack
         this.history.push();
-        if (init) this.plugins.image.init.call(this);
+        if (init) {
+            imageEl = container.querySelector('img');
+            this.plugins.image.init.call(this);
+            const size = this.plugins.resizing.call_controller_resize.call(this, imageEl, 'image');
+            this.plugins.image.onModifyMode.call(this, imageEl, size);
+        }
     },
 
     sizeRevert: function () {
