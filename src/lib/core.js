@@ -509,7 +509,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this.getSelectedElements() :
                 this.getSelectedElements(function (current) {
                     const component = this.getParentElement(current, this.isComponent);
-                    return ((this.isFormatElement(current) && (!component || component === myComponent)) || (this.isComponent(current) && !this.getFormatElement(current)));
+                    return (this.isFormatElement(current) && (!component || component === myComponent)) || (this.isComponent(current) && !this.getFormatElement(current));
                 }.bind(util));
 
             return selectedLines;
@@ -2423,7 +2423,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
                 core.callPlugin('video', function () {
-                    const iframe = util.getChildElement(targetElement.parentNode, 'iframe');
+                    const iframe = targetElement.parentNode.querySelector('iframe');
                     const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
                     core.plugins.video.onModifyMode.call(core, iframe, size);
                 });
@@ -2585,29 +2585,27 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     const commonCon = range.commonAncestorContainer;
                     if (range.startOffset === 0 && range.endOffset === 0) {
-                        if (range.startOffset === 0 && range.endOffset === 0) {
-                            if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-                                let detach = true;
-                                let comm = commonCon;
-                                while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
-                                    if (comm.previousSibling) {
-                                        detach = false;
-                                        break;
-                                    }
-                                    comm = comm.parentNode;
-                                }
-
-                                if (detach) {
-                                    e.preventDefault();
-                                    core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                        if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                            let detach = true;
+                            let comm = commonCon;
+                            while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
+                                if (comm.previousSibling) {
+                                    detach = false;
                                     break;
-                                }	
-                            }	
-
-                            if (util.isComponent(commonCon.previousSibling)) {	
-                                const previousEl = commonCon.previousSibling;	
-                                util.removeItem(previousEl);	
+                                }
+                                comm = comm.parentNode;
                             }
+
+                            if (detach) {
+                                e.preventDefault();
+                                core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                                break;
+                            }	
+                        }	
+
+                        if (util.isComponent(commonCon.previousSibling)) {
+                            const previousEl = commonCon.previousSibling;
+                            util.removeItem(previousEl);
                         }
                     }
 
@@ -2622,24 +2620,37 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         break;
                     }
 
-                    if (util.onlyZeroWidthSpace(formatEl)) {
+                    if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null) && range.startOffset === selectionNode.textContent.length) {
                         let nextEl = formatEl.nextElementSibling;
                         if (util.isComponent(nextEl)) {
                             e.preventDefault();
-                            util.removeItem(formatEl);
-                            
-                            if (util.hasClass(nextEl, 'sun-editor-id-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
+
+                            if (util.onlyZeroWidthSpace(formatEl)) {
+                                util.removeItem(formatEl);
+                            }
+
+                            if (util.hasClass(nextEl, 'sun-editor-id-comp') || /^IMG$/i.test(nextEl.nodeName)) {
                                 e.stopPropagation();
-                                nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
-                                core.callPlugin('image', function () {
-                                    const size = core.plugins.resizing.call_controller_resize.call(core, nextEl, 'image');
-                                    core.plugins.image.onModifyMode.call(core, nextEl, size);
-                                    
-                                    if (!util.getParentElement(nextEl, '.sun-editor-id-image-container')) {
-                                        core.plugins.image.openModify.call(core, true);
-                                        core.plugins.image.update_image.call(core, true);
-                                    }
-                                });
+                                if (util.hasClass(nextEl, 'sun-editor-id-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
+                                    nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
+                                    core.callPlugin('image', function () {
+                                        const size = core.plugins.resizing.call_controller_resize.call(core, nextEl, 'image');
+                                        core.plugins.image.onModifyMode.call(core, nextEl, size);
+                                        
+                                        if (!util.getParentElement(nextEl, '.sun-editor-id-comp')) {
+                                            core.plugins.image.openModify.call(core, true);
+                                            core.plugins.image.update_image.call(core, true);
+                                        }
+                                    });
+                                } else if (util.hasClass(nextEl, 'sun-editor-id-iframe-container')) {
+                                    e.stopPropagation();
+                                    core.callPlugin('video', function () {
+                                        const iframe = nextEl.querySelector('iframe');
+                                        const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
+                                        core.plugins.video.onModifyMode.call(core, iframe, size);
+                                    });
+                                }
+
                                 // history stack
                                 core.history.push();
                             }
