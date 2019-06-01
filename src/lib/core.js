@@ -2571,6 +2571,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[resizingName].destroy.call(core);
+                        // history stack	
+                        core.history.push();
+                        break;
                     }
 
                     if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
@@ -2597,8 +2600,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 if (detach) {
                                     e.preventDefault();
                                     core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
-                                    // history stack
-                                    core.history.push();
                                     break;
                                 }	
                             }	
@@ -2606,8 +2607,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             if (util.isComponent(commonCon.previousSibling)) {	
                                 const previousEl = commonCon.previousSibling;	
                                 util.removeItem(previousEl);	
-                                // history stack	
-                                core.history.push();	
                             }
                         }
                     }
@@ -2618,6 +2617,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[resizingName].destroy.call(core);
+                        // history stack	
+                        core.history.push();
+                        break;
                     }
 
                     if (util.onlyZeroWidthSpace(formatEl)) {
@@ -2638,9 +2640,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                         core.plugins.image.update_image.call(core, true);
                                     }
                                 });
+                                // history stack
+                                core.history.push();
                             }
+
+                            break;
                         }
                     }
+                    
                     break;
                 case 9: /** tab key */
                     e.preventDefault();
@@ -2696,6 +2703,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
                 case 13: /** enter key */
                     if (selectRange) break;
+
                     formatEl = util.getFormatElement(selectionNode);
                     rangeEl = util.getRangeFormatElement(formatEl);
                     const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
@@ -2722,6 +2730,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         const compContext = context[resizingName];
                         const container = compContext._container;
                         const sibling = container.previousElementSibling || container.nextElementSibling;
+
                         let newEl = null;
                         if (util.isListCell(container.parentNode)) {
                             newEl = util.createElement('BR');
@@ -2736,6 +2745,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
                         });
+
+                        // history stack
+                        core.history.push();
                     }
                     
                     break;
