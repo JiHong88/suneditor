@@ -570,7 +570,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         insertComponent: function (element) {
             let oNode = null;
-            const formatEl = util.getFormatElement(this.getSelectionNode());
+            const selectionNode = this.getSelectionNode();
+            const formatEl = util.getFormatElement(selectionNode);
 
             if (util.isListCell(formatEl)) {
                 if (/^HR$/i.test(element.nodeName)) {
@@ -581,7 +582,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
                     this.setRange(textNode, 1, textNode, 1);
                 } else {
-                    this.insertNode(element, this.getSelectionNode());
+                    this.insertNode(element, selectionNode === formatEl ? null : selectionNode);
                     oNode = util.createElement('LI');
                     formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
                 }
