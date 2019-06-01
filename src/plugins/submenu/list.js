@@ -177,9 +177,10 @@ export default {
 
                 newCell = this.util.createElement('LI');
                 if (this.util.isComponent(fTag)) {
-                    if (!/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace));
+                    const isHR = /^HR$/i.test(fTag.nodeName);
+                    if (!isHR) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace));
                     newCell.innerHTML += fTag.outerHTML;
-                    if (/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace))
+                    if (isHR) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace));
                 } else {
                     newCell.innerHTML = fTag.innerHTML;
                 }

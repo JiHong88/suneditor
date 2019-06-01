@@ -1974,6 +1974,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 disButtons[i].disabled = wysiwygActive;
             }
 
+            this.controllersOff();
+
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>' + util.zeroWidthSpace + '</p>';

@@ -597,8 +597,8 @@ const util = {
         if (!first) return;
         if (!last) last = first;
 
-        while (first && first.nodeType === 1 && !this.isBreak(first)) first = first.firstChild;
-        while (last && last.nodeType === 1 && !this.isBreak(last)) last = last.lastChild;
+        while (first && first.nodeType === 1 && first.childNodes.length > 0 && !this.isBreak(first)) first = first.firstChild;
+        while (last && last.nodeType === 1 && last.childNodes.length > 0 &&  !this.isBreak(last)) last = last.lastChild;
 
         return {
             sc: first,
@@ -798,7 +798,7 @@ const util = {
 
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
-            .replace(/(<[a-z]+)[^>]*(?=>)/g, function (m, t) {
+            .replace(/(<[a-zA-Z]+)[^>]*(?=>)/g, function (m, t) {
                 const v = m.match(/((?:colspan|rowspan|target|href|src)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
