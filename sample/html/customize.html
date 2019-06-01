@@ -116,6 +116,9 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <br><br>
 
+            <label><input type="checkbox" id="imageUploadHeader">&nbsp;&nbsp;imageUploadHeader</label>
+            <textarea id="imageUploadHeader_value" placeholder='{"Access-Control-Allow-Origin": "*"}' style="width: 300px; vertical-align: top;"></textarea>
+            <br><br>
             <label><input type="checkbox" id="imageUploadUrl">&nbsp;&nbsp;imageUploadUrl</label>
             <input type="text" id="imageUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
             <br><br>
@@ -173,7 +176,7 @@ var langSelect = document.getElementById('language');
 var editor = null;
 
 function sun_create () {
-    if (editor) editor.destroy();
+    if (editor && editor.destroy) editor.destroy();
 
     imageTable.innerHTML = '';
 
@@ -204,6 +207,7 @@ function sun_create () {
         imageFileInput: document.getElementById('imageFileInput').checked,
         imageUrlInput: document.getElementById('imageUrlInput').checked,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : null,
+        imageUploadUrl: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : null,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : null,
         videoResizing: document.getElementById('videoResizing').checked,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,

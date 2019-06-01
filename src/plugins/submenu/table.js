@@ -167,12 +167,9 @@ export default {
 
         oTable.innerHTML = tableHTML;
 
-        const formatEl = this.util.getFormatElement(this.getSelectionNode());
-
-        this.insertNode(oTable, formatEl);
-        this.appendFormatTag(oTable);
+        this.insertComponent(oTable);
+        
         this.focus();
-
         this.plugins.table.reset_table_picker.call(this);
     },
 

@@ -291,6 +291,7 @@ imageWidth      : The default width size of the image frame.        default: 'au
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
+imageUploadHeader : Http Header when uploading images.              default: null {Object}
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
                   When not used, it enters base64 data

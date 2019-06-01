@@ -23,7 +23,7 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|ol|ul|dl|li|hr)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|ol|ul|dl|li|hr|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -165,7 +165,7 @@ const util = {
 
         if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
 
-        return this._tagConvertor(innerHTML);
+        return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
     },
 
     /**
@@ -213,7 +213,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !this.isComponent(element)) return true;
+        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI)$/i.test(element.nodeName) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
@@ -229,12 +229,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover, table) element - ".sun-editor-id-comp"
+     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".sun-editor-id-comp"
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
-        return element && (/sun-editor-id-comp/.test(element.className) || /^TABLE$/.test(element.nodeName));
+        return element && (/sun-editor-id-comp/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
     },
 
     /**
@@ -284,7 +284,7 @@ const util = {
     /**
      * @description Get the index of the argument value in the element array
      * @param {Array} array - element array
-     * @param {Element} element - Element to find index
+     * @param {Element} element - The element to find index
      * @returns {Number}
      */
     getArrayIndex: function (array, element) {
@@ -302,7 +302,7 @@ const util = {
     /**
      * @description Get the next index of the argument value in the element array
      * @param {Array} array - element array
-     * @param {Element} item - Element to find index
+     * @param {Element} item - The element to find index
      * @returns {Number}
      */
     nextIdx: function (array, item) {
@@ -313,8 +313,8 @@ const util = {
 
     /**
      * @description Get the previous index of the argument value in the element array
-     * @param {Array} array - element array
-     * @param {Element} item - Element to find index
+     * @param {Array} array - Element array
+     * @param {Element} item - The element to find index
      * @returns {Number}
      */
     prevIdx: function (array, item) {
@@ -324,21 +324,64 @@ const util = {
     },
 
     /**
-     * @description Get index from parent
-     * @param {Element} element - Element
+     * @description Returns the index compared to other sibling nodes.
+     * @param {Node} node - The Node to find index
      * @returns {Number}
      */
-    getPositionIndex: function (element) {
+    getPositionIndex: function (node) {
         let idx = 0;
-        while (!!(element = element.previousSibling)) {
+        while (!!(node = node.previousSibling)) {
             idx += 1;
         }
         return idx;
     },
 
     /**
+     * @description Returns the position of the "node" in the "parentNode" in a numerical array.
+     * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
+     * @param {Node} node - The Node to find position path
+     * @param {Element|null} parentNode - Parent node. If null, wysiwyg div area
+     * @returns {Array}
+     */
+    getNodePath: function (node, parentNode) {
+        const path = [];
+        let finds = true;
+
+        this.getParentElement(node, function (el) {
+            if (el === parentNode) finds = false;
+            if (finds && !this.isWysiwygDiv(el)) path.push(el);
+            return false;
+        }.bind(this));
+        
+        return path.map(this.getPositionIndex).reverse();
+    },
+
+    /**
+     * @description Returns the node in the location of the path array obtained from "util.getNodePath".
+     * @param {Array} offsets - Position array, array obtained from "util.getNodePath"
+     * @param {Element} parentNode - Base parent element
+     * @returns {Element}
+     */
+    getNodeFromPath: function (offsets, parentNode) {
+        let current = parentNode;
+        let nodes;
+
+        for (let i = 0, len = offsets.length; i < len; i++) {
+            nodes = current.childNodes;
+            if (nodes.length === 0) break;
+            if (nodes.length <= offsets[i]) {
+                current = nodes[nodes.length - 1];
+            } else {
+                current = nodes[offsets[i]];
+            }
+        }
+
+        return current;
+    },
+
+    /**
      * @description Check the node is a list (ol, ul)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isList: function (node) {
@@ -347,7 +390,7 @@ const util = {
 
     /**
      * @description Check the node is a list cell (li)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isListCell: function (node) {
@@ -356,7 +399,7 @@ const util = {
 
     /**
      * @description Check the node is a table (table, thead, tbody, tr, th, td)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isTable: function (node) {
@@ -365,7 +408,7 @@ const util = {
 
     /**
      * @description Check the node is a table cell (td, th)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isCell: function (node) {
@@ -374,7 +417,7 @@ const util = {
 
     /**
      * @description Check the node is a break node (BR)
-     * @param {Element|String} node - Nodes to check
+     * @param {Element|String} node - The element or element name to check
      * @returns {Boolean}
      */
     isBreak: function (node) {
@@ -394,7 +437,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (element !== current && validation(current)) {
+            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
                 children.push(current);
             }
 
@@ -419,7 +462,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if (element !== current && validation(current)) {
+            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
                 children.push(current);
             }
 
@@ -439,11 +482,11 @@ const util = {
      */
     getElementDepth: function (element) {
         let depth = 0;
-        element = element.parentNode
+        element = element.parentNode;
 
         while (element && !this.isWysiwygDiv(element)) {
             depth += 1;
-            element = element.parentNode
+            element = element.parentNode;
         }
 
         return depth;
@@ -690,7 +733,7 @@ const util = {
                     cc = {
                         sc: element.previousElementSibling,
                         ec: element.nextElementSibling
-                    }
+                    };
                     util.removeItem(element);
                     recursionFunc(parent);
                 }
@@ -705,8 +748,11 @@ const util = {
      * @param {Element} element - Element node
      */
     removeEmptyNode: function (element) {
+        const inst = this;
+        
         (function recursionFunc(current) {
-            if (current !== element && util.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName))) {
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
+                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
@@ -714,7 +760,7 @@ const util = {
             } else {
                 const children = current.children;
                 for (let i = 0, len = children.length, r = 0; i < len; i++) {
-                    if (!children[i + r]) continue;
+                    if (!children[i + r] || inst.isComponent(children[i + r])) continue;
                     r += recursionFunc(children[i + r]);
                 }
             }
@@ -722,12 +768,22 @@ const util = {
             return 0;
         })(element);
 
-        if (element.childNodes.length == 0) element.innerHTML = this.zeroWidthSpace;
+        if (element.childNodes.length === 0) element.innerHTML = this.zeroWidthSpace;
+    },
+
+    /**
+     * @description Nodes that need to be added without modification when changing text nodes (util.isComponent, util.isFormatElement, img, video)
+     * @param {Element} element - Element to check
+     * @returns {Boolean}
+     */
+    ignoreNodeChange: function (element) {
+        return util.isComponent(element) || util.isFormatElement(element) || /^(IMG|VIDEO)$/i.test(element.nodeName);
     },
 
     /**
      * @description Gets the clean HTML code for editor
      * @param {String} html - HTML string
+     * @returns {String}
      */
     cleanHTML: function (html) {
         const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
@@ -762,7 +818,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|b|strong|u|i|var|em|strike|s|sub|sup|ol|ul|li|br|hr|a|img|iframe|table|thead|tbody|th|tr|td'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|strike|del|sub|sup'.split('|');
         let regStr = '<\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {

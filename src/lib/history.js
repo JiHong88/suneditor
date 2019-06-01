@@ -10,6 +10,7 @@
 export default function (core, change) {
     const _w = window;
     const editor = core.context.element.wysiwyg;
+    const util = core.util;
     const undo = core.context.tool.undo;
     const redo = core.context.tool.redo;
     let pushDelay = null;
@@ -26,38 +27,11 @@ export default function (core, change) {
         }
     }];
 
-    function createHistoryPath (node) {
-        const path = [];
-
-        core.util.getParentElement(node, function (el) {
-            if (!this.isWysiwygDiv(el)) path.push(el);
-            return false;
-        }.bind(core.util));
-        
-        return path.map(core.util.getPositionIndex).reverse();
-    }
-
-    function getNodeFromStack (offsets) {
-        let current = editor;
-        let nodes;
-
-        for (let i = 0, len = offsets.length; i < len; i++) {
-            nodes = current.childNodes;
-            if (nodes.length <= offsets[i]) {
-                current = nodes[nodes.length - 1];
-            } else {
-                current = nodes[offsets[i]];
-            }
-        }
-
-        return current;
-    }
-
     function setContentsFromStack () {
         const item = stack[stackIndex];
         editor.innerHTML = item.contents;
 
-        core.setRange(getNodeFromStack(item.s.path), item.s.offset, getNodeFromStack(item.e.path), item.e.offset);
+        core.setRange(util.getNodeFromPath(item.s.path, editor), item.s.offset, util.getNodeFromPath(item.e.path, editor), item.e.offset);
         core.focus();
 
         if (stackIndex === 0) {
@@ -90,11 +64,11 @@ export default function (core, change) {
         stack[stackIndex] = {
             contents: current,
             s: {
-                path: createHistoryPath(range.startContainer),
+                path: util.getNodePath(range.startContainer),
                 offset: range.startOffset
             },
             e: {
-                path: createHistoryPath(range.endContainer),
+                path: util.getNodePath(range.endContainer),
                 offset: range.endOffset
             }
         };

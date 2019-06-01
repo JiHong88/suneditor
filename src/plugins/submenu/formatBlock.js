@@ -76,10 +76,85 @@ export default {
         }
         // others
         else {
-            this.execCommand('formatBlock', false, value);
+            const range = this.getRange();
+            const startOffset = range.startOffset;
+            const endOffset = range.endOffset;
+
+            let selectedFormsts = this.getSelectedElementsAndComponents();
+            if (selectedFormsts.length === 0) return;
+
+            let first = selectedFormsts[0];
+            let last = selectedFormsts[selectedFormsts.length - 1];
+            const firstPath = this.util.getNodePath(range.startContainer, first);
+            const lastPath = this.util.getNodePath(range.endContainer, last);
+            
+            // remove list
+            let rangeArr = {};
+            let listFirst = false;
+            let listLast = false;
+            const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
+            for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
+                lastIndex = i === len - 1;
+                o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
+                isList = this.util.isList(o);
+                if (!r && isList) {
+                    r = o;
+                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
+                    if (i === 0) listFirst = true;
+                } else if (r && isList) {
+                    if (r !== o) {
+                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
+                        if (listFirst) {
+                            first = edge.sc;
+                            listFirst = false;
+                        }
+                        if (lastIndex) last = edge.ec;
+
+                        if (isList) {
+                            r = o;
+                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
+                            if (lastIndex) listLast = true;
+                        } else {
+                            r = null;
+                        }
+                    } else {
+                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
+                        if (lastIndex) listLast = true;
+                    }
+                }
+
+                if (lastIndex && this.util.isList(r)) {
+                    const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
+                    if (listLast || len === 1) {
+                        last = edge.ec;
+                        if (listFirst) first = edge.sc || last;
+                    }
+                }
+            }
+
+            // change format tag
+            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
+            selectedFormsts = this.getSelectedElementsAndComponents();
+            for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
+                node = selectedFormsts[i];
+                
+                if (node.nodeName !== value && !this.util.isComponent(node)) {
+                    newFormat = this.util.createElement(value);
+                    newFormat.innerHTML = node.innerHTML;
+                    node.parentNode.insertBefore(newFormat, node);
+                    this.util.removeItem(node);
+                }
+
+                if (i === 0) first = newFormat || node;
+                if (i === len - 1) last = newFormat || node;
+                newFormat = null;
+            }
+
+            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
+            // history stack
+            this.history.push();
         }
 
         this.submenuOff();
-        this.focus();
     }
 };

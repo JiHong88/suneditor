@@ -203,6 +203,7 @@ export default {
         const submitAction = function (files) {
             if (files.length > 0) {
                 const imageUploadUrl = this.context.option.imageUploadUrl;
+                const imageUploadHeader = this.context.option.imageUploadHeader;
                 const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
                 if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
@@ -215,6 +216,11 @@ export default {
                     this.context.image._xmlHttp = this.util.getXMLHttpRequest();
                     this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
                     this.context.image._xmlHttp.open('post', imageUploadUrl, true);
+                    if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
+                        for(let key in imageUploadHeader){
+                            this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
+                        }
+                    }
                     this.context.image._xmlHttp.send(formData);
                 }
                 else {
@@ -446,8 +452,7 @@ export default {
             this.plugins.image.setAutoSize.call(this);
         }
 
-        this.insertNode(container, this.util.getFormatElement(this.getSelectionNode()));
-        this.appendFormatTag(container);
+        this.insertComponent(container);
     },
 
     update_image: function (init) {
@@ -534,7 +539,7 @@ export default {
                 contextImage._element : 
                 this.util.getFormatElement(contextImage._element) || contextImage._element;
             existElement.parentNode.insertBefore(container, existElement);
-            this.util.removeItem(contextImage._element);
+            this.util.removeItem(existElement);
         }
 
         // transform
@@ -544,7 +549,12 @@ export default {
 
         // history stack
         this.history.push();
-        if (init) this.plugins.image.init.call(this);
+        if (init) {
+            imageEl = container.querySelector('img');
+            this.plugins.image.init.call(this);
+            const size = this.plugins.resizing.call_controller_resize.call(this, imageEl, 'image');
+            this.plugins.image.onModifyMode.call(this, imageEl, size);
+        }
     },
 
     sizeRevert: function () {

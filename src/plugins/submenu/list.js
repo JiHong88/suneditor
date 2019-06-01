@@ -86,16 +86,8 @@ export default {
 
         if (!command) return;
 
-        const commonCon = this.getRange().commonAncestorContainer;
-        const selectedFormsts = this.util.isTable(commonCon) ? this.getSelectedElements() : this.getSelectedElements(function (current) {
-            return (this.isFormatElement(current) && !this.getParentElement(current, this.isComponent)) || this.isComponent(current);
-        }.bind(this.util));
-
+        const selectedFormsts = this.getSelectedElementsAndComponents();
         if (!selectedFormsts || selectedFormsts.length === 0) return;
-
-        const passComponent = function (current) {
-            return !this.isComponent(current);
-        }.bind(this.util);
 
         let isRemove = true;
         let edgeFirst = null;
@@ -104,20 +96,25 @@ export default {
         // merge
         const firstSel = selectedFormsts[0];
         const lastSel = selectedFormsts[selectedFormsts.length - 1];
-        const topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousSibling ? firstSel.parentNode.previousSibling : firstSel.previousSibling;
-        const bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextSibling ? lastSel.parentNode.nextSibling : lastSel.nextSibling;
+        let topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
+        let bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            if (!this.util.isListCell(selectedFormsts[i]) && !this.util.isComponent(selectedFormsts[i])) {
+            if (!this.util.isList(this.util.getRangeFormatElement(selectedFormsts[i], function (current) {
+                return this.getRangeFormatElement(current) && current !== selectedFormsts[i];
+            }.bind(this.util)))) {
                 isRemove = false;
                 break;
             }
         }
 
         if (isRemove && (!topEl || command !== topEl.tagName) && (!bottomEl || command !== bottomEl.tagName)) {
-            const currentFormat = this.util.getFormatElement(this.getSelectionNode());
-            const cancel = currentFormat ? currentFormat.parentNode.tagName === command : selectedFormsts[0];
+            const currentFormat = this.util.getRangeFormatElement(this.getSelectionNode());
+            const cancel = currentFormat && currentFormat.tagName === command;
             let rangeArr, tempList;
+            const passComponent = function (current) {
+                return !this.isComponent(current);
+            }.bind(this.util);
 
             if (!cancel) tempList = this.util.createElement(command);
 
@@ -127,16 +124,16 @@ export default {
 
                 if (!r) {
                     r = o;
-                    rangeArr = {r: r, f: [selectedFormsts[i]]};
+                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                 } else {
                     if (r !== o) {
                         const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
                         if (!edgeFirst) edgeFirst = edge;
                         if (!cancel) tempList = this.util.createElement(command);
                         r = o;
-                        rangeArr = {r: r, f: [selectedFormsts[i]]};
+                        rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
                     } else {
-                        rangeArr.f.push(selectedFormsts[i]);
+                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
                     }
                 }
 
@@ -146,41 +143,67 @@ export default {
                 }
             }
         } else {
+            const topElParent = topEl ? topEl.parentNode : topEl;
+            const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
+            topEl = topElParent && !this.util.isWysiwygDiv(topElParent) && topElParent.nodeName === command ? topElParent : topEl;
+            bottomEl = bottomElParent && !this.util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === command ? bottomElParent : bottomEl;
+
             const mergeTop = topEl && topEl.tagName === command;
             const mergeBottom = bottomEl && bottomEl.tagName === command;
+            
             let list = mergeTop ? topEl : this.util.createElement(command);
             let firstList = null;
             let lastList = null;
             let topNumber = null;
             let bottomNumber = null;
+
+            const passComponent = function (current) {
+                return !this.isComponent(current) && !this.isList(current);
+            }.bind(this.util);
             
-            for (let i = 0, len = selectedFormsts.length, fTag, isCell, next, parentTag, siblingTag, rangeTag; i < len; i++) {
+            for (let i = 0, len = selectedFormsts.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormsts[i];
+                if (fTag.childNodes.length === 0 && !this.util.ignoreNodeChange(fTag)) {
+                    this.util.removeItem(fTag);
+                    continue;
+                }
                 next = selectedFormsts[i + 1];
-                isCell = this.util.isListCell(fTag) || this.util.isComponent(fTag);
-                rangeTag = this.util.isRangeFormatElement(fTag.parentNode) ? fTag.parentNode : null;
-                parentTag = isCell ? fTag.parentNode.parentNode : fTag.parentNode;
-                siblingTag = isCell ? fTag.parentNode.nextSibling : fTag.nextSibling;
+                originParent = fTag.parentNode;
+                nextParent = next ? next.parentNode : null;
+                isCell = this.util.isListCell(fTag);
+                rangeTag = this.util.isRangeFormatElement(originParent) ? originParent : null;
+                parentTag = isCell && !this.util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
+                siblingTag = isCell && !this.util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
-                list.innerHTML += isCell ? fTag.outerHTML : '<li>' + fTag.innerHTML + '</li>';
-                if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
+                newCell = this.util.createElement('LI');
+                if (this.util.isComponent(fTag)) {
+                    if (!/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace));
+                    newCell.innerHTML += fTag.outerHTML;
+                    if (/^HR$/i.test(fTag.nodeName)) newCell.appendChild(this.util.createTextNode(this.util.zeroWidthSpace))
+                } else {
+                    newCell.innerHTML = fTag.innerHTML;
+                }
+                list.appendChild(newCell);
 
-                if (i === len - 1) lastList = list;
-                if (i === len - 1 || !next || parentTag !== next.parentNode || this.util.isRangeFormatElement(siblingTag)) {
+                if (!next) lastList = list;
+                if (!next || parentTag !== nextParent || this.util.isRangeFormatElement(siblingTag)) {
                     if (!firstList) firstList = list;
-
-                    if (!mergeTop) {
-                        parentTag.insertBefore(list, siblingTag);
-                        if (!mergeBottom && this.util.getRangeFormatElement(next, passComponent) !== this.util.getRangeFormatElement(fTag, passComponent)) list = this.util.createElement(command);
+                    if ((!mergeTop || !next || parentTag !== nextParent) && !(next && this.util.isList(nextParent) && nextParent === originParent)) {
+                        if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
                     }
                 }
 
                 this.util.removeItem(fTag);
+                if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
+                if (next && this.util.getRangeFormatElement(nextParent, passComponent) !== this.util.getRangeFormatElement(originParent, passComponent)) {
+                    list = this.util.createElement(command);
+                }
+
                 if (rangeTag && rangeTag.children.length === 0) this.util.removeItem(rangeTag);
             }
 
             if (topNumber) {
-                firstList = list.children[topNumber];
+                firstList = firstList.children[topNumber];
             }
 
             if (mergeBottom) {

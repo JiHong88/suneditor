@@ -61,18 +61,7 @@ export default {
         oHr.className = className;
         this.focus();
 
-        let sibling = this.util.getFormatElement(this.getSelectionNode());
-        let li = null;
-
-        if (this.util.isListCell(sibling)) {
-            li = this.util.createElement('LI');
-            this.insertNode(li, sibling);
-            li.appendChild(oHr);
-        } else {
-            this.insertNode(oHr, this.util.getFormatElement(this.getSelectionNode()));
-        }
-
-        const oNode = this.appendFormatTag(oHr);
+        let oNode = this.insertComponent(oHr);
         this.setRange(oNode, 0, oNode, 0);
     },
 

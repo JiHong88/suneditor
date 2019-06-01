@@ -117,7 +117,7 @@
                     <td class="type">
                         <span class="param-type">String</span>
                     </td>
-                    <td class="description last">text contents</td>
+                    <td class="description last">Text contents</td>
                 </tr>
                 </tbody>
             </table>
@@ -179,7 +179,7 @@
                     <td class="type">
                         <span class="param-type">String</span>
                     </td>
-                    <td class="description last">contents</td>
+                    <td class="description last">Contents</td>
                 </tr>
                 </tbody>
             </table>
@@ -298,7 +298,7 @@
             <h4 class="name" id="isComponent"><span class="type-signature"></span>isComponent<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the component(img, iframe cover, table) element - ".sun-editor-id-comp"
+                It is judged whether it is the component(img, iframe cover, table, hr) element - ".sun-editor-id-comp"
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -492,10 +492,10 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="getPositionIndex"><span class="type-signature"></span>getPositionIndex<span class="signature">(element)</span><span
+        <h4 class="name" id="getPositionIndex"><span class="type-signature"></span>getPositionIndex<span class="signature">(node)</span><span
                 class="type-signature"> &rarr; {Number}</span></h4>
         <div class="description">
-            Get index from parent
+            Returns the index compared to other sibling nodes.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -508,11 +508,80 @@
             </thead>
             <tbody>
             <tr>
-                <td class="name"><code>element</code></td>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Node to find index</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode)</span><span
+                class="type-signature"> &rarr; {Array}</span></h4>
+        <div class="description">
+            Returns the position of the "node" in the "parentNode" in a numerical array.<br>
+            ex) &lt;p&gt;&lt;span&gt;aa&lt;/span&gt;&lt;span&gt;bb&lt;/span&gt;&lt;/p&gt; : <span class="type-signature">(node: "bb", parentNode: "&lt;P&gt;") &rarr; [1, 0]</span>
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">The Node to find position path</td>
+            </tr>
+            <tr>
+                <td class="name"><code>parentNode</code></td>
+                <td class="type">
+                    <span class="param-type">Element|null</span>
+                </td>
+                <td class="description last">Parent node. If null, wysiwyg div area</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="getNodeFromPath"><span class="type-signature"></span>getNodeFromPath<span class="signature">(node, parentNode)</span><span
+                class="type-signature"> &rarr; {Array}</span></h4>
+        <div class="description">
+            Returns the node in the location of the path array obtained from "util.getNodePath".
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>offsets</code></td>
+                <td class="type">
+                    <span class="param-type">Array</span>
+                </td>
+                <td class="description last">Position array, array obtained from "util.getNodePath"</td>
+            </tr>
+            <tr>
+                <td class="name"><code>parentNode</code></td>
                 <td class="type">
                     <span class="param-type">Element</span>
                 </td>
-                <td class="description last">Element to find index</td>
+                <td class="description last">Base parent element</td>
             </tr>
             </tbody>
         </table>
@@ -539,7 +608,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -566,7 +635,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -593,7 +662,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -620,7 +689,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -647,7 +716,7 @@
                 <td class="type">
                     <span class="param-type">Element|String</span>
                 </td>
-                <td class="description last">Nodes or node name to check</td>
+                <td class="description last">The element or element name to check</td>
             </tr>
             </tbody>
         </table>
@@ -1167,6 +1236,60 @@
         </table>
         <dl class="details"></dl>
 
+
+        <h4 class="name" id="ignoreNodeChange"><span class="type-signature"></span>ignoreNodeChange<span class="signature">(element)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Nodes that need to be added without modification when changing text nodes (util.isComponent, util.isFormatElement, img, video)
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html)</span><span
+                class="type-signature"> &rarr; {String}</span></h4>
+        <div class="description">
+            Gets the clean HTML code for editor
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>html</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">HTML string</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
         </article>
     </section>
 </div>
@@ -1196,6 +1319,8 @@
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
+        <li><a href="document-util.html#getNodePath">getNodePath</a></li>
+        <li><a href="document-util.html#getNodeFromPath">getNodeFromPath</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isTable">isTable</a></li>
@@ -1216,6 +1341,8 @@
         <li><a href="document-util.html#removeItem">removeItem</a></li>
         <li><a href="document-util.html#removeItemAllParents">removeItemAllParents</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
+        <li><a href="document-util.html#ignoreNodeChange">ignoreNodeChange</a></li>
+        <li><a href="document-util.html#cleanHTML">cleanHTML</a></li>
     </ul>
 </nav>
 
