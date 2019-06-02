@@ -20,6 +20,7 @@ export default {
             _trIndex: 0,
             _tdCnt: 0,
             _trCnt: 0,
+            _rowSpan: 0,
             _tableXY: [],
             _maxWidth: true,
             resizeIcon: null,
@@ -263,10 +264,20 @@ export default {
 
         if (reset || contextTable._trCnt === 0) {
             contextTable._trElements = table.rows;
-            contextTable._tdIndex = tdElement.cellIndex;
+
+            const cellIndex = tdElement.cellIndex;
+            const cells = contextTable._trElement.cells;
+            let rowSpan = 0;
+            for (let i = 0, len = cells.length, cell; i < len; i++) {
+                cell = cells[i];
+                if (i === cellIndex && cell.rowSpan) rowSpan += cell.rowSpan - 1;
+            }
+
+            contextTable._rowSpan = rowSpan;
+            contextTable._trCnt = contextTable._trElements.length;
+            contextTable._tdCnt = cells.length - 1;
+            contextTable._tdIndex = cellIndex;
             contextTable._trIndex = contextTable._trElement.rowIndex;
-            contextTable._trCnt = table.rows.length;
-            contextTable._tdCnt = contextTable._trElement.cells.length;
         }
 
         const offset = this.util.getOffset(tdElement);
@@ -277,11 +288,27 @@ export default {
     insertRowCell: function (type, option) {
         const contextTable = this.context.table;
 
+        // row
         if (type === 'row') {
-            const rowIndex = option === 'up' ? contextTable._trIndex : contextTable._trIndex + 1;
-            let cells = '';
+            const rowIndex = option === 'up' ? contextTable._trIndex : contextTable._trIndex + contextTable._rowSpan + 1;
+            
+            let colSpan = 0;
+            const trIndex = contextTable._trIndex;
+            const rows = contextTable._trElements;
+            for (let i = 0, td; i <= trIndex; i++) {
+                td = rows[i].cells;
+                for (let c = 0, cLen = td.length, rs, cs; c < cLen; c++) {
+                    rs = td[c].rowSpan;
+                    cs = td[c].colSpan;
+                    if (rs < 2 && cs < 2) continue;
 
-            for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
+                    if (rs + i > rowIndex && rowIndex > i) td[c].rowSpan = rs + 1;
+                    else if ((rs + i === rowIndex || rowIndex === i) && cs > 1) colSpan += cs;
+                }
+            }
+
+            let cells = '';
+            for (let i = 0, len = contextTable._tdCnt + colSpan; i < len; i++) {
                 cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
             }
 
@@ -290,13 +317,20 @@ export default {
         }
         // cell
         else {
-            const trArray = contextTable._trElements;
             const cellIndex = option === 'left' ? contextTable._tdIndex : contextTable._tdIndex + 1;
-            let cell = null;
-            
-            for (let i = 0, len = contextTable._trCnt; i < len; i++) {
-                cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+            const rows = contextTable._trElements;
+
+            for (let i = 0, len = rows.length, addIndex = 0, cells, newCell; i < len; i++) {
+                cells = rows[i].cells;
+
+                for (let c = 0, cLen = cellIndex, cell, cs, rs; c < cLen; c++) {
+                    cell = cells[c];
+                    cs = cell.colSpan - 1;
+                    rs = cell.rowSpan - 1;
+                }
+
+                newCell = rows[i].insertCell(cellIndex + addIndex);
+                newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
             }
         }
 
