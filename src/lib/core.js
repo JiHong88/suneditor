@@ -877,6 +877,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let insertedNew = false;
 
             function appendNode (parent, insNode, sibling) {
+                if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
+                
                 const children = insNode.childNodes;
                 let format = insNode.cloneNode(false);
                 let first = null;
@@ -2554,15 +2556,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             formatEl = util.getFormatElement(selectionNode) || selectionNode;
             rangeEl = util.getRangeFormatElement(selectionNode);
             if (!selectRange && (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl)) {
-                if (rangeEl && (util.isList(rangeEl) || /^PRE$/i.test(rangeEl.nodeName)) && keyCode !== 8 && keyCode !== 46) {
-                    const newTag = util.createElement(util.isList(rangeEl) ? 'LI' : 'P');
-                    newTag.innerHTML = util.zeroWidthSpace;
-                    rangeEl.insertBefore(newTag, selectionNode.nextElementSibling);
-                    core.setRange(newTag, 0, newTag, 0);
-                } else {
-                    core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
-                    core.focus();
-                }
+                core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
+                core.focus();
                 return;
             }
 
