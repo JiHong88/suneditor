@@ -777,7 +777,7 @@ const util = {
      * @returns {Boolean}
      */
     isIgnoreNodeChange: function (element) {
-        return !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)$/i.test(element.nodeName);
+        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark)$/i.test(element.nodeName);
     },
 
     /**
@@ -818,7 +818,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|strike|del|sub|sup'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark'.split('|');
         let regStr = '<\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
