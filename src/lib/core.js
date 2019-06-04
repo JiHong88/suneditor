@@ -886,7 +886,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util.ignoreNodeChange(c) && !util.isListCell(format)) {
+                    if (util.isIgnoreNodeChange(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
@@ -1375,7 +1375,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1463,14 +1463,21 @@ export default function (context, pluginCallButtons, plugins, lang) {
             util.removeEmptyNode(pNode);
             if (preventDelete) newInnerNode.textContent = util.zeroWidthSpace;
 
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            // node change
+            const endConReset = isRemoveFormat || !endContainer.textContent;
+            const startPath = util.getNodePath(startContainer, pNode);
+            const endPath = util.getNodePath(endConReset ? startContainer : endContainer, pNode);
+
+            element.innerHTML = pNode.innerHTML;
+
+            startContainer = util.getNodeFromPath(startPath, element);
+            endContainer = util.getNodeFromPath(endPath, element);
 
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: isRemoveFormat || !endContainer.textContent ? startContainer : endContainer,
-                endOffset: isRemoveFormat || !endContainer.textContent ? startContainer.textContent.length : endOffset
+                endContainer: endContainer,
+                endOffset: endConReset ? collapsed ? 1 : startOff + endOffset - 1 : endOffset
             };
         },
 
@@ -1495,7 +1502,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (!child) continue;
                     let coverNode = node;
 
-                    if (util.ignoreNodeChange(child)) {
+                    if (util.isIgnoreNodeChange(child)) {
                         pNode.appendChild(newInnerNode);
                         newInnerNode = newInnerNode.cloneNode(false);
                         pNode.appendChild(child);
@@ -1528,8 +1535,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            // node change
+            element.innerHTML = pNode.innerHTML;
         },
 
         /**
@@ -1563,7 +1570,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1682,8 +1689,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     container = pNode.firstChild;
                     offset = 0;
                 }
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+
+                // node change
+                const path = util.getNodePath(container, pNode);
+                element.innerHTML = pNode.innerHTML;
+                container = util.getNodeFromPath(path, element);
             }
 
             return {
@@ -1723,7 +1733,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1846,8 +1856,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     container = pNode.firstChild;
                     offset = container.textContent.length;
                 }
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                
+                // node change
+                const path = util.getNodePath(container, pNode);
+                element.innerHTML = pNode.innerHTML;
+                container = util.getNodeFromPath(path, element);
             }
 
             return {

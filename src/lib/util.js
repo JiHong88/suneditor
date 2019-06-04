@@ -772,12 +772,12 @@ const util = {
     },
 
     /**
-     * @description Nodes that need to be added without modification when changing text nodes (util.isComponent, util.isFormatElement, img, video)
+     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)
      * @param {Element} element - Element to check
      * @returns {Boolean}
      */
-    ignoreNodeChange: function (element) {
-        return util.isComponent(element) || util.isFormatElement(element) || /^(IMG|VIDEO)$/i.test(element.nodeName);
+    isIgnoreNodeChange: function (element) {
+        return !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)$/i.test(element.nodeName);
     },
 
     /**
