@@ -275,7 +275,7 @@ export default {
 
             contextTable._rowSpan = rowSpan;
             contextTable._trCnt = contextTable._trElements.length;
-            contextTable._tdCnt = cells.length - 1;
+            contextTable._tdCnt = cells.length;
             contextTable._tdIndex = cellIndex;
             contextTable._trIndex = contextTable._trElement.rowIndex;
         }
@@ -302,8 +302,13 @@ export default {
                     cs = td[c].colSpan;
                     if (rs < 2 && cs < 2) continue;
 
-                    if (rs + i > rowIndex && rowIndex > i) td[c].rowSpan = rs + 1;
-                    else if ((rs + i === rowIndex || rowIndex === i) && cs > 1) colSpan += cs;
+                    if (rs + i > rowIndex && rowIndex > i) {
+                        td[c].rowSpan = rs + 1;
+                    } else if ((rs + i === rowIndex || rowIndex === i) && cs > 1) {
+                        colSpan += cs;
+                    }
+
+                    if (i === trIndex) colSpan -= 1;
                 }
             }
 
