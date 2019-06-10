@@ -290,7 +290,8 @@ export default {
 
         // row
         if (type === 'row') {
-            const rowIndex = option === 'up' ? contextTable._trIndex : contextTable._trIndex + contextTable._rowSpan + 1;
+            const up = option === 'up';
+            const rowIndex = up ? contextTable._trIndex : contextTable._trIndex + contextTable._rowSpan + 1;
             
             let colSpan = 0;
             const trIndex = contextTable._trIndex;
@@ -304,11 +305,11 @@ export default {
 
                     if (rs + i > rowIndex && rowIndex > i) {
                         td[c].rowSpan = rs + 1;
-                    } else if ((rs + i === rowIndex || rowIndex === i) && cs > 1) {
+                        if (i === trIndex) colSpan -= 1;
+                    } else if (up ? rs + i > rowIndex : rowIndex === rs + i) {
                         colSpan += cs;
+                        if (i === trIndex) colSpan -= 1;
                     }
-
-                    if (i === trIndex) colSpan -= 1;
                 }
             }
 
