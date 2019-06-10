@@ -1508,6 +1508,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         pNode.appendChild(child);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
+                        node = newInnerNode;
                         i--;
                         continue;
                     } else if (validation(child)) {
