@@ -268,16 +268,19 @@ export default {
             const cellIndex = tdElement.cellIndex;
             const cells = contextTable._trElement.cells;
             let rowSpan = 0;
-            for (let i = 0, len = cells.length, cell; i < len; i++) {
+            let colSpan = 0;
+            for (let i = 0, cell; i <= cellIndex; i++) {
                 cell = cells[i];
+                if (cell.colSpan > 1 && i < cellIndex) colSpan += cell.colSpan - 1;
                 if (i === cellIndex && cell.rowSpan) rowSpan += cell.rowSpan - 1;
             }
 
             contextTable._rowSpan = rowSpan;
+            contextTable._colSpan = colSpan;
             contextTable._trCnt = contextTable._trElements.length;
             contextTable._tdCnt = cells.length;
-            contextTable._tdIndex = cellIndex;
             contextTable._trIndex = contextTable._trElement.rowIndex;
+            contextTable._tdIndex = cellIndex;
         }
 
         const offset = this.util.getOffset(tdElement);
@@ -293,9 +296,10 @@ export default {
             const up = option === 'up';
             const rowIndex = up ? contextTable._trIndex : contextTable._trIndex + contextTable._rowSpan + 1;
             
-            let colSpan = 0;
-            const trIndex = contextTable._trIndex;
             const rows = contextTable._trElements;
+            const trIndex = contextTable._trIndex;
+            let colSpan = 0;
+
             for (let i = 0, td; i <= trIndex; i++) {
                 td = rows[i].cells;
                 for (let c = 0, cLen = td.length, rs, cs; c < cLen; c++) {
@@ -323,19 +327,26 @@ export default {
         }
         // cell
         else {
-            const cellIndex = option === 'left' ? contextTable._tdIndex : contextTable._tdIndex + 1;
-            const rows = contextTable._trElements;
+            const left = option === 'left';
+            const cellIndex = left ? contextTable._tdIndex : contextTable._tdIndex + 1;
 
-            for (let i = 0, len = rows.length, addIndex = 0, cells, newCell; i < len; i++) {
+            const rows = contextTable._trElements;
+            const colSpan = contextTable._colSpan;
+
+            for (let i = 0, len = rows.length, insertIndex, cells, newCell; i < len; i++) {
+                insertIndex = cellIndex;
                 cells = rows[i].cells;
 
-                for (let c = 0, cLen = cellIndex, cell, cs, rs; c < cLen; c++) {
-                    cell = cells[c];
-                    cs = cell.colSpan - 1;
-                    rs = cell.rowSpan - 1;
+                if (i !== contextTable._trIndex) {
+                    for (let c = 0, cell; c < cellIndex; c++) {
+                        cell = cells[c];
+                        if (colSpan === 0 && cell.colSpan > 1) {
+                            insertIndex += 1;
+                        }
+                    }
                 }
 
-                newCell = rows[i].insertCell(cellIndex + addIndex);
+                newCell = rows[i].insertCell(insertIndex);
                 newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
             }
         }
