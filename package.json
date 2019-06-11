@@ -37,7 +37,7 @@
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "7.0.0",
-    "@webpack-cli/init": "^0.1.5",
+    "@webpack-cli/init": "^0.2.2",
     "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.1",
