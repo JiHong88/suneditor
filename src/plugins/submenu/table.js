@@ -263,24 +263,42 @@ export default {
         }
 
         if (reset || contextTable._trCnt === 0) {
-            contextTable._trElements = table.rows;
-
+            const rows = contextTable._trElements = table.rows;
             const cellIndex = tdElement.cellIndex;
-            const cells = contextTable._trElement.cells;
-            let rowSpan = 0;
-            let colSpan = 0;
-            for (let i = 0, cell; i <= cellIndex; i++) {
-                cell = cells[i];
-                if (cell.colSpan > 1 && i < cellIndex) colSpan += cell.colSpan - 1;
-                if (i === cellIndex && cell.rowSpan) rowSpan += cell.rowSpan - 1;
+
+            let cellCnt = 0;
+            let rowCnt = 0;
+            
+            const cells = rows[0].cells;
+            for (let i = 0, len = cells.length; i < len; i++) {
+                cellCnt += cells[i].colSpan;
             }
 
-            contextTable._rowSpan = rowSpan;
-            contextTable._colSpan = colSpan;
-            contextTable._trCnt = contextTable._trElements.length;
-            contextTable._tdCnt = cells.length;
-            contextTable._trIndex = contextTable._trElement.rowIndex;
-            contextTable._tdIndex = cellIndex;
+            for (let i = 0, len = rows.length; i < len; i++) {
+                rowCnt += rows[i].cells[0].rowSpan;
+            }
+
+            contextTable._logical_rowCnt = rowCnt;
+            contextTable._physical_rowCnt = contextTable._trElements.length;
+            contextTable._logical_cellCnt = cellCnt;
+            contextTable._physical_cellCnt = contextTable._trElement.cells.length;
+
+            // const cellIndex = tdElement.cellIndex;
+            // const cells = contextTable._trElement.cells;
+            // let rowSpan = 0;
+            // let colSpan = 0;
+            // for (let i = 0, cell; i <= cellIndex; i++) {
+            //     cell = cells[i];
+            //     if (cell.colSpan > 1 && i < cellIndex) colSpan += cell.colSpan - 1;
+            //     if (i === cellIndex && cell.rowSpan) rowSpan += cell.rowSpan - 1;
+            // }
+
+            // contextTable._rowSpan = rowSpan;
+            // contextTable._colSpan = colSpan;
+            // contextTable._trCnt = contextTable._trElements.length;
+            // contextTable._tdCnt = cells.length;
+            // contextTable._trIndex = contextTable._trElement.rowIndex;
+            // contextTable._tdIndex = cellIndex;
         }
 
         const offset = this.util.getOffset(tdElement);
