@@ -16,17 +16,20 @@ export default {
             _tdElement: null,
             _trElement: null,
             _trElements: null,
-            _tdIndex: 0,
-            _trIndex: 0,
-            _tdCnt: 0,
-            _trCnt: 0,
-            _rowSpan: 0,
             _tableXY: [],
             _maxWidth: true,
             resizeIcon: null,
             resizeText: null,
             maxText: core.lang.controller.maxSize,
-            minText: core.lang.controller.minSize
+            minText: core.lang.controller.minSize,
+            _physical_cellCnt: 0,
+            _logical_cellCnt: 0,
+            _physical_rowCnt: 0,
+            _logical_rowCnt: 0,
+            _physical_rowIndex: 0,
+            _logical_rowIndex: 0,
+            _physical_cellIndex: 0,
+            _logical_cellIndex: 0
         };
 
         /** set submenu */
@@ -214,12 +217,16 @@ export default {
         contextTable._tdElement = null;
         contextTable._trElement = null;
         contextTable._trElements = 0;
-        contextTable._tdIndex = 0;
-        contextTable._trIndex = 0;
-        contextTable._trCnt = 0;
-        contextTable._tdCnt = 0;
         contextTable._tableXY = [];
         contextTable._maxWidth = true;
+        contextTable._physical_cellCnt = 0;
+        contextTable._logical_cellCnt = 0;
+        contextTable._physical_rowCnt = 0;
+        contextTable._logical_rowCnt = 0;
+        contextTable._physical_rowIndex = 0;
+        contextTable._logical_rowIndex = 0;
+        contextTable._physical_cellIndex = 0;
+        contextTable._logical_cellIndex = 0;
     },
 
     /** table edit controller */
@@ -262,43 +269,68 @@ export default {
             contextTable._trElement = tdElement.parentNode;
         }
 
-        if (reset || contextTable._trCnt === 0) {
+        if (reset || contextTable._logical_rowCnt === 0) {
             const rows = contextTable._trElements = table.rows;
             const cellIndex = tdElement.cellIndex;
+            let logcalCellIndex = 0;
 
+            // row index
+            const rowIndex = contextTable._physical_rowIndex = contextTable._trElement.rowIndex;
+            contextTable._logical_rowIndex = contextTable._physical_rowIndex + contextTable._trElement.cells[cellIndex].rowSpan - 1;
+
+            // count
             let cellCnt = 0;
             let rowCnt = 0;
             
-            const cells = rows[0].cells;
-            for (let i = 0, len = cells.length; i < len; i++) {
+            for (let i = 0, cells = rows[0].cells, len = rows[0].cells.length; i < len; i++) {
                 cellCnt += cells[i].colSpan;
             }
 
             for (let i = 0, len = rows.length; i < len; i++) {
                 rowCnt += rows[i].cells[0].rowSpan;
+
+                if (i === rowIndex) {
+                    const cells = rows[i].cells;
+                    let index = cellIndex;
+                    for (let c = 0; c < index; c++) {
+                        logcalCellIndex += cells[c].colSpan;
+                    }
+                }
             }
 
-            contextTable._logical_rowCnt = rowCnt;
-            contextTable._physical_rowCnt = contextTable._trElements.length;
-            contextTable._logical_cellCnt = cellCnt;
             contextTable._physical_cellCnt = contextTable._trElement.cells.length;
+            contextTable._logical_cellCnt = cellCnt;
+            contextTable._physical_rowCnt = contextTable._trElements.length;
+            contextTable._logical_rowCnt = rowCnt;
 
-            // const cellIndex = tdElement.cellIndex;
-            // const cells = contextTable._trElement.cells;
-            // let rowSpan = 0;
-            // let colSpan = 0;
-            // for (let i = 0, cell; i <= cellIndex; i++) {
-            //     cell = cells[i];
-            //     if (cell.colSpan > 1 && i < cellIndex) colSpan += cell.colSpan - 1;
-            //     if (i === cellIndex && cell.rowSpan) rowSpan += cell.rowSpan - 1;
-            // }
+            // cell index
+            let colSpan = 0;
 
-            // contextTable._rowSpan = rowSpan;
-            // contextTable._colSpan = colSpan;
-            // contextTable._trCnt = contextTable._trElements.length;
-            // contextTable._tdCnt = cells.length;
-            // contextTable._trIndex = contextTable._trElement.rowIndex;
-            // contextTable._tdIndex = cellIndex;
+            for (let i = 0, cells, cIndex; i <= rowIndex; i++) {
+                cells = rows[i].cells;
+                cIndex = logcalCellIndex;
+                for (let c = 0, cell, rs, cs; c <= cIndex; c++) {
+                    cell = cells[c];
+                    if (!cell) break;
+
+                    rs = cell.rowSpan;
+                    cs = cell.colSpan;
+                    cIndex -= cs - 1;
+                    if (rs < 2 && cs < 2) continue;
+
+                    if (i === rowIndex) {
+                        if (cs > 1 && c < cellIndex) colSpan += cs - 1;
+                        continue;
+                    }
+
+                    if (rs + i > rowIndex && rowIndex > i) {
+                        colSpan += cs;
+                    }
+                }
+            }
+
+            contextTable._physical_cellIndex = cellIndex;
+            contextTable._logical_cellIndex = cellIndex + colSpan;
         }
 
         const offset = this.util.getOffset(tdElement);
@@ -312,31 +344,28 @@ export default {
         // row
         if (type === 'row') {
             const up = option === 'up';
-            const rowIndex = up ? contextTable._trIndex : contextTable._trIndex + contextTable._rowSpan + 1;
+            if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
+            const rowIndex = up ? contextTable._physical_rowIndex : contextTable._logical_rowIndex + 1;
             
             const rows = contextTable._trElements;
-            const trIndex = contextTable._trIndex;
-            let colSpan = 0;
+            let cellCnt = contextTable._logical_cellCnt;
 
-            for (let i = 0, td; i <= trIndex; i++) {
-                td = rows[i].cells;
-                for (let c = 0, cLen = td.length, rs, cs; c < cLen; c++) {
-                    rs = td[c].rowSpan;
-                    cs = td[c].colSpan;
+            for (let i = 0, len = contextTable._physical_rowIndex, cell; i <= len; i++) {
+                cell = rows[i].cells;
+                for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
+                    rs = cell[c].rowSpan;
+                    cs = cell[c].colSpan;
                     if (rs < 2 && cs < 2) continue;
 
                     if (rs + i > rowIndex && rowIndex > i) {
-                        td[c].rowSpan = rs + 1;
-                        if (i === trIndex) colSpan -= 1;
-                    } else if (up ? rs + i > rowIndex : rowIndex === rs + i) {
-                        colSpan += cs;
-                        if (i === trIndex) colSpan -= 1;
+                        cell[c].rowSpan = rs + 1;
+                        cellCnt -= cs;
                     }
                 }
             }
 
             let cells = '';
-            for (let i = 0, len = contextTable._tdCnt + colSpan; i < len; i++) {
+            for (let i = 0, len = cellCnt; i < len; i++) {
                 cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
             }
 
@@ -346,19 +375,18 @@ export default {
         // cell
         else {
             const left = option === 'left';
-            const cellIndex = left ? contextTable._tdIndex : contextTable._tdIndex + 1;
+            const cellIndex = left ? contextTable._physical_cellIndex : contextTable._physical_cellIndex + 1;
 
             const rows = contextTable._trElements;
-            const colSpan = contextTable._colSpan;
 
             for (let i = 0, len = rows.length, insertIndex, cells, newCell; i < len; i++) {
                 insertIndex = cellIndex;
                 cells = rows[i].cells;
 
-                if (i !== contextTable._trIndex) {
+                if (i !== contextTable._physical_rowIndex) {
                     for (let c = 0, cell; c < cellIndex; c++) {
                         cell = cells[c];
-                        if (colSpan === 0 && cell.colSpan > 1) {
+                        if (cell.colSpan > 1) {
                             insertIndex += 1;
                         }
                     }
@@ -376,14 +404,14 @@ export default {
         const contextTable = this.context.table;
 
         if (type === 'row') {
-            contextTable._element.deleteRow(contextTable._trIndex);
+            contextTable._element.deleteRow(contextTable._physical_rowIndex);
         }
         // cell
         else {
             const trArray = contextTable._trElements;
-            const cellIndex = contextTable._tdIndex;
+            const cellIndex = contextTable._physical_cellIndex;
             
-            for (let i = 0, len = contextTable._trCnt; i < len; i++) {
+            for (let i = 0, len = contextTable._physical_rowCnt; i < len; i++) {
                 trArray[i].deleteCell(cellIndex);
             }
         }
