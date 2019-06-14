@@ -331,6 +331,7 @@ export default {
 
             contextTable._physical_cellIndex = cellIndex;
             contextTable._logical_cellIndex = cellIndex + colSpan;
+            contextTable._current_colSpan = contextTable._tdElement.colSpan - 1;
         }
 
         const offset = this.util.getOffset(tdElement);
@@ -375,25 +376,71 @@ export default {
         // cell
         else {
             const left = option === 'left';
-            const cellIndex = left ? contextTable._physical_cellIndex : contextTable._physical_cellIndex + 1;
+            const cellIndex = left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + contextTable._current_colSpan + 1;
 
             const rows = contextTable._trElements;
+            let rowSpanArr = [];
+            let spanIndex = [];
+            let passCell = 0;
 
-            for (let i = 0, len = rows.length, insertIndex, cells, newCell; i < len; i++) {
+            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan; i < len; i++) {
+                row = rows[i];
                 insertIndex = cellIndex;
-                cells = rows[i].cells;
+                applySpan = false
+                cells = row.cells;
 
-                if (i !== contextTable._physical_rowIndex) {
-                    for (let c = 0, cell; c < cellIndex; c++) {
-                        cell = cells[c];
-                        if (cell.colSpan > 1) {
-                            insertIndex += 1;
+                for (let c = 0, cell, rs, cs; c < insertIndex; c++) {
+                    cell = cells[c];
+                    if (!cell) break;
+
+                    rs = cell.rowSpan - 1;
+                    cs = cell.colSpan - 1;
+
+                    if (rs > 0) {
+                        rowSpanArr.push({
+                            rs: rs,
+                            cs: cs + 1
+                        });
+                    }
+
+                    if (cs > 0) {
+                        if (passCell < 1 && cs + c >= insertIndex) {
+                            cell.colSpan += 1;
+                            insertIndex = null;
+                            passCell = rs + 1;
+                            break;
                         }
+
+                        insertIndex -= cs;
+                    }
+
+                    if (!applySpan) {
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            insertIndex -= arr.cs;
+                            arr.rs -= 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                                r--;
+                            }  
+                        }
+                        applySpan = true;
                     }
                 }
 
-                newCell = rows[i].insertCell(insertIndex);
-                newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                spanIndex = spanIndex.concat(rowSpanArr);
+                rowSpanArr = [];
+
+                if (passCell > 0) {
+                    passCell -= 1;
+                    continue;
+                }
+
+                if (insertIndex !== null) {
+                    newCell = this.util.createElement(cells[0].nodeName);
+                    newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                    newCell = row.insertBefore(newCell, cells[insertIndex]);
+                }
             }
         }
 
