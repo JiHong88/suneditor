@@ -2006,9 +2006,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
-
-                // history stack	
-                this.history.push();
             }
             else {
                 context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);

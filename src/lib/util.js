@@ -807,6 +807,7 @@ const util = {
                 }
                 return t;
             })
+            .replace(/<\/?(span[^>^<]*)>/g, '')
             .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
@@ -818,8 +819,8 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark'.split('|');
-        let regStr = '<\/?(';
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+        let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
             regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
