@@ -617,7 +617,7 @@ const util = {
         let tableElement = element.nodeType === 3 ? element.parentElement : element;
 
         while (!this.isWysiwygDiv(tableElement.parentNode)) {
-            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {
+            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME|AUDIO|VIDEO)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }
@@ -819,7 +819,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
         let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
