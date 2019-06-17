@@ -2903,7 +2903,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             while (offsetEl) {
                 offsetTop += offsetEl.offsetTop;
-                offsetEl = offsetEl.parentElement;
+                offsetEl = offsetEl.offsetParent;
             }
 
             return offsetTop;
