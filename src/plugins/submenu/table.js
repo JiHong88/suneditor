@@ -444,20 +444,23 @@ export default {
         // cell
         else {
             const left = option === 'left';
-            const cellIndex = left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + contextTable._current_colSpan + 1;
+            const colSpan = contextTable._current_colSpan;
+            const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
 
             const rows = contextTable._trElements;
             let rowSpanArr = [];
             let spanIndex = [];
             let passCell = 0;
+            const removeCell = [];
 
-            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan; i < len; i++) {
+            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
                 row = rows[i];
                 insertIndex = cellIndex;
                 applySpan = false
                 cells = row.cells;
+                cellColSpan = 0;
 
-                for (let c = 0, cell, rs, cs; c < insertIndex; c++) {
+                for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
                     cell = cells[c];
                     if (!cell) break;
 
@@ -467,47 +470,91 @@ export default {
                     if (rs > 0) {
                         rowSpanArr.push({
                             rs: rs,
-                            cs: cs + 1
+                            cs: cs + 1,
+                            index: c + cellColSpan
                         });
                     }
 
-                    if (cs > 0) {
-                        if (passCell < 1 && cs + c >= insertIndex) {
-                            cell.colSpan += 1;
-                            insertIndex = null;
-                            passCell = rs + 1;
-                            break;
+                    if (!remove) {
+                        if (cs > 0) {
+                            if (passCell < 1 && cs + c >= insertIndex) {
+                                cell.colSpan += 1;
+                                insertIndex = null;
+                                passCell = rs + 1;
+                                break;
+                            }
+    
+                            insertIndex -= cs;
                         }
 
-                        insertIndex -= cs;
-                    }
-
-                    if (!applySpan) {
-                        for (let r = 0, arr; r < spanIndex.length; r++) {
-                            arr = spanIndex[r];
-                            insertIndex -= arr.cs;
-                            arr.rs -= 1;
-                            if (arr.rs < 1) {
-                                spanIndex.splice(r, 1);
-                                r--;
-                            }  
+                        if (!applySpan) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                insertIndex -= arr.cs;
+                                arr.rs -= 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                    r--;
+                                }  
+                            }
+                            applySpan = true;
                         }
-                        applySpan = true;
+                    } else {
+                        removeIndex = c + cellColSpan;
+
+                        if (spanIndex.length > 0) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                if (removeIndex >= arr.index) {
+                                    cellColSpan += arr.cs;
+                                    arr.rs -= 1;
+                                    if (arr.rs < 1) {
+                                        spanIndex.splice(r, 1);
+                                        r--;
+                                    }  
+                                }
+                            }
+                        }
+
+                        removeIndex = c + cellColSpan;
+                        if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
+                            removeCell.push(cell);
+                        } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
+                            let modifyColSpan = 0;
+
+                            for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
+                                if (m >= removeIndex && m <= removeIndex + cs) {
+                                    modifyColSpan++;
+                                }
+                            }
+
+                            cell.colSpan -= this.util._w.Math.abs(modifyColSpan);
+                        }
+
+                        cellColSpan += cs;
                     }
                 }
 
                 spanIndex = spanIndex.concat(rowSpanArr);
                 rowSpanArr = [];
 
-                if (passCell > 0) {
-                    passCell -= 1;
-                    continue;
+                if (!remove) {
+                    if (passCell > 0) {
+                        passCell -= 1;
+                        continue;
+                    }
+    
+                    if (insertIndex !== null) {
+                        newCell = this.util.createElement(cells[0].nodeName);
+                        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                        newCell = row.insertBefore(newCell, cells[insertIndex]);
+                    }
                 }
+            }
 
-                if (insertIndex !== null) {
-                    newCell = this.util.createElement(cells[0].nodeName);
-                    newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
-                    newCell = row.insertBefore(newCell, cells[insertIndex]);
+            if (remove) {
+                for (let r = 0; r < removeCell.length; r++) {
+                    this.util.removeItem(removeCell[r]);
                 }
             }
         }
