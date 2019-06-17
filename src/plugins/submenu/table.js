@@ -20,6 +20,7 @@ export default {
             _maxWidth: true,
             resizeIcon: null,
             resizeText: null,
+            headerButton: null,
             maxText: core.lang.controller.maxSize,
             minText: core.lang.controller.minSize,
             _physical_cellCnt: 0,
@@ -44,8 +45,9 @@ export default {
         /** set table controller */
         let tableController = eval(this.setController_table.call(core));
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('button > i');
-        context.table.resizeText = tableController.querySelector('button > span > span');
+        context.table.resizeIcon = tableController.querySelector('__se_table_resize > i');
+        context.table.resizeText = tableController.querySelector('__se_table_resize > span > span');
+        context.table.headerButton = tableController.querySelector('.__se_table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
@@ -93,9 +95,13 @@ export default {
         tableResize.innerHTML = '' +
             '<div>' +
             '   <div class="btn-group">' +
-            '       <button type="button" data-command="resize" data-option="up" class="se-tooltip">' +
+            '       <button type="button" data-command="resize" class="se-tooltip __se_table_resize">' +
             '           <i class="icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="header" class="se-tooltip btn_editor __se_table_header">' +
+            '           <i class="icon-table-header"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="remove" class="se-tooltip">' +
             '           <i class="icon-delete"></i>' +
@@ -269,6 +275,12 @@ export default {
         if (contextTable._tdElement !== tdElement) {
             contextTable._tdElement = tdElement;
             contextTable._trElement = tdElement.parentNode;
+        }
+
+        if (/THEAD/i.test(table.firstElementChild.nodeName)) {
+            this.util.addClass(contextTable.headerButton, 'on');
+        } else {
+            this.util.removeClass(contextTable.headerButton, 'on');
         }
 
         if (reset || contextTable._logical_rowCnt === 0) {
@@ -507,6 +519,33 @@ export default {
         }
     },
 
+    toggleHeader: function () {
+        const headerButton = this.context.table.headerButton;
+        const active = this.util.hasClass(headerButton, 'on');
+        const table = this.context.table._element;
+
+        if (!active) {
+            const header = this.util.createElement('THEAD');
+            let th = '';
+            for (let i = 0, len = this.context.table._logical_cellCnt; i < len; i++) {
+                th += '<th></th>';
+            }
+
+            header.innerHTML = th;
+            table.insertBefore(header, table.firstElementChild)
+        } else {
+            this.util.removeItem(table.getElementsByTagName('thead')[0]);
+        }
+
+        this.util.toggleClass(headerButton, 'on');
+
+        if (/TH/i.test(this.context.table._tdElement.nodeName)) {
+            this.controllersOff();
+        } else {
+            this.plugins.table.setPositionControllerDiv.call(this, this.context.table._tdElement, false);
+        }
+    },
+
     deleteRowCell: function (type) {
         const contextTable = this.context.table;
 
@@ -568,6 +607,9 @@ export default {
                 break;
             case 'delete':
                 this.plugins.table.editRowCell.call(this, value, null, true);
+                break;
+            case 'header':
+                this.plugins.table.toggleHeader.call(this);
                 break;
             case 'resize':
                 contextTable.resizeDiv.style.display = 'none';

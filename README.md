@@ -3,8 +3,6 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 **Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
 
-[![NPM](https://nodei.co/npm/suneditor.png)](https://nodei.co/npm/suneditor/)
-
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/releases)
 [![npm](https://img.shields.io/npm/dt/suneditor.svg)](https://www.npmjs.com/package/suneditor)

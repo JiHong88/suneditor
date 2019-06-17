@@ -115,7 +115,11 @@
             rotateLeft: 'Rotation à gauche',
             rotateRight: 'Rotation à droite',
             maxSize: 'Taille max',
-            minSize: 'Taille min'
+            minSize: 'Taille min',
+            tableHeader: 'En-tête de table',
+            mergeCells: 'Fusionner des cellules',
+            HorizontalSplit: 'Scission horizontale',
+            VerticalSplit: 'Scission verticale'
         }
     };
 

@@ -129,6 +129,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
         _notHideToolbar: false,
 
         /**
+         * @description Variable value that sticky toolbar mode
+         * @private
+         */
+        _sticky: false,
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -203,7 +209,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _editorAreaOriginCssText: '',
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
-            _sticky: false,
             _fullScreenSticky: false,
             _imagesInfo: [],
             _imageIndex: 0
@@ -2866,8 +2871,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (core._variable.isFullScreen) {
                 core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
-            }
-            else if (core._variable._sticky) {
+            } else if (core._sticky) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
@@ -2878,19 +2882,31 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
-            const editorTop = element.topArea.offsetTop - (core._isInline ? element.toolbar.offsetHeight : 0);
             const y = (this.scrollY || _d.documentElement.scrollTop) + context.option.stickyToolbar;
+            const editorTop = event._getStickyOffsetTop() - (core._isInline ? element.toolbar.offsetHeight : 0);
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
             else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
-                if (!core._variable._sticky) event._onStickyToolbar(element);
+                if (!core._sticky) event._onStickyToolbar(element);
                 element.toolbar.style.top = (editorHeight + editorTop + context.option.stickyToolbar -y - core._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
                 event._onStickyToolbar(element);
             }
+        },
+
+        _getStickyOffsetTop: function () {
+            let offsetEl = context.element.topArea;
+            let offsetTop = 0;
+
+            while (offsetEl) {
+                offsetTop += offsetEl.offsetTop;
+                offsetEl = offsetEl.parentElement;
+            }
+
+            return offsetTop;
         },
 
         _onStickyToolbar: function (element) {
@@ -2902,7 +2918,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             element.toolbar.style.top = context.option.stickyToolbar + 'px';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
-            core._variable._sticky = true;
+            core._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
@@ -2911,7 +2927,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : '';
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
-            core._variable._sticky = false;
+            core._sticky = false;
         },
 
         _codeViewAutoScroll: function () {
@@ -3158,7 +3174,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
     
     /** window event */
     _w.addEventListener('resize', event.onResize_window, false);
-    if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
+    if (context.option.stickyToolbar > -1) {
+        _w.addEventListener('scroll', event.onScroll_window, false);
+    }
 
     return userFunction;
 }
