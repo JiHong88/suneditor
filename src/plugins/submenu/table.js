@@ -16,16 +16,23 @@ export default {
             _tdElement: null,
             _trElement: null,
             _trElements: null,
-            _tdIndex: 0,
-            _trIndex: 0,
-            _tdCnt: 0,
-            _trCnt: 0,
             _tableXY: [],
             _maxWidth: true,
             resizeIcon: null,
             resizeText: null,
+            headerButton: null,
+            splitMenu: null,
             maxText: core.lang.controller.maxSize,
-            minText: core.lang.controller.minSize
+            minText: core.lang.controller.minSize,
+            _physical_cellCnt: 0,
+            _logical_cellCnt: 0,
+            _physical_rowCnt: 0,
+            _logical_rowCnt: 0,
+            _rowIndex: 0,
+            _physical_cellIndex: 0,
+            _logical_cellIndex: 0,
+            _current_colSpan: 0,
+            _current_rowSpan: 0
         };
 
         /** set submenu */
@@ -39,13 +46,15 @@ export default {
         /** set table controller */
         let tableController = eval(this.setController_table.call(core));
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('button > i');
-        context.table.resizeText = tableController.querySelector('button > span > span');
+        context.table.resizeIcon = tableController.querySelector('__se__table_resize > i');
+        context.table.resizeText = tableController.querySelector('__se__table_resize > span > span');
+        context.table.headerButton = tableController.querySelector('.__se__table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
+        context.table.splitMenu = resizeDiv.querySelector('.__se__split_menu');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -88,9 +97,13 @@ export default {
         tableResize.innerHTML = '' +
             '<div>' +
             '   <div class="btn-group">' +
-            '       <button type="button" data-command="resize" data-option="up" class="se-tooltip">' +
+            '       <button type="button" data-command="resize" class="se-tooltip __se__table_resize">' +
             '           <i class="icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="header" class="se-tooltip btn_editor __se__table_header">' +
+            '           <i class="icon-table-header"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="remove" class="se-tooltip">' +
             '           <i class="icon-delete"></i>' +
@@ -124,6 +137,10 @@ export default {
             '           <i class="icon-delete-row"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
+            '       <button type="button" data-command="merge" class="se-tooltip" disabled>' +
+            '           <i class="icon-merge-cell"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
+            '       </button>' +
             '   </div>' +
             '</div>' +
             '<div>' +
@@ -139,6 +156,20 @@ export default {
             '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
             '           <i class="icon-delete-column"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="onsplit" class="se-tooltip">' +
+            '           <i class="icon-split-cell"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
+            '       <div class="__se__split_menu sun-editor-common layer_editor" style="display:none; left:-100%;">' +
+            '           <div class="inner_layer">' +
+            '               <ul class="list_editor">' +
+            '                   <li class="btn_edit" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
+            '                   ' + lang.controller.VerticalSplit + '</li>' +
+            '                   <li class="btn_edit" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
+            '                   ' + lang.controller.HorizontalSplit + '</li>' +
+            '               </ul>' +
+            '           </div>' +
+            '       </div>' +
             '       </button>' +
             '   </div>' +
             '</div>';
@@ -176,8 +207,8 @@ export default {
     onMouseMove_tablePicker: function (e) {
         e.stopPropagation();
 
-        let x = Math.ceil(e.offsetX / 18);
-        let y = Math.ceil(e.offsetY / 18);
+        let x = this._w.Math.ceil(e.offsetX / 18);
+        let y = this._w.Math.ceil(e.offsetY / 18);
         x = x < 1 ? 1 : x;
         y = y < 1 ? 1 : y;
         this.context.table.tableHighlight.style.width = x + 'em';
@@ -213,23 +244,26 @@ export default {
         contextTable._tdElement = null;
         contextTable._trElement = null;
         contextTable._trElements = 0;
-        contextTable._tdIndex = 0;
-        contextTable._trIndex = 0;
-        contextTable._trCnt = 0;
-        contextTable._tdCnt = 0;
         contextTable._tableXY = [];
         contextTable._maxWidth = true;
+        contextTable._physical_cellCnt = 0;
+        contextTable._logical_cellCnt = 0;
+        contextTable._physical_rowCnt = 0;
+        contextTable._logical_rowCnt = 0;
+        contextTable._rowIndex = 0;
+        contextTable._physical_cellIndex = 0;
+        contextTable._logical_cellIndex = 0;
+        contextTable._current_colSpan = 0;
+        contextTable._current_rowSpan = 0;
     },
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
         this.plugins.table.init.call(this);
         const contextTable = this.context.table;
-        const resizeDiv = contextTable.resizeDiv;
         const tableController = contextTable.tableController;
         
         this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
-        resizeDiv.style.display = 'block';
 
         const tableElement = contextTable._element;
         const offset = this.util.getOffset(tableElement);
@@ -240,7 +274,7 @@ export default {
         tableController.style.display = 'block';
         tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
 
-        this.controllersOn(resizeDiv, tableController);
+        this.controllersOn(contextTable.resizeDiv, tableController);
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -261,65 +295,430 @@ export default {
             contextTable._trElement = tdElement.parentNode;
         }
 
-        if (reset || contextTable._trCnt === 0) {
-            contextTable._trElements = table.rows;
-            contextTable._tdIndex = tdElement.cellIndex;
-            contextTable._trIndex = contextTable._trElement.rowIndex;
-            contextTable._trCnt = table.rows.length;
-            contextTable._tdCnt = contextTable._trElement.cells.length;
+        if (/THEAD/i.test(table.firstElementChild.nodeName)) {
+            this.util.addClass(contextTable.headerButton, 'on');
+        } else {
+            this.util.removeClass(contextTable.headerButton, 'on');
         }
+
+        if (reset || contextTable._logical_rowCnt === 0) {
+            const rows = contextTable._trElements = table.rows;
+            const cellIndex = tdElement.cellIndex;
+            let logcalCellIndex = 0;
+
+            // row index
+            const rowIndex = contextTable._rowIndex = contextTable._trElement.rowIndex;
+
+            // count
+            let cellCnt = 0;
+            let rowCnt = 0;
+            
+            for (let i = 0, cells = rows[0].cells, len = rows[0].cells.length; i < len; i++) {
+                cellCnt += cells[i].colSpan;
+            }
+
+            for (let i = 0, len = rows.length; i < len; i++) {
+                rowCnt += rows[i].cells[0].rowSpan;
+
+                if (i === rowIndex) {
+                    const cells = rows[i].cells;
+                    let index = cellIndex;
+                    for (let c = 0; c < index; c++) {
+                        logcalCellIndex += cells[c].colSpan;
+                    }
+                }
+            }
+
+            contextTable._physical_cellCnt = contextTable._trElement.cells.length;
+            contextTable._logical_cellCnt = cellCnt;
+            contextTable._physical_rowCnt = contextTable._trElements.length;
+            contextTable._logical_rowCnt = rowCnt;
+
+            // cell index
+            let colSpan = 0;
+
+            for (let i = 0, cells, cIndex; i <= rowIndex; i++) {
+                cells = rows[i].cells;
+                cIndex = logcalCellIndex;
+                for (let c = 0, cell, rs, cs; c <= cIndex; c++) {
+                    cell = cells[c];
+                    if (!cell) break;
+
+                    rs = cell.rowSpan;
+                    cs = cell.colSpan;
+                    cIndex -= cs - 1;
+                    if (rs < 2 && cs < 2) continue;
+
+                    if (i === rowIndex) {
+                        if (cs > 1 && c < cellIndex) colSpan += cs - 1;
+                        continue;
+                    }
+
+                    if (rs + i > rowIndex && rowIndex > i) {
+                        colSpan += cs;
+                    }
+                }
+            }
+
+            contextTable._physical_cellIndex = cellIndex;
+            contextTable._logical_cellIndex = cellIndex + colSpan;
+
+            // span
+            contextTable._current_colSpan = contextTable._tdElement.colSpan - 1;
+            contextTable._current_rowSpan - contextTable._trElement.cells[cellIndex].rowSpan - 1;
+        }
+
+        resizeDiv.style.display = 'block';
 
         const offset = this.util.getOffset(tdElement);
         resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
+
+        const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+        if (overLeft < 0) {
+            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft - 16) + 'px';
+            resizeDiv.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+        } else {
+            resizeDiv.firstElementChild.style.left = '20px';
+        }
     },
 
-    insertRowCell: function (type, option) {
+    editRowCell: function (type, option, remove) {
         const contextTable = this.context.table;
 
+        // row
         if (type === 'row') {
-            const rowIndex = option === 'up' ? contextTable._trIndex : contextTable._trIndex + 1;
-            let cells = '';
+            const up = option === 'up';
+            if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
+            
+            const rowIndex = remove || up ? contextTable._rowIndex : contextTable._rowIndex + contextTable._current_rowSpan + 1;
+            const sign = remove ? -1 : 1;
+            
+            const rows = contextTable._trElements;
+            let cellCnt = contextTable._logical_cellCnt;
 
-            for (let i = 0, len = contextTable._tdCnt; i < len; i++) {
-                cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
+            for (let i = 0, len = contextTable._rowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
+                cell = rows[i].cells;
+                for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
+                    rs = cell[c].rowSpan;
+                    cs = cell[c].colSpan;
+                    if (rs < 2 && cs < 2) continue;
+
+                    if (rs + i > rowIndex && rowIndex > i) {
+                        cell[c].rowSpan = rs + sign;
+                        cellCnt -= cs;
+                    }
+                }
             }
 
-            const newRow = contextTable._element.insertRow(rowIndex);
-            newRow.innerHTML = cells;
+            if (remove) {
+                const next = rows[contextTable._rowIndex + 1];
+                if (next) {
+                    const spanCells = [];
+                    let cells = rows[contextTable._rowIndex].cells;
+                    let colSpan = 0;
+
+                    for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
+                        cell = cells[i];
+                        logcalIndex = i + colSpan;
+                        colSpan += cell.colSpan - 1;
+
+                        if (cell.rowSpan > 1) {
+                            cell.rowSpan -= 1;
+                            spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
+                        }
+                    }
+
+                    if (spanCells.length > 0) {
+                        let spanCell = spanCells.shift();
+                        cells = next.cells;
+                        colSpan = 0;
+
+                        for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
+                            cell = cells[i];
+                            logcalIndex = i + colSpan;
+                            colSpan += cell.colSpan - 1;
+        
+                            if (logcalIndex >= spanCell.index) {
+                                i--, colSpan--;
+                                colSpan += spanCell.cell.colSpan - 1;
+                                next.insertBefore(spanCell.cell, cell);
+                                spanCell = spanCells.shift();
+                                if (!spanCell) break;
+                            }
+                        }
+
+                        if (spanCell) {
+                            next.appendChild(spanCell.cell);
+                            for (let i = 0, len = spanCells.length; i < len; i++) {
+                                next.appendChild(spanCells[i].cell);
+                            }
+                        }
+                    }
+                }
+
+                contextTable._element.deleteRow(rowIndex);
+            } else {
+                let cells = '';
+
+                for (let i = 0, len = cellCnt; i < len; i++) {
+                    cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
+                }
+
+                const newRow = contextTable._element.insertRow(rowIndex);
+                newRow.innerHTML = cells;
+            }
         }
         // cell
         else {
-            const trArray = contextTable._trElements;
-            const cellIndex = option === 'left' ? contextTable._tdIndex : contextTable._tdIndex + 1;
-            let cell = null;
-            
-            for (let i = 0, len = contextTable._trCnt; i < len; i++) {
-                cell = trArray[i].insertCell(cellIndex);
-                cell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+            const left = option === 'left';
+            const colSpan = contextTable._current_colSpan;
+            const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
+
+            const rows = contextTable._trElements;
+            let rowSpanArr = [];
+            let spanIndex = [];
+            let passCell = 0;
+            const removeCell = [];
+
+            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+                row = rows[i];
+                insertIndex = cellIndex;
+                applySpan = false;
+                cells = row.cells;
+                cellColSpan = 0;
+
+                for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
+                    cell = cells[c];
+                    if (!cell) break;
+
+                    rs = cell.rowSpan - 1;
+                    cs = cell.colSpan - 1;
+
+                    if (rs > 0) {
+                        rowSpanArr.push({
+                            rs: rs,
+                            cs: cs + 1,
+                            index: c + cellColSpan
+                        });
+                    }
+
+                    if (!remove) {
+                        if (cs > 0) {
+                            if (passCell < 1 && cs + c >= insertIndex) {
+                                cell.colSpan += 1;
+                                insertIndex = null;
+                                passCell = rs + 1;
+                                break;
+                            }
+    
+                            insertIndex -= cs;
+                        }
+
+                        if (!applySpan) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                insertIndex -= arr.cs;
+                                arr.rs -= 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                    r--;
+                                }  
+                            }
+                            applySpan = true;
+                        }
+                    } else {
+                        removeIndex = c + cellColSpan;
+
+                        if (spanIndex.length > 0) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                if (removeIndex >= arr.index) {
+                                    cellColSpan += arr.cs;
+                                    arr.rs -= 1;
+                                    if (arr.rs < 1) {
+                                        spanIndex.splice(r, 1);
+                                        r--;
+                                    }  
+                                }
+                            }
+                        }
+
+                        removeIndex = c + cellColSpan;
+                        if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
+                            removeCell.push(cell);
+                        } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
+                            let modifyColSpan = 0;
+
+                            for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
+                                if (m >= removeIndex && m <= removeIndex + cs) {
+                                    modifyColSpan++;
+                                }
+                            }
+
+                            cell.colSpan -= this._w.Math.abs(modifyColSpan);
+                        }
+
+                        cellColSpan += cs;
+                    }
+                }
+
+                spanIndex = spanIndex.concat(rowSpanArr);
+                rowSpanArr = [];
+
+                if (!remove) {
+                    if (passCell > 0) {
+                        passCell -= 1;
+                        continue;
+                    }
+    
+                    if (insertIndex !== null) {
+                        newCell = this.util.createElement(cells[0].nodeName);
+                        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                        newCell = row.insertBefore(newCell, cells[insertIndex]);
+                    }
+                }
+            }
+
+            if (remove) {
+                for (let r = 0; r < removeCell.length; r++) {
+                    this.util.removeItem(removeCell[r]);
+                }
             }
         }
 
-        this.plugins.table.setPositionControllerDiv.call(this, contextTable._tdElement, true);
+        if (!remove) {
+            this.plugins.table.setPositionControllerDiv.call(this, contextTable._tdElement, true);
+        } else {
+            this.controllersOff();
+        }
     },
 
-    deleteRowCell: function (type) {
-        const contextTable = this.context.table;
+    _closeSplitMenu: null,
+    openSplitMenu: function () {
+        this.context.table.splitMenu.style.display = 'block';
 
-        if (type === 'row') {
-            contextTable._element.deleteRow(contextTable._trIndex);
-        }
-        // cell
-        else {
-            const trArray = contextTable._trElements;
-            const cellIndex = contextTable._tdIndex;
-            
-            for (let i = 0, len = contextTable._trCnt; i < len; i++) {
-                trArray[i].deleteCell(cellIndex);
+        this.plugins.table._closeSplitMenu = function () {
+            this.context.table.splitMenu.style.display = 'none';
+            this._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+            this.plugins.table._closeSplitMenu = null;
+        }.bind(this);
+
+        this._d.addEventListener('mousedown', this.plugins.table._closeSplitMenu);
+    },
+
+    splitCells: function (direction) {
+        const vertical = direction === 'vertical';
+        const contextTable = this.context.table;
+        const currentCell = contextTable._tdElement;
+
+        const newCell = this.util.createElement(currentCell.nodeName);
+        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+
+        if (vertical) {
+            const colSpan = currentCell.colSpan;
+            if (colSpan > 1) {
+                newCell.colSpan = this._w.Math.floor(colSpan/2);
+                newCell.rowSpan = currentCell.rowSpan;
+                currentCell.colSpan = colSpan - newCell.colSpan;
+                contextTable._trElement.insertBefore(newCell, currentCell.nextElementSibling);
+            } else {
+                
+            }
+        } else {
+            const rowSpan = currentCell.rowSpan;
+            if (rowSpan > 1) {
+                newCell.rowSpan = this._w.Math.floor(rowSpan/2);
+                newCell.colSpan = currentCell.colSpan;
+                const newRowSpan = rowSpan - newCell.rowSpan;
+
+                const rowSpanArr = [];
+                const rows = contextTable._trElements;
+                const nextRowIndex = this.util.getArrayIndex(rows, contextTable._trElement) + newRowSpan;
+                const index = contextTable._logical_cellIndex;
+
+                for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
+                    cells = rows[i].cells;
+                    colSpan = 0;
+                    for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
+                        logcalIndex = c + colSpan;
+                        if (logcalIndex >= index) break;
+
+                        cell = cells[c];
+                        cs = cell.rowSpan - 1;
+                        if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
+                            rowSpanArr.push({
+                                index: logcalIndex,
+                                cs: cell.colSpan
+                            });
+                        }
+                        colSpan += cell.colSpan - 1;
+                    }
+                }
+
+                const nextRow = rows[nextRowIndex];
+                const nextCells = nextRow.cells;
+                let colSpan = 0;
+                let rs = rowSpanArr.shift();
+
+                for (let c = 0, cLen = nextCells.length, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+                    logcalIndex = c + colSpan;
+                    cell = nextCells[c];
+                    cs = cell.colSpan - 1;
+                    insertIndex = logcalIndex + cs + 1;
+
+                    if (rs && insertIndex >= rs.index) {
+                        colSpan += rs.cs;
+                        insertIndex += rs.cs;
+                        rs = rowSpanArr.shift();
+                    }
+                    
+                    if (insertIndex >= index) {
+                        nextRow.insertBefore(newCell, cell.nextElementSibling);
+                        break;
+                    }
+
+                    colSpan += cs;
+                }
+
+                currentCell.rowSpan = newRowSpan;
+            } else {
+                
             }
         }
 
-        this.controllersOff();
+        this.plugins.table.setPositionControllerDiv.call(this, currentCell, true);
+    },
+
+    mergeCells: function () {
+
+    },
+
+    toggleHeader: function () {
+        const headerButton = this.context.table.headerButton;
+        const active = this.util.hasClass(headerButton, 'on');
+        const table = this.context.table._element;
+
+        if (!active) {
+            const header = this.util.createElement('THEAD');
+            let th = '';
+            for (let i = 0, len = this.context.table._logical_cellCnt; i < len; i++) {
+                th += '<th><div>' + this.util.zeroWidthSpace + '</div></th>';
+            }
+
+            header.innerHTML = th;
+            table.insertBefore(header, table.firstElementChild);
+        } else {
+            this.util.removeItem(table.getElementsByTagName('thead')[0]);
+        }
+
+        this.util.toggleClass(headerButton, 'on');
+
+        if (/TH/i.test(this.context.table._tdElement.nodeName)) {
+            this.controllersOff();
+        } else {
+            this.plugins.table.setPositionControllerDiv.call(this, this.context.table._tdElement, false);
+        }
     },
 
     resizeTable: function () {
@@ -353,6 +752,11 @@ export default {
         const value = target.getAttribute('data-value');
         const option = target.getAttribute('data-option');
         
+        if (typeof this.plugins.table._closeSplitMenu === 'function') {
+            this.plugins.table._closeSplitMenu();
+            if (command === 'onsplit') return;
+        }
+
         if (!command) return;
 
         e.preventDefault();
@@ -360,10 +764,22 @@ export default {
 
         switch (command) {
             case 'insert':
-                this.plugins.table.insertRowCell.call(this, value, option);
+                this.plugins.table.editRowCell.call(this, value, option, false);
                 break;
             case 'delete':
-                this.plugins.table.deleteRowCell.call(this, value);
+                this.plugins.table.editRowCell.call(this, value, null, true);
+                break;
+            case 'header':
+                this.plugins.table.toggleHeader.call(this);
+                break;
+            case 'onsplit':
+                this.plugins.table.openSplitMenu.call(this);
+                break;
+            case 'split':
+                this.plugins.table.splitCells.call(this, value);
+                break;
+            case 'merge':
+                this.plugins.table.mergeCells.call(this);
                 break;
             case 'resize':
                 contextTable.resizeDiv.style.display = 'none';
@@ -373,10 +789,10 @@ export default {
             case 'remove':
                 this.util.removeItem(contextTable._element);
                 this.controllersOff();
-                this.focus();
         }
 
         // history stack
         this.history.push();
+        this.focus();
     }
 };

@@ -30,6 +30,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
      * should always bind this object when registering an event in the plug-in.
      */
     const core = {
+        _d: _d,
+        _w: _w,
+        
         /**
          * @description Elements and user options parameters of the suneditor
          */
@@ -129,6 +132,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
         _notHideToolbar: false,
 
         /**
+         * @description Variable value that sticky toolbar mode
+         * @private
+         */
+        _sticky: false,
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -203,7 +212,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _editorAreaOriginCssText: '',
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
-            _sticky: false,
             _fullScreenSticky: false,
             _imagesInfo: [],
             _imageIndex: 0
@@ -877,6 +885,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let insertedNew = false;
 
             function appendNode (parent, insNode, sibling) {
+                if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
+                
                 const children = insNode.childNodes;
                 let format = insNode.cloneNode(false);
                 let first = null;
@@ -884,7 +894,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util.ignoreNodeChange(c) && !util.isListCell(format)) {
+                    if (util.isIgnoreNodeChange(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
@@ -1373,7 +1383,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1461,14 +1471,21 @@ export default function (context, pluginCallButtons, plugins, lang) {
             util.removeEmptyNode(pNode);
             if (preventDelete) newInnerNode.textContent = util.zeroWidthSpace;
 
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            // node change
+            const endConReset = isRemoveFormat || !endContainer.textContent;
+            const startPath = util.getNodePath(startContainer, pNode);
+            const endPath = util.getNodePath(endConReset ? startContainer : endContainer, pNode);
+
+            element.innerHTML = pNode.innerHTML;
+
+            startContainer = util.getNodeFromPath(startPath, element);
+            endContainer = util.getNodeFromPath(endPath, element);
 
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
-                endContainer: isRemoveFormat || !endContainer.textContent ? startContainer : endContainer,
-                endOffset: isRemoveFormat || !endContainer.textContent ? startContainer.textContent.length : endOffset
+                endContainer: endContainer,
+                endOffset: endConReset ? collapsed ? 1 : startOff + endOffset - 1 : endOffset
             };
         },
 
@@ -1493,12 +1510,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (!child) continue;
                     let coverNode = node;
 
-                    if (util.ignoreNodeChange(child)) {
+                    if (util.isIgnoreNodeChange(child)) {
                         pNode.appendChild(newInnerNode);
                         newInnerNode = newInnerNode.cloneNode(false);
                         pNode.appendChild(child);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
+                        node = newInnerNode;
                         i--;
                         continue;
                     } else if (validation(child)) {
@@ -1526,8 +1544,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            // node change
+            element.innerHTML = pNode.innerHTML;
         },
 
         /**
@@ -1561,7 +1579,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1680,8 +1698,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     container = pNode.firstChild;
                     offset = 0;
                 }
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+
+                // node change
+                const path = util.getNodePath(container, pNode);
+                element.innerHTML = pNode.innerHTML;
+                container = util.getNodeFromPath(path, element);
             }
 
             return {
@@ -1721,7 +1742,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.ignoreNodeChange(child)) {
+                            if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1844,8 +1865,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     container = pNode.firstChild;
                     offset = container.textContent.length;
                 }
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                
+                // node change
+                const path = util.getNodePath(container, pNode);
+                element.innerHTML = pNode.innerHTML;
+                container = util.getNodeFromPath(path, element);
             }
 
             return {
@@ -2554,15 +2578,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             formatEl = util.getFormatElement(selectionNode) || selectionNode;
             rangeEl = util.getRangeFormatElement(selectionNode);
             if (!selectRange && (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl)) {
-                if (rangeEl && (util.isList(rangeEl) || /^PRE$/i.test(rangeEl.nodeName)) && keyCode !== 8 && keyCode !== 46) {
-                    const newTag = util.createElement(util.isList(rangeEl) ? 'LI' : 'P');
-                    newTag.innerHTML = util.zeroWidthSpace;
-                    rangeEl.insertBefore(newTag, selectionNode.nextElementSibling);
-                    core.setRange(newTag, 0, newTag, 0);
-                } else {
-                    core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
-                    core.focus();
-                }
+                core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
+                core.focus();
                 return;
             }
 
@@ -2857,8 +2874,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (core._variable.isFullScreen) {
                 core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
-            }
-            else if (core._variable._sticky) {
+            } else if (core._sticky) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
@@ -2869,19 +2885,31 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
-            const editorTop = element.topArea.offsetTop - (core._isInline ? element.toolbar.offsetHeight : 0);
             const y = (this.scrollY || _d.documentElement.scrollTop) + context.option.stickyToolbar;
+            const editorTop = event._getStickyOffsetTop() - (core._isInline ? element.toolbar.offsetHeight : 0);
             
             if (y < editorTop) {
                 event._offStickyToolbar(element);
             }
             else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
-                if (!core._variable._sticky) event._onStickyToolbar(element);
+                if (!core._sticky) event._onStickyToolbar(element);
                 element.toolbar.style.top = (editorHeight + editorTop + context.option.stickyToolbar -y - core._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
                 event._onStickyToolbar(element);
             }
+        },
+
+        _getStickyOffsetTop: function () {
+            let offsetEl = context.element.topArea;
+            let offsetTop = 0;
+
+            while (offsetEl) {
+                offsetTop += offsetEl.offsetTop;
+                offsetEl = offsetEl.offsetParent;
+            }
+
+            return offsetTop;
         },
 
         _onStickyToolbar: function (element) {
@@ -2893,7 +2921,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             element.toolbar.style.top = context.option.stickyToolbar + 'px';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'sun-editor-sticky');
-            core._variable._sticky = true;
+            core._sticky = true;
         },
 
         _offStickyToolbar: function (element) {
@@ -2902,7 +2930,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : '';
             element.editorArea.style.marginTop = '';
             util.removeClass(element.toolbar, 'sun-editor-sticky');
-            core._variable._sticky = false;
+            core._sticky = false;
         },
 
         _codeViewAutoScroll: function () {
@@ -3149,7 +3177,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
     
     /** window event */
     _w.addEventListener('resize', event.onResize_window, false);
-    if (context.option.stickyToolbar > -1) _w.addEventListener('scroll', event.onScroll_window, false);
+    if (context.option.stickyToolbar > -1) {
+        _w.addEventListener('scroll', event.onScroll_window, false);
+    }
 
     return userFunction;
 }

@@ -617,7 +617,7 @@ const util = {
         let tableElement = element.nodeType === 3 ? element.parentElement : element;
 
         while (!this.isWysiwygDiv(tableElement.parentNode)) {
-            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {
+            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME|AUDIO|VIDEO)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {
                 tableOffsetLeft += tableElement.offsetLeft;
                 tableOffsetTop += tableElement.offsetTop;
             }
@@ -772,12 +772,12 @@ const util = {
     },
 
     /**
-     * @description Nodes that need to be added without modification when changing text nodes (util.isComponent, util.isFormatElement, img, video)
+     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)
      * @param {Element} element - Element to check
      * @returns {Boolean}
      */
-    ignoreNodeChange: function (element) {
-        return util.isComponent(element) || util.isFormatElement(element) || /^(IMG|VIDEO)$/i.test(element.nodeName);
+    isIgnoreNodeChange: function (element) {
+        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark)$/i.test(element.nodeName);
     },
 
     /**
@@ -807,6 +807,7 @@ const util = {
                 }
                 return t;
             })
+            .replace(/<\/?(span[^>^<]*)>/g, '')
             .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
@@ -818,8 +819,8 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'.split('|');
-        let regStr = '<\/?(';
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+        let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
             regStr += '(?!\\b' + exclusionTags[i] + '\\b)';

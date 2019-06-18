@@ -115,7 +115,12 @@
             rotateLeft: '左に回転',
             rotateRight: '右に回転',
             maxSize: '最大サイズ',
-            minSize: '最小サイズ'
+            minSize: '最小サイズ',
+            tableHeader: '表のヘッダー',
+            mergeCells: 'セルの結合',
+            splitCells: 'セルを分割',
+            HorizontalSplit: '横分割',
+            VerticalSplit: '垂直分割'
         }
     };
 

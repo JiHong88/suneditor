@@ -115,7 +115,12 @@
             rotateLeft: 'Rotate left',
             rotateRight: 'Rotate right',
             maxSize: 'Max size',
-            minSize: 'Min size'
+            minSize: 'Min size',
+            tableHeader: 'Table header',
+            mergeCells: 'Merge cells',
+            splitCells: 'Split Cells',
+            HorizontalSplit: 'Horizontal split',
+            VerticalSplit: 'Vertical split'
         }
     };
 

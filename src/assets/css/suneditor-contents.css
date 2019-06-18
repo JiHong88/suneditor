@@ -37,6 +37,8 @@
 
 .sun-editor-editable img, .sun-editor-editable iframe {
     display: block;
+    margin: 0;
+    padding: 0;
     max-width: 100%;
 }
 
@@ -254,16 +256,22 @@
     border-spacing: 0;
     border-collapse: collapse;
 }
+.sun-editor-editable table thead {
+    border-bottom: 2px solid #333;
+}
+
 .sun-editor-editable table th {
-    background-color: #e1e1e1;
-    border: 1px solid #aaa;
+    background-color: #efefef;
+    border: 1px solid #e1e1e1;
+    padding:0.4em;
 }
 
 .sun-editor-editable table tr {
-    border: 1px solid #ccc;
+    border: 1px solid #e1e1e1;
 }
 .sun-editor-editable table td {
-    border: 1px solid #ccc; padding:0.4em;
+    border: 1px solid #e1e1e1;
+    padding:0.4em;
 }
 
 /** component (image, iframe video) */
@@ -273,7 +281,7 @@
     margin: 0 0 10px;
 }
 .sun-editor-editable[contenteditable=true] .sun-editor-id-comp {
-    outline: 1px dashed #ccc;
+    outline: 1px dashed #e1e1e1;
 }
 
 /** image, video iframe figure cover */

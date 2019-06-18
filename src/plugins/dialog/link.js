@@ -155,11 +155,19 @@ export default {
         linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
 
         const offset = this.util.getOffset(selectionATag);
-        linkBtn.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
-        
+        linkBtn.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
+
         linkBtn.style.display = 'block';
 
+        const overLeft = this.context.element.wysiwyg.offsetWidth - (linkBtn.offsetLeft + linkBtn.offsetWidth);
+        if (overLeft < 0) {
+            linkBtn.style.left = (linkBtn.offsetLeft + overLeft - 16) + 'px';
+            linkBtn.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+        } else {
+            linkBtn.firstElementChild.style.left = '20px';
+        }
+        
         this.controllersOn(linkBtn);
     },
 

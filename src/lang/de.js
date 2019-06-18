@@ -115,7 +115,12 @@
             rotateLeft: 'Nach links drehen',
             rotateRight: 'Nach rechts drehen',
             maxSize: 'Maximale größe',
-            minSize: 'Mindest größe'
+            minSize: 'Mindest größe',
+            tableHeader: 'Tabellenüberschrift',
+            mergeCells: 'Zellen verbinden',
+            splitCells: 'Zellen Teilung',
+            HorizontalSplit: 'Horizontale Teilung',
+            VerticalSplit: 'Vertikale Teilung'
         }
     };
 
