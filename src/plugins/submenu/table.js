@@ -207,8 +207,8 @@ export default {
     onMouseMove_tablePicker: function (e) {
         e.stopPropagation();
 
-        let x = Math.ceil(e.offsetX / 18);
-        let y = Math.ceil(e.offsetY / 18);
+        let x = this._w.Math.ceil(e.offsetX / 18);
+        let y = this._w.Math.ceil(e.offsetY / 18);
         x = x < 1 ? 1 : x;
         y = y < 1 ? 1 : y;
         this.context.table.tableHighlight.style.width = x + 'em';
@@ -261,11 +261,9 @@ export default {
     call_controller_tableEdit: function (tdElement) {
         this.plugins.table.init.call(this);
         const contextTable = this.context.table;
-        const resizeDiv = contextTable.resizeDiv;
         const tableController = contextTable.tableController;
         
         this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
-        resizeDiv.style.display = 'block';
 
         const tableElement = contextTable._element;
         const offset = this.util.getOffset(tableElement);
@@ -276,7 +274,7 @@ export default {
         tableController.style.display = 'block';
         tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
 
-        this.controllersOn(resizeDiv, tableController);
+        this.controllersOn(contextTable.resizeDiv, tableController);
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -370,9 +368,19 @@ export default {
             contextTable._current_rowSpan - contextTable._trElement.cells[cellIndex].rowSpan - 1;
         }
 
+        resizeDiv.style.display = 'block';
+
         const offset = this.util.getOffset(tdElement);
         resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
+
+        const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+        if (overLeft < 0) {
+            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft - 16) + 'px';
+            resizeDiv.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+        } else {
+            resizeDiv.firstElementChild.style.left = '20px';
+        }
     },
 
     editRowCell: function (type, option, remove) {
@@ -548,7 +556,7 @@ export default {
                                 }
                             }
 
-                            cell.colSpan -= this.util._w.Math.abs(modifyColSpan);
+                            cell.colSpan -= this._w.Math.abs(modifyColSpan);
                         }
 
                         cellColSpan += cs;
@@ -587,21 +595,16 @@ export default {
     },
 
     _closeSplitMenu: null,
-    openSplitMenu: function (hidden) {
-        if (!hidden) {
-            this.context.table.splitMenu.style.display = 'none';
-            this.util._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
-            return;
-        }
-
+    openSplitMenu: function () {
         this.context.table.splitMenu.style.display = 'block';
 
         this.plugins.table._closeSplitMenu = function () {
             this.context.table.splitMenu.style.display = 'none';
-            this.util._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+            this._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+            this.plugins.table._closeSplitMenu = null;
         }.bind(this);
 
-        this.util._d.addEventListener('mousedown', this.plugins.table._closeSplitMenu);
+        this._d.addEventListener('mousedown', this.plugins.table._closeSplitMenu);
     },
 
     splitCells: function (direction) {
@@ -615,10 +618,70 @@ export default {
         if (vertical) {
             const colSpan = currentCell.colSpan;
             if (colSpan > 1) {
-                newCell.colSpan = this.util._w.Math.floor(colSpan/2);
+                newCell.colSpan = this._w.Math.floor(colSpan/2);
                 newCell.rowSpan = currentCell.rowSpan;
                 currentCell.colSpan = colSpan - newCell.colSpan;
                 contextTable._trElement.insertBefore(newCell, currentCell.nextElementSibling);
+            } else {
+                
+            }
+        } else {
+            const rowSpan = currentCell.rowSpan;
+            if (rowSpan > 1) {
+                newCell.rowSpan = this._w.Math.floor(rowSpan/2);
+                newCell.colSpan = currentCell.colSpan;
+                const newRowSpan = rowSpan - newCell.rowSpan;
+
+                const rowSpanArr = [];
+                const rows = contextTable._trElements;
+                const nextRowIndex = this.util.getArrayIndex(rows, contextTable._trElement) + newRowSpan;
+                const index = contextTable._logical_cellIndex;
+
+                for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
+                    cells = rows[i].cells;
+                    colSpan = 0;
+                    for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
+                        logcalIndex = c + colSpan;
+                        if (logcalIndex >= index) break;
+
+                        cell = cells[c];
+                        cs = cell.rowSpan - 1;
+                        if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
+                            rowSpanArr.push({
+                                index: logcalIndex,
+                                cs: cell.colSpan
+                            });
+                        }
+                        colSpan += cell.colSpan - 1;
+                    }
+                }
+
+                const nextRow = rows[nextRowIndex];
+                const nextCells = nextRow.cells;
+                let colSpan = 0;
+                let rs = rowSpanArr.shift();
+
+                for (let c = 0, cLen = nextCells.length, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+                    logcalIndex = c + colSpan;
+                    cell = nextCells[c];
+                    cs = cell.colSpan - 1;
+                    insertIndex = logcalIndex + cs + 1;
+
+                    if (rs && insertIndex >= rs.index) {
+                        colSpan += rs.cs;
+                        insertIndex += rs.cs;
+                        rs = rowSpanArr.shift();
+                    }
+                    
+                    if (insertIndex >= index) {
+                        nextRow.insertBefore(newCell, cell.nextElementSibling);
+                        break;
+                    }
+
+                    colSpan += cs;
+                }
+
+                currentCell.rowSpan = newRowSpan;
             } else {
                 
             }
@@ -689,6 +752,11 @@ export default {
         const value = target.getAttribute('data-value');
         const option = target.getAttribute('data-option');
         
+        if (typeof this.plugins.table._closeSplitMenu === 'function') {
+            this.plugins.table._closeSplitMenu();
+            if (command === 'onsplit') return;
+        }
+
         if (!command) return;
 
         e.preventDefault();
@@ -705,7 +773,7 @@ export default {
                 this.plugins.table.toggleHeader.call(this);
                 break;
             case 'onsplit':
-                this.plugins.table.openSplitMenu.call(this, this.context.table.splitMenu.style.display === 'none');
+                this.plugins.table.openSplitMenu.call(this);
                 break;
             case 'split':
                 this.plugins.table.splitCells.call(this, value);

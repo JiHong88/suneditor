@@ -166,6 +166,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     minHeight: '150px',
     maxHeight: '500px',
+    height: 450,
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],

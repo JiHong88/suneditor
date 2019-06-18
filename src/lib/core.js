@@ -30,6 +30,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
      * should always bind this object when registering an event in the plug-in.
      */
     const core = {
+        _d: _d,
+        _w: _w,
+        
         /**
          * @description Elements and user options parameters of the suneditor
          */

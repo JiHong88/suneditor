@@ -52,7 +52,60 @@
                 <button type="button" class="btn btn-md btn-success" onclick="sun_create()">Create</button>
                 <br><br>
         
-                <textarea id="editor2" style="width: 1080px; height: 200px;"></textarea>
+                <textarea id="editor2" style="width: 1080px; height: 200px;">
+                    <table style="width: 100%;">
+                    <thead>
+                    <tr>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                    <td colspan="2"><div>0</div></td>
+                    <td><div>1</div></td>
+                    <td colspan="2" rowspan="2"><div>2</div></td>
+                    <td><div>3</div></td>
+                    <td colspan="2"><div>4</div></td>
+                    </tr>
+                    <tr>
+                    <td><div>0</div></td>
+                    <td colspan="2"><div>1</div></td>
+                    <td colspan="3"><div>2</div></td>
+                    </tr>
+                    <tr>
+                    <td colspan="4"><div>0</div></td>
+                    <td colspan="2" rowspan="2"><div>1</div></td>
+                    <td><div>2</div></td>
+                    <td rowspan="4"><div>3</div></td>
+                    </tr>
+                    <tr>
+                    <td><div>0</div></td>
+                    <td><div>1</div></td>
+                    <td colspan="2" rowspan="2"><div>2</div></td>
+                    <td rowspan="2"><div>3</div></td>
+                    </tr>
+                    <tr>
+                    <td colspan="2"><div>0</div></td>
+                    <td><div>1</div></td>
+                    <td><div>2</div></td>
+                    </tr>
+                    <tr>
+                    <td><div>0</div></td>
+                    <td><div>1</div></td>
+                    <td colspan="5"><div>2</div></td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    <div><div><br></div></div>
+                    <p></p>
+                </textarea>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_destroy2()">Destroy</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_create2()">Create</button>
                 <br>
