@@ -118,6 +118,7 @@
             minSize: '최소화',
             tableHeader: '테이블 제목',
             mergeCells: '셀 병합',
+            splitCells: '셀 분할',
             HorizontalSplit: '가로 분할',
             VerticalSplit: '세로 분할'
         }

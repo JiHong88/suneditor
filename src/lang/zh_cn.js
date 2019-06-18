@@ -118,6 +118,7 @@
             minSize: '最小尺寸',
             tableHeader: '表的标题',
             mergeCells: '合并单元格',
+            splitCells: '分裂细胞',
             HorizontalSplit: '水平分割',
             VerticalSplit: '垂直分裂'
         }

@@ -21,6 +21,7 @@ export default {
             resizeIcon: null,
             resizeText: null,
             headerButton: null,
+            splitMenu: null,
             maxText: core.lang.controller.maxSize,
             minText: core.lang.controller.minSize,
             _physical_cellCnt: 0,
@@ -45,14 +46,15 @@ export default {
         /** set table controller */
         let tableController = eval(this.setController_table.call(core));
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('__se_table_resize > i');
-        context.table.resizeText = tableController.querySelector('__se_table_resize > span > span');
-        context.table.headerButton = tableController.querySelector('.__se_table_header');
+        context.table.resizeIcon = tableController.querySelector('__se__table_resize > i');
+        context.table.resizeText = tableController.querySelector('__se__table_resize > span > span');
+        context.table.headerButton = tableController.querySelector('.__se__table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
+        context.table.splitMenu = resizeDiv.querySelector('.__se__split_menu');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -95,11 +97,11 @@ export default {
         tableResize.innerHTML = '' +
             '<div>' +
             '   <div class="btn-group">' +
-            '       <button type="button" data-command="resize" class="se-tooltip __se_table_resize">' +
+            '       <button type="button" data-command="resize" class="se-tooltip __se__table_resize">' +
             '           <i class="icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="header" class="se-tooltip btn_editor __se_table_header">' +
+            '       <button type="button" data-command="header" class="se-tooltip btn_editor __se__table_header">' +
             '           <i class="icon-table-header"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
@@ -135,6 +137,10 @@ export default {
             '           <i class="icon-delete-row"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
+            '       <button type="button" data-command="merge" class="se-tooltip" disabled>' +
+            '           <i class="icon-merge-cell"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
+            '       </button>' +
             '   </div>' +
             '</div>' +
             '<div>' +
@@ -150,6 +156,20 @@ export default {
             '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
             '           <i class="icon-delete-column"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="onsplit" class="se-tooltip">' +
+            '           <i class="icon-split-cell"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
+            '       <div class="__se__split_menu sun-editor-common layer_editor" style="display:none; left:-100%;">' +
+            '           <div class="inner_layer">' +
+            '               <ul class="list_editor">' +
+            '                   <li class="btn_edit" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
+            '                   ' + lang.controller.VerticalSplit + '</li>' +
+            '                   <li class="btn_edit" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
+            '                   ' + lang.controller.HorizontalSplit + '</li>' +
+            '               </ul>' +
+            '           </div>' +
+            '       </div>' +
             '       </button>' +
             '   </div>' +
             '</div>';
@@ -397,7 +417,7 @@ export default {
 
                         if (cell.rowSpan > 1) {
                             cell.rowSpan -= 1;
-                            spanCells.push({cell: cell.cloneNode(true), index: logcalIndex})
+                            spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
                         }
                     }
 
@@ -412,7 +432,7 @@ export default {
                             colSpan += cell.colSpan - 1;
         
                             if (logcalIndex >= spanCell.index) {
-                                i--;
+                                i--, colSpan--;
                                 colSpan += spanCell.cell.colSpan - 1;
                                 next.insertBefore(spanCell.cell, cell);
                                 spanCell = spanCells.shift();
@@ -456,7 +476,7 @@ export default {
             for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
                 row = rows[i];
                 insertIndex = cellIndex;
-                applySpan = false
+                applySpan = false;
                 cells = row.cells;
                 cellColSpan = 0;
 
@@ -566,6 +586,51 @@ export default {
         }
     },
 
+    _closeSplitMenu: null,
+    openSplitMenu: function (hidden) {
+        if (!hidden) {
+            this.context.table.splitMenu.style.display = 'none';
+            this.util._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+            return;
+        }
+
+        this.context.table.splitMenu.style.display = 'block';
+
+        this.plugins.table._closeSplitMenu = function () {
+            this.context.table.splitMenu.style.display = 'none';
+            this.util._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+        }.bind(this);
+
+        this.util._d.addEventListener('mousedown', this.plugins.table._closeSplitMenu);
+    },
+
+    splitCells: function (direction) {
+        const vertical = direction === 'vertical';
+        const contextTable = this.context.table;
+        const currentCell = contextTable._tdElement;
+
+        const newCell = this.util.createElement(currentCell.nodeName);
+        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+
+        if (vertical) {
+            const colSpan = currentCell.colSpan;
+            if (colSpan > 1) {
+                newCell.colSpan = this.util._w.Math.floor(colSpan/2);
+                newCell.rowSpan = currentCell.rowSpan;
+                currentCell.colSpan = colSpan - newCell.colSpan;
+                contextTable._trElement.insertBefore(newCell, currentCell.nextElementSibling);
+            } else {
+                
+            }
+        }
+
+        this.plugins.table.setPositionControllerDiv.call(this, currentCell, true);
+    },
+
+    mergeCells: function () {
+
+    },
+
     toggleHeader: function () {
         const headerButton = this.context.table.headerButton;
         const active = this.util.hasClass(headerButton, 'on');
@@ -575,11 +640,11 @@ export default {
             const header = this.util.createElement('THEAD');
             let th = '';
             for (let i = 0, len = this.context.table._logical_cellCnt; i < len; i++) {
-                th += '<th></th>';
+                th += '<th><div>' + this.util.zeroWidthSpace + '</div></th>';
             }
 
             header.innerHTML = th;
-            table.insertBefore(header, table.firstElementChild)
+            table.insertBefore(header, table.firstElementChild);
         } else {
             this.util.removeItem(table.getElementsByTagName('thead')[0]);
         }
@@ -591,25 +656,6 @@ export default {
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, this.context.table._tdElement, false);
         }
-    },
-
-    deleteRowCell: function (type) {
-        const contextTable = this.context.table;
-
-        if (type === 'row') {
-            contextTable._element.deleteRow(contextTable._rowIndex);
-        }
-        // cell
-        else {
-            const trArray = contextTable._trElements;
-            const cellIndex = contextTable._physical_cellIndex;
-            
-            for (let i = 0, len = contextTable._physical_rowCnt; i < len; i++) {
-                trArray[i].deleteCell(cellIndex);
-            }
-        }
-
-        this.controllersOff();
     },
 
     resizeTable: function () {
@@ -658,6 +704,15 @@ export default {
             case 'header':
                 this.plugins.table.toggleHeader.call(this);
                 break;
+            case 'onsplit':
+                this.plugins.table.openSplitMenu.call(this, this.context.table.splitMenu.style.display === 'none');
+                break;
+            case 'split':
+                this.plugins.table.splitCells.call(this, value);
+                break;
+            case 'merge':
+                this.plugins.table.mergeCells.call(this);
+                break;
             case 'resize':
                 contextTable.resizeDiv.style.display = 'none';
                 contextTable._maxWidth = !contextTable._maxWidth;
@@ -666,10 +721,10 @@ export default {
             case 'remove':
                 this.util.removeItem(contextTable._element);
                 this.controllersOff();
-                this.focus();
         }
 
         // history stack
         this.history.push();
+        this.focus();
     }
 };

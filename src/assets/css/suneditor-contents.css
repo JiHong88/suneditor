@@ -37,6 +37,8 @@
 
 .sun-editor-editable img, .sun-editor-editable iframe {
     display: block;
+    margin: 0;
+    padding: 0;
     max-width: 100%;
 }
 
