@@ -1019,7 +1019,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let tempCon, tempOffset, tempChild, tempArray;
 
-            if (isRemoveFormat && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
+            if (isRemoveFormat && range.collapsed && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
                 return;
             }
 
@@ -2292,7 +2292,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
 
                 /** A */
-                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
+                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null && core.plugins.link) {
                     if (!context.link || core.controllerArray[0] !== context.link.linkBtn) {
                         core.callPlugin('link', function () {
                             core.plugins.link.call_controller_linkButton.call(core, selectionParent);
@@ -2424,6 +2424,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
         },
 
+        /**
+         * @warning Events are registered only when there is a table plugin.
+         */
+        onMouseDown_wysiwyg: function (e) {
+            const target = util.getParentElement(e.target, util.isCell);
+            if (!target) return;
+
+            core.callPlugin('table', function () {
+                core.plugins.table.tableCellMultiSelect.call(core, target);
+            });
+        },
+
         onMouseUp_wysiwyg: function () {
             core._editorRange();
             
@@ -2440,6 +2452,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
+                if (!core.plugins.image) return;
+
                 core.callPlugin('image', function () {
                     const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
                     core.plugins.image.onModifyMode.call(core, targetElement, size);
@@ -2455,6 +2469,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
+                if (!core.plugins.video) return;
+
                 core.callPlugin('video', function () {
                     const iframe = targetElement.parentNode.querySelector('iframe');
                     const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
@@ -2484,7 +2500,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             } else {
                 const td = util.getParentElement(targetElement, util.isCell);
-                if (td) {
+                if (td && core.plugins.table) {
                     if (core.controllerArray.length === 0) {
                         core.callPlugin('table', core.plugins.table.call_controller_tableEdit.bind(core, td));
                     }
@@ -2836,7 +2852,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         onDrop_wysiwyg: function (e) {
             const files = e.dataTransfer.files;
 
-            if (files.length > 0) {
+            if (files.length > 0 && core.plugins.image) {
                 e.stopPropagation();
                 e.preventDefault();
                 
@@ -3151,6 +3167,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
+    if (core.plugins.table) context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
