@@ -1019,6 +1019,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let tempCon, tempOffset, tempChild, tempArray;
 
+            if (isRemoveFormat && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
+                return;
+            }
+
             if (isRemoveNode) {
                 appendNode = this.util.createElement('DIV');
             }
@@ -1445,7 +1449,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (i === 0) startContainer = textNode;
                 }
-                if (collapsed) startOffset = 1;
             } else {
                 if (isRemoveNode) {
                     for (let i = 0; i < nNodeArray.length; i++) {
@@ -1461,8 +1464,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 
                 if (collapsed) {
                     startContainer = endContainer = newInnerNode;
-                    startOffset = 1;
-                    endOffset = 1;
                 }
             }
 
@@ -1481,11 +1482,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
             startContainer = util.getNodeFromPath(startPath, element);
             endContainer = util.getNodeFromPath(endPath, element);
 
+            if (collapsed) {
+                startOffset = startContainer.textContent.length;
+                endOffset = endContainer.textContent.length;
+            }
+
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
                 endContainer: endContainer,
-                endOffset: endConReset ? collapsed ? 1 : startOff + endOffset - 1 : endOffset
+                endOffset: endConReset ? endContainer.textContent.length : endOffset
             };
         },
 

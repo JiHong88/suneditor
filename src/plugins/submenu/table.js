@@ -21,6 +21,7 @@ export default {
             resizeIcon: null,
             resizeText: null,
             headerButton: null,
+            mergeButton: null,
             splitMenu: null,
             maxText: core.lang.controller.maxSize,
             minText: core.lang.controller.minSize,
@@ -55,6 +56,7 @@ export default {
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
         context.table.splitMenu = resizeDiv.querySelector('.__se__split_menu');
+        context.table.mergeButton = resizeDiv.querySelector('.__se__merge_button');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -137,7 +139,7 @@ export default {
             '           <i class="icon-delete-row"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="merge" class="se-tooltip" disabled>' +
+            '       <button type="button" data-command="merge" class="__se__merge_button se-tooltip" disabled>' +
             '           <i class="icon-merge-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
             '       </button>' +
