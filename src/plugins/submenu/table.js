@@ -611,31 +611,85 @@ export default {
         const vertical = direction === 'vertical';
         const contextTable = this.context.table;
         const currentCell = contextTable._tdElement;
+        const rows = contextTable._trElements;
+        const currentRow = contextTable._trElement;
+        const index = contextTable._logical_cellIndex;
+        const rowIndex = contextTable._rowIndex;
 
         const newCell = this.util.createElement(currentCell.nodeName);
         newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
 
         if (vertical) {
-            const colSpan = currentCell.colSpan;
-            if (colSpan > 1) {
-                newCell.colSpan = this._w.Math.floor(colSpan/2);
-                newCell.rowSpan = currentCell.rowSpan;
-                currentCell.colSpan = colSpan - newCell.colSpan;
-                contextTable._trElement.insertBefore(newCell, currentCell.nextElementSibling);
+            const currentColSpan = currentCell.colSpan;
+            newCell.rowSpan = currentCell.rowSpan;
+
+            if (currentColSpan > 1) {
+                newCell.colSpan = this._w.Math.floor(currentColSpan/2);
+                currentCell.colSpan = currentColSpan - newCell.colSpan;
+                currentRow.insertBefore(newCell, currentCell.nextElementSibling);
             } else {
-                
+                let rowSpanArr = [];
+                let spanIndex = [];
+
+                for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
+                    cells = rows[i].cells;
+                    colSpan = 0;
+                    if (i === rowIndex) continue;
+                    for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
+                        cell = cells[c];
+                        cs = cell.colSpan - 1;
+                        rs = cell.rowSpan - 1;
+                        logcalIndex = c + colSpan;
+
+                        if (spanIndex.length > 0) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                if (logcalIndex >= arr.index) {
+                                    colSpan += arr.cs;
+                                    logcalIndex += arr.cs;
+                                    arr.rs -= 1;
+                                    if (arr.rs < 1) {
+                                        spanIndex.splice(r, 1);
+                                        r--;
+                                    }  
+                                }
+                            }
+                        }
+
+                        if (logcalIndex <= index && rs > 0) {
+                            rowSpanArr.push({
+                                index: logcalIndex,
+                                cs: cs + 1,
+                                rs: rs,
+                            });
+                        }
+
+                        if (logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+                            cell.colSpan += 1;
+                            break;
+                        }
+
+                        if (logcalIndex > index) break;
+                        
+                        colSpan += cell.colSpan - 1;
+                    }
+
+                    spanIndex = spanIndex.concat(rowSpanArr);
+                    rowSpanArr = [];
+                }
+
+                currentRow.insertBefore(newCell, currentCell.nextElementSibling);
             }
         } else {
-            const rowSpan = currentCell.rowSpan;
-            if (rowSpan > 1) {
-                newCell.rowSpan = this._w.Math.floor(rowSpan/2);
-                newCell.colSpan = currentCell.colSpan;
-                const newRowSpan = rowSpan - newCell.rowSpan;
+            const currentRowSpan = currentCell.rowSpan;
+            newCell.colSpan = currentCell.colSpan;
+
+            if (currentRowSpan > 1) {
+                newCell.rowSpan = this._w.Math.floor(currentRowSpan/2);
+                const newRowSpan = currentRowSpan - newCell.rowSpan;
 
                 const rowSpanArr = [];
-                const rows = contextTable._trElements;
-                const nextRowIndex = this.util.getArrayIndex(rows, contextTable._trElement) + newRowSpan;
-                const index = contextTable._logical_cellIndex;
+                const nextRowIndex = this.util.getArrayIndex(rows, currentRow) + newRowSpan;
 
                 for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
                     cells = rows[i].cells;
@@ -658,10 +712,9 @@ export default {
 
                 const nextRow = rows[nextRowIndex];
                 const nextCells = nextRow.cells;
-                let colSpan = 0;
                 let rs = rowSpanArr.shift();
 
-                for (let c = 0, cLen = nextCells.length, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+                for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
                     logcalIndex = c + colSpan;
                     cell = nextCells[c];
                     cs = cell.colSpan - 1;
@@ -683,7 +736,27 @@ export default {
 
                 currentCell.rowSpan = newRowSpan;
             } else {
-                
+                const newRow = this.util.createElement('TR');
+                newRow.appendChild(currentCell.cloneNode(false));
+
+                for (let i = 0, cells; i < rowIndex; i++) {
+                    cells = rows[i].cells;
+                    for (let c = 0, cLen = cells.length; c < cLen; c++) {
+                        if (i + cells[c].rowSpan - 1 >= rowIndex) {
+                            cells[c].rowSpan += 1;
+                        }
+                    }
+                }
+
+                const physicalIndex = contextTable._physical_cellIndex;
+                const cells = currentRow.cells;
+
+                for (let c = 0, cLen = cells.length; c < cLen; c++) {
+                    if (c === physicalIndex) continue;       
+                    cells[c].rowSpan += 1;                    
+                }
+
+                currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
             }
         }
 
