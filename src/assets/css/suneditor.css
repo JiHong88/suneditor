@@ -311,6 +311,8 @@
 /* controller - table */
 .sun-editor .sun-editor-id-table {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .sun-editor-id-table-edit {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+/* controller - table - select class */
+.sun-editor .sun-editor-id-wysiwyg table td.__se__selected, .sun-editor .sun-editor-id-wysiwyg table th.__se__selected {border:1px double #4592ff;}
 /* controller - link */
 .sun-editor .sun-editor-id-link-btn {padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .sun-editor-id-link-btn::before, .sun-editor .sun-editor-id-link-btn::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}

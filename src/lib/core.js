@@ -292,13 +292,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Disable controller in editor area (link button, image resize button)
+         * @description Show controller at editor area (link button, image resize button, init function, etc..)
+         * @param {*} arguments - controller elements, functions..
          */
         controllersOn: function () {
             if (this._bindControllersOff) this._bindControllersOff();
 
             for (let i = 0; i < arguments.length; i++) {
-                arguments[i].style.display = 'block';
+                if (arguments[i].style) arguments[i].style.display = 'block';
                 this.controllerArray[i] = arguments[i];
             }
 
@@ -308,7 +309,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Disable controller in editor area (link button, image resize button)
+         * @description Hide controller at editor area (link button, image resize button..)
          */
         controllersOff: function () {
             _d.removeEventListener('mousedown', this._bindControllersOff);
@@ -318,7 +319,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const len = this.controllerArray.length;
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
-                    this.controllerArray[i].style.display = 'none';
+                    if (typeof this.controllerArray[i] === 'function') this.controllerArray[i]();
+                    else this.controllerArray[i].style.display = 'none';
                 }
 
                 this.controllerArray = [];
@@ -2431,8 +2433,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const target = util.getParentElement(e.target, util.isCell);
             if (!target) return;
 
-            core.callPlugin('table', function () {
-                core.plugins.table.tableCellMultiSelect.call(core, target);
+            _w.setTimeout(function () {
+                core.callPlugin('table', function () {
+                    core.plugins.table.tableCellMultiSelect.call(core, target);
+                });
             });
         },
 
@@ -2497,13 +2501,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     };
 
                     figcaption.addEventListener('blur', hideToolbar);
-                }
-            } else {
-                const td = util.getParentElement(targetElement, util.isCell);
-                if (td && core.plugins.table) {
-                    if (core.controllerArray.length === 0) {
-                        core.callPlugin('table', core.plugins.table.call_controller_tableEdit.bind(core, td));
-                    }
                 }
             }
 
