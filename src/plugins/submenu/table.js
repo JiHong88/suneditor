@@ -861,8 +861,7 @@ export default {
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
-        if (!target || target === tablePlugin._selectedCell || target === tablePlugin._fixedCell 
-            || tablePlugin._fixedCellName !== target.nodeName || tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
+        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
             return;
         }
 
@@ -879,15 +878,25 @@ export default {
             this.util.removeClass(selectedCells[i], '__se__selected');
         }
 
+        if (startCell === endCell) {
+            this.util.addClass(startCell, '__se__selected');
+            return;
+        }
+
         let findSelectedCell = true;
         let findIndex = true;
         let spanIndex = [];
         let rowSpanArr = [];
-        const ref = {i: 0};
+        const ref = {i: 0, cs: null, ce: null, rs: null, re: null};
 
         for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
             cells = rows[i].cells;
             colSpan = 0;
+            if (i === 0) {
+                spanIndex = [];
+                rowSpanArr = [];
+            }
+
             for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs; c < cLen; c++) {
                 cell = cells[c];
                 cs = cell.colSpan - 1;
@@ -912,10 +921,10 @@ export default {
                 if (findSelectedCell) {
                     if (cell === startCell || cell === endCell) {
                         ref.i += 1;
-                        ref.cs = ref.cs && ref.cs < logcalIndex ? ref.cs : logcalIndex;
-                        ref.ce = ref.ce && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
-                        ref.rs = ref.rs && ref.rs < i ? ref.rs : i;
-                        ref.re = ref.re && ref.re > i + rs ? ref.re : i + rs;
+                        ref.cs = ref.cs !== null && ref.cs < logcalIndex ? ref.cs : logcalIndex;
+                        ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
+                        ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
+                        ref.re = ref.re !== null && ref.re > i + rs ? ref.re : i + rs;
                     }
                     if (ref.i === 2) {
                         findSelectedCell = false
@@ -923,11 +932,25 @@ export default {
                         break;
                     }
                 } else if (findIndex) {
-                    // TODO
-                    if (len - 1 === i) {
+                    // TODO loop
+                    if (logcalIndex >= ref.cs && logcalIndex <= ref.ce && i >= ref.rs && i <= ref.re) {
+                        const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
+                        const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
+                        const newRs = ref.rs < i ? ref.rs : i;
+                        const newRe = ref.re > i + rs ? ref.re : i + rs;
+
+                        if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
+                            ref.cs = newCs;
+                            ref.ce = newCe;
+                            ref.rs = newRs;
+                            ref.re = newRe;
+                            i = -1;
+                            break;
+                        }
+                    }
+                    if (len - 1 === i && cLen - 1 === c) {
                         findIndex = false;
                         i = -1;
-                        break;
                     }
                 } else {
                     if (logcalIndex >= ref.cs && logcalIndex + cs <= ref.ce && i >= ref.rs && i + rs <= ref.re) {
