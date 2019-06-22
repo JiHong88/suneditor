@@ -162,8 +162,8 @@ export default {
 
         const overLeft = this.context.element.wysiwyg.offsetWidth - (linkBtn.offsetLeft + linkBtn.offsetWidth);
         if (overLeft < 0) {
-            linkBtn.style.left = (linkBtn.offsetLeft + overLeft - 16) + 'px';
-            linkBtn.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+            linkBtn.style.left = (linkBtn.offsetLeft + overLeft) + 'px';
+            linkBtn.firstElementChild.style.left = (20 - overLeft) + 'px';
         } else {
             linkBtn.firstElementChild.style.left = '20px';
         }

@@ -299,8 +299,8 @@ export default {
 
         const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
         if (overLeft < 0) {
-            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft - 16) + 'px';
-            resizeDiv.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
+            resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
         } else {
             resizeDiv.firstElementChild.style.left = '20px';
         }
@@ -869,6 +869,32 @@ export default {
         tablePlugin.setMultiCells.call(this, tablePlugin._fixedCell, target);
     },
 
+    _getMultiCellArr: function (ref) {
+        const regCell = [];
+        const regRow = [];
+
+        for (let i = ref.cs, len = ref.ce; i <= len; i++) {
+            regCell.push(i);
+        }
+
+        for (let i = ref.rs, len = ref.re; i <= len; i++) {
+            regRow.push(i);
+        }
+
+        return {
+            cell: regCell,
+            row: regRow
+        }
+    },
+
+    _checkCellIndex: function (ref, index, spanIndex) {
+        for (let i = index, len = spanIndex; i <= len; i++) {
+            if (ref.indexOf(i) > -1) return true;
+        }
+
+        return false;
+    },
+
     setMultiCells: function (startCell, endCell) {
         const tablePlugin = this.plugins.table;
         const rows = tablePlugin._selectedTable.rows;
@@ -884,20 +910,15 @@ export default {
         }
 
         let findSelectedCell = true;
-        let findIndex = true;
         let spanIndex = [];
         let rowSpanArr = [];
-        const ref = {i: 0, cs: null, ce: null, rs: null, re: null};
+        const ref = {i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
 
         for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
             cells = rows[i].cells;
             colSpan = 0;
-            if (i === 0) {
-                spanIndex = [];
-                rowSpanArr = [];
-            }
 
-            for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs; c < cLen; c++) {
+            for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs, reg; c < cLen; c++) {
                 cell = cells[c];
                 cs = cell.colSpan - 1;
                 rs = cell.rowSpan - 1;
@@ -913,7 +934,13 @@ export default {
                             if (arr.rs < 1) {
                                 spanIndex.splice(r, 1);
                                 r--;
-                            }  
+                            }
+                        } else if (c === cLen - 1) {
+                            arr.rs -= 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                                r--;
+                            }
                         }
                     }
                 }
@@ -925,37 +952,41 @@ export default {
                         ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
                         ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
                         ref.re = ref.re !== null && ref.re > i + rs ? ref.re : i + rs;
+
+                        reg = tablePlugin._getMultiCellArr(ref);
+                        ref.regCell = reg.cell;
+                        ref.regRow = reg.row;
                     }
                     if (ref.i === 2) {
-                        findSelectedCell = false
+                        findSelectedCell = false;
+                        spanIndex = [];
+                        rowSpanArr = [];
                         i = -1;
                         break;
                     }
-                } else if (findIndex) {
-                    // TODO loop
-                    if (logcalIndex >= ref.cs && logcalIndex <= ref.ce && i >= ref.rs && i <= ref.re) {
-                        const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
-                        const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
-                        const newRs = ref.rs < i ? ref.rs : i;
-                        const newRe = ref.re > i + rs ? ref.re : i + rs;
+                } else if (tablePlugin._checkCellIndex(ref.regCell, logcalIndex, logcalIndex + cs) && tablePlugin._checkCellIndex(ref.regRow, i, i + rs)) {
+                    const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
+                    const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
+                    const newRs = ref.rs < i ? ref.rs : i;
+                    const newRe = ref.re > i + rs ? ref.re : i + rs;
 
-                        if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
-                            ref.cs = newCs;
-                            ref.ce = newCe;
-                            ref.rs = newRs;
-                            ref.re = newRe;
-                            i = -1;
-                            break;
-                        }
-                    }
-                    if (len - 1 === i && cLen - 1 === c) {
-                        findIndex = false;
+                    if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
+                        ref.cs = newCs;
+                        ref.ce = newCe;
+                        ref.rs = newRs;
+                        ref.re = newRe;
+
+                        reg = tablePlugin._getMultiCellArr(ref);
+                        ref.regCell = reg.cell;
+                        ref.regRow = reg.row;
+
+                        spanIndex = [];
+                        rowSpanArr = [];
                         i = -1;
+                        break;
                     }
-                } else {
-                    if (logcalIndex >= ref.cs && logcalIndex + cs <= ref.ce && i >= ref.rs && i + rs <= ref.re) {
-                        this.util.addClass(cell, '__se__selected');
-                    }
+
+                    this.util.addClass(cell, '__se__selected');
                 }
 
                 if (rs > 0) {
@@ -976,6 +1007,11 @@ export default {
 
     tableCellMultiSelect: function (tdElement) {
         const tablePlugin = this.plugins.table;
+
+        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
+            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+        }
 
         this.util.addClass(tdElement, '__se__selected');
 
