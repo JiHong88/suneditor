@@ -244,6 +244,8 @@ export default {
 
     init: function () {
         const contextTable = this.context.table;
+        const tablePlugin = this.plugins.table;
+
         const selectedCells = contextTable._element.querySelectorAll('.__se__selected');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
             this.util.removeClass(selectedCells[i], '__se__selected');
@@ -264,6 +266,18 @@ export default {
         contextTable._logical_cellIndex = 0;
         contextTable._current_colSpan = 0;
         contextTable._current_rowSpan = 0;
+
+        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
+            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+            tablePlugin._bindOnSelect = null;
+            tablePlugin._bindOffSelect = null;
+        }
+
+        tablePlugin._fixedCell = null;
+        tablePlugin._selectedCell = null;
+        tablePlugin._fixedCellName = null;
+        tablePlugin._selectedTable = null;
     },
 
     /** table edit controller */
@@ -308,7 +322,7 @@ export default {
 
     setCellInfo: function (tdElement, reset) {
         const contextTable = this.context.table;
-        const table = contextTable._element = contextTable._element || this.util.getParentElement(tdElement, 'TABLE');
+        const table = contextTable._element = this.plugins.table._selectedTable;
 
         if (/THEAD/i.test(table.firstElementChild.nodeName)) {
             this.util.addClass(contextTable.headerButton, 'on');
@@ -773,7 +787,7 @@ export default {
     },
 
     mergeCells: function () {
-
+        
     },
 
     toggleHeader: function () {
@@ -838,6 +852,8 @@ export default {
 
         this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
         this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+        tablePlugin._bindOnSelect = null;
+        tablePlugin._bindOffSelect = null;
 
         if (!tablePlugin._selectedCell || tablePlugin._fixedCell === tablePlugin._selectedCell) {
             contextTable.splitButton.removeAttribute('disabled');
@@ -848,13 +864,6 @@ export default {
         }
 
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell, true);
-
-        tablePlugin._bindOnSelect = null;
-        tablePlugin._bindOffSelect = null;
-        tablePlugin._selectedCell = null;
-        tablePlugin._fixedCell = null;
-        tablePlugin._fixedCellName = null;
-        tablePlugin._selectedTable = null;
     },
 
     _onCellMultiSelect: function (e) {
@@ -884,7 +893,7 @@ export default {
         return {
             cell: regCell,
             row: regRow
-        }
+        };
     },
 
     _checkCellIndex: function (ref, index, spanIndex) {
@@ -927,19 +936,21 @@ export default {
                 if (spanIndex.length > 0) {
                     for (let r = 0, arr; r < spanIndex.length; r++) {
                         arr = spanIndex[r];
+                        if (arr.row > i) continue;
                         if (logcalIndex >= arr.index) {
                             colSpan += arr.cs;
                             logcalIndex += arr.cs;
                             arr.rs -= 1;
+                            arr.row = i + 1;
                             if (arr.rs < 1) {
                                 spanIndex.splice(r, 1);
                                 r--;
                             }
                         } else if (c === cLen - 1) {
                             arr.rs -= 1;
+                            arr.row = i + 1;
                             if (arr.rs < 1) {
                                 spanIndex.splice(r, 1);
-                                r--;
                             }
                         }
                     }
@@ -994,6 +1005,7 @@ export default {
                         index: logcalIndex,
                         cs: cs + 1,
                         rs: rs,
+                        row: -1
                     });
                 }
 
@@ -1007,11 +1019,6 @@ export default {
 
     tableCellMultiSelect: function (tdElement) {
         const tablePlugin = this.plugins.table;
-
-        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
-            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
-            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
-        }
 
         this.util.addClass(tdElement, '__se__selected');
 
