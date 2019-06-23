@@ -406,7 +406,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _editorRange: function () {
             const selection = _w.getSelection();
-            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) return;
+            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) {
+                this._variable._selectionNode = context.element.wysiwyg;
+                return;
+            }
             
             let range = null;
             let selectionNode = null;

@@ -246,6 +246,8 @@ export default {
         const contextTable = this.context.table;
         const tablePlugin = this.plugins.table;
 
+        if (!contextTable._element) return;
+
         const selectedCells = contextTable._element.querySelectorAll('.__se__selected');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
             this.util.removeClass(selectedCells[i], '__se__selected');
@@ -274,10 +276,8 @@ export default {
             tablePlugin._bindOffSelect = null;
         }
 
-        tablePlugin._fixedCell = null;
-        tablePlugin._selectedCell = null;
-        tablePlugin._fixedCellName = null;
         tablePlugin._selectedTable = null;
+        tablePlugin._ref = null;
     },
 
     /** table edit controller */
@@ -352,6 +352,7 @@ export default {
             }
 
             for (let i = 0, len = rows.length; i < len; i++) {
+                if (rows[i].cells.length === 0) continue;
                 rowCnt += rows[i].cells[0].rowSpan;
 
                 if (i === rowIndex) {
@@ -373,6 +374,7 @@ export default {
 
             for (let i = 0, cells, cIndex; i <= rowIndex; i++) {
                 cells = rows[i].cells;
+                if (cells.length === 0) continue;
                 cIndex = logcalCellIndex;
                 for (let c = 0, cell, rs, cs; c <= cIndex; c++) {
                     cell = cells[c];
@@ -419,6 +421,8 @@ export default {
 
             for (let i = 0, len = contextTable._rowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
                 cell = rows[i].cells;
+                if (cell.length === 0) return;
+                
                 for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
                     rs = cell[c].rowSpan;
                     cs = cell[c].colSpan;
@@ -592,7 +596,7 @@ export default {
                         continue;
                     }
     
-                    if (insertIndex !== null) {
+                    if (insertIndex !== null && cells.length > 0) {
                         newCell = this.util.createElement(cells[0].nodeName);
                         newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
                         newCell = row.insertBefore(newCell, cells[insertIndex]);
@@ -759,11 +763,14 @@ export default {
 
                 currentCell.rowSpan = newRowSpan;
             } else { // rowspan - n
+                newCell.rowSpan = currentCell.rowSpan;
                 const newRow = this.util.createElement('TR');
-                newRow.appendChild(currentCell.cloneNode(false));
+                newRow.appendChild(newCell);
 
                 for (let i = 0, cells; i < rowIndex; i++) {
                     cells = rows[i].cells;
+                    if (cells.length === 0) return;
+
                     for (let c = 0, cLen = cells.length; c < cLen; c++) {
                         if (i + cells[c].rowSpan - 1 >= rowIndex) {
                             cells[c].rowSpan += 1;
@@ -787,7 +794,66 @@ export default {
     },
 
     mergeCells: function () {
+        const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
+
+        const ref = tablePlugin._ref;
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        const mergeCell = selectedCells[0];
         
+        let emptyRowFirst = null;
+        let emptyRowLast = null;
+        let cs = ref.regCell.length;
+        let rs = ref.regRow.length;
+        let mergeHTML = '';
+        let row = null;
+
+        for (let i = 1, len = selectedCells.length, cell; i < len; i++) {
+            cell = selectedCells[i];
+            if (row !== cell.parentNode) row = cell.parentNode;
+
+            mergeHTML += cell.innerHTML;
+            this.util.removeItem(cell);
+
+            if (row.cells.length === 0) {
+                if (!emptyRowFirst) emptyRowFirst = row;
+                else emptyRowLast = row;
+                rs -= 1;
+            }
+        }
+
+        if (emptyRowFirst) {
+            const rows = contextTable._trElements;
+            const rowIndexFirst = this.util.getArrayIndex(rows, emptyRowFirst);
+            const rowIndexLast = this.util.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
+            const removeRows = [];
+    
+            for (let i = 0, cells; i <= rowIndexLast; i++) {
+                cells = rows[i].cells;
+                if (cells.length === 0) {
+                    removeRows.push(rows[i]);
+                    continue;
+                }
+    
+                for (let c = 0, cLen = cells.length, cell; c < cLen; c++) {
+                    cell = cells[c];
+                    if (i + cell.rowSpan - 1 >= rowIndexFirst) {
+                        cell.rowSpan = i + cell.rowSpan - rowIndexFirst;
+                    }
+                }
+            }
+
+            for (let i = 0, len = removeRows.length; i < len; i++) {
+                this.util.removeItem(removeRows[i]);
+            }
+        }
+
+        mergeCell.innerHTML += mergeHTML;
+        mergeCell.colSpan = cs;
+        mergeCell.rowSpan = rs;
+
+        tablePlugin.call_controller_tableEdit.call(this, mergeCell, true);
+        this.util.addClass(mergeCell, '__se__selected');
     },
 
     toggleHeader: function () {
@@ -846,6 +912,7 @@ export default {
     _fixedCellName: null,
     _selectedCell: null,
     _selectedTable: null,
+    _ref: null,
     _offCellMultiSelect: function () {
         const tablePlugin = this.plugins.table;
         const contextTable = this.context.table;
@@ -864,6 +931,10 @@ export default {
         }
 
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell, true);
+
+        tablePlugin._fixedCell = null;
+        tablePlugin._selectedCell = null;
+        tablePlugin._fixedCellName = null;
     },
 
     _onCellMultiSelect: function (e) {
@@ -921,7 +992,7 @@ export default {
         let findSelectedCell = true;
         let spanIndex = [];
         let rowSpanArr = [];
-        const ref = {i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
+        const ref = tablePlugin._ref = {i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
 
         for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
             cells = rows[i].cells;
@@ -958,7 +1029,6 @@ export default {
 
                 if (findSelectedCell) {
                     if (cell === startCell || cell === endCell) {
-                        ref.i += 1;
                         ref.cs = ref.cs !== null && ref.cs < logcalIndex ? ref.cs : logcalIndex;
                         ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
                         ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
@@ -967,7 +1037,10 @@ export default {
                         reg = tablePlugin._getMultiCellArr(ref);
                         ref.regCell = reg.cell;
                         ref.regRow = reg.row;
+
+                        ref.i += 1;
                     }
+                    
                     if (ref.i === 2) {
                         findSelectedCell = false;
                         spanIndex = [];
@@ -1019,6 +1092,13 @@ export default {
 
     tableCellMultiSelect: function (tdElement) {
         const tablePlugin = this.plugins.table;
+
+        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
+            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+            tablePlugin._bindOnSelect = null;
+            tablePlugin._bindOffSelect = null;
+        }
 
         this.util.addClass(tdElement, '__se__selected');
 
