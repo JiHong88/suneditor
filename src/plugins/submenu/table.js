@@ -256,7 +256,7 @@ export default {
         contextTable._element = null;
         contextTable._tdElement = null;
         contextTable._trElement = null;
-        contextTable._trElements = 0;
+        contextTable._trElements = null;
         contextTable._tableXY = [];
         contextTable._maxWidth = true;
         contextTable._physical_cellCnt = 0;
@@ -276,6 +276,7 @@ export default {
             tablePlugin._bindOffSelect = null;
         }
 
+        tablePlugin._selectedCells = null;
         tablePlugin._selectedTable = null;
         tablePlugin._ref = null;
     },
@@ -322,7 +323,7 @@ export default {
 
     setCellInfo: function (tdElement, reset) {
         const contextTable = this.context.table;
-        const table = contextTable._element = this.plugins.table._selectedTable;
+        const table = contextTable._element = this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
 
         if (/THEAD/i.test(table.firstElementChild.nodeName)) {
             this.util.addClass(contextTable.headerButton, 'on');
@@ -405,216 +406,301 @@ export default {
         }
     },
 
-    editRowCell: function (type, option, remove) {
-        const contextTable = this.context.table;
+    editTable: function (type, option) {
+        const tablePlugin = this.plugins.table;
+        const isRow = type === 'row';
 
-        // row
-        if (type === 'row') {
-            const up = option === 'up';
-            if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
-            
-            const rowIndex = remove || up ? contextTable._rowIndex : contextTable._rowIndex + contextTable._current_rowSpan + 1;
-            const sign = remove ? -1 : 1;
-            
-            const rows = contextTable._trElements;
-            let cellCnt = contextTable._logical_cellCnt;
+        // multi cells
+        if (tablePlugin._ref) {
+            const positionCell = this.context.table._tdElement;
+            const selectedCells = tablePlugin._selectedCells;
 
-            for (let i = 0, len = contextTable._rowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
-                cell = rows[i].cells;
-                if (cell.length === 0) return;
-                
-                for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
-                    rs = cell[c].rowSpan;
-                    cs = cell[c].colSpan;
-                    if (rs < 2 && cs < 2) continue;
+            if (isRow) {
+                if (!option) {
+                    let row = selectedCells[0].parentNode;
+                    const removeCells = [selectedCells[0]];
 
-                    if (rs + i > rowIndex && rowIndex > i) {
-                        cell[c].rowSpan = rs + sign;
-                        cellCnt -= cs;
+                    for (let i = 1, len = selectedCells.length, cell; i < len; i++) {
+                        cell = selectedCells[i];
+                        if (row !== cell.parentNode) {
+                            removeCells.push(cell);
+                            row = cell.parentNode;
+                        }
                     }
+
+                    for (let i = 0, len = removeCells.length; i < len; i++) {
+                        tablePlugin.setCellInfo.call(this, removeCells[i], true);
+                        tablePlugin.editRow.call(this, option);
+                    }
+                } else {
+                    tablePlugin.setCellInfo.call(this, option === 'up' ? selectedCells[0] : selectedCells[selectedCells.length - 1], true);
+                    tablePlugin.editRow.call(this, option, positionCell);
+                }
+            } else {
+                const firstRow = selectedCells[0].parentNode;
+                if (!option) {
+                    const removeCells = [selectedCells[0]];
+                    
+                    for (let i = 1, len = selectedCells.length - 1, cell; i < len; i++) {
+                        cell = selectedCells[i];
+                        if (firstRow === cell.parentNode) {
+                            removeCells.push(cell);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    for (let i = 0, len = removeCells.length; i < len; i++) {
+                        tablePlugin.setCellInfo.call(this, removeCells[i], true);
+                        tablePlugin.editCell.call(this, option);
+                    }
+                } else {
+                    let rightCell = null;
+
+                    for (let i = 0, len = selectedCells.length - 1; i < len; i++) {
+                        if (firstRow !== selectedCells[i + 1].parentNode) {
+                            rightCell = selectedCells[i];
+                            break;
+                        }
+                    }
+
+                    tablePlugin.setCellInfo.call(this, option === 'left' ? selectedCells[0] : rightCell || selectedCells[0], true);
+                    tablePlugin.editCell.call(this, option, positionCell);
                 }
             }
 
-            if (remove) {
-                const next = rows[contextTable._rowIndex + 1];
-                if (next) {
-                    const spanCells = [];
-                    let cells = rows[contextTable._rowIndex].cells;
-                    let colSpan = 0;
+            if (!option) tablePlugin.init.call(this);
+        } // one cell
+        else {
+            tablePlugin[isRow ? 'editRow' : 'editCell'].call(this, option);
+        }
+    },
+
+    editRow: function (option, positionResetElement) {
+        const contextTable = this.context.table;
+        const remove = !option;
+
+        const up = option === 'up';
+        if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
+        
+        const originRowIndex = contextTable._rowIndex;
+        const rowIndex = remove || up ? originRowIndex : originRowIndex + contextTable._current_rowSpan + 1;
+        const sign = remove ? -1 : 1;
+        
+        const rows = contextTable._trElements;
+        let cellCnt = contextTable._logical_cellCnt;
+
+        for (let i = 0, len = originRowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
+            cell = rows[i].cells;
+            if (cell.length === 0) return;
+            
+            for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
+                rs = cell[c].rowSpan;
+                cs = cell[c].colSpan;
+                if (rs < 2 && cs < 2) continue;
+
+                if (rs + i > rowIndex && rowIndex > i) {
+                    cell[c].rowSpan = rs + sign;
+                    cellCnt -= cs;
+                }
+            }
+        }
+
+        if (remove) {
+            const next = rows[originRowIndex + 1];
+            if (next) {
+                const spanCells = [];
+                let cells = rows[originRowIndex].cells;
+                let colSpan = 0;
+
+                for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
+                    cell = cells[i];
+                    logcalIndex = i + colSpan;
+                    colSpan += cell.colSpan - 1;
+
+                    if (cell.rowSpan > 1) {
+                        cell.rowSpan -= 1;
+                        spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
+                    }
+                }
+
+                if (spanCells.length > 0) {
+                    let spanCell = spanCells.shift();
+                    cells = next.cells;
+                    colSpan = 0;
 
                     for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
                         cell = cells[i];
                         logcalIndex = i + colSpan;
                         colSpan += cell.colSpan - 1;
-
-                        if (cell.rowSpan > 1) {
-                            cell.rowSpan -= 1;
-                            spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
-                        }
-                    }
-
-                    if (spanCells.length > 0) {
-                        let spanCell = spanCells.shift();
-                        cells = next.cells;
-                        colSpan = 0;
-
-                        for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
-                            cell = cells[i];
-                            logcalIndex = i + colSpan;
-                            colSpan += cell.colSpan - 1;
-        
-                            if (logcalIndex >= spanCell.index) {
-                                i--, colSpan--;
-                                colSpan += spanCell.cell.colSpan - 1;
-                                next.insertBefore(spanCell.cell, cell);
-                                spanCell = spanCells.shift();
-                                if (!spanCell) break;
-                            }
-                        }
-
-                        if (spanCell) {
-                            next.appendChild(spanCell.cell);
-                            for (let i = 0, len = spanCells.length; i < len; i++) {
-                                next.appendChild(spanCells[i].cell);
-                            }
-                        }
-                    }
-                }
-
-                contextTable._element.deleteRow(rowIndex);
-            } else {
-                let cells = '';
-
-                for (let i = 0, len = cellCnt; i < len; i++) {
-                    cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
-                }
-
-                const newRow = contextTable._element.insertRow(rowIndex);
-                newRow.innerHTML = cells;
-            }
-        }
-        // cell
-        else {
-            const left = option === 'left';
-            const colSpan = contextTable._current_colSpan;
-            const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
-
-            const rows = contextTable._trElements;
-            let rowSpanArr = [];
-            let spanIndex = [];
-            let passCell = 0;
-            const removeCell = [];
-
-            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
-                row = rows[i];
-                insertIndex = cellIndex;
-                applySpan = false;
-                cells = row.cells;
-                cellColSpan = 0;
-
-                for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
-                    cell = cells[c];
-                    if (!cell) break;
-
-                    rs = cell.rowSpan - 1;
-                    cs = cell.colSpan - 1;
-
-                    if (rs > 0) {
-                        rowSpanArr.push({
-                            rs: rs,
-                            cs: cs + 1,
-                            index: c + cellColSpan
-                        });
-                    }
-
-                    if (!remove) {
-                        if (cs > 0) {
-                            if (passCell < 1 && cs + c >= insertIndex) {
-                                cell.colSpan += 1;
-                                insertIndex = null;
-                                passCell = rs + 1;
-                                break;
-                            }
     
-                            insertIndex -= cs;
+                        if (logcalIndex >= spanCell.index) {
+                            i--, colSpan--;
+                            colSpan += spanCell.cell.colSpan - 1;
+                            next.insertBefore(spanCell.cell, cell);
+                            spanCell = spanCells.shift();
+                            if (!spanCell) break;
+                        }
+                    }
+
+                    if (spanCell) {
+                        next.appendChild(spanCell.cell);
+                        for (let i = 0, len = spanCells.length; i < len; i++) {
+                            next.appendChild(spanCells[i].cell);
+                        }
+                    }
+                }
+            }
+
+            contextTable._element.deleteRow(rowIndex);
+        } else {
+            let cells = '';
+
+            for (let i = 0, len = cellCnt; i < len; i++) {
+                cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
+            }
+
+            const newRow = contextTable._element.insertRow(rowIndex);
+            newRow.innerHTML = cells;
+        }
+
+        if (!remove) {
+            this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
+        } else {
+            this.controllersOff();
+        }
+    },
+
+    editCell: function (option, positionResetElement) {
+        const contextTable = this.context.table;
+        const remove = !option;
+
+        const left = option === 'left';
+        const colSpan = contextTable._current_colSpan;
+        const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
+
+        const rows = contextTable._trElements;
+        let rowSpanArr = [];
+        let spanIndex = [];
+        let passCell = 0;
+        const removeCell = [];
+
+        for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+            row = rows[i];
+            insertIndex = cellIndex;
+            applySpan = false;
+            cells = row.cells;
+            cellColSpan = 0;
+
+            for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
+                cell = cells[c];
+                if (!cell) break;
+
+                rs = cell.rowSpan - 1;
+                cs = cell.colSpan - 1;
+
+                if (rs > 0) {
+                    rowSpanArr.push({
+                        rs: rs,
+                        cs: cs + 1,
+                        index: c + cellColSpan,
+                        row: -1
+                    });
+                }
+
+                if (!remove) {
+                    if (cs > 0) {
+                        if (passCell < 1 && cs + c >= insertIndex) {
+                            cell.colSpan += 1;
+                            insertIndex = null;
+                            passCell = rs + 1;
+                            break;
                         }
 
-                        if (!applySpan) {
-                            for (let r = 0, arr; r < spanIndex.length; r++) {
-                                arr = spanIndex[r];
-                                insertIndex -= arr.cs;
+                        insertIndex -= cs;
+                    }
+
+                    if (!applySpan) {
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            insertIndex -= arr.cs;
+                            arr.rs -= 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                                r--;
+                            }  
+                        }
+                        applySpan = true;
+                    }
+                } else {
+                    removeIndex = c + cellColSpan;
+
+                    if (spanIndex.length > 0) {
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            if (arr.row > i) continue;
+
+                            if (removeIndex >= arr.index) {
+                                cellColSpan += arr.cs;
                                 arr.rs -= 1;
+                                arr.row = i + 1;
                                 if (arr.rs < 1) {
                                     spanIndex.splice(r, 1);
                                     r--;
                                 }  
-                            }
-                            applySpan = true;
-                        }
-                    } else {
-                        removeIndex = c + cellColSpan;
-
-                        if (spanIndex.length > 0) {
-                            for (let r = 0, arr; r < spanIndex.length; r++) {
-                                arr = spanIndex[r];
-                                if (removeIndex >= arr.index) {
-                                    cellColSpan += arr.cs;
-                                    arr.rs -= 1;
-                                    if (arr.rs < 1) {
-                                        spanIndex.splice(r, 1);
-                                        r--;
-                                    }  
+                            } else if (c === insertIndex - 1) {
+                                arr.rs -= 1;
+                                arr.row = i + 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
                                 }
                             }
                         }
+                    }
 
-                        removeIndex = c + cellColSpan;
-                        if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
-                            removeCell.push(cell);
-                        } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
-                            let modifyColSpan = 0;
+                    removeIndex = c + cellColSpan;
+                    if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
+                        removeCell.push(cell);
+                    } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
+                        let modifyColSpan = 0;
 
-                            for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
-                                if (m >= removeIndex && m <= removeIndex + cs) {
-                                    modifyColSpan++;
-                                }
+                        for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
+                            if (m >= removeIndex && m <= removeIndex + cs) {
+                                modifyColSpan++;
                             }
-
-                            cell.colSpan -= this._w.Math.abs(modifyColSpan);
                         }
 
-                        cellColSpan += cs;
+                        cell.colSpan -= this._w.Math.abs(modifyColSpan);
                     }
-                }
 
-                spanIndex = spanIndex.concat(rowSpanArr);
-                rowSpanArr = [];
-
-                if (!remove) {
-                    if (passCell > 0) {
-                        passCell -= 1;
-                        continue;
-                    }
-    
-                    if (insertIndex !== null && cells.length > 0) {
-                        newCell = this.util.createElement(cells[0].nodeName);
-                        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
-                        newCell = row.insertBefore(newCell, cells[insertIndex]);
-                    }
+                    cellColSpan += cs;
                 }
             }
 
-            if (remove) {
-                for (let r = 0; r < removeCell.length; r++) {
-                    this.util.removeItem(removeCell[r]);
+            spanIndex = spanIndex.concat(rowSpanArr);
+            rowSpanArr = [];
+
+            if (!remove) {
+                if (passCell > 0) {
+                    passCell -= 1;
+                    continue;
+                }
+
+                if (insertIndex !== null && cells.length > 0) {
+                    newCell = this.util.createElement(cells[0].nodeName);
+                    newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                    newCell = row.insertBefore(newCell, cells[insertIndex]);
                 }
             }
         }
 
-        if (!remove) {
-            this.plugins.table.setPositionControllerDiv.call(this, contextTable._tdElement, true);
-        } else {
+        if (remove) {
+            for (let r = 0; r < removeCell.length; r++) {
+                this.util.removeItem(removeCell[r]);
+            }
             this.controllersOff();
+        } else {
+            this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         }
     },
 
@@ -798,7 +884,7 @@ export default {
         const contextTable = this.context.table;
 
         const ref = tablePlugin._ref;
-        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        const selectedCells = tablePlugin._selectedCells;
         const mergeCell = selectedCells[0];
         
         let emptyRowFirst = null;
@@ -852,7 +938,9 @@ export default {
         mergeCell.colSpan = cs;
         mergeCell.rowSpan = rs;
 
-        tablePlugin.call_controller_tableEdit.call(this, mergeCell, true);
+        this.controllersOff();
+        tablePlugin.call_controller_tableEdit.call(this, mergeCell);
+
         this.util.addClass(mergeCell, '__se__selected');
     },
 
@@ -908,6 +996,7 @@ export default {
 
     _bindOnSelect: null,
     _bindOffSelect: null,
+    _selectedCells: null,
     _fixedCell: null,
     _fixedCellName: null,
     _selectedCell: null,
@@ -930,8 +1019,9 @@ export default {
             contextTable.mergeButton.removeAttribute('disabled');
         }
 
-        tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell, true);
+        tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
+        tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
         tablePlugin._fixedCell = null;
         tablePlugin._selectedCell = null;
         tablePlugin._fixedCellName = null;
@@ -992,7 +1082,7 @@ export default {
         let findSelectedCell = true;
         let spanIndex = [];
         let rowSpanArr = [];
-        const ref = tablePlugin._ref = {i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
+        const ref = tablePlugin._ref = {_i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
 
         for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
             cells = rows[i].cells;
@@ -1038,10 +1128,10 @@ export default {
                         ref.regCell = reg.cell;
                         ref.regRow = reg.row;
 
-                        ref.i += 1;
+                        ref._i += 1;
                     }
                     
-                    if (ref.i === 2) {
+                    if (ref._i === 2) {
                         findSelectedCell = false;
                         spanIndex = [];
                         rowSpanArr = [];
@@ -1135,10 +1225,8 @@ export default {
 
         switch (command) {
             case 'insert':
-                this.plugins.table.editRowCell.call(this, value, option, false);
-                break;
             case 'delete':
-                this.plugins.table.editRowCell.call(this, value, null, true);
+                this.plugins.table.editTable.call(this, value, option);
                 break;
             case 'header':
                 this.plugins.table.toggleHeader.call(this);
