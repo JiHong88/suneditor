@@ -117,8 +117,8 @@
             maxSize: 'Taille max',
             minSize: 'Taille min',
             tableHeader: 'En-tête de table',
-            mergeCells: 'Fusionner des cellules',
-            splitCells: 'Cellules divisés',
+            mergeCells: 'Fusionner les cellules',
+            splitCells: 'Diviser les Cellules',
             HorizontalSplit: 'Scission horizontale',
             VerticalSplit: 'Scission verticale'
         }
