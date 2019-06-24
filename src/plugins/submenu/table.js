@@ -269,13 +269,6 @@ export default {
         contextTable._current_colSpan = 0;
         contextTable._current_rowSpan = 0;
 
-        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
-            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
-            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
-            tablePlugin._bindOnSelect = null;
-            tablePlugin._bindOffSelect = null;
-        }
-
         tablePlugin._selectedCells = null;
         tablePlugin._selectedTable = null;
         tablePlugin._ref = null;
@@ -408,11 +401,33 @@ export default {
 
     editTable: function (type, option) {
         const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
+        const table = contextTable._element;
         const isRow = type === 'row';
+
+        if (isRow) {
+            const tableAttr = contextTable._trElement.parentNode;
+            if (/^THEAD$/i.test(tableAttr.nodeName)) {
+                if (option === 'up') {
+                    return;
+                } else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
+                    const tbody = this.util.createElement('TBODY');
+                    const tr = this.util.createElement('TR');
+                    tbody.appendChild(tr);
+
+                    for (let i = 0, len = contextTable._logical_cellCnt; i < len; i++) {
+                        tr.innerHTML += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
+                    }
+
+                    table.appendChild(tbody);
+                    return;
+                }
+            }
+        }
 
         // multi cells
         if (tablePlugin._ref) {
-            const positionCell = this.context.table._tdElement;
+            const positionCell = contextTable._tdElement;
             const selectedCells = tablePlugin._selectedCells;
 
             if (isRow) {
@@ -474,6 +489,15 @@ export default {
         else {
             tablePlugin[isRow ? 'editRow' : 'editCell'].call(this, option);
         }
+
+        if (!option) {
+            const children = table.children;
+            for (let i = 0; i < children.length; i++) {
+                if (children[i].children.length === 0) this.util.removeItem(children[i]);
+            }
+
+            if (table.children.length === 0) this.util.removeItem(table);
+        }
     },
 
     editRow: function (option, positionResetElement) {
@@ -481,8 +505,6 @@ export default {
         const remove = !option;
 
         const up = option === 'up';
-        if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
-        
         const originRowIndex = contextTable._rowIndex;
         const rowIndex = remove || up ? originRowIndex : originRowIndex + contextTable._current_rowSpan + 1;
         const sign = remove ? -1 : 1;
@@ -1006,6 +1028,9 @@ export default {
         const tablePlugin = this.plugins.table;
         const contextTable = this.context.table;
 
+        this.context.element.wysiwyg.setAttribute('contenteditable', true);
+        this.util.removeClass(this.context.element.wysiwyg, '__se__no_selection');
+
         this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
         this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
         tablePlugin._bindOnSelect = null;
@@ -1031,7 +1056,17 @@ export default {
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
-        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
+        if (!tablePlugin._ref) {
+            if (target === tablePlugin._fixedCell) {
+                return;
+            } else {
+                this.context.element.wysiwyg.setAttribute('contenteditable', false);
+                this.util.addClass(this.context.element.wysiwyg, '__se__no_selection');
+            }
+        }
+
+        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName ||
+                tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
             return;
         }
 

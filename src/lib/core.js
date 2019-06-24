@@ -406,10 +406,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _editorRange: function () {
             const selection = _w.getSelection();
-            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) {
-                this._variable._selectionNode = context.element.wysiwyg;
-                return;
-            }
+            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) return;
             
             let range = null;
             let selectionNode = null;
@@ -2595,10 +2592,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = range.startContainer !== range.endContainer;
-            let formatEl, rangeEl;
+            let formatEl = util.getFormatElement(selectionNode) || selectionNode;
+            let rangeEl = util.getRangeFormatElement(selectionNode);
 
-            formatEl = util.getFormatElement(selectionNode) || selectionNode;
-            rangeEl = util.getRangeFormatElement(selectionNode);
             if (!selectRange && (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl)) {
                 core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
                 core.focus();
