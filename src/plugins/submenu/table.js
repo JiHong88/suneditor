@@ -674,6 +674,7 @@ export default {
 
                             if (removeIndex >= arr.index) {
                                 cellColSpan += arr.cs;
+                                removeIndex = c + cellColSpan;
                                 arr.rs -= 1;
                                 arr.row = i + 1;
                                 if (arr.rs < 1) {
@@ -690,13 +691,11 @@ export default {
                         }
                     }
 
-                    removeIndex = c + cellColSpan;
-
                     if (rs > 0) {
                         rowSpanArr.push({
                             rs: rs,
                             cs: cs + 1,
-                            index: c + cellColSpan,
+                            index: removeIndex,
                             row: -1
                         });
                     }
@@ -719,7 +718,8 @@ export default {
                 }
             }
 
-            spanIndex = spanIndex.concat(rowSpanArr);
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+
             rowSpanArr = [];
 
             if (!remove) {
@@ -849,7 +849,7 @@ export default {
                         colSpan += cell.colSpan - 1;
                     }
 
-                    spanIndex = spanIndex.concat(rowSpanArr);
+                    spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
                     rowSpanArr = [];
                 }
 
@@ -1065,7 +1065,10 @@ export default {
     _selectedCell: null,
     _selectedTable: null,
     _ref: null,
-    _offCellMultiSelect: function () {
+    _offCellMultiSelect: function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
         const tablePlugin = this.plugins.table;
         const contextTable = this.context.table;
 
@@ -1251,7 +1254,7 @@ export default {
                 colSpan += cell.colSpan - 1;
             }
 
-            spanIndex = spanIndex.concat(rowSpanArr);
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
             rowSpanArr = [];
         }
     },
@@ -1333,6 +1336,5 @@ export default {
 
         // history stack
         this.history.push();
-        this.focus();
     }
 };

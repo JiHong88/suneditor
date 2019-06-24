@@ -82,6 +82,5 @@ export default {
         this.plugins.horizontalRule.appendHr.call(this, value);
 
         this.submenuOff();
-        this.focus();
     }
 };

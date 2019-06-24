@@ -227,6 +227,5 @@ export default {
         }
 
         this.submenuOff();
-        this.focus();
     }
 };

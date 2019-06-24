@@ -92,6 +92,5 @@ export default {
         this.nodeChange(newNode, ['background-color']);
         
         this.submenuOff();
-        this.focus();
     }
 };

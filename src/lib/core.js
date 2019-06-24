@@ -406,7 +406,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _editorRange: function () {
             const selection = _w.getSelection();
-            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) return;
+            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) {
+                this.execCommand('formatBlock', false, 'P');
+                context.element.wysiwyg.focus();
+            }
             
             let range = null;
             let selectionNode = null;
@@ -2268,7 +2271,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && selectionParent.style.marginLeft.match(/\d+/)[0] * 1 > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && (selectionParent.style.marginLeft.match(/\d+/) || [0])[0] * 1 > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;
@@ -2441,6 +2444,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onMouseUp_wysiwyg: function () {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             core._editorRange();
             
             if (core._isBalloon) {
@@ -2451,6 +2455,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onClick_wysiwyg: function (e) {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
             const targetElement = e.target;
 
