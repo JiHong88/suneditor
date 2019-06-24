@@ -38,7 +38,7 @@
   "devDependencies": {
     "@babel/core": "7.0.0",
     "@webpack-cli/init": "^0.2.2",
-    "babel-loader": "^8.0.5",
+    "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
@@ -53,9 +53,9 @@
     "mini-css-extract-plugin": "^0.4.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "url-loader": "^1.1.2",
-    "webpack": "^4.29.3",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.1.14",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^3.7.2",
     "webpack-merge": "^4.2.1"
   },
   "scripts": {

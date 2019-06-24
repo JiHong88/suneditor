@@ -718,7 +718,7 @@ export default {
                 }
             }
 
-            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
 
             rowSpanArr = [];
 
@@ -849,7 +849,7 @@ export default {
                         colSpan += cell.colSpan - 1;
                     }
 
-                    spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+                    spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
                     rowSpanArr = [];
                 }
 
@@ -1254,7 +1254,7 @@ export default {
                 colSpan += cell.colSpan - 1;
             }
 
-            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
             rowSpanArr = [];
         }
     },
