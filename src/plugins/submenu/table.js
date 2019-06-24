@@ -493,7 +493,10 @@ export default {
         if (!option) {
             const children = table.children;
             for (let i = 0; i < children.length; i++) {
-                if (children[i].children.length === 0) this.util.removeItem(children[i]);
+                if (children[i].children.length === 0) {
+                    this.util.removeItem(children[i]);
+                    i--;
+                }
             }
 
             if (table.children.length === 0) this.util.removeItem(table);
@@ -606,6 +609,7 @@ export default {
         let spanIndex = [];
         let passCell = 0;
         const removeCell = [];
+        const removeSpanArr = [];
 
         for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
             row = rows[i];
@@ -614,20 +618,25 @@ export default {
             cells = row.cells;
             cellColSpan = 0;
 
-            for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
+            for (let c = 0, cell, cLen = cells.length, rs, cs, removeIndex; c < cLen; c++) {
                 cell = cells[c];
                 if (!cell) break;
 
                 rs = cell.rowSpan - 1;
                 cs = cell.colSpan - 1;
 
-                if (rs > 0) {
-                    rowSpanArr.push({
-                        rs: rs,
-                        cs: cs + 1,
-                        index: c + cellColSpan,
-                        row: -1
-                    });
+                if (remove ? c > insertIndex + colSpan : c >= insertIndex) {
+                    if (!remove) break;
+
+                    if (rs > 0) {
+                        removeSpanArr.push({
+                            cell: cell,
+                            i: i,
+                            rs: i + rs
+                        });
+                    }
+
+                    continue;
                 }
 
                 if (!remove) {
@@ -658,6 +667,7 @@ export default {
                     removeIndex = c + cellColSpan;
 
                     if (spanIndex.length > 0) {
+                        const lastCell = !cells[c + 1];
                         for (let r = 0, arr; r < spanIndex.length; r++) {
                             arr = spanIndex[r];
                             if (arr.row > i) continue;
@@ -670,7 +680,7 @@ export default {
                                     spanIndex.splice(r, 1);
                                     r--;
                                 }  
-                            } else if (c === insertIndex - 1) {
+                            } else if (lastCell) {
                                 arr.rs -= 1;
                                 arr.row = i + 1;
                                 if (arr.rs < 1) {
@@ -681,6 +691,16 @@ export default {
                     }
 
                     removeIndex = c + cellColSpan;
+
+                    if (rs > 0) {
+                        rowSpanArr.push({
+                            rs: rs,
+                            cs: cs + 1,
+                            index: c + cellColSpan,
+                            row: -1
+                        });
+                    }
+
                     if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
                         removeCell.push(cell);
                     } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
@@ -717,9 +737,30 @@ export default {
         }
 
         if (remove) {
-            for (let r = 0; r < removeCell.length; r++) {
+            const removeRowArr = [];
+            for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
+                row = removeCell[r].parentNode;
                 this.util.removeItem(removeCell[r]);
+                if (row.cells.length === 0) {
+                    removeRowArr.push({
+                        i: this.util.getArrayIndex(rows, row)
+                    });
+
+                    this.util.removeItem(row);
+                }
             }
+
+            for (let i = 0, len = removeRowArr.length, row; i < len; i++) {
+                row = removeRowArr[i];
+                for (let c = 0, cLen = removeSpanArr.length, rowSpanCell; c < cLen; c++) {
+                    rowSpanCell = removeSpanArr[c];
+
+                    if (row.i >= rowSpanCell.i && row.i <= rowSpanCell.rs) {
+                        rowSpanCell.cell.rowSpan -= 1;
+                    }
+                }
+            }
+
             this.controllersOff();
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
@@ -1225,12 +1266,17 @@ export default {
             tablePlugin._bindOffSelect = null;
         }
 
-        this.util.addClass(tdElement, '__se__selected');
-
         tablePlugin._fixedCell = tdElement;
         tablePlugin._fixedCellName = tdElement.nodeName;
         tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
 
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        for (let i = 0, len = selectedCells.length; i < len; i++) {
+            this.util.removeClass(selectedCells[i], '__se__selected');
+        }
+
+        this.util.addClass(tdElement, '__se__selected');
+        
         tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
         tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
 
