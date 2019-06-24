@@ -701,7 +701,6 @@ const util = {
      */
     removeItem: function (item) {
         if (!item) return;
-
         try {
             item.remove();
         } catch (e) {

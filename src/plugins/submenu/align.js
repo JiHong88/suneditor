@@ -82,7 +82,6 @@ export default {
 
         if (!command) return;
 
-        this.focus();
         this.execCommand(command, false, null);
         this.submenuOff();
     }

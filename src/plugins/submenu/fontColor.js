@@ -93,6 +93,5 @@ export default {
         this.nodeChange(newNode, ['color']);
 
         this.submenuOff();
-        this.focus();
     }
 };

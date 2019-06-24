@@ -21,6 +21,8 @@ export default {
             resizeIcon: null,
             resizeText: null,
             headerButton: null,
+            mergeButton: null,
+            splitButton: null,
             splitMenu: null,
             maxText: core.lang.controller.maxSize,
             minText: core.lang.controller.minSize,
@@ -55,6 +57,8 @@ export default {
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
         context.table.splitMenu = resizeDiv.querySelector('.__se__split_menu');
+        context.table.mergeButton = resizeDiv.querySelector('.__se__merge_button');
+        context.table.splitButton = resizeDiv.querySelector('.__se__split_button');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -137,7 +141,7 @@ export default {
             '           <i class="icon-delete-row"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="merge" class="se-tooltip" disabled>' +
+            '       <button type="button" data-command="merge" class="__se__merge_button se-tooltip" disabled>' +
             '           <i class="icon-merge-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
             '       </button>' +
@@ -157,7 +161,7 @@ export default {
             '           <i class="icon-delete-column"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="onsplit" class="se-tooltip">' +
+            '       <button type="button" data-command="onsplit" class="__se__split_button se-tooltip">' +
             '           <i class="icon-split-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
             '       <div class="__se__split_menu sun-editor-common layer_editor" style="display:none; left:-100%;">' +
@@ -240,10 +244,19 @@ export default {
 
     init: function () {
         const contextTable = this.context.table;
+        const tablePlugin = this.plugins.table;
+
+        if (!contextTable._element) return;
+
+        const selectedCells = contextTable._element.querySelectorAll('.__se__selected');
+        for (let i = 0, len = selectedCells.length; i < len; i++) {
+            this.util.removeClass(selectedCells[i], '__se__selected');
+        }
+
         contextTable._element = null;
         contextTable._tdElement = null;
         contextTable._trElement = null;
-        contextTable._trElements = 0;
+        contextTable._trElements = null;
         contextTable._tableXY = [];
         contextTable._maxWidth = true;
         contextTable._physical_cellCnt = 0;
@@ -255,11 +268,14 @@ export default {
         contextTable._logical_cellIndex = 0;
         contextTable._current_colSpan = 0;
         contextTable._current_rowSpan = 0;
+
+        tablePlugin._selectedCells = null;
+        tablePlugin._selectedTable = null;
+        tablePlugin._ref = null;
     },
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
-        this.plugins.table.init.call(this);
         const contextTable = this.context.table;
         const tableController = contextTable.tableController;
         
@@ -274,26 +290,33 @@ export default {
         tableController.style.display = 'block';
         tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
 
-        this.controllersOn(contextTable.resizeDiv, tableController);
+        this.controllersOn(contextTable.resizeDiv, tableController, this.plugins.table.init.bind(this));
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
         const contextTable = this.context.table;
         const resizeDiv = contextTable.resizeDiv;
-        let table = contextTable._element;
+        
+        this.plugins.table.setCellInfo.call(this, tdElement, reset);
 
-        if (!table) {
-            table = tdElement;
-            while (!/^TABLE$/i.test(table.nodeName)) {
-                table = table.parentNode;
-            }
-            contextTable._element = table;
-        }
+        resizeDiv.style.display = 'block';
 
-        if (contextTable._tdElement !== tdElement) {
-            contextTable._tdElement = tdElement;
-            contextTable._trElement = tdElement.parentNode;
+        const offset = this.util.getOffset(tdElement);
+        resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
+        resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
+
+        const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+        if (overLeft < 0) {
+            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
+            resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
+        } else {
+            resizeDiv.firstElementChild.style.left = '20px';
         }
+    },
+
+    setCellInfo: function (tdElement, reset) {
+        const contextTable = this.context.table;
+        const table = contextTable._element = this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
 
         if (/THEAD/i.test(table.firstElementChild.nodeName)) {
             this.util.addClass(contextTable.headerButton, 'on');
@@ -301,7 +324,12 @@ export default {
             this.util.removeClass(contextTable.headerButton, 'on');
         }
 
-        if (reset || contextTable._logical_rowCnt === 0) {
+        if (reset || contextTable._physical_cellCnt === 0) {
+            if (contextTable._tdElement !== tdElement) {
+                contextTable._tdElement = tdElement;
+                contextTable._trElement = tdElement.parentNode;
+            }
+
             const rows = contextTable._trElements = table.rows;
             const cellIndex = tdElement.cellIndex;
             let logcalCellIndex = 0;
@@ -318,6 +346,7 @@ export default {
             }
 
             for (let i = 0, len = rows.length; i < len; i++) {
+                if (rows[i].cells.length === 0) continue;
                 rowCnt += rows[i].cells[0].rowSpan;
 
                 if (i === rowIndex) {
@@ -339,6 +368,7 @@ export default {
 
             for (let i = 0, cells, cIndex; i <= rowIndex; i++) {
                 cells = rows[i].cells;
+                if (cells.length === 0) continue;
                 cIndex = logcalCellIndex;
                 for (let c = 0, cell, rs, cs; c <= cIndex; c++) {
                     cell = cells[c];
@@ -367,230 +397,373 @@ export default {
             contextTable._current_colSpan = contextTable._tdElement.colSpan - 1;
             contextTable._current_rowSpan - contextTable._trElement.cells[cellIndex].rowSpan - 1;
         }
-
-        resizeDiv.style.display = 'block';
-
-        const offset = this.util.getOffset(tdElement);
-        resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
-        resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
-
-        const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
-        if (overLeft < 0) {
-            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft - 16) + 'px';
-            resizeDiv.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
-        } else {
-            resizeDiv.firstElementChild.style.left = '20px';
-        }
     },
 
-    editRowCell: function (type, option, remove) {
+    editTable: function (type, option) {
+        const tablePlugin = this.plugins.table;
         const contextTable = this.context.table;
+        const table = contextTable._element;
+        const isRow = type === 'row';
 
-        // row
-        if (type === 'row') {
-            const up = option === 'up';
-            if (up && /^TH$/i.test(contextTable._tdElement.nodeName)) return;
-            
-            const rowIndex = remove || up ? contextTable._rowIndex : contextTable._rowIndex + contextTable._current_rowSpan + 1;
-            const sign = remove ? -1 : 1;
-            
-            const rows = contextTable._trElements;
-            let cellCnt = contextTable._logical_cellCnt;
+        if (isRow) {
+            const tableAttr = contextTable._trElement.parentNode;
+            if (/^THEAD$/i.test(tableAttr.nodeName)) {
+                if (option === 'up') {
+                    return;
+                } else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
+                    const tbody = this.util.createElement('TBODY');
+                    const tr = this.util.createElement('TR');
+                    tbody.appendChild(tr);
 
-            for (let i = 0, len = contextTable._rowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
-                cell = rows[i].cells;
-                for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
-                    rs = cell[c].rowSpan;
-                    cs = cell[c].colSpan;
-                    if (rs < 2 && cs < 2) continue;
-
-                    if (rs + i > rowIndex && rowIndex > i) {
-                        cell[c].rowSpan = rs + sign;
-                        cellCnt -= cs;
+                    for (let i = 0, len = contextTable._logical_cellCnt; i < len; i++) {
+                        tr.innerHTML += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
                     }
+
+                    table.appendChild(tbody);
+                    return;
+                }
+            }
+        }
+
+        // multi cells
+        if (tablePlugin._ref) {
+            const positionCell = contextTable._tdElement;
+            const selectedCells = tablePlugin._selectedCells;
+
+            if (isRow) {
+                if (!option) {
+                    let row = selectedCells[0].parentNode;
+                    const removeCells = [selectedCells[0]];
+
+                    for (let i = 1, len = selectedCells.length, cell; i < len; i++) {
+                        cell = selectedCells[i];
+                        if (row !== cell.parentNode) {
+                            removeCells.push(cell);
+                            row = cell.parentNode;
+                        }
+                    }
+
+                    for (let i = 0, len = removeCells.length; i < len; i++) {
+                        tablePlugin.setCellInfo.call(this, removeCells[i], true);
+                        tablePlugin.editRow.call(this, option);
+                    }
+                } else {
+                    tablePlugin.setCellInfo.call(this, option === 'up' ? selectedCells[0] : selectedCells[selectedCells.length - 1], true);
+                    tablePlugin.editRow.call(this, option, positionCell);
+                }
+            } else {
+                const firstRow = selectedCells[0].parentNode;
+                if (!option) {
+                    const removeCells = [selectedCells[0]];
+                    
+                    for (let i = 1, len = selectedCells.length - 1, cell; i < len; i++) {
+                        cell = selectedCells[i];
+                        if (firstRow === cell.parentNode) {
+                            removeCells.push(cell);
+                        } else {
+                            break;
+                        }
+                    }
+
+                    for (let i = 0, len = removeCells.length; i < len; i++) {
+                        tablePlugin.setCellInfo.call(this, removeCells[i], true);
+                        tablePlugin.editCell.call(this, option);
+                    }
+                } else {
+                    let rightCell = null;
+
+                    for (let i = 0, len = selectedCells.length - 1; i < len; i++) {
+                        if (firstRow !== selectedCells[i + 1].parentNode) {
+                            rightCell = selectedCells[i];
+                            break;
+                        }
+                    }
+
+                    tablePlugin.setCellInfo.call(this, option === 'left' ? selectedCells[0] : rightCell || selectedCells[0], true);
+                    tablePlugin.editCell.call(this, option, positionCell);
                 }
             }
 
-            if (remove) {
-                const next = rows[contextTable._rowIndex + 1];
-                if (next) {
-                    const spanCells = [];
-                    let cells = rows[contextTable._rowIndex].cells;
-                    let colSpan = 0;
+            if (!option) tablePlugin.init.call(this);
+        } // one cell
+        else {
+            tablePlugin[isRow ? 'editRow' : 'editCell'].call(this, option);
+        }
+
+        if (!option) {
+            const children = table.children;
+            for (let i = 0; i < children.length; i++) {
+                if (children[i].children.length === 0) {
+                    this.util.removeItem(children[i]);
+                    i--;
+                }
+            }
+
+            if (table.children.length === 0) this.util.removeItem(table);
+        }
+    },
+
+    editRow: function (option, positionResetElement) {
+        const contextTable = this.context.table;
+        const remove = !option;
+
+        const up = option === 'up';
+        const originRowIndex = contextTable._rowIndex;
+        const rowIndex = remove || up ? originRowIndex : originRowIndex + contextTable._current_rowSpan + 1;
+        const sign = remove ? -1 : 1;
+        
+        const rows = contextTable._trElements;
+        let cellCnt = contextTable._logical_cellCnt;
+
+        for (let i = 0, len = originRowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
+            cell = rows[i].cells;
+            if (cell.length === 0) return;
+            
+            for (let c = 0, cLen = cell.length, rs, cs; c < cLen; c++) {
+                rs = cell[c].rowSpan;
+                cs = cell[c].colSpan;
+                if (rs < 2 && cs < 2) continue;
+
+                if (rs + i > rowIndex && rowIndex > i) {
+                    cell[c].rowSpan = rs + sign;
+                    cellCnt -= cs;
+                }
+            }
+        }
+
+        if (remove) {
+            const next = rows[originRowIndex + 1];
+            if (next) {
+                const spanCells = [];
+                let cells = rows[originRowIndex].cells;
+                let colSpan = 0;
+
+                for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
+                    cell = cells[i];
+                    logcalIndex = i + colSpan;
+                    colSpan += cell.colSpan - 1;
+
+                    if (cell.rowSpan > 1) {
+                        cell.rowSpan -= 1;
+                        spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
+                    }
+                }
+
+                if (spanCells.length > 0) {
+                    let spanCell = spanCells.shift();
+                    cells = next.cells;
+                    colSpan = 0;
 
                     for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
                         cell = cells[i];
                         logcalIndex = i + colSpan;
                         colSpan += cell.colSpan - 1;
-
-                        if (cell.rowSpan > 1) {
-                            cell.rowSpan -= 1;
-                            spanCells.push({cell: cell.cloneNode(false), index: logcalIndex});
+    
+                        if (logcalIndex >= spanCell.index) {
+                            i--, colSpan--;
+                            colSpan += spanCell.cell.colSpan - 1;
+                            next.insertBefore(spanCell.cell, cell);
+                            spanCell = spanCells.shift();
+                            if (!spanCell) break;
                         }
                     }
 
-                    if (spanCells.length > 0) {
-                        let spanCell = spanCells.shift();
-                        cells = next.cells;
-                        colSpan = 0;
-
-                        for (let i = 0, len = cells.length, cell, logcalIndex; i < len; i++) {
-                            cell = cells[i];
-                            logcalIndex = i + colSpan;
-                            colSpan += cell.colSpan - 1;
-        
-                            if (logcalIndex >= spanCell.index) {
-                                i--, colSpan--;
-                                colSpan += spanCell.cell.colSpan - 1;
-                                next.insertBefore(spanCell.cell, cell);
-                                spanCell = spanCells.shift();
-                                if (!spanCell) break;
-                            }
-                        }
-
-                        if (spanCell) {
-                            next.appendChild(spanCell.cell);
-                            for (let i = 0, len = spanCells.length; i < len; i++) {
-                                next.appendChild(spanCells[i].cell);
-                            }
+                    if (spanCell) {
+                        next.appendChild(spanCell.cell);
+                        for (let i = 0, len = spanCells.length; i < len; i++) {
+                            next.appendChild(spanCells[i].cell);
                         }
                     }
                 }
-
-                contextTable._element.deleteRow(rowIndex);
-            } else {
-                let cells = '';
-
-                for (let i = 0, len = cellCnt; i < len; i++) {
-                    cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
-                }
-
-                const newRow = contextTable._element.insertRow(rowIndex);
-                newRow.innerHTML = cells;
             }
+
+            contextTable._element.deleteRow(rowIndex);
+        } else {
+            let cells = '';
+
+            for (let i = 0, len = cellCnt; i < len; i++) {
+                cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
+            }
+
+            const newRow = contextTable._element.insertRow(rowIndex);
+            newRow.innerHTML = cells;
         }
-        // cell
-        else {
-            const left = option === 'left';
-            const colSpan = contextTable._current_colSpan;
-            const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
 
-            const rows = contextTable._trElements;
-            let rowSpanArr = [];
-            let spanIndex = [];
-            let passCell = 0;
-            const removeCell = [];
+        if (!remove) {
+            this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
+        } else {
+            this.controllersOff();
+        }
+    },
 
-            for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
-                row = rows[i];
-                insertIndex = cellIndex;
-                applySpan = false;
-                cells = row.cells;
-                cellColSpan = 0;
+    editCell: function (option, positionResetElement) {
+        const contextTable = this.context.table;
+        const remove = !option;
 
-                for (let c = 0, cell, rs, cs, removeIndex; remove ? c <= insertIndex + colSpan : c < insertIndex; c++) {
-                    cell = cells[c];
-                    if (!cell) break;
+        const left = option === 'left';
+        const colSpan = contextTable._current_colSpan;
+        const cellIndex = remove || left ? contextTable._logical_cellIndex : contextTable._logical_cellIndex + colSpan + 1;
 
-                    rs = cell.rowSpan - 1;
-                    cs = cell.colSpan - 1;
+        const rows = contextTable._trElements;
+        let rowSpanArr = [];
+        let spanIndex = [];
+        let passCell = 0;
+        const removeCell = [];
+        const removeSpanArr = [];
+
+        for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+            row = rows[i];
+            insertIndex = cellIndex;
+            applySpan = false;
+            cells = row.cells;
+            cellColSpan = 0;
+
+            for (let c = 0, cell, cLen = cells.length, rs, cs, removeIndex; c < cLen; c++) {
+                cell = cells[c];
+                if (!cell) break;
+
+                rs = cell.rowSpan - 1;
+                cs = cell.colSpan - 1;
+
+                if (remove ? c > insertIndex + colSpan : c >= insertIndex) {
+                    if (!remove) break;
+
+                    if (rs > 0) {
+                        removeSpanArr.push({
+                            cell: cell,
+                            i: i,
+                            rs: i + rs
+                        });
+                    }
+
+                    continue;
+                }
+
+                if (!remove) {
+                    if (cs > 0) {
+                        if (passCell < 1 && cs + c >= insertIndex) {
+                            cell.colSpan += 1;
+                            insertIndex = null;
+                            passCell = rs + 1;
+                            break;
+                        }
+
+                        insertIndex -= cs;
+                    }
+
+                    if (!applySpan) {
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            insertIndex -= arr.cs;
+                            arr.rs -= 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                                r--;
+                            }  
+                        }
+                        applySpan = true;
+                    }
+                } else {
+                    removeIndex = c + cellColSpan;
+
+                    if (spanIndex.length > 0) {
+                        const lastCell = !cells[c + 1];
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            if (arr.row > i) continue;
+
+                            if (removeIndex >= arr.index) {
+                                cellColSpan += arr.cs;
+                                removeIndex = c + cellColSpan;
+                                arr.rs -= 1;
+                                arr.row = i + 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                    r--;
+                                }  
+                            } else if (lastCell) {
+                                arr.rs -= 1;
+                                arr.row = i + 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                }
+                            }
+                        }
+                    }
 
                     if (rs > 0) {
                         rowSpanArr.push({
                             rs: rs,
                             cs: cs + 1,
-                            index: c + cellColSpan
+                            index: removeIndex,
+                            row: -1
                         });
                     }
 
-                    if (!remove) {
-                        if (cs > 0) {
-                            if (passCell < 1 && cs + c >= insertIndex) {
-                                cell.colSpan += 1;
-                                insertIndex = null;
-                                passCell = rs + 1;
-                                break;
-                            }
-    
-                            insertIndex -= cs;
-                        }
+                    if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
+                        removeCell.push(cell);
+                    } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
+                        let modifyColSpan = 0;
 
-                        if (!applySpan) {
-                            for (let r = 0, arr; r < spanIndex.length; r++) {
-                                arr = spanIndex[r];
-                                insertIndex -= arr.cs;
-                                arr.rs -= 1;
-                                if (arr.rs < 1) {
-                                    spanIndex.splice(r, 1);
-                                    r--;
-                                }  
-                            }
-                            applySpan = true;
-                        }
-                    } else {
-                        removeIndex = c + cellColSpan;
-
-                        if (spanIndex.length > 0) {
-                            for (let r = 0, arr; r < spanIndex.length; r++) {
-                                arr = spanIndex[r];
-                                if (removeIndex >= arr.index) {
-                                    cellColSpan += arr.cs;
-                                    arr.rs -= 1;
-                                    if (arr.rs < 1) {
-                                        spanIndex.splice(r, 1);
-                                        r--;
-                                    }  
-                                }
+                        for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
+                            if (m >= removeIndex && m <= removeIndex + cs) {
+                                modifyColSpan++;
                             }
                         }
 
-                        removeIndex = c + cellColSpan;
-                        if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
-                            removeCell.push(cell);
-                        } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
-                            let modifyColSpan = 0;
-
-                            for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
-                                if (m >= removeIndex && m <= removeIndex + cs) {
-                                    modifyColSpan++;
-                                }
-                            }
-
-                            cell.colSpan -= this._w.Math.abs(modifyColSpan);
-                        }
-
-                        cellColSpan += cs;
+                        cell.colSpan -= this._w.Math.abs(modifyColSpan);
                     }
-                }
 
-                spanIndex = spanIndex.concat(rowSpanArr);
-                rowSpanArr = [];
-
-                if (!remove) {
-                    if (passCell > 0) {
-                        passCell -= 1;
-                        continue;
-                    }
-    
-                    if (insertIndex !== null) {
-                        newCell = this.util.createElement(cells[0].nodeName);
-                        newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
-                        newCell = row.insertBefore(newCell, cells[insertIndex]);
-                    }
+                    cellColSpan += cs;
                 }
             }
 
-            if (remove) {
-                for (let r = 0; r < removeCell.length; r++) {
-                    this.util.removeItem(removeCell[r]);
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+
+            rowSpanArr = [];
+
+            if (!remove) {
+                if (passCell > 0) {
+                    passCell -= 1;
+                    continue;
+                }
+
+                if (insertIndex !== null && cells.length > 0) {
+                    newCell = this.util.createElement(cells[0].nodeName);
+                    newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+                    newCell = row.insertBefore(newCell, cells[insertIndex]);
                 }
             }
         }
 
-        if (!remove) {
-            this.plugins.table.setPositionControllerDiv.call(this, contextTable._tdElement, true);
-        } else {
+        if (remove) {
+            const removeRowArr = [];
+            for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
+                row = removeCell[r].parentNode;
+                this.util.removeItem(removeCell[r]);
+                if (row.cells.length === 0) {
+                    removeRowArr.push({
+                        i: this.util.getArrayIndex(rows, row)
+                    });
+
+                    this.util.removeItem(row);
+                }
+            }
+
+            for (let i = 0, len = removeRowArr.length, row; i < len; i++) {
+                row = removeRowArr[i];
+                for (let c = 0, cLen = removeSpanArr.length, rowSpanCell; c < cLen; c++) {
+                    rowSpanCell = removeSpanArr[c];
+
+                    if (row.i >= rowSpanCell.i && row.i <= rowSpanCell.rs) {
+                        rowSpanCell.cell.rowSpan -= 1;
+                    }
+                }
+            }
+
             this.controllersOff();
+        } else {
+            this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         }
     },
 
@@ -611,31 +784,88 @@ export default {
         const vertical = direction === 'vertical';
         const contextTable = this.context.table;
         const currentCell = contextTable._tdElement;
+        const rows = contextTable._trElements;
+        const currentRow = contextTable._trElement;
+        const index = contextTable._logical_cellIndex;
+        const rowIndex = contextTable._rowIndex;
 
         const newCell = this.util.createElement(currentCell.nodeName);
         newCell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
 
+        // vertical
         if (vertical) {
-            const colSpan = currentCell.colSpan;
-            if (colSpan > 1) {
-                newCell.colSpan = this._w.Math.floor(colSpan/2);
-                newCell.rowSpan = currentCell.rowSpan;
-                currentCell.colSpan = colSpan - newCell.colSpan;
-                contextTable._trElement.insertBefore(newCell, currentCell.nextElementSibling);
-            } else {
-                
+            const currentColSpan = currentCell.colSpan;
+            newCell.rowSpan = currentCell.rowSpan;
+
+            // colspan - 0
+            if (currentColSpan > 1) {
+                newCell.colSpan = this._w.Math.floor(currentColSpan/2);
+                currentCell.colSpan = currentColSpan - newCell.colSpan;
+                currentRow.insertBefore(newCell, currentCell.nextElementSibling);
+            } else { // colspan - n
+                let rowSpanArr = [];
+                let spanIndex = [];
+
+                for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
+                    cells = rows[i].cells;
+                    colSpan = 0;
+                    if (i === rowIndex) continue;
+                    for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
+                        cell = cells[c];
+                        cs = cell.colSpan - 1;
+                        rs = cell.rowSpan - 1;
+                        logcalIndex = c + colSpan;
+
+                        if (spanIndex.length > 0) {
+                            for (let r = 0, arr; r < spanIndex.length; r++) {
+                                arr = spanIndex[r];
+                                if (logcalIndex >= arr.index) {
+                                    colSpan += arr.cs;
+                                    logcalIndex += arr.cs;
+                                    arr.rs -= 1;
+                                    if (arr.rs < 1) {
+                                        spanIndex.splice(r, 1);
+                                        r--;
+                                    }  
+                                }
+                            }
+                        }
+
+                        if (logcalIndex <= index && rs > 0) {
+                            rowSpanArr.push({
+                                index: logcalIndex,
+                                cs: cs + 1,
+                                rs: rs,
+                            });
+                        }
+
+                        if (logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+                            cell.colSpan += 1;
+                            break;
+                        }
+
+                        if (logcalIndex > index) break;
+                        
+                        colSpan += cell.colSpan - 1;
+                    }
+
+                    spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+                    rowSpanArr = [];
+                }
+
+                currentRow.insertBefore(newCell, currentCell.nextElementSibling);
             }
-        } else {
-            const rowSpan = currentCell.rowSpan;
-            if (rowSpan > 1) {
-                newCell.rowSpan = this._w.Math.floor(rowSpan/2);
-                newCell.colSpan = currentCell.colSpan;
-                const newRowSpan = rowSpan - newCell.rowSpan;
+        } else { // horizontal
+            const currentRowSpan = currentCell.rowSpan;
+            newCell.colSpan = currentCell.colSpan;
+
+            // rowspan - 0
+            if (currentRowSpan > 1) {
+                newCell.rowSpan = this._w.Math.floor(currentRowSpan/2);
+                const newRowSpan = currentRowSpan - newCell.rowSpan;
 
                 const rowSpanArr = [];
-                const rows = contextTable._trElements;
-                const nextRowIndex = this.util.getArrayIndex(rows, contextTable._trElement) + newRowSpan;
-                const index = contextTable._logical_cellIndex;
+                const nextRowIndex = this.util.getArrayIndex(rows, currentRow) + newRowSpan;
 
                 for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
                     cells = rows[i].cells;
@@ -658,10 +888,9 @@ export default {
 
                 const nextRow = rows[nextRowIndex];
                 const nextCells = nextRow.cells;
-                let colSpan = 0;
                 let rs = rowSpanArr.shift();
 
-                for (let c = 0, cLen = nextCells.length, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+                for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
                     logcalIndex = c + colSpan;
                     cell = nextCells[c];
                     cs = cell.colSpan - 1;
@@ -682,8 +911,31 @@ export default {
                 }
 
                 currentCell.rowSpan = newRowSpan;
-            } else {
-                
+            } else { // rowspan - n
+                newCell.rowSpan = currentCell.rowSpan;
+                const newRow = this.util.createElement('TR');
+                newRow.appendChild(newCell);
+
+                for (let i = 0, cells; i < rowIndex; i++) {
+                    cells = rows[i].cells;
+                    if (cells.length === 0) return;
+
+                    for (let c = 0, cLen = cells.length; c < cLen; c++) {
+                        if (i + cells[c].rowSpan - 1 >= rowIndex) {
+                            cells[c].rowSpan += 1;
+                        }
+                    }
+                }
+
+                const physicalIndex = contextTable._physical_cellIndex;
+                const cells = currentRow.cells;
+
+                for (let c = 0, cLen = cells.length; c < cLen; c++) {
+                    if (c === physicalIndex) continue;       
+                    cells[c].rowSpan += 1;                    
+                }
+
+                currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
             }
         }
 
@@ -691,7 +943,68 @@ export default {
     },
 
     mergeCells: function () {
+        const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
 
+        const ref = tablePlugin._ref;
+        const selectedCells = tablePlugin._selectedCells;
+        const mergeCell = selectedCells[0];
+        
+        let emptyRowFirst = null;
+        let emptyRowLast = null;
+        let cs = ref.regCell.length;
+        let rs = ref.regRow.length;
+        let mergeHTML = '';
+        let row = null;
+
+        for (let i = 1, len = selectedCells.length, cell; i < len; i++) {
+            cell = selectedCells[i];
+            if (row !== cell.parentNode) row = cell.parentNode;
+
+            mergeHTML += cell.innerHTML;
+            this.util.removeItem(cell);
+
+            if (row.cells.length === 0) {
+                if (!emptyRowFirst) emptyRowFirst = row;
+                else emptyRowLast = row;
+                rs -= 1;
+            }
+        }
+
+        if (emptyRowFirst) {
+            const rows = contextTable._trElements;
+            const rowIndexFirst = this.util.getArrayIndex(rows, emptyRowFirst);
+            const rowIndexLast = this.util.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
+            const removeRows = [];
+    
+            for (let i = 0, cells; i <= rowIndexLast; i++) {
+                cells = rows[i].cells;
+                if (cells.length === 0) {
+                    removeRows.push(rows[i]);
+                    continue;
+                }
+    
+                for (let c = 0, cLen = cells.length, cell; c < cLen; c++) {
+                    cell = cells[c];
+                    if (i + cell.rowSpan - 1 >= rowIndexFirst) {
+                        cell.rowSpan = i + cell.rowSpan - rowIndexFirst;
+                    }
+                }
+            }
+
+            for (let i = 0, len = removeRows.length; i < len; i++) {
+                this.util.removeItem(removeRows[i]);
+            }
+        }
+
+        mergeCell.innerHTML += mergeHTML;
+        mergeCell.colSpan = cs;
+        mergeCell.rowSpan = rs;
+
+        this.controllersOff();
+        tablePlugin.call_controller_tableEdit.call(this, mergeCell);
+
+        this.util.addClass(mergeCell, '__se__selected');
     },
 
     toggleHeader: function () {
@@ -744,9 +1057,241 @@ export default {
         contextTable._element.style.width = width;
     },
 
+    _bindOnSelect: null,
+    _bindOffSelect: null,
+    _selectedCells: null,
+    _fixedCell: null,
+    _fixedCellName: null,
+    _selectedCell: null,
+    _selectedTable: null,
+    _ref: null,
+    _offCellMultiSelect: function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
+
+        this.context.element.wysiwyg.setAttribute('contenteditable', true);
+        this.util.removeClass(this.context.element.wysiwyg, '__se__no_selection');
+
+        this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+        this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+        tablePlugin._bindOnSelect = null;
+        tablePlugin._bindOffSelect = null;
+
+        if (!tablePlugin._selectedCell || tablePlugin._fixedCell === tablePlugin._selectedCell) {
+            contextTable.splitButton.removeAttribute('disabled');
+            contextTable.mergeButton.setAttribute('disabled', true);
+        } else {
+            contextTable.splitButton.setAttribute('disabled', true);
+            contextTable.mergeButton.removeAttribute('disabled');
+        }
+
+        tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
+
+        tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        tablePlugin._fixedCell = null;
+        tablePlugin._selectedCell = null;
+        tablePlugin._fixedCellName = null;
+    },
+
+    _onCellMultiSelect: function (e) {
+        const tablePlugin = this.plugins.table;
+        const target = this.util.getParentElement(e.target, this.util.isCell);
+
+        if (!tablePlugin._ref) {
+            if (target === tablePlugin._fixedCell) {
+                return;
+            } else {
+                this.context.element.wysiwyg.setAttribute('contenteditable', false);
+                this.util.addClass(this.context.element.wysiwyg, '__se__no_selection');
+            }
+        }
+
+        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName ||
+                tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
+            return;
+        }
+
+        tablePlugin._selectedCell = target;
+        tablePlugin.setMultiCells.call(this, tablePlugin._fixedCell, target);
+    },
+
+    _getMultiCellArr: function (ref) {
+        const regCell = [];
+        const regRow = [];
+
+        for (let i = ref.cs, len = ref.ce; i <= len; i++) {
+            regCell.push(i);
+        }
+
+        for (let i = ref.rs, len = ref.re; i <= len; i++) {
+            regRow.push(i);
+        }
+
+        return {
+            cell: regCell,
+            row: regRow
+        };
+    },
+
+    _checkCellIndex: function (ref, index, spanIndex) {
+        for (let i = index, len = spanIndex; i <= len; i++) {
+            if (ref.indexOf(i) > -1) return true;
+        }
+
+        return false;
+    },
+
+    setMultiCells: function (startCell, endCell) {
+        const tablePlugin = this.plugins.table;
+        const rows = tablePlugin._selectedTable.rows;
+
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        for (let i = 0, len = selectedCells.length; i < len; i++) {
+            this.util.removeClass(selectedCells[i], '__se__selected');
+        }
+
+        if (startCell === endCell) {
+            this.util.addClass(startCell, '__se__selected');
+            return;
+        }
+
+        let findSelectedCell = true;
+        let spanIndex = [];
+        let rowSpanArr = [];
+        const ref = tablePlugin._ref = {_i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
+
+        for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
+            cells = rows[i].cells;
+            colSpan = 0;
+
+            for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs, reg; c < cLen; c++) {
+                cell = cells[c];
+                cs = cell.colSpan - 1;
+                rs = cell.rowSpan - 1;
+                logcalIndex = c + colSpan;
+
+                if (spanIndex.length > 0) {
+                    for (let r = 0, arr; r < spanIndex.length; r++) {
+                        arr = spanIndex[r];
+                        if (arr.row > i) continue;
+                        if (logcalIndex >= arr.index) {
+                            colSpan += arr.cs;
+                            logcalIndex += arr.cs;
+                            arr.rs -= 1;
+                            arr.row = i + 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                                r--;
+                            }
+                        } else if (c === cLen - 1) {
+                            arr.rs -= 1;
+                            arr.row = i + 1;
+                            if (arr.rs < 1) {
+                                spanIndex.splice(r, 1);
+                            }
+                        }
+                    }
+                }
+
+                if (findSelectedCell) {
+                    if (cell === startCell || cell === endCell) {
+                        ref.cs = ref.cs !== null && ref.cs < logcalIndex ? ref.cs : logcalIndex;
+                        ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
+                        ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
+                        ref.re = ref.re !== null && ref.re > i + rs ? ref.re : i + rs;
+
+                        reg = tablePlugin._getMultiCellArr(ref);
+                        ref.regCell = reg.cell;
+                        ref.regRow = reg.row;
+
+                        ref._i += 1;
+                    }
+                    
+                    if (ref._i === 2) {
+                        findSelectedCell = false;
+                        spanIndex = [];
+                        rowSpanArr = [];
+                        i = -1;
+                        break;
+                    }
+                } else if (tablePlugin._checkCellIndex(ref.regCell, logcalIndex, logcalIndex + cs) && tablePlugin._checkCellIndex(ref.regRow, i, i + rs)) {
+                    const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
+                    const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
+                    const newRs = ref.rs < i ? ref.rs : i;
+                    const newRe = ref.re > i + rs ? ref.re : i + rs;
+
+                    if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
+                        ref.cs = newCs;
+                        ref.ce = newCe;
+                        ref.rs = newRs;
+                        ref.re = newRe;
+
+                        reg = tablePlugin._getMultiCellArr(ref);
+                        ref.regCell = reg.cell;
+                        ref.regRow = reg.row;
+
+                        spanIndex = [];
+                        rowSpanArr = [];
+                        i = -1;
+                        break;
+                    }
+
+                    this.util.addClass(cell, '__se__selected');
+                }
+
+                if (rs > 0) {
+                    rowSpanArr.push({
+                        index: logcalIndex,
+                        cs: cs + 1,
+                        rs: rs,
+                        row: -1
+                    });
+                }
+
+                colSpan += cell.colSpan - 1;
+            }
+
+            spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index});
+            rowSpanArr = [];
+        }
+    },
+
+    tableCellMultiSelect: function (tdElement) {
+        const tablePlugin = this.plugins.table;
+
+        if (tablePlugin._bindOnSelect || tablePlugin._bindOffSelect) {
+            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+            tablePlugin._bindOnSelect = null;
+            tablePlugin._bindOffSelect = null;
+        }
+
+        tablePlugin._fixedCell = tdElement;
+        tablePlugin._fixedCellName = tdElement.nodeName;
+        tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
+
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        for (let i = 0, len = selectedCells.length; i < len; i++) {
+            this.util.removeClass(selectedCells[i], '__se__selected');
+        }
+
+        this.util.addClass(tdElement, '__se__selected');
+        
+        tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
+        tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
+
+        this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
+        this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
+    },
+
     onClick_tableController: function (e) {
         e.stopPropagation();
         const target = e.target.getAttribute('data-command') ? e.target : e.target.parentNode;
+
+        if (target.getAttribute('disabled')) return;
 
         const command = target.getAttribute('data-command');
         const value = target.getAttribute('data-value');
@@ -764,10 +1309,8 @@ export default {
 
         switch (command) {
             case 'insert':
-                this.plugins.table.editRowCell.call(this, value, option, false);
-                break;
             case 'delete':
-                this.plugins.table.editRowCell.call(this, value, null, true);
+                this.plugins.table.editTable.call(this, value, option);
                 break;
             case 'header':
                 this.plugins.table.toggleHeader.call(this);
@@ -793,6 +1336,5 @@ export default {
 
         // history stack
         this.history.push();
-        this.focus();
     }
 };

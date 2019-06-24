@@ -292,13 +292,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Disable controller in editor area (link button, image resize button)
+         * @description Show controller at editor area (link button, image resize button, init function, etc..)
+         * @param {*} arguments - controller elements, functions..
          */
         controllersOn: function () {
             if (this._bindControllersOff) this._bindControllersOff();
 
             for (let i = 0; i < arguments.length; i++) {
-                arguments[i].style.display = 'block';
+                if (arguments[i].style) arguments[i].style.display = 'block';
                 this.controllerArray[i] = arguments[i];
             }
 
@@ -308,7 +309,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Disable controller in editor area (link button, image resize button)
+         * @description Hide controller at editor area (link button, image resize button..)
          */
         controllersOff: function () {
             _d.removeEventListener('mousedown', this._bindControllersOff);
@@ -318,7 +319,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const len = this.controllerArray.length;
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
-                    this.controllerArray[i].style.display = 'none';
+                    if (typeof this.controllerArray[i] === 'function') this.controllerArray[i]();
+                    else this.controllerArray[i].style.display = 'none';
                 }
 
                 this.controllerArray = [];
@@ -404,7 +406,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         _editorRange: function () {
             const selection = _w.getSelection();
-            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) return;
+            if (!util.getParentElement(selection.focusNode, '.sun-editor-id-wysiwyg') || util.isWysiwygDiv(selection.focusNode)) {
+                this.execCommand('formatBlock', false, 'P');
+                context.element.wysiwyg.focus();
+            }
             
             let range = null;
             let selectionNode = null;
@@ -1019,6 +1024,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let tempCon, tempOffset, tempChild, tempArray;
 
+            if (isRemoveFormat && range.collapsed && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
+                return;
+            }
+
             if (isRemoveNode) {
                 appendNode = this.util.createElement('DIV');
             }
@@ -1445,7 +1454,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                     if (i === 0) startContainer = textNode;
                 }
-                if (collapsed) startOffset = 1;
             } else {
                 if (isRemoveNode) {
                     for (let i = 0; i < nNodeArray.length; i++) {
@@ -1461,8 +1469,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 
                 if (collapsed) {
                     startContainer = endContainer = newInnerNode;
-                    startOffset = 1;
-                    endOffset = 1;
                 }
             }
 
@@ -1481,11 +1487,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
             startContainer = util.getNodeFromPath(startPath, element);
             endContainer = util.getNodeFromPath(endPath, element);
 
+            if (collapsed) {
+                startOffset = startContainer.textContent.length;
+                endOffset = endContainer.textContent.length;
+            }
+
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
                 endContainer: endContainer,
-                endOffset: endConReset ? collapsed ? 1 : startOff + endOffset - 1 : endOffset
+                endOffset: endConReset ? endContainer.textContent.length : endOffset
             };
         },
 
@@ -2260,7 +2271,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && selectionParent.style.marginLeft.match(/\d+/)[0] * 1 > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && (selectionParent.style.marginLeft.match(/\d+/) || [0])[0] * 1 > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;
@@ -2286,7 +2297,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
 
                 /** A */
-                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null) {
+                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null && core.plugins.link) {
                     if (!context.link || core.controllerArray[0] !== context.link.linkBtn) {
                         core.callPlugin('link', function () {
                             core.plugins.link.call_controller_linkButton.call(core, selectionParent);
@@ -2418,7 +2429,22 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
         },
 
+        /**
+         * @warning Events are registered only when there is a table plugin.
+         */
+        onMouseDown_wysiwyg: function (e) {
+            const target = util.getParentElement(e.target, util.isCell);
+            if (!target) return;
+
+            _w.setTimeout(function () {
+                core.callPlugin('table', function () {
+                    core.plugins.table.tableCellMultiSelect.call(core, target);
+                });
+            });
+        },
+
         onMouseUp_wysiwyg: function () {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             core._editorRange();
             
             if (core._isBalloon) {
@@ -2429,11 +2455,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onClick_wysiwyg: function (e) {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
             const targetElement = e.target;
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
+                if (!core.plugins.image) return;
+
                 core.callPlugin('image', function () {
                     const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
                     core.plugins.image.onModifyMode.call(core, targetElement, size);
@@ -2449,6 +2478,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
                 e.preventDefault();
+                if (!core.plugins.video) return;
+
                 core.callPlugin('video', function () {
                     const iframe = targetElement.parentNode.querySelector('iframe');
                     const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
@@ -2475,13 +2506,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     };
 
                     figcaption.addEventListener('blur', hideToolbar);
-                }
-            } else {
-                const td = util.getParentElement(targetElement, util.isCell);
-                if (td) {
-                    if (core.controllerArray.length === 0) {
-                        core.callPlugin('table', core.plugins.table.call_controller_tableEdit.bind(core, td));
-                    }
                 }
             }
 
@@ -2573,10 +2597,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = range.startContainer !== range.endContainer;
-            let formatEl, rangeEl;
+            let formatEl = util.getFormatElement(selectionNode) || selectionNode;
+            let rangeEl = util.getRangeFormatElement(selectionNode);
 
-            formatEl = util.getFormatElement(selectionNode) || selectionNode;
-            rangeEl = util.getRangeFormatElement(selectionNode);
             if (!selectRange && (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl)) {
                 core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
                 core.focus();
@@ -2830,7 +2853,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         onDrop_wysiwyg: function (e) {
             const files = e.dataTransfer.files;
 
-            if (files.length > 0) {
+            if (files.length > 0 && core.plugins.image) {
                 e.stopPropagation();
                 e.preventDefault();
                 
@@ -3145,6 +3168,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
+    if (core.plugins.table) context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);

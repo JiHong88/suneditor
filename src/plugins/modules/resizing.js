@@ -186,10 +186,10 @@ export default {
         const overLeft = this.context.element.wysiwyg.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
 
         contextResizing.resizeButton.style.top = (h + t + 60) + 'px';
-        contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft + 16 : 0)) + 'px';
+        contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft : 0)) + 'px';
 
         if (overLeft < 0) {
-            contextResizing.resizeButton.firstElementChild.style.left = (20 - overLeft + 16) + 'px';
+            contextResizing.resizeButton.firstElementChild.style.left = (20 - overLeft) + 'px';
         } else {
             contextResizing.resizeButton.firstElementChild.style.left = '20px';
         }
