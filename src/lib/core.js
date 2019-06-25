@@ -1477,6 +1477,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 endOffset = endContainer.textContent.length;
             }
 
+            if (endContainer.textContent.length === 0) {
+                util.removeItem(endContainer);
+                endContainer = startContainer;
+            }
+
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
