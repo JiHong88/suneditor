@@ -2535,10 +2535,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const toolbarHeight = toolbar.offsetHeight;
 
             let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
-            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - context.element.topArea.offsetTop + (_w.scrollY || _d.documentElement.scrollTop);
+            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() - context.element.topArea.offsetTop + (_w.scrollY || _d.documentElement.scrollTop);
 
             const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
-            
+
             toolbar.style.left = (l < 0 ? padding : overRight < 0 ? l : l - overRight - padding) + 'px';
             toolbar.style.top = (t) + 'px';
 
@@ -2553,9 +2553,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             const arrow_width = context.element._arrow.offsetWidth;
-            const arrow_left = (toolbarWidth / 2 + (l < 0 ? l - arrow_width : overRight < 0 ? 0 : overRight + arrow_width));
+            const arrow_left = toolbarWidth / 2 + (l < 0 ? l - arrow_width : overRight < 0 ? 0 : overRight + arrow_width);
             const arrow_point_width = arrow_width / 2;
-            context.element._arrow.style.left = (arrow_left < arrow_point_width ? arrow_point_width : arrow_left + arrow_point_width >= toolbarWidth ? arrow_left - arrow_point_width : arrow_left) + 'px';
+            const left = _w.Math.abs(arrow_left < arrow_point_width ? arrow_point_width : arrow_left + arrow_point_width >= toolbarWidth ? arrow_left - arrow_point_width : arrow_left - (isDirTop ? 0 : padding));
+            context.element._arrow.style.left = (left + 11 > toolbar.offsetWidth ? toolbar.offsetWidth - 11 : left) + 'px';
         },
 
         _showToolbarInline: function () {
