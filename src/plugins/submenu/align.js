@@ -18,32 +18,33 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
+        let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+        listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.align._alignList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
+        context.align._alignList = listUl.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
 
         /** empty memory */
-        listDiv = null;
+        listDiv = null, listUl = null;
     },
 
     setSubmenu: function () {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'layer_editor';
+        listDiv.className = 'se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="sun-editor-submenu inner_layer layer_align">' +
-            '   <ul class="list_editor">' +
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '"><span class="icon-align-left"></span>' + lang.toolbar.alignLeft + '</button></li>' +
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '"><span class="icon-align-center"></span>' + lang.toolbar.alignCenter + '</button></li>' +
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '"><span class="icon-align-right"></span>' + lang.toolbar.alignRight + '</button></li>' +
-            '       <li><button type="button" class="btn_edit btn_align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '"><span class="icon-align-justify"></span>' + lang.toolbar.alignJustify + '</button></li>' +
+            '<div class="se-submenu se-list-inner se-list-align">' +
+            '   <ul class="se-list-basic">' +
+            '       <li><button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '"><span class="se-icon-align-left"></span>' + lang.toolbar.alignLeft + '</button></li>' +
+            '       <li><button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '"><span class="se-icon-align-center"></span>' + lang.toolbar.alignCenter + '</button></li>' +
+            '       <li><button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '"><span class="se-icon-align-right"></span>' + lang.toolbar.alignRight + '</button></li>' +
+            '       <li><button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '"><span class="se-icon-align-justify"></span>' + lang.toolbar.alignJustify + '</button></li>' +
             '   </ul>' +
             '</div>';
 

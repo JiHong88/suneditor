@@ -14,7 +14,7 @@ export default {
         let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickUp.bind(core));
+        listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -27,27 +27,27 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer">' +
-            '   <ul class="list_editor format_list">' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="P" title="' + lang.toolbar.tag_p + '"><span class="p_ex">' + lang.toolbar.tag_p + '</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="DIV" title="' + lang.toolbar.tag_div + '"><span class="div_ex">' + lang.toolbar.tag_div + '</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="range" data-value="BLOCKQUOTE" title="' + lang.toolbar.tag_quote + '">' +
+            '<div class="se-list-inner">' +
+            '   <ul class="se-list-basic se-list-format">' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="P" title="' + lang.toolbar.tag_p + '"><span class="p_ex">' + lang.toolbar.tag_p + '</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="DIV" title="' + lang.toolbar.tag_div + '"><span class="div_ex">' + lang.toolbar.tag_div + '</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="range" data-value="BLOCKQUOTE" title="' + lang.toolbar.tag_quote + '">' +
             '               <blockquote class="quote_ex">' + lang.toolbar.tag_quote + '</blockquote>' +
             '           </button>' +
             '       </li>' +
-            '       <li><button type="button" class="btn_edit" data-command="range" data-value="PRE" title="' + lang.toolbar.pre + '">' +
+            '       <li><button type="button" class="se-btn-list" data-command="range" data-value="PRE" title="' + lang.toolbar.pre + '">' +
             '               <pre class="pre_ex">' + lang.toolbar.pre + '</pre>' +
             '           </button>' +
             '       </li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H1" title="' + lang.toolbar.tag_h + ' 1" style="height:40px;"><span class="h1_ex">' + lang.toolbar.tag_h + ' 1</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H2" title="' + lang.toolbar.tag_h + ' 2" style="height:34px;"><span class="h2_ex">' + lang.toolbar.tag_h + ' 2</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H3" title="' + lang.toolbar.tag_h + ' 3" style="height:26px;"><span class="h3_ex">' + lang.toolbar.tag_h + ' 3</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H4" title="' + lang.toolbar.tag_h + ' 4" style="height:23px;"><span class="h4_ex">' + lang.toolbar.tag_h + ' 4</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H5" title="' + lang.toolbar.tag_h + ' 5" style="height:19px;"><span class="h5_ex">' + lang.toolbar.tag_h + ' 5</span></button></li>' +
-            '       <li><button type="button" class="btn_edit" data-command="replace" data-value="H6" title="' + lang.toolbar.tag_h + ' 6" style="height:15px;"><span class="h6_ex">' + lang.toolbar.tag_h + ' 6</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H1" title="' + lang.toolbar.tag_h + ' 1" style="height:40px;"><span class="h1_ex">' + lang.toolbar.tag_h + ' 1</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H2" title="' + lang.toolbar.tag_h + ' 2" style="height:34px;"><span class="h2_ex">' + lang.toolbar.tag_h + ' 2</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H3" title="' + lang.toolbar.tag_h + ' 3" style="height:26px;"><span class="h3_ex">' + lang.toolbar.tag_h + ' 3</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H4" title="' + lang.toolbar.tag_h + ' 4" style="height:23px;"><span class="h4_ex">' + lang.toolbar.tag_h + ' 4</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H5" title="' + lang.toolbar.tag_h + ' 5" style="height:19px;"><span class="h5_ex">' + lang.toolbar.tag_h + ' 5</span></button></li>' +
+            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H6" title="' + lang.toolbar.tag_h + ' 6" style="height:15px;"><span class="h6_ex">' + lang.toolbar.tag_h + ' 6</span></button></li>' +
             '   </ul>' +
             '</div>';
 

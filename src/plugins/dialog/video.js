@@ -40,26 +40,26 @@ export default {
         /** video dialog */
         let video_dialog = eval(this.setDialog.call(core));
         context.video.modal = video_dialog;
-        context.video.focusElement = video_dialog.getElementsByClassName('sun-editor-id-video-url')[0];
-        context.video.captionCheckEl = video_dialog.getElementsByClassName('suneditor-id-video-check-caption')[0];
+        context.video.focusElement = video_dialog.querySelector('._se_video_url');
+        context.video.captionCheckEl = video_dialog.querySelector('._se_video_check_caption');
 
         /** add event listeners */
-        video_dialog.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
 
         context.video.videoWidth = {};
         context.video.videoHeight = {};
 
         if (context.option.videoResizing) {
-            context.video.videoWidth = video_dialog.getElementsByClassName('sun-editor-id-video-x')[0];
-            context.video.videoHeight = video_dialog.getElementsByClassName('sun-editor-id-video-y')[0];
-            context.video.proportion = video_dialog.getElementsByClassName('suneditor-id-video-check-proportion')[0];
+            context.video.videoWidth = video_dialog.querySelector('._se_video_size_x');
+            context.video.videoHeight = video_dialog.querySelector('._se_video_size_y');
+            context.video.proportion = video_dialog.querySelector('._se_video_check_proportion');
 
             context.video.videoWidth.value = context.option.videoWidth;
             context.video.videoHeight.value = context.option.videoHeight;
 
             context.video.videoWidth.addEventListener('change', this.setInputSize.bind(core, 'x'));
             context.video.videoHeight.addEventListener('change', this.setInputSize.bind(core, 'y'));
-            video_dialog.getElementsByClassName('sun-editor-id-video-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
+            video_dialog.querySelector('.se-dialog-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
         }
 
         /** append html */
@@ -75,45 +75,45 @@ export default {
         const lang = this.lang;
         const dialog = this.util.createElement('DIV');
 
-        dialog.className = 'modal-content sun-editor-id-dialog-video';
+        dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
         let html = '' +
             '<form class="editor_video">' +
-            '   <div class="modal-header">' +
+            '   <div class="se-dialog-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
+            '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.videoBox.title + '</h5>' +
             '   </div>' +
-            '   <div class="modal-body">' +
-            '       <div class="form-group">' +
+            '   <div class="se-dialog-body">' +
+            '       <div class="se-dialog-form">' +
             '           <label>' + lang.dialogBox.videoBox.url + '</label>' +
-            '           <input class="form-control sun-editor-id-video-url" type="text" />' +
+            '           <input class="se-input-form _se_video_url" type="text" />' +
             '       </div>';
 
             if (option.videoResizing) {
                 html += '' +
-                '   <div class="form-group">' +
-                '       <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '       <input type="number" class="form-size-control sun-editor-id-video-x" /><label class="size-x">x</label><input type="number" class="form-size-control sun-editor-id-video-y" />' +
-                '       <label><input type="checkbox" class="suneditor-id-video-check-proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-video-revert-button" style="float: right;"><i class="icon-revert"></i></button>' +
+                '   <div class="se-dialog-form">' +
+                '       <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+                '       <input type="number" class="se-input-control _se_video_size_x" /><label class="se-dialog-size-x">x</label><input type="number" class="se-input-control _se_video_size_y" />' +
+                '       <label><input type="checkbox" class="_se_video_check_proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn-basic se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                 '   </div>';
             }
 
             html += '' +
-            '       <div class="form-group-footer">' +
-            '           <label><input type="checkbox" class="suneditor-id-video-check-caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+            '       <div class="se-dialog-form-footer">' +
+            '           <label><input type="checkbox" class="_se_video_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
             '       </div>' +
             '   </div>' +
-            '   <div class="modal-footer">' +
+            '   <div class="se-dialog-footer">' +
             '       <div style="float: left;">' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="left">' + lang.dialogBox.left + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
+            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-video" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 
@@ -183,7 +183,7 @@ export default {
             if (this.context.dialog.updateModal) {
                 contextVideo._element.src = oIframe.src;
                 container = contextVideo._container;
-                cover = this.util.getParentElement(contextVideo._element, '.sun-editor-figure-cover');
+                cover = this.util.getParentElement(contextVideo._element, '.se-component-figure');
                 oIframe = contextVideo._element;
                 resizingDiv = contextVideo._resizingDiv;
             }
@@ -204,11 +204,11 @@ export default {
 
                 /** resizingDiv */
                 contextVideo._resizingDiv = resizingDiv = this.util.createElement('DIV');
-                resizingDiv.className = 'sun-editor-id-iframe-inner-resizing-cover';
+                resizingDiv.className = 'se-video-inner';
                 cover.appendChild(resizingDiv);
 
                 /** container */
-                container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-iframe-container');
+                container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
             }
 
             const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
@@ -281,10 +281,10 @@ export default {
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
-        contextVideo._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
-        contextVideo._container = this.util.getParentElement(element, '.sun-editor-id-iframe-container');
+        contextVideo._cover = this.util.getParentElement(element, '.se-component-figure');
+        contextVideo._container = this.util.getParentElement(element, '.se-video-container');
         contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
-        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.sun-editor-id-iframe-inner-resizing-cover');
+        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.se-video-inner');
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 

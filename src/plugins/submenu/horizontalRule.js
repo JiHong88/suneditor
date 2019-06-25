@@ -14,7 +14,7 @@ export default {
         let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.horizontalRulePick.bind(core));
+        listDiv.querySelector('ul').addEventListener('click', this.horizontalRulePick.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -27,25 +27,25 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer layer_line">' +
-            '   <ul class="list_editor">' +
+            '<div class="se-list-inner se-list-line">' +
+            '   <ul class="se-list-basic">' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="solid">' +
+            '           <button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="solid">' +
             '               <hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
             '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_solid + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dotted">' +
+            '           <button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="dotted">' +
             '               <hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
             '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dotted + '</span></span>' +
             '           </button>' +
             '       </li>' +
             '       <li>' +
-            '           <button type="button" class="btn_edit btn_line se-tooltip" data-command="horizontalRule" data-value="dashed">' +
+            '           <button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="dashed">' +
             '               <hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
             '               <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dashed + '</span></span>' +
             '           </button>' +

@@ -20,9 +20,9 @@ export default {
         /** link dialog */
         let link_dialog = eval(this.setDialog.call(core));
         context.link.modal = link_dialog;
-        context.link.focusElement = link_dialog.getElementsByClassName('sun-editor-id-link-url')[0];
-        context.link.linkAnchorText = link_dialog.getElementsByClassName('sun-editor-id-link-text')[0];
-        context.link.linkNewWindowCheck = link_dialog.getElementsByClassName('sun-editor-id-link-check')[0];
+        context.link.focusElement = link_dialog.querySelector('._se_link_url');
+        context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
+        context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
 
         /** link button */
         let link_button = eval(this.setController_LinkButton.call(core));
@@ -31,7 +31,7 @@ export default {
         link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        link_dialog.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         link_button.addEventListener('click', this.onClick_linkBtn.bind(core));
 
         /** append html */
@@ -47,28 +47,28 @@ export default {
         const lang = this.lang;
         const dialog = this.util.createElement('DIV');
 
-        dialog.className = 'modal-content sun-editor-id-dialog-link';
+        dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
             '<form class="editor_link">' +
-            '   <div class="modal-header">' +
+            '   <div class="se-dialog-header">' +
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
+            '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '       </button>' +
             '       <h5 class="modal-title">' + lang.dialogBox.linkBox.title + '</h5>' +
             '   </div>' +
-            '   <div class="modal-body">' +
-            '       <div class="form-group">' +
+            '   <div class="se-dialog-body">' +
+            '       <div class="se-dialog-form">' +
             '           <label>' + lang.dialogBox.linkBox.url + '</label>' +
-            '           <input class="form-control sun-editor-id-link-url" type="text" />' +
+            '           <input class="se-input-form _se_link_url" type="text" />' +
             '       </div>' +
-            '       <div class="form-group">' +
-            '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="form-control sun-editor-id-link-text" type="text" />' +
+            '       <div class="se-dialog-form">' +
+            '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
             '       </div>' +
-            '       <label><input type="checkbox" class="sun-editor-id-link-check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       <label><input type="checkbox" class="_se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '   </div>' +
-            '   <div class="modal-footer">' +
-            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-link" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '   <div class="se-dialog-footer">' +
+            '       <button type="submit" class="btn se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 
@@ -80,18 +80,18 @@ export default {
         const lang = this.lang;
         const link_btn = this.util.createElement('DIV');
 
-        link_btn.className = 'se-controller sun-editor-id-link-btn';
+        link_btn.className = 'se-controller se-controller-link';
         link_btn.style.display = 'none';
         link_btn.innerHTML = '' +
-            '<div class="arrow arrow-up"></div>' +
+            '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
-            '   <div class="btn-group">' +
+            '   <div class="se-btn-group">' +
             '     <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-            '       <i class="icon-link"></i>' +
+            '       <i class="se-icon-link"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
             '   </button>' +
             '     <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-            '       <i class="icon-delete"></i>' +
+            '       <i class="se-icon-delete"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
             '   </button>' +
             '   </div>' +

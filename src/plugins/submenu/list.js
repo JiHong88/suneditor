@@ -18,34 +18,35 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
+        let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+        listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.list._list = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
+        context.list._list = listUl.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
 
         /** empty memory */
-        listDiv = null;
+        listDiv = null, listUl = null;
     },
 
     setSubmenu: function () {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer">' +
-            '   <ul class="list_editor">' +
-            '       <li><button type="button" class="btn_edit se-tooltip" data-command="OL">' +
-            '           <i class="icon-list-number"></i>' +
+            '<div class="se-list-inner">' +
+            '   <ul class="se-list-basic">' +
+            '       <li><button type="button" class="se-btn-list se-tooltip" data-command="OL">' +
+            '           <i class="se-icon-list-number"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
             '       </button></li>' +
-            '       <li><button type="button" class="btn_edit se-tooltip" data-command="UL">' +
-            '           <i class="icon-list-bullets"></i>' +
+            '       <li><button type="button" class="se-btn-list se-tooltip" data-command="UL">' +
+            '           <i class="se-icon-list-bullets"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
             '       </button></li>' +
             '   </ul>' +

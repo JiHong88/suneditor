@@ -92,13 +92,13 @@
         <span class="pl-k">const</span> <span class="pl-c1">lang</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">lang</span>;
         <span class="pl-k">const</span> <span class="pl-c1">listDiv</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">util</span>.<span class="pl-c1">createElement</span>(<span class="pl-s"><span class="pl-pds">'</span>DIV<span class="pl-pds">'</span></span>);
 
-        <span class="pl-smi">listDiv</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>layer_editor<span class="pl-pds">'</span></span>;
+        <span class="pl-smi">listDiv</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>se-list-layer<span class="pl-pds">'</span></span>;
         <span class="pl-smi">listDiv</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
         <span class="pl-smi">listDiv</span>.<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-            <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="inner_layer layer_align"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-            <span class="pl-s"><span class="pl-pds">'</span>   &lt;ul class="list_editor"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;input class="form-control" type="text" style="width: 100%; border: 1px solid #CCC;" /&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="btn_editor se-tooltip"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="se-list-inner se-list-align"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>   &lt;ul class="se-list-basic"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;input class="se-input-form" type="text" style="width: 100%; border: 1px solid #CCC;" /&gt;&lt;/li&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+            <span class="pl-s"><span class="pl-pds">'</span>       &lt;li&gt;&lt;button type="button" class="se-btn-basic se-tooltip"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>           &lt;span&gt;OK&lt;/span&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>           &lt;span class="se-tooltip-inner"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
             <span class="pl-s"><span class="pl-pds">'</span>               &lt;span class="se-tooltip-text"&gt;Append text&lt;/span&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
@@ -198,13 +198,13 @@
         setSubmenu: function () {
             const listDiv = this.util.createElement('DIV');
 
-            listDiv.className = 'sun-editor-submenu layer_editor';
+            listDiv.className = 'se-submenu se-list-layer';
             listDiv.style.display = 'none';
             listDiv.innerHTML = '' +
-                '<div class="inner_layer layer_align">' +
-                '   <ul class="list_editor">' +
-                '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
-                '       <li><button type="button" class="btn_editor se-tooltip">' +
+                '<div class="se-list-inner se-list-align">' +
+                '   <ul class="se-list-basic">' +
+                '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+                '       <li><button type="button" class="se-btn-basic se-tooltip">' +
                 '               <span>OK</span>' +
                 '               <span class="se-tooltip-inner">' +
                 '                   <span class="se-tooltip-text">Append text</span>' +

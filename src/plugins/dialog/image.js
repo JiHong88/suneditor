@@ -44,28 +44,28 @@ export default {
         /** image dialog */
         let image_dialog = eval(this.setDialog.call(core));
         context.image.modal = image_dialog;
-        context.image.imgUrlFile = image_dialog.getElementsByClassName('sun-editor-id-image-url')[0];
-        context.image.imgInputFile = context.image.focusElement = image_dialog.getElementsByClassName('sun-editor-id-image-file')[0];
-        context.image.altText = image_dialog.getElementsByClassName('sun-editor-id-image-alt')[0];
-        context.image.imgLink = image_dialog.getElementsByClassName('sun-editor-id-image-link')[0];
-        context.image.imgLinkNewWindowCheck = image_dialog.getElementsByClassName('sun-editor-id-linkCheck')[0];
-        context.image.captionCheckEl = image_dialog.getElementsByClassName('suneditor-id-image-check-caption')[0];
+        context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
+        context.image.imgInputFile = context.image.focusElement = image_dialog.querySelector('._se_image_file');
+        context.image.altText = image_dialog.querySelector('._se_image_alt');
+        context.image.imgLink = image_dialog.querySelector('._se_image_link');
+        context.image.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
+        context.image.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
 
         /** add event listeners */
-        context.image.modal.getElementsByClassName('sun-editor-tab-button')[0].addEventListener('click', this.openTab.bind(core));
-        context.image.modal.getElementsByClassName('se-btn-primary')[0].addEventListener('click', this.submit.bind(core));
+        context.image.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
+        context.image.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         
         context.image.imageX = {};
         context.image.imageY = {};
         if (context.option.imageResizing) {
-            context.image.proportion = image_dialog.getElementsByClassName('suneditor-id-image-check-proportion')[0];
-            context.image.imageX = image_dialog.getElementsByClassName('sun-editor-id-image-x')[0];
-            context.image.imageY = image_dialog.getElementsByClassName('sun-editor-id-image-y')[0];
+            context.image.proportion = image_dialog.querySelector('._se_image_check_proportion');
+            context.image.imageX = image_dialog.querySelector('._se_image_size_x');
+            context.image.imageY = image_dialog.querySelector('._se_image_size_y');
             context.image.imageX.value = context.option.imageWidth;
             
             context.image.imageX.addEventListener('change', this.setInputSize.bind(core, 'x'));
             context.image.imageY.addEventListener('change', this.setInputSize.bind(core, 'y'));
-            image_dialog.getElementsByClassName('sun-editor-id-image-revert-button')[0].addEventListener('click', this.sizeRevert.bind(core));
+            image_dialog.querySelector('.se-dialog-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
         }
 
         /** append html */
@@ -81,77 +81,77 @@ export default {
         const lang = this.lang;
         const dialog = this.util.createElement('DIV');
 
-        dialog.className = 'modal-content sun-editor-id-dialog-image';
+        dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
 
         let html = '' +
-            '<div class="modal-header">' +
+            '<div class="se-dialog-header">' +
             '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '       <i aria-hidden="true" data-command="close" class="icon-cancel"></i>' +
+            '       <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '   </button>' +
             '   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
             '</div>' +
-            '<div class="sun-editor-tab-button">' +
-            '   <button type="button" class="sun-editor-id-tab-link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
-            '   <button type="button" class="sun-editor-id-tab-link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+            '<div class="se-dialog-tabs">' +
+            '   <button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
+            '   <button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
-            '   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-image">' +
-            '       <div class="modal-body">';
+            '   <div class="_se_tab_content _se_tab_content_image">' +
+            '       <div class="se-dialog-body">';
 
             if (option.imageFileInput) {
                 html += '' +
-                    '   <div class="form-group">' +
+                    '   <div class="se-dialog-form">' +
                     '       <label>' + lang.dialogBox.imageBox.file + '</label>' +
-                    '       <input class="form-control sun-editor-id-image-file" type="file" accept="image/*" multiple="multiple" />' +
+                    '       <input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
                     '   </div>' ;
             }
 
             if (option.imageUrlInput) {
                 html += '' +
-                    '   <div class="form-group">' +
+                    '   <div class="se-dialog-form">' +
                     '       <label>' + lang.dialogBox.imageBox.url + '</label>' +
-                    '       <input class="form-control sun-editor-id-image-url" type="text" />' +
+                    '       <input class="se-input-form _se_image_url" type="text" />' +
                     '   </div>';
             }
 
             html += '' +
-            '           <div class="form-group">' +
-            '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="form-control sun-editor-id-image-alt" type="text" />' +
+            '           <div class="se-dialog-form">' +
+            '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
             '           </div>';
 
             if (option.imageResizing) {
                 html += '' +
-                '       <div class="form-group">' +
-                '           <div class="size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '           <input class="form-size-control sun-editor-id-image-x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="size-x">x</label><input class="form-size-control sun-editor-id-image-y" type="number" min="1" disabled />' +
-                '           <label><input type="checkbox" class="suneditor-id-image-check-proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="btn_editor btn-revert sun-editor-id-image-revert-button" style="float: right;"><i class="icon-revert"></i></button>' +
+                '       <div class="se-dialog-form">' +
+                '           <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+                '           <input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
+                '           <label><input type="checkbox" class="_se_image_check_proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn-basic se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                 '       </div>' ;
             }
 
             html += '' +
-            '           <div class="form-group-footer">' +
-            '               <label><input type="checkbox" class="suneditor-id-image-check-caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+            '           <div class="se-dialog-form-footer">' +
+            '               <label><input type="checkbox" class="_se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
             '           </div>' +
             '       </div>' +
             '   </div>' +
-            '   <div class="sun-editor-id-tab-content sun-editor-id-tab-content-url" style="display: none">' +
-            '       <div class="modal-body">' +
-            '           <div class="form-group">' +
-            '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="form-control sun-editor-id-image-link" type="text" />' +
+            '   <div class="_se_tab_content _se_tab_content_url" style="display: none">' +
+            '       <div class="se-dialog-body">' +
+            '           <div class="se-dialog-form">' +
+            '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
             '           </div>' +
-            '           <label><input type="checkbox" class="sun-editor-id-linkCheck"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '           <label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '       </div>' +
             '   </div>' +
-            '   <div class="modal-footer">' +
+            '   <div class="se-dialog-footer">' +
             '       <div style="float: left;">' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="left">' + lang.dialogBox.left + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="center">' + lang.dialogBox.center + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="modal-radio" value="right">' + lang.dialogBox.right + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
+            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn se-btn-primary sun-editor-id-submit-image" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="btn se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 
@@ -162,7 +162,7 @@ export default {
 
     openTab: function (e) {
         const modal = this.context.image.modal;
-        const targetElement = (e === 'init' ? modal.getElementsByClassName('sun-editor-id-tab-link')[0] : e.target);
+        const targetElement = (e === 'init' ? modal.querySelector('._se_tab_link') : e.target);
 
         if (!/^BUTTON$/i.test(targetElement.tagName)) {
             return false;
@@ -170,7 +170,7 @@ export default {
 
         // Declare all variables
         const tabName = targetElement.getAttribute('data-tab-link');
-        const contentClassName = 'sun-editor-id-tab-content';
+        const contentClassName = '_se_tab_content';
         let i, tabContent, tabLinks;
 
         // Get all elements with class="tabcontent" and hide them
@@ -180,13 +180,13 @@ export default {
         }
 
         // Get all elements with class="tablinks" and remove the class "active"
-        tabLinks = modal.getElementsByClassName('sun-editor-id-tab-link');
+        tabLinks = modal.getElementsByClassName('_se_tab_link');
         for (i = 0; i < tabLinks.length; i++) {
             this.util.removeClass(tabLinks[i], 'active');
         }
 
         // Show the current tab, and add an "active" class to the button that opened the tab
-        modal.getElementsByClassName(contentClassName + '-' + tabName)[0].style.display = 'block';
+        modal.querySelector('.' + contentClassName + '_' + tabName).style.display = 'block';
         this.util.addClass(targetElement, 'active');
 
         // focus
@@ -425,7 +425,7 @@ export default {
         }
 
         const cover = this.plugins.resizing.set_cover.call(this, oImg);
-        const container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
+        const container = this.plugins.resizing.set_container.call(this, cover, 'se-image-container');
 
         // caption
         if (contextImage._captionChecked) {
@@ -473,7 +473,7 @@ export default {
         if (container === null) {
             cover = cover.cloneNode(true);
             isNewContainer = true;
-            container = this.plugins.resizing.set_container.call(this, cover, 'sun-editor-id-image-container');
+            container = this.plugins.resizing.set_container.call(this, cover, 'se-image-container');
         }
         
         if (isNewContainer) {
@@ -569,8 +569,8 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
-        contextImage._cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
-        contextImage._container = this.util.getParentElement(element, '.sun-editor-id-image-container');
+        contextImage._cover = this.util.getParentElement(element, '.se-component-figure');
+        contextImage._container = this.util.getParentElement(element, '.se-image-container');
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
@@ -671,7 +671,7 @@ export default {
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, '.sun-editor-id-image-container') || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, '.se-image-container') || imageEl;
 
         const dataIndex = imageEl.getAttribute('data-index');
         

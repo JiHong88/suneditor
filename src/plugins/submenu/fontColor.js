@@ -23,28 +23,29 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
-        context.fontColor.colorInput = listDiv.getElementsByClassName('sun-editor-id-submenu-color-input')[0];
+        let listUl = listDiv.querySelector('ul');
+        context.fontColor.colorInput = listDiv.querySelector('._se_color_picker_input');
 
         /** add event listeners */
         context.fontColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
-        listDiv.getElementsByClassName('sun-editor-id-submenu-color-submit')[0].addEventListener('click', this.submit.bind(core));
-        listDiv.getElementsByClassName('sun-editor-id-submenu-color-default')[0].addEventListener('click', this.remove.bind(core));
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+        listDiv.querySelector('._se_color_picker_submit').addEventListener('click', this.submit.bind(core));
+        listDiv.querySelector('._se_color_picker_remove').addEventListener('click', this.remove.bind(core));
+        listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.fontColor.colorList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
+        context.fontColor.colorList = listUl.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
 
         /** empty memory */
-        listDiv = null;
+        listDiv = null, listUl = null;
     },
 
     setSubmenu: function () {
         const colorArea = this.context.colorPicker.colorListHTML;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = colorArea;
 

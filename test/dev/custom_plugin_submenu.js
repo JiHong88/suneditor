@@ -36,13 +36,13 @@ export default {
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="inner_layer layer_align">' +
-            '   <ul class="list_editor">' +
-            '       <li><input class="form-control" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
-            '       <li><button type="button" class="btn_editor se-tooltip">' +
+            '<div class="se-list-inner se-list-align">' +
+            '   <ul class="se-list-basic">' +
+            '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+            '       <li><button type="button" class="se-btn-basic se-tooltip">' +
             '               <span>OK</span>' +
             '               <span class="se-tooltip-inner">' +
             '                   <span class="se-tooltip-text">Append text</span>' +

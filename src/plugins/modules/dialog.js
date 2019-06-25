@@ -15,14 +15,14 @@ export default {
 
         /** dialog */
         let dialog_div = core.util.createElement('DIV');
-        dialog_div.className = 'sun-editor-id-dialogBox sun-editor-common';
+        dialog_div.className = 'se-dialog sun-editor-common';
 
         let dialog_back = core.util.createElement('DIV');
-        dialog_back.className = 'modal-dialog-background sun-editor-id-dialog-back';
+        dialog_back.className = 'se-dialog-back';
         dialog_back.style.display = 'none';
 
         let dialog_area = core.util.createElement('DIV');
-        dialog_area.className = 'modal-dialog sun-editor-id-dialog-modal';
+        dialog_area.className = 'se-dialog-inner';
         dialog_area.style.display = 'none';
 
         dialog_div.appendChild(dialog_back);
@@ -45,7 +45,7 @@ export default {
     onClick_dialog: function (e) {
         e.stopPropagation();
 
-        if (/modal-dialog/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
+        if (/se-dialog-inner/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
             this.plugins.dialog.close.call(this);
         }
     },

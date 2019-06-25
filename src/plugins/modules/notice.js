@@ -18,11 +18,11 @@ export default {
         let notice_span = core.util.createElement('SPAN');
         let notice_button = core.util.createElement('BUTTON');
 
-        notice_div.className = 'sun-editor-id-notice';
+        notice_div.className = 'se-notice';
         notice_button.className = 'close';
         notice_button.setAttribute('aria-label', 'Close');
         notice_button.setAttribute('title', core.lang.dialogBox.close);
-        notice_button.innerHTML = '<i aria-hidden="true" data-command="close" class="icon-cancel"></i>';
+        notice_button.innerHTML = '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>';
         
         notice_div.appendChild(notice_span);
         notice_div.appendChild(notice_button);

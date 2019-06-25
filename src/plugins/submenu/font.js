@@ -20,9 +20,9 @@ export default {
         let listDiv = eval(this.setSubmenu.call(core));
 
         /** add event listeners */
-        listDiv.getElementsByClassName('list_family')[0].addEventListener('click', this.pickup.bind(core));
+        listDiv.querySelector('.se-list-font-family').addEventListener('click', this.pickup.bind(core));
 
-        context.font._fontList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
+        context.font._fontList = listDiv.querySelectorAll('ul li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -36,7 +36,7 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'layer_editor';
+        listDiv.className = 'se-list-layer';
         listDiv.style.display = 'none';
 
         let font, text, i, len;
@@ -52,13 +52,13 @@ export default {
                 'Verdana'
             ] : option.font;
 
-        let list = '<div class="sun-editor-submenu inner_layer list_family">' +
-            '   <ul class="list_editor">' +
-            '       <li><button type="button" class="default_value btn_edit" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+        let list = '<div class="se-submenu se-list-inner se-list-font-family">' +
+            '   <ul class="se-list-basic">' +
+            '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
             text = font.split(',')[0];
-            list += '<li><button type="button" class="btn_edit" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+            list += '<li><button type="button" class="se-btn-list" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
         }
         list += '   </ul>';
         list += '</div>';

@@ -29,16 +29,16 @@ export default {
         let resize_div_container = eval(this.setController_resize.call(core));
         context.resizing.resizeContainer = resize_div_container;
 
-        context.resizing.resizeDiv = resize_div_container.getElementsByClassName('modal-resize')[0];
-        context.resizing.resizeDot = resize_div_container.getElementsByClassName('resize-dot')[0];
-        context.resizing.resizeDisplay = resize_div_container.getElementsByClassName('resize-display')[0];
+        context.resizing.resizeDiv = resize_div_container.querySelector('.se-modal-resize');
+        context.resizing.resizeDot = resize_div_container.querySelector('.se-resize-dot');
+        context.resizing.resizeDisplay = resize_div_container.querySelector('.se-resize-display');
 
         let resize_button = eval(this.setController_button.call(core));
         context.resizing.resizeButton = resize_button;
         resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
-        let resize_handles = context.resizing.resizeHandles = resize_div_container.querySelectorAll('.sun-editor-name-resize-handle');
-        context.resizing.resizeButtonGroup = resize_button.getElementsByClassName('sun-editor-id-resize-button-group')[0];
+        let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.getElementsByTagName('span');
+        context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
 
         /** add event listeners */
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -63,21 +63,21 @@ export default {
     setController_resize: function () {
         const resize_container = this.util.createElement('DIV');
         
-        resize_container.className = 'modal-resize-container';
+        resize_container.className = 'se-resizing-container';
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
-            '<div class="modal-resize">' +
-            '   <div class="resize-display"></div>' +
+            '<div class="se-modal-resize">' +
+            '   <div class="se-resize-display"></div>' +
             '</div>' +
-            '<div class="resize-dot">' +
-            '   <span class="tl sun-editor-name-resize-handle"></span>' +
-            '   <span class="tr sun-editor-name-resize-handle"></span>' +
-            '   <span class="bl sun-editor-name-resize-handle"></span>' +
-            '   <span class="br sun-editor-name-resize-handle"></span>' +
-            '   <span class="lw sun-editor-name-resize-handle"></span>' +
-            '   <span class="th sun-editor-name-resize-handle"></span>' +
-            '   <span class="rw sun-editor-name-resize-handle"></span>' +
-            '   <span class="bh sun-editor-name-resize-handle"></span>' +
+            '<div class="se-resize-dot">' +
+            '   <span class="tl"></span>' +
+            '   <span class="tr"></span>' +
+            '   <span class="bl"></span>' +
+            '   <span class="br"></span>' +
+            '   <span class="lw"></span>' +
+            '   <span class="th"></span>' +
+            '   <span class="rw"></span>' +
+            '   <span class="bh"></span>' +
             '</div>';
 
         return resize_container;
@@ -87,11 +87,11 @@ export default {
         const lang = this.lang;
         const resize_button = this.util.createElement("DIV");
 
-        resize_button.className = "se-controller controller-resizing";
+        resize_button.className = "se-controller se-controller-resizing";
         resize_button.style.display = "none";
         resize_button.innerHTML = '' +
-            '<div class="arrow arrow-up"></div>' +
-            '<div class="btn-group sun-editor-id-resize-button-group">' +
+            '<div class="se-arrow se-arrow-up"></div>' +
+            '<div class="se-btn-group _se_resizing_btn_group">' +
             '   <button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
             '       <span class="note-fontsize-10">100%</span>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
@@ -109,33 +109,33 @@ export default {
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
-            '       <i class="icon-rotate-left"></i>' +
+            '       <i class="se-icon-rotate-left"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
-            '       <i class="icon-rotate-right"></i>' +
+            '       <i class="se-icon-rotate-right"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
             '   </button>' +
             '</div>' +
-            '<div class="btn-group">' +
+            '<div class="se-btn-group">' +
             '   <button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
-            '       <i class="icon-mirror-horizontal"></i>' +
+            '       <i class="se-icon-mirror-horizontal"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
-            '       <i class="icon-mirror-vertical"></i>' +
+            '       <i class="se-icon-mirror-vertical"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="revert" class="se-tooltip">' +
-            '       <i class="icon-revert"></i>' +
+            '       <i class="se-icon-revert"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="update" class="se-tooltip">' +
-            '       <i class="icon-modify"></i>' +
+            '       <i class="se-icon-modify"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="delete" class="se-tooltip">' +
-            '       <i class="icon-delete"></i>' +
+            '       <i class="se-icon-delete"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
             '   </button>' +
             '</div>';
@@ -220,7 +220,7 @@ export default {
 
     set_cover: function (element) {
         const cover = this.util.createElement('FIGURE');
-        cover.className = 'sun-editor-figure-cover';
+        cover.className = 'se-component-figure';
         cover.appendChild(element);
 
         return cover;
@@ -228,7 +228,7 @@ export default {
 
     set_container: function (cover, className) {
         const container = this.util.createElement('DIV');
-        container.className = 'sun-editor-id-comp ' + className;
+        container.className = 'se-component ' + className;
         container.setAttribute('contenteditable', false);
         container.appendChild(cover);
 
@@ -325,7 +325,7 @@ export default {
     },
 
     setTransformSize: function (element) {
-        const cover = this.util.getParentElement(element, '.sun-editor-figure-cover');
+        const cover = this.util.getParentElement(element, '.se-component-figure');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -351,7 +351,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.sun-editor-figure-cover'), 'FIGCAPTION'));
+        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.se-component-figure'), 'FIGCAPTION'));
     },
 
     _setTransForm: function (element, r, x, y) {

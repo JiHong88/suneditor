@@ -18,17 +18,18 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
+        let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
-        listDiv.getElementsByTagName('UL')[0].addEventListener('click', this.pickup.bind(core));
+        listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.fontSize._sizeList = listDiv.getElementsByTagName('UL')[0].querySelectorAll('li button');
+        context.fontSize._sizeList = listUl.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
 
         /** empty memory */
-        listDiv = null;
+        listDiv = null, listUl = null;
     },
 
     setSubmenu: function () {
@@ -36,17 +37,17 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'sun-editor-submenu layer_editor';
+        listDiv.className = 'se-submenu se-list-layer';
         listDiv.style.display = 'none';
 
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
-        let list = '<div class="inner_layer layer_size">' +
-            '   <ul class="list_editor font_size_list">' +
-            '       <li><button type="button" class="default_value btn_edit" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+        let list = '<div class="se-list-inner se-list-font-size">' +
+            '   <ul class="se-list-basic se-list-font-size-inner">' +
+            '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (let i = 0, len = sizeList.length; i < len; i++) {
             const size = sizeList[i];
-            list += '<li><button type="button" class="btn_edit" data-value="' + size + '" title="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
+            list += '<li><button type="button" class="se-btn-list" data-value="' + size + '" title="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
         }
         list += '   </ul>' +
             '</div>';

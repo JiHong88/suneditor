@@ -94,7 +94,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
-        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.sun-editor-id-toolbar button:not([class~="code-view-enabled"])'),
+        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])'),
 
         /**
          * @description History object for undo, redo
@@ -1992,7 +1992,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Add or remove the class name of "body" so that the code block is visible
          */
         toggleDisplayBlocks: function () {
-            util.toggleClass(context.element.wysiwyg, 'sun-editor-show-block');
+            util.toggleClass(context.element.wysiwyg, 'se-show-block');
         },
 
         /**
@@ -2059,7 +2059,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (context.element._stickyDummy.style.display !== 'none') {
                     this._variable._fullScreenSticky = true;
                     context.element._stickyDummy.style.display = 'none';
-                    util.removeClass(toolbar, "sun-editor-sticky");
+                    util.removeClass(toolbar, "se-toolbar-sticky");
                 }
 
                 this._variable._bodyOverflow = _d.body.style.overflow;
@@ -2078,8 +2078,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this._variable.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
 
-                util.removeClass(element.firstElementChild, 'icon-expansion');
-                util.addClass(element.firstElementChild, 'icon-reduction');
+                util.removeClass(element.firstElementChild, 'se-icon-expansion');
+                util.addClass(element.firstElementChild, 'se-icon-reduction');
             }
             else {
                 this._variable.isFullScreen = false;
@@ -2092,18 +2092,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 _d.body.style.overflow = this._variable._bodyOverflow;
 
                 if (context.option.stickyToolbar > -1) {
-                    util.removeClass(toolbar, 'sun-editor-sticky');
+                    util.removeClass(toolbar, 'se-toolbar-sticky');
                     event.onScroll_window();
                 }
 
                 if (this._variable._fullScreenSticky) {
                     this._variable._fullScreenSticky = false;
                     context.element._stickyDummy.style.display = 'block';
-                    util.addClass(toolbar, "sun-editor-sticky");
+                    util.addClass(toolbar, "se-toolbar-sticky");
                 }
 
-                util.removeClass(element.firstElementChild, 'icon-reduction');
-                util.addClass(element.firstElementChild, 'icon-expansion');
+                util.removeClass(element.firstElementChild, 'se-icon-reduction');
+                util.addClass(element.firstElementChild, 'se-icon-expansion');
             }
         },
 
@@ -2253,7 +2253,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     const textAlign = selectionParent.style.textAlign;
                     if (findAlign && textAlign && commandMap.ALIGN) {
                         commandMapNodes.push('ALIGN');
-                        commandMap.ALIGN.className = 'icon-align-' + textAlign;
+                        commandMap.ALIGN.className = 'se-icon-align-' + textAlign;
                         commandMap.ALIGN.setAttribute('data-focus', textAlign);
                         findAlign = false;
                     }
@@ -2329,7 +2329,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
                 }
                 else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
-                    commandMap.ALIGN.className = 'icon-align-left';
+                    commandMap.ALIGN.className = 'se-icon-align-left';
                     commandMap.ALIGN.removeAttribute('data-focus');
                 }
                 else if (commandMap.LI && util.isListCell(key)) {
@@ -2358,7 +2358,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         onMouseDown_toolbar: function (e) {
             let target = e.target;
 
-            if (util.getParentElement(target, '.sun-editor-submenu')) {
+            if (util.getParentElement(target, '.se-submenu')) {
                 e.stopPropagation();
                 core._notHideToolbar = true;
             } else {
@@ -2366,7 +2366,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 let command = target.getAttribute('data-command');
                 let className = target.className;
     
-                while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
+                while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
                     target = target.parentNode;
                     command = target.getAttribute('data-command');
                     className = target.className;
@@ -2387,7 +2387,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             let command = target.getAttribute('data-command');
             let className = target.className;
 
-            while (!command && !/editor_tool/.test(className) && !/sun-editor-id-toolbar/.test(className)) {
+            while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
                 target = target.parentNode;
                 command = target.getAttribute('data-command');
                 display = target.getAttribute('data-display');
@@ -2472,7 +2472,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
                     core.plugins.image.onModifyMode.call(core, targetElement, size);
                     
-                    if (!util.getParentElement(targetElement, '.sun-editor-id-image-container')) {
+                    if (!util.getParentElement(targetElement, '.se-image-container')) {
                         core.plugins.image.openModify.call(core, true);
                         core.plugins.image.update_image.call(core, true);
                     }
@@ -2481,7 +2481,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 return;
             }
 
-            if (/sun-editor-id-iframe-inner-resizing-cover/i.test(targetElement.className)) {
+            if (/se-video-inner/i.test(targetElement.className)) {
                 e.preventDefault();
                 if (!core.plugins.video) return;
 
@@ -2548,12 +2548,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
             toolbar.style.top = (t) + 'px';
 
             if (isDirTop) {
-                util.removeClass(context.element._arrow, 'arrow-up');
-                util.addClass(context.element._arrow, 'arrow-down');
+                util.removeClass(context.element._arrow, 'se-arrow-up');
+                util.addClass(context.element._arrow, 'se-arrow-down');
                 context.element._arrow.style.top = (toolbarHeight) + 'px';
             } else {
-                util.removeClass(context.element._arrow, 'arrow-down');
-                util.addClass(context.element._arrow, 'arrow-up');
+                util.removeClass(context.element._arrow, 'se-arrow-down');
+                util.addClass(context.element._arrow, 'se-arrow-up');
                 context.element._arrow.style.top = '-11px';
             }
 
@@ -2672,20 +2672,20 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 util.removeItem(formatEl);
                             }
 
-                            if (util.hasClass(nextEl, 'sun-editor-id-comp') || /^IMG$/i.test(nextEl.nodeName)) {
+                            if (util.hasClass(nextEl, 'se-component') || /^IMG$/i.test(nextEl.nodeName)) {
                                 e.stopPropagation();
-                                if (util.hasClass(nextEl, 'sun-editor-id-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
+                                if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
                                     core.callPlugin('image', function () {
                                         const size = core.plugins.resizing.call_controller_resize.call(core, nextEl, 'image');
                                         core.plugins.image.onModifyMode.call(core, nextEl, size);
                                         
-                                        if (!util.getParentElement(nextEl, '.sun-editor-id-comp')) {
+                                        if (!util.getParentElement(nextEl, '.se-component')) {
                                             core.plugins.image.openModify.call(core, true);
                                             core.plugins.image.update_image.call(core, true);
                                         }
                                     });
-                                } else if (util.hasClass(nextEl, 'sun-editor-id-iframe-container')) {
+                                } else if (util.hasClass(nextEl, 'se-video-container')) {
                                     e.stopPropagation();
                                     core.callPlugin('video', function () {
                                         const iframe = nextEl.querySelector('iframe');
@@ -2955,7 +2955,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             element.toolbar.style.top = context.option.stickyToolbar + 'px';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
-            util.addClass(element.toolbar, 'sun-editor-sticky');
+            util.addClass(element.toolbar, 'se-toolbar-sticky');
             core._sticky = true;
         },
 
@@ -2964,7 +2964,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             element.toolbar.style.top = core._isInline ? core._inlineToolbarAttr.top : '';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : '';
             element.editorArea.style.marginTop = '';
-            util.removeClass(element.toolbar, 'sun-editor-sticky');
+            util.removeClass(element.toolbar, 'se-toolbar-sticky');
             core._sticky = false;
         },
 
@@ -3197,7 +3197,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         if (/\d+/.test(context.option.height)) {
             context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
         } else {
-            util.addClass(context.element.resizingBar, 'none-resize');
+            util.addClass(context.element.resizingBar, 'se-resizing-none');
         }
     }
 

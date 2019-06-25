@@ -38,9 +38,9 @@ export default {
                 '#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535', '#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222'
             ] : option.colorList;
 
-        let list = '<div class="inner_layer">' +
-            '<div class="pallet_color_selector">' +
-            '   <ul class="list_color">';
+        let list = '<div class="se-list-inner">' +
+            '<div class="se-selector-color">' +
+            '   <ul class="se-color-pallet">';
         for (let i = 0, len = colorList.length; i < len; i++) {
             const color = colorList[i];
             list += '<li>' +
@@ -49,15 +49,15 @@ export default {
         }
         list += '</ul>' +
             '</div>' +
-            '<form class="sub-form-group">' +
+            '<form class="se-submenu-form-group">' +
             '   <label>#</label>' +
-            '   <input type="text" maxlength="6" class="sun-editor-id-submenu-color-input" />' +
-            '   <button type="submit" class="se-btn-primary sun-editor-id-submenu-color-submit se-tooltip">' +
-            '       <i class="icon-checked"></i>' +
+            '   <input type="text" maxlength="6" class="_se_color_picker_input" />' +
+            '   <button type="submit" class="se-btn-primary se-tooltip _se_color_picker_submit">' +
+            '       <i class="se-icon-checked"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.submitButton + '</span></span>' +
             '   </button>' +
-            '   <button type="button" class="btn_editor sun-editor-id-submenu-color-default se-tooltip">' +
-            '       <i class="icon-erase"></i>' +
+            '   <button type="button" class="se-btn-basic se-tooltip _se_color_picker_remove">' +
+            '       <i class="se-icon-erase"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.removeFormat + '</span></span>' +
             '   </button>' +
             '</form>' +

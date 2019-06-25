@@ -39,26 +39,26 @@ export default {
 
         /** set submenu */
         let listDiv = eval(this.setSubmenu.call(core));
-        let tablePicker = listDiv.getElementsByClassName('sun-editor-id-table-picker')[0];
+        let tablePicker = listDiv.querySelector('.se-controller-table-picker');
 
-        context.table.tableHighlight = listDiv.getElementsByClassName('sun-editor-id-table-highlighted')[0];
-        context.table.tableUnHighlight = listDiv.getElementsByClassName('sun-editor-id-table-unhighlighted')[0];
-        context.table.tableDisplay = listDiv.getElementsByClassName('sun-editor-table-display')[0];
+        context.table.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
+        context.table.tableUnHighlight = listDiv.querySelector('.se-table-size-unhighlighted');
+        context.table.tableDisplay = listDiv.querySelector('.se-table-size-display');
 
         /** set table controller */
         let tableController = eval(this.setController_table.call(core));
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('__se__table_resize > i');
-        context.table.resizeText = tableController.querySelector('__se__table_resize > span > span');
+        context.table.resizeIcon = tableController.querySelector('_se_table_resize > i');
+        context.table.resizeText = tableController.querySelector('_se_table_resize > span > span');
         context.table.headerButton = tableController.querySelector('.__se__table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
         let resizeDiv = eval(this.setController_tableEditor.call(core));
         context.table.resizeDiv = resizeDiv;
-        context.table.splitMenu = resizeDiv.querySelector('.__se__split_menu');
-        context.table.mergeButton = resizeDiv.querySelector('.__se__merge_button');
-        context.table.splitButton = resizeDiv.querySelector('.__se__split_button');
+        context.table.splitMenu = resizeDiv.querySelector('._se_table_split_menu');
+        context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
+        context.table.splitButton = resizeDiv.querySelector('._se_table_split_button');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -78,16 +78,16 @@ export default {
 
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
-        listDiv.className = 'sun-editor-submenu table-content';
+        listDiv.className = 'se-submenu se-selector-table';
         listDiv.style.display = 'none';
 
         listDiv.innerHTML = '' +
-            '<div class="table-data-form">' +
-            '   <div class="table-picker sun-editor-id-table-picker"></div>' +
-            '   <div class="table-highlighted sun-editor-id-table-highlighted"></div>' +
-            '   <div class="table-unhighlighted sun-editor-id-table-unhighlighted"></div>' +
+            '<div class="se-table-size">' +
+            '   <div class="se-table-size-picker se-controller-table-picker"></div>' +
+            '   <div class="se-table-size-highlighted"></div>' +
+            '   <div class="se-table-size-unhighlighted"></div>' +
             '</div>' +
-            '<div class="table-display sun-editor-table-display">1 x 1</div>';
+            '<div class="se-table-size-display">1 x 1</div>';
 
         return listDiv;
     },
@@ -96,21 +96,21 @@ export default {
         const lang = this.lang;
         const tableResize = this.util.createElement('DIV');
 
-        tableResize.className = 'se-controller sun-editor-id-table';
+        tableResize.className = 'se-controller se-controller-table';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div>' +
-            '   <div class="btn-group">' +
-            '       <button type="button" data-command="resize" class="se-tooltip __se__table_resize">' +
-            '           <i class="icon-expansion"></i>' +
+            '   <div class="se-btn-group">' +
+            '       <button type="button" data-command="resize" class="se-tooltip _se_table_resize">' +
+            '           <i class="se-icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="header" class="se-tooltip btn_editor __se__table_header">' +
-            '           <i class="icon-table-header"></i>' +
+            '       <button type="button" data-command="header" class="se-tooltip se-btn-basic __se__table_header">' +
+            '           <i class="se-icon-table-header"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="remove" class="se-tooltip">' +
-            '           <i class="icon-delete"></i>' +
+            '           <i class="se-icon-delete"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
             '       </button>' +
             '   </div>' +
@@ -123,53 +123,53 @@ export default {
         const lang = this.lang;
         const tableResize = this.util.createElement('DIV');
 
-        tableResize.className = 'se-controller sun-editor-id-table-edit';
+        tableResize.className = 'se-controller se-controller-table-cell';
         tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
-            '<div class="arrow arrow-up"></div>' +
+            '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +
-            '   <div class="btn-group">' +
+            '   <div class="se-btn-group">' +
             '       <button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
-            '           <i class="icon-insert-row-above"></i>' +
+            '           <i class="se-icon-insert-row-above"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
-            '           <i class="icon-insert-row-below"></i>' +
+            '           <i class="se-icon-insert-row-below"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
-            '           <i class="icon-delete-row"></i>' +
+            '           <i class="se-icon-delete-row"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="merge" class="__se__merge_button se-tooltip" disabled>' +
-            '           <i class="icon-merge-cell"></i>' +
+            '       <button type="button" data-command="merge" class="_se_table_merge_button se-tooltip" disabled>' +
+            '           <i class="se-icon-merge-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
             '       </button>' +
             '   </div>' +
             '</div>' +
             '<div>' +
-            '   <div class="btn-group">' +
+            '   <div class="se-btn-group">' +
             '     <button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
-            '       <i class="icon-insert-column-left"></i>' +
+            '       <i class="se-icon-insert-column-left"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
-            '           <i class="icon-insert-column-right"></i>' +
+            '           <i class="se-icon-insert-column-right"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
-            '           <i class="icon-delete-column"></i>' +
+            '           <i class="se-icon-delete-column"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="onsplit" class="__se__split_button se-tooltip">' +
-            '           <i class="icon-split-cell"></i>' +
+            '       <button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
+            '           <i class="se-icon-split-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
-            '       <div class="__se__split_menu sun-editor-common layer_editor" style="display:none; left:-100%;">' +
-            '           <div class="inner_layer">' +
-            '               <ul class="list_editor">' +
-            '                   <li class="btn_edit" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
+            '       <div class="_se_table_split_menu sun-editor-common se-list-layer" style="display:none; left:-100%;">' +
+            '           <div class="se-list-inner">' +
+            '               <ul class="se-list-basic">' +
+            '                   <li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
             '                   ' + lang.controller.VerticalSplit + '</li>' +
-            '                   <li class="btn_edit" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
+            '                   <li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
             '                   ' + lang.controller.HorizontalSplit + '</li>' +
             '               </ul>' +
             '           </div>' +
@@ -248,9 +248,9 @@ export default {
 
         if (!contextTable._element) return;
 
-        const selectedCells = contextTable._element.querySelectorAll('.__se__selected');
+        const selectedCells = contextTable._element.querySelectorAll('.se-table-selected-cell');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
-            this.util.removeClass(selectedCells[i], '__se__selected');
+            this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
         }
 
         contextTable._element = null;
@@ -1002,9 +1002,10 @@ export default {
         mergeCell.rowSpan = rs;
 
         this.controllersOff();
+        tablePlugin.setActiveButton.call(this, true, false);
         tablePlugin.call_controller_tableEdit.call(this, mergeCell);
 
-        this.util.addClass(mergeCell, '__se__selected');
+        this.util.addClass(mergeCell, 'se-table-selected-cell');
     },
 
     toggleHeader: function () {
@@ -1022,7 +1023,7 @@ export default {
             header.innerHTML = th;
             table.insertBefore(header, table.firstElementChild);
         } else {
-            this.util.removeItem(table.getElementsByTagName('thead')[0]);
+            this.util.removeItem(table.querySelector('thead'));
         }
 
         this.util.toggleClass(headerButton, 'on');
@@ -1039,14 +1040,14 @@ export default {
         const icon =  contextTable.resizeIcon;
         const span = contextTable.resizeText;
 
-        let removeClass = 'icon-expansion';
-        let addClass = 'icon-reduction';
+        let removeClass = 'se-icon-expansion';
+        let addClass = 'se-icon-reduction';
         let text = contextTable.minText;
         let width = '100%';
 
         if (!contextTable._maxWidth) {
-            removeClass = 'icon-reduction';
-            addClass = 'icon-expansion';
+            removeClass = 'se-icon-reduction';
+            addClass = 'se-icon-expansion';
             text = contextTable.maxText;
             width = 'auto';
         }
@@ -1055,6 +1056,18 @@ export default {
         this.util.addClass(icon, addClass);
         this.util.changeTxt(span, text);
         contextTable._element.style.width = width;
+    },
+
+    setActiveButton: function (fixedCell, selectedCell) {
+        const contextTable = this.context.table;
+
+        if (!selectedCell || fixedCell === selectedCell) {
+            contextTable.splitButton.removeAttribute('disabled');
+            contextTable.mergeButton.setAttribute('disabled', true);
+        } else {
+            contextTable.splitButton.setAttribute('disabled', true);
+            contextTable.mergeButton.removeAttribute('disabled');
+        }
     },
 
     _bindOnSelect: null,
@@ -1070,27 +1083,19 @@ export default {
         e.preventDefault();
 
         const tablePlugin = this.plugins.table;
-        const contextTable = this.context.table;
 
         this.context.element.wysiwyg.setAttribute('contenteditable', true);
-        this.util.removeClass(this.context.element.wysiwyg, '__se__no_selection');
+        this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
 
         this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
         this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
         tablePlugin._bindOnSelect = null;
         tablePlugin._bindOffSelect = null;
-
-        if (!tablePlugin._selectedCell || tablePlugin._fixedCell === tablePlugin._selectedCell) {
-            contextTable.splitButton.removeAttribute('disabled');
-            contextTable.mergeButton.setAttribute('disabled', true);
-        } else {
-            contextTable.splitButton.setAttribute('disabled', true);
-            contextTable.mergeButton.removeAttribute('disabled');
-        }
-
+        
+        tablePlugin.setActiveButton.call(this, tablePlugin._fixedCell, tablePlugin._selectedCell);
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
-        tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
         tablePlugin._fixedCell = null;
         tablePlugin._selectedCell = null;
         tablePlugin._fixedCellName = null;
@@ -1105,7 +1110,7 @@ export default {
                 return;
             } else {
                 this.context.element.wysiwyg.setAttribute('contenteditable', false);
-                this.util.addClass(this.context.element.wysiwyg, '__se__no_selection');
+                this.util.addClass(this.context.element.wysiwyg, 'se-disabled');
             }
         }
 
@@ -1148,13 +1153,13 @@ export default {
         const tablePlugin = this.plugins.table;
         const rows = tablePlugin._selectedTable.rows;
 
-        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
-            this.util.removeClass(selectedCells[i], '__se__selected');
+            this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
         }
 
         if (startCell === endCell) {
-            this.util.addClass(startCell, '__se__selected');
+            this.util.addClass(startCell, 'se-table-selected-cell');
             return;
         }
 
@@ -1239,7 +1244,7 @@ export default {
                         break;
                     }
 
-                    this.util.addClass(cell, '__se__selected');
+                    this.util.addClass(cell, 'se-table-selected-cell');
                 }
 
                 if (rs > 0) {
@@ -1273,12 +1278,12 @@ export default {
         tablePlugin._fixedCellName = tdElement.nodeName;
         tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
 
-        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.__se__selected');
+        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
-            this.util.removeClass(selectedCells[i], '__se__selected');
+            this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
         }
 
-        this.util.addClass(tdElement, '__se__selected');
+        this.util.addClass(tdElement, 'se-table-selected-cell');
         
         tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
         tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);

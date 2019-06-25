@@ -203,7 +203,7 @@ const util = {
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
-        if (element && element.nodeType === 1 && this.hasClass(element, 'sun-editor-id-wysiwyg')) return true;
+        if (element && element.nodeType === 1 && this.hasClass(element, 'se-wrapper-wysiwyg')) return true;
         return false;
     },
 
@@ -229,12 +229,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".sun-editor-id-comp"
+     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".se-component"
      * @param {Element} element - The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
-        return element && (/sun-editor-id-comp/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
+        return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
     },
 
     /**

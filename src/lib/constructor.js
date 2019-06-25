@@ -78,35 +78,35 @@ const _Constructor = {
     
         /** relative div */
         const relative = doc.createElement('DIV');
-        relative.className = 'sun-editor-container';
+        relative.className = 'se-container';
     
         /** toolbar */
         const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
 
         let arrow = null;
         if (/inline|balloon/i.test(options.mode)) {
-            tool_bar.element.className += ' sun-inline-toolbar';
+            tool_bar.element.className += ' se-toolbar-inline';
             tool_bar.element.style.width = options.toolbarWidth;
             if (/balloon/i.test(options.mode)) {
                 arrow = doc.createElement('DIV');
-                arrow.className = 'arrow';
+                arrow.className = 'se-arrow';
                 tool_bar.element.appendChild(arrow);
             }
         }
 
         /** sticky toolbar dummy */
         const sticky_dummy = doc.createElement('DIV');
-        sticky_dummy.className = 'sun-editor-sticky-dummy';
+        sticky_dummy.className = 'se-toolbar-sticky-dummy';
     
         /** inner editor div */
         const editor_div = doc.createElement('DIV');
-        editor_div.className = 'sun-editor-id-editorArea';
+        editor_div.className = 'se-wrapper';
     
         /** wysiwyg div */
         const wysiwyg_div = doc.createElement('DIV');
         wysiwyg_div.setAttribute('contenteditable', true);
         wysiwyg_div.setAttribute('scrolling', 'auto');
-        wysiwyg_div.className = 'input_editor sun-editor-id-wysiwyg sun-editor-editable';
+        wysiwyg_div.className = 'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable';
         wysiwyg_div.style.display = 'block';
         wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
         wysiwyg_div.style.height = options.height;
@@ -115,7 +115,7 @@ const _Constructor = {
     
         /** textarea for code view */
         const textarea = doc.createElement('TEXTAREA');
-        textarea.className = 'input_editor sun-editor-id-code';
+        textarea.className = 'se-wrapper-inner se-wrapper-code';
         textarea.style.display = 'none';
         textarea.style.height = options.height;
         textarea.style.minHeight = options.minHeight;
@@ -125,21 +125,21 @@ const _Constructor = {
         let resizing_bar = null;
         if (options.resizingBar) {
             resizing_bar = doc.createElement('DIV');
-            resizing_bar.className = 'sun-editor-id-resizingBar sun-editor-common';
+            resizing_bar.className = 'se-resizing-bar sun-editor-common';
         }
     
         /** navigation */
         const navigation = doc.createElement('DIV');
-        navigation.className = 'sun-editor-id-navigation sun-editor-common';
+        navigation.className = 'se-navigation sun-editor-common';
     
         /** loading box */
         const loading_box = doc.createElement('DIV');
-        loading_box.className = 'sun-editor-id-loading sun-editor-common';
-        loading_box.innerHTML = '<div class="loading-effect"></div>';
+        loading_box.className = 'se-loading-box sun-editor-common';
+        loading_box.innerHTML = '<div class="se-loading-effect"></div>';
     
         /** resize operation background */
         const resize_back = doc.createElement('DIV');
-        resize_back.className = 'sun-editor-id-resize-background';
+        resize_back.className = 'se-resizing-back';
     
         /** append html */
         editor_div.appendChild(wysiwyg_div);
@@ -185,121 +185,121 @@ const _Constructor = {
     _defaultButtons: function (lang) {
         return {
             /** command */
-            bold: ['sun-editor-id-bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
-                '<i class="icon-bold"></i>'
+            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
+                '<i class="se-icon-bold"></i>'
             ],
 
-            underline: ['sun-editor-id-underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '',
-                '<i class="icon-underline"></i>'
+            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '',
+                '<i class="se-icon-underline"></i>'
             ],
 
-            italic: ['sun-editor-id-italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '',
-                '<i class="icon-italic"></i>'
+            italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '',
+                '<i class="se-icon-italic"></i>'
             ],
 
-            strike: ['sun-editor-id-strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '',
-                '<i class="icon-strokethrough"></i>'
+            strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '',
+                '<i class="se-icon-strokethrough"></i>'
             ],
 
-            subscript: ['sun-editor-id-subscript', lang.toolbar.subscript, 'SUB', '',
-                '<i class="icon-subscript"></i>'
+            subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '',
+                '<i class="se-icon-subscript"></i>'
             ],
 
-            superscript: ['sun-editor-id-superscript', lang.toolbar.superscript, 'SUP', '',
-                '<i class="icon-superscript"></i>'
+            superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '',
+                '<i class="se-icon-superscript"></i>'
             ],
 
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '',
-                '<i class="icon-erase"></i>'
+                '<i class="se-icon-erase"></i>'
             ],
 
             indent: ['', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
-                '<i class="icon-indent-right"></i>'
+                '<i class="se-icon-indent-right"></i>'
             ],
 
-            outdent: ['sun-editor-id-outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
-                '<i class="icon-indent-left"></i>'
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
+                '<i class="se-icon-indent-left"></i>'
             ],
 
             fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '',
-                '<i class="icon-expansion"></i>'
+                '<i class="se-icon-expansion"></i>'
             ],
 
             showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '',
-                '<i class="icon-showBlocks"></i>'
+                '<i class="se-icon-showBlocks"></i>'
             ],
 
             codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '',
-                '<i class="icon-code-view"></i>'
+                '<i class="se-icon-code-view"></i>'
             ],
 
-            undo: ['sun-editor-id-undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
-                '<i class="icon-undo"></i>', true
+            undo: ['_se_command_undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
+                '<i class="se-icon-undo"></i>', true
             ],
 
-            redo: ['sun-editor-id-redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
-                '<i class="icon-redo"></i>', true
+            redo: ['_se_command_redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
+                '<i class="se-icon-redo"></i>', true
             ],
 
             preview: ['', lang.toolbar.preview, 'preview', '',
-                '<i class="icon-preview"></i>'
+                '<i class="se-icon-preview"></i>'
             ],
 
             print: ['', lang.toolbar.print, 'print', '',
-                '<i class="icon-print"></i>'
+                '<i class="se-icon-print"></i>'
             ],
 
-            save: ['sun-editor-id-save', lang.toolbar.save, 'save', '',
-                '<i class="icon-save"></i>', true
+            save: ['_se_command_save', lang.toolbar.save, 'save', '',
+                '<i class="se-icon-save"></i>', true
             ],
 
             /** plugins - submenu */
-            font: ['btn_editor_select btn_font sun-editor-id-font-family', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt">' + lang.toolbar.font + '</span><i class="icon-arrow-down"></i>'
+            font: ['se-btn-select se-btn-tool-font _se_command_font_family', lang.toolbar.font, 'font', 'submenu',
+                '<span class="txt">' + lang.toolbar.font + '</span><i class="se-icon-arrow-down"></i>'
             ],
-            formatBlock: ['btn_editor_select btn_format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt sun-editor-id-format">' + lang.toolbar.formats + '</span><i class="icon-arrow-down"></i>'
+            formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu',
+                '<span class="txt _se_command_format">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
-            fontSize: ['btn_editor_select btn_size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt sun-editor-id-font-size">' + lang.toolbar.fontSize + '</span><i class="icon-arrow-down"></i>'
+            fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu',
+                '<span class="txt _se_command_font_size">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
-                '<i class="icon-fontColor"></i>'
+                '<i class="se-icon-fontColor"></i>'
             ],
 
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
-                '<i class="icon-hiliteColor"></i>'
+                '<i class="se-icon-hiliteColor"></i>'
             ],
 
-            align: ['btn_align', lang.toolbar.align, 'align', 'submenu',
-                '<i class="icon-align-left sun-editor-id-align"></i>'
+            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu',
+                '<i class="se-icon-align-left _se_command_align"></i>'
             ],
 
-            list: ['sun-editor-id-list', lang.toolbar.list, 'list', 'submenu',
-                '<i class="icon-list-number"></i>'
+            list: ['_se_command_list', lang.toolbar.list, 'list', 'submenu',
+                '<i class="se-icon-list-number"></i>'
             ],
 
             horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu',
-                '<i class="icon-hr"></i>'
+                '<i class="se-icon-hr"></i>'
             ],
 
             table: ['', lang.toolbar.table, 'table', 'submenu',
-                '<i class="icon-grid"></i>'
+                '<i class="se-icon-grid"></i>'
             ],
 
             /** plugins - dialog */
             link: ['', lang.toolbar.link, 'link', 'dialog',
-                '<i class="icon-link"></i>'
+                '<i class="se-icon-link"></i>'
             ],
 
             image: ['', lang.toolbar.image, 'image', 'dialog',
-                '<i class="icon-image"></i>'
+                '<i class="se-icon-image"></i>'
             ],
 
             video: ['', lang.toolbar.video, 'video', 'dialog',
-                '<i class="icon-video"></i>'
+                '<i class="se-icon-video"></i>'
             ]
         };
     },
@@ -311,10 +311,10 @@ const _Constructor = {
      */
     _createModuleGroup: function (oneModule) {
         const oDiv = util.createElement('DIV');
-        oDiv.className = 'tool_module' + (oneModule ? '' : ' sun-editor-module-border');
+        oDiv.className = 'se-btn-module' + (oneModule ? '' : ' se-btn-module-border');
 
         const oUl = util.createElement('UL');
-        oUl.className = 'editor_tool';
+        oUl.className = 'se-menu-list';
         oDiv.appendChild(oUl);
 
         return {
@@ -339,7 +339,7 @@ const _Constructor = {
         const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'btn_editor' + (dataDisplay === 'submenu' ? ' btn_submenu' : '') + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
+        oButton.setAttribute('class', 'se-btn-basic' + (dataDisplay === 'submenu' ? ' se-btn-submenu' : '') + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
@@ -364,10 +364,10 @@ const _Constructor = {
      */
     _createToolBar: function (doc, buttonList, _plugins, lang) {
         const separator_vertical = doc.createElement('DIV');
-        separator_vertical.className = 'sun-editor-toolbar-separator-vertical';
+        separator_vertical.className = 'se-toolbar-separator-vertical';
 
         const tool_bar = doc.createElement('DIV');
-        tool_bar.className = 'sun-editor-id-toolbar sun-editor-common';
+        tool_bar.className = 'se-toolbar sun-editor-common';
 
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang);
@@ -427,14 +427,14 @@ const _Constructor = {
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
                 const enterDiv = doc.createElement('DIV');
-                enterDiv.className = 'tool_module_enter';
+                enterDiv.className = 'se-btn-module-enter';
                 tool_bar.appendChild(enterDiv);
                 vertical = false;
             }
         }
 
         const tool_cover = doc.createElement('DIV');
-        tool_cover.className = 'sun-editor-id-toolbar-cover';
+        tool_cover.className = 'se-toolbar-cover';
         tool_bar.appendChild(tool_cover);
 
         return {
