@@ -2540,7 +2540,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const toolbarHeight = toolbar.offsetHeight;
 
             let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
-            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() - context.element.topArea.offsetTop + (_w.scrollY || _d.documentElement.scrollTop);
+            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
 
             const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
 
