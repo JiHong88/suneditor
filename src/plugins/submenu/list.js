@@ -12,7 +12,7 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.list = {
-            _list: [],
+            _list: null,
             currentList: ''
         };
 

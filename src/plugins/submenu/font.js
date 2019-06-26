@@ -12,7 +12,7 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.font = {
-            _fontList: [],
+            _fontList: null,
             currentFont: ''
         };
 
@@ -70,7 +70,7 @@ export default {
     on: function () {
         const fontContext = this.context.font;
         const fontList = fontContext._fontList;
-        const currentFont = this.commandMap.FONT.getAttribute('title') || '';
+        const currentFont = this.commandMap.FONT.textContent;
 
         if (currentFont !== fontContext.currentFont) {
             for (let i = 0, len = fontList.length; i < len; i++) {

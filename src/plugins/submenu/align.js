@@ -12,7 +12,7 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.align = {
-            _alignList: [],
+            _alignList: null,
             currentAlign: ''
         };
 
@@ -54,7 +54,7 @@ export default {
     on: function () {
         const alignContext = this.context.align;
         const alignList = alignContext._alignList;
-        const currentAlign = this.commandMap.ALIGN.getAttribute('data-focus');
+        const currentAlign = this.commandMap.ALIGN.getAttribute('data-focus') || 'left';
 
         if (currentAlign !== alignContext.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {

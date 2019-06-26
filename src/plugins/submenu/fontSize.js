@@ -12,7 +12,7 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.fontSize = {
-            _sizeList: [],
+            _sizeList: null,
             currentSize: ''
         };
 
@@ -60,7 +60,7 @@ export default {
     on: function () {
         const fontSizeContext = this.context.fontSize;
         const sizeList = fontSizeContext._sizeList;
-        const currentSize = this.commandMap.SIZE.getAttribute('title') || '';
+        const currentSize = (this.commandMap.SIZE.textContent.match(/\d+/) || [''])[0];
 
         if (currentSize !== fontSizeContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {
