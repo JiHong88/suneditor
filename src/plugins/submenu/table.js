@@ -1339,6 +1339,8 @@ export default {
                 this.controllersOff();
         }
 
+        this.focus();
+
         // history stack
         this.history.push();
     }
