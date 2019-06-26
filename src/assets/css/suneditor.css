@@ -312,7 +312,7 @@
 .sun-editor .se-controller-table {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 /* controller - table - select class */
-.sun-editor .se-wrapper-wysiwyg table td.se-table-selected-cell, .sun-editor .se-wrapper-wysiwyg table th.se-table-selected-cell {border:1px double #4592ff;}
+.sun-editor .se-wrapper-wysiwyg table td.se-table-selected-cell, .sun-editor .se-wrapper-wysiwyg table th.se-table-selected-cell {border:1px double #4592ff; background-color:#f1f7ff;}
 /* controller - link */
 .sun-editor .se-controller-link {padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-link::before, .sun-editor .se-controller-link::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}

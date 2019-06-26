@@ -259,19 +259,16 @@
 .sun-editor-editable table thead {
     border-bottom: 2px solid #333;
 }
-
-.sun-editor-editable table th {
-    background-color: #efefef;
-    border: 1px solid #e1e1e1;
-    padding:0.4em;
-}
-
 .sun-editor-editable table tr {
-    border: 1px solid #e1e1e1;
+    border: 1px solid #efefef;
 }
-.sun-editor-editable table td {
+.sun-editor-editable table th {
+    background-color: #f9f9f9;
+}
+.sun-editor-editable table th, .sun-editor-editable table td {
     border: 1px solid #e1e1e1;
     padding:0.4em;
+    background-clip: padding-box;
 }
 
 /** component (image, iframe video) */
