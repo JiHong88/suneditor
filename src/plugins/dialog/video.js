@@ -155,7 +155,7 @@ export default {
 
             /** iframe source */
             if (/^<iframe.*\/iframe>$/.test(url)) {
-                oIframe = (new DOMParser()).parseFromString(url, 'text/html').getElementsByTagName('iframe')[0];
+                oIframe = (new DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
             }
             /** url */
             else {
@@ -183,7 +183,7 @@ export default {
             if (this.context.dialog.updateModal) {
                 contextVideo._element.src = oIframe.src;
                 container = contextVideo._container;
-                cover = this.util.getParentElement(contextVideo._element, '.se-component-figure');
+                cover = this.util.getParentElement(contextVideo._element, 'FIGURE');
                 oIframe = contextVideo._element;
                 resizingDiv = contextVideo._resizingDiv;
             }
@@ -281,7 +281,7 @@ export default {
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
-        contextVideo._cover = this.util.getParentElement(element, '.se-component-figure');
+        contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
         contextVideo._container = this.util.getParentElement(element, '.se-video-container');
         contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
         contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.se-video-inner');

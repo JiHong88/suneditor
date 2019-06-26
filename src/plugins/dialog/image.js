@@ -569,7 +569,7 @@ export default {
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
-        contextImage._cover = this.util.getParentElement(element, '.se-component-figure');
+        contextImage._cover = this.util.getParentElement(element, 'FIGURE');
         contextImage._container = this.util.getParentElement(element, '.se-image-container');
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';

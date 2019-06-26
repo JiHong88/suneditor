@@ -52,6 +52,16 @@ export default {
 
     open: function (kind, update)  {
         if (this.modalForm) return false;
+        if (this.plugins.dialog._bindClose) {
+            this._d.removeEventListener('keydown', this.plugins.dialog._bindClose);
+            this.plugins.dialog._bindClose = null;
+        }
+
+        this.plugins.dialog._bindClose = function (e) {
+            if (!/27/.test(e.keyCode)) return;
+            this.plugins.dialog.close.call(this);
+        }.bind(this);
+        this._d.addEventListener('keydown', this.plugins.dialog._bindClose);
 
         this.context.dialog.updateModal = update;
 
@@ -73,7 +83,13 @@ export default {
         if (focusElement) focusElement.focus();
     },
 
+    _bindClose: null,
     close: function () {
+        if (this.plugins.dialog._bindClose) {
+            this._d.removeEventListener('keydown', this.plugins.dialog._bindClose);
+            this.plugins.dialog._bindClose = null;
+        }
+
         this.modalForm.style.display = 'none';
         this.context.dialog.back.style.display = 'none';
         this.context.dialog.modalArea.style.display = 'none';

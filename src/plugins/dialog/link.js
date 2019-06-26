@@ -149,10 +149,11 @@ export default {
     call_controller_linkButton: function (selectionATag) {
         this.editLink = this.context.link._linkAnchor = selectionATag;
         const linkBtn = this.context.link.linkBtn;
+        const link = linkBtn.querySelector('a');
 
-        linkBtn.getElementsByTagName('A')[0].href = selectionATag.href;
-        linkBtn.getElementsByTagName('A')[0].title = selectionATag.textContent;
-        linkBtn.getElementsByTagName('A')[0].textContent = selectionATag.textContent;
+        link.href = selectionATag.href;
+        link.title = selectionATag.textContent;
+        link.textContent = selectionATag.textContent;
 
         const offset = this.util.getOffset(selectionATag);
         linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';

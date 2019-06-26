@@ -285,19 +285,19 @@
 }
 
 /** image, video iframe figure cover */
-.sun-editor-editable figure.se-component-figure {
+.sun-editor-editable figure {
     display: block;
     outline: none;
     margin: 0;
     padding: 0;
 }
-.sun-editor-editable figure.se-component-figure figcaption {
+.sun-editor-editable figure figcaption {
     padding: 1em .5em;
     margin: 0;
     background-color: #f9f9f9;
     outline: none;
 }
-.sun-editor-editable figure.se-component-figure figcaption p{
+.sun-editor-editable figure figcaption p{
     line-height: 2;
     margin: 0;
 }

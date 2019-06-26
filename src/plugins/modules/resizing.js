@@ -37,7 +37,7 @@ export default {
         context.resizing.resizeButton = resize_button;
         resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
-        let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.getElementsByTagName('span');
+        let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
 
         /** add event listeners */
@@ -220,7 +220,6 @@ export default {
 
     set_cover: function (element) {
         const cover = this.util.createElement('FIGURE');
-        cover.className = 'se-component-figure';
         cover.appendChild(element);
 
         return cover;
@@ -325,7 +324,7 @@ export default {
     },
 
     setTransformSize: function (element) {
-        const cover = this.util.getParentElement(element, '.se-component-figure');
+        const cover = this.util.getParentElement(element, 'FIGURE');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
@@ -351,7 +350,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, '.se-component-figure'), 'FIGCAPTION'));
+        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION'));
     },
 
     _setTransForm: function (element, r, x, y) {
