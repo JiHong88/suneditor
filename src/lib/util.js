@@ -509,13 +509,13 @@ const util = {
             check = query;
         } else {
             let attr;
-            if (/\./.test(query)) {
+            if (/^\./.test(query)) {
                 attr = 'className';
                 query = query.split('.')[1];
-            } else if (/#/.test(query)) {
+            } else if (/^#/.test(query)) {
                 attr = 'id';
                 query = '^' + query.split('#')[1] + '$';
-            } else if (/:/.test(query)) {
+            } else if (/^:/.test(query)) {
                 attr = 'name';
                 query = '^' + query.split(':')[1] + '$';
             } else {
@@ -557,13 +557,13 @@ const util = {
             check = query;
         } else {
             let attr;
-            if (/\./.test(query)) {
+            if (/^\./.test(query)) {
                 attr = 'className';
                 query = query.split('.')[1];
-            } else if (/#/.test(query)) {
+            } else if (/^#/.test(query)) {
                 attr = 'id';
                 query = '^' + query.split('#')[1] + '$';
-            } else if (/:/.test(query)) {
+            } else if (/^:/.test(query)) {
                 attr = 'name';
                 query = '^' + query.split(':')[1] + '$';
             } else {
