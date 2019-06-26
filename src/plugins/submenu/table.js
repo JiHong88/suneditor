@@ -164,7 +164,8 @@ export default {
             '       <button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
             '           <i class="se-icon-split-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
-            '       <div class="_se_table_split_menu sun-editor-common se-list-layer" style="display:none; left:-100%;">' +
+            '       </button>' +
+            '       <div class="_se_table_split_menu sun-editor-common se-list-layer" style="display:none; left:50%;">' +
             '           <div class="se-list-inner">' +
             '               <ul class="se-list-basic">' +
             '                   <li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
@@ -174,7 +175,6 @@ export default {
             '               </ul>' +
             '           </div>' +
             '       </div>' +
-            '       </button>' +
             '   </div>' +
             '</div>';
 
@@ -769,7 +769,7 @@ export default {
 
     _closeSplitMenu: null,
     openSplitMenu: function () {
-        this.context.table.splitMenu.style.display = 'block';
+        this.context.table.splitMenu.style.display = 'inline-table';
 
         this.plugins.table._closeSplitMenu = function () {
             this.context.table.splitMenu.style.display = 'none';

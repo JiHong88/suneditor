@@ -186,10 +186,9 @@
 /* submenu layer - common list form button on */
 .sun-editor .se-list-inner .se-list-basic li button.on {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.on:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
-/* submenu layer - list default value button */
-.sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 /* submenu layer - list button */
-.sun-editor .se-btn-list {width:100%; height:32px; padding:0 14px; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
+.sun-editor .se-btn-list {width:100%; height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
+.sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 .sun-editor .se-btn-list:hover, .sun-editor .se-btn-list:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
 /** --- submenu layer - se-list-inner > exception */
@@ -313,7 +312,7 @@
 .sun-editor .se-controller-table {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 /* controller - table - select class */
-.sun-editor .se-wrapper-wysiwyg table td.se-table-selected-cell, .sun-editor .se-wrapper-wysiwyg table th.se-table-selected-cell {border:1px double #4592ff; background-color:#f1f7ff;}
+.sun-editor .se-wrapper-wysiwyg table td.se-table-selected-cell, .sun-editor .se-wrapper-wysiwyg table th.se-table-selected-cell {border:1px double #4592ff;}
 /* controller - link */
 .sun-editor .se-controller-link {padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-link::before, .sun-editor .se-controller-link::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
