@@ -2429,8 +2429,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         onMouseDown_wysiwyg: function (e) {
             const target = util.getParentElement(e.target, util.isCell);
-            if (!target) return;
-
+            if (!target || target === core.plugins.table._fixedCell) return;
+            
             _w.setTimeout(function () {
                 core.callPlugin('table', function () {
                     core.plugins.table.tableCellMultiSelect.call(core, target);
@@ -3180,7 +3180,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    if (core.plugins.table) context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
@@ -3188,6 +3187,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+    /** Events are registered only when there is a table plugin.  */
+    if (core.plugins.table) {
+        context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, false);
+        context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
+    }
     
     /** code view area auto line */
     if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);

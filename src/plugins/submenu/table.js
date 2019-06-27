@@ -1089,6 +1089,8 @@ export default {
         this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
         tablePlugin._bindOnSelect = null;
         tablePlugin._bindOffSelect = null;
+
+        if (!tablePlugin._fixedCell || !tablePlugin._selectedTable) return;
         
         tablePlugin.setActiveButton.call(this, tablePlugin._fixedCell, tablePlugin._selectedCell);
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
@@ -1272,6 +1274,7 @@ export default {
             tablePlugin._bindOffSelect = null;
         }
 
+        this.controllersOff();
         tablePlugin._fixedCell = tdElement;
         tablePlugin._fixedCellName = tdElement.nodeName;
         tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
