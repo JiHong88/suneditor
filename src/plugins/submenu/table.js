@@ -797,12 +797,12 @@ export default {
             const currentColSpan = currentCell.colSpan;
             newCell.rowSpan = currentCell.rowSpan;
 
-            // colspan - 0
+            // colspan > 1
             if (currentColSpan > 1) {
                 newCell.colSpan = this._w.Math.floor(currentColSpan/2);
                 currentCell.colSpan = currentColSpan - newCell.colSpan;
                 currentRow.insertBefore(newCell, currentCell.nextElementSibling);
-            } else { // colspan - n
+            } else { // colspan - 1
                 let rowSpanArr = [];
                 let spanIndex = [];
 
@@ -859,7 +859,7 @@ export default {
             const currentRowSpan = currentCell.rowSpan;
             newCell.colSpan = currentCell.colSpan;
 
-            // rowspan - 0
+            // rowspan > 1
             if (currentRowSpan > 1) {
                 newCell.rowSpan = this._w.Math.floor(currentRowSpan/2);
                 const newRowSpan = currentRowSpan - newCell.rowSpan;
@@ -902,7 +902,7 @@ export default {
                         rs = rowSpanArr.shift();
                     }
                     
-                    if (insertIndex >= index) {
+                    if (insertIndex >= index || c === cLen - 1) {
                         nextRow.insertBefore(newCell, cell.nextElementSibling);
                         break;
                     }
@@ -911,7 +911,7 @@ export default {
                 }
 
                 currentCell.rowSpan = newRowSpan;
-            } else { // rowspan - n
+            } else { // rowspan - 1
                 newCell.rowSpan = currentCell.rowSpan;
                 const newRow = this.util.createElement('TR');
                 newRow.appendChild(newCell);
@@ -976,6 +976,10 @@ export default {
             const rowIndexFirst = this.util.getArrayIndex(rows, emptyRowFirst);
             const rowIndexLast = this.util.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
             const removeRows = [];
+            const compareIndexArr = [];
+            for (let i = rowIndexFirst; i <= rowIndexLast; i++) {
+                compareIndexArr.push(i);
+            }
     
             for (let i = 0, cells; i <= rowIndexLast; i++) {
                 cells = rows[i].cells;
@@ -986,8 +990,12 @@ export default {
     
                 for (let c = 0, cLen = cells.length, cell; c < cLen; c++) {
                     cell = cells[c];
-                    if (i + cell.rowSpan - 1 >= rowIndexFirst) {
-                        cell.rowSpan = i + cell.rowSpan - rowIndexFirst;
+                    if (cell.rowSpan > 1 && i + cell.rowSpan - 1 >= rowIndexFirst) {
+                        let span = 0;
+                        for (let s = i, sLen = i + cell.rowSpan; s < sLen; s++) {
+                            if (compareIndexArr.indexOf(s) > -1) span++;
+                        }
+                        cell.rowSpan -= span;
                     }
                 }
             }
