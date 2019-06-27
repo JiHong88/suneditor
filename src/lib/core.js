@@ -2429,11 +2429,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         onMouseDown_wysiwyg: function (e) {
             const target = util.getParentElement(e.target, util.isCell);
-            if (!target || target === core.plugins.table._fixedCell) return;
+            if (!target) return;
+
+            const tablePlugin = core.plugins.table;
+            if (target === tablePlugin._fixedCell || tablePlugin._shift) return;
             
             _w.setTimeout(function () {
                 core.callPlugin('table', function () {
-                    core.plugins.table.tableCellMultiSelect.call(core, target);
+                    tablePlugin.tableCellMultiSelect.call(core, target, false);
                 });
             });
         },
@@ -2805,6 +2808,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
                     
                     break;
+            }
+
+            if (shift) {
+                if (util.isCell(rangeEl) && core.plugins.table) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    core.plugins.table.tableCellMultiSelect.call(core, rangeEl, true);
+                    return;
+                }
             }
 
             if (userFunction.onKeyDown) userFunction.onKeyDown(e);
@@ -3189,7 +3201,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
     /** Events are registered only when there is a table plugin.  */
     if (core.plugins.table) {
-        context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, false);
+        context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
         context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
     }
     
