@@ -42,7 +42,7 @@ export default {
         };
 
         /** image dialog */
-        let image_dialog = eval(this.setDialog.call(core));
+        let image_dialog = this.setDialog.call(core);
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
         context.image.imgInputFile = context.image.focusElement = image_dialog.querySelector('._se_image_file');

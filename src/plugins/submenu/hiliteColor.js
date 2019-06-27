@@ -22,7 +22,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = eval(this.setSubmenu.call(core));
+        let listDiv = this.setSubmenu.call(core);
         let listUl = listDiv.querySelector('ul');
         context.hiliteColor.colorInput = listDiv.querySelector('._se_color_picker_input');
 

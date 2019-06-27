@@ -11,7 +11,7 @@ export default {
     name: 'horizontalRule',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = eval(this.setSubmenu.call(core));
+        let listDiv = this.setSubmenu.call(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.horizontalRulePick.bind(core));

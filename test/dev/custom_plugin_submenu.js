@@ -17,7 +17,7 @@ export default {
         };
 
         // Generate submenu HTML
-        let listDiv = eval(this.setSubmenu.call(core));
+        let listDiv = this.setSubmenu.call(core);
 
         // Input tag caching
         context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];

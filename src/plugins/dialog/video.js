@@ -38,7 +38,7 @@ export default {
         };
 
         /** video dialog */
-        let video_dialog = eval(this.setDialog.call(core));
+        let video_dialog = this.setDialog.call(core);
         context.video.modal = video_dialog;
         context.video.focusElement = video_dialog.querySelector('._se_video_url');
         context.video.captionCheckEl = video_dialog.querySelector('._se_video_check_caption');

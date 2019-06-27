@@ -38,7 +38,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = eval(this.setSubmenu.call(core));
+        let listDiv = this.setSubmenu.call(core);
         let tablePicker = listDiv.querySelector('.se-controller-table-picker');
 
         context.table.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
@@ -46,7 +46,7 @@ export default {
         context.table.tableDisplay = listDiv.querySelector('.se-table-size-display');
 
         /** set table controller */
-        let tableController = eval(this.setController_table.call(core));
+        let tableController = this.setController_table.call(core);
         context.table.tableController = tableController;
         context.table.resizeIcon = tableController.querySelector('_se_table_resize > i');
         context.table.resizeText = tableController.querySelector('_se_table_resize > span > span');
@@ -54,7 +54,7 @@ export default {
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
-        let resizeDiv = eval(this.setController_tableEditor.call(core));
+        let resizeDiv = this.setController_tableEditor.call(core);
         context.table.resizeDiv = resizeDiv;
         context.table.splitMenu = resizeDiv.querySelector('._se_table_split_menu');
         context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
@@ -1080,8 +1080,6 @@ export default {
     _ref: null,
     _offCellMultiSelect: function (e) {
         e.stopPropagation();
-        e.preventDefault();
-
         const tablePlugin = this.plugins.table;
 
         this.context.element.wysiwyg.setAttribute('contenteditable', true);

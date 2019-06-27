@@ -18,14 +18,14 @@ export default {
         context.link = {};
 
         /** link dialog */
-        let link_dialog = eval(this.setDialog.call(core));
+        let link_dialog = this.setDialog.call(core);
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.querySelector('._se_link_url');
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
 
         /** link button */
-        let link_button = eval(this.setController_LinkButton.call(core));
+        let link_button = this.setController_LinkButton.call(core);
         context.link.linkBtn = link_button;
         context.link._linkAnchor = null;
         link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);

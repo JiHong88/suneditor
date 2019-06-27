@@ -17,7 +17,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = eval(this.setSubmenu.call(core));
+        let listDiv = this.setSubmenu.call(core);
 
         /** add event listeners */
         listDiv.querySelector('.se-list-font-family').addEventListener('click', this.pickup.bind(core));

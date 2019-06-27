@@ -26,14 +26,14 @@ export default {
         };
 
         /** resize controller, button */
-        let resize_div_container = eval(this.setController_resize.call(core));
+        let resize_div_container = this.setController_resize.call(core);
         context.resizing.resizeContainer = resize_div_container;
 
         context.resizing.resizeDiv = resize_div_container.querySelector('.se-modal-resize');
         context.resizing.resizeDot = resize_div_container.querySelector('.se-resize-dot');
         context.resizing.resizeDisplay = resize_div_container.querySelector('.se-resize-display');
 
-        let resize_button = eval(this.setController_button.call(core));
+        let resize_button = this.setController_button.call(core);
         context.resizing.resizeButton = resize_button;
         resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
