@@ -28,8 +28,7 @@ export default {
             minText: core.lang.controller.minSize,
             _physical_cellCnt: 0,
             _logical_cellCnt: 0,
-            _physical_rowCnt: 0,
-            _logical_rowCnt: 0,
+            _rowCnt: 0,
             _rowIndex: 0,
             _physical_cellIndex: 0,
             _logical_cellIndex: 0,
@@ -261,8 +260,7 @@ export default {
         contextTable._maxWidth = true;
         contextTable._physical_cellCnt = 0;
         contextTable._logical_cellCnt = 0;
-        contextTable._physical_rowCnt = 0;
-        contextTable._logical_rowCnt = 0;
+        contextTable._rowCnt = 0;
         contextTable._rowIndex = 0;
         contextTable._physical_cellIndex = 0;
         contextTable._logical_cellIndex = 0;
@@ -333,70 +331,84 @@ export default {
 
             const rows = contextTable._trElements = table.rows;
             const cellIndex = tdElement.cellIndex;
-            let logcalCellIndex = 0;
 
-            // row index
-            const rowIndex = contextTable._rowIndex = contextTable._trElement.rowIndex;
-
-            // count
             let cellCnt = 0;
-            let rowCnt = 0;
-            
             for (let i = 0, cells = rows[0].cells, len = rows[0].cells.length; i < len; i++) {
                 cellCnt += cells[i].colSpan;
             }
 
-            for (let i = 0, len = rows.length; i < len; i++) {
-                if (rows[i].cells.length === 0) continue;
-                rowCnt += rows[i].cells[0].rowSpan;
+            // row cnt, row index
+            const rowIndex = contextTable._rowIndex = contextTable._trElement.rowIndex;
+            contextTable._rowCnt = rows.length;
 
-                if (i === rowIndex) {
-                    const cells = rows[i].cells;
-                    let index = cellIndex;
-                    for (let c = 0; c < index; c++) {
-                        logcalCellIndex += cells[c].colSpan;
-                    }
-                }
-            }
-
+            // cell cnt, physical cell index
             contextTable._physical_cellCnt = contextTable._trElement.cells.length;
             contextTable._logical_cellCnt = cellCnt;
-            contextTable._physical_rowCnt = contextTable._trElements.length;
-            contextTable._logical_rowCnt = rowCnt;
-
-            // cell index
-            let colSpan = 0;
-
-            for (let i = 0, cells, cIndex; i <= rowIndex; i++) {
-                cells = rows[i].cells;
-                if (cells.length === 0) continue;
-                cIndex = logcalCellIndex;
-                for (let c = 0, cell, rs, cs; c <= cIndex; c++) {
-                    cell = cells[c];
-                    if (!cell) break;
-
-                    rs = cell.rowSpan;
-                    cs = cell.colSpan;
-                    cIndex -= cs - 1;
-                    if (rs < 2 && cs < 2) continue;
-
-                    if (i === rowIndex) {
-                        if (cs > 1 && c < cellIndex) colSpan += cs - 1;
-                        continue;
-                    }
-
-                    if (rs + i > rowIndex && rowIndex > i) {
-                        colSpan += cs;
-                    }
-                }
-            }
-
             contextTable._physical_cellIndex = cellIndex;
-            contextTable._logical_cellIndex = cellIndex + colSpan;
 
             // span
             contextTable._current_colSpan = contextTable._tdElement.colSpan - 1;
             contextTable._current_rowSpan - contextTable._trElement.cells[cellIndex].rowSpan - 1;
+
+            // find logcal cell index
+            let rowSpanArr = [];
+            let spanIndex = [];
+            for (let i = 0, cells, colSpan; i <= rowIndex; i++) {
+                cells = rows[i].cells;
+                colSpan = 0;
+                for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
+                    cell = cells[c];
+                    cs = cell.colSpan - 1;
+                    rs = cell.rowSpan - 1;
+                    logcalIndex = c + colSpan;
+
+                    if (spanIndex.length > 0) {
+                        for (let r = 0, arr; r < spanIndex.length; r++) {
+                            arr = spanIndex[r];
+                            if (arr.row > i) continue;
+                            if (logcalIndex >= arr.index) {
+                                colSpan += arr.cs;
+                                logcalIndex += arr.cs;
+                                arr.rs -= 1;
+                                arr.row = i + 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                    r--;
+                                }  
+                            } else if (c === cLen - 1) {
+                                arr.rs -= 1;
+                                arr.row = i + 1;
+                                if (arr.rs < 1) {
+                                    spanIndex.splice(r, 1);
+                                }
+                            }
+                        }
+                    }
+
+                    // logcal cell index
+                    if (i === rowIndex && c === cellIndex) {
+                        contextTable._logical_cellIndex = logcalIndex;
+                        break;
+                    }
+
+                    if (rs > 0) {
+                        rowSpanArr.push({
+                            index: logcalIndex,
+                            cs: cs + 1,
+                            rs: rs,
+                            row: -1
+                        });
+                    }
+                    
+                    colSpan += cs;
+                }
+
+                spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
+                rowSpanArr = [];
+            }
+
+            rowSpanArr = null;
+            spanIndex = null;
         }
     },
 
@@ -613,7 +625,7 @@ export default {
         const removeCell = [];
         const removeSpanArr = [];
 
-        for (let i = 0, len = rows.length, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+        for (let i = 0, len = contextTable._rowCnt, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
             row = rows[i];
             insertIndex = cellIndex;
             applySpan = false;
@@ -809,10 +821,9 @@ export default {
                 let rowSpanArr = [];
                 let spanIndex = [];
 
-                for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
+                for (let i = 0, len = contextTable._rowCnt, cells, colSpan; i < len; i++) {
                     cells = rows[i].cells;
                     colSpan = 0;
-                    if (i === rowIndex) continue;
                     for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
                         cell = cells[c];
                         cs = cell.colSpan - 1;
@@ -822,14 +833,22 @@ export default {
                         if (spanIndex.length > 0) {
                             for (let r = 0, arr; r < spanIndex.length; r++) {
                                 arr = spanIndex[r];
+                                if (arr.row > i) continue;
                                 if (logcalIndex >= arr.index) {
                                     colSpan += arr.cs;
                                     logcalIndex += arr.cs;
                                     arr.rs -= 1;
+                                    arr.row = i + 1;
                                     if (arr.rs < 1) {
                                         spanIndex.splice(r, 1);
                                         r--;
                                     }  
+                                } else if (c === cLen - 1) {
+                                    arr.rs -= 1;
+                                    arr.row = i + 1;
+                                    if (arr.rs < 1) {
+                                        spanIndex.splice(r, 1);
+                                    }
                                 }
                             }
                         }
@@ -839,17 +858,18 @@ export default {
                                 index: logcalIndex,
                                 cs: cs + 1,
                                 rs: rs,
+                                row: -1
                             });
                         }
 
-                        if (logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+                        if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
                             cell.colSpan += 1;
                             break;
                         }
 
                         if (logcalIndex > index) break;
                         
-                        colSpan += cell.colSpan - 1;
+                        colSpan += cs;
                     }
 
                     spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
