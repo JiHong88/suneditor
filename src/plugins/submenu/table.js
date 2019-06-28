@@ -438,12 +438,13 @@ export default {
             }
         }
 
-        // multi cells
+        // multi
         if (tablePlugin._ref) {
             const positionCell = contextTable._tdElement;
             const selectedCells = tablePlugin._selectedCells;
-
+            // multi - row
             if (isRow) {
+                // remove row
                 if (!option) {
                     let row = selectedCells[0].parentNode;
                     const removeCells = [selectedCells[0]];
@@ -460,16 +461,17 @@ export default {
                         tablePlugin.setCellInfo.call(this, removeCells[i], true);
                         tablePlugin.editRow.call(this, option);
                     }
-                } else {
+                } else { // edit row
                     tablePlugin.setCellInfo.call(this, option === 'up' ? selectedCells[0] : selectedCells[selectedCells.length - 1], true);
                     tablePlugin.editRow.call(this, option, positionCell);
                 }
-            } else {
+            } else { // multi - cell
                 const firstRow = selectedCells[0].parentNode;
+                // remove cell
                 if (!option) {
                     const removeCells = [selectedCells[0]];
                     
-                    for (let i = 1, len = selectedCells.length - 1, cell; i < len; i++) {
+                    for (let i = 1, len = selectedCells.length, cell; i < len; i++) {
                         cell = selectedCells[i];
                         if (firstRow === cell.parentNode) {
                             removeCells.push(cell);
@@ -482,7 +484,7 @@ export default {
                         tablePlugin.setCellInfo.call(this, removeCells[i], true);
                         tablePlugin.editCell.call(this, option);
                     }
-                } else {
+                } else { // edit cell
                     let rightCell = null;
 
                     for (let i = 0, len = selectedCells.length - 1; i < len; i++) {
@@ -498,11 +500,12 @@ export default {
             }
 
             if (!option) tablePlugin.init.call(this);
-        } // one cell
+        } // one
         else {
             tablePlugin[isRow ? 'editRow' : 'editCell'].call(this, option);
         }
 
+        // after remove
         if (!option) {
             const children = table.children;
             for (let i = 0; i < children.length; i++) {
@@ -639,21 +642,8 @@ export default {
                 rs = cell.rowSpan - 1;
                 cs = cell.colSpan - 1;
 
-                if (remove ? c > insertIndex + colSpan : c >= insertIndex) {
-                    if (!remove) break;
-
-                    if (rs > 0) {
-                        removeSpanArr.push({
-                            cell: cell,
-                            i: i,
-                            rs: i + rs
-                        });
-                    }
-
-                    continue;
-                }
-
                 if (!remove) {
+                    if (c >= insertIndex) break;
                     if (cs > 0) {
                         if (passCell < 1 && cs + c >= insertIndex) {
                             cell.colSpan += 1;
@@ -717,15 +707,13 @@ export default {
                     if (removeIndex >= insertIndex && removeIndex + cs <= insertIndex + colSpan) {
                         removeCell.push(cell);
                     } else if (removeIndex <= insertIndex + colSpan && removeIndex + cs >= insertIndex) {
-                        let modifyColSpan = 0;
-
-                        for (let m = cellIndex; m <= cellIndex + colSpan; m++) {
-                            if (m >= removeIndex && m <= removeIndex + cs) {
-                                modifyColSpan++;
-                            }
-                        }
-
-                        cell.colSpan -= this._w.Math.abs(modifyColSpan);
+                        cell.colSpan -= util.getOverlapRangeAtIndex(cellIndex, cellIndex + colSpan, removeIndex, removeIndex + cs); 
+                    } else if (rs > 0 && (removeIndex < insertIndex || removeIndex + cs > insertIndex + colSpan)) {
+                        removeSpanArr.push({
+                            cell: cell,
+                            i: i,
+                            rs: i + rs
+                        });
                     }
 
                     cellColSpan += cs;
@@ -733,7 +721,6 @@ export default {
             }
 
             spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {return a.index - b.index;});
-
             rowSpanArr = [];
 
             if (!remove) {
@@ -751,28 +738,20 @@ export default {
         }
 
         if (remove) {
-            const removeRowArr = [];
+            let removeFirst, removeEnd;
             for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
                 row = removeCell[r].parentNode;
                 util.removeItem(removeCell[r]);
                 if (row.cells.length === 0) {
-                    removeRowArr.push({
-                        i: util.getArrayIndex(rows, row)
-                    });
-
+                    if (!removeFirst) removeFirst = util.getArrayIndex(rows, row);
+                    removeEnd = util.getArrayIndex(rows, row);
                     util.removeItem(row);
                 }
             }
 
-            for (let i = 0, len = removeRowArr.length, row; i < len; i++) {
-                row = removeRowArr[i];
-                for (let c = 0, cLen = removeSpanArr.length, rowSpanCell; c < cLen; c++) {
-                    rowSpanCell = removeSpanArr[c];
-
-                    if (row.i >= rowSpanCell.i && row.i <= rowSpanCell.rs) {
-                        rowSpanCell.cell.rowSpan -= 1;
-                    }
-                }
+            for (let c = 0, cLen = removeSpanArr.length, rowSpanCell; c < cLen; c++) {
+                rowSpanCell = removeSpanArr[c];
+                rowSpanCell.cell.rowSpan = util.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
             }
 
             this.controllersOff();
@@ -976,8 +955,8 @@ export default {
         
         let emptyRowFirst = null;
         let emptyRowLast = null;
-        let cs = ref.regCell.length;
-        let rs = ref.regRow.length;
+        let cs = (ref.ce - ref.cs) + 1;
+        let rs = (ref.re - ref.rs) + 1;
         let mergeHTML = '';
         let row = null;
 
@@ -1007,10 +986,6 @@ export default {
             const rowIndexFirst = util.getArrayIndex(rows, emptyRowFirst);
             const rowIndexLast = util.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
             const removeRows = [];
-            const compareIndexArr = [];
-            for (let i = rowIndexFirst; i <= rowIndexLast; i++) {
-                compareIndexArr.push(i);
-            }
     
             for (let i = 0, cells; i <= rowIndexLast; i++) {
                 cells = rows[i].cells;
@@ -1019,14 +994,11 @@ export default {
                     continue;
                 }
     
-                for (let c = 0, cLen = cells.length, cell; c < cLen; c++) {
+                for (let c = 0, cLen = cells.length, cell, rs; c < cLen; c++) {
                     cell = cells[c];
-                    if (cell.rowSpan > 1 && i + cell.rowSpan - 1 >= rowIndexFirst) {
-                        let span = 0;
-                        for (let s = i, sLen = i + cell.rowSpan; s < sLen; s++) {
-                            if (compareIndexArr.indexOf(s) > -1) span++;
-                        }
-                        cell.rowSpan -= span;
+                    rs = cell.rowSpan - 1;
+                    if (rs > 0 && i + rs >= rowIndexFirst) {
+                        cell.rowSpan -= util.getOverlapRangeAtIndex(rowIndexFirst, rowIndexLast, i, i + rs);
                     }
                 }
             }
@@ -1165,32 +1137,6 @@ export default {
         tablePlugin.setMultiCells.call(this, tablePlugin._fixedCell, target);
     },
 
-    _getMultiCellArr: function (ref) {
-        const regCell = [];
-        const regRow = [];
-
-        for (let i = ref.cs, len = ref.ce; i <= len; i++) {
-            regCell.push(i);
-        }
-
-        for (let i = ref.rs, len = ref.re; i <= len; i++) {
-            regRow.push(i);
-        }
-
-        return {
-            cell: regCell,
-            row: regRow
-        };
-    },
-
-    _checkCellIndex: function (ref, index, spanIndex) {
-        for (let i = index, len = spanIndex; i <= len; i++) {
-            if (ref.indexOf(i) > -1) return true;
-        }
-
-        return false;
-    },
-
     setMultiCells: function (startCell, endCell) {
         const tablePlugin = this.plugins.table;
         const rows = tablePlugin._selectedTable.rows;
@@ -1209,13 +1155,13 @@ export default {
         let findSelectedCell = true;
         let spanIndex = [];
         let rowSpanArr = [];
-        const ref = tablePlugin._ref = {_i: 0, cs: null, ce: null, rs: null, re: null, regCell: null, regRow: null};
+        const ref = tablePlugin._ref = {_i: 0, cs: null, ce: null, rs: null, re: null};
 
         for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
             cells = rows[i].cells;
             colSpan = 0;
 
-            for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs, reg; c < cLen; c++) {
+            for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs; c < cLen; c++) {
                 cell = cells[c];
                 cs = cell.colSpan - 1;
                 rs = cell.rowSpan - 1;
@@ -1250,11 +1196,6 @@ export default {
                         ref.ce = ref.ce !== null && ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
                         ref.rs = ref.rs !== null && ref.rs < i ? ref.rs : i;
                         ref.re = ref.re !== null && ref.re > i + rs ? ref.re : i + rs;
-
-                        reg = tablePlugin._getMultiCellArr(ref);
-                        ref.regCell = reg.cell;
-                        ref.regRow = reg.row;
-
                         ref._i += 1;
                     }
                     
@@ -1265,7 +1206,7 @@ export default {
                         i = -1;
                         break;
                     }
-                } else if (tablePlugin._checkCellIndex(ref.regCell, logcalIndex, logcalIndex + cs) && tablePlugin._checkCellIndex(ref.regRow, i, i + rs)) {
+                } else if (util.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && util.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
                     const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
                     const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
                     const newRs = ref.rs < i ? ref.rs : i;
@@ -1276,14 +1217,10 @@ export default {
                         ref.ce = newCe;
                         ref.rs = newRs;
                         ref.re = newRe;
-
-                        reg = tablePlugin._getMultiCellArr(ref);
-                        ref.regCell = reg.cell;
-                        ref.regRow = reg.row;
+                        i = -1;
 
                         spanIndex = [];
                         rowSpanArr = [];
-                        i = -1;
                         break;
                     }
 
