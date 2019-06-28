@@ -245,11 +245,13 @@ export default {
         const contextTable = this.context.table;
         const tablePlugin = this.plugins.table;
 
-        if (!contextTable._element) return;
+        tablePlugin._removeEvents.call(this);
 
-        const selectedCells = contextTable._element.querySelectorAll('.se-table-selected-cell');
-        for (let i = 0, len = selectedCells.length; i < len; i++) {
-            this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
+        if (tablePlugin._selectedTable) {
+            const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
+            for (let i = 0, len = selectedCells.length; i < len; i++) {
+                this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
+            }
         }
 
         contextTable._element = null;
@@ -271,6 +273,10 @@ export default {
         tablePlugin._selectedCells = null;
         tablePlugin._selectedTable = null;
         tablePlugin._ref = null;
+
+        tablePlugin._fixedCell = null;
+        tablePlugin._selectedCell = null;
+        tablePlugin._fixedCellName = null;
     },
 
     /** table edit controller */
@@ -1269,11 +1275,7 @@ export default {
         if (!shift) {
             this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
-            tablePlugin._bindOffShift = function () {
-                tablePlugin._removeEvents.call(this);
-                this.util.removeClass(tdElement, 'se-table-selected-cell');
-            }.bind(this);
-
+            tablePlugin._bindOffShift = function () { tablePlugin.init.call(this); }.bind(this);
             this._d.addEventListener('keyup', tablePlugin._bindOffShift, false);
             this._d.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
         }
@@ -1281,7 +1283,6 @@ export default {
 
     _removeEvents: function () {
         const tablePlugin = this.plugins.table;
-        tablePlugin._shift = false;
 
         if (tablePlugin._bindOnSelect) {
             this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
@@ -1298,8 +1299,6 @@ export default {
             this._d.removeEventListener('keyup', tablePlugin._bindOffShift);
             tablePlugin._bindOffShift = null;
         }
-
-        tablePlugin.init.call(this);
     },
 
     onClick_tableController: function (e) {

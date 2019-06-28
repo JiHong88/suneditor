@@ -2810,11 +2810,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
             }
 
-            if (shift) {
-                if (util.isCell(rangeEl) && core.plugins.table) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    core.plugins.table.tableCellMultiSelect.call(core, rangeEl, true);
+            if (shift && !event._directionKeyKeyCode.test(keyCode)) {
+                e.preventDefault();
+                e.stopPropagation();
+                const tablePlugin = core.plugins.table;
+                if (util.isCell(rangeEl) && tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
+                    tablePlugin.tableCellMultiSelect.call(core, rangeEl, true);
                     return;
                 }
             }
