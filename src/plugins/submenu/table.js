@@ -264,8 +264,7 @@ export default {
             }
         }
 
-        this.context.element.wysiwyg.setAttribute('contenteditable', true);
-        this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
+        tablePlugin._toggleEditor.call(this, true);
 
         contextTable._element = null;
         contextTable._tdElement = null;
@@ -1091,14 +1090,19 @@ export default {
     _selectedCell: null,
     _selectedTable: null,
     _ref: null,
+    _toggleEditor: function (enabled) {
+        this.context.element.wysiwyg.setAttribute('contenteditable', enabled);
+        if (enabled) this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
+        else this.util.addClass(this.context.element.wysiwyg, 'se-disabled');
+    },
+
     _offCellMultiSelect: function (e) {
         e.stopPropagation();
         const tablePlugin = this.plugins.table;
 
         if (!tablePlugin._shift) {
             tablePlugin._removeEvents.call(this);
-            this.context.element.wysiwyg.setAttribute('contenteditable', true);
-            this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
+            tablePlugin._toggleEditor.call(this, true);
         }
 
         if (!tablePlugin._fixedCell || !tablePlugin._selectedTable) return;
@@ -1121,13 +1125,12 @@ export default {
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
-        if (!tablePlugin._ref) {
-            if (!tablePlugin._shift && target === tablePlugin._fixedCell) {
-                return;
-            } else {
-                this.context.element.wysiwyg.setAttribute('contenteditable', false);
-                this.util.addClass(this.context.element.wysiwyg, 'se-disabled');
-            }
+        if (tablePlugin._shift) {
+            if (target === tablePlugin._fixedCell) tablePlugin._toggleEditor.call(this, true);
+            else tablePlugin._toggleEditor.call(this, false);
+        } else if (!tablePlugin._ref) {
+            if (target === tablePlugin._fixedCell) return;
+            else tablePlugin._toggleEditor.call(this, false);
         }
 
         if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || 
@@ -1291,8 +1294,8 @@ export default {
             this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                if (tablePlugin._ref) this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this));
-                else tablePlugin.init.call(this);
+                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this));
+                if (!tablePlugin._ref) this.controllersOff();
             }.bind(this);
 
             this._d.addEventListener('keyup', tablePlugin._bindOffShift, false);

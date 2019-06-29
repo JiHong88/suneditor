@@ -2814,9 +2814,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 e.preventDefault();
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;
-                if (util.isCell(rangeEl) && tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
-                    tablePlugin.onTableCellMultiSelect.call(core, rangeEl, true);
-                    return;
+                if (tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
+                    const cell = util.getParentElement(formatEl, util.isCell);
+                    if (cell) {
+                        tablePlugin.onTableCellMultiSelect.call(core, cell, true);
+                        return;
+                    }
                 }
             }
 

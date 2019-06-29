@@ -81,7 +81,7 @@
 .sun-editor .se-icon-arrow-down::before{content:'\0066'; font-size: 10px;}
 .sun-editor .se-icon-video::before{content:'\0067';}
 .sun-editor .se-icon-cancel::before{content:'\0068'; font-size:10px;}
-.sun-editor .se-icon-exclamation::before{content:'\0069';}
+.sun-editor .se-icon-warning::before{content:'\0069';}
 .sun-editor .se-icon-insert-column-right::before{content:'\006a';}
 .sun-editor .se-icon-insert-row-below::before{content:'\006b';}
 .sun-editor .se-icon-insert-row-above::before{content:'\006c';}
@@ -99,9 +99,16 @@
 .sun-editor .se-icon-save::before{content:'\0078';}
 .sun-editor .se-icon-hr::before{content:'\0079';}
 .sun-editor .se-icon-checked::before{content:'\007a';}
-.sun-editor .se-icon-table-header:before{content:'\0030';}
-.sun-editor .se-icon-merge-cell:before{content:'\0031';}
-.sun-editor .se-icon-split-cell:before{content:'\0032';}
+.sun-editor .se-icon-table-header::before{content:'\0030';}
+.sun-editor .se-icon-merge-cell::before{content:'\0031';}
+.sun-editor .se-icon-split-cell::before{content:'\0032';}
+.sun-editor .se-icon-pdf::before{content:'\0033';}
+.sun-editor .se-icon-file::before{content:'\0034';}
+.sun-editor .se-icon-question::before{content:'\0035';}
+.sun-editor .se-icon-attachment::before{content:'\0036';}
+.sun-editor .se-icon-add::before{content:'\0037';}
+.sun-editor .se-icon-more-vertical::before{content:'\0038';}
+.sun-editor .se-icon-more-horizontal::before{content:'\0039';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
