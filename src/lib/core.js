@@ -2810,7 +2810,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
             }
 
-            if (shift && !event._directionKeyKeyCode.test(keyCode)) {
+            if (shift && /16/.test(keyCode)) {
                 e.preventDefault();
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;

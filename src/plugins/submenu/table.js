@@ -55,7 +55,7 @@ export default {
         /** set resizing */
         let resizeDiv = this.setController_tableEditor.call(core);
         context.table.resizeDiv = resizeDiv;
-        context.table.splitMenu = resizeDiv.querySelector('._se_table_split_menu');
+        context.table.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
         context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
         context.table.splitButton = resizeDiv.querySelector('._se_table_split_button');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
@@ -164,7 +164,7 @@ export default {
             '           <i class="se-icon-split-cell"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
             '       </button>' +
-            '       <div class="_se_table_split_menu sun-editor-common se-list-layer" style="display:none; left:50%;">' +
+            '       <div class="se-btn-group-sub sun-editor-common se-list-layer">' +
             '           <div class="se-list-inner">' +
             '               <ul class="se-list-basic">' +
             '                   <li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
@@ -254,6 +254,9 @@ export default {
             }
         }
 
+        this.context.element.wysiwyg.setAttribute('contenteditable', true);
+        this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
+
         contextTable._element = null;
         contextTable._tdElement = null;
         contextTable._trElement = null;
@@ -282,20 +285,21 @@ export default {
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
         const contextTable = this.context.table;
+        const tablePlugin = this.plugins.table;
         const tableController = contextTable.tableController;
         
-        this.plugins.table.setPositionControllerDiv.call(this, tdElement, false);
+        tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
         const tableElement = contextTable._element;
         const offset = this.util.getOffset(tableElement);
 
         contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
-        this.plugins.table.resizeTable.call(this);
+        tablePlugin.resizeTable.call(this);
         tableController.style.left = (offset.left + tableElement.offsetLeft - this.context.element.wysiwyg.scrollLeft) + 'px';
         tableController.style.display = 'block';
         tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
 
-        this.controllersOn(contextTable.resizeDiv, tableController, this.plugins.table.init.bind(this));
+        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this));
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -1088,6 +1092,7 @@ export default {
         }
     },
 
+    // multi selecte
     _bindOnSelect: null,
     _bindOffSelect: null,
     _bindOffShift: null,
@@ -1102,10 +1107,11 @@ export default {
         e.stopPropagation();
         const tablePlugin = this.plugins.table;
 
-        this.context.element.wysiwyg.setAttribute('contenteditable', true);
-        this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
-
-        tablePlugin._removeEvents.call(this);
+        if (!tablePlugin._shift) {
+            tablePlugin._removeEvents.call(this);
+            this.context.element.wysiwyg.setAttribute('contenteditable', true);
+            this.util.removeClass(this.context.element.wysiwyg, 'se-disabled');
+        }
 
         if (!tablePlugin._fixedCell || !tablePlugin._selectedTable) return;
         
@@ -1113,10 +1119,12 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
         tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
-        tablePlugin._shift = false;
-        tablePlugin._fixedCell = null;
-        tablePlugin._selectedCell = null;
-        tablePlugin._fixedCellName = null;
+
+        if (!tablePlugin._shift) {
+            tablePlugin._fixedCell = null;
+            tablePlugin._selectedCell = null;
+            tablePlugin._fixedCellName = null;
+        }
 
         this.focus();
     },
@@ -1134,8 +1142,8 @@ export default {
             }
         }
 
-        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName ||
-                tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
+        if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || 
+            tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
             return;
         }
 
@@ -1271,14 +1279,18 @@ export default {
         tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
         tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
 
-        this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
         if (!shift) {
             this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
-            tablePlugin._bindOffShift = function () { tablePlugin.init.call(this); }.bind(this);
+            tablePlugin._bindOffShift = function () {
+                if (tablePlugin._ref) this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this));
+                else tablePlugin.init.call(this);
+            }.bind(this);
             this._d.addEventListener('keyup', tablePlugin._bindOffShift, false);
             this._d.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
         }
+
+        this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
     },
 
     _removeEvents: function () {
