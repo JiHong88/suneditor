@@ -217,7 +217,7 @@ export default {
                     const formData = new FormData();
 
                     for (let i = 0; i < filesLen; i++) {
-                        formData.append('file-' + fileCnt, files[i]);
+                        formData.append('file-' + i, files[i]);
                     }
 
                     this.context.image._xmlHttp = this.util.getXMLHttpRequest();
