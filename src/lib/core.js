@@ -2436,7 +2436,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             
             _w.setTimeout(function () {
                 core.callPlugin('table', function () {
-                    tablePlugin.tableCellMultiSelect.call(core, target, false);
+                    tablePlugin.onTableCellMultiSelect.call(core, target, false);
                 });
             });
         },
@@ -2815,7 +2815,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;
                 if (util.isCell(rangeEl) && tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
-                    tablePlugin.tableCellMultiSelect.call(core, rangeEl, true);
+                    tablePlugin.onTableCellMultiSelect.call(core, rangeEl, true);
                     return;
                 }
             }

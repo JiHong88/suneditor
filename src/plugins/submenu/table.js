@@ -182,29 +182,39 @@ export default {
 
     appendTable: function () {
         const oTable = this.util.createElement('TABLE');
+        const createCells = this.plugins.table.createCells;
 
-        let x = this.context.table._tableXY[0];
+        const x = this.context.table._tableXY[0];
         let y = this.context.table._tableXY[1];
         let tableHTML = '<tbody>';
-
         while (y > 0) {
-            tableHTML += '<tr>';
-            let tdCnt = x;
-            while (tdCnt > 0) {
-                tableHTML += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
-                --tdCnt;
-            }
-            tableHTML += '</tr>';
+            tableHTML += '<tr>' + createCells.call(this, 'td', x) + '</tr>';
             --y;
         }
         tableHTML += '</tbody>';
-
         oTable.innerHTML = tableHTML;
 
         this.insertComponent(oTable);
         
         this.focus();
         this.plugins.table.reset_table_picker.call(this);
+    },
+
+    createCells: function (nodeName, cnt, returnElement) {
+        nodeName = nodeName.toLowerCase();
+
+        if (!returnElement) {
+            let cellsHTML = '';
+            while (cnt > 0) {
+                cellsHTML += '<' +nodeName + '><div>' + this.util.zeroWidthSpace + '</div></' + nodeName + '>';
+                cnt--;
+            }
+            return cellsHTML;
+        } else {
+            const cell = this.util.createElement(nodeName);
+            cell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+            return cell;
+        }
     },
 
     onMouseMove_tablePicker: function (e) {
@@ -434,15 +444,7 @@ export default {
                 if (option === 'up') {
                     return;
                 } else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
-                    const tbody = this.util.createElement('TBODY');
-                    const tr = this.util.createElement('TR');
-                    tbody.appendChild(tr);
-
-                    for (let i = 0, len = contextTable._logical_cellCnt; i < len; i++) {
-                        tr.innerHTML += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
-                    }
-
-                    table.appendChild(tbody);
+                    table.innerHTML += '<tbody><tr>' + tablePlugin.createCells.call(this, 'td', contextTable._logical_cellCnt, false) + '</tr></tbody>';
                     return;
                 }
             }
@@ -605,14 +607,8 @@ export default {
 
             contextTable._element.deleteRow(rowIndex);
         } else {
-            let cells = '';
-
-            for (let i = 0, len = cellCnt; i < len; i++) {
-                cells += '<td><div>' + this.util.zeroWidthSpace + '</div></td>';
-            }
-
             const newRow = contextTable._element.insertRow(rowIndex);
-            newRow.innerHTML = cells;
+            newRow.innerHTML = this.plugins.table.createCells.call(this, 'td', cellCnt, false);
         }
 
         if (!remove) {
@@ -740,8 +736,7 @@ export default {
                 }
 
                 if (insertIndex !== null && cells.length > 0) {
-                    newCell = util.createElement(cells[0].nodeName);
-                    newCell.innerHTML = '<div>' + util.zeroWidthSpace + '</div>';
+                    newCell = this.plugins.table.createCells.call(this, cells[0].nodeName, 0, true);
                     newCell = row.insertBefore(newCell, cells[insertIndex]);
                 }
             }
@@ -792,9 +787,7 @@ export default {
         const currentRow = contextTable._trElement;
         const index = contextTable._logical_cellIndex;
         const rowIndex = contextTable._rowIndex;
-
-        const newCell = util.createElement(currentCell.nodeName);
-        newCell.innerHTML = '<div>' + util.zeroWidthSpace + '</div>';
+        const newCell = this.plugins.table.createCells.call(this, currentCell.nodeName, 0, true);
 
         // vertical
         if (vertical) {
@@ -1037,12 +1030,7 @@ export default {
 
         if (!active) {
             const header = util.createElement('THEAD');
-            let th = '';
-            for (let i = 0, len = this.context.table._logical_cellCnt; i < len; i++) {
-                th += '<th><div>' + util.zeroWidthSpace + '</div></th>';
-            }
-
-            header.innerHTML = th;
+            header.innerHTML = '<tr>' + this.plugins.table.createCells.call(this, 'th', this.context.table._logical_cellCnt, false) + '</tr>';
             table.insertBefore(header, table.firstElementChild);
         } else {
             util.removeItem(table.querySelector('thead'));
@@ -1134,7 +1122,7 @@ export default {
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
         if (!tablePlugin._ref) {
-            if (target === tablePlugin._fixedCell) {
+            if (!tablePlugin._shift && target === tablePlugin._fixedCell) {
                 return;
             } else {
                 this.context.element.wysiwyg.setAttribute('contenteditable', false);
@@ -1144,14 +1132,14 @@ export default {
 
         if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || 
             tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
-            return;
+                return;
         }
 
         tablePlugin._selectedCell = target;
-        tablePlugin.setMultiCells.call(this, tablePlugin._fixedCell, target);
+        tablePlugin._setMultiCells.call(this, tablePlugin._fixedCell, target);
     },
 
-    setMultiCells: function (startCell, endCell) {
+    _setMultiCells: function (startCell, endCell) {
         const tablePlugin = this.plugins.table;
         const rows = tablePlugin._selectedTable.rows;
         const util = this.util;
@@ -1163,7 +1151,7 @@ export default {
 
         if (startCell === endCell) {
             util.addClass(startCell, 'se-table-selected-cell');
-            return;
+            if (!tablePlugin._shift) return;
         }
 
         let findSelectedCell = true;
@@ -1258,7 +1246,27 @@ export default {
         }
     },
 
-    tableCellMultiSelect: function (tdElement, shift) {
+    _removeEvents: function () {
+        const tablePlugin = this.plugins.table;
+
+        if (tablePlugin._bindOnSelect) {
+            this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
+            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            tablePlugin._bindOnSelect = null;
+        }
+
+        if (tablePlugin._bindOffSelect) {
+            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+            tablePlugin._bindOffSelect = null;
+        }
+
+        if (tablePlugin._bindOffShift) {
+            this._d.removeEventListener('keyup', tablePlugin._bindOffShift);
+            tablePlugin._bindOffShift = null;
+        }
+    },
+
+    onTableCellMultiSelect: function (tdElement, shift) {
         const tablePlugin = this.plugins.table;
 
         tablePlugin._removeEvents.call(this);
@@ -1286,31 +1294,12 @@ export default {
                 if (tablePlugin._ref) this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this));
                 else tablePlugin.init.call(this);
             }.bind(this);
+
             this._d.addEventListener('keyup', tablePlugin._bindOffShift, false);
             this._d.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
         }
 
         this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
-    },
-
-    _removeEvents: function () {
-        const tablePlugin = this.plugins.table;
-
-        if (tablePlugin._bindOnSelect) {
-            this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
-            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
-            tablePlugin._bindOnSelect = null;
-        }
-
-        if (tablePlugin._bindOffSelect) {
-            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
-            tablePlugin._bindOffSelect = null;
-        }
-
-        if (tablePlugin._bindOffShift) {
-            this._d.removeEventListener('keyup', tablePlugin._bindOffShift);
-            tablePlugin._bindOffShift = null;
-        }
     },
 
     onClick_tableController: function (e) {
