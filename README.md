@@ -19,7 +19,8 @@ Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your 
 - Paste from Word and Excel.
 - Paste images and modify. (server upload or using base64 encoding)
 - Media embeds.
-- Many other features : )
+- Edit a table.
+- Many other features :)
 
 Supported Browser -
 Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
@@ -408,9 +409,9 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
-editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {
-    console.log('targetImgElement :' + targetImgElement + ', index : ' + index + ', isDelete : ' + isDelete)
-    console.log(imageInfo)
+editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
+    console.log(`targetImgElement:${targetImgElement}, index:${index}, isDelete:${isDelete}`)
+    console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called when the image is upload failed.

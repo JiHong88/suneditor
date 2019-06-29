@@ -38,7 +38,8 @@ export default {
             _floatClassRegExp: 'float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
-            _defaultAuto: context.option.imageWidth === 'auto' ? true : false
+            _defaultAuto: context.option.imageWidth === 'auto' ? true : false,
+            _uploadFileLength: 0
         };
 
         /** image dialog */
@@ -294,7 +295,8 @@ export default {
         if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+            const file = {name: this.context.image.imgUrlFile.value.split('/').pop(), size: 0};
+            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element, file);
         } catch (e) {
             notice.open.call(this, '[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
@@ -321,36 +323,41 @@ export default {
     setInputSize: function (xy) {
         if (!this.context.dialog.updateModal) return;
 
-        if (this.context.image.proportion.checked) {
+        const contextImage = this.context.image;
+        if (contextImage.proportion.checked) {
             if (xy === 'x') {
-                this.context.image.imageY.value = Math.round((this.context.image._element_h / this.context.image._element_w) * this.context.image.imageX.value);
+                contextImage.imageY.value = Math.round((contextImage._element_h / contextImage._element_w) * contextImage.imageX.value);
             } else {
-                this.context.image.imageX.value = Math.round((this.context.image._element_w / this.context.image._element_h) * this.context.image.imageY.value);
+                contextImage.imageX.value = Math.round((contextImage._element_w / contextImage._element_h) * contextImage.imageY.value);
             }
         }
     },
 
     submit: function (e) {
+        const contextImage = this.context.image;
+        const imagePlugin = this.plugins.image;
         this.showLoading();
 
         e.preventDefault();
         e.stopPropagation();
 
-        this.context.image._linkValue = this.context.image.imgLink.value;
-        this.context.image._altText = this.context.image.altText.value;
-        this.context.image._align = this.context.image.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
-        this.context.image._captionChecked = this.context.image.captionCheckEl.checked;
-        if (this.context.image._resizing) this.context.image._proportionChecked = this.context.image.proportion.checked;
+        contextImage._linkValue = contextImage.imgLink.value;
+        contextImage._altText = contextImage.altText.value;
+        contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
+        contextImage._captionChecked = contextImage.captionCheckEl.checked;
+        if (contextImage._resizing) contextImage._proportionChecked = contextImage.proportion.checked;
 
         try {
             if (this.context.dialog.updateModal) {
-                this.plugins.image.update_image.call(this);
+                imagePlugin.update_image.call(this);
             }
             
-            if (this.context.image.imgInputFile && this.context.image.imgInputFile.files.length > 0) {
-                this.plugins.image.onRender_imgInput.call(this);
-            } else if (this.context.image.imgUrlFile && this.context.image.imgUrlFile.value.trim().length > 0) {
-                this.plugins.image.onRender_imgUrl.call(this);
+            if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
+                contextImage._uploadFileLength = contextImage.imgInputFile.files.length;
+                imagePlugin.onRender_imgInput.call(this);
+            } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
+                contextImage._uploadFileLength = 1;
+                imagePlugin.onRender_imgUrl.call(this);
             } else {
                 this.closeLoading();
             }
@@ -365,41 +372,44 @@ export default {
         return false;
     },
 
+    _setImagesInfo: function (img, file) {
+        let dataIndex = img.getAttribute('data-index');
+        if (!dataIndex) {
+            dataIndex = this._variable._imageIndex;
+            img.setAttribute('data-index', dataIndex);
+
+            this._variable._imagesInfo[dataIndex] = {
+                src: img.src,
+                index: dataIndex,
+                name: file.name,
+                size: file.size,
+                select: function () {
+                    const size = this.plugins.resizing.call_controller_resize.call(this, img, 'image');
+                    this.plugins.image.onModifyMode.call(this, img, size);
+                    img.scrollIntoView();
+                }.bind(this),
+                delete: this.plugins.image.destroy.bind(this, img)
+            };
+
+            this._variable._imageIndex++;
+
+            img.setAttribute('data-file-name', file.name);
+            img.setAttribute('data-file-size', file.size);
+        }
+        else {
+            this._variable._imagesInfo[dataIndex].name = img.getAttribute("data-file-name");
+            this._variable._imagesInfo[dataIndex].size = img.getAttribute("data-file-size") * 1;
+        }
+
+        this._imageUpload(img, dataIndex, false, this._variable._imagesInfo[dataIndex], --this.context.image._uploadFileLength);
+    },
+
     _onload_image: function (oImg, file) {
         oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
         oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
 
         if (!file) return;
-
-        let dataIndex = oImg.getAttribute('data-index');
-        if (!dataIndex) {
-            dataIndex = this._variable._imageIndex;
-            oImg.setAttribute('data-index', dataIndex);
-
-            this._variable._imagesInfo[dataIndex] = {
-                src: oImg.src,
-                index: dataIndex,
-                name: file.name,
-                size: file.size,
-                select: function () {
-                    const size = this.plugins.resizing.call_controller_resize.call(this, oImg, 'image');
-                    this.plugins.image.onModifyMode.call(this, oImg, size);
-                    oImg.scrollIntoView();
-                }.bind(this),
-                delete: this.plugins.image.destroy.bind(this, oImg)
-            };
-
-            this._variable._imageIndex++;
-
-            oImg.setAttribute('data-file-name', file.name);
-            oImg.setAttribute('data-file-size', file.size);
-        }
-        else {
-            this._variable._imagesInfo[dataIndex].name = oImg.getAttribute("data-file-name");
-            this._variable._imagesInfo[dataIndex].size = oImg.getAttribute("data-file-size") * 1;
-        }
-
-        this._imageUpload(oImg, dataIndex, false, this._variable._imagesInfo[dataIndex]);
+        this.plugins.image._setImagesInfo.call(this, oImg, file);       
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {
@@ -682,7 +692,7 @@ export default {
 
         if (dataIndex) {
             delete this._variable._imagesInfo[dataIndex];
-            this._imageUpload(imageEl, dataIndex, true);
+            this._imageUpload(imageEl, dataIndex, true, null, 0);
         }
     },
 

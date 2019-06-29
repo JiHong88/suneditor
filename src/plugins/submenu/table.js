@@ -1291,7 +1291,7 @@ export default {
             this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                if (tablePlugin._ref) this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this));
+                if (tablePlugin._ref) this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this));
                 else tablePlugin.init.call(this);
             }.bind(this);
 

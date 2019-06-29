@@ -141,8 +141,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description An user event function when image uploaded success or remove image
          * @private
          */
-        _imageUpload: function (targetImgElement, index, isDelete, imageInfo) {
-            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, isDelete, imageInfo);
+        _imageUpload: function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
+            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, isDelete, imageInfo, remainingFilesCount);
         },
 
         /**

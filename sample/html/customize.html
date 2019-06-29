@@ -13,6 +13,89 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .image-list {
+            display: flex;
+            box-sizing: border-box;
+            position: relative;
+            width: 100%;
+            margin-top: 14px;
+            background: #fff;
+        }
+
+        .image-list * {
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .image-list button {
+            margin: 0 !important;
+        }
+
+        .image-list .file-list-info {
+            float: left;
+            white-space: nowrap;
+            padding: 10px;
+        }
+        
+        .image-list .file-list-info span {
+            display: block;
+            width: 100%;
+            margin: 12px 0;
+        }
+
+        .image-list .file-list-info .total-size {
+            color: #333;
+        }
+
+        .image-list .file-list {
+            padding: 10px;
+        }
+
+        .image-list .file-list ul {
+            margin: 0;
+            padding: 0;
+            height: auto;
+            width: 100%;
+            background-color: #f5f5f5;
+        }
+
+        .image-list .file-list ul li {
+            position: relative;
+            display: inline-block;
+            margin: 3px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #999;
+        }
+
+        .image-list .file-list ul li.checked {
+            border: 3px solid #dc3545;
+        }
+
+        .image-list .file-list ul li img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .image-list .file-list ul li .image-size {
+            color: #333;
+            font-size: 10px;
+        }
+
+        .image-list .file-list ul li .image-check {
+            position: absolute;
+            top: 0;
+            left: auto;
+            right: 0;
+            margin: 0;
+            padding: 1px 0 1px 2px;
+            border: 0;
+            border-radius: 0 0 0 5px;
+            outline: none;
+            background-color: #dc3545;
+        }
+    </style>
 </head>
 <body class="back_categorys" style="min-width:100%; background-color:#000;">
 <nav class="navbar navbar-inverse">
@@ -108,7 +191,7 @@
 
             <label><input type="checkbox" id="imageResizing">&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageFileInput" checked>&nbsp;&nbsp;imageFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="imageUrlInput">&nbsp;&nbsp;imageUrlInput</label>
+            <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>
             <br><br>
 
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
@@ -139,19 +222,20 @@
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
-        <h4 class="sub-title">Uploaded image file list</h4>
-        <table>
-            <colgroup>
-                <col width="70%">
-            </colgroup>
-            <thead>
-                <th>FileName</th>
-                <th>Size</th>
-                <th>Remove</th>
-            </thead>
-            <tbody id="imageTable">
-            </tbody>
-        </table>
+        <div style="width: 100%; background: #fff;">
+            <h5 style="margin: 10px 0 0 10px;">Uploaded image file list</h5>
+        </div>
+        <div id="image_wrapper" class="image-list" style="display: none;">
+            <div class="file-list-info">
+                <span>Attached files</span>
+                <span id="image_size" class="total-size text-small-2">0KB</span>
+                <button class="btn btn-md btn-danger" id="image_remove" disabled onclick="deleteCheckedImages()">Remove</button>
+            </div>
+            <div class="file-list">
+                <ul id="image_list">
+                </ul>
+            </div>
+        </div>
     </article>
 
     <footer>
@@ -171,9 +255,16 @@
 <script src="../../src/lang/ko.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
-var imageTable = document.getElementById('imageTable');
 var langSelect = document.getElementById('language');
 var editor = null;
+
+var imageWrapper = document.getElementById('image_wrapper');
+var imageSize = document.getElementById('image_size');
+var imageRemove = document.getElementById('image_remove');
+var imageTable = document.getElementById('image_list');
+
+let imageList = [];
+let selectedImages = [];
 
 function sun_create () {
     if (editor && editor.destroy) editor.destroy();
@@ -228,28 +319,83 @@ function sun_create () {
         lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
     });
 
-    editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo) {
-        var imageList = editor.getImagesInfo();
-        var list = '';
-        var i;
-
+    editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
         console.log('imageInfo', imageInfo);
-        console.log('imageList', imageList)
 
-        for (i = 0; i < imageList.length; i++) {
-            if (!imageList[i]) continue;
-
-            list += '<tr><td><a href="javascript:onClickImageList(\'select\',' + i + ')">' + imageList[i].name + '</a></td>' +
-                '<td>' + imageList[i].size + '</td>' +
-                '<td style="text-align: center;"><a href="javascript:onClickImageList(\'delete\',' + i + ')">X</a></td></tr>'
+        if (isDelete) {
+            imageList.splice(imageList.findIndex(u => u.index === index), 1)
+        } else {
+            const image = editor.getImagesInfo()[editor.getImagesInfo().findIndex(v => v && v.index === index)]
+            if (!image) return
+            imageList.unshift(image)
         }
 
-        imageTable.innerHTML = list;
+        if (remainingFilesCount === 0) {
+            console.log('imageList', imageList)
+            setImageList(imageList)
+        }
     }
 }
 
-function onClickImageList (type, index) {
+function setImageList () {
+    if (imageList.length > 0) imageWrapper.style.display = 'flex';
+    else imageWrapper.style.display = 'none';
+
+    let list = '';
+    let size = 0;
+
+    for (let i = 0, image; i < imageList.length; i++) {
+        image = imageList[i];
+            
+        list += `<li id="img_${image.index}">
+                    <a href="javascript:checkImage(${image.index})">
+                        <div>
+                            <img src="${image.src}">
+                        </div>
+                    </a>
+                    <a href="javascript:setImage('select','${image.index}')" class="image-size">${(image.size / 1000).toFixed(1)}KB</a>
+                </li>`;
+        
+        size += (image.size / 1000).toFixed(1) * 1;
+    }
+
+    imageSize.innerText = size.toFixed(1) + 'KB';
+    imageTable.innerHTML = list;
+}
+
+function setImage (type, index) {
     editor.getImagesInfo()[index][type]();
+}
+
+function checkImage (index) {
+    const li = imageTable.querySelector('#img_' + index);
+    const currentImageIdx = selectedImages.findIndex(v => v === index)
+
+    if (currentImageIdx > -1) {
+        selectedImages.splice(currentImageIdx, 1)
+        li.className = '';
+    } else {
+        selectedImages.push(index)
+        li.className = 'checked';
+    }
+
+    if (selectedImages.length > 0) {
+        imageRemove.removeAttribute('disabled');
+    } else {
+        imageRemove.setAttribute('disabled', true);
+    }
+}
+
+function deleteCheckedImages() {
+    editor.getImagesInfo().forEach(el => {
+        selectedImages.forEach(selected => {
+          if (el.index === selected) {
+            el.delete()
+          }
+        })
+      })
+
+    selectedImages = []
 }
 
 sun_create();
