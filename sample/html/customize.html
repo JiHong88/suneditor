@@ -19,7 +19,7 @@
             box-sizing: border-box;
             position: relative;
             width: 100%;
-            margin-top: 14px;
+            margin: 0;
             background: #fff;
         }
 
@@ -74,13 +74,13 @@
         }
 
         .image-list .file-list ul li img {
-            width: 100%;
-            height: 100%;
+            width: 54px;
+            height: 54px;
         }
 
         .image-list .file-list ul li .image-size {
             color: #333;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .image-list .file-list ul li .image-check {
@@ -255,13 +255,13 @@
 <script src="../../src/lang/ko.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
-var langSelect = document.getElementById('language');
-var editor = null;
+const langSelect = document.getElementById('language');
+let editor = null;
 
-var imageWrapper = document.getElementById('image_wrapper');
-var imageSize = document.getElementById('image_size');
-var imageRemove = document.getElementById('image_remove');
-var imageTable = document.getElementById('image_list');
+const imageWrapper = document.getElementById('image_wrapper');
+const imageSize = document.getElementById('image_size');
+const imageRemove = document.getElementById('image_remove');
+const imageTable = document.getElementById('image_list');
 
 let imageList = [];
 let selectedImages = [];
@@ -323,9 +323,9 @@ function sun_create () {
         console.log('imageInfo', imageInfo);
 
         if (isDelete) {
-            imageList.splice(imageList.findIndex(u => u.index === index), 1)
+            imageList.splice(findIndex(imageList, index), 1)
         } else {
-            const image = editor.getImagesInfo()[editor.getImagesInfo().findIndex(v => v && v.index === index)]
+            const image = editor.getImagesInfo()[findIndex(editor.getImagesInfo(), index)]
             if (!image) return
             imageList.unshift(image)
         }
@@ -344,19 +344,18 @@ function setImageList () {
     let list = '';
     let size = 0;
 
-    for (let i = 0, image; i < imageList.length; i++) {
+    for (let i = 0, image, fixSize; i < imageList.length; i++) {
         image = imageList[i];
+        fixSize = (image.size / 1000).toFixed(1) * 1
             
-        list += `<li id="img_${image.index}">
-                    <a href="javascript:checkImage(${image.index})">
-                        <div>
-                            <img src="${image.src}">
-                        </div>
-                    </a>
-                    <a href="javascript:setImage('select','${image.index}')" class="image-size">${(image.size / 1000).toFixed(1)}KB</a>
-                </li>`;
+        list += '<li id="img_' + image.index + '">' +
+                    '<a href="javascript:checkImage(' + image.index + ')">' +
+                        '<div><img src="' + image.src + '"></div>' +
+                    '</a>' +
+                    '<a href="javascript:setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
+                '</li>';
         
-        size += (image.size / 1000).toFixed(1) * 1;
+        size += fixSize;
     }
 
     imageSize.innerText = size.toFixed(1) + 'KB';
@@ -364,12 +363,12 @@ function setImageList () {
 }
 
 function setImage (type, index) {
-    editor.getImagesInfo()[index][type]();
+    imageList[findIndex(imageList, index)][type]();
 }
 
 function checkImage (index) {
     const li = imageTable.querySelector('#img_' + index);
-    const currentImageIdx = selectedImages.findIndex(v => v === index)
+    const currentImageIdx = findIndex(selectedImages, index)
 
     if (currentImageIdx > -1) {
         selectedImages.splice(currentImageIdx, 1)
@@ -387,8 +386,8 @@ function checkImage (index) {
 }
 
 function deleteCheckedImages() {
-    editor.getImagesInfo().forEach(el => {
-        selectedImages.forEach(selected => {
+    editor.getImagesInfo().forEach(function (el) {
+        selectedImages.forEach(function (selected) {
           if (el.index === selected) {
             el.delete()
           }
@@ -396,6 +395,20 @@ function deleteCheckedImages() {
       })
 
     selectedImages = []
+}
+
+function findIndex(arr, index) {
+    let idx = -1;
+
+    arr.some(function (a, i) {
+        if ((typeof a === 'number' ? a : a.index) === index) {
+            idx = i;
+            return true;
+        }
+        return false;
+    })
+
+    return idx;
 }
 
 sun_create();

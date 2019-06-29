@@ -201,8 +201,14 @@ export default {
     },
 
     onRender_imgInput: function () {
-        const submitAction = function (files) {
-            if (files.length > 0) {
+        const submitAction = function (fileList) {
+            if (fileList.length > 0) {
+                const files = [];
+                for (let i = 0, len = fileList.length; i < len; i++) {
+                    if (/image/i.test(fileList[i].type)) files.push(fileList[i]);
+                }
+
+                this.context.image._uploadFileLength = files.length;
                 const imageUploadUrl = this.context.option.imageUploadUrl;
                 const imageUploadHeader = this.context.option.imageUploadHeader;
                 const filesLen = this.context.dialog.updateModal ? 1 : files.length;
@@ -211,7 +217,7 @@ export default {
                     const formData = new FormData();
 
                     for (let i = 0; i < filesLen; i++) {
-                        formData.append('file-' + i, files[i]);
+                        formData.append('file-' + fileCnt, files[i]);
                     }
 
                     this.context.image._xmlHttp = this.util.getXMLHttpRequest();
@@ -293,6 +299,7 @@ export default {
 
     onRender_imgUrl: function () {
         if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
+        this.context.image._uploadFileLength = 1;
 
         try {
             const file = {name: this.context.image.imgUrlFile.value.split('/').pop(), size: 0};
@@ -353,10 +360,8 @@ export default {
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
-                contextImage._uploadFileLength = contextImage.imgInputFile.files.length;
                 imagePlugin.onRender_imgInput.call(this);
             } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
-                contextImage._uploadFileLength = 1;
                 imagePlugin.onRender_imgUrl.call(this);
             } else {
                 this.closeLoading();
