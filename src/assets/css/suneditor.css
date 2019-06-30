@@ -154,6 +154,8 @@
 .sun-editor .se-toolbar-separator-vertical {display:inline-block; height:31px; width:1px; margin:2px; vertical-align:top;}
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {display:none; position:absolute; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
+/* balloon toolbar */
+.sun-editor .se-toolbar.se-toolbar-balloon {display:none; position:absolute; width:auto; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
 /* sticky toolbar */
 .sun-editor .se-toolbar.se-toolbar-sticky {position:fixed; top:0px;}
 .sun-editor .se-toolbar-sticky-dummy {display:none; position:static; z-index:-1;}

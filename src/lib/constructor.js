@@ -82,16 +82,16 @@ const _Constructor = {
     
         /** toolbar */
         const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
-
         let arrow = null;
-        if (/inline|balloon/i.test(options.mode)) {
+
+        if (/inline/i.test(options.mode)) {
             tool_bar.element.className += ' se-toolbar-inline';
             tool_bar.element.style.width = options.toolbarWidth;
-            if (/balloon/i.test(options.mode)) {
-                arrow = doc.createElement('DIV');
-                arrow.className = 'se-arrow';
-                tool_bar.element.appendChild(arrow);
-            }
+        } else if (/balloon/i.test(options.mode)) {
+            tool_bar.element.className += ' se-toolbar-balloon';
+            arrow = doc.createElement('DIV');
+            arrow.className = 'se-arrow';
+            tool_bar.element.appendChild(arrow);
         }
 
         /** sticky toolbar dummy */
