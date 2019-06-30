@@ -1012,7 +1012,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             
             const isRemoveNode = !appendNode;
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
-            let tempCon, tempOffset, tempChild, tempArray;
+            let tempCon, tempOffset, tempChild;
 
             if (isRemoveFormat && range.collapsed && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
                 return;
@@ -1051,13 +1051,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                    tempArray = [];
-                    tempChild = tempCon.childNodes;
-                    for (let i = 0, len = tempChild.length; i < len; i++) {
-                        tempArray.push(tempChild[i]);
-                    }
-                    tempCon = tempArray[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
+                    tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
                     tempOffset = 0;
+                }
+
+                let format = util.getFormatElement(tempCon);
+                if (format === util.getRangeFormatElement(format)) {
+                    format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
+                    tempCon.parentNode.insertBefore(format, tempCon);
+                    format.appendChild(tempCon);
                 }
 
                 if (util.isBreak(tempCon)) {
@@ -1067,6 +1069,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
+            // set startContainer
             let startCon = tempCon;
             let startOff = tempOffset;
 
@@ -1076,14 +1079,17 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
                 while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                    tempArray = [];
                     tempChild = tempCon.childNodes;
-                    for (let i = 0, len = tempChild.length; i < len; i++) {
-                        tempArray.push(tempChild[i]);
-                    }
-                    tempCon = tempArray[tempOffset - 1] || !/FIGURE/i.test(tempArray[0].nodeName) ? tempArray[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
+                    tempCon = tempChild[tempOffset - 1] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
+                    tempOffset = tempCon.textContent.length;
                 }
-                tempOffset = tempCon.textContent.length;
+
+                let format = util.getFormatElement(tempCon);
+                if (format === util.getRangeFormatElement(format)) {
+                    format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
+                    tempCon.parentNode.insertBefore(format, tempCon);
+                    format.appendChild(tempCon);
+                }
 
                 if (util.isBreak(tempCon)) {
                     const emptyText = util.createTextNode(util.zeroWidthSpace);
@@ -1093,8 +1099,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
+            // set endContainer
             let endCon = tempCon;
             let endOff = tempOffset;
+
+            // set Range
             const newNodeName = appendNode.nodeName;
             this.setRange(startCon, startOff, endCon, endOff);
 
@@ -2454,10 +2463,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
 
-            const selectionNode = core.getSelectionNode();
-            const formatEl = util.getFormatElement(selectionNode) || selectionNode;
+            const formatEl = util.getFormatElement(core.getSelectionNode());
             const rangeEl = util.getRangeFormatElement(formatEl);
-            if (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl) {
+            if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl)) {
                 core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
                 core.focus();
                 return;
@@ -2851,9 +2859,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 return;
             }
 
-            const formatEl = util.getFormatElement(selectionNode) || selectionNode;
+            const formatEl = util.getFormatElement(selectionNode);
             const rangeEl = util.getRangeFormatElement(formatEl);
-            if (!formatEl || formatEl.nodeType === 3 || formatEl === rangeEl) {
+            if (!formatEl || formatEl === rangeEl) {
                 core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
                 core.focus();
                 selectionNode = core.getSelectionNode();
@@ -2987,7 +2995,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onPaste_wysiwyg: function (e) {
-            if (!e.clipboardData.getData) return true;
+            if (!e.clipboardData) return true;
 
             const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
             
