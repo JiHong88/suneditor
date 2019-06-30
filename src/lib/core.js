@@ -2432,13 +2432,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (!target) return;
 
             const tablePlugin = core.plugins.table;
-            if (target === tablePlugin._fixedCell || tablePlugin._shift) return;
-            
-            _w.setTimeout(function () {
+            if (target !== tablePlugin._fixedCell && !tablePlugin._shift) {
                 core.callPlugin('table', function () {
                     tablePlugin.onTableCellMultiSelect.call(core, target, false);
                 });
-            });
+            }
         },
 
         onMouseUp_wysiwyg: function () {
