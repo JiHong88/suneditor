@@ -69,7 +69,13 @@
             tag_div: 'Normal (DIV)',
             tag_h: 'Overskrift',
             tag_quote: 'Citer',
-            pre: 'Code'
+            pre: 'Code',
+						minSize: 'Mindste størrelse',
+						tableHeader: 'Tabel overskrift',
+						mergeCells: 'Sammenlæg celler (merge)',
+						splitCells: 'Opdel celler',
+						HorizontalSplit: 'Opdel horisontalt',
+						VerticalSplit: 'Opdel vertikalt'
         },
         dialogBox: {
             linkBox: {
