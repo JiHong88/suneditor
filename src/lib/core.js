@@ -1929,9 +1929,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     this.removeFormat();
                     this.focus();
                     break;
-                case 'preview':
                 case 'print':
-                    this.openWindowContents(command);
+                    this.print();
+                    break;
+                case 'preview':
+                    this.preview();
                     break;
                 case 'showBlocks':
                     this.toggleDisplayBlocks();
@@ -1947,7 +1949,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
-
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
                     const on = util.hasClass(this.commandMap[command], 'on');
@@ -1957,7 +1958,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'on')) {
                         this.nodeChange(null, null, ['SUB']);
                     }
-
                     this.nodeChange(on ? null : this.util.createElement(command), null, [command]);
                     this.focus();
             }
@@ -2117,11 +2117,49 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Open the preview window or open the print window
-         * @param {String} mode - 'preview' or 'print'
+         * @description Prints the current contents of the editor.
          */
-        openWindowContents: function (mode) {
-            const isPrint = mode === 'print';
+        print: function () {
+            const contents = util.createElement('DIV');
+            const style = util.createElement('STYLE');
+            const iframe = util.createElement('IFRAME');
+            iframe.setAttribute('style', 'display: none; height: 0; width: 0; position: absolute;');
+
+            _d.body.appendChild(iframe);
+            let printDocument = iframe.contentWindow || iframe.contentDocument;
+            if (printDocument.document) printDocument = printDocument.document;
+
+            style.innerHTML = util.getPageStyle();
+            contents.className = 'sun-editor-editable';
+            contents.innerHTML = this.getContents();
+
+            printDocument.head.appendChild(style);
+            printDocument.body.appendChild(contents);
+            
+            try {
+                iframe.focus();
+                // IE or Edge
+                if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
+                    try {
+                        iframe.contentWindow.document.execCommand('print', false, null);
+                    } catch (e) {
+                        iframe.contentWindow.print();
+                    }
+                } else {
+                    // Other browsers
+                    iframe.contentWindow.print();
+                }
+            } catch (error) {
+                throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
+            } finally {
+                util.removeItem(iframe);
+            }
+        },
+
+        /**
+         * @description Open the preview window.
+         */
+        preview: function () {
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
             windowObject.document.write('' +
@@ -2129,14 +2167,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 '<head>' +
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<title>' + (isPrint ? lang.toolbar.print : lang.toolbar.preview) + '</title>' +
-                '<link rel="stylesheet" type="text/css" href="' + util.getIncludePath(['suneditor-contents', 'suneditor'], 'css') + '">' +
+                '<title>' + lang.toolbar.preview + '</title>' +
+                '<style>' + util.getPageStyle() + '</style>' +
                 '</head>' +
                 '<body>' +
-                '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' +
-                this.getContents() + '</div>' +
-                (isPrint ? '<script>window.print();</script>' : '') + '</body>' +
-                '</html>');
+                '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' + this.getContents() + '</div>' +
+                '</body>' +
+                '</html>'
+            );
         },
 
         /**

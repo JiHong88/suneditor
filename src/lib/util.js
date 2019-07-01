@@ -133,6 +133,24 @@ const util = {
     },
 
     /**
+     * @description Returns the CSS text that has been applied to the current page.
+     * @returns {String}
+     */
+    getPageStyle: function () {
+        let cssText = '';
+        const sheets = this._d.styleSheets;
+        
+        for (let i = 0, len = sheets.length, rules; i < len; i++) {
+            rules = sheets[i].cssRules;
+            for (let c = 0, cLen = rules.length; c < cLen; c++) {
+                cssText += rules[c].cssText;
+            }
+        }
+
+        return cssText;
+    },
+
+    /**
      * @description Converts contents into a format that can be placed in an editor
      * @param {String} contents - contents
      * @returns {String}
