@@ -45,15 +45,15 @@ const _Constructor = {
         options.colorList = options.colorList || null;
         // images
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-        options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? ('' + options.imageWidth).match(/\d+/)[0] : 'auto';
+        options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         // video
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-        options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? ('' + options.videoWidth).match(/\d+/)[0] : 560;
-        options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? ('' + options.videoHeight).match(/\d+/)[0] : 315;
+        options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? options.videoWidth.toString().match(/\d+/)[0] : 560;
+        options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = options.youtubeQuery || '';
         // callBack function
         // options.callBackSave = options.callBackSave;
