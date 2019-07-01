@@ -288,7 +288,7 @@ fontSize        : Change default font-size array.                   default: nul
 colorList       : Change default color array of color picker.       default: null {Array}
 ------------------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}

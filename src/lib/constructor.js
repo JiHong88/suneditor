@@ -37,7 +37,7 @@ const _Constructor = {
         // size
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
-        options.minHeight = (/^\d+$/.test(options.minHeight) ? options.height + 'px' : options.minHeight) || '';
+        options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         // font, size, color list
         options.font = options.font || null;
@@ -45,15 +45,15 @@ const _Constructor = {
         options.colorList = options.colorList || null;
         // images
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-        options.imageWidth = options.imageWidth || 'auto';
+        options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? ('' + options.imageWidth).match(/\d+/)[0] : 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         // video
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-        options.videoWidth = options.videoWidth || 560;
-        options.videoHeight = options.videoHeight || 315;
+        options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? ('' + options.videoWidth).match(/\d+/)[0] : 560;
+        options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? ('' + options.videoHeight).match(/\d+/)[0] : 315;
         options.youtubeQuery = options.youtubeQuery || '';
         // callBack function
         // options.callBackSave = options.callBackSave;
