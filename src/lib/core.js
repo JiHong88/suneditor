@@ -2120,22 +2120,23 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Prints the current contents of the editor.
          */
         print: function () {
+            const iframe = util.createElement('IFRAME');
+            iframe.style.display = 'none';
+
             const contents = util.createElement('DIV');
             const style = util.createElement('STYLE');
-            const iframe = util.createElement('IFRAME');
-            iframe.setAttribute('style', 'display: none; height: 0; width: 0; position: absolute;');
-
-            _d.body.appendChild(iframe);
-            let printDocument = iframe.contentWindow || iframe.contentDocument;
-            if (printDocument.document) printDocument = printDocument.document;
-
             style.innerHTML = util.getPageStyle();
             contents.className = 'sun-editor-editable';
             contents.innerHTML = this.getContents();
 
+            _d.body.appendChild(iframe);
+            
+            let printDocument = iframe.contentWindow || iframe.contentDocument;
+            if (printDocument.document) printDocument = printDocument.document;
+
             printDocument.head.appendChild(style);
             printDocument.body.appendChild(contents);
-            
+
             try {
                 iframe.focus();
                 // IE or Edge
@@ -2160,6 +2161,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Open the preview window.
          */
         preview: function () {
+            const cssText = util.getPageStyle();
+            const contentsHTML = this.getContents();
+            
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
             windowObject.document.write('' +
@@ -2168,10 +2172,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                 '<title>' + lang.toolbar.preview + '</title>' +
-                '<style>' + util.getPageStyle() + '</style>' +
+                '<style>' + cssText + '</style>' +
                 '</head>' +
                 '<body>' +
-                '<div class="sun-editor-editable" style="width:' + context.element.wysiwyg.offsetWidth + 'px; margin:auto;">' + this.getContents() + '</div>' +
+                '<div class="sun-editor-editable">' + contentsHTML + '</div>' +
                 '</body>' +
                 '</html>'
             );
