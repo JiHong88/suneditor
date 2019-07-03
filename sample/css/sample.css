@@ -24,29 +24,13 @@ footer {
     margin-bottom: 10px;
 }
 
-/** github-cat*/
-.github-cat {
-     color: #0d2636;
-     font-family: initial;
+/** badge */
+.badge {
+    padding: 15px 0;
+    background-color: inherit;
  }
 
-.github-cat::before {
-    content: "";
-    display: inline-block;
-    background-image: url(../img/github_blue.png);
-    width: 22px;
-    height: 22px;
-    background-repeat: no-repeat;
-    background-size: 22px 22px;
-    vertical-align: bottom;
-    margin-right: 2px;
-}
-
-.github-cat:hover, .github-cat:focus {
-    color: #fff;
-}
-
-.github-cat:hover::before {
-    background-image: url(../img/github.png);
-}
-
+ .badge > * {
+    float: left;
+    padding: 0 0 0 10px !important;
+ }

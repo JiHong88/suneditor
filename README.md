@@ -1,7 +1,5 @@
-# Suneditor
+# [Suneditor](http://suneditor.com)
 Pure javscript based WYSIWYG web editor, with no dependencies
-
-**Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
 
 [![NPM](https://nodei.co/npm/suneditor.png)](https://nodei.co/npm/suneditor/)
 
@@ -11,38 +9,31 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 ![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/suneditor.svg)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg)
 
+> The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
+> - Clean paste from Word and Excel.
+> - Media embeds.
+> - Edit a table.
+> - And.. many other features :)
 
-```properties
-The Suneditor is based on pure javascript, with no dependencies.
-Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
+**Browser Support**
 
-- Paste from Word and Excel.
-- Paste images and modify. (server upload or using base64 encoding)
-- Media embeds.
-- Edit a table.
-- Many other features :)
+| Chrome | Firefox | Opera | Safari | Edge | Internet Explorer |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| Yes | Yes | Yes | Yes | Yes | 11+ |
 
-Supported Browser -
-Chrome, Opera, Firefox, Edge, IE11, Safari, Mobile web.
-
-Supported Languages
-DA, DE, EN, FR, JA, KO, RU, ZH_CN
-```
+**Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
 
 #### npm
-
 ``` sh
 $ npm install --save suneditor
 ```
 
 #### bower
-
 ``` sh
 $ bower install --save suneditor
 ```
 
-## Getting Started
-**<a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>**
+## <a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>
 ### 1. Include
 ```html
 <!-- <link href="../src/assets/css/suneditor.css" rel="stylesheet" type="text/css"> -->
