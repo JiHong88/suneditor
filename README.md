@@ -1,4 +1,4 @@
-# [Suneditor](http://suneditor.com)
+# [SunEditor](http://suneditor.com)
 Pure javscript based WYSIWYG web editor, with no dependencies
 
 [![NPM](https://nodei.co/npm/suneditor.png)](https://nodei.co/npm/suneditor/)
@@ -15,7 +15,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Edit a table.
 > - And.. many other features :)
 
-<p align="center"><img src="http://suneditor.com/docs/screen-1.png"/></p>
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen_capture_1.png)
 
 #### Browser Support
 
