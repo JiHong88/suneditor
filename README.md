@@ -15,13 +15,13 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Edit a table.
 > - And.. many other features :)
 
-**Browser Support**
+#### Browser Support
 
-| Chrome | Firefox | Opera | Safari | Edge | Internet Explorer |
+| <img src="http://suneditor.com/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="http://suneditor.com/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="http://suneditor.com/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="http://suneditor.com/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="http://suneditor.com/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge | <img src="http://suneditor.com/docs/explorer-64.png" alt="Explorer" width="16px" height="16px" /> Internet Explorer |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Yes | Yes | Yes | Yes | Yes | 11+ |
 
-**Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>**
+#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
 #### npm
 ``` sh
