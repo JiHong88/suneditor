@@ -555,7 +555,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
             const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
-            oFormat.innerHTML = util.zeroWidthSpace;
+            oFormat.innerHTML = '<br>';
 
             if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
             else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
@@ -2018,7 +2018,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p>' + util.zeroWidthSpace + '</p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
                 context.element.wysiwyg.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwyg.style.display = 'block';
@@ -2673,7 +2673,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
-                        selectionNode.innerHTML = util.zeroWidthSpace;
+                        selectionNode.innerHTML = '<br>';
                         return false;
                     }
 
@@ -2841,7 +2841,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                             newEl = util.createElement('BR');
                         } else {
                             newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : 'P');
-                            newEl.innerHTML = util.zeroWidthSpace;
+                            newEl.innerHTML = '<br>';
                         }
 
                         container.parentNode.insertBefore(newEl, container);
@@ -2892,7 +2892,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 selectionNode.innerHTML = '';
 
                 const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : 'P');
-                oFormatTag.innerHTML = util.zeroWidthSpace;
+                oFormatTag.innerHTML = '<br>';
 
                 selectionNode.appendChild(oFormatTag);
                 core.setRange(oFormatTag, 0, oFormatTag, 0);

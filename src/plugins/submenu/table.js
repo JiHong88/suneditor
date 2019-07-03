@@ -206,13 +206,13 @@ export default {
         if (!returnElement) {
             let cellsHTML = '';
             while (cnt > 0) {
-                cellsHTML += '<' +nodeName + '><div>' + this.util.zeroWidthSpace + '</div></' + nodeName + '>';
+                cellsHTML += '<' +nodeName + '><br></' + nodeName + '>';
                 cnt--;
             }
             return cellsHTML;
         } else {
             const cell = this.util.createElement(nodeName);
-            cell.innerHTML = '<div>' + this.util.zeroWidthSpace + '</div>';
+            cell.innerHTML = '<br>';
             return cell;
         }
     },

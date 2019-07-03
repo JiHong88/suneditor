@@ -181,7 +181,7 @@ const util = {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
 
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : this.zeroWidthSpace) + '</p>';
+        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
 
         return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
     },
@@ -201,6 +201,7 @@ const util = {
             for (let i = 0, len = children.length, node; i < len; i++) {
                 node = children[i];
                 if (/^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|OL|UL|FIGCAPTION)$/i.test(node.nodeName)) {
+                    node.innerHTML = node.innerHTML.replace(/\n/g, '');
                     const tag = node.nodeName.toLowerCase();
                     html += node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + '\n';
                     recursionFunc(node);
@@ -801,7 +802,7 @@ const util = {
             return 0;
         })(element);
 
-        if (element.childNodes.length === 0) element.innerHTML = this.zeroWidthSpace;
+        if (element.childNodes.length === 0) element.innerHTML = '<br>';
     },
 
     /**
