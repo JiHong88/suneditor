@@ -186,7 +186,7 @@
 .sun-editor .se-btn-basic:disabled, .sun-editor .se-btn-basic:disabled *, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
 
 /** --- submenu layer ---------------------------------------------------------- */
-.sun-editor .se-list-layer {display:none; position:absolute; top:37px; z-index:3; left:1px; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-list-layer {display:none; position:absolute; top:37px; z-index:4; left:1px; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-list-layer .se-list-inner {padding:0; margin:0; overflow-x:initial; overflow-y:initial; overflow:visible;}
 .sun-editor .se-list-layer button {margin:0; width:100%;}
 /* submenu layer - common list form */
@@ -228,7 +228,7 @@
 .sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
 /* submenu layer --- table selector */
-.sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:3; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
+.sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:4; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
 .sun-editor .se-selector-table .se-table-size-picker {position:absolute !important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
 .sun-editor .se-selector-table .se-table-size-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('../img/highlighted.png') repeat;}
