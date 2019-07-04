@@ -239,12 +239,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Array} moduleArray - module object's Array [dialog, resizing]
          */
         addModule: function (moduleArray) {
-            let moduleName = '';
-            for (let i = 0, len = moduleArray.length; i < len; i++) {
+            for (let i = 0, len = moduleArray.length, moduleName; i < len; i++) {
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
                     this.plugins[moduleName] = moduleArray[i];
-                    this.plugins[moduleName].add(this);
+                    if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
                 }
             }
         },
@@ -2297,6 +2296,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (findFormat && commandMap.FORMAT) {
                         commandMapNodes.push('FORMAT');
                         util.changeTxt(commandMap.FORMAT, nodeName);
+                        commandMap.FORMAT.setAttribute('data-focus', nodeName);
                         findFormat = false;
                     }
 

@@ -37,7 +37,6 @@ export default {
         const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'se-list-layer';
-        listDiv.style.display = 'none';
 
         let font, text, i, len;
         let fontList = !option.font ?

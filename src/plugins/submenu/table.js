@@ -78,8 +78,6 @@ export default {
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
         listDiv.className = 'se-submenu se-selector-table';
-        listDiv.style.display = 'none';
-
         listDiv.innerHTML = '' +
             '<div class="se-table-size">' +
             '   <div class="se-table-size-picker se-controller-table-picker"></div>' +
@@ -96,7 +94,6 @@ export default {
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table';
-        tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div>' +
             '   <div class="se-btn-group">' +
@@ -123,7 +120,6 @@ export default {
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';
-        tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +
@@ -1103,6 +1099,9 @@ export default {
         if (!tablePlugin._shift) {
             tablePlugin._removeEvents.call(this);
             tablePlugin._toggleEditor.call(this, true);
+        } else if (tablePlugin._initBind) {
+            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            tablePlugin._initBind = null;
         }
 
         if (!tablePlugin._fixedCell || !tablePlugin._selectedTable) return;
@@ -1252,6 +1251,11 @@ export default {
     _removeEvents: function () {
         const tablePlugin = this.plugins.table;
 
+        if (tablePlugin._initBind) {
+            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            tablePlugin._initBind = null;
+        }
+
         if (tablePlugin._bindOnSelect) {
             this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
             this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
@@ -1269,6 +1273,7 @@ export default {
         }
     },
 
+    _initBind: null,
     onTableCellMultiSelect: function (tdElement, shift) {
         const tablePlugin = this.plugins.table;
 
@@ -1303,6 +1308,9 @@ export default {
         }
 
         this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
+
+        tablePlugin._initBind = tablePlugin.init.bind(this);
+        this._d.addEventListener('touchmove', tablePlugin._initBind, false);
     },
 
     onClick_tableController: function (e) {
