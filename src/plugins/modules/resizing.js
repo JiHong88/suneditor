@@ -88,7 +88,6 @@ export default {
         const resize_button = this.util.createElement("DIV");
 
         resize_button.className = "se-controller se-controller-resizing";
-        resize_button.style.display = "none";
         resize_button.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="se-btn-group _se_resizing_btn_group">' +

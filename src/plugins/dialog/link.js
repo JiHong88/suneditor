@@ -81,7 +81,6 @@ export default {
         const link_btn = this.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';
-        link_btn.style.display = 'none';
         link_btn.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +

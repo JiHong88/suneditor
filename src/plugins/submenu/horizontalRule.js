@@ -28,7 +28,6 @@ export default {
         const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer';
-        listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner se-list-line">' +
             '   <ul class="se-list-basic">' +

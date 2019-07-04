@@ -78,8 +78,6 @@ export default {
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
         listDiv.className = 'se-submenu se-selector-table';
-        listDiv.style.display = 'none';
-
         listDiv.innerHTML = '' +
             '<div class="se-table-size">' +
             '   <div class="se-table-size-picker se-controller-table-picker"></div>' +
@@ -96,7 +94,6 @@ export default {
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table';
-        tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div>' +
             '   <div class="se-btn-group">' +
@@ -123,7 +120,6 @@ export default {
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';
-        tableResize.style.display = 'none';
         tableResize.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +

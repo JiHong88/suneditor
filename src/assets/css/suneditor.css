@@ -227,8 +227,8 @@
 /* submenu layer - align */
 .sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
-/* submenu layer - table selector */
-.sun-editor .se-selector-table {position:absolute; top:34px; left:1px; z-index:3; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
+/* submenu layer --- table selector */
+.sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:3; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
 .sun-editor .se-selector-table .se-table-size-picker {position:absolute !important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
 .sun-editor .se-selector-table .se-table-size-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('../img/highlighted.png') repeat;}
@@ -239,8 +239,9 @@
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:7px;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button {display:block; width:30px; height:30px; text-indent:-9999px;}
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.on {border:2px dashed #fff;}
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover, .sun-editor .se-list-layer .se-color-pallet button:focus {border:2px solid #fff;}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.on, 
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover, 
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {border:3px solid #fff;}
 /* submenu layer - form group (color selector) */
 .sun-editor .se-submenu-form-group {height:auto; padding:0 7px 7px 7px;}
 .sun-editor .se-submenu-form-group label {display:inline-block; font-weight:bold; font-size:14px; letter-spacing:1px;}
