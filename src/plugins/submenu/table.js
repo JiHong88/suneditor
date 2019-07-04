@@ -1103,6 +1103,9 @@ export default {
         if (!tablePlugin._shift) {
             tablePlugin._removeEvents.call(this);
             tablePlugin._toggleEditor.call(this, true);
+        } else if (tablePlugin._initBind) {
+            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            tablePlugin._initBind = null;
         }
 
         if (!tablePlugin._fixedCell || !tablePlugin._selectedTable) return;
@@ -1252,6 +1255,11 @@ export default {
     _removeEvents: function () {
         const tablePlugin = this.plugins.table;
 
+        if (tablePlugin._initBind) {
+            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            tablePlugin._initBind = null;
+        }
+
         if (tablePlugin._bindOnSelect) {
             this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
             this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
@@ -1269,6 +1277,7 @@ export default {
         }
     },
 
+    _initBind: null,
     onTableCellMultiSelect: function (tdElement, shift) {
         const tablePlugin = this.plugins.table;
 
@@ -1303,6 +1312,9 @@ export default {
         }
 
         this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
+
+        tablePlugin._initBind = tablePlugin.init.bind(this);
+        this._d.addEventListener('touchmove', tablePlugin._initBind, false);
     },
 
     onClick_tableController: function (e) {

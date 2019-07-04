@@ -10,11 +10,19 @@
 export default {
     name: 'formatBlock',
     add: function (core, targetElement) {
+        const context = core.context;
+        context.formatBlock = {
+            _formatList: null,
+            currentFormat: ''
+        };
+
         /** set submenu */
         let listDiv = this.setSubmenu.call(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
+
+        context.formatBlock._formatList = listDiv.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -52,6 +60,24 @@ export default {
             '</div>';
 
         return listDiv;
+    },
+
+    on: function () {
+        const formatContext = this.context.formatBlock;
+        const formatList = formatContext._formatList;
+        const currentFormat = this.commandMap.FORMAT.getAttribute('data-focus') || 'P';
+
+        if (currentFormat !== formatContext.currentFormat) {
+            for (let i = 0, len = formatList.length; i < len; i++) {
+                if (currentFormat === formatList[i].getAttribute('data-value')) {
+                    this.util.addClass(formatList[i], 'on');
+                } else {
+                    this.util.removeClass(formatList[i], 'on');
+                }
+            }
+
+            formatContext.currentFormat = currentFormat;
+        }
     },
 
     pickUp: function (e) {

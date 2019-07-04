@@ -2297,6 +2297,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (findFormat && commandMap.FORMAT) {
                         commandMapNodes.push('FORMAT');
                         util.changeTxt(commandMap.FORMAT, nodeName);
+                        commandMap.FORMAT.setAttribute('data-focus', nodeName);
                         findFormat = false;
                     }
 
