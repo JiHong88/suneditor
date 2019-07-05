@@ -51,9 +51,9 @@
     "karma-jasmine": "^1.1.2",
     "lodash": ">=4.17.11",
     "mini-css-extract-plugin": "^0.4.5",
-    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
     "url-loader": "^1.1.2",
-    "webpack": "^4.35.0",
+    "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2",
     "webpack-merge": "^4.2.1"

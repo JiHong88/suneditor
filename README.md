@@ -14,7 +14,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Edit a table.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen_capture_1.png)
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main.png)
 
 #### Browser Support
 
