@@ -58,9 +58,9 @@ export default {
         if (currentAlign !== alignContext.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {
                 if (currentAlign === alignList[i].getAttribute('data-value')) {
-                    this.util.addClass(alignList[i], 'on');
+                    this.util.addClass(alignList[i], 'active');
                 } else {
-                    this.util.removeClass(alignList[i], 'on');
+                    this.util.removeClass(alignList[i], 'active');
                 }
             }
 

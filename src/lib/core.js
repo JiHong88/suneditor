@@ -1011,9 +1011,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
             
             const isRemoveNode = !appendNode;
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
+            let startCon = range.startContainer;
+            let startOff = range.startOffset;
+            let endCon = range.endContainer;
+            let endOff = range.endOffset;
             let tempCon, tempOffset, tempChild;
 
-            if (isRemoveFormat && range.collapsed && util.isFormatElement(range.startContainer.parentNode) && util.isFormatElement(range.endContainer.parentNode)) {
+            if (isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) {
                 return;
             }
 
@@ -1022,8 +1026,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             /* checked same style property */
-            if (!isRemoveFormat && range.startContainer === range.endContainer) {
-                let sNode = range.startContainer;
+            if (!isRemoveFormat && startCon === endCon) {
+                let sNode = startCon;
                 if (isRemoveFormat) {
                     if (util.getFormatElement(sNode) === sNode.parentNode) return;
                 } else if (styleArray.length > 0) {
@@ -1045,49 +1049,62 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             /* find text node */
             // startContainer
-            tempCon = util.isWysiwygDiv(range.startContainer) ? context.element.wysiwyg.firstChild : range.startContainer;
-            tempOffset = range.startOffset;
+            tempCon = util.isWysiwygDiv(startCon) ? context.element.wysiwyg.firstChild : startCon;
+            tempOffset = startOff;
 
-            if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
-                while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                    tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
-                    tempOffset = 0;
-                }
-
-                let format = util.getFormatElement(tempCon);
-                if (format === util.getRangeFormatElement(format)) {
-                    format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
-                    tempCon.parentNode.insertBefore(format, tempCon);
-                    format.appendChild(tempCon);
+            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+                const onlyBreak = util.isBreak(tempCon);
+                if (!onlyBreak) {
+                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+                        tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
+                        tempOffset = 0;
+                    }
+    
+                    let format = util.getFormatElement(tempCon);
+                    if (format === util.getRangeFormatElement(format)) {
+                        format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
+                        tempCon.parentNode.insertBefore(format, tempCon);
+                        format.appendChild(tempCon);
+                    }
                 }
 
                 if (util.isBreak(tempCon)) {
                     const emptyText = util.createTextNode(util.zeroWidthSpace);
                     tempCon.parentNode.insertBefore(emptyText, tempCon);
                     tempCon = emptyText;
+                    if (onlyBreak) {
+                        if (startCon === endCon) {
+                            endCon = tempCon;
+                            endOff = 1;
+                        }
+                        util.removeItem(startCon);
+                    }
                 }
             }
 
             // set startContainer
-            let startCon = tempCon;
-            let startOff = tempOffset;
+            startCon = tempCon;
+            startOff = tempOffset;
 
             // endContainer
-            tempCon = util.isWysiwygDiv(range.endContainer) ? context.element.wysiwyg.lastChild : range.endContainer;
-            tempOffset = range.endOffset;
+            tempCon = util.isWysiwygDiv(endCon) ? context.element.wysiwyg.lastChild : endCon;
+            tempOffset = endOff;
 
-            if (tempCon.nodeType === 1 && tempCon.childNodes.length > 0) {
-                while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                    tempChild = tempCon.childNodes;
-                    tempCon = tempChild[tempOffset - 1] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
-                    tempOffset = tempCon.textContent.length;
-                }
-
-                let format = util.getFormatElement(tempCon);
-                if (format === util.getRangeFormatElement(format)) {
-                    format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
-                    tempCon.parentNode.insertBefore(format, tempCon);
-                    format.appendChild(tempCon);
+            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+                const onlyBreak = util.isBreak(tempCon);
+                if (!onlyBreak) {
+                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+                        tempChild = tempCon.childNodes;
+                        tempCon = tempChild[tempOffset - 1] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
+                        tempOffset = tempCon.textContent.length;
+                    }
+    
+                    let format = util.getFormatElement(tempCon);
+                    if (format === util.getRangeFormatElement(format)) {
+                        format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
+                        tempCon.parentNode.insertBefore(format, tempCon);
+                        format.appendChild(tempCon);
+                    }
                 }
 
                 if (util.isBreak(tempCon)) {
@@ -1095,12 +1112,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     tempCon.parentNode.insertBefore(emptyText, tempCon);
                     tempCon = emptyText;
                     tempOffset = 0;
+                    if (onlyBreak) {
+                        util.removeItem(endCon);
+                    }
                 }
             }
 
             // set endContainer
-            let endCon = tempCon;
-            let endOff = tempOffset;
+            endCon = tempCon;
+            endOff = tempOffset;
 
             // set Range
             const newNodeName = appendNode.nodeName;
@@ -1322,7 +1342,15 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         startPass = true;
 
                         if (newNode !== textNode) newNode.appendChild(startContainer);
-                        if (!isSameNode) continue;
+
+                        if (!isSameNode) {
+                            continue;
+                        } else if (endOff === startOffset || endOff === textNode.data.length) {
+                            endContainer = textNode;
+                            endOffset = textNode.data.length;
+                            endPass = true;
+                            continue;
+                        }
                     }
 
                     // endContainer
@@ -1908,11 +1936,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
                 case 'codeView':
                     this.toggleCodeView();
-                    util.toggleClass(target, 'on');
+                    util.toggleClass(target, 'active');
                     break;
                 case 'fullScreen':
                     this.toggleFullScreen(target);
-                    util.toggleClass(target, 'on');
+                    util.toggleClass(target, 'active');
                     break;
                 case 'indent':
                 case 'outdent':
@@ -1936,7 +1964,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     break;
                 case 'showBlocks':
                     this.toggleDisplayBlocks();
-                    util.toggleClass(target, 'on');
+                    util.toggleClass(target, 'active');
                     break;
                 case 'save':
                     if (typeof context.option.callBackSave === 'function') {
@@ -1950,11 +1978,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
-                    const on = util.hasClass(this.commandMap[command], 'on');
+                    const on = util.hasClass(this.commandMap[command], 'active');
 
-                    if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'on')) {
+                    if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'active')) {
                         this.nodeChange(null, null, ['SUP']);
-                    } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'on')) {
+                    } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'active')) {
                         this.nodeChange(null, null, ['SUB']);
                     }
                     this.nodeChange(on ? null : this.util.createElement(command), null, [command]);
@@ -2364,7 +2392,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             for (let i = 0; i < commandMapNodes.length; i++) {
                 nodeName = commandMapNodes[i];
                 if (classOnCheck.test(nodeName)) {
-                    util.addClass(commandMap[nodeName], 'on');
+                    util.addClass(commandMap[nodeName], 'active');
                 }
             }
 
@@ -2390,7 +2418,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
                 }
                 else {
-                    util.removeClass(commandMap[key], 'on');
+                    util.removeClass(commandMap[key], 'active');
                 }
             }
 
@@ -2690,7 +2718,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                 comm = comm.parentNode;
                             }
 
-                            if (detach) {
+                            if (detach && rangeEl.parentNode) {
                                 e.preventDefault();
                                 core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
                                 break;

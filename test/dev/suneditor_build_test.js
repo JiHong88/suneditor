@@ -204,8 +204,8 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 // name of the plugin to be recognized by the toolbar.
                 // It must be the same as the name attribute of the plugin 
                 dataCommand: 'custom_plugin_submenu',
-                // button's class ("se-btn-basic" class is registered, basic button click css is applied.)
-                buttonClass:'se-btn-basic', 
+                // button's class ("se-btn" class is registered, basic button click css is applied.)
+                buttonClass:'se-btn', 
                 // HTML title attribute
                 title:'Custom plugin of the submenu', 
                 // 'submenu' or 'dialog' or '' (command button)

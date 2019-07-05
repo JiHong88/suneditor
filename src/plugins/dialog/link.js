@@ -68,7 +68,7 @@ export default {
             '       <label><input type="checkbox" class="_se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
             '   </div>' +
             '   <div class="se-dialog-footer">' +
-            '       <button type="submit" class="btn se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 
@@ -85,14 +85,14 @@ export default {
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="se-btn-group">' +
-            '     <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-            '       <i class="se-icon-link"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
-            '   </button>' +
-            '     <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-            '       <i class="se-icon-delete"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-            '   </button>' +
+            '       <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
+            '           <i class="se-icon-link"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+            '       </button>' +
+            '       <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
+            '           <i class="se-icon-delete"></i>' +
+            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+            '       </button>' +
             '   </div>' +
             '</div>';
 

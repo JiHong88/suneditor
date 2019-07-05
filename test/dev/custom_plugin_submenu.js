@@ -42,7 +42,7 @@ export default {
             '<div class="se-list-inner se-list-align">' +
             '   <ul class="se-list-basic">' +
             '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
-            '       <li><button type="button" class="se-btn-basic se-tooltip">' +
+            '       <li><button type="button" class="se-btn se-tooltip">' +
             '               <span>OK</span>' +
             '               <span class="se-tooltip-inner">' +
             '                   <span class="se-tooltip-text">Append text</span>' +

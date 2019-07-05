@@ -127,7 +127,7 @@ export default {
                 '           <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '           <input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
                 '           <label><input type="checkbox" class="_se_image_check_proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn-basic se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                 '       </div>' ;
             }
 
@@ -152,7 +152,7 @@ export default {
             '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
             '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
             '       </div>' +
-            '       <button type="submit" class="btn se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '   </div>' +
             '</form>';
 

@@ -339,7 +339,7 @@ const _Constructor = {
         const oButton = util.createElement('BUTTON');
 
         oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'se-btn-basic' + (dataDisplay === 'submenu' ? ' se-btn-submenu' : '') + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
+        oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';

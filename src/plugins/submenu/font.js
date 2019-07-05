@@ -74,9 +74,9 @@ export default {
         if (currentFont !== fontContext.currentFont) {
             for (let i = 0, len = fontList.length; i < len; i++) {
                 if (currentFont === fontList[i].getAttribute('data-value')) {
-                    this.util.addClass(fontList[i], 'on');
+                    this.util.addClass(fontList[i], 'active');
                 } else {
-                    this.util.removeClass(fontList[i], 'on');
+                    this.util.removeClass(fontList[i], 'active');
                 }
             }
 

@@ -47,8 +47,8 @@ export default {
         /** set table controller */
         let tableController = this.setController_table.call(core);
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('_se_table_resize > i');
-        context.table.resizeText = tableController.querySelector('_se_table_resize > span > span');
+        context.table.resizeIcon = tableController.querySelector('._se_table_resize > i');
+        context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
         context.table.headerButton = tableController.querySelector('.__se__table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
@@ -101,7 +101,7 @@ export default {
             '           <i class="se-icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="header" class="se-tooltip se-btn-basic __se__table_header">' +
+            '       <button type="button" data-command="header" class="se-tooltip __se__table_header">' +
             '           <i class="se-icon-table-header"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
@@ -333,9 +333,9 @@ export default {
         const table = contextTable._element = this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
 
         if (/THEAD/i.test(table.firstElementChild.nodeName)) {
-            this.util.addClass(contextTable.headerButton, 'on');
+            this.util.addClass(contextTable.headerButton, 'active');
         } else {
-            this.util.removeClass(contextTable.headerButton, 'on');
+            this.util.removeClass(contextTable.headerButton, 'active');
         }
 
         if (reset || contextTable._physical_cellCnt === 0) {
@@ -762,9 +762,11 @@ export default {
 
     _closeSplitMenu: null,
     openSplitMenu: function () {
+        this.util.addClass(this.context.table.splitButton, 'on');
         this.context.table.splitMenu.style.display = 'inline-table';
 
         this.plugins.table._closeSplitMenu = function () {
+            this.util.removeClass(this.context.table.splitButton, 'on');
             this.context.table.splitMenu.style.display = 'none';
             this._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
             this.plugins.table._closeSplitMenu = null;
@@ -1020,7 +1022,7 @@ export default {
     toggleHeader: function () {
         const util = this.util;
         const headerButton = this.context.table.headerButton;
-        const active = util.hasClass(headerButton, 'on');
+        const active = util.hasClass(headerButton, 'active');
         const table = this.context.table._element;
 
         if (!active) {
@@ -1031,7 +1033,7 @@ export default {
             util.removeItem(table.querySelector('thead'));
         }
 
-        util.toggleClass(headerButton, 'on');
+        util.toggleClass(headerButton, 'active');
 
         if (/TH/i.test(this.context.table._tdElement.nodeName)) {
             this.controllersOff();

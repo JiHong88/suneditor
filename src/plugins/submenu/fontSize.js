@@ -64,9 +64,9 @@ export default {
         if (currentSize !== fontSizeContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {
                 if (currentSize === sizeList[i].getAttribute('data-value')) {
-                    this.util.addClass(sizeList[i], 'on');
+                    this.util.addClass(sizeList[i], 'active');
                 } else {
-                    this.util.removeClass(sizeList[i], 'on');
+                    this.util.removeClass(sizeList[i], 'active');
                 }
             }
 

@@ -451,7 +451,7 @@ const util = {
      */
     getListChildren: function (element, validation) {
         const children = [];
-        if (!element || !element.children) return children;
+        if (!element || !element.children || element.children.length === 0) return children;
 
         validation = validation || function () { return true; };
 
@@ -476,7 +476,7 @@ const util = {
      */
     getListChildNodes: function (element, validation) {
         const children = [];
-        if (!element || !element.childNodes) return children;
+        if (!element || element.childNodes.length === 0) return children;
 
         validation = validation || function () { return true; };
 

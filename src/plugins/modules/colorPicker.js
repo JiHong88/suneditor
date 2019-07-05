@@ -56,7 +56,7 @@ export default {
             '       <i class="se-icon-checked"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.submitButton + '</span></span>' +
             '   </button>' +
-            '   <button type="button" class="se-btn-basic se-tooltip _se_color_picker_remove">' +
+            '   <button type="button" class="se-btn se-tooltip _se_color_picker_remove">' +
             '       <i class="se-icon-erase"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.removeFormat + '</span></span>' +
             '   </button>' +
@@ -75,9 +75,9 @@ export default {
         if (colorList) {
             for (let i = 0, len = colorList.length; i < len; i++) {
                 if (fillColor === colorList[i].getAttribute('data-value')) {
-                    this.util.addClass(colorList[i], 'on');
+                    this.util.addClass(colorList[i], 'active');
                 } else {
-                    this.util.removeClass(colorList[i], 'on');
+                    this.util.removeClass(colorList[i], 'active');
                 }
             }
         }

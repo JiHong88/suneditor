@@ -62,9 +62,9 @@ export default {
         if (currentList !== listContext.currentList) {
             for (let i = 0, len = list.length; i < len; i++) {
                 if (currentList === list[i].getAttribute('data-command')) {
-                    this.util.addClass(list[i], 'on');
+                    this.util.addClass(list[i], 'active');
                 } else {
-                    this.util.removeClass(list[i], 'on');
+                    this.util.removeClass(list[i], 'active');
                 }
             }
 

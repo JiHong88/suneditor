@@ -127,6 +127,16 @@
 
 /** button */
 .sun-editor button {color:#000;}
+/* se-btn button active*/
+.sun-editor .se-btn:enabled.active {color:#4592ff; outline:0 none;}
+.sun-editor .se-btn:enabled.active:hover, .sun-editor .se-btn:enabled.active:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-btn:enabled.active:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+/* se-btn button on */
+.sun-editor .se-btn:enabled.on {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-btn:enabled.on:hover, .sun-editor .se-btn:enabled.on:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-btn:enabled.on:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
+/* disabled buttons, icon blur */
+.sun-editor .se-btn:disabled, .sun-editor .se-btn:disabled *, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
 
 /** --- primary button */
 .sun-editor .se-btn-primary {color:#000; background-color:#c7deff; border:1px solid #80bdff; border-radius:2px;}
@@ -134,9 +144,9 @@
 .sun-editor .se-btn-primary:active {color:#fff; background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 
 /** --- common button */
-.sun-editor .se-btn-basic {float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; padding:0; font-size:12px; line-height:27px;}
-.sun-editor .se-btn-basic:enabled:hover, .sun-editor .se-btn-basic:enabled:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
-.sun-editor .se-btn-basic:enabled:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+.sun-editor .se-btn {float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; padding:0; font-size:12px; line-height:27px;}
+.sun-editor .se-btn:enabled:hover, .sun-editor .se-btn:enabled:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-btn:enabled:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
 
 /** --- form control */
 .sun-editor .se-input-control {display:inline-block; width:70px; height:34px; font-size:14px; text-align:center; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:2px; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
@@ -174,16 +184,6 @@
 .sun-editor .se-btn-select.se-btn-tool-font {width:100px;}
 .sun-editor .se-btn-select.se-btn-tool-format {width:80px;}
 .sun-editor .se-btn-select.se-btn-tool-size {width:80px;}
-/* command button on*/
-.sun-editor .se-btn-basic:enabled.on:not(.se-btn-submenu) {color:#4592ff; outline:0 none;}
-.sun-editor .se-btn-basic:enabled.on:not(.se-btn-submenu):hover, .sun-editor .se-btn-basic:enabled.on:not(.se-btn-submenu):focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
-.sun-editor .se-btn-basic:enabled.on:not(.se-btn-submenu):active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
-/* submenu button on */
-.sun-editor .se-btn-basic:enabled.on.se-btn-submenu {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
-.sun-editor .se-btn-basic:enabled.on.se-btn-submenu:hover, .sun-editor .se-btn-basic:enabled.on.se-btn-submenu:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
-.sun-editor .se-btn-basic:enabled.on.se-btn-submenu:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
-/* disabled buttons, icon blur */
-.sun-editor .se-btn-basic:disabled, .sun-editor .se-btn-basic:disabled *, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
 
 /** --- submenu layer ---------------------------------------------------------- */
 .sun-editor .se-list-layer {display:none; position:absolute; top:37px; z-index:4; left:1px; border:1px solid #bababa; border-radius:2px; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
@@ -193,8 +193,8 @@
 .sun-editor .se-list-inner .se-list-basic {width:100%; padding:0;}
 .sun-editor .se-list-inner .se-list-basic li {width:100%;}
 /* submenu layer - common list form button on */
-.sun-editor .se-list-inner .se-list-basic li button.on {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
-.sun-editor .se-list-inner .se-list-basic li button.on:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
+.sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
+.sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 /* submenu layer - list button */
 .sun-editor .se-btn-list {width:100%; height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
@@ -239,7 +239,7 @@
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:7px;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button {display:block; width:30px; height:30px; text-indent:-9999px;}
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.on, 
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active, 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover, 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {border:3px solid #fff;}
 /* submenu layer - form group (color selector) */
@@ -248,7 +248,7 @@
 .sun-editor .se-submenu-form-group input {display:inline-block; width:164px; height:35px; font-size:14px; margin:0; padding:4px; border-bottom:2px solid #b1b1b1; text-transform:uppercase;}
 .sun-editor .se-submenu-form-group input:focus {outline:none; border-bottom:3px solid #b1b1b1;}
 .sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; padding:0; margin:0 0 0 4px !important;}
-.sun-editor .se-submenu-form-group button.se-btn-basic {border:1px solid #ccc;}
+.sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}
 
 /** --- editor area */
 .sun-editor .se-wrapper {position:static; width:100%; height:auto; overflow:hidden; z-index:1;}
@@ -283,7 +283,7 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-x {margin:0 8px 0 8px; width:25px; text-align:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer {padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-content .btn {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; background-image:none; border-radius:2px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; background-image:none; border-radius:2px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-btn-radio {margin-left:12px; margin-right:5px;}
 /* dialog - revert button */
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-btn-revert {border:1px solid #ccc;}
@@ -298,14 +298,24 @@
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
 .sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:3; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+
 /* controller - button group */
 .sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px 2px 2px 0; top:0; left:0;}
 .sun-editor .se-controller .se-btn-group .se-btn-group-sub {left:50%; width:max-content; display:none;/* display: inline-table; */}
-.sun-editor .se-controller .se-btn-group button {position:relative; min-height:35px; height:auto; border:none; border-radius:2px; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px; padding:5px 10px; font-size:12px; line-height:1.5; background-color:#fff; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation;}
-.sun-editor .se-controller .se-btn-group button:hover:not(:disabled), .sun-editor .se-controller .se-btn-group button:focus:not(:disabled) {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
-.sun-editor .se-controller .se-btn-group button:active:not(:disabled) {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+.sun-editor .se-controller .se-btn-group button {position:relative; min-height:35px; height:auto; border:none; border-radius:2px; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px; padding:5px 10px; font-size:12px; line-height:1.5; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation;}
+.sun-editor .se-controller .se-btn-group button:hover:enabled, .sun-editor .se-controller .se-btn-group button:focus:enabled {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-controller .se-btn-group button:active:enabled {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+/* controller - buttn group active */
+.sun-editor .se-controller .se-btn-group button:enabled.active {color:#4592ff; outline:0 none;}
+.sun-editor .se-controller .se-btn-group button:enabled.active:hover, .sun-editor .se-controller .se-btn-group button:enabled.active:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-controller .se-btn-group button:enabled.active:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+/* controller - buttn group on */
+.sun-editor .se-controller .se-btn-group button:enabled.on {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-controller .se-btn-group button:enabled.on:hover, .sun-editor .se-controller .se-btn-group button:enabled.on:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-controller .se-btn-group button:enabled.on:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
+
 /* controller - resizing(image, iframe) */
-.sun-editor .se-controller-resizing {margin-top:-50px !important; padding:0 0 2px 0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-resizing {margin-top:-50px !important; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-resizing-container {position:absolute; display:none; z-index:3; border:1px solid #80bdff;}
 .sun-editor .se-resizing-container .se-modal-resize {position:absolute; display:inline-block; background-color:#3f9dff; opacity:0.3;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
@@ -320,12 +330,12 @@
 .sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-7px; cursor:s-resize;}
 .sun-editor .se-resizing-container .se-resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:#fff; background-color:#000; border-radius:2px;}
 /* controller - table */
-.sun-editor .se-controller-table {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
-.sun-editor .se-controller-table-cell {width:auto; padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-table-cell {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 /* controller - table - select class */
 .sun-editor .se-wrapper-wysiwyg table td.se-table-selected-cell, .sun-editor .se-wrapper-wysiwyg table th.se-table-selected-cell {border:1px double #4592ff; background-color:#f1f7ff;}
 /* controller - link */
-.sun-editor .se-controller-link {padding:1px; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-link {padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-link::before, .sun-editor .se-controller-link::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .se-controller-link .link-content {padding:0; margin:0;}
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}

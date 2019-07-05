@@ -69,9 +69,9 @@ export default {
         if (currentFormat !== formatContext.currentFormat) {
             for (let i = 0, len = formatList.length; i < len; i++) {
                 if (currentFormat === formatList[i].getAttribute('data-value')) {
-                    this.util.addClass(formatList[i], 'on');
+                    this.util.addClass(formatList[i], 'active');
                 } else {
-                    this.util.removeClass(formatList[i], 'on');
+                    this.util.removeClass(formatList[i], 'active');
                 }
             }
 
