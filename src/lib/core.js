@@ -177,6 +177,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             SIZE: context.tool.fontSize,
             ALIGN: context.tool.align,
             LI: context.tool.list,
+            LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
             STRONG: context.tool.bold,
             INS: context.tool.underline,
             EM: context.tool.italic,
@@ -2244,7 +2245,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
         _historyIgnoreRegExp: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _keyCodeShortcut: {
             65: 'A',
             66: 'B',
@@ -2337,13 +2338,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         findAlign = false;
                     }
 
-                    /* List */
-                    if (findList && util.isListCell(nodeName) && commandMap.LI) {
-                        commandMapNodes.push('LI');
-                        commandMap.LI.setAttribute('data-focus', selectionParent.parentNode.nodeName);
-                        findList = false;
-                    }
-
                     /* Outdent */
                     if (findOutdent && selectionParent.style.marginLeft && (selectionParent.style.marginLeft.match(/\d+/) || [0])[0] * 1 > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
@@ -2352,6 +2346,20 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     }
 
                     continue;
+                }
+
+                /* List */
+                if (findList && util.isList(nodeName) && commandMap.LI) {
+                    commandMapNodes.push('LI');
+                    commandMap.LI.setAttribute('data-focus', nodeName);
+                    if (/UL/i.test(nodeName)) {
+                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-number');
+                        util.addClass(commandMap.LI_ICON, 'se-icon-list-bullets');
+                    } else {
+                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
+                        util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
+                    }
+                    findList = false;
                 }
 
                 /** Font */
@@ -2411,11 +2419,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     commandMap.ALIGN.className = 'se-icon-align-left';
                     commandMap.ALIGN.removeAttribute('data-focus');
                 }
-                else if (commandMap.LI && util.isListCell(key)) {
-                    commandMap.LI.removeAttribute('data-focus');
-                }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
+                }
+                else if (commandMap.LI && util.isListCell(key)) {
+                    commandMap.LI.removeAttribute('data-focus');
+                    util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
+                    util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
+                    util.removeClass(commandMap.LI, 'active');
                 }
                 else {
                     util.removeClass(commandMap[key], 'active');
