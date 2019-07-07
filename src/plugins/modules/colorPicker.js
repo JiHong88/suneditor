@@ -39,11 +39,22 @@ export default {
                 ['#f15f5f', '#f29661', '#e5d85c', '#bce55c', '#5cd1e5', '#6699ff', '#a366ff', '#f261df', '#8c8c8c'],
                 ['#980000', '#993800', '#998a00', '#6b9900', '#008299', '#003399', '#3d0099', '#990085', '#353535'],
                 ['#670000', '#662500', '#665c00', '#476600', '#005766', '#002266', '#290066', '#660058', '#222222']
-            ] : typeof option.colorList[0] !== 'object' ? [option.colorList] : option.colorList;
+            ] : option.colorList;
 
+        let colorArr = [];
         let list = '<div class="se-list-inner">';
             for (let i = 0, len = colorList.length; i < len; i++) {
-                list += '<div class="se-selector-color">' + makeColor(colorList[i]) + '</div>';
+                if (typeof colorList[i] === 'string') {
+                    colorArr.push(colorList[i]);
+                    if (i < len - 1) continue;
+                }
+                if (colorArr.length > 0) {
+                    list += '<div class="se-selector-color">' + makeColor(colorArr) + '</div>';
+                    colorArr = [];
+                }
+                if (typeof colorList[i] === 'object') {
+                    list += '<div class="se-selector-color">' + makeColor(colorList[i]) + '</div>';
+                }
             }
             list += '' +
             '<form class="se-submenu-form-group">' +
