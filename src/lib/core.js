@@ -2545,9 +2545,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             e.stopPropagation();
 
             const formatEl = util.getFormatElement(core.getSelectionNode());
-            const rangeEl = util.getRangeFormatElement(formatEl);
+            const rangeEl = util.getRangeFormatElement(core.getSelectionNode());
             if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl)) {
-                core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
+                core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 core.focus();
                 return;
             }
@@ -2941,9 +2941,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             const formatEl = util.getFormatElement(selectionNode);
-            const rangeEl = util.getRangeFormatElement(formatEl);
+            const rangeEl = util.getRangeFormatElement(selectionNode);
             if (!formatEl || formatEl === rangeEl) {
-                core.execCommand('formatBlock', false, util.isCell(rangeEl) ? 'DIV' : 'P');
+                core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 core.focus();
                 selectionNode = core.getSelectionNode();
             }
