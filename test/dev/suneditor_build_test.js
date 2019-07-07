@@ -160,6 +160,7 @@ const editor = suneditor.init({
         custom_plugin_submenu
     ],
     width: '100%',
+    
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
@@ -167,6 +168,10 @@ let s2 = editor.create(document.getElementById('editor2'), {
     minHeight: '150px',
     maxHeight: '500px',
     height: 450,
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+    ],
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],

@@ -23,22 +23,21 @@ export default {
 
         /** set submenu */
         let listDiv = this.setSubmenu.call(core);
-        let listUl = listDiv.querySelector('ul');
         context.hiliteColor.colorInput = listDiv.querySelector('._se_color_picker_input');
 
         /** add event listeners */
         context.hiliteColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
         listDiv.querySelector('._se_color_picker_submit').addEventListener('click', this.submit.bind(core));
         listDiv.querySelector('._se_color_picker_remove').addEventListener('click', this.remove.bind(core));
-        listUl.addEventListener('click', this.pickup.bind(core));
+        listDiv.addEventListener('click', this.pickup.bind(core));
 
-        context.hiliteColor.colorList = listUl.querySelectorAll('li button');
+        context.hiliteColor.colorList = listDiv.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
 
         /** empty memory */
-        listDiv = null, listUl = null;
+        listDiv = null;
     },
 
     setSubmenu: function () {
@@ -64,7 +63,7 @@ export default {
     },
 
     onChangeInput: function (e) {
-        this.plugins.colorPicker.setCurrentColor.call(this, '#' + e.target.value);
+        this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);
     },
 
     remove: function () {

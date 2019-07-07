@@ -46,121 +46,33 @@
 <div class="content">
     <article class="markdown-body entry-content" itemprop="text">
         <a id="setting" href="#setting"><h4 class="sub-title">1. Options Setting</h4></a>
-
-<div class="highlight highlight-source-js"><pre>plugins<span class="pl-k">:</span> [
-    font,
-    fontSize,
-    formatBlock,
-    fontColor,
-    hiliteColor,
-    align,
-    horizontalRule,
-    list,
-    table,
-    link,
-    image,
-    video
-]               <span class="pl-k">:</span> Plugins <span class="pl-smi">array</span>.                                    <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-lang            <span class="pl-k">:</span> language object.   default <span class="pl-k">:</span> en {<span class="pl-c1">Object</span>}
-mode            <span class="pl-k">:</span> The mode <span class="pl-k">of</span> the <span class="pl-en">editor</span> (<span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span>). <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-toolbarWidth    <span class="pl-k">:</span> The width <span class="pl-k">of</span> the <span class="pl-smi">toolbar</span>. <span class="pl-smi">Applies</span> only when the editor mode is 
-                  <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span> <span class="pl-smi">mode</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>max-content<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-stickyToolbar   <span class="pl-k">:</span> Reference height value that should be changed to sticky toolbar mode.
-                  It can also be used when there is another fixed toolbar at the top.
-                  <span class="pl-c1">Set</span> to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
-                  If set to <span class="pl-k">-</span><span class="pl-c1">1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn <span class="pl-smi">off</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
-resizingBar     <span class="pl-k">:</span> Show the bottom resizing bar.
-                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be <span class="pl-smi">resized</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-showPathLabel   <span class="pl-k">:</span> Displays the current node structure to <span class="pl-smi">resizingBar</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-popupDisplay    <span class="pl-k">:</span> Size <span class="pl-k">of</span> background area when activating dialog <span class="pl-c1">window</span> (<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span><span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>) default<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-display         <span class="pl-k">:</span> The display property <span class="pl-k">of</span> <span class="pl-smi">suneditor</span>.                <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>block<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-width           <span class="pl-k">:</span> The width size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                     <span class="pl-smi">default</span><span class="pl-k">:</span> clientWidth<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-height          <span class="pl-k">:</span> The height size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                    <span class="pl-smi">default</span><span class="pl-k">:</span> clientHeight<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-minHeight       <span class="pl-k">:</span> The min<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-maxHeight       <span class="pl-k">:</span> The max<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family <span class="pl-smi">array</span>.                 <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size <span class="pl-smi">array</span>.                   <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-colorList       <span class="pl-k">:</span> Change default color array <span class="pl-k">of</span> color <span class="pl-smi">picker</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-imageResizing   <span class="pl-k">:</span> Can resize the <span class="pl-smi">image</span>.                             <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the image <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span>}
-imageFileInput  <span class="pl-k">:</span> Choose whether to create a file input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageUrlInput   <span class="pl-k">:</span> Choose whether to create a image url input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.
-                  If the value <span class="pl-k">of</span> imageFileInput is <span class="pl-c1">false</span>, it will be <span class="pl-smi">unconditionally</span>.   <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageUploadHeader <span class="pl-k">:</span> Http Header when uploading images.              <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Object</span>}
-imageUploadUrl  <span class="pl-k">:</span> The image upload to server mapping <span class="pl-smi">address</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
-                  ex) <span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
-                  When not used, it enters base64 data
-                  <span class="pl-k">return</span> {
-                          <span class="pl-s"><span class="pl-pds">"</span>errorMessage<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>insert error message<span class="pl-pds">"</span></span>,
-                          <span class="pl-s"><span class="pl-pds">"</span>result<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
-                              {
-                                  <span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>/download/editorImg/test_image.jpg<span class="pl-pds">"</span></span>,
-                                  <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_image.jpg<span class="pl-pds">"</span></span>,
-                                  <span class="pl-s"><span class="pl-pds">"</span>size<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>561276<span class="pl-pds">"</span></span>
-                              }
-                          ]
-                      }
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-videoResizing   <span class="pl-k">:</span> Can resize the video <span class="pl-smi">iframe</span>.                       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-videoWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.         <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
-videoHeight     <span class="pl-k">:</span> The default heigth size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
-youtubeQuery    <span class="pl-k">:</span> The query string <span class="pl-k">of</span> a YouTube embedded URL.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-                  It takes precedence over the value user entered.
-                  ex) <span class="pl-s"><span class="pl-pds">'</span>autoplay=1&amp;mute=1&amp;enablejsapi=1&amp;controls=0&amp;rel=0&amp;modestbranding=1<span class="pl-pds">'</span></span>
-                  <span class="pl-c"><span class="pl-c">//</span> https://developers.google.com/youtube/player_parameters</span>
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is <span class="pl-smi">clicked</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span style="color: rgb(0, 130, 153);">userFunction</span>.<span style="color: rgb(61, 0, 153);">save</span> {<span class="pl-c1">Function</span>}
-<span class="pl-k">------------------------------------------------------------------------------------------------------------------</span>
-buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
-                  default<span class="pl-k">:</span> [
-                    [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
-                    <span class="pl-c"><span class="pl-c">//</span> ['font', 'fontSize', 'formatBlock'],</span>
-                    [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
-                    [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-                    <span class="pl-c"><span class="pl-c">//</span> '/', Line break</span>
-                    <span class="pl-c"><span class="pl-c">//</span> ['fontColor', 'hiliteColor'],</span>
-                    [<span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>],
-                    <span class="pl-c"><span class="pl-c">//</span> ['align', 'horizontalRule', 'list', 'table'],</span>
-                    <span class="pl-c"><span class="pl-c">//</span> ['link', 'image', 'video'],</span>
-                    [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
-                    [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
-                    <span class="pl-c"><span class="pl-c">//</span> ['save'],</span>
-                  ]</pre></div>
-
         <p></p>
         <textarea id="exampleOptions" style="width:100%; height:200px;">
             <div><span style="color: rgb(0, 130, 153);"><b>SunEditor</b></span><b>.<span style="color: rgb(61, 0, 153);">create</span></b>(<span style="color: rgb(152, 0, 0);">'exampleOptions'</span>, {</div>
-            <div>&nbsp; &nbsp; fontSize : [</div>
-            <div><span style="color: rgb(0, 51, 153);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 8, 10, 14, 18, 24, 36</span></div>
-            <div>&nbsp; &nbsp; ],</div>
             <div>&nbsp; &nbsp; font : [</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; <span style="color: rgb(152, 0, 0);">'Arial'</span>,</div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'tohoma'</span>,</div>
             <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'Courier New,Courier'</span></div>
-            <div>&nbsp; &nbsp; ],</div><div>&nbsp; &nbsp; width :<span style="color: rgb(152, 0, 0);"> '100%'</span>,</div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; fontSize : [</div>
+            <div><span style="color: rgb(0, 51, 153);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 8, 10, 14, 18, 24, 36</span></div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; colorList : [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'</span>],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen'</span>],</div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; width :<span style="color: rgb(152, 0, 0);"> '100%'</span>,</div>
             <div>&nbsp; &nbsp; height : <span style="color: rgb(152, 0, 0);">'auto'</span>,</div>
             <div>&nbsp; &nbsp; videoWidth : <span style="color: rgb(0, 51, 153);">360</span>,</div>
             <div>&nbsp; &nbsp; videoHeight : <span style="color: rgb(0, 51, 153);">115</span>,</div>
             <div>&nbsp; &nbsp; youtubeQuery : <span style="color: rgb(152, 0, 0);">'autoplay=1&mute=1&enablejsapi=1'</span>,</div>
-            <div>&nbsp; &nbsp; imageWidth : <span style="color: rgb(0, 51, 153);">150,</span></div>
             <div>&nbsp; &nbsp; popupDisplay : <span style="color: rgb(152, 0, 0);">'local'</span>,</div>
             <div>&nbsp; &nbsp; resizingBar : <span style="color: rgb(0, 130, 153);">false</span>,</div>
             <div>&nbsp; &nbsp; buttonList : [</div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'font', 'fontSize', 'formatBlock',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'removeFormat',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fontColor', 'hiliteColor',</span><span style="color: rgb(152, 0, 0);">﻿</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'outdent', 'indent',</span><span style="color: rgb(152, 0, 0);">&nbsp;</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'align', 'horizontalRule', 'list', 'table',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'link', 'image', 'video',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fullScreen', 'showBlocks', 'codeView',</span></div>
-            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'preview', 'print', 'save'</span>]</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'font', 'fontSize',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fontColor', 'hiliteColor', 'video',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fullScreen', 'codeView',</span></div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'preview', 'save'</span>]</div>
             <div>&nbsp; &nbsp; ],</div>
             <div>&nbsp; &nbsp; callBackSave: <span style="color: rgb(0, 51, 153);">function</span> (<span style="color: rgb(152, 0, 0);">contents</span>) {</div>
             <div>&nbsp; &nbsp; &nbsp; &nbsp; <span style="color: rgb(0, 51, 153);">alert</span>(<span style="color: rgb(152, 0, 0);">contents</span>);</div>
@@ -330,13 +242,17 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
 <script src="../../dist/suneditor.min.js"></script>
 <script>
     SUNEDITOR.create('exampleOptions',{
-        fontSize : [
-            8, 10, 14, 18, 24, 36
-        ],
         font : [
             'Arial',
             'tahoma',
             'Courier New,Courier'
+        ],
+        fontSize : [
+            8, 10, 14, 18, 24, 36
+        ],
+        colorList: [
+            ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+            ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
         ],
         width : '100%',
         height : 'auto',
@@ -347,15 +263,10 @@ buttonList      <span class="pl-k">:</span> Defines button list to array {<span 
         popupDisplay: 'local',
         resizingBar: false,
         buttonList : [
-            ['font', 'fontSize', 'formatBlock',
-            'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-            'removeFormat',
-            'fontColor', 'hiliteColor',
-            'outdent', 'indent',
-            'align', 'horizontalRule', 'list', 'table',
-            'link', 'image', 'video',
-            'fullScreen', 'showBlocks', 'codeView',
-            'preview', 'print', 'save']
+            ['font', 'fontSize',
+            'fontColor', 'hiliteColor', 'video',
+            'fullScreen', 'codeView',
+            'preview', 'save']
         ],
         callBackSave: function (contents) {
             alert(contents);

@@ -235,7 +235,7 @@
 .sun-editor .se-selector-table .se-table-size-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:5em; height:5em; background:url('../img/unhighlighted.png') repeat;}
 .sun-editor .se-selector-table .se-table-size-display {padding-left:5px;}
 /* submenu layer - color selector */
-.sun-editor .se-list-layer .se-selector-color {display:flex; width:270px; height:auto; padding:0;}
+.sun-editor .se-list-layer .se-selector-color {display:flex; width:max-content; height:auto; padding:0; margin:auto;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button {display:block; width:30px; height:30px; text-indent:-9999px;}
@@ -243,9 +243,8 @@
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover, 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {border:3px solid #fff;}
 /* submenu layer - form group (color selector) */
-.sun-editor .se-submenu-form-group {height:auto; padding:4px;}
-.sun-editor .se-submenu-form-group label {display:inline-block; font-weight:bold; font-size:14px; letter-spacing:1px;}
-.sun-editor .se-submenu-form-group input {display:inline-block; width:164px; height:35px; font-size:14px; margin:0; padding:4px; border-bottom:2px solid #b1b1b1; text-transform:uppercase;}
+.sun-editor .se-submenu-form-group {display:flex; width:100%; height:auto; padding:4px;}
+.sun-editor .se-submenu-form-group input {flex:auto; display:inline-block; width:72px; height:33px; font-size:12px; margin:1px 0 1px 0; padding:0; border-bottom:2px solid #b1b1b1; outline:none; text-transform:uppercase;}
 .sun-editor .se-submenu-form-group input:focus {outline:none; border-bottom:3px solid #b1b1b1;}
 .sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; padding:0; margin:0 0 0 4px !important;}
 .sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}

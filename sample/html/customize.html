@@ -13,89 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
     <!-- suneditor -->
     <link href="../../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
-    <style>
-        .image-list {
-            display: flex;
-            box-sizing: border-box;
-            position: relative;
-            width: 100%;
-            margin: 0;
-            background: #fff;
-        }
-
-        .image-list * {
-            font-size: 13px;
-            box-sizing: border-box;
-        }
-
-        .image-list button {
-            margin: 0 !important;
-        }
-
-        .image-list .file-list-info {
-            float: left;
-            white-space: nowrap;
-            padding: 10px;
-        }
-        
-        .image-list .file-list-info span {
-            display: block;
-            width: 100%;
-            margin: 12px 0;
-        }
-
-        .image-list .file-list-info .total-size {
-            color: #333;
-        }
-
-        .image-list .file-list {
-            padding: 10px;
-        }
-
-        .image-list .file-list ul {
-            margin: 0;
-            padding: 0;
-            height: auto;
-            width: 100%;
-            background-color: #f5f5f5;
-        }
-
-        .image-list .file-list ul li {
-            position: relative;
-            display: inline-block;
-            margin: 3px;
-            width: 60px;
-            height: 60px;
-            border: 3px solid #999;
-        }
-
-        .image-list .file-list ul li.checked {
-            border: 3px solid #dc3545;
-        }
-
-        .image-list .file-list ul li img {
-            width: 54px;
-            height: 54px;
-        }
-
-        .image-list .file-list ul li .image-size {
-            color: #333;
-            font-size: 12px;
-        }
-
-        .image-list .file-list ul li .image-check {
-            position: absolute;
-            top: 0;
-            left: auto;
-            right: 0;
-            margin: 0;
-            padding: 1px 0 1px 2px;
-            border: 0;
-            border-radius: 0 0 0 5px;
-            outline: none;
-            background-color: #dc3545;
-        }
-    </style>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -351,10 +268,11 @@ function setImageList () {
         fixSize = (image.size / 1000).toFixed(1) * 1
             
         list += '<li id="img_' + image.index + '">' +
-                    '<a href="javascript:checkImage(' + image.index + ')">' +
+                    '<div onclick="checkImage(' + image.index + ')">' +
                         '<div><img src="' + image.src + '"></div>' +
-                    '</a>' +
-                    '<a href="javascript:setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
+                    '</div>' +
+                    '<a href="javascript:void(0)" onclick="setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
+                    '<div class="image-check"><svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>' +
                 '</li>';
         
         size += fixSize;
