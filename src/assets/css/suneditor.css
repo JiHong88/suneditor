@@ -238,7 +238,7 @@
 .sun-editor .se-list-layer .se-selector-color {display:flex; width:max-content; max-width:270px; height:auto; padding:0; margin:auto;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button {display:block; width:30px; height:30px; text-indent:-9999px;}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button {display:block; cursor:default; width:30px; height:30px; text-indent:-9999px;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active, 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover, 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {border:3px solid #fff;}
