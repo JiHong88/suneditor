@@ -141,8 +141,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description An user event function when image uploaded success or remove image
          * @private
          */
-        _imageUpload: function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
-            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, isDelete, imageInfo, remainingFilesCount);
+        _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount);
         },
 
         /**
@@ -214,8 +214,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
             _fullScreenSticky: false,
-            _imagesInfo: [],
-            _imageIndex: 0
+            _imagesInfo: []
         },
 
         /**
@@ -232,7 +231,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 this.initPlugins[pluginName] = true;
             }
                 
-            callBackFunction();
+            if (typeof callBackFunction === 'function') callBackFunction();
         },
 
         /**
@@ -312,6 +311,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Hide controller at editor area (link button, image resize button..)
          */
         controllersOff: function () {
+            if (!this._bindControllersOff) return;
+
             _d.removeEventListener('mousedown', this._bindControllersOff);
             _d.removeEventListener('keydown', this._bindControllersOff);
             this._bindControllersOff = null;
@@ -2564,7 +2565,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     
                     if (!util.getParentElement(targetElement, '.se-image-container')) {
                         core.plugins.image.openModify.call(core, true);
-                        core.plugins.image.update_image.call(core, true);
+                        core.plugins.image.update_image.call(core, true, true);
                     }
                 });
 
@@ -2772,7 +2773,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                                         
                                         if (!util.getParentElement(nextEl, '.se-component')) {
                                             core.plugins.image.openModify.call(core, true);
-                                            core.plugins.image.update_image.call(core, true);
+                                            core.plugins.image.update_image.call(core, true, true);
                                         }
                                     });
                                 } else if (util.hasClass(nextEl, 'se-video-container')) {
@@ -2950,6 +2951,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             if (event._directionKeyKeyCode.test(keyCode)) {
                 event._findButtonEffectTag();
+            }
+
+            if (core.plugins.image) {
+                if (!core.initPlugins.image) {
+                    core.callPlugin('image', function () {
+                        core.plugins.image.checkImagesInfo.call(core);
+                    });
+                } else {
+                    core.plugins.image.checkImagesInfo.call(core);
+                }
             }
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
@@ -3168,6 +3179,31 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         getImagesInfo: function () {
             return core._variable._imagesInfo;
+        },
+
+        /**
+         * @description Set current images info
+         */
+        setImagesInfo: function () {
+            if (!core.plugins.image) return;
+            
+            function setInfo () {
+                const setImageInfo = core.plugins.image.setImagesInfo;
+                const images = context.element.wysiwyg.querySelectorAll('img');
+                core.context.image._uploadFileLength = images.length;
+
+                for (let i = 0, len = images.length, img; i < len; i++) {
+                    img = images[i];
+                    img.removeAttribute('data-index');
+                    setImageInfo.call(core, img, {
+                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
+                        'size': img.getAttribute('data-file-size') || 0
+                    });
+                }
+            }
+
+            if (!core.initPlugins.image) core.callPlugin('image', setInfo);
+            else setInfo();
         },
 
         /**

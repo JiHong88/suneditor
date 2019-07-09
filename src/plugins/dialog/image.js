@@ -256,7 +256,9 @@ export default {
 
         reader.onload = function (update, updateElement, file) {
             try {
-                this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, update, updateElement, file);
+                if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
+                else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, file);
+
                 if (index === filesLen) this.closeLoading();
             } catch (e) {
                 this.closeLoading();
@@ -279,8 +281,10 @@ export default {
                     }
                 } else {
                     const fileList = response.result;
-                    for (let i = 0, len = (update && fileList.length > 0 ? 1 : fileList.length); i < len; i++) {
-                        this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, align, update, updateElement, {name: fileList[i].name, size: fileList[i].size});
+                    for (let i = 0, len = fileList.length, file; i < len; i++) {
+                        file = {name: fileList[i].name, size: fileList[i].size};
+                        if (update) this.plugins.image.update_src.call(this, fileList[i].url, updateElement, file);
+                        else this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, align, file);
                     }
                 }
 
@@ -296,11 +300,11 @@ export default {
 
     onRender_imgUrl: function () {
         if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
-        this.context.image._uploadFileLength = 1;
 
         try {
             const file = {name: this.context.image.imgUrlFile.value.split('/').pop(), size: 0};
-            this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element, file);
+            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, this.context.image.imgUrlFile.value, this.context.image._element, file);
+            else this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, file);
         } catch (e) {
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -352,7 +356,7 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this);
+                imagePlugin.update_image.call(this, false, false);
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
@@ -372,52 +376,87 @@ export default {
         return false;
     },
 
-    _setImagesInfo: function (img, file) {
+    setImagesInfo: function (img, file) {
         let dataIndex = img.getAttribute('data-index');
+        let info = this._variable._imagesInfo[dataIndex];
+        let state = '';
+
         if (!dataIndex) {
-            dataIndex = this._variable._imageIndex;
+            state = 'create';
+            dataIndex = this._variable._imagesInfo.length;
             img.setAttribute('data-index', dataIndex);
 
-            this._variable._imagesInfo[dataIndex] = {
+            info = this._variable._imagesInfo[dataIndex] = {
                 src: img.src,
                 index: dataIndex,
                 name: file.name,
                 size: file.size,
                 select: function () {
-                    const size = this.plugins.resizing.call_controller_resize.call(this, img, 'image');
-                    this.plugins.image.onModifyMode.call(this, img, size);
-                    img.scrollIntoView();
+                    img.scrollIntoView(true);
+                    this._w.setTimeout(function () {
+                        this.plugins.image.onModifyMode.call(this, img, this.plugins.resizing.call_controller_resize.call(this, img, 'image'));
+                    }.bind(this));
                 }.bind(this),
                 delete: this.plugins.image.destroy.bind(this, img)
             };
-
-            this._variable._imageIndex++;
 
             img.setAttribute('data-file-name', file.name);
             img.setAttribute('data-file-size', file.size);
         }
         else {
-            this._variable._imagesInfo[dataIndex].name = img.getAttribute("data-file-name");
-            this._variable._imagesInfo[dataIndex].size = img.getAttribute("data-file-size") * 1;
+            state = 'update';
+            info.src = img.src,
+            info.name = img.getAttribute("data-file-name");
+            info.size = img.getAttribute("data-file-size") * 1;
         }
 
-        this._imageUpload(img, dataIndex, false, this._variable._imagesInfo[dataIndex], --this.context.image._uploadFileLength);
+        img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
+        img.setAttribute('data-origin', img.offsetWidth + ',' + img.offsetHeight);
+
+        this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
+    },
+
+    checkImagesInfo: function () {
+        const imagePlugin = this.plugins.image;
+        const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
+        const imagesInfo = this._variable._imagesInfo;
+        const currentImages = [];
+
+        if (images.length === imagesInfo.length) return;
+
+        for (let i = 0, len = images.length, img; i < len; i++) {
+            img = images[i];
+            if (!this.util.getParentElement(img, '.se-image-container')) {
+                imagePlugin.onModifyMode.call(this, img, null);
+                imagePlugin.openModify.call(this, true);
+                imagePlugin.update_image.call(this, true, false);
+            } else if (!img.getAttribute('data-index')) {
+                imagePlugin.setImagesInfo.call(this, img, {
+                    'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
+                    'size': img.getAttribute('data-file-size') || 0
+                });
+            }
+
+            //@todo
+            currentImages.push(img.getAttribute('data-index') * 1);
+        }
+
+        for (let i = 0, dataIndex; i < imagesInfo.length; i++) {
+            dataIndex = imagesInfo[i].index;
+            if (currentImages.indexOf(dataIndex) > -1) continue;
+
+            imagesInfo.splice(i, 1);
+            this._imageUpload(null, dataIndex, 'delete', null, 0);
+            i--;
+        }
     },
 
     _onload_image: function (oImg, file) {
-        oImg.setAttribute('origin-size', oImg.naturalWidth + ',' + oImg.naturalHeight);
-        oImg.setAttribute('data-origin', oImg.offsetWidth + ',' + oImg.offsetHeight);
-
         if (!file) return;
-        this.plugins.image._setImagesInfo.call(this, oImg, file);       
+        this.plugins.image.setImagesInfo.call(this, oImg, file);
     },
 
-    create_image: function (src, linkValue, linkNewWindow, width, align, update, updateElement, file) {
-        if (update) {
-            updateElement.src = src;
-            return;
-        }
-
+    create_image: function (src, linkValue, linkNewWindow, width, align, file) {
         const contextImage = this.context.image;
 
         let oImg = this.util.createElement('IMG');
@@ -465,7 +504,7 @@ export default {
         this.insertComponent(container);
     },
 
-    update_image: function (init) {
+    update_image: function (init, openController) {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
         let imageEl = contextImage._element;
@@ -550,6 +589,7 @@ export default {
                 this.util.getFormatElement(contextImage._element) || contextImage._element;
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(existElement);
+            imageEl = container.querySelector('img');
         }
 
         // transform
@@ -557,14 +597,27 @@ export default {
             this.plugins.resizing.setTransformSize.call(this, imageEl);
         }
 
-        // history stack
-        this.history.push();
+        // set imagesInfo
         if (init) {
-            imageEl = container.querySelector('img');
+            this.plugins.image.setImagesInfo.call(this, imageEl, {
+                'name': imageEl.getAttribute('data-file-name') || imageEl.src.split('/').pop(),
+                'size': imageEl.getAttribute('data-file-size') || 0
+            });
+        }
+
+        if (openController) {
             this.plugins.image.init.call(this);
             const size = this.plugins.resizing.call_controller_resize.call(this, imageEl, 'image');
             this.plugins.image.onModifyMode.call(this, imageEl, size);
         }
+
+        // history stack
+        this.history.push();
+    },
+
+    update_src: function (src, element, file) {
+        element.src = src;
+        this._w.setTimeout(this.plugins.image.setImagesInfo.bind(this, element, file));
     },
 
     sizeRevert: function () {
@@ -584,17 +637,19 @@ export default {
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
-        contextImage._element_w = size.w;
-        contextImage._element_h = size.h;
-        contextImage._element_t = size.t;
-        contextImage._element_l = size.l;
+        if (size) {
+            contextImage._element_w = size.w;
+            contextImage._element_h = size.h;
+            contextImage._element_t = size.t;
+            contextImage._element_l = size.l;
+        }
 
         let userSize = contextImage._element.getAttribute('data-origin');
         if (userSize) {
             userSize = userSize.split(',');
             contextImage._origin_w = userSize[0] * 1;
             contextImage._origin_h = userSize[1] * 1;
-        } else {
+        } else if (size) {
             contextImage._origin_w = size.w;
             contextImage._origin_h = size.h;
             contextImage._element.setAttribute('data-origin', size.w + ',' + size.h);
@@ -691,8 +746,9 @@ export default {
         this.controllersOff();
 
         if (dataIndex) {
-            delete this._variable._imagesInfo[dataIndex];
-            this._imageUpload(imageEl, dataIndex, true, null, 0);
+            const imagesInfo = this._variable._imagesInfo;
+            imagesInfo.splice(imagesInfo.indexOf(imagesInfo[dataIndex]), 1);
+            this._imageUpload(imageEl, dataIndex, 'delete', null, 0);
         }
     },
 

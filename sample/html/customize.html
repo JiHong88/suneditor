@@ -238,15 +238,18 @@ function sun_create () {
         lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
     });
 
-    editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
+    editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
         console.log('imageInfo', imageInfo);
 
-        if (isDelete) {
+        if (state === 'delete') {
             imageList.splice(findIndex(imageList, index), 1)
         } else {
-            const image = editor.getImagesInfo()[findIndex(editor.getImagesInfo(), index)]
-            if (!image) return
-            imageList.unshift(image)
+            if (state === 'create') {
+                const image = editor.getImagesInfo()[findIndex(editor.getImagesInfo(), index)]
+                imageList.unshift(image)
+            } else {
+                imageList.splice(findIndex(imageList, index), 1)
+            }
         }
 
         if (remainingFilesCount === 0) {

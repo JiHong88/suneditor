@@ -420,8 +420,8 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
-editor.onImageUpload = function (targetImgElement, index, isDelete, imageInfo, remainingFilesCount) {
-    console.log(`targetImgElement:${targetImgElement}, index:${index}, isDelete:${isDelete}`)
+editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create','update','delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
