@@ -274,7 +274,7 @@ function setImageList () {
                     '<div onclick="checkImage(' + image.index + ')">' +
                         '<div><img src="' + image.src + '"></div>' +
                     '</div>' +
-                    '<a href="javascript:void(0)" onclick="setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
+                    '<a href="javascript:void(0)" onclick="selectImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
                     '<div class="image-check"><svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>' +
                 '</li>';
         
@@ -285,7 +285,21 @@ function setImageList () {
     imageTable.innerHTML = list;
 }
 
-function setImage (type, index) {
+function findIndex(arr, index) {
+    let idx = -1;
+
+    arr.some(function (a, i) {
+        if ((typeof a === 'number' ? a : a.index) === index) {
+            idx = i;
+            return true;
+        }
+        return false;
+    })
+
+    return idx;
+}
+
+function selectImage (type, index) {
     imageList[findIndex(imageList, index)][type]();
 }
 
@@ -309,29 +323,16 @@ function checkImage (index) {
 }
 
 function deleteCheckedImages() {
-    editor.getImagesInfo().forEach(function (el) {
-        selectedImages.forEach(function (selected) {
-          if (el.index === selected) {
-            el.delete()
-          }
-        })
-      })
+    const iamgesInfo = editor.getImagesInfo();
+
+    for (let i = 0; i < iamgesInfo.length; i++) {
+        if (selectedImages.indexOf(iamgesInfo[i].index) > -1) {
+            iamgesInfo[i].delete();
+            i--;
+        }
+    }
 
     selectedImages = []
-}
-
-function findIndex(arr, index) {
-    let idx = -1;
-
-    arr.some(function (a, i) {
-        if ((typeof a === 'number' ? a : a.index) === index) {
-            idx = i;
-            return true;
-        }
-        return false;
-    })
-
-    return idx;
 }
 
 sun_create();

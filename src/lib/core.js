@@ -214,7 +214,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
             _fullScreenSticky: false,
-            _imagesInfo: []
+            _imagesInfo: [],
+            _imageIndex: 0
         },
 
         /**
@@ -2217,8 +2218,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
         getContents: function () {
             let contents = '';
 
-            if (context.element.wysiwyg.innerText.trim().length === 0) return contents;
-
             if (core._variable.wysiwygActive) {
                 contents = context.element.wysiwyg.innerHTML;
             } else {
@@ -2237,6 +2236,17 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             return renderHTML.innerHTML;
+        },
+
+        /**
+         * @description Correct the value of the images information array(core._variable._imagesInfo) by comparing the images tag of the editor.
+         * @private
+         */
+        _checkImages: function () {
+            if (this.plugins.image) {
+                if (!this.initPlugins.image) this.callPlugin('image', this.plugins.image.checkImagesInfo.bind(this));
+                else this.plugins.image.checkImagesInfo.call(this);
+            }
         }
     };
 
@@ -2953,15 +2963,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 event._findButtonEffectTag();
             }
 
-            if (core.plugins.image) {
-                if (!core.initPlugins.image) {
-                    core.callPlugin('image', function () {
-                        core.plugins.image.checkImagesInfo.call(core);
-                    });
-                } else {
-                    core.plugins.image.checkImagesInfo.call(core);
-                }
-            }
+            core._checkImages();
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
 
@@ -3182,31 +3184,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Set current images info
-         */
-        setImagesInfo: function () {
-            if (!core.plugins.image) return;
-            
-            function setInfo () {
-                const setImageInfo = core.plugins.image.setImagesInfo;
-                const images = context.element.wysiwyg.querySelectorAll('img');
-                core.context.image._uploadFileLength = images.length;
-
-                for (let i = 0, len = images.length, img; i < len; i++) {
-                    img = images[i];
-                    img.removeAttribute('data-index');
-                    setImageInfo.call(core, img, {
-                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
-                        'size': img.getAttribute('data-file-size') || 0
-                    });
-                }
-            }
-
-            if (!core.initPlugins.image) core.callPlugin('image', setInfo);
-            else setInfo();
-        },
-
-        /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html - HTML Element or HTML string or plain string
          */
@@ -3358,6 +3335,26 @@ export default function (context, pluginCallButtons, plugins, lang) {
     _w.addEventListener('resize', event.onResize_window, false);
     if (context.option.stickyToolbar > -1) {
         _w.addEventListener('scroll', event.onScroll_window, false);
+    }
+
+    /** check image elements */
+    if (core.plugins.image && context.element.wysiwyg.getElementsByTagName('IMG').length > 0) {
+        _w.setTimeout(function () {
+            core.callPlugin('image', function () {
+                const setImagesInfo = this.plugins.image.setImagesInfo;
+                const images = context.element.wysiwyg.getElementsByTagName('IMG');
+                this.context.image._uploadFileLength = images.length;
+    
+                for (let i = 0, len = images.length, img; i < len; i++) {
+                    img = images[i];
+                    img.removeAttribute('data-index');
+                    setImagesInfo.call(this, img, {
+                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
+                        'size': img.getAttribute('data-file-size') || 0
+                    });
+                }
+            }.bind(core));
+        });
     }
 
     return userFunction;

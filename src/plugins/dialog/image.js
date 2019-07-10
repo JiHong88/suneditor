@@ -377,16 +377,18 @@ export default {
     },
 
     setImagesInfo: function (img, file) {
+        const imagesInfo = this._variable._imagesInfo;
         let dataIndex = img.getAttribute('data-index');
-        let info = this._variable._imagesInfo[dataIndex];
+        let info = null;
         let state = '';
 
         if (!dataIndex) {
             state = 'create';
-            dataIndex = this._variable._imagesInfo.length;
+            dataIndex = this._variable._imageIndex;
             img.setAttribute('data-index', dataIndex);
+            this._variable._imageIndex++;
 
-            info = this._variable._imagesInfo[dataIndex] = {
+            info = {
                 src: img.src,
                 index: dataIndex,
                 name: file.name,
@@ -394,17 +396,29 @@ export default {
                 select: function () {
                     img.scrollIntoView(true);
                     this._w.setTimeout(function () {
+                        // @todo
                         this.plugins.image.onModifyMode.call(this, img, this.plugins.resizing.call_controller_resize.call(this, img, 'image'));
                     }.bind(this));
                 }.bind(this),
                 delete: this.plugins.image.destroy.bind(this, img)
             };
 
+            imagesInfo.push(info);
+
             img.setAttribute('data-file-name', file.name);
             img.setAttribute('data-file-size', file.size);
         }
         else {
             state = 'update';
+            dataIndex *= 1;
+
+            for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                if (dataIndex === imagesInfo[i].index) {
+                    info = imagesInfo[i];
+                    break;
+                }
+            }
+
             info.src = img.src,
             info.name = img.getAttribute("data-file-name");
             info.size = img.getAttribute("data-file-size") * 1;
@@ -417,28 +431,35 @@ export default {
     },
 
     checkImagesInfo: function () {
-        const imagePlugin = this.plugins.image;
         const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
         const imagesInfo = this._variable._imagesInfo;
-        const currentImages = [];
 
         if (images.length === imagesInfo.length) return;
+        
+        const imagePlugin = this.plugins.image;
+        const currentImages = [];
+        const infoIndex = [];
+        for (let i = 0, len = imagesInfo.length; i < len; i++) {
+            infoIndex[i] = imagesInfo[i].index;
+        }
 
         for (let i = 0, len = images.length, img; i < len; i++) {
             img = images[i];
             if (!this.util.getParentElement(img, '.se-image-container')) {
+                currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
                 imagePlugin.update_image.call(this, true, false);
-            } else if (!img.getAttribute('data-index')) {
+            } else if (!img.getAttribute('data-index') || infoIndex.indexOf(img.getAttribute('data-index') * 1) < 0) {
+                currentImages.push(this._variable._imageIndex);
+                img.removeAttribute('data-index');
                 imagePlugin.setImagesInfo.call(this, img, {
                     'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
                     'size': img.getAttribute('data-file-size') || 0
                 });
+            } else {
+                currentImages.push(img.getAttribute('data-index') * 1);
             }
-
-            //@todo
-            currentImages.push(img.getAttribute('data-index') * 1);
         }
 
         for (let i = 0, dataIndex; i < imagesInfo.length; i++) {
@@ -737,18 +758,23 @@ export default {
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, '.se-image-container') || imageEl;
-
-        const dataIndex = imageEl.getAttribute('data-index');
+        const dataIndex = imageEl.getAttribute('data-index') * 1;
         
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
 
         this.controllersOff();
 
-        if (dataIndex) {
+        if (dataIndex >= 0) {
             const imagesInfo = this._variable._imagesInfo;
-            imagesInfo.splice(imagesInfo.indexOf(imagesInfo[dataIndex]), 1);
-            this._imageUpload(imageEl, dataIndex, 'delete', null, 0);
+
+            for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                if (dataIndex === imagesInfo[i].index) {
+                    imagesInfo.splice(i, 1);
+                    this._imageUpload(null, dataIndex, 'delete', null, 0);
+                    return;
+                }
+            }
         }
     },
 

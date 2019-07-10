@@ -46,6 +46,7 @@ export default function (core, change) {
         }
 
         // onChange
+        core._checkImages();
         change();
     }
 

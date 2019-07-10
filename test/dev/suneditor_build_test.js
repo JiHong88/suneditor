@@ -235,13 +235,14 @@ window.checkImage = function (index) {
 }
 
 window.deleteCheckedImages = function () {
-    s2.getImagesInfo().forEach(function (el) {
-        selectedImages.forEach(function (selected) {
-        if (el.index === selected) {
-            el.delete()
+    const iamgesInfo = s2.getImagesInfo();
+    
+    for (let i = 0; i < iamgesInfo.length; i++) {
+        if (selectedImages.indexOf(iamgesInfo[i].index) > -1) {
+            iamgesInfo[i].delete();
+            i--;
         }
-        })
-    })
+    }
 
     selectedImages = []
 }
@@ -292,7 +293,6 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
     }
 }
 
-s2.setImagesInfo();
 
 window.sun_destroy2 = function () {
     s2.destroy();
