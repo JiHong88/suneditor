@@ -382,33 +382,25 @@ export default {
         let info = null;
         let state = '';
 
+        // create
         if (!dataIndex) {
             state = 'create';
             dataIndex = this._variable._imageIndex;
-            img.setAttribute('data-index', dataIndex);
             this._variable._imageIndex++;
+
+            img.setAttribute('data-index', dataIndex);
+            img.setAttribute('data-file-name', file.name);
+            img.setAttribute('data-file-size', file.size);
 
             info = {
                 src: img.src,
                 index: dataIndex,
                 name: file.name,
-                size: file.size,
-                select: function () {
-                    img.scrollIntoView(true);
-                    this._w.setTimeout(function () {
-                        // @todo
-                        this.plugins.image.onModifyMode.call(this, img, this.plugins.resizing.call_controller_resize.call(this, img, 'image'));
-                    }.bind(this));
-                }.bind(this),
-                delete: this.plugins.image.destroy.bind(this, img)
+                size: file.size
             };
 
             imagesInfo.push(info);
-
-            img.setAttribute('data-file-name', file.name);
-            img.setAttribute('data-file-size', file.size);
-        }
-        else {
+        } else { // update
             state = 'update';
             dataIndex *= 1;
 
@@ -423,6 +415,15 @@ export default {
             info.name = img.getAttribute("data-file-name");
             info.size = img.getAttribute("data-file-size") * 1;
         }
+
+        // method bind
+        info.delete = this.plugins.image.destroy.bind(this, img);
+        info.select = function () {
+            img.scrollIntoView(true);
+            this._w.setTimeout(function () {
+                this.plugins.image.onModifyMode.call(this, img, this.plugins.resizing.call_controller_resize.call(this, img, 'image'));
+            }.bind(this));
+        }.bind(this);
 
         img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
         img.setAttribute('data-origin', img.offsetWidth + ',' + img.offsetHeight);

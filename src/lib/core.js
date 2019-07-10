@@ -3288,9 +3288,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
         }
     };
 
-    /** excute history function */
-    core.history = _history(core, event._onChange_historyStack);
-
     /** add event listeners */
     /** toolbar event */
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
@@ -3353,8 +3350,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         'size': img.getAttribute('data-file-size') || 0
                     });
                 }
+
+                /** excute history function */
+                this.history = _history(this, event._onChange_historyStack);
             }.bind(core));
         });
+    } else {
+        /** excute history function */
+        core.history = _history(core, event._onChange_historyStack);
     }
 
     return userFunction;

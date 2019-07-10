@@ -281,7 +281,7 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
     } else {
         if (state === 'create') {
             const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
-            imageList.unshift(image)
+            imageList.push(image)
         } else {
             imageList.splice(findIndex(imageList, index), 1)
         }

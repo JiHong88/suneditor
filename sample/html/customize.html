@@ -246,7 +246,7 @@ function sun_create () {
         } else {
             if (state === 'create') {
                 const image = editor.getImagesInfo()[findIndex(editor.getImagesInfo(), index)]
-                imageList.unshift(image)
+                imageList.push(image)
             } else {
                 imageList.splice(findIndex(imageList, index), 1)
             }
