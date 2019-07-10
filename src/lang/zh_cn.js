@@ -11,7 +11,7 @@
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?
             factory(global, true) :
-            function(w) {
+            function (w) {
                 if (!w.document) {
                     throw new Error('SUNEDITOR_LANG a window with a document');
                 }
@@ -65,8 +65,8 @@
             tag_p: '段落格式',
             tag_div: '正文 (DIV)',
             tag_h: '标题',
-            tag_quote: '引用',
-            pre: '代码'
+            tag_blockquote: '引用',
+            tag_pre: '代码'
         },
         dialogBox: {
             linkBox: {

@@ -14,7 +14,7 @@
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?
             factory(global, true) :
-            function(w) {
+            function (w) {
                 if (!w.document) {
                     throw new Error('SUNEDITOR_LANG a window with a document');
                 }
@@ -68,8 +68,8 @@
             tag_p: 'Paragraph',
             tag_div: 'Normal (DIV)',
             tag_h: 'Overskrift',
-            tag_quote: 'Citer',
-            pre: 'Code'
+            tag_blockquote: 'Citer',
+            tag_pre: 'Code'
         },
         dialogBox: {
             linkBox: {

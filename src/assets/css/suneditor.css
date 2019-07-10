@@ -208,6 +208,8 @@
 .sun-editor .se-list-layer .se-list-format {width:175px;}
 .sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list {height:auto; min-height:32px; line-height:100%;}
+.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
+.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
 .sun-editor .se-list-layer .se-list-format p {font-size:13px; margin:0; padding:0;}
 .sun-editor .se-list-layer .se-list-format div {font-size:13px; margin:0; padding:0;}
 .sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; margin:0; padding:0; color:#333;}

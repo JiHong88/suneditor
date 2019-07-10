@@ -32,31 +32,28 @@ export default {
     },
 
     setSubmenu: function () {
-        const lang = this.lang;
+        const option = this.context.option;
+        const lang_toolbar = this.lang.toolbar;
         const listDiv = this.util.createElement('DIV');
+        const formatList = !option.formats || option.formats.length === 0 ? ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] : option.formats;
 
         listDiv.className = 'se-submenu se-list-layer';
-        listDiv.innerHTML = '' +
-            '<div class="se-list-inner">' +
-            '   <ul class="se-list-basic se-list-format">' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="P" title="' + lang.toolbar.tag_p + '"><p>' + lang.toolbar.tag_p + '</p></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="DIV" title="' + lang.toolbar.tag_div + '"><div>' + lang.toolbar.tag_div + '</div></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="range" data-value="BLOCKQUOTE" title="' + lang.toolbar.tag_quote + '">' +
-            '               <blockquote class="quote_ex">' + lang.toolbar.tag_quote + '</blockquote>' +
-            '           </button>' +
-            '       </li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="range" data-value="PRE" title="' + lang.toolbar.pre + '">' +
-            '               <pre class="pre_ex">' + lang.toolbar.pre + '</pre>' +
-            '           </button>' +
-            '       </li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H1" title="' + lang.toolbar.tag_h + ' 1" style="height:40px;"><h1>' + lang.toolbar.tag_h + ' 1</h1></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H2" title="' + lang.toolbar.tag_h + ' 2" style="height:34px;"><h2>' + lang.toolbar.tag_h + ' 2</h2></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H3" title="' + lang.toolbar.tag_h + ' 3" style="height:26px;"><h3>' + lang.toolbar.tag_h + ' 3</h3></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H4" title="' + lang.toolbar.tag_h + ' 4" style="height:23px;"><h4>' + lang.toolbar.tag_h + ' 4</h4></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H5" title="' + lang.toolbar.tag_h + ' 5" style="height:19px;"><h5>' + lang.toolbar.tag_h + ' 5</h5></button></li>' +
-            '       <li><button type="button" class="se-btn-list" data-command="replace" data-value="H6" title="' + lang.toolbar.tag_h + ' 6" style="height:15px;"><h6>' + lang.toolbar.tag_h + ' 6</h6></button></li>' +
-            '   </ul>' +
-            '</div>';
+
+        let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
+            for (let i = 0, len = formatList.length, format, command, title, h; i < len; i++) {
+                format = formatList[i].toLowerCase();
+                command = format === 'pre' || format === 'blockquote' ? 'range' : 'replace';
+                h = /^h/.test(format) ? format.match(/\d+/)[0] : '';
+                title = lang_toolbar['tag_' + (h ? 'h' : format)] + h;
+
+                list += '<li>' +
+                    '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + format + '" title="' + title + '">' +
+                    '<' + format + '>' + title + '</' + format + '>' +
+                    '</button></li>';
+            }
+            list += '</ul></div>';
+
+        listDiv.innerHTML = list;
 
         return listDiv;
     },
@@ -163,7 +160,7 @@ export default {
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
                 
-                if (node.nodeName !== value && !this.util.isComponent(node)) {
+                if (node.nodeName.toLowerCase() !== value.toLowerCase() && !this.util.isComponent(node)) {
                     newFormat = this.util.createElement(value);
                     newFormat.innerHTML = node.innerHTML;
                     node.parentNode.insertBefore(newFormat, node);

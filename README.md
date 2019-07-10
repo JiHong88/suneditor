@@ -284,6 +284,10 @@ fontSize        : Change default font-size array.                   default: [..
                   Default value: [
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
+formats         : Change default formatBlock array.                 default: [...] {Array}
+                  Default value: [
+                      'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+                  ]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
                     '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000',

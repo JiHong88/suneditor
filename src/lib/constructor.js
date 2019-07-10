@@ -39,9 +39,10 @@ const _Constructor = {
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        // font, size, color list
+        // font, size, formats, color list
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
+        options.formats = options.formats || null;
         options.colorList = options.colorList || null;
         // images
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;

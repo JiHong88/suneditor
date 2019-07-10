@@ -11,7 +11,7 @@
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?
             factory(global, true) :
-            function(w) {
+            function (w) {
                 if (!w.document) {
                     throw new Error('SUNEDITOR_LANG a window with a document');
                 }
@@ -65,8 +65,8 @@
             tag_p: '본문',
             tag_div: '기본 (DIV)',
             tag_h: '제목',
-            tag_quote: '인용문',
-            pre: '코드'
+            tag_blockquote: '인용문',
+            tag_pre: '코드'
         },
         dialogBox: {
             linkBox: {
