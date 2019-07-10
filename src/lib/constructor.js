@@ -39,6 +39,8 @@ const _Constructor = {
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        options.maxCharCount = /^\d+$/.test(options.maxCharCount) ? options.maxCharCount * 1 : null;
+        options.charCounter = options.maxCharCount > 0 ? true : options.charCounter;
         // font, size, formats, color list
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
@@ -121,6 +123,25 @@ const _Constructor = {
         textarea.style.height = options.height;
         textarea.style.minHeight = options.minHeight;
         textarea.style.maxHeight = options.maxHeight;
+
+        /** char counter */
+        let char_counter_wrapper = null;
+        let char_counter = null;
+        if (options.charCounter) {
+            char_counter_wrapper = doc.createElement('DIV');
+            char_counter_wrapper.className = 'se-char-counter-wrapper';
+
+            char_counter = doc.createElement('SPAN');
+            char_counter.className = 'se-char-counter';
+            char_counter.textContent = '0';
+            char_counter_wrapper.appendChild(char_counter);
+
+            if (options.maxCharCount > 0) {
+                const char_max = doc.createElement('SPAN');
+                char_max.textContent = ' / ' + options.maxCharCount;
+                char_counter_wrapper.appendChild(char_max);
+            }
+        }
     
         /** resize bar */
         let resizing_bar = null;
@@ -145,12 +166,15 @@ const _Constructor = {
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
+        if (char_counter_wrapper) {
+            editor_div.appendChild(char_counter_wrapper);
+        }
+        
         relative.appendChild(tool_bar.element);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
-
         if (resizing_bar) {
             resizing_bar.appendChild(navigation);
             relative.appendChild(resizing_bar);
@@ -166,6 +190,7 @@ const _Constructor = {
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
+                _charCounter: char_counter,
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
                 _loading: loading_box,

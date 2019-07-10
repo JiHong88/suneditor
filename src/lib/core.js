@@ -2239,6 +2239,25 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
+         * @description todo
+         */
+        checkCharCount: function () {
+            const charCounter = context.element.charCounter;
+            if (!charCounter) return;
+            
+            const length = context.element.wysiwyg.textContent.length;
+            const maxCharCount = context.option.maxCharCount;
+
+            charCounter.textContent = length;
+
+            if (length > maxCharCount) {
+                return false;
+            }
+
+            return true;
+        },
+
+        /**
          * @description Correct the value of the images information array(core._variable._imagesInfo) by comparing the images tag of the editor.
          * @private
          */
@@ -2921,6 +2940,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
+            // @todo
+            core.checkCharCount();
+
             if (userFunction.onKeyDown) userFunction.onKeyDown(e);
         },
 
@@ -3098,6 +3120,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 e.stopPropagation();
                 e.preventDefault();
             }
+
+            core.checkCharCount();
         },
 
         _onChange_historyStack: function () {
@@ -3359,6 +3383,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /** excute history function */
         core.history = _history(core, event._onChange_historyStack);
     }
+
+    core.checkCharCount();
 
     return userFunction;
 }

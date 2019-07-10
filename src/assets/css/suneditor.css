@@ -257,6 +257,10 @@
 .sun-editor .se-wrapper .se-wrapper-inner:focus {outline:none;}
 .sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:0; margin:0;}
 
+/** char counter */
+.sun-editor .se-wrapper .se-char-counter-wrapper {position:absolute; display:block; width:auto; height:auto; bottom:0px; right:4px; background:transparent; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
+.sun-editor .se-wrapper .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
+
 /** --- resize bar */
 .sun-editor .se-resizing-bar {width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 8px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
