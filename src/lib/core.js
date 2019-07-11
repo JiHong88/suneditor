@@ -365,7 +365,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Element} startCon - The startContainer property of the selection object.
          * @param {Number} startOff - The startOffset property of the selection object.
          * @param {Element} endCon - The endContainer property of the selection object.
-         * @param {Element} endOff - The endOffset property of the selection object.
+         * @param {Number} endOff - The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
@@ -2239,20 +2239,25 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description todo
+         * @description The current number of characters is counted and displayed.
+         * @param {Number} nextCharCount - 
+         * @private
          */
-        checkCharCount: function () {
+        _charCount: function (nextCharCount) {
             const charCounter = context.element.charCounter;
-            if (!charCounter) return;
-            
-            const length = context.element.wysiwyg.textContent.length;
+            if (!charCounter) return true;
+            if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
+
             const maxCharCount = context.option.maxCharCount;
-
-            charCounter.textContent = length;
-
-            if (length > maxCharCount) {
-                return false;
+            if (maxCharCount > 0) {
+                if ((context.element.wysiwyg.textContent.length + nextCharCount) > maxCharCount) {
+                    return false;
+                }
             }
+
+            _w.setTimeout(function () {
+                charCounter.textContent = context.element.wysiwyg.textContent.length;
+            });
 
             return true;
         },
@@ -2274,7 +2279,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
      */
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreRegExp: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _keyCodeShortcut: {
             65: 'A',
@@ -2940,8 +2945,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            // @todo
-            core.checkCharCount();
+            if (!core._charCount(1)) {
+                if (e.key.length === 1 && !ctrl && !alt) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
 
             if (userFunction.onKeyDown) userFunction.onKeyDown(e);
         },
@@ -2990,7 +3000,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
 
             // history stack
-            if (!event._historyIgnoreRegExp.test(keyCode)) {
+            if (!event._historyIgnoreKeycode.test(keyCode)) {
                 core.history.push();
             }
         },
@@ -3001,19 +3011,39 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onDrop_wysiwyg: function (e) {
-            const files = e.dataTransfer.files;
+            if (!e.dataTransfer) return true;
 
+            // files
+            const files = e.dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
                 e.stopPropagation();
                 e.preventDefault();
                 
-                core.focus();
-    
+                const range = core.getRange();
+                core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+
                 core.callPlugin('image', function () {
                     context.image.imgInputFile.files = files;
                     core.plugins.image.onRender_imgInput.call(core);
                     context.image.imgInputFile.files = null;
                 });
+            // check char count
+            } else if (!core._charCount(e.dataTransfer.getData('text/plain').length)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            // html paste
+            } else {
+                const cleanData = util.cleanHTML(e.dataTransfer.getData('text/html'));
+                if (cleanData) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const range = core.getRange();
+                    core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                    
+                    core.execCommand('insertHTML', false, cleanData);
+                }
             }
 
             if (userFunction.onDrop) userFunction.onDrop(e);
@@ -3113,15 +3143,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
         onPaste_wysiwyg: function (e) {
             if (!e.clipboardData) return true;
 
+            if (!core._charCount(e.clipboardData.getData('text/plain').length)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
-            
             if (cleanData) {
                 core.execCommand('insertHTML', false, cleanData);
                 e.stopPropagation();
                 e.preventDefault();
             }
-
-            core.checkCharCount();
         },
 
         _onChange_historyStack: function () {
@@ -3213,7 +3246,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         insertHTML: function (html) {
             if (!html.nodeType || html.nodeType !== 1) {
-                const template = util.createElement('template');
+                const template = util.createElement('DIV');
                 template.innerHTML = html;
                 html = template.firstChild || template.content.firstChild;
             }
@@ -3384,7 +3417,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         core.history = _history(core, event._onChange_historyStack);
     }
 
-    core.checkCharCount();
+    core._charCount(0);
 
     return userFunction;
 }

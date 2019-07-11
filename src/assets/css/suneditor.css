@@ -127,6 +127,16 @@
 
 /** button */
 .sun-editor button {color:#000;}
+
+/** --- se-btn button */
+.sun-editor .se-btn {float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; padding:0; font-size:12px; line-height:27px;}
+.sun-editor .se-btn:enabled:hover, .sun-editor .se-btn:enabled:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
+.sun-editor .se-btn:enabled:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+/** --- primary button */
+.sun-editor .se-btn-primary {color:#000; background-color:#c7deff; border:1px solid #80bdff; border-radius:2px;}
+.sun-editor .se-btn-primary:hover, .sun-editor .se-btn-primary:focus {color:#000; background-color:#80bdff; border-color:#3f9dff; outline:0 none;}
+.sun-editor .se-btn-primary:active {color:#fff; background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
+
 /* se-btn button active*/
 .sun-editor .se-btn:enabled.active {color:#4592ff; outline:0 none;}
 .sun-editor .se-btn:enabled.active:hover, .sun-editor .se-btn:enabled.active:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
@@ -136,17 +146,7 @@
 .sun-editor .se-btn:enabled.on:hover, .sun-editor .se-btn:enabled.on:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
 .sun-editor .se-btn:enabled.on:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
 /* disabled buttons, icon blur */
-.sun-editor .se-btn:disabled, .sun-editor .se-btn:disabled *, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
-
-/** --- primary button */
-.sun-editor .se-btn-primary {color:#000; background-color:#c7deff; border:1px solid #80bdff; border-radius:2px;}
-.sun-editor .se-btn-primary:hover, .sun-editor .se-btn-primary:focus {color:#000; background-color:#80bdff; border-color:#3f9dff; outline:0 none;}
-.sun-editor .se-btn-primary:active {color:#fff; background-color:#3f9dff; border-color:#4592ff; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
-
-/** --- common button */
-.sun-editor .se-btn {float:left; width:35px; height:35px; border:0; border-radius:2px; margin:1px !important; padding:0; font-size:12px; line-height:27px;}
-.sun-editor .se-btn:enabled:hover, .sun-editor .se-btn:enabled:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
-.sun-editor .se-btn:enabled:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
+.sun-editor .se-btn:disabled, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
 
 /** --- form control */
 .sun-editor .se-input-control {display:inline-block; width:70px; height:34px; font-size:14px; text-align:center; line-height:1.42857143; color:#555; background-color:#fff; background-image:none; border:1px solid #ccc; border-radius:2px; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
@@ -258,7 +258,7 @@
 .sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:0; margin:0;}
 
 /** char counter */
-.sun-editor .se-wrapper .se-char-counter-wrapper {position:absolute; display:block; width:auto; height:auto; bottom:0px; right:4px; background:transparent; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
+.sun-editor .se-wrapper .se-char-counter-wrapper {position:absolute; display:block; width:auto; height:auto; bottom:0px; right:20px; background:transparent; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 .sun-editor .se-wrapper .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
 
 /** --- resize bar */

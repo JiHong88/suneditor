@@ -45,10 +45,10 @@ export default function (core, change) {
             if (redo) redo.removeAttribute('disabled');
         }
 
-        // onChange
         core._checkImages();
-        change();
-        core.checkCharCount();
+        core._charCount(0);
+        // onChange
+        change(0);
     }
 
     function pushStack () {
