@@ -2248,16 +2248,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (!charCounter) return true;
             if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
 
+            _w.setTimeout(function () {
+                charCounter.textContent = context.element.wysiwyg.textContent.length;
+            });
+
             const maxCharCount = context.option.maxCharCount;
             if (maxCharCount > 0) {
                 if ((context.element.wysiwyg.textContent.length + nextCharCount) > maxCharCount) {
                     return false;
                 }
             }
-
-            _w.setTimeout(function () {
-                charCounter.textContent = context.element.wysiwyg.textContent.length;
-            });
 
             return true;
         },
@@ -3010,45 +3010,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (userFunction.onScroll) userFunction.onScroll(e);
         },
 
-        onDrop_wysiwyg: function (e) {
-            if (!e.dataTransfer) return true;
-
-            // files
-            const files = e.dataTransfer.files;
-            if (files.length > 0 && core.plugins.image) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                const range = core.getRange();
-                core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-
-                core.callPlugin('image', function () {
-                    context.image.imgInputFile.files = files;
-                    core.plugins.image.onRender_imgInput.call(core);
-                    context.image.imgInputFile.files = null;
-                });
-            // check char count
-            } else if (!core._charCount(e.dataTransfer.getData('text/plain').length)) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            // html paste
-            } else {
-                const cleanData = util.cleanHTML(e.dataTransfer.getData('text/html'));
-                if (cleanData) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    
-                    const range = core.getRange();
-                    core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-                    
-                    core.execCommand('insertHTML', false, cleanData);
-                }
-            }
-
-            if (userFunction.onDrop) userFunction.onDrop(e);
-        },
-
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
 
@@ -3141,20 +3102,66 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onPaste_wysiwyg: function (e) {
-            if (!e.clipboardData) return true;
+            const clipboardData = e.clipboardData;
+            if (!clipboardData) return true;
 
-            if (!core._charCount(e.clipboardData.getData('text/plain').length)) {
+            if (!core._charCount(clipboardData.getData('text/plain').length)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
 
-            const cleanData = util.cleanHTML(e.clipboardData.getData('text/html'));
+            const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
             if (cleanData) {
-                core.execCommand('insertHTML', false, cleanData);
                 e.stopPropagation();
                 e.preventDefault();
+                core.execCommand('insertHTML', false, cleanData);
             }
+        },
+
+        onDropOver_wysiwyg: function (e) {
+            e.preventDefault();
+        },
+
+        onDrop_wysiwyg: function (e) {
+            const dataTransfer = e.dataTransfer;
+            if (!dataTransfer) return true;
+
+            // files
+            const files = dataTransfer.files;
+            if (files.length > 0 && core.plugins.image) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                // @todo
+                const range = core.getRange();
+                core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+
+                core.callPlugin('image', function () {
+                    context.image.imgInputFile.files = files;
+                    core.plugins.image.onRender_imgInput.call(core);
+                    context.image.imgInputFile.files = null;
+                });
+            // check char count
+            } else if (!core._charCount(dataTransfer.getData('text/plain').length)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            // html paste
+            } else {
+                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'));
+                if (cleanData) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const range = core.getRange();
+                    core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                    
+                    core.execCommand('insertHTML', false, cleanData);
+                }
+            }
+
+            if (userFunction.onDrop) userFunction.onDrop(e);
         },
 
         _onChange_historyStack: function () {
@@ -3355,8 +3362,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('dragover', event.onDropOver_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     /** Events are registered only when there is a table plugin.  */
     if (core.plugins.table) {
         context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
