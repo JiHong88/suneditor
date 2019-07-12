@@ -1,12 +1,13 @@
 # [SunEditor](http://suneditor.com)
 Pure javscript based WYSIWYG web editor, with no dependencies
 
-[![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
-[![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg)](https://github.com/JiHong88/SunEditor/releases)
-[![npm version](https://img.shields.io/npm/v/suneditor.svg)](https://nodei.co/npm/suneditor/)
-[![bower version](https://img.shields.io/bower/v/suneditor.svg)](https://github.com/JiHong88/SunEditor/releases/latest)
-![npm](https://img.shields.io/npm/dt/suneditor.svg)
-![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg)
+[![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
+[![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
+[![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
+[![bower version](https://img.shields.io/bower/v/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases/latest)
+[![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
+![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)
+![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
 > - Clean paste from Word and Excel.
@@ -16,30 +17,41 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png)
 
+> #### Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+
 #### Browser Support
 
 | <img src="http://suneditor.com/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="http://suneditor.com/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="http://suneditor.com/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="http://suneditor.com/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="http://suneditor.com/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge | <img src="http://suneditor.com/docs/explorer-64.png" alt="Explorer" width="16px" height="16px" /> Internet Explorer |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 | Yes | Yes | Yes | Yes | Yes | 11+ |
 
-#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
-
+## Install
 #### npm
 ``` sh
 $ npm install --save suneditor
 ```
-
 #### bower
 ``` sh
 $ bower install --save suneditor
 ```
+#### cdn
+``` html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<!-- languages (Basic Language: English/en) -->
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
+```
+[jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
 
-## <a href="http://suneditor.com/sample/html/getting-started.html" target="_blank">Getting Started</a>
+[jsdelivr/suneditor-languages-list](https://www.jsdelivr.com/package/npm/suneditor?path=src%2Flang)
+
+
+## Getting Started
 ### 1. Include
 ```html
-<!-- <link href="../src/assets/css/suneditor.css" rel="stylesheet" type="text/css"> -->
-<!-- <link href="../src/assets/css/suneditor-contents.css" rel="stylesheet" type="text/css"> -->
-<link href="../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
+<!-- <link rel="stylesheet" href="../src/assets/css/suneditor.css" rel="stylesheet"> -->
+<!-- <link  rel="stylesheet" href="../src/assets/css/suneditor-contents.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="../dist/css/suneditor.min.css">
 <script src="../dist/suneditor.min.js"></script>
 <script src="../src/lang/ko.js"></script>
 ```

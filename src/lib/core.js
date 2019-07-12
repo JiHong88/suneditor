@@ -2946,7 +2946,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
 
             if (!core._charCount(1)) {
-                if (e.key.length === 1 && !ctrl && !alt) {
+                if (!ctrl && !alt && /^(Key[a-zA-Z]|Digit[0-9]|Numpad[0-9])$/i.test(e.code)) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
@@ -3119,10 +3119,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
         },
 
-        onDropOver_wysiwyg: function (e) {
-            e.preventDefault();
-        },
-
         onDrop_wysiwyg: function (e) {
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
@@ -3130,13 +3126,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             // files
             const files = dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                // @todo
-                const range = core.getRange();
-                core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-
+                event._setDropLocationSelection(e);
                 core.callPlugin('image', function () {
                     context.image.imgInputFile.files = files;
                     core.plugins.image.onRender_imgInput.call(core);
@@ -3151,17 +3141,21 @@ export default function (context, pluginCallButtons, plugins, lang) {
             } else {
                 const cleanData = util.cleanHTML(dataTransfer.getData('text/html'));
                 if (cleanData) {
-                    e.stopPropagation();
-                    e.preventDefault();
-
-                    const range = core.getRange();
-                    core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-                    
+                    event._setDropLocationSelection(e);
                     core.execCommand('insertHTML', false, cleanData);
                 }
             }
 
             if (userFunction.onDrop) userFunction.onDrop(e);
+        },
+
+        _setDropLocationSelection: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // @todo
+            const range = core.getRange();
+            core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
         },
 
         _onChange_historyStack: function () {
@@ -3363,7 +3357,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('dragover', event.onDropOver_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
     /** Events are registered only when there is a table plugin.  */
     if (core.plugins.table) {
