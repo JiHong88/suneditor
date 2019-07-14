@@ -31,7 +31,7 @@ const _Constructor = {
         // bottom resizing bar
         options.resizingBar = /inline|balloon/i.test(options.mode) ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
-        options.maxCharCount = /^\d+$/.test(options.maxCharCount) ? options.maxCharCount * 1 : null;
+        options.maxCharCount = /^\d+$/.test(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         // popup, editor display
         options.popupDisplay = options.popupDisplay || 'full';
