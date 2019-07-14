@@ -329,8 +329,10 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     width: '100%',
     stickyToolbar: false,
     popupDisplay: 'local',
-    maxCharCount: 300,
-    resizingBar: false
+    // maxCharCount: 300,
+    // resizingBar: false
+    // showPathLabel:false
+    charCounter: true
 });
 window.sun_destroy3 = function () {
     s3.destroy();

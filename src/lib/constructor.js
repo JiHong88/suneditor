@@ -31,6 +31,8 @@ const _Constructor = {
         // bottom resizing bar
         options.resizingBar = /inline|balloon/i.test(options.mode) ? false : options.resizingBar === undefined ? true : options.resizingBar;
         options.showPathLabel = typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        options.maxCharCount = /^\d+$/.test(options.maxCharCount) ? options.maxCharCount * 1 : null;
+        options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         // popup, editor display
         options.popupDisplay = options.popupDisplay || 'full';
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
@@ -39,8 +41,6 @@ const _Constructor = {
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        options.maxCharCount = /^\d+$/.test(options.maxCharCount) ? options.maxCharCount * 1 : null;
-        options.charCounter = options.maxCharCount > 0 ? true : options.charCounter;
         // font, size, formats, color list
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
@@ -124,35 +124,38 @@ const _Constructor = {
         textarea.style.minHeight = options.minHeight;
         textarea.style.maxHeight = options.maxHeight;
 
-        /** char counter */
-        let char_counter_wrapper = null;
-        let char_counter = null;
-        if (options.charCounter) {
-            char_counter_wrapper = doc.createElement('DIV');
-            char_counter_wrapper.className = 'se-char-counter-wrapper';
-
-            char_counter = doc.createElement('SPAN');
-            char_counter.className = 'se-char-counter';
-            char_counter.textContent = '0';
-            char_counter_wrapper.appendChild(char_counter);
-
-            if (options.maxCharCount > 0) {
-                const char_max = doc.createElement('SPAN');
-                char_max.textContent = ' / ' + options.maxCharCount;
-                char_counter_wrapper.appendChild(char_max);
-            }
-        }
-    
         /** resize bar */
         let resizing_bar = null;
+        let navigation = null;
+        let char_counter = null;
         if (options.resizingBar) {
             resizing_bar = doc.createElement('DIV');
             resizing_bar.className = 'se-resizing-bar sun-editor-common';
-        }
+
+            /** navigation */
+            navigation = doc.createElement('DIV');
+            navigation.className = 'se-navigation sun-editor-common';
+            resizing_bar.appendChild(navigation);
+
+            /** char counter */
+            if (options.charCounter) {
+                const charWrapper = doc.createElement('DIV');
+                charWrapper.className = 'se-char-counter-wrapper';
     
-        /** navigation */
-        const navigation = doc.createElement('DIV');
-        navigation.className = 'se-navigation sun-editor-common';
+                char_counter = doc.createElement('SPAN');
+                char_counter.className = 'se-char-counter';
+                char_counter.textContent = '0';
+                charWrapper.appendChild(char_counter);
+    
+                if (options.maxCharCount > 0) {
+                    const char_max = doc.createElement('SPAN');
+                    char_max.textContent = ' / ' + options.maxCharCount;
+                    charWrapper.appendChild(char_max);
+                }
+
+                resizing_bar.appendChild(charWrapper);
+            }
+        }
     
         /** loading box */
         const loading_box = doc.createElement('DIV');
@@ -166,20 +169,14 @@ const _Constructor = {
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
-        if (char_counter_wrapper) {
-            editor_div.appendChild(char_counter_wrapper);
-        }
-        
         relative.appendChild(tool_bar.element);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
         if (resizing_bar) {
-            resizing_bar.appendChild(navigation);
             relative.appendChild(resizing_bar);
         }
-        
         top_div.appendChild(relative);
     
         return {
@@ -190,9 +187,9 @@ const _Constructor = {
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
-                _charCounter: char_counter,
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
+                _charCounter: char_counter,
                 _loading: loading_box,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,

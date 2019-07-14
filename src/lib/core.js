@@ -3153,7 +3153,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             e.stopPropagation();
             e.preventDefault();
             
-            // @todo
             const range = core.getRange();
             core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
         },

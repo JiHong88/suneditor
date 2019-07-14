@@ -274,10 +274,14 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
+--resizing bar-----------------------------------------------------------------------------------------------------
 resizingBar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
 showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
-popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
+charCounter     : Shows the number of characters in the editor.     
+                  If the maxCharCount option has a value, it becomes true. default: false {Boolean}
+maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
 --contents---------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}
 width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
@@ -286,9 +290,6 @@ minHeight       : The min-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
 maxHeight       : The max-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
-charCounter     : Shows the number of characters in the editor.     
-                  If the maxCharCount option has a value, it becomes true. default: false {Boolean}
-maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
 --Defining menu items---------------------------------------------------------------------------------------------
 font            : Change default font-family array.                 default: [...] {Array}
                   Default value: [

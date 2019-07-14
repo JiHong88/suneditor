@@ -257,15 +257,16 @@
 .sun-editor .se-wrapper .se-wrapper-inner:focus {outline:none;}
 .sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:0; margin:0;}
 
-/** char counter */
-.sun-editor .se-wrapper .se-char-counter-wrapper {position:absolute; display:block; width:auto; height:auto; bottom:0px; right:20px; background:transparent; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
-.sun-editor .se-wrapper .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
 
-/** --- resize bar */
-.sun-editor .se-resizing-bar {width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 8px; background-color:#fafafa; cursor:ns-resize;}
+/** --- resizing bar */
+.sun-editor .se-resizing-bar {display:flex; width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 4px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
-.sun-editor .se-resizing-bar .se-navigation {position:relative; width:auto; height:auto; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5;}
 .sun-editor .se-resizing-bar .se-resizing-back {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+/** resizing bar - nabigation */
+.sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
+/** resizing bar - char counter */
+.sun-editor .se-resizing-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; font-size:10px; background:transparent;}
+.sun-editor .se-resizing-bar .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
 
 /* --- dialog ---------------------------------------------------------- */
 .sun-editor .se-dialog {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
