@@ -179,7 +179,7 @@
 .sun-editor .se-menu-list li {position:relative; float:left; padding:0; margin:0;}
 /* tool bar select button (font, fontSize, formatBlock) */
 .sun-editor .se-btn-select {width:auto; display:flex; text-align:left; padding:4px 6px;}
-.sun-editor .se-btn-select .txt {flex:5; float:left;}
+.sun-editor .se-btn-select .txt {flex:5; float:left; text-align:left;}
 .sun-editor .se-btn-select .se-icon-arrow-down {flex:1; float:right;}
 .sun-editor .se-btn-select.se-btn-tool-font {width:100px;}
 .sun-editor .se-btn-select.se-btn-tool-format {width:80px;}
