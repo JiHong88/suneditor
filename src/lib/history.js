@@ -46,7 +46,7 @@ export default function (core, change) {
         }
 
         core._checkImages();
-        core._charCount(0);
+        core._charCount(0, false);
         // onChange
         change(0);
     }

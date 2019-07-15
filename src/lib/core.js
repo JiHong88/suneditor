@@ -2243,18 +2243,42 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Number} nextCharCount Length of character to be added.
          * @private
          */
-        _charCount: function (nextCharCount) {
+        _charCount: function (nextCharCount, blink) {
             const charCounter = context.element.charCounter;
             if (!charCounter) return true;
             if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
+
+            const maxCharCount = context.option.maxCharCount;
 
             _w.setTimeout(function () {
                 charCounter.textContent = context.element.wysiwyg.textContent.length;
             });
 
-            const maxCharCount = context.option.maxCharCount;
             if (maxCharCount > 0) {
-                if ((context.element.wysiwyg.textContent.length + nextCharCount) > maxCharCount) {
+                let over = false;
+                const count = context.element.wysiwyg.textContent.length;
+                
+                if (count > maxCharCount) {
+                    core._editorRange();
+                    const range = core.getRange();
+                    const endOff = range.endOffset - 1;
+                    const text = core.getSelectionNode().textContent;
+
+                    core.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
+                    core.setRange(range.endContainer, endOff, range.endContainer, endOff);
+                    over = true;
+                } else if ((count + nextCharCount) > maxCharCount) {
+                    over = true;
+                }
+
+                if (over) {
+                    if (blink && !util.hasClass(charCounter, 'se-blink')) {
+                        util.addClass(charCounter, 'se-blink');
+                        _w.setTimeout(function () {
+                            util.removeClass(charCounter, 'se-blink');
+                        }, 600);
+                    }
+
                     return false;
                 }
             }
@@ -2279,7 +2303,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
      */
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|9[1-3]|11[2-9]|12[0-3]|144|145)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _keyCodeShortcut: {
             65: 'A',
@@ -2945,8 +2969,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 }
             }
 
-            if (!core._charCount(1)) {
-                if (!ctrl && !alt && /^(Key[a-zA-Z]|Digit[0-9]|Numpad[0-9])$/i.test(e.code)) {
+            const textKey = !ctrl && !alt && e.key.length === 1;
+            if (!core._charCount(1, textKey)) {
+                if (textKey) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
@@ -2997,12 +3022,20 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             core._checkImages();
 
-            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
+            if (!core._charCount(1, e.key.length === 1)) {
+                if (e.key.length === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
 
             // history stack
             if (!event._historyIgnoreKeycode.test(keyCode)) {
                 core.history.push();
             }
+
+            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
         },
 
         onScroll_wysiwyg: function (e) {
@@ -3105,7 +3138,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             const clipboardData = e.clipboardData;
             if (!clipboardData) return true;
 
-            if (!core._charCount(clipboardData.getData('text/plain').length)) {
+            if (!core._charCount(clipboardData.getData('text/plain').length, true)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -3133,7 +3166,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     context.image.imgInputFile.files = null;
                 });
             // check char count
-            } else if (!core._charCount(dataTransfer.getData('text/plain').length)) {
+            } else if (!core._charCount(dataTransfer.getData('text/plain').length, true)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -3417,7 +3450,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         core.history = _history(core, event._onChange_historyStack);
     }
 
-    core._charCount(0);
+    core._charCount(0, false);
 
     return userFunction;
 }
