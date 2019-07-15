@@ -10,9 +10,10 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
-> - Clean paste from Word and Excel.
+> - Pasting from Microsoft Word and Excel.
+> - Drag&drop image uploads.
+> - Custom table selection.
 > - Media embeds.
-> - Edit a table.
 > - And.. many other features :)
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png)

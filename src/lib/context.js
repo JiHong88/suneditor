@@ -9,9 +9,9 @@
 
 /**
  * @description Elements and variables you should have
- * @param {HTMLElement} element - textarea element
- * @param {object} cons - Toolbar element you created
- * @param {json} options - Inserted options
+ * @param {HTMLElement} element textarea element
+ * @param {object} cons Toolbar element you created
+ * @param {json} options Inserted options
  * @returns Elements, variables of the editor
  * @private
  */

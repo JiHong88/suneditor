@@ -17,7 +17,7 @@ export default {
     /**
      * @description Returns the create function with preset options.
      * If the options overlap, the options of the 'create' function take precedence.
-     * @param {Json} options - Initialization options
+     * @param {Json} options Initialization options
      * @returns {function}
      */
     init: function (init_options) {
@@ -30,8 +30,8 @@ export default {
 
     /**
      * @description Create the suneditor
-     * @param {String|Element} idOrElement - textarea Id or textarea element
-     * @param {Json} options - user options
+     * @param {String|Element} idOrElement textarea Id or textarea element
+     * @param {Json} options user options
      * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
      */
     create: function (idOrElement, options, _init_options) {

@@ -156,19 +156,19 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Elements that need to change text or className for each selection change
-         * @property {Element} FORMAT - format button > span.txt
-         * @property {Element} FONT - font family button > span.txt
-         * @property {Element} FONT_TOOLTIP - font family tooltip element
-         * @property {Element} SIZE - font size button > span.txt
-         * @property {Element} ALIGN - align button > div.icon
-         * @property {Element} LI - list button
-         * @property {Element} STRONG - bold button
-         * @property {Element} INS - underline button
-         * @property {Element} EM - italic button
-         * @property {Element} DEL - strike button
-         * @property {Element} SUB - subscript button
-         * @property {Element} SUP - superscript button
-         * @property {Element} OUTDENT - outdent button
+         * @property {Element} FORMAT format button > span.txt
+         * @property {Element} FONT font family button > span.txt
+         * @property {Element} FONT_TOOLTIP font family tooltip element
+         * @property {Element} SIZE font size button > span.txt
+         * @property {Element} ALIGN align button > div.icon
+         * @property {Element} LI list button
+         * @property {Element} STRONG bold button
+         * @property {Element} INS underline button
+         * @property {Element} EM italic button
+         * @property {Element} DEL strike button
+         * @property {Element} SUB subscript button
+         * @property {Element} SUP superscript button
+         * @property {Element} OUTDENT outdent button
          */
         commandMap: {
             FORMAT: context.tool.format,
@@ -189,13 +189,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Variables used internally in editor operation
-         * @property {Boolean} wysiwygActive - The wysiwyg frame or code view state
-         * @property {Boolean} isFullScreen - State of full screen
-         * @property {Number} innerHeight_fullScreen - InnerHeight in editor when in full screen
-         * @property {Number} resizeClientY - Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
-         * @property {Number} tabSize - Indented size when tab button clicked (4)
-         * @property {Number} minResizingSize - Minimum size of editing area when resized (65)
-         * @property {Array} currentNodes -  An array of the current cursor's node structure
+         * @property {Boolean} wysiwygActive The wysiwyg frame or code view state
+         * @property {Boolean} isFullScreen State of full screen
+         * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
+         * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
+         * @property {Number} tabSize Indented size when tab button clicked (4)
+         * @property {Number} minResizingSize Minimum size of editing area when resized (65)
+         * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
          */
         _variable: {
@@ -221,8 +221,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description If the plugin is not added, add the plugin and call the 'add' function.
          * If the plugin is added call callBack function.
-         * @param {String} pluginName - The name of the plugin to call
-         * @param {function} callBackFunction - Function to be executed immediately after module call
+         * @param {String} pluginName The name of the plugin to call
+         * @param {function} callBackFunction Function to be executed immediately after module call
          */
         callPlugin: function (pluginName, callBackFunction) {
             if (!this.plugins[pluginName]) {
@@ -237,7 +237,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description If the module is not added, add the module and call the 'add' function
-         * @param {Array} moduleArray - module object's Array [dialog, resizing]
+         * @param {Array} moduleArray module object's Array [dialog, resizing]
          */
         addModule: function (moduleArray) {
             for (let i = 0, len = moduleArray.length, moduleName; i < len; i++) {
@@ -251,7 +251,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Enabled submenu
-         * @param {Element} element - Submenu element to call
+         * @param {Element} element Submenu element to call
          */
         submenuOn: function (element) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
@@ -293,7 +293,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Show controller at editor area (link button, image resize button, init function, etc..)
-         * @param {*} arguments - controller elements, functions..
+         * @param {*} arguments controller elements, functions..
          */
         controllersOn: function () {
             if (this._bindControllersOff) this._bindControllersOff();
@@ -333,9 +333,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description javascript execCommand
-         * @param {String} command - javascript execCommand function property
-         * @param {Boolean} showDefaultUI - javascript execCommand function property
-         * @param {String} value - javascript execCommand function property
+         * @param {String} command javascript execCommand function property
+         * @param {Boolean} showDefaultUI javascript execCommand function property
+         * @param {String} value javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
             _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
@@ -362,10 +362,10 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Set current editor's range object
-         * @param {Element} startCon - The startContainer property of the selection object.
-         * @param {Number} startOff - The startOffset property of the selection object.
-         * @param {Element} endCon - The endContainer property of the selection object.
-         * @param {Number} endOff - The endOffset property of the selection object.
+         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Number} startOff The startOffset property of the selection object.
+         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Number} endOff The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
@@ -444,7 +444,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Returns a "formatElement"(P, DIV, H[1-6], LI) array from the currently selected range.
-         * @param {Function|null} validation - The validation function. (Replaces the default validation function-util.isFormatElement(current))
+         * @param {Function|null} validation The validation function. (Replaces the default validation function-util.isFormatElement(current))
          * @returns {Array}
          */
         getSelectedElements: function (validation) {
@@ -522,8 +522,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Determine if this offset is the edge offset of container
-         * @param {Object} container - The container property of the selection object.
-         * @param {Number} offset - The offset property of the selection object.
+         * @param {Object} container The container property of the selection object.
+         * @param {Number} offset The offset property of the selection object.
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
@@ -548,8 +548,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Append format element to sibling node of argument element.
          * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
          * If not, the currently selected format tag is inserted.
-         * @param {Element} element - Insert as siblings of that element
-         * @param {String|null} formatNodeName - Node name to be inserted
+         * @param {Element} element Insert as siblings of that element
+         * @param {String|null} formatNodeName Node name to be inserted
          * @returns {Element}
          */
         appendFormatTag: function (element, formatNodeName) {
@@ -570,7 +570,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * This method is add the element next line and insert the new line.
          * When used in a tag in "LI", it is inserted into the LI tag.
          * Returns the next line added.
-         * @param {Element} element - Element to be inserted
+         * @param {Element} element Element to be inserted
          * @returns {Element}
          */
         insertComponent: function (element) {
@@ -602,8 +602,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
-         * @param {Element} oNode - Element to be inserted
-         * @param {Element|null} afterNode - If the node exists, it is inserted after the node
+         * @param {Element} oNode Element to be inserted
+         * @param {Element|null} afterNode If the node exists, it is inserted after the node
          */
         insertNode: function (oNode, afterNode) {
             const range = this.getRange();
@@ -760,7 +760,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Appended all selected format Element to the argument element and insert
-         * @param {Element} rangeElement - Element of wrap the arguments (PRE, BLOCKQUOTE...)
+         * @param {Element} rangeElement Element of wrap the arguments (PRE, BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
             const rangeLines = this.getSelectedElementsAndComponents();
@@ -860,12 +860,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
          * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling}.
-         * @param {Element} rangeElement - Range format element (PRE, BLOCKQUOTE, OL, UL...)
-         * @param {Array|null} selectedFormats - Array of format elements (P, DIV, LI...) to remove.
+         * @param {Element} rangeElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
+         * @param {Array|null} selectedFormats Array of format elements (P, DIV, LI...) to remove.
          * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
-         * @param {Element|null} newRangeElement - The node(rangeElement) to replace the currently wrapped node.
-         * @param {Boolean} remove - Delete without detached.
-         * @param {Boolean} notHistory - When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+         * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
+         * @param {Boolean} remove Delete without detached.
+         * @param {Boolean} notHistory When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistory) {
             const range = this.getRange();
@@ -1002,9 +1002,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * 3. Styles such as the style property of the "styleArray" argument will be deleted.
          * 4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.
          * 5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
-         * @param {Element|null} appendNode - The element to be added to the selection. If it is null, delete the node.
-         * @param {Array|null} styleArray - The style attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
-         * @param {Array|null} removeNodeArray - An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
+         * @param {Element|null} appendNode The element to be added to the selection. If it is null, delete the node.
+         * @param {Array|null} styleArray The style attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
+         * @param {Array|null} removeNodeArray An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray) {
             const range = this.getRange();
@@ -1241,8 +1241,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Strip remove node
-         * @param {Element} element - The format node
-         * @param {Element} removeNode = The remove node
+         * @param {Element} element The format node
+         * @param {Element} removeNode The remove node
          * @private
          */
         _stripRemoveNode: function (element, removeNode) {
@@ -1258,16 +1258,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description wraps text nodes of line selected text.
-         * @param {Element} element - The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode - The dom that will wrap the selected text area
-         * @param {function} validation - Check if the node should be stripped.
-         * @param {Element} startCon - The startContainer property of the selection object.
-         * @param {Number} startOff - The startOffset property of the selection object.
-         * @param {Element} endCon - The endContainer property of the selection object.
-         * @param {Number} endOff - The endOffset property of the selection object.
-         * @param {Boolean} isRemoveFormat - Is the remove all formats command?
-         * @param {Boolean} isRemoveNode - "newInnerNode" is remove node?
-         * @param {Boolean} collapsed - range.collapsed
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Number} startOff The startOffset property of the selection object.
+         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Number} endOff The endOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+         * @param {Boolean} collapsed range.collapsed
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
@@ -1531,11 +1531,11 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description wraps mid lines selected text.
-         * @param {Element} element - The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode - The dom that will wrap the selected text area
-         * @param {function} validation - Check if the node should be stripped.
-         * @param {Boolean} isRemoveFormat - Is the remove all formats command?
-         * @param {Boolean} isRemoveNode - "newInnerNode" is remove node?
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @private
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode) {
@@ -1597,13 +1597,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description wraps first line selected text.
-         * @param {Element} element - The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode - The dom that will wrap the selected text area
-         * @param {function} validation - Check if the node should be stripped.
-         * @param {Element} startCon - The startContainer property of the selection object.
-         * @param {Number} startOff - The startOffset property of the selection object.
-         * @param {Boolean} isRemoveFormat - Is the remove all formats command?
-         * @param {Boolean} isRemoveNode - "newInnerNode" is remove node?
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Number} startOff The startOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @returns {{container: *, offset: *}}
          * @private
          */
@@ -1759,13 +1759,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description wraps last line selected text.
-         * @param {Element} element - The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode - The dom that will wrap the selected text area
-         * @param {function} validation - Check if the node should be stripped.
-         * @param {Element} endCon - The endContainer property of the selection object.
-         * @param {Number} endOff - The endOffset property of the selection object.
-         * @param {Boolean} isRemoveFormat - Is the remove all formats command?
-         * @param {Boolean} isRemoveNode - "newInnerNode" is remove node?
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Number} endOff The endOffset property of the selection object.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @returns {{container: *, offset: *}}
          * @private
          */
@@ -1926,8 +1926,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
          * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
-         * @param {Element} target - The element of command button
-         * @param {String} command - Property of command button (data-value)
+         * @param {Element} target The element of command button
+         * @param {String} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
             switch (command) {
@@ -2003,7 +2003,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description This method implements indentation to selected range.
          * Setted "margin-left" to "25px" in the top "P" tag of the parameter node.
-         * @param command {String} - Separator ("indent" or "outdent")
+         * @param {String} command Separator ("indent" or "outdent")
          */
         indent: function (command) {
             const rangeLines = this.getSelectedElements();
@@ -2076,7 +2076,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Changes to full screen or default screen
-         * @param {Element} element - full screen button
+         * @param {Element} element full screen button
          */
         toggleFullScreen: function (element) {
             const topArea = context.element.topArea;
@@ -2240,7 +2240,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description The current number of characters is counted and displayed.
-         * @param {Number} nextCharCount - 
+         * @param {Number} nextCharCount Length of character to be added.
          * @private
          */
         _charCount: function (nextCharCount) {
@@ -3167,7 +3167,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     const userFunction = {
         /**
          * @description Event functions
-         * @param {Object} event - Event Object
+         * @param {Object} event Event Object
          */
         onScroll: null,
         onClick: null,
@@ -3178,23 +3178,23 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
-         * @param {Element} targetImgElement - Current img element
-         * @param {Number} index - Uploaded index
-         * @param {Boolean} isDelete - Whether or not it was called after the delete operation
-         * @param {Object} imageInfo - Image info object
+         * @param {Element} targetImgElement Current img element
+         * @param {Number} index Uploaded index
+         * @param {Boolean} isDelete Whether or not it was called after the delete operation
+         * @param {Object} imageInfo Image info object
          */
         onImageUpload: null,
 
         /**
          * @description Called when the image is upload failed
-         * @param {String} errorMessage - Error message
-         * @param {Object} result - Result info Object
+         * @param {String} errorMessage Error message
+         * @param {Object} result Result info Object
          */
         onImageUploadError: null,
 
         /**
          * @description Open a notice area
-         * @param {String} message - Notice message
+         * @param {String} message Notice message
          */
         noticeOpen: function (message) {
             core.addModule([notice]);
@@ -3242,7 +3242,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
-         * @param {Element|String} html - HTML Element or HTML string or plain string
+         * @param {Element|String} html HTML Element or HTML string or plain string
          */
         insertHTML: function (html) {
             if (!html.nodeType || html.nodeType !== 1) {
@@ -3262,7 +3262,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Change the contents of the suneditor
-         * @param {String} contents - Contents to Input
+         * @param {String} contents Contents to Input
          */
         setContents: function (contents) {
             if (core._variable.wysiwygActive) {
@@ -3277,7 +3277,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
         /**
          * @description Add contents to the suneditor
-         * @param {String} contents - Contents to Input
+         * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
             if (core._variable.wysiwygActive) {

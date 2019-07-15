@@ -35,7 +35,7 @@ const util = {
 
     /**
      * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
-     * @param {String|Node} text - String value or Node
+     * @param {String|Node} text String value or Node
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
@@ -72,7 +72,7 @@ const util = {
 
     /**
      * @description Create Element node
-     * @param {String} elementName - Element name
+     * @param {String} elementName Element name
      * @returns {Element}
      */
     createElement: function (elementName) {
@@ -81,7 +81,7 @@ const util = {
 
     /**
      * @description Create text node
-     * @param {String} text - text contents
+     * @param {String} text text contents
      * @returns {Node}
      */
     createTextNode: function (text) {
@@ -91,8 +91,8 @@ const util = {
     /**
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
-     * @param {Array} nameArray - File name array
-     * @param {String} extension - js, css
+     * @param {Array} nameArray File name array
+     * @param {String} extension js, css
      * @returns {String}
      */
     getIncludePath: function (nameArray, extension) {
@@ -152,7 +152,7 @@ const util = {
 
     /**
      * @description Converts contents into a format that can be placed in an editor
-     * @param {String} contents - contents
+     * @param {String} contents contents
      * @returns {String}
      */
     convertContentsForEditor: function (contents) {
@@ -188,7 +188,7 @@ const util = {
 
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-     * @param {Element} wysiwygDiv - WYSIWYG element (context.element.wysiwyg)
+     * @param {Element} wysiwygDiv WYSIWYG element (context.element.wysiwyg)
      * @returns {String}
      */
     convertHTMLForCodeView: function (wysiwygDiv) {
@@ -218,7 +218,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the edit region top div element.
-     * @param {Element} element - The element to check
+     * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
@@ -228,7 +228,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the format element (P, DIV, H1-6, LI, TH, TD)
-     * @param {Element} element - The element to check
+     * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
@@ -239,7 +239,7 @@ const util = {
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
-     * @param {Element} element - The element to check
+     * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
@@ -249,7 +249,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".se-component"
-     * @param {Element} element - The element to check
+     * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
@@ -258,8 +258,8 @@ const util = {
 
     /**
      * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
-     * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
-     * @param {Function|null} validation - Additional validation function.
+     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation Additional validation function.
      * @returns {Element}
      */
     getFormatElement: function (element, validation) {
@@ -281,8 +281,8 @@ const util = {
 
     /**
      * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
-     * @param {Element} element - Reference element if null or no value, it is relative to the current focus node.
-     * @param {Function|null} validation - Additional validation function.
+     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
      */
     getRangeFormatElement: function (element, validation) {
@@ -302,8 +302,8 @@ const util = {
 
     /**
      * @description Get the index of the argument value in the element array
-     * @param {Array} array - element array
-     * @param {Element} element - The element to find index
+     * @param {Array} array element array
+     * @param {Element} element The element to find index
      * @returns {Number}
      */
     getArrayIndex: function (array, element) {
@@ -320,8 +320,8 @@ const util = {
 
     /**
      * @description Get the next index of the argument value in the element array
-     * @param {Array} array - element array
-     * @param {Element} item - The element to find index
+     * @param {Array} array element array
+     * @param {Element} item The element to find index
      * @returns {Number}
      */
     nextIdx: function (array, item) {
@@ -332,8 +332,8 @@ const util = {
 
     /**
      * @description Get the previous index of the argument value in the element array
-     * @param {Array} array - Element array
-     * @param {Element} item - The element to find index
+     * @param {Array} array Element array
+     * @param {Element} item The element to find index
      * @returns {Number}
      */
     prevIdx: function (array, item) {
@@ -344,7 +344,7 @@ const util = {
 
     /**
      * @description Returns the index compared to other sibling nodes.
-     * @param {Node} node - The Node to find index
+     * @param {Node} node The Node to find index
      * @returns {Number}
      */
     getPositionIndex: function (node) {
@@ -358,8 +358,8 @@ const util = {
     /**
      * @description Returns the position of the "node" in the "parentNode" in a numerical array.
      * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
-     * @param {Node} node - The Node to find position path
-     * @param {Element|null} parentNode - Parent node. If null, wysiwyg div area
+     * @param {Node} node The Node to find position path
+     * @param {Element|null} parentNode Parent node. If null, wysiwyg div area
      * @returns {Array}
      */
     getNodePath: function (node, parentNode) {
@@ -377,8 +377,8 @@ const util = {
 
     /**
      * @description Returns the node in the location of the path array obtained from "util.getNodePath".
-     * @param {Array} offsets - Position array, array obtained from "util.getNodePath"
-     * @param {Element} parentNode - Base parent element
+     * @param {Array} offsets Position array, array obtained from "util.getNodePath"
+     * @param {Element} parentNode Base parent element
      * @returns {Element}
      */
     getNodeFromPath: function (offsets, parentNode) {
@@ -400,7 +400,7 @@ const util = {
 
     /**
      * @description Check the node is a list (ol, ul)
-     * @param {Element|String} node - The element or element name to check
+     * @param {Element|String} node The element or element name to check
      * @returns {Boolean}
      */
     isList: function (node) {
@@ -409,7 +409,7 @@ const util = {
 
     /**
      * @description Check the node is a list cell (li)
-     * @param {Element|String} node - The element or element name to check
+     * @param {Element|String} node The element or element name to check
      * @returns {Boolean}
      */
     isListCell: function (node) {
@@ -418,7 +418,7 @@ const util = {
 
     /**
      * @description Check the node is a table (table, thead, tbody, tr, th, td)
-     * @param {Element|String} node - The element or element name to check
+     * @param {Element|String} node The element or element name to check
      * @returns {Boolean}
      */
     isTable: function (node) {
@@ -427,7 +427,7 @@ const util = {
 
     /**
      * @description Check the node is a table cell (td, th)
-     * @param {Element|String} node - The element or element name to check
+     * @param {Element|String} node The element or element name to check
      * @returns {Boolean}
      */
     isCell: function (node) {
@@ -436,7 +436,7 @@ const util = {
 
     /**
      * @description Check the node is a break node (BR)
-     * @param {Element|String} node - The element or element name to check
+     * @param {Element|String} node The element or element name to check
      * @returns {Boolean}
      */
     isBreak: function (node) {
@@ -445,8 +445,8 @@ const util = {
 
     /**
      * @description Get all child nodes of the argument value element (Without text node)
-     * @param {Element|String} element - element to get child node
-     * @param {(function|null)} validation - Conditional function
+     * @param {Element|String} element element to get child node
+     * @param {(function|null)} validation Conditional function
      * @returns {Array}
      */
     getListChildren: function (element, validation) {
@@ -470,8 +470,8 @@ const util = {
 
     /**
      * @description Get all child nodes of the argument value element (Include text nodes)
-     * @param {Element} element - element to get child node
-     * @param {(function|null)} validation - Conditional function
+     * @param {Element} element element to get child node
+     * @param {(function|null)} validation Conditional function
      * @returns {Array}
      */
     getListChildNodes: function (element, validation) {
@@ -496,7 +496,7 @@ const util = {
     /**
      * @description Returns the number of parents nodes.
      * "0" when the parent node is the WYSIWYG area.
-     * @param {Element} element - The element to check
+     * @param {Element} element The element to check
      * @returns {Number}
      */
     getElementDepth: function (element) {
@@ -515,8 +515,8 @@ const util = {
      * @description Get the parent element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
-     * @param {Node} element - Reference element
-     * @param {String|Function} query - Query String (tagName, .className, #ID, :name) or validation function.
+     * @param {Node} element Reference element
+     * @param {String|Function} query Query String (tagName, .className, #ID, :name) or validation function.
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
@@ -562,9 +562,9 @@ const util = {
      * @description Get the child element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
-     * @param {Node} element - Reference element
-     * @param {String|Function} query - Query String (tagName, .className, #ID, :name) or validation function.
-     * @param {Boolean} last - If true returns the last node among the found child nodes. (default: first node)
+     * @param {Node} element Reference element
+     * @param {String|Function} query Query String (tagName, .className, #ID, :name) or validation function.
+     * @param {Boolean} last If true returns the last node among the found child nodes. (default: first node)
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
@@ -608,8 +608,8 @@ const util = {
      * 2. The last node of all the child nodes of the "last" element is returned.
      * 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
      * { sc: "first", ec: "last" }
-     * @param {Element} first - First element
-     * @param {Element|null} last - Last element
+     * @param {Element} first First element
+     * @param {Element|null} last Last element
      * @returns {Object}
      */
     getEdgeChildNodes: function (first, last) {
@@ -627,7 +627,7 @@ const util = {
 
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
-     * @param {Element} element - Element node
+     * @param {Element} element Element node
      * @returns {Object}
      */
     getOffset: function (element) {
@@ -652,10 +652,10 @@ const util = {
     /**
      * @description It compares the start and end indexes of "a" and "b" and returns the number of overlapping indexes in the range.
      * ex) 1, 5, 4, 6 => 2 (4 ~ 5)
-     * @param {Number} aStart - Start index of "a"
-     * @param {Number} aEnd - End index of "a"
-     * @param {Number} bStart - Start index of "b"
-     * @param {Number} bEnd - Start index of "b"
+     * @param {Number} aStart Start index of "a"
+     * @param {Number} aEnd End index of "a"
+     * @param {Number} bStart Start index of "b"
+     * @param {Number} bEnd Start index of "b"
      * @returns {Number}
      */
     getOverlapRangeAtIndex: function (aStart, aEnd, bStart, bEnd) {
@@ -667,8 +667,8 @@ const util = {
 
     /**
      * @description Set the text content value of the argument value element
-     * @param {Element} element - Element to replace text content
-     * @param {String} txt - Text to be applied
+     * @param {Element} element Element to replace text content
+     * @param {String} txt Text to be applied
      */
     changeTxt: function (element, txt) {
         if (!element || !txt) return;
@@ -677,8 +677,8 @@ const util = {
 
     /**
      * @description Determine whether any of the matched elements are assigned the given class
-     * @param {Element} element - Elements to search class name
-     * @param {String} className - Class name to search for
+     * @param {Element} element Elements to search class name
+     * @param {String} className Class name to search for
      * @returns {Boolean}
      */
     hasClass: function (element, className) {
@@ -689,8 +689,8 @@ const util = {
 
     /**
      * @description Append the className value of the argument value element
-     * @param {Element} element - Elements to add class name
-     * @param {String} className - Class name to be add
+     * @param {Element} element Elements to add class name
+     * @param {String} className Class name to be add
      */
     addClass: function (element, className) {
         if (!element) return;
@@ -703,8 +703,8 @@ const util = {
 
     /**
      * @description Delete the className value of the argument value element
-     * @param {Element} element - Elements to remove class name
-     * @param {String} className - Class name to be remove
+     * @param {Element} element Elements to remove class name
+     * @param {String} className Class name to be remove
      */
     removeClass: function (element, className) {
         if (!element) return;
@@ -715,8 +715,8 @@ const util = {
 
     /**
      * @description Argument value If there is no class name, insert it and delete the class name if it exists
-     * @param {Element} element - Elements to replace class name
-     * @param {String} className - Class name to be change
+     * @param {Element} element Elements to replace class name
+     * @param {String} className Class name to be change
      */
     toggleClass: function (element, className) {
         if (!element) return;
@@ -732,7 +732,7 @@ const util = {
 
     /**
      * @description Delete argumenu value element
-     * @param {Element} item - Element to be remove
+     * @param {Element} item Element to be remove
      */
     removeItem: function (item) {
         if (!item) return;
@@ -746,8 +746,8 @@ const util = {
     /**
      * @description Delete all parent nodes that match the condition.
      * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
-     * @param {Element} item - Element to be remove
-     * @param {Function|null} validation - Validation function. default(Deleted if it only have breakLine and blanks)
+     * @param {Element} item Element to be remove
+     * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
      * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
      */
     removeItemAllParents: function (item, validation) {
@@ -779,7 +779,7 @@ const util = {
 
     /**
      * @description Delete a empty child node of argument element
-     * @param {Element} element - Element node
+     * @param {Element} element Element node
      */
     removeEmptyNode: function (element) {
         const inst = this;
@@ -807,7 +807,7 @@ const util = {
 
     /**
      * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)
-     * @param {Element} element - Element to check
+     * @param {Element} element Element to check
      * @returns {Boolean}
      */
     isIgnoreNodeChange: function (element) {
@@ -816,7 +816,7 @@ const util = {
 
     /**
      * @description Gets the clean HTML code for editor
-     * @param {String} html - HTML string
+     * @param {String} html HTML string
      * @returns {String}
      */
     cleanHTML: function (html) {

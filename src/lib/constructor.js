@@ -11,10 +11,10 @@ import util from './util';
 
 /**
  * @description document create - call _createToolBar()
- * @param {element} element - textarea
- * @param {JSON} options - user options
- * @param {JSON} lang - user language
- * @param {JSON} _plugins - plugins object
+ * @param {element} element textarea
+ * @param {JSON} options user options
+ * @param {JSON} lang user language
+ * @param {JSON} _plugins plugins object
  * @returns {JSON}
  * @private
  */
@@ -348,12 +348,12 @@ const _Constructor = {
 
     /**
      * @description Create a button element
-     * @param {string} buttonClass - className in button
-     * @param {string} title - Title in button
-     * @param {string} dataCommand - The data-command property of the button
-     * @param {string} dataDisplay - The data-display property of the button ('dialog', 'submenu')
-     * @param {string} innerHTML - Html in button
-     * @param {string} _disabled - Button disabled
+     * @param {string} buttonClass className in button
+     * @param {string} title Title in button
+     * @param {string} dataCommand The data-command property of the button
+     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu')
+     * @param {string} innerHTML Html in button
+     * @param {string} _disabled Button disabled
      * @returns {Element}
      * @private
      */
@@ -380,9 +380,9 @@ const _Constructor = {
 
     /**
      * @description Create editor HTML
-     * @param {Array} doc - document object
-     * @param {Array} buttonList - option.buttonList
-     * @param {Array} lang - option.lang
+     * @param {Array} doc document object
+     * @param {Array} buttonList option.buttonList
+     * @param {Array} lang option.lang
      * @private
      */
     _createToolBar: function (doc, buttonList, _plugins, lang) {
