@@ -2600,22 +2600,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         onClick_wysiwyg: function (e) {
+            const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
-
-            const formatEl = util.getFormatElement(core.getSelectionNode());
-            const rangeEl = util.getRangeFormatElement(core.getSelectionNode());
-            if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl)) {
-                core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
-                core.focus();
-                return;
-            }
-
-            const targetElement = e.target;
 
             if (/^IMG$/i.test(targetElement.nodeName)) {
                 e.preventDefault();
                 if (!core.plugins.image) return;
+                if (targetElement.getAttribute('contenteditable') !== 'false')
 
                 core.callPlugin('image', function () {
                     const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
@@ -2643,8 +2635,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 return;
             }
 
-            event._findButtonEffectTag();
-
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
             if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
                 e.preventDefault();
@@ -2662,6 +2652,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
                     figcaption.addEventListener('blur', hideToolbar);
                 }
             }
+
+            const formatEl = util.getFormatElement(core.getSelectionNode());
+            const rangeEl = util.getRangeFormatElement(core.getSelectionNode());
+            if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
+                core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                core.focus();
+                return;
+            }
+
+            event._findButtonEffectTag();
 
             if (userFunction.onClick) userFunction.onClick(e);
         },
