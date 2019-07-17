@@ -616,7 +616,7 @@ export default {
 
         // transform
         if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
-            this.plugins.resizing.setTransformSize.call(this, imageEl);
+            this.plugins.resizing.setTransformSize.call(this, imageEl, null, null);
         }
 
         // set imagesInfo

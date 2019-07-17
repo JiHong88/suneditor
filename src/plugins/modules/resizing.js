@@ -279,7 +279,7 @@ export default {
             contextEl.setAttribute('data-rotate', deg);
             contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
 
-            this.plugins.resizing.setTransformSize.call(this, contextEl);
+            this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
 
             const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
             contextPlugin.onModifyMode.call(this, contextEl, size);
@@ -319,17 +319,17 @@ export default {
 
         element.style.width = (originSize[0] + 'px' || 'auto');
         element.style.height = (originSize[1] + 'px' || '');
-        this.plugins.resizing.setTransformSize.call(this, element);
+        this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 
-    setTransformSize: function (element) {
+    setTransformSize: function (element, width, height) {
         const cover = this.util.getParentElement(element, 'FIGURE');
 
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
 
-        const offsetW = element.offsetWidth;
-        const offsetH = element.offsetHeight;
+        const offsetW = width || element.offsetWidth;
+        const offsetH = height || element.offsetHeight;
         const w = isVertical ? offsetH : offsetW;
         const h = isVertical ? offsetW : offsetH;
 
@@ -449,7 +449,7 @@ export default {
 
         contextResizing._resize_w = resultW;
         contextResizing._resize_h = resultH;
-        this.util.changeTxt(contextResizing.resizeDisplay, Math.round(resultW) + ' x ' + Math.round(resultH));
+        this.util.changeTxt(contextResizing.resizeDisplay, this._w.Math.round(resultW) + ' x ' + this._w.Math.round(resultH));
         contextResizing._isChange = true;
     },
 
@@ -458,11 +458,11 @@ export default {
         this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
 
-        const w = isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w;
-        const h = isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h;
+        const w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);
+        const h = this._w.Math.round(isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h);
 
         this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
-        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element);
+        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
         
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
     }

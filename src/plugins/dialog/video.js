@@ -20,7 +20,6 @@ export default {
             _container: null,
             _cover: null,
             _element: null,
-            _resizingDiv: null,
             _element_w: context.option.videoWidth,
             _element_h: context.option.videoHeight,
             _element_l: 0,
@@ -146,7 +145,6 @@ export default {
             const contextVideo = this.context.video;
             const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
             const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
-            let resizingDiv = null;
             let oIframe = null;
             let cover = null;
             let container = null;
@@ -155,7 +153,7 @@ export default {
 
             /** iframe source */
             if (/^<iframe.*\/iframe>$/.test(url)) {
-                oIframe = (new DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
+                oIframe = (new this._w.DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
             }
             /** url */
             else {
@@ -185,7 +183,6 @@ export default {
                 container = contextVideo._container;
                 cover = this.util.getParentElement(contextVideo._element, 'FIGURE');
                 oIframe = contextVideo._element;
-                resizingDiv = contextVideo._resizingDiv;
             }
             /** create */
             else {
@@ -201,11 +198,6 @@ export default {
 
                 /** cover */
                 cover = this.plugins.resizing.set_cover.call(this, oIframe);
-
-                /** resizingDiv */
-                contextVideo._resizingDiv = resizingDiv = this.util.createElement('DIV');
-                resizingDiv.className = 'se-video-inner';
-                cover.appendChild(resizingDiv);
 
                 /** container */
                 container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
@@ -251,7 +243,7 @@ export default {
                 this.insertComponent(container);
             }
             else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
-                this.plugins.resizing.setTransformSize.call(this, oIframe);
+                this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);
             }
 
             // history stack
@@ -284,7 +276,6 @@ export default {
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
         contextVideo._container = this.util.getParentElement(element, '.se-video-container');
         contextVideo._caption = this.util.getChildElement(contextVideo._cover, 'FIGCAPTION');
-        contextVideo._resizingDiv = this.util.getChildElement(contextVideo._cover, '.se-video-inner');
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -322,11 +313,29 @@ export default {
         this.plugins.dialog.open.call(this, 'video', true);
     },
 
+    _update_cover: function (src) {
+        
+    },
+
+    checkVideos: function () {
+        const videos = this.context.element.wysiwyg.getElementsByTagName('IFRAME');
+        if (videos.length === this._variable._videosCnt) return;
+
+        const videoPlugin = this.plugins.video;
+        this._variable._videosCnt = videos.length;
+
+        for (let i = 0, len = this._variable._videosCnt, video; i < len; i++) {
+            video = videos[i];
+            if (!this.util.getParentElement(video, '.se-image-container')) {
+                videoPlugin.update_video.call(this, video.src);
+            }
+        }
+    },
+
     setSize: function (w, h, isVertical) {
         const contextVideo = this.context.video;
         contextVideo._element.style.width = w + 'px';
         contextVideo._element.style.height = h + 'px';
-        contextVideo._resizingDiv.style.height = (isVertical ? w : h) + 'px';
     },
 
     setPercentSize: function (w) {
@@ -337,7 +346,7 @@ export default {
         contextVideo._cover.style.width = '100%';
         contextVideo._cover.style.height = '';
         contextVideo._element.style.width = '100%';
-        contextVideo._element.style.height = contextVideo._resizingDiv.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
+        contextVideo._element.style.height = ((contextVideo._origin_h / contextVideo._origin_w) * contextVideo._element.offsetWidth) + 'px';
 
         if (/100/.test(w)) {
             this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);

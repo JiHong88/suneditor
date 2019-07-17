@@ -310,15 +310,3 @@
 .sun-editor-editable .se-video-container iframe {
     outline: 1px solid #9e9e9e;
 }
-.sun-editor-editable .se-video-inner {
-    display: none;
-}
-.sun-editor-editable[contenteditable=true] .se-video-inner {
-    display: block;
-    position:absolute;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-    background-color: transparent;
-}

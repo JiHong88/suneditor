@@ -2604,35 +2604,37 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
 
-            if (/^IMG$/i.test(targetElement.nodeName)) {
-                e.preventDefault();
-                if (!core.plugins.image) return;
-                if (targetElement.getAttribute('contenteditable') !== 'false')
-
-                core.callPlugin('image', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, targetElement, 'image');
-                    core.plugins.image.onModifyMode.call(core, targetElement, size);
-                    
-                    if (!util.getParentElement(targetElement, '.se-image-container')) {
-                        core.plugins.image.openModify.call(core, true);
-                        core.plugins.image.update_image.call(core, true, true);
+            if (/^FIGURE$/i.test(targetElement.nodeName)) {
+                const component = targetElement.firstElementChild;
+                if (component) {
+                    if (/^IMG$/i.test(component.nodeName)) {
+                        e.preventDefault();
+                        if (!core.plugins.image) return;
+                        if (targetElement.getAttribute('contenteditable') !== 'false')
+    
+                        core.callPlugin('image', function () {
+                            const size = core.plugins.resizing.call_controller_resize.call(core, component, 'image');
+                            core.plugins.image.onModifyMode.call(core, component, size);
+                            
+                            if (!util.getParentElement(component, '.se-image-container')) {
+                                core.plugins.image.openModify.call(core, true);
+                                core.plugins.image.update_image.call(core, true, true);
+                            }
+                        });
+    
+                        return;
+                    } else if (/^IFRAME$/i.test(component.nodeName)) {
+                        e.preventDefault();
+                        if (!core.plugins.video) return;
+    
+                        core.callPlugin('video', function () {
+                            const size = core.plugins.resizing.call_controller_resize.call(core, component, 'video');
+                            core.plugins.video.onModifyMode.call(core, component, size);
+                        });
+    
+                        return;
                     }
-                });
-
-                return;
-            }
-
-            if (/se-video-inner/i.test(targetElement.className)) {
-                e.preventDefault();
-                if (!core.plugins.video) return;
-
-                core.callPlugin('video', function () {
-                    const iframe = targetElement.parentNode.querySelector('iframe');
-                    const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
-                    core.plugins.video.onModifyMode.call(core, iframe, size);
-                });
-
-                return;
+                }
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
