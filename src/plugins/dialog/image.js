@@ -688,7 +688,7 @@ export default {
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
 
         if (contextImage._resizing) {
-            contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') === 'true';
+            contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
             contextImage.imageX.value = contextImage._element.offsetWidth;
             contextImage.imageY.value = contextImage._element.offsetHeight;
             contextImage.imageX.disabled = false;

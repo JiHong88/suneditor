@@ -45,7 +45,7 @@ export default function (core, change) {
             if (redo) redo.removeAttribute('disabled');
         }
 
-        core._checkImages();
+        core._checkComponents();
         core._charCount(0, false);
         // onChange
         change(0);

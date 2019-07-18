@@ -188,7 +188,6 @@ export default {
             else {
                 oIframe.frameBorder = '0';
                 oIframe.allowFullscreen = true;
-                oIframe.contentDocument;
                 oIframe.onload = function () {
                     this.setAttribute('origin-size', this.offsetWidth + ',' + this.offsetHeight);
                     this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
@@ -201,6 +200,7 @@ export default {
 
                 /** container */
                 container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
+                this._variable._videosCnt++;
             }
 
             const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
@@ -262,6 +262,42 @@ export default {
         return false;
     },
 
+    _update_videoCover: function (oIframe) {
+        const contextVideo = this.context.video;
+
+        oIframe.frameBorder = '0';
+        oIframe.allowFullscreen = true;
+        oIframe.onload = function () {
+            this.setAttribute('origin-size', this.offsetWidth + ',' + this.offsetHeight);
+            this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
+            this.style.height = this.offsetHeight + 'px';
+        }.bind(oIframe);
+        
+        const existElement = this.util.getParentElement(oIframe, this.util.isComponent) || 
+            this.util.getParentElement(oIframe, function (current) {
+                return this.isWysiwygDiv(current.parentNode);
+            }.bind(this.util));
+
+        contextVideo._element = oIframe = oIframe.cloneNode(false);
+        const cover = this.plugins.resizing.set_cover.call(this, oIframe);
+        const container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
+
+        const figcaption = existElement.getElementsByTagName('FIGCAPTION')[0];
+        if (!!figcaption) {
+            const caption = this.plugins.resizing.create_caption.call(this);
+            caption.innerHTML = figcaption.innerHTML;
+            cover.appendChild(caption);
+        }
+
+        const originSize = (oIframe.getAttribute('origin-size') || '').split(',');
+        const w = originSize[0] || this.context.option.videoWidth;
+        const h = originSize[1] || this.context.option.videoHeight;
+        this.plugins.video.setSize.call(this, w, h);
+
+        existElement.parentNode.insertBefore(container, existElement);
+        this.util.removeItem(existElement);
+    },
+
     sizeRevert: function () {
         const contextVideo = this.context.video;
         if (contextVideo._origin_w) {
@@ -306,15 +342,11 @@ export default {
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
         if (contextVideo._resizing) {
-            contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') === 'true';
+            contextVideo.proportion.checked = contextVideo._proportionChecked = contextVideo._element.getAttribute('data-proportion') !== 'false';
             contextVideo.proportion.disabled = false;
         }
 
         this.plugins.dialog.open.call(this, 'video', true);
-    },
-
-    _update_cover: function (src) {
-        
     },
 
     checkVideos: function () {
@@ -327,7 +359,7 @@ export default {
         for (let i = 0, len = this._variable._videosCnt, video; i < len; i++) {
             video = videos[i];
             if (!this.util.getParentElement(video, '.se-image-container')) {
-                videoPlugin.update_video.call(this, video.src);
+                videoPlugin._update_videoCover.call(this, video);
             }
         }
     },
@@ -376,6 +408,7 @@ export default {
     },
 
     destroy: function () {
+        this._variable._videosCnt--;
         this.util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
         this.controllersOff();
@@ -385,6 +418,9 @@ export default {
         const contextVideo = this.context.video;
         contextVideo.focusElement.value = '';
         contextVideo.captionCheckEl.checked = false;
+        contextVideo._origin_w = this.context.option.videoWidth;
+        contextVideo._origin_h = this.context.option.videoHeight;
+
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
         
         if (contextVideo._resizing) {

@@ -256,6 +256,7 @@
 .sun-editor .se-wrapper .se-wrapper-inner:focus {outline:none;}
 .sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:0; margin:0;}
 .sun-editor .se-wrapper .se-wrapper-wysiwyg figure::after {position:absolute; content:''; z-index:1; top:0; left:0; right:0; bottom:0; cursor:default; display:block; background:rgba(0,0,0,0);}
+.sun-editor .se-wrapper .se-wrapper-wysiwyg figure > figcaption {z-index:2;}
 
 
 /** --- resizing bar */

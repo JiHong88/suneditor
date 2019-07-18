@@ -215,7 +215,8 @@ export default function (context, pluginCallButtons, plugins, lang) {
             _codeOriginCssText: '',
             _fullScreenSticky: false,
             _imagesInfo: [],
-            _imageIndex: 0
+            _imageIndex: 0,
+            _videosCnt: 0
         },
 
         /**
@@ -2287,13 +2288,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
-         * @description Correct the value of the images information array(core._variable._imagesInfo) by comparing the images tag of the editor.
+         * @description Check the components such as image and video and modify them according to the format.
          * @private
          */
-        _checkImages: function () {
+        _checkComponents: function () {
             if (this.plugins.image) {
                 if (!this.initPlugins.image) this.callPlugin('image', this.plugins.image.checkImagesInfo.bind(this));
                 else this.plugins.image.checkImagesInfo.call(this);
+            }
+
+            if (this.plugins.video) {
+                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideos.bind(this));
+                else this.plugins.video.checkVideos.call(this);
             }
         }
     };
@@ -3022,7 +3028,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 event._findButtonEffectTag();
             }
 
-            core._checkImages();
+            core._checkComponents();
 
             if (!core._charCount(1, e.key.length === 1)) {
                 if (e.key.length === 1) {
