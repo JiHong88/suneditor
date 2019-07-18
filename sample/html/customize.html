@@ -144,7 +144,7 @@
         <div style="width: 100%; background: #fff;">
             <h5 style="margin: 10px 0 0 10px;">Uploaded image file list</h5>
         </div>
-        <div id="image_wrapper" class="image-list" style="display: none;">
+        <div id="image_wrapper" class="image-list" style="display: flex;">
             <div class="file-list-info">
                 <span>Attached files</span>
                 <span id="image_size" class="total-size text-small-2">0KB</span>
@@ -260,9 +260,6 @@ function sun_create () {
 }
 
 function setImageList () {
-    if (imageList.length > 0) imageWrapper.style.display = 'flex';
-    else imageWrapper.style.display = 'none';
-
     let list = '';
     let size = 0;
 
