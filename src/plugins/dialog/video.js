@@ -358,13 +358,13 @@ export default {
 
         for (let i = 0, len = this._variable._videosCnt, video; i < len; i++) {
             video = videos[i];
-            if (!this.util.getParentElement(video, '.se-image-container')) {
+            if (!this.util.getParentElement(video, '.se-video-container')) {
                 videoPlugin._update_videoCover.call(this, video);
             }
         }
     },
 
-    setSize: function (w, h, isVertical) {
+    setSize: function (w, h) {
         const contextVideo = this.context.video;
         contextVideo._element.style.width = w + 'px';
         contextVideo._element.style.height = h + 'px';
