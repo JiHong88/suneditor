@@ -412,6 +412,9 @@ export default {
         this.util.removeItem(this.context.video._container);
         this.plugins.video.init.call(this);
         this.controllersOff();
+
+        // history stack
+        this.history.push();
     },
 
     init: function () {

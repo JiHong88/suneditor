@@ -2770,8 +2770,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[resizingName].destroy.call(core);
-                        // history stack
-                        core.history.push();
                         break;
                     }
 
@@ -2814,8 +2812,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[resizingName].destroy.call(core);
-                        // history stack	
-                        core.history.push();
                         break;
                     }
 

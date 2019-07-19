@@ -38,6 +38,8 @@ const _Constructor = {
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
         // size
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.minWidth = (/^\d+$/.test(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+        options.maxWidth = (/^\d+$/.test(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
@@ -77,6 +79,8 @@ const _Constructor = {
         top_div.className = 'sun-editor';
         if (element.id) top_div.id = 'suneditor_' + element.id;
         top_div.style.width = options.width;
+        top_div.style.minWidth = options.minWidth;
+        top_div.style.maxWidth = options.maxWidth;
         top_div.style.display = options.display;
     
         /** relative div */

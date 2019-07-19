@@ -766,6 +766,9 @@ export default {
 
         this.controllersOff();
 
+        // history stack
+        this.history.push();
+        
         if (dataIndex >= 0) {
             const imagesInfo = this._variable._imagesInfo;
 
