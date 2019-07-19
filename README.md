@@ -266,7 +266,8 @@ plugins: [
     image,
     video
 ]               : Plugins array.                                    default: null {Array}
---Layout----------------------------------------------------------------------------------------------------------
+
+// Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
@@ -275,29 +276,34 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
---Display----------------------------------------------------------------------------------------------------------
+
+// Display-------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}
 popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
---Bottom resizing bar----------------------------------------------------------------------------------------------
+
+// Bottom resizing bar-------------------------------------------------------------------------------------------
 resizingBar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
 showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
 charCounter     : Shows the number of characters in the editor.     
                   If the maxCharCount option has a value, it becomes true. default: false {Boolean}
 maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
---Width size-------------------------------------------------------------------------------------------------------
+
+// Width size----------------------------------------------------------------------------------------------------
 width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
 minWidth        : The min-width size of the editor.
                   Used when 'width' value is 'auto' or '~%'.        default: null {Number|String}
 maxWidth        : The max-width size of the editor.
                   Used when 'width' value is 'auto' or '~%'.        default: null {Number|String}
---Height size------------------------------------------------------------------------------------------------------
+
+// Height size---------------------------------------------------------------------------------------------------
 height          : The height size of the editor.                    default: clientHeight||'auto' {Number|String}
 minHeight       : The min-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
 maxHeight       : The max-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
---Defining menu items----------------------------------------------------------------------------------------------
+
+// Defining menu items-------------------------------------------------------------------------------------------
 font            : Change default font-family array.                 default: [...] {Array}
                   Default value: [
                     'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
@@ -324,7 +330,8 @@ colorList       : Change default color array of color picker.       default: [..
                     ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'], // Line break
                     ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
                   ]
---Image-------------------------------------------------------------------------------------------------------------
+
+// Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
 imageWidth      : The default width size of the image frame.        default: 'auto' {Number}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
@@ -344,7 +351,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                                 }
                             ]
                         }
---Video-------------------------------------------------------------------------------------------------------------
+
+// Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
 videoWidth      : The default width size of the video frame.         default: 560 {Number}
 videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
@@ -352,9 +360,11 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
---Defining save button----------------------------------------------------------------------------------------------
+
+// Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
---Buttons-----------------------------------------------------------------------------------------------------------
+
+// Buttons--------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
