@@ -48,7 +48,7 @@ export default function (core, change) {
         core._checkComponents();
         core._charCount(0, false);
         // onChange
-        change(0);
+        change();
     }
 
     function pushStack () {

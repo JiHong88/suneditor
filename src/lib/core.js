@@ -306,13 +306,14 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             this._bindControllersOff = this.controllersOff.bind(this);
             _d.addEventListener('mousedown', this._bindControllersOff, false);
-            _d.addEventListener('keydown', this._bindControllersOff, false);
+            if (!this._resizingName) _d.addEventListener('keydown', this._bindControllersOff, false);
         },
 
         /**
          * @description Hide controller at editor area (link button, image resize button..)
          */
         controllersOff: function () {
+            this._resizingName = '';
             if (!this._bindControllersOff) return;
 
             _d.removeEventListener('mousedown', this._bindControllersOff);
@@ -328,8 +329,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 this.controllerArray = [];
             }
-
-            this._resizingName = '';
         },
 
         /**
@@ -2771,7 +2770,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[resizingName].destroy.call(core);
-                        // history stack	
+                        // history stack
                         core.history.push();
                         break;
                     }
@@ -3398,6 +3397,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
     context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+    context.element.wysiwyg.addEventListener('dragover', function (e) { e.preventDefault(); }, false);
     /** Events are registered only when there is a table plugin.  */
     if (core.plugins.table) {
         context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});

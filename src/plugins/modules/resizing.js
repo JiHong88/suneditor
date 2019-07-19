@@ -179,6 +179,7 @@ export default {
             resizeHandles[i].style.display = resizeDisplay;
         }
 
+        this._resizingName = plugin;
         this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
 
         // button group
@@ -199,8 +200,6 @@ export default {
         const originSize = (targetElement.getAttribute('origin-size') || '').split(',');
         contextResizing._origin_w = originSize[0] || targetElement.naturalWidth;
         contextResizing._origin_h = originSize[1] || targetElement.naturalHeight;
-
-        this._resizingName = plugin;
 
         return {
             w: w,
