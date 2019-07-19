@@ -24,3 +24,4 @@ test/
 karma.conf.js
 bower.json
 webpack.*.js
+package-lock.json
