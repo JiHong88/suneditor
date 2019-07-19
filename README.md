@@ -35,7 +35,7 @@ $ npm install --save suneditor
 ``` sh
 $ bower install --save suneditor
 ```
-#### cdn
+#### CDN
 ``` html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css">
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
