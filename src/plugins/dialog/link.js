@@ -193,6 +193,9 @@ export default {
         }
 
         this.controllersOff();
+        
+        // history stack
+        this.history.push();
     },
 
     init: function () {

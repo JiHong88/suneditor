@@ -61,7 +61,7 @@ export default {
     on: function () {
         const formatContext = this.context.formatBlock;
         const formatList = formatContext._formatList;
-        const currentFormat = this.commandMap.FORMAT.getAttribute('data-focus') || 'P';
+        const currentFormat = (this.commandMap.FORMAT.getAttribute('data-focus') || 'P').toLowerCase();
 
         if (currentFormat !== formatContext.currentFormat) {
             for (let i = 0, len = formatList.length; i < len; i++) {
