@@ -6,10 +6,9 @@ function buttonToggle () {
     navbarCollapse.style.display = navDisplay ? 'block' : 'none';
 }
 
-// images
+// image list sample
 var editorImageSample = null;
 
-const imageWrapper = document.getElementById('image_wrapper');
 const imageSize = document.getElementById('image_size');
 const imageRemove = document.getElementById('image_remove');
 const imageTable = document.getElementById('image_list');
