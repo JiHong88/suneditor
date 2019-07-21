@@ -200,46 +200,73 @@ export default {
         return false;
     },
 
-    onRender_imgInput: function () {
-        const submitAction = function (fileList) {
-            if (fileList.length > 0) {
-                const files = [];
-                for (let i = 0, len = fileList.length; i < len; i++) {
-                    if (/image/i.test(fileList[i].type)) files.push(fileList[i]);
-                }
-
-                this.context.image._uploadFileLength = files.length;
-                const imageUploadUrl = this.context.option.imageUploadUrl;
-                const imageUploadHeader = this.context.option.imageUploadHeader;
-                const filesLen = this.context.dialog.updateModal ? 1 : files.length;
-
-                if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-                    const formData = new FormData();
-
-                    for (let i = 0; i < filesLen; i++) {
-                        formData.append('file-' + i, files[i]);
-                    }
-
-                    this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                    this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
-                    this.context.image._xmlHttp.open('post', imageUploadUrl, true);
-                    if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
-                        for(let key in imageUploadHeader){
-                            this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
-                        }
-                    }
-                    this.context.image._xmlHttp.send(formData);
-                }
-                else {
-                    for (let i = 0; i < filesLen; i++) {
-                        this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, i, filesLen - 1);
-                    }
+    submitAction: function (fileList) {
+        if (fileList.length > 0) {
+            let fileSize = 0;
+            const files = [];
+            for (let i = 0, len = fileList.length; i < len; i++) {
+                if (/image/i.test(fileList[i].type)) {
+                    files.push(fileList[i]);
+                    fileSize += fileList[i].size;
                 }
             }
-        }.bind(this);
 
+            const limitSize = this.context.option.imageUploadSizeLimit;
+            if (limitSize > 0) {
+                let infoSize = 0;
+                const imagesInfo = this._variable._imagesInfo;
+                for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                    infoSize += imagesInfo[i].size * 1;
+                }
+
+                if ((fileSize + infoSize) > limitSize) {
+                    const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
+                    if (this._imageUploadError(err, {
+                        'limitSize': limitSize,
+                        'currentSize': infoSize,
+                        'uploadSize': fileSize
+                    })) {
+                        notice.open.call(this, err);
+                    }
+
+                    this.closeLoading();
+                    return;
+                }
+            }
+
+            this.context.image._uploadFileLength = files.length;
+            const imageUploadUrl = this.context.option.imageUploadUrl;
+            const imageUploadHeader = this.context.option.imageUploadHeader;
+            const filesLen = this.context.dialog.updateModal ? 1 : files.length;
+
+            if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
+                const formData = new FormData();
+
+                for (let i = 0; i < filesLen; i++) {
+                    formData.append('file-' + i, files[i]);
+                }
+
+                this.context.image._xmlHttp = this.util.getXMLHttpRequest();
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                this.context.image._xmlHttp.open('post', imageUploadUrl, true);
+                if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
+                    for(let key in imageUploadHeader){
+                        this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
+                    }
+                }
+                this.context.image._xmlHttp.send(formData);
+            }
+            else {
+                for (let i = 0; i < filesLen; i++) {
+                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, i, filesLen - 1);
+                }
+            }
+        }
+    },
+
+    onRender_imgInput: function () {
         try {
-            submitAction(this.context.image.imgInputFile.files);
+            this.plugins.image.submitAction.call(this, this.context.image.imgInputFile.files);
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');

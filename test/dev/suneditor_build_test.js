@@ -188,7 +188,8 @@ let s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote']
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    imageUploadSizeLimit: 30000
 });
 
 let imageList = [];
@@ -292,6 +293,10 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
         console.log('imageList', imageList)
         setImageList(imageList)
     }
+}
+
+window.sun_insertImage2 = function () {
+    s2.insertImage(document.getElementById('sun_files').files);
 }
 
 

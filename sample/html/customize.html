@@ -137,6 +137,9 @@
             <br><br>
             <label><input type="checkbox" id="imageUploadUrl">&nbsp;&nbsp;imageUploadUrl</label>
             <input type="text" id="imageUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageUploadSizeLimit">&nbsp;&nbsp;imageUploadSizeLimit</label>
+            <input type="text" id="imageUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
@@ -155,9 +158,13 @@
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
-        <div id="image_wrapper" class="image-list">
+        <div class="image-list">
             <div class="file-list-info">
                 <span>Attached files</span>
+                <span class="xefu-btn">
+                    <span class="files-text">Attach image</span>
+                </span>
+                <input type="file" id="files_upload" accept="image/*" multiple="multiple" class="files-text files-input" />
                 <span id="image_size" class="total-size text-small-2">0KB</span>
                 <button class="btn btn-md btn-danger" id="image_remove" disabled onclick="deleteCheckedImages()">Remove</button>
             </div>
@@ -227,8 +234,9 @@ function sun_create () {
         imageFileInput: document.getElementById('imageFileInput').checked,
         imageUrlInput: document.getElementById('imageUrlInput').checked,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : null,
-        imageUploadUrl: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : null,
+        imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : null,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : null,
+        imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : null,
         videoResizing: document.getElementById('videoResizing').checked,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,

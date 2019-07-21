@@ -50,6 +50,68 @@ footer {
     background: #fff;
 }
 
+.xefu-btn {
+    display: inline-block;
+    *display: inline;
+    margin: 0;
+    padding: 0 12px!important;
+    height: 24px!important;
+    overflow: visible;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    text-decoration: none!important;
+    text-align: center;
+    vertical-align: top;
+    line-height: 24px!important;
+    font-family: inherit;
+    font-size: 12px;
+    color: #333;
+    *zoom: 1;
+    cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+    background-color: #f5f5f5;
+    *background-color: #e6e6e6;
+    background-image: -moz-linear-gradient(top,#ffffff,#e6e6e6);
+    background-image: -webkit-linear-gradient(top,#ffffff,#e6e6e6);
+    background-image: -webkit-gradient(top,#ffffff,#e6e6e6);
+    background-image: -o-linear-gradient(top,#ffffff,#e6e6e6);
+    background-image: linear-gradient(top,#ffffff,#e6e6e6);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff',endColorstr='#e6e6e6',GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+
+.image-list .files-text {
+    display: inline-block;
+    margin: 0 -12px!important;
+    padding: 0 12px!important;
+    overflow: visible;
+    width: auto;
+    height: 24px;
+    border: 0;
+    vertical-align: top;
+    text-decoration: none!important;
+    line-height: 24px;
+    font-family: inherit;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    background: 0 0;
+}
+
+.image-list .files-input {
+    position: absolute;
+    width: 112px;
+    left: 14px;
+    top: 57px;
+    margin: 0;
+    opacity: 0;
+    -ms-filter: 'alpha(opacity=0)';
+    font-size: 200px!important;
+    direction: ltr;
+    cursor: pointer;
+}
+
 .image-list * {
     font-size: 13px;
     box-sizing: border-box;

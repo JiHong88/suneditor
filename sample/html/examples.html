@@ -119,9 +119,13 @@
             <div class="se-component se-image-container float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-index="1" data-file-name="s-cat1.jpg" data-file-size="52000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
             <p><br></p>
         </textarea>
-        <div id="image_wrapper" class="image-list">
+        <div class="image-list">
             <div class="file-list-info">
                 <span>Attached files</span>
+                <span class="xefu-btn">
+                    <span class="files-text">Attach image</span>
+                </span>
+                <input type="file" id="files_upload" accept="image/*" multiple="multiple" class="files-text files-input" />
                 <span id="image_size" class="total-size text-small-2">0KB</span>
                 <button class="btn btn-md btn-danger" id="image_remove" disabled onclick="deleteCheckedImages()">Remove</button>
             </div>
@@ -135,6 +139,10 @@
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_wrapper<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>image-list<span class="pl-pds">"</span></span>&gt;
     &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list-info<span class="pl-pds">"</span></span>&gt;
         &lt;<span class="pl-ent">span</span>&gt;Attached files&lt;/<span class="pl-ent">span</span>&gt;
+        &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>xefu-btn<span class="pl-pds">"</span></span>&gt;
+            &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text<span class="pl-pds">"</span></span>&gt;Attach image&lt;/<span class="pl-ent">span</span>&gt;
+        &lt;/<span class="pl-ent">span</span>&gt;
+        &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>file<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>files_upload<span class="pl-pds">"</span></span> <span class="pl-e">accept</span>=<span class="pl-s"><span class="pl-pds">"</span>image/*<span class="pl-pds">"</span></span> <span class="pl-e">multiple</span>=<span class="pl-s"><span class="pl-pds">"</span>multiple<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text files-input<span class="pl-pds">"</span></span>/&gt;
         &lt;<span class="pl-ent">span</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_size<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>total-size text-small-2<span class="pl-pds">"</span></span>&gt;0KB&lt;/<span class="pl-ent">span</span>&gt;
         &lt;<span class="pl-ent">button</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>btn btn-md btn-danger<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_remove<span class="pl-pds">"</span></span> <span class="pl-e">disabled</span> <span class="pl-e">onclick</span>=<span class="pl-s"><span class="pl-pds">"</span>deleteCheckedImages()<span class="pl-pds">"</span></span>&gt;Remove&lt;/<span class="pl-ent">button</span>&gt;
     &lt;/<span class="pl-ent">div</span>&gt;
@@ -145,8 +153,8 @@
 &lt;/<span class="pl-ent">div</span>&gt;</pre></div>
 
 <!-- image management js-->
-<div class="highlight highlight-source-js">
-<pre><span class="pl-k">const</span> <span class="pl-c1">imageSize</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_size<span class="pl-pds">'</span></span>);
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">imageWrapper</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_wrapper<span class="pl-pds">'</span></span>);
+<span class="pl-k">const</span> <span class="pl-c1">imageSize</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_size<span class="pl-pds">'</span></span>);
 <span class="pl-k">const</span> <span class="pl-c1">imageRemove</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_remove<span class="pl-pds">'</span></span>);
 <span class="pl-k">const</span> <span class="pl-c1">imageTable</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_list<span class="pl-pds">'</span></span>);
 
@@ -179,6 +187,14 @@
         <span class="pl-en">setImageList</span>(imageList)
     }
 }
+
+<span class="pl-c"><span class="pl-c">//</span> Upload from outside the editor</span>
+<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>files_upload<span class="pl-pds">'</span></span>).<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>change<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
+    <span class="pl-k">if</span> (<span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-smi">files</span>) {
+        <span class="pl-smi">editorImageSample</span>.<span class="pl-en">insertImage</span>(<span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-smi">files</span>)
+        <span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>
+    }
+})
 
 <span class="pl-c"><span class="pl-c">//</span> Edit image list</span>
 <span class="pl-k">function</span> <span class="pl-en">setImageList</span> () {
