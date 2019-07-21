@@ -3277,6 +3277,18 @@ export default function (context, pluginCallButtons, plugins, lang) {
         },
 
         /**
+         * @description Upload images using image plugin
+         * @param {FileList} files FileList
+         */
+        insertImage: function (files) {
+            if (!core.plugins.image || !files) return;
+
+            if (!core.initPlugins.image) core.callPlugin('image', core.plugins.image.submitAction.bind(core, files));
+            else core.plugins.image.submitAction.call(core, files);
+            core.focus();
+        },
+
+        /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
          */
