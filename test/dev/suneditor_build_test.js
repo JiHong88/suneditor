@@ -295,6 +295,10 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
     }
 }
 
+window.sun_insertImage2 = function () {
+    s2.insertImage(document.getElementById('sun_files').files);
+}
+
 
 window.sun_destroy2 = function () {
     s2.destroy();
