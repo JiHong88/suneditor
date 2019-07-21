@@ -351,6 +351,7 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                                 }
                             ]
                         }
+imageUploadSizeLimit: The size of the total uploadable images (in bytes).   default: null {Number}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}

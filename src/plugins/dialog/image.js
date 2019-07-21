@@ -203,9 +203,36 @@ export default {
     onRender_imgInput: function () {
         const submitAction = function (fileList) {
             if (fileList.length > 0) {
+                let fileSize = 0;
                 const files = [];
                 for (let i = 0, len = fileList.length; i < len; i++) {
-                    if (/image/i.test(fileList[i].type)) files.push(fileList[i]);
+                    if (/image/i.test(fileList[i].type)) {
+                        files.push(fileList[i]);
+                        fileSize += fileList[i].size;
+                    }
+                }
+
+                const limitSize = this.context.option.imageUploadSizeLimit;
+                if (limitSize > 0) {
+                    let infoSize = 0;
+                    const imagesInfo = this._variable._imagesInfo;
+                    for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                        infoSize += imagesInfo[i].size * 1;
+                    }
+
+                    if ((fileSize + infoSize) > limitSize) {
+                        const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
+                        if (this._imageUploadError(err, {
+                            'limitSize': limitSize,
+                            'currentSize': infoSize,
+                            'uploadSize': fileSize
+                        })) {
+                            notice.open.call(this, err);
+                        }
+
+                        this.closeLoading();
+                        return;
+                    }
                 }
 
                 this.context.image._uploadFileLength = files.length;

@@ -188,7 +188,8 @@ let s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote']
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    imageUploadSizeLimit: 30000
 });
 
 let imageList = [];
