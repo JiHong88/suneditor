@@ -37,7 +37,7 @@ $ bower install --save suneditor
 ```
 #### CDN
 ``` html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css">
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
@@ -50,9 +50,9 @@ $ bower install --save suneditor
 ## Getting Started
 ### 1. Include
 ```html
-<!-- <link rel="stylesheet" href="../src/assets/css/suneditor.css" rel="stylesheet"> -->
-<!-- <link  rel="stylesheet" href="../src/assets/css/suneditor-contents.css" rel="stylesheet"> -->
-<link rel="stylesheet" href="../dist/css/suneditor.min.css">
+<!-- <link href="../src/assets/css/suneditor.css" rel="stylesheet"> -->
+<!-- <link  href="../src/assets/css/suneditor-contents.css" rel="stylesheet"> -->
+<link href="../dist/css/suneditor.min.css" rel="stylesheet">
 <script src="../dist/suneditor.min.js"></script>
 <script src="../src/lang/ko.js"></script>
 ```
