@@ -631,21 +631,20 @@ const util = {
      * @returns {Object}
      */
     getOffset: function (element) {
-        let tableOffsetLeft = 0;
-        let tableOffsetTop = 0;
-        let tableElement = element.nodeType === 3 ? element.parentElement : element;
+        let offsetLeft = 0;
+        let offsetTop = 0;
+        let offsetElement = element.nodeType === 3 ? element.parentElement : element;
+        const wysiwyg = this.getParentElement(element, this.isWysiwygDiv.bind(this));
 
-        while (!this.isWysiwygDiv(tableElement.parentNode)) {
-            if (/^(A|TD|TH|FIGURE|FIGCAPTION|IMG|IFRAME|AUDIO|VIDEO)$/i.test(tableElement.nodeName) || /relative/i.test(tableElement.style.position)) {
-                tableOffsetLeft += tableElement.offsetLeft;
-                tableOffsetTop += tableElement.offsetTop;
-            }
-            tableElement = tableElement.parentNode;
+        while (offsetElement && !this.hasClass(offsetElement, 'se-container') && offsetElement !== wysiwyg) {
+            offsetLeft += offsetElement.offsetLeft;
+            offsetTop += offsetElement.offsetTop;
+            offsetElement = offsetElement.offsetParent;
         }
 
         return {
-            left: tableOffsetLeft,
-            top: tableOffsetTop - tableElement.parentNode.scrollTop
+            left: offsetLeft,
+            top: offsetTop - wysiwyg.scrollTop
         };
     },
 

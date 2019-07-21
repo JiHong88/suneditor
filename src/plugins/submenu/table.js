@@ -300,9 +300,9 @@ export default {
 
         contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
         tablePlugin.resizeTable.call(this);
-        tableController.style.left = (offset.left + tableElement.offsetLeft - this.context.element.wysiwyg.scrollLeft) + 'px';
+        tableController.style.left = offset.left + 'px';
         tableController.style.display = 'block';
-        tableController.style.top = (offset.top + tableElement.offsetTop - tableController.offsetHeight - 2) + 'px';
+        tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
 
         if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this));
     },
