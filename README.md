@@ -418,6 +418,9 @@ editor.getContents();
  **/
 editor.getImagesInfo();
 
+// Upload images using image plugin
+editor.insertImage(FileList);
+
 // Inserts an HTML element or HTML string or plain string at the current cursor position
 editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
 

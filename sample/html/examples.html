@@ -310,6 +310,10 @@
 <span class="pl-c"><span class="pl-c">**/</span> </span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
 
+<span class="pl-c"><span class="pl-c">//</span> Upload images using image plugin</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">insertImage</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>example_files_input<span class="pl-pds">'</span></span>).<span class="pl-c1">files</span>);
+
+
 <span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
 
@@ -379,6 +383,10 @@
             <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
             <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
             <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
+            <div>
+                <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
+                <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
+            </div>
             <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
             <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
             <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
@@ -493,6 +501,10 @@
 
     function sun_getImagesInfo() {
         console.log(suneditor.getImagesInfo());
+    }
+
+    function sun_insertImage() {
+        suneditor.insertImage(document.getElementById('example_files_input').files);
     }
 
     function sun_insertHTML(html) {
