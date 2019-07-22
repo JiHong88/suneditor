@@ -141,7 +141,12 @@ const util = {
         const sheets = this._d.styleSheets;
         
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
-            rules = sheets[i].cssRules;
+            try {
+                rules = sheets[i].cssRules;
+            } catch (e) {
+                continue;
+            }
+            
             for (let c = 0, cLen = rules.length; c < cLen; c++) {
                 cssText += rules[c].cssText;
             }
