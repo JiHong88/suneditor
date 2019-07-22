@@ -189,7 +189,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
         alert(contents)
     },
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
-    imageUploadSizeLimit: 30000
+    // imageUploadSizeLimit: 30000
 });
 
 let imageList = [];
@@ -284,8 +284,8 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
         if (state === 'create') {
             const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
             imageList.push(image)
-        } else {
-            imageList.splice(findIndex(imageList, index), 1)
+        } else { // update
+            
         }
     }
 

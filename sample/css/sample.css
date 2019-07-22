@@ -163,13 +163,18 @@ footer {
     border: 3px solid #fff;
 }
 
+.image-list .file-list ul li .image-wrapper {
+    width: 54px;
+    height: 54px;;
+}
+
 .image-list .file-list ul li.checked {
     border: 3px solid #dc3545;
 }
 
 .image-list .file-list ul li img {
-    width: 54px;
-    height: 54px;
+    width: 100%;
+    height: auto;
 }
 
 .image-list .file-list ul li .image-size {

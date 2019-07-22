@@ -32,8 +32,8 @@ function imageUpload (targetImgElement, index, state, imageInfo, remainingFilesC
         if (state === 'create') {
             const image = editorImageSample.getImagesInfo()[findIndex(editorImageSample.getImagesInfo(), index)]
             imageList.push(image)
-        } else {
-            imageList.splice(findIndex(imageList, index), 1)
+        } else { // update
+            //
         }
     }
 
@@ -53,7 +53,7 @@ function setImageList () {
             
         list += '<li id="img_' + image.index + '">' +
                     '<div onclick="checkImage(' + image.index + ')">' +
-                        '<div><img src="' + image.src + '"></div>' +
+                        '<div class="image-wrapper"><img src="' + image.src + '"></div>' +
                     '</div>' +
                     '<a href="javascript:void(0)" onclick="selectImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
                     '<div class="image-check"><svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>' +

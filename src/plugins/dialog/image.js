@@ -421,7 +421,7 @@ export default {
 
             info = {
                 src: img.src,
-                index: dataIndex,
+                index: dataIndex * 1,
                 name: file.name,
                 size: file.size
             };
@@ -633,9 +633,10 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode) ? 
+            const existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
-                this.util.getFormatElement(contextImage._element) || contextImage._element;
+                /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
+                
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(existElement);
             imageEl = container.querySelector('img');
@@ -708,12 +709,13 @@ export default {
     openModify: function (notOpen) {
         const contextImage = this.context.image;
         contextImage.imgUrlFile.value = contextImage._element.src;
-        contextImage.altText.value = contextImage._element.alt;
-        contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
+        contextImage._altText = contextImage.altText.value = contextImage._element.alt;
+        contextImage._linkValue = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
+        contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
-
+        
         if (contextImage._resizing) {
             contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
             contextImage.imageX.value = contextImage._element.offsetWidth;

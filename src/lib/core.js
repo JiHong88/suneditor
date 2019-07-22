@@ -2610,35 +2610,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
             e.stopPropagation();
 
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
-                const component = targetElement.firstElementChild;
-                if (component) {
-                    if (/^IMG$/i.test(component.nodeName)) {
-                        e.preventDefault();
-                        if (!core.plugins.image) return;
-                        if (targetElement.getAttribute('contenteditable') !== 'false')
-    
-                        core.callPlugin('image', function () {
-                            const size = core.plugins.resizing.call_controller_resize.call(core, component, 'image');
-                            core.plugins.image.onModifyMode.call(core, component, size);
-                            
-                            if (!util.getParentElement(component, '.se-image-container')) {
-                                core.plugins.image.openModify.call(core, true);
-                                core.plugins.image.update_image.call(core, true, true);
-                            }
-                        });
-    
-                        return;
-                    } else if (/^IFRAME$/i.test(component.nodeName)) {
-                        e.preventDefault();
-                        if (!core.plugins.video) return;
-    
-                        core.callPlugin('video', function () {
-                            const size = core.plugins.resizing.call_controller_resize.call(core, component, 'video');
-                            core.plugins.video.onModifyMode.call(core, component, size);
-                        });
-    
-                        return;
-                    }
+                const imageComponent = targetElement.querySelector('IMG');
+                const videoComponent = targetElement.querySelector('IFRAME');
+
+                if (imageComponent) {
+                    e.preventDefault();
+                    if (!core.plugins.image) return;
+                    if (targetElement.getAttribute('contenteditable') !== 'false')
+
+                    core.callPlugin('image', function () {
+                        const size = core.plugins.resizing.call_controller_resize.call(core, imageComponent, 'image');
+                        core.plugins.image.onModifyMode.call(core, imageComponent, size);
+                        
+                        if (!util.getParentElement(imageComponent, '.se-image-container')) {
+                            core.plugins.image.openModify.call(core, true);
+                            core.plugins.image.update_image.call(core, true, true);
+                        }
+                    });
+
+                    return;
+                } else if (videoComponent) {
+                    e.preventDefault();
+                    if (!core.plugins.video) return;
+
+                    core.callPlugin('video', function () {
+                        const size = core.plugins.resizing.call_controller_resize.call(core, videoComponent, 'video');
+                        core.plugins.video.onModifyMode.call(core, videoComponent, size);
+                    });
+
+                    return;
                 }
             }
 
@@ -3006,8 +3006,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
                 selectionNode.appendChild(oFormatTag);
                 core.setRange(oFormatTag, 0, oFormatTag, 0);
-
                 event._findButtonEffectTag();
+
+                core._checkComponents();
                 return;
             }
 
