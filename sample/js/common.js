@@ -16,12 +16,14 @@ const imageTable = document.getElementById('image_list');
 let imageList = [];
 let selectedImages = [];
 
-document.getElementById('files_upload').addEventListener('change', function (e) {
-    if (e.target.files) {
-        editorImageSample.insertImage(e.target.files)
-        e.target.value = ''
-    }
-})
+if (document.getElementById('files_upload')) {
+    document.getElementById('files_upload').addEventListener('change', function (e) {
+        if (e.target.files) {
+            editorImageSample.insertImage(e.target.files)
+            e.target.value = ''
+        }
+    })
+}
 
 function imageUpload (targetImgElement, index, state, imageInfo, remainingFilesCount) {
     console.log('imageInfo', imageInfo);
