@@ -40,6 +40,12 @@ export default {
         let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
 
+        context.resizing.alignMenu = resize_button.querySelector('._se_resizing_align_menu');
+        context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
+
+        context.resizing.alignButton = resize_button.querySelector('._se_resizing_align_button');
+        context.resizing.alignButtonIcon = context.resizing.alignButton.querySelector('i');
+
         /** add event listeners */
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -125,6 +131,32 @@ export default {
             '       <i class="se-icon-mirror-vertical"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
             '   </button>' +
+            '   <button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
+            '       <i class="se-icon-align-justify"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
+            '   </button>' +
+            '   <div class="se-btn-group-sub sun-editor-common se-list-layer _se_resizing_align_menu" style="left: 57px;">' +
+            '       <div class="se-list-inner">' +
+            '           <ul class="se-list-basic">' +
+            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
+            '                   <i class="se-icon-align-justify"></i>' +
+            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
+            '               </button></li>' +
+            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
+            '                   <i class="se-icon-align-left"></i>' +
+            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
+            '               </button></li>' +
+            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
+            '                   <i class="se-icon-align-center"></i>' +
+            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
+            '               </button></li>' +
+            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
+            '                   <i class="se-icon-align-right"></i>' +
+            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
+            '               </button></li>' +
+            '           </ul>' +
+            '       </div>' +
+            '   </div>' +
             '   <button type="button" data-command="revert" class="se-tooltip">' +
             '       <i class="se-icon-revert"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
@@ -179,6 +211,15 @@ export default {
             resizeHandles[i].style.display = resizeDisplay;
         }
 
+        // align icon
+        const alignList = contextResizing.alignMenuList;
+        this.util.removeClass(contextResizing.alignButtonIcon, 'se-icon-align\\-[a-z]+');
+        this.util.addClass(contextResizing.alignButtonIcon, 'se-icon-align-' + (align === 'basic' ? 'justify' : align));
+        for (let i = 0, len = alignList.length; i < len; i++) {
+            if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
+            else this.util.removeClass(alignList[i], 'on');
+        }
+
         this._resizingName = plugin;
         this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
 
@@ -207,6 +248,21 @@ export default {
             t: t,
             l: l
         };
+    },
+
+    _closeAlignMenu: null,
+    openAlignMenu: function () {
+        this.util.addClass(this.context.resizing.alignButton, 'on');
+        this.context.resizing.alignMenu.style.display = 'inline-table';
+
+        this.plugins.resizing._closeAlignMenu = function () {
+            this.util.removeClass(this.context.resizing.alignButton, 'on');
+            this.context.resizing.alignMenu.style.display = 'none';
+            this._d.removeEventListener('mousedown', this.plugins.resizing._closeAlignMenu);
+            this.plugins.resizing._closeAlignMenu = null;
+        }.bind(this);
+
+        this._d.addEventListener('mousedown', this.plugins.resizing._closeAlignMenu);
     },
 
     create_caption: function () {
@@ -241,65 +297,85 @@ export default {
         if (!command) return;
 
         const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
-        const contextEl = this.context[this.context.resizing._resize_plugin]._element;
+        const currentContext = this.context[this.context.resizing._resize_plugin];
+        const contextEl = currentContext._element;
         const contextPlugin = this.plugins[this.context.resizing._resize_plugin];
 
         e.preventDefault();
 
-        if (/percent/.test(command)) {
-            this.plugins.resizing.resetTransform.call(this, contextEl);
-
-            contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
-
-            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
-            contextPlugin.onModifyMode.call(this, contextEl, size);
+        if (typeof this.plugins.resizing._closeAlignMenu === 'function') {
+            this.plugins.resizing._closeAlignMenu();
+            if (command === 'onalign') return;
         }
-        else if (/mirror/.test(command)) {
-            const r = contextEl.getAttribute('data-rotate') || '0';
-            let x = contextEl.getAttribute('data-rotateX') || '';
-            let y = contextEl.getAttribute('data-rotateY') || '';
 
-            if ((value === 'h' && !this.context.resizing._rotateVertical) || (value === 'v' && this.context.resizing._rotateVertical)) {
-                y = y ? '' : '180';
-            } else {
-                x = x ? '' : '180';
-            }
-
-            contextEl.setAttribute('data-rotateX', x);
-            contextEl.setAttribute('data-rotateY', y);
-
-            this.plugins.resizing._setTransForm(contextEl, r, x, y);
-        }
-        else if (/rotate/.test(command)) {
-            const contextResizing = this.context.resizing;
-            const slope = (contextEl.getAttribute('data-rotate') * 1) + (value * 1);
-            const deg = Math.abs(slope) >= 360 ? 0 : slope;
-
-            contextEl.setAttribute('data-rotate', deg);
-            contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(deg).toString());
-
-            this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
-
-            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin);
-            contextPlugin.onModifyMode.call(this, contextEl, size);
-        }
-        else if (/revert/.test(command)) {
-            if (contextPlugin.setAutoSize) {
-                contextPlugin.setAutoSize.call(this);
-            } else {
-                contextPlugin.resetAlign.call(this);
+        switch (command) {
+            case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-            }
-
-            const size = this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin);
-            contextPlugin.onModifyMode.call(this, contextEl, size);
-        }
-        else if (/update/.test(command)) {
-            contextPlugin.openModify.call(this);
-            this.controllersOff();
-        }
-        else if (/delete/.test(command)) {
-            contextPlugin.destroy.call(this);
+                contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                break;
+            case 'mirror':
+                const r = contextEl.getAttribute('data-rotate') || '0';
+                let x = contextEl.getAttribute('data-rotateX') || '';
+                let y = contextEl.getAttribute('data-rotateY') || '';
+    
+                if ((value === 'h' && !this.context.resizing._rotateVertical) || (value === 'v' && this.context.resizing._rotateVertical)) {
+                    y = y ? '' : '180';
+                } else {
+                    x = x ? '' : '180';
+                }
+    
+                contextEl.setAttribute('data-rotateX', x);
+                contextEl.setAttribute('data-rotateY', y);
+    
+                this.plugins.resizing._setTransForm(contextEl, r, x, y);
+                break;
+            case 'rotate':
+                const contextResizing = this.context.resizing;
+                const slope = (contextEl.getAttribute('data-rotate') * 1) + (value * 1);
+                const deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
+    
+                contextEl.setAttribute('data-rotate', deg);
+                contextResizing._rotateVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
+                this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
+    
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
+                break;
+            case 'onalign':
+                this.plugins.resizing.openAlignMenu.call(this);
+                break;
+            case 'align':
+                const alignValue = value === 'basic' ? 'none' : value;
+        
+                if (alignValue && 'none' !== alignValue) {
+                    currentContext._cover.style.margin = 'auto';
+                } else {
+                    currentContext._cover.style.margin = '0';
+                }
+    
+                this.util.removeClass(currentContext._container, currentContext._floatClassRegExp);
+                this.util.addClass(currentContext._container, 'float-' + alignValue);
+                contextEl.setAttribute('data-align', alignValue);
+    
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                break;
+            case 'revert':
+                if (contextPlugin.setAutoSize) {
+                    contextPlugin.setAutoSize.call(this);
+                } else {
+                    contextPlugin.resetAlign.call(this);
+                    this.plugins.resizing.resetTransform.call(this, contextEl);
+                }
+    
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                break;
+            case 'update':
+                contextPlugin.openModify.call(this);
+                this.controllersOff();
+                break;
+            case 'delete':
+                contextPlugin.destroy.call(this);
+                break;
         }
 
         // history stack

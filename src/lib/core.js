@@ -2948,6 +2948,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(resizingName, function () {
+                            core.controllersOff();
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
                         });

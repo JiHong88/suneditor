@@ -168,6 +168,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     minHeight: '150px',
     maxHeight: '500px',
     height: 450,
+    imageWidth: '100%',
     colorList: [
         ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
         ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']

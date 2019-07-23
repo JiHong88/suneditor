@@ -49,7 +49,7 @@ export default {
         context.table.tableController = tableController;
         context.table.resizeIcon = tableController.querySelector('._se_table_resize > i');
         context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
-        context.table.headerButton = tableController.querySelector('.__se__table_header');
+        context.table.headerButton = tableController.querySelector('._se_table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
@@ -101,7 +101,7 @@ export default {
             '           <i class="se-icon-expansion"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
             '       </button>' +
-            '       <button type="button" data-command="header" class="se-tooltip __se__table_header">' +
+            '       <button type="button" data-command="header" class="se-tooltip _se_table_header">' +
             '           <i class="se-icon-table-header"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
             '       </button>' +
