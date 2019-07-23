@@ -247,7 +247,7 @@ export default {
                 }
 
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                 if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
@@ -258,7 +258,7 @@ export default {
             }
             else {
                 for (let i = 0; i < filesLen; i++) {
-                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, i, filesLen - 1);
+                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image._align, i, filesLen - 1);
                 }
             }
         }
@@ -518,7 +518,11 @@ export default {
         oImg.setAttribute('data-rotate', '0');
 
         if (contextImage._resizing) {
-            if (/\d+/.test(width)) oImg.style.width = width;
+            if (/\d+/.test(width)) {
+                width = width.match(/\d+/)[0] * 1;
+                if (width > 0) oImg.style.width = width + 'px';
+                else width = '';
+            }
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         }
 
