@@ -3316,13 +3316,19 @@ export default function (context, pluginCallButtons, plugins, lang) {
          */
         setContents: function (contents) {
             if (core._variable.wysiwygActive) {
-                context.element.wysiwyg.innerHTML = util.convertContentsForEditor(contents);
-            } else {
-                context.element.code.value = contents;
-            }
+                const html = util.convertContentsForEditor(contents);
+                if (html !== context.element.wysiwyg.innerHTML) {
+                    context.element.wysiwyg.innerHTML = html;
 
-            // history stack
-            core.history.push();
+                    // history stack
+                    core.history.push();
+                }
+            } else {
+                const value = util.convertHTMLForCodeView(contents);
+                if (value !== context.element.code.value) {
+                    context.element.code.value = value;
+                }
+            }
         },
 
         /**
