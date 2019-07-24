@@ -98,19 +98,19 @@ export default {
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="se-btn-group _se_resizing_btn_group">' +
             '   <button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
-            '       <span class="note-fontsize-10">100%</span>' +
+            '       <span>100%</span>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
-            '       <span class="note-fontsize-10">75%</span>' +
+            '       <span>75%</span>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
-            '       <span class="note-fontsize-10">50%</span>' +
+            '       <span>50%</span>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
-            '       <span class="note-fontsize-10">25%</span>' +
+            '       <span>25%</span>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
