@@ -82,7 +82,7 @@ export default {
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
             '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '       </button>' +
-            '       <h5 class="modal-title">' + lang.dialogBox.videoBox.title + '</h5>' +
+            '       <span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
             '   </div>' +
             '   <div class="se-dialog-body">' +
             '       <div class="se-dialog-form">' +
@@ -106,7 +106,7 @@ export default {
             '       </div>' +
             '   </div>' +
             '   <div class="se-dialog-footer">' +
-            '       <div style="float: left;">' +
+            '       <div>' +
             '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
             '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
             '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +

@@ -55,7 +55,7 @@ export default {
             '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
             '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '       </button>' +
-            '       <h5 class="modal-title">' + lang.dialogBox.linkBox.title + '</h5>' +
+            '       <span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
             '   </div>' +
             '   <div class="se-dialog-body">' +
             '       <div class="se-dialog-form">' +

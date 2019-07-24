@@ -90,7 +90,7 @@ export default {
             '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
             '       <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
             '   </button>' +
-            '   <h5 class="modal-title">' + lang.dialogBox.imageBox.title + '</h5>' +
+            '   <span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
             '<div class="se-dialog-tabs">' +
             '   <button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
@@ -146,7 +146,7 @@ export default {
             '       </div>' +
             '   </div>' +
             '   <div class="se-dialog-footer">' +
-            '       <div style="float: left;">' +
+            '       <div>' +
             '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
             '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
             '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
