@@ -17,7 +17,7 @@
 .sun-editor textarea {resize:none !important; border:0 !important;}
 .sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer; outline:none;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align:middle;}
-.sun-editor button span {display:block; margin:0; padding:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;}
+.sun-editor button span {display:block; margin:0; padding:0;}
 .sun-editor button .txt {display:block; margin-top:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 /** --- icon */
