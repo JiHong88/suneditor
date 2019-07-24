@@ -65,7 +65,9 @@ export default {
             '       <div class="se-dialog-form">' +
             '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
             '       </div>' +
-            '       <label><input type="checkbox" class="_se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       <div class="se-dialog-form-footer">' +
+            '           <label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+            '       </div>' +
             '   </div>' +
             '   <div class="se-dialog-footer">' +
             '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +

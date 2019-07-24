@@ -312,7 +312,7 @@ window.sun_create2 = function () {
 
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
+        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
         [
             {
                 // plugin's name attribute

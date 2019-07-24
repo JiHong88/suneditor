@@ -56,6 +56,14 @@
     float: none;
 }
 
+/* span */
+.sun-editor-editable span {
+    display: inline;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+}
+
 /* a */
 .sun-editor-editable a {
     color: #004cff;

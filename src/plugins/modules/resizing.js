@@ -40,7 +40,7 @@ export default {
         let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
 
-        context.resizing.alignMenu = resize_button.querySelector('._se_resizing_align_menu');
+        context.resizing.alignMenu = resize_button.querySelector('.se-resizing-align-list');
         context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
 
         context.resizing.alignButton = resize_button.querySelector('._se_resizing_align_button');
@@ -135,7 +135,7 @@ export default {
             '       <i class="se-icon-align-justify"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
             '   </button>' +
-            '   <div class="se-btn-group-sub sun-editor-common se-list-layer _se_resizing_align_menu" style="left: 57px;">' +
+            '   <div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
             '       <div class="se-list-inner">' +
             '           <ul class="se-list-basic">' +
             '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +

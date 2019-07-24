@@ -126,14 +126,14 @@ export default {
                 '       <div class="se-dialog-form">' +
                 '           <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '           <input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
-                '           <label><input type="checkbox" class="_se_image_check_proportion" style="margin-left: 20px;" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                '           <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                 '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                 '       </div>' ;
             }
 
             html += '' +
             '           <div class="se-dialog-form-footer">' +
-            '               <label><input type="checkbox" class="_se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+            '               <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
             '           </div>' +
             '       </div>' +
             '   </div>' +

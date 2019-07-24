@@ -95,14 +95,14 @@ export default {
                 '   <div class="se-dialog-form">' +
                 '       <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
                 '       <input type="number" class="se-input-control _se_video_size_x" /><label class="se-dialog-size-x">x</label><input type="number" class="se-input-control _se_video_size_y" />' +
-                '       <label><input type="checkbox" class="_se_video_check_proportion" style="margin-left: 20px;" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                '       <label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                 '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                 '   </div>';
             }
 
             html += '' +
             '       <div class="se-dialog-form-footer">' +
-            '           <label><input type="checkbox" class="_se_video_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+            '           <label><input type="checkbox" class="se-dialog-btn-check _se_video_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
             '       </div>' +
             '   </div>' +
             '   <div class="se-dialog-footer">' +
