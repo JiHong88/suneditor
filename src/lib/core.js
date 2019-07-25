@@ -596,6 +596,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 oNode = this.appendFormatTag(element);
             }
 
+            // history stack
+            this.history.push();
+
             return oNode;
         },
 
@@ -3333,7 +3336,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (core._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value += contents;
+                context.element.code.value += util.convertHTMLForCodeView(contents);
             }
 
             // history stack
