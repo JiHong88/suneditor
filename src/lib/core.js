@@ -2593,21 +2593,16 @@ export default function (context, pluginCallButtons, plugins, lang) {
             }
         },
 
-        onMouseUp_wysiwyg: function () {
+        onClick_wysiwyg: function (e) {
+            const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
-            core._editorRange();
+            e.stopPropagation();
             
             if (core._isBalloon) {
                 const range = core.getRange();
                 if (range.collapsed) event._hideToolbar();
                 else event._showToolbarBalloon(range);
             }
-        },
-
-        onClick_wysiwyg: function (e) {
-            const targetElement = e.target;
-            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
-            e.stopPropagation();
 
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
                 const imageComponent = targetElement.querySelector('IMG');
@@ -2616,7 +2611,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (imageComponent) {
                     e.preventDefault();
                     if (!core.plugins.image) return;
-                    if (targetElement.getAttribute('contenteditable') !== 'false')
 
                     core.callPlugin('image', function () {
                         const size = core.plugins.resizing.call_controller_resize.call(core, imageComponent, 'image');
@@ -2665,9 +2659,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
                 core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 core.focus();
-                return;
             }
 
+            core._editorRange();
             event._findButtonEffectTag();
 
             if (userFunction.onClick) userFunction.onClick(e);
@@ -3406,7 +3400,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
     context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
     context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
     /** editor area */
-    context.element.wysiwyg.addEventListener('mouseup', event.onMouseUp_wysiwyg, false);
     context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
     context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
     context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
