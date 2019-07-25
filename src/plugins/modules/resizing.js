@@ -46,6 +46,8 @@ export default {
         context.resizing.alignButton = resize_button.querySelector('._se_resizing_align_button');
         context.resizing.alignButtonIcon = context.resizing.alignButton.querySelector('i');
 
+        context.resizing.captionButton = resize_button.querySelector('._se_resizing_caption_button');
+
         /** add event listeners */
         resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
         resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -157,6 +159,10 @@ export default {
             '           </ul>' +
             '       </div>' +
             '   </div>' +
+            '   <button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
+            '       <i class="se-icon-caption"></i>' +
+            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
+            '   </button>' +
             '   <button type="button" data-command="revert" class="se-tooltip">' +
             '       <i class="se-icon-revert"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
@@ -220,8 +226,17 @@ export default {
             else this.util.removeClass(alignList[i], 'on');
         }
 
+        // caption active
+        if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
+            this.util.addClass(contextResizing.captionButton, 'active');
+            this.context[plugin]._captionChecked = true;
+        } else {
+            this.util.removeClass(contextResizing.captionButton, 'active');
+            this.context[plugin]._captionChecked = false;
+        }
+
         this._resizingName = plugin;
-        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
+        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.plugins[plugin].init.bind(this));
 
         // button group
         const overLeft = this.context.element.wysiwyg.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
@@ -297,9 +312,11 @@ export default {
         if (!command) return;
 
         const value = target.getAttribute('data-value') || target.parentNode.getAttribute('data-value');
-        const currentContext = this.context[this.context.resizing._resize_plugin];
+
+        const pluginName = this.context.resizing._resize_plugin;
+        const currentContext = this.context[pluginName];
         const contextEl = currentContext._element;
-        const contextPlugin = this.plugins[this.context.resizing._resize_plugin];
+        const contextPlugin = this.plugins[pluginName];
 
         e.preventDefault();
 
@@ -312,7 +329,7 @@ export default {
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
                 contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':
                 const r = contextEl.getAttribute('data-rotate') || '0';
@@ -357,7 +374,37 @@ export default {
                 this.util.addClass(currentContext._container, 'float-' + alignValue);
                 contextEl.setAttribute('data-align', alignValue);
     
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                break;
+            case 'caption':
+                const caption = !currentContext._captionChecked;
+                contextPlugin.openModify.call(this, true);
+                currentContext._captionChecked = currentContext.captionCheckEl.checked = caption;
+
+                if (pluginName === 'image') {
+                    contextPlugin.update_image.call(this, false, false);
+                } else if (pluginName === 'video') {
+                    this.context.dialog.updateModal = true;
+                    contextPlugin.submitAction.call(this);
+                }
+
+                if (caption) {
+                    const captionText = this.util.getChildElement(currentContext._caption, function (current) {
+                        return current.nodeType === 3;
+                    });
+
+                    if (!captionText) {
+                        currentContext._caption.focus();
+                    } else {
+                        this.setRange(captionText, 0, captionText, captionText.textContent.length);
+                    }
+
+                    this.controllersOff();
+                } else {
+                    contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    contextPlugin.openModify.call(this, true);
+                }
+
                 break;
             case 'revert':
                 if (contextPlugin.setAutoSize) {
@@ -367,7 +414,7 @@ export default {
                     this.plugins.resizing.resetTransform.call(this, contextEl);
                 }
     
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, this.context.resizing._resize_plugin));
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'update':
                 contextPlugin.openModify.call(this);

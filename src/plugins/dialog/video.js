@@ -131,6 +131,117 @@ export default {
         }
     },
 
+    submitAction: function () {
+        if (this.context.video.focusElement.value.trim().length === 0) return false;
+
+        const contextVideo = this.context.video;
+        const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
+        const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
+        let oIframe = null;
+        let cover = null;
+        let container = null;
+        let url = contextVideo.focusElement.value.trim();
+        contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
+
+        /** iframe source */
+        if (/^<iframe.*\/iframe>$/.test(url)) {
+            oIframe = (new this._w.DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
+        }
+        /** url */
+        else {
+            oIframe = this.util.createElement('IFRAME');
+            /** youtube */
+            if (/youtu\.?be/.test(url)) {
+                url = url.replace('watch?v=', '');
+                if (!/^\/\/.+\/embed\//.test(url)) {
+                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
+                }
+
+                if (contextVideo._youtubeQuery.length > 0) {
+                    if (/\?/.test(url)) {
+                        const splitUrl = url.split('?');
+                        url = splitUrl[0] + '?' + contextVideo._youtubeQuery + '&' + splitUrl[1];
+                    } else {
+                        url += '?' + contextVideo._youtubeQuery;
+                    }
+                }
+            }
+            oIframe.src = url;
+        }
+
+        /** update */
+        if (this.context.dialog.updateModal) {
+            contextVideo._element.src = oIframe.src;
+            container = contextVideo._container;
+            cover = this.util.getParentElement(contextVideo._element, 'FIGURE');
+            oIframe = contextVideo._element;
+        }
+        /** create */
+        else {
+            oIframe.frameBorder = '0';
+            oIframe.allowFullscreen = true;
+            oIframe.onload = function () {
+                this.setAttribute('origin-size', this.offsetWidth + ',' + this.offsetHeight);
+                this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
+                this.style.height = this.offsetHeight + 'px';
+            }.bind(oIframe);
+            contextVideo._element = oIframe;
+
+            /** cover */
+            cover = this.plugins.resizing.set_cover.call(this, oIframe);
+
+            /** container */
+            container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
+            this._variable._videosCnt++;
+        }
+
+        const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
+
+        if (contextVideo._resizing) {
+            this.context.video._proportionChecked = contextVideo.proportion.checked;
+            oIframe.setAttribute('data-proportion', contextVideo._proportionChecked);
+        }
+
+        // caption
+        if (contextVideo._captionChecked) {
+            if (!contextVideo._caption) {
+                contextVideo._caption = this.plugins.resizing.create_caption.call(this);
+                cover.appendChild(contextVideo._caption);
+            }
+        } else {
+            if (contextVideo._caption) {
+                this.util.removeItem(contextVideo._caption);
+                contextVideo._caption = null;
+            }
+        }
+
+        // size
+        if (changeSize) {
+            this.plugins.video.setSize.call(this, w, h);
+        }
+
+        // align
+        if (contextVideo._align && 'none' !== contextVideo._align) {
+            cover.style.margin = 'auto';
+        } else {
+            cover.style.margin = '0';
+        }
+        
+        this.util.removeClass(container, this.context.video._floatClassRegExp);
+        this.util.addClass(container, 'float-' + contextVideo._align);
+        oIframe.setAttribute('data-align', contextVideo._align);
+
+        if (!this.context.dialog.updateModal) {
+            this.insertComponent(container);
+        }
+        else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
+            this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);
+        }
+
+        // history stack
+        this.history.push();
+    },
+
     submit: function (e) {
         this.showLoading();
 
@@ -139,119 +250,8 @@ export default {
 
         this.context.video._captionChecked = this.context.video.captionCheckEl.checked;
 
-        const submitAction = function () {
-            if (this.context.video.focusElement.value.trim().length === 0) return false;
-
-            const contextVideo = this.context.video;
-            const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
-            const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
-            let oIframe = null;
-            let cover = null;
-            let container = null;
-            let url = contextVideo.focusElement.value.trim();
-            contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
-
-            /** iframe source */
-            if (/^<iframe.*\/iframe>$/.test(url)) {
-                oIframe = (new this._w.DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
-            }
-            /** url */
-            else {
-                oIframe = this.util.createElement('IFRAME');
-                /** youtube */
-                if (/youtu\.?be/.test(url)) {
-                    url = url.replace('watch?v=', '');
-                    if (!/^\/\/.+\/embed\//.test(url)) {
-                        url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
-                    }
-
-                    if (contextVideo._youtubeQuery.length > 0) {
-                        if (/\?/.test(url)) {
-                            const splitUrl = url.split('?');
-                            url = splitUrl[0] + '?' + contextVideo._youtubeQuery + '&' + splitUrl[1];
-                        } else {
-                            url += '?' + contextVideo._youtubeQuery;
-                        }
-                    }
-                }
-                oIframe.src = url;
-            }
-
-            /** update */
-            if (this.context.dialog.updateModal) {
-                contextVideo._element.src = oIframe.src;
-                container = contextVideo._container;
-                cover = this.util.getParentElement(contextVideo._element, 'FIGURE');
-                oIframe = contextVideo._element;
-            }
-            /** create */
-            else {
-                oIframe.frameBorder = '0';
-                oIframe.allowFullscreen = true;
-                oIframe.onload = function () {
-                    this.setAttribute('origin-size', this.offsetWidth + ',' + this.offsetHeight);
-                    this.setAttribute('data-origin', this.offsetWidth + ',' + this.offsetHeight);
-                    this.style.height = this.offsetHeight + 'px';
-                }.bind(oIframe);
-                contextVideo._element = oIframe;
-
-                /** cover */
-                cover = this.plugins.resizing.set_cover.call(this, oIframe);
-
-                /** container */
-                container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
-                this._variable._videosCnt++;
-            }
-
-            const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
-
-            if (contextVideo._resizing) {
-                this.context.video._proportionChecked = contextVideo.proportion.checked;
-                oIframe.setAttribute('data-proportion', contextVideo._proportionChecked);
-            }
-
-            // caption
-            if (contextVideo._captionChecked) {
-                if (!contextVideo._caption) {
-                    contextVideo._caption = this.plugins.resizing.create_caption.call(this);
-                    cover.appendChild(contextVideo._caption);
-                }
-            } else {
-                if (contextVideo._caption) {
-                    this.util.removeItem(contextVideo._caption);
-                    contextVideo._caption = null;
-                }
-            }
-
-            // size
-            if (changeSize) {
-                this.plugins.video.setSize.call(this, w, h);
-            }
-
-            // align
-            if (contextVideo._align && 'none' !== contextVideo._align) {
-                cover.style.margin = 'auto';
-            } else {
-                cover.style.margin = '0';
-            }
-            
-            this.util.removeClass(container, this.context.video._floatClassRegExp);
-            this.util.addClass(container, 'float-' + contextVideo._align);
-            oIframe.setAttribute('data-align', contextVideo._align);
-
-            if (!this.context.dialog.updateModal) {
-                this.insertComponent(container);
-            }
-            else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || (this.context.resizing._rotateVertical && contextVideo._captionChecked)) {
-                this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);
-            }
-
-            // history stack
-            this.history.push();
-        }.bind(this);
-
         try {
-            submitAction();
+            this.plugins.video.submitAction.call(this);
         } finally {
             this.plugins.dialog.close.call(this);
             this.closeLoading();
@@ -332,7 +332,7 @@ export default {
         }
     },
 
-    openModify: function () {
+    openModify: function (notOpen) {
         const contextVideo = this.context.video;
 
         contextVideo.focusElement.value = contextVideo._element.src;
@@ -346,7 +346,7 @@ export default {
             contextVideo.proportion.disabled = false;
         }
 
-        this.plugins.dialog.open.call(this, 'video', true);
+        if (!notOpen) this.plugins.dialog.open.call(this, 'video', true);
     },
 
     checkVideos: function () {

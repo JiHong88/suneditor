@@ -521,7 +521,7 @@ const util = {
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
      * @param {Node} element Reference element
-     * @param {String|Function} query Query String (tagName, .className, #ID, :name) or validation function.
+     * @param {String|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
      * Not use it like jquery.
      * Only one condition can be entered at a time.
      * @returns {Element|null}
@@ -543,7 +543,7 @@ const util = {
                 attr = 'name';
                 query = '^' + query.split(':')[1] + '$';
             } else {
-                attr = 'tagName';
+                attr = 'nodeName';
                 query = '^' + query + '$';
             }
 
@@ -568,7 +568,7 @@ const util = {
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
      * @param {Node} element Reference element
-     * @param {String|Function} query Query String (tagName, .className, #ID, :name) or validation function.
+     * @param {String|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
      * @param {Boolean} last If true returns the last node among the found child nodes. (default: first node)
      * Not use it like jquery.
      * Only one condition can be entered at a time.
@@ -591,7 +591,7 @@ const util = {
                 attr = 'name';
                 query = '^' + query.split(':')[1] + '$';
             } else {
-                attr = 'tagName';
+                attr = 'nodeName';
                 query = '^' + query + '$';
             }
 

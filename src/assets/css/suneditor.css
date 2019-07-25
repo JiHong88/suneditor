@@ -103,13 +103,15 @@
 .sun-editor .se-icon-table-header::before{content:'\0030';}
 .sun-editor .se-icon-merge-cell::before{content:'\0031';}
 .sun-editor .se-icon-split-cell::before{content:'\0032';}
-.sun-editor .se-icon-pdf::before{content:'\0033';}
+.sun-editor .se-icon-caption::before{content:'\0033';}
 .sun-editor .se-icon-file::before{content:'\0034';}
 .sun-editor .se-icon-question::before{content:'\0035';}
 .sun-editor .se-icon-attachment::before{content:'\0036';}
 .sun-editor .se-icon-add::before{content:'\0037';}
 .sun-editor .se-icon-more-vertical::before{content:'\0038';}
 .sun-editor .se-icon-more-horizontal::before{content:'\0039';}
+.sun-editor .se-icon-map-pin::before{content:'\0021';}
+.sun-editor .se-icon-magic-stick::before{content:'\0022';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
