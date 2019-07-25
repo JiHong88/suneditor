@@ -88,7 +88,7 @@ export default {
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
             '   <div class="se-btn-group">' +
             '       <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-            '           <i class="se-icon-link"></i>' +
+            '           <i class="se-icon-edit"></i>' +
             '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
             '       </button>' +
             '       <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +

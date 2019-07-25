@@ -168,7 +168,7 @@ export default {
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="update" class="se-tooltip">' +
-            '       <i class="se-icon-modify"></i>' +
+            '       <i class="se-icon-edit"></i>' +
             '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
             '   </button>' +
             '   <button type="button" data-command="delete" class="se-tooltip">' +
