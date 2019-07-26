@@ -390,6 +390,17 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
+// Add or reset option property
+editor.setOptions({
+    minHeight: '300',
+    buttonList: [
+        ['fontColor', 'hiliteColor']
+    ],
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
+    ]
+});
+
 // Open a notice area
 editor.noticeOpen('test notice');
 

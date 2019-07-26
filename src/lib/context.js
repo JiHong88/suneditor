@@ -12,7 +12,7 @@
  * @param {HTMLElement} element textarea element
  * @param {object} cons Toolbar element you created
  * @param {json} options Inserted options
- * @returns Elements, variables of the editor
+ * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
 const _Context = function (element, cons, options) {

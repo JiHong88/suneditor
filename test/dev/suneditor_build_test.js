@@ -164,15 +164,13 @@ const editor = suneditor.init({
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
-    plugins: plugins,
-    minHeight: '150px',
-    maxHeight: '500px',
-    height: 450,
-    imageWidth: '100%',
-    colorList: [
-        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
-        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+    plugins: [
+        plugins.hiliteColor,
+        plugins.fontColor
     ],
+    maxHeight: '400px',
+    height: 150,
+    imageWidth: '100%',
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -192,6 +190,29 @@ let s2 = editor.create(document.getElementById('editor2'), {
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
     // imageUploadSizeLimit: 30000
 });
+
+const newOption = {
+    mode: 'balloon',
+    plugins: plugins,
+    minHeight: '300',
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        ['fontColor', 'hiliteColor'],
+        ['outdent', 'indent'],
+        ['align', 'horizontalRule', 'list', 'table'],
+        ['link', 'image', 'video'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print'],
+        ['save'],
+    ],
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+    ],
+}
 
 let imageList = [];
 let selectedImages = [];
@@ -294,6 +315,10 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
         console.log('imageList', imageList)
         setImageList(imageList)
     }
+}
+
+window.sun_setOptions2 = function () {
+    s2.setOptions(newOption);
 }
 
 window.sun_insertImage2 = function () {

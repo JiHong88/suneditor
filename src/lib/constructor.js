@@ -7,23 +7,239 @@
  */
 'use strict';
 
+import _defaultLang from '../lang/en';
 import util from './util';
 
-/**
- * @description document create - call _createToolBar()
- * @param {element} element textarea
- * @param {JSON} options user options
- * @param {JSON} lang user language
- * @param {JSON} _plugins plugins object
- * @returns {JSON}
- * @private
- */
-const _Constructor = {
-    init: function (element, options, lang, _plugins) {
+
+export default {
+    /**
+     * @description document create - call _createToolBar()
+     * @param {element} element Textarea
+     * @param {Object} options Options
+     * @returns {Object}
+     */
+    init: function (element, options) {
         if (typeof options !== 'object') options = {};
+
+        const doc = document;
+
+        /** --- init options --- */
+        this._initOptions(element, options);
     
+        // suneditor div
+        const top_div = doc.createElement('DIV');
+        top_div.className = 'sun-editor';
+        if (element.id) top_div.id = 'suneditor_' + element.id;
+    
+        // relative div
+        const relative = doc.createElement('DIV');
+        relative.className = 'se-container';
+    
+        // toolbar
+        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options.lang);
+        const arrow = doc.createElement('DIV');
+        arrow.className = 'se-arrow';
+
+        // sticky toolbar dummy
+        const sticky_dummy = doc.createElement('DIV');
+        sticky_dummy.className = 'se-toolbar-sticky-dummy';
+    
+        // inner editor div
+        const editor_div = doc.createElement('DIV');
+        editor_div.className = 'se-wrapper';
+    
+        // wysiwyg div
+        const wysiwyg_div = doc.createElement('DIV');
+        wysiwyg_div.setAttribute('contenteditable', true);
+        wysiwyg_div.setAttribute('scrolling', 'auto');
+        wysiwyg_div.className = 'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable';
+        wysiwyg_div.style.display = 'block';
+        wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
+    
+        // textarea for code view
+        const textarea = doc.createElement('TEXTAREA');
+        textarea.className = 'se-wrapper-inner se-wrapper-code';
+        textarea.style.display = 'none';
+
+        /** --- init elements and create bottom bar --- */
+        const bottomBar = this._initElements(options, top_div, tool_bar.element, arrow, wysiwyg_div, textarea);
+
+        // resizing bar
+        const resizing_bar = bottomBar.resizingBar;
+        const navigation = bottomBar.navigation;
+        const char_counter = bottomBar.charCounter;
+    
+        // loading box
+        const loading_box = doc.createElement('DIV');
+        loading_box.className = 'se-loading-box sun-editor-common';
+        loading_box.innerHTML = '<div class="se-loading-effect"></div>';
+    
+        // resize operation background
+        const resize_back = doc.createElement('DIV');
+        resize_back.className = 'se-resizing-back';
+    
+        /** append html */
+        editor_div.appendChild(wysiwyg_div);
+        editor_div.appendChild(textarea);
+        relative.appendChild(tool_bar.element);
+        relative.appendChild(sticky_dummy);
+        relative.appendChild(editor_div);
+        relative.appendChild(resize_back);
+        relative.appendChild(loading_box);
+        if (resizing_bar) {
+            relative.appendChild(resizing_bar);
+        }
+        top_div.appendChild(relative);
+    
+        return {
+            constructed: {
+                _top: top_div,
+                _relative: relative,
+                _toolBar: tool_bar.element,
+                _editorArea: editor_div,
+                _wysiwygArea: wysiwyg_div,
+                _codeArea: textarea,
+                _resizingBar: resizing_bar,
+                _navigation: navigation,
+                _charCounter: char_counter,
+                _loading: loading_box,
+                _resizeBack: resize_back,
+                _stickyDummy: sticky_dummy,
+                _arrow: arrow
+            },
+            options: options,
+            plugins: tool_bar.plugins,
+            pluginCallButtons: tool_bar.pluginCallButtons
+        };
+    },
+
+    /**
+     * @description Add or reset options
+     * @param {Object} mergeOptions New options property
+     * @param {Object} context Context object of core
+     * @param {Object} plugins Origin plugins
+     * @param {Object} originOptions Origin options
+     * @returns {Object} pluginCallButtons
+     * @private
+     */
+    _setOptions: function (mergeOptions, context, plugins, originOptions) {
+        this._initOptions(context.element.originElement, mergeOptions);
+
+        const el = context.element;
+        const relative = el.relative;
+        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode;
+        const isNewPlugins = !!mergeOptions.plugins;
+
+        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions.lang);
+        const arrow = document.createElement('DIV');
+        arrow.className = 'se-arrow';
+
+        if (isNewToolbar) {
+            relative.insertBefore(tool_bar.element, el.toolbar);
+            relative.removeChild(el.toolbar);
+            el.toolbar = tool_bar.element;
+            el._arrow = arrow;
+        }
+        
+        const bottomBar = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow, el.wysiwyg, el.code);
+        if (el.resizingBar) relative.removeChild(el.resizingBar);
+        if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
+        
+        el.resizingBar = bottomBar.resizingBar;
+        el.navigation = bottomBar.navigation;
+        el.charCounter = bottomBar.charCounter;
+
+        return {
+            callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
+            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null
+        };
+    },
+
+    /**
+     * @description Initialize property of suneditor elements
+     * @param {Object} options Options
+     * @param {Element} topDiv Suneditor top div
+     * @param {Element} toolBar Tool bar
+     * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
+     * @param {Element} wysiwygDiv WYSIWYG view div
+     * @param {Element} textarea Code view textarea
+     * @returns {Object} Bottom bar elements (resizingBar, navigation, charCounter)
+     * @private
+     */
+    _initElements: function (options, topDiv, toolBar, toolBarArrow, wysiwygDiv, textarea) {
+        /** top div */
+        topDiv.style.width = options.width;
+        topDiv.style.minWidth = options.minWidth;
+        topDiv.style.maxWidth = options.maxWidth;
+        topDiv.style.display = options.display;
+
+        /** toolbar */
+        if (/inline/i.test(options.mode)) {
+            toolBar.className += ' se-toolbar-inline';
+            toolBar.style.width = options.toolbarWidth;
+        } else if (/balloon/i.test(options.mode)) {
+            toolBar.className += ' se-toolbar-balloon';
+            toolBar.appendChild(toolBarArrow);
+        }
+
+        /** editor */
+        wysiwygDiv.style.height = options.height;
+        wysiwygDiv.style.minHeight = options.minHeight;
+        wysiwygDiv.style.maxHeight = options.maxHeight;
+
+        textarea.style.height = options.height;
+        textarea.style.minHeight = options.minHeight;
+        textarea.style.maxHeight = options.maxHeight;
+
+        /** resize bar */
+        let resizingBar = null;
+        let navigation = null;
+        let charCounter = null;
+        if (options.resizingBar) {
+            resizingBar = document.createElement('DIV');
+            resizingBar.className = 'se-resizing-bar sun-editor-common';
+
+            /** navigation */
+            navigation = document.createElement('DIV');
+            navigation.className = 'se-navigation sun-editor-common';
+            resizingBar.appendChild(navigation);
+
+            /** char counter */
+            if (options.charCounter) {
+                const charWrapper = document.createElement('DIV');
+                charWrapper.className = 'se-char-counter-wrapper';
+    
+                charCounter = document.createElement('SPAN');
+                charCounter.className = 'se-char-counter';
+                charCounter.textContent = '0';
+                charWrapper.appendChild(charCounter);
+    
+                if (options.maxCharCount > 0) {
+                    const char_max = document.createElement('SPAN');
+                    char_max.textContent = ' / ' + options.maxCharCount;
+                    charWrapper.appendChild(char_max);
+                }
+
+                resizingBar.appendChild(charWrapper);
+            }
+        }
+
+        return {
+            resizingBar: resizingBar,
+            navigation: navigation,
+            charCounter: charCounter
+        };
+    },
+
+    /**
+     * @description Initialize options
+     * @param {Element} element Options object
+     * @param {Object} options Options object
+     * @private
+     */
+    _initOptions: function (element, options) {
         /** user options */
-        options.lang = lang;
+        options.lang = options.lang || _defaultLang;
         // toolbar
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'max-content';
@@ -72,138 +288,6 @@ const _Constructor = {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
-    
-        const doc = document;
-    
-        /** suneditor div */
-        const top_div = doc.createElement('DIV');
-        top_div.className = 'sun-editor';
-        if (element.id) top_div.id = 'suneditor_' + element.id;
-        top_div.style.width = options.width;
-        top_div.style.minWidth = options.minWidth;
-        top_div.style.maxWidth = options.maxWidth;
-        top_div.style.display = options.display;
-    
-        /** relative div */
-        const relative = doc.createElement('DIV');
-        relative.className = 'se-container';
-    
-        /** toolbar */
-        const tool_bar = this._createToolBar(doc, options.buttonList, _plugins, lang);
-        let arrow = null;
-
-        if (/inline/i.test(options.mode)) {
-            tool_bar.element.className += ' se-toolbar-inline';
-            tool_bar.element.style.width = options.toolbarWidth;
-        } else if (/balloon/i.test(options.mode)) {
-            tool_bar.element.className += ' se-toolbar-balloon';
-            arrow = doc.createElement('DIV');
-            arrow.className = 'se-arrow';
-            tool_bar.element.appendChild(arrow);
-        }
-
-        /** sticky toolbar dummy */
-        const sticky_dummy = doc.createElement('DIV');
-        sticky_dummy.className = 'se-toolbar-sticky-dummy';
-    
-        /** inner editor div */
-        const editor_div = doc.createElement('DIV');
-        editor_div.className = 'se-wrapper';
-    
-        /** wysiwyg div */
-        const wysiwyg_div = doc.createElement('DIV');
-        wysiwyg_div.setAttribute('contenteditable', true);
-        wysiwyg_div.setAttribute('scrolling', 'auto');
-        wysiwyg_div.className = 'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable';
-        wysiwyg_div.style.display = 'block';
-        wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
-        wysiwyg_div.style.height = options.height;
-        wysiwyg_div.style.minHeight = options.minHeight;
-        wysiwyg_div.style.maxHeight = options.maxHeight;
-    
-        /** textarea for code view */
-        const textarea = doc.createElement('TEXTAREA');
-        textarea.className = 'se-wrapper-inner se-wrapper-code';
-        textarea.style.display = 'none';
-        textarea.style.height = options.height;
-        textarea.style.minHeight = options.minHeight;
-        textarea.style.maxHeight = options.maxHeight;
-
-        /** resize bar */
-        let resizing_bar = null;
-        let navigation = null;
-        let char_counter = null;
-        if (options.resizingBar) {
-            resizing_bar = doc.createElement('DIV');
-            resizing_bar.className = 'se-resizing-bar sun-editor-common';
-
-            /** navigation */
-            navigation = doc.createElement('DIV');
-            navigation.className = 'se-navigation sun-editor-common';
-            resizing_bar.appendChild(navigation);
-
-            /** char counter */
-            if (options.charCounter) {
-                const charWrapper = doc.createElement('DIV');
-                charWrapper.className = 'se-char-counter-wrapper';
-    
-                char_counter = doc.createElement('SPAN');
-                char_counter.className = 'se-char-counter';
-                char_counter.textContent = '0';
-                charWrapper.appendChild(char_counter);
-    
-                if (options.maxCharCount > 0) {
-                    const char_max = doc.createElement('SPAN');
-                    char_max.textContent = ' / ' + options.maxCharCount;
-                    charWrapper.appendChild(char_max);
-                }
-
-                resizing_bar.appendChild(charWrapper);
-            }
-        }
-    
-        /** loading box */
-        const loading_box = doc.createElement('DIV');
-        loading_box.className = 'se-loading-box sun-editor-common';
-        loading_box.innerHTML = '<div class="se-loading-effect"></div>';
-    
-        /** resize operation background */
-        const resize_back = doc.createElement('DIV');
-        resize_back.className = 'se-resizing-back';
-    
-        /** append html */
-        editor_div.appendChild(wysiwyg_div);
-        editor_div.appendChild(textarea);
-        relative.appendChild(tool_bar.element);
-        relative.appendChild(sticky_dummy);
-        relative.appendChild(editor_div);
-        relative.appendChild(resize_back);
-        relative.appendChild(loading_box);
-        if (resizing_bar) {
-            relative.appendChild(resizing_bar);
-        }
-        top_div.appendChild(relative);
-    
-        return {
-            constructed: {
-                _top: top_div,
-                _relative: relative,
-                _toolBar: tool_bar.element,
-                _editorArea: editor_div,
-                _wysiwygArea: wysiwyg_div,
-                _codeArea: textarea,
-                _resizingBar: resizing_bar,
-                _navigation: navigation,
-                _charCounter: char_counter,
-                _loading: loading_box,
-                _resizeBack: resize_back,
-                _stickyDummy: sticky_dummy,
-                _arrow: arrow
-            },
-            options: options,
-            plugins: tool_bar.plugins,
-            pluginCallButtons: tool_bar.pluginCallButtons
-        };
     },
 
     /**
@@ -472,5 +556,3 @@ const _Constructor = {
         };
     }
 };
-
-export default _Constructor;

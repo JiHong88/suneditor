@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import _Constructor from './constructor';
+import _Context from './context';
 import _history from './history';
 import _util from './util';
 import notice from '../plugins/modules/notice';
@@ -18,9 +20,10 @@ import notice from '../plugins/modules/notice';
  * @param context
  * @param plugins
  * @param lang
+ * @param _options
  * @returns {Object} UserFunction Object
  */
-export default function (context, pluginCallButtons, plugins, lang) {
+export default function (context, pluginCallButtons, plugins, lang, _options) {
     const _d = document;
     const _w = window;
     const util = _util;
@@ -94,7 +97,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
         /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
-        codeViewDisabledButtons: context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])'),
+        codeViewDisabledButtons: null,
 
         /**
          * @description History object for undo, redo
@@ -111,13 +114,13 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @description Is inline mode?
          * @private
          */
-        _isInline: /inline/i.test(context.option.mode),
+        _isInline: null,
 
         /**
          * @description Is balloon mode?
          * @private
          */
-        _isBalloon: /balloon/i.test(context.option.mode),
+        _isBalloon: null,
 
         /**
          * @description Required value when using inline mode to sticky toolbar
@@ -170,22 +173,7 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @property {Element} SUP superscript button
          * @property {Element} OUTDENT outdent button
          */
-        commandMap: {
-            FORMAT: context.tool.format,
-            FONT: context.tool.font,
-            FONT_TOOLTIP: context.tool.fontTooltip,
-            SIZE: context.tool.fontSize,
-            ALIGN: context.tool.align,
-            LI: context.tool.list,
-            LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
-            STRONG: context.tool.bold,
-            INS: context.tool.underline,
-            EM: context.tool.italic,
-            DEL: context.tool.strike,
-            SUB: context.tool.subscript,
-            SUP: context.tool.superscript,
-            OUTDENT: context.tool.outdent
-        },
+        commandMap: null,
 
         /**
          * @description Variables used internally in editor operation
@@ -2303,6 +2291,35 @@ export default function (context, pluginCallButtons, plugins, lang) {
                 if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideos.bind(this));
                 else this.plugins.video.checkVideos.call(this);
             }
+        },
+
+        /**
+         * @description Initializ core variable
+         * @private
+         */
+        _init: function () {
+            core.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
+            core._isInline = /inline/i.test(context.option.mode);
+            core._isBalloon = /balloon/i.test(context.option.mode);
+
+            core.commandMap = {
+                FORMAT: context.tool.format,
+                FONT: context.tool.font,
+                FONT_TOOLTIP: context.tool.fontTooltip,
+                SIZE: context.tool.fontSize,
+                ALIGN: context.tool.align,
+                LI: context.tool.list,
+                LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
+                STRONG: context.tool.bold,
+                INS: context.tool.underline,
+                EM: context.tool.italic,
+                DEL: context.tool.strike,
+                SUB: context.tool.subscript,
+                SUP: context.tool.superscript,
+                OUTDENT: context.tool.outdent
+            };
+
+            core._variable._originCssText = context.element.topArea.style.cssText;
         }
     };
 
@@ -2601,12 +2618,6 @@ export default function (context, pluginCallButtons, plugins, lang) {
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             e.stopPropagation();
             
-            if (core._isBalloon) {
-                const range = core.getRange();
-                if (range.collapsed) event._hideToolbar();
-                else event._showToolbarBalloon(range);
-            }
-
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
                 const imageComponent = targetElement.querySelector('IMG');
                 const videoComponent = targetElement.querySelector('IFRAME');
@@ -2666,6 +2677,12 @@ export default function (context, pluginCallButtons, plugins, lang) {
 
             core._editorRange();
             event._findButtonEffectTag();
+
+            if (core._isBalloon) {
+                const range = core.getRange();
+                if (range.collapsed) event._hideToolbar();
+                else event._showToolbarBalloon(range);
+            }
 
             if (userFunction.onClick) userFunction.onClick(e);
         },
@@ -3195,6 +3212,56 @@ export default function (context, pluginCallButtons, plugins, lang) {
         _onChange_historyStack: function () {
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (userFunction.onChange) userFunction.onChange(core.getContents());
+        },
+
+        _init: function () {
+            /** toolbar event */
+            context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
+            context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
+            /** editor area */
+            context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('dragover', function (e) { e.preventDefault(); }, false);
+            /** Events are registered only when there is a table plugin.  */
+            if (core.plugins.table) {
+                context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+                context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
+            }
+            
+            /** code view area auto line */
+            if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
+
+            /** resizingBar */
+            if (context.element.resizingBar) {
+                if (/\d+/.test(context.option.height)) {
+                    context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
+                } else {
+                    util.addClass(context.element.resizingBar, 'se-resizing-none');
+                }
+            }
+
+            /** inline editor */
+            if (core._isInline) {
+                context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
+            }
+
+            /** inline, balloon editor */
+            if (core._isInline || core._isBalloon) {
+                context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
+            }
+            
+            /** window event */
+            _w.removeEventListener('resize', event.onResize_window);
+            _w.removeEventListener('scroll', event.onScroll_window);
+
+            _w.addEventListener('resize', event.onResize_window, false);
+            if (context.option.stickyToolbar > -1) {
+                _w.addEventListener('scroll', event.onScroll_window, false);
+            }
         }
     };
 
@@ -3226,6 +3293,59 @@ export default function (context, pluginCallButtons, plugins, lang) {
          * @param {Object} result Result info Object
          */
         onImageUploadError: null,
+
+        /**
+         * @description Add or reset option property
+         * @param {Object} options Options
+         */
+        setOptions: function (options) {
+            core.plugins = options.plugins || core.plugins;
+            const mergeOptions = [_options, options].reduce(function (init, option) {
+                Object.keys(option).forEach(function (key) {
+                    init[key] = option[key];
+                });
+                return init;
+            }, {});
+
+            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
+
+            if (cons.callButtons) {
+                pluginCallButtons = cons.callButtons;
+                core.initPlugins = {};
+            }
+
+            if (cons.plugins) {
+                core.plugins = plugins = cons.plugins;
+            }
+
+            // reset context
+            const el = context.element;
+            const constructed = {
+                _top: el.topArea,
+                _relative: el.relative,
+                _toolBar: el.toolbar,
+                _editorArea: el.editorArea,
+                _wysiwygArea: el.wysiwyg,
+                _codeArea: el.code,
+                _resizingBar: el.resizingBar,
+                _navigation: el.navigation,
+                _charCounter: el.charCounter,
+                _loading: el.loading,
+                _resizeBack: el.resizeBackground,
+                _stickyDummy: el._stickyDummy,
+                _arrow: el._arrow
+            };
+            
+            _options = mergeOptions;
+            core.lang = lang = _options.lang;
+            core.context = context = _Context(context.element.originElement, constructed, _options);
+
+            core._init();
+            event._init();
+
+            core._checkComponents();
+            core._charCount(0, false);
+        },
 
         /**
          * @description Open a notice area
@@ -3398,51 +3518,9 @@ export default function (context, pluginCallButtons, plugins, lang) {
         }
     };
 
-    /** add event listeners */
-    /** toolbar event */
-    context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
-    context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
-    /** editor area */
-    context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
-    context.element.wysiwyg.addEventListener('dragover', function (e) { e.preventDefault(); }, false);
-    /** Events are registered only when there is a table plugin.  */
-    if (core.plugins.table) {
-        context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
-        context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
-    }
-    
-    /** code view area auto line */
-    if (context.option.height === 'auto') context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
-
-    /** resizingBar */
-    if (context.element.resizingBar) {
-        if (/\d+/.test(context.option.height)) {
-            context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
-        } else {
-            util.addClass(context.element.resizingBar, 'se-resizing-none');
-        }
-    }
-
-    /** inline editor */
-    if (core._isInline) {
-        context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
-    }
-
-    /** inline, balloon editor */
-    if (core._isInline || core._isBalloon) {
-        context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
-    }
-    
-    /** window event */
-    _w.addEventListener('resize', event.onResize_window, false);
-    if (context.option.stickyToolbar > -1) {
-        _w.addEventListener('scroll', event.onScroll_window, false);
-    }
+    /** initialize core and add event listeners */
+    core._init();
+    event._init();
 
     /** check image elements */
     if (core.plugins.image && context.element.wysiwyg.getElementsByTagName('IMG').length > 0) {
