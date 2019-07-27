@@ -3171,6 +3171,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
         },
 
+        onDragOver_wysiwyg: function (e) {
+            e.preventDefault();
+        },
+
         onDrop_wysiwyg: function (e) {
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
@@ -3214,7 +3218,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onChange) userFunction.onChange(core.getContents());
         },
 
-        _init: function () {
+        _addEvent: function () {
             /** toolbar event */
             context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
@@ -3224,8 +3228,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+            context.element.wysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('dragover', function (e) { e.preventDefault(); }, false);
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
                 context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
@@ -3262,6 +3266,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (context.option.stickyToolbar > -1) {
                 _w.addEventListener('scroll', event.onScroll_window, false);
             }
+        },
+
+        _removeEvent: function () {
+            context.element.toolbar.removeEventListener('mousedown', event.onMouseDown_toolbar);
+            context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
+
+            context.element.wysiwyg.removeEventListener('click', event.onClick_wysiwyg);
+            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
+            context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
+            context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
+            context.element.wysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
+            context.element.wysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
+            context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
+            context.element.wysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            context.element.wysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
+            
+            context.element.wysiwyg.removeEventListener('focus', event._showToolbarInline);
+            context.element.wysiwyg.removeEventListener('blur', event._hideToolbar);
+
+            context.element.code.removeEventListener('keyup', event._codeViewAutoScroll);
+            context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
+            
+            _w.removeEventListener('resize', event.onResize_window);
+            _w.removeEventListener('scroll', event.onScroll_window);
+        },
+
+        _init: function () {
+            this._removeEvent();
+            this._addEvent();
         }
     };
 
@@ -3345,6 +3378,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core._checkComponents();
             core._charCount(0, false);
+            core.focus();
         },
 
         /**
@@ -3520,7 +3554,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
     /** initialize core and add event listeners */
     core._init();
-    event._init();
+    event._addEvent();
 
     /** check image elements */
     if (core.plugins.image && context.element.wysiwyg.getElementsByTagName('IMG').length > 0) {

@@ -213,6 +213,13 @@ const newOption = {
         ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
     ],
 }
+const newOption2 = {
+    mode: 'classic',
+    maxHeight: '400px',
+    height: 150,
+    imageWidth: '100%',
+    colorList: null,
+}
 
 let imageList = [];
 let selectedImages = [];
@@ -319,6 +326,9 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
 
 window.sun_setOptions2 = function () {
     s2.setOptions(newOption);
+}
+window.sun_setOptions3 = function () {
+    s2.setOptions(newOption2);
 }
 
 window.sun_insertImage2 = function () {
