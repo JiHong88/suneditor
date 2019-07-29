@@ -271,7 +271,7 @@ plugins: [
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
-                  'inline' or 'balloon' mode. default: 'max-content' {Number|String}
+                  'inline' or 'balloon' mode. default: 'auto' {Number|String}
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.

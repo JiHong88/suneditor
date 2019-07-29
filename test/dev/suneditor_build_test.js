@@ -220,6 +220,9 @@ const newOption2 = {
     imageWidth: '100%',
     colorList: null,
 }
+const newOption3 = {
+    mode: 'inline'
+}
 
 let imageList = [];
 let selectedImages = [];
@@ -329,6 +332,9 @@ window.sun_setOptions2 = function () {
 }
 window.sun_setOptions3 = function () {
     s2.setOptions(newOption2);
+}
+window.sun_setOptions4 = function () {
+    s2.setOptions(newOption3);
 }
 
 window.sun_insertImage2 = function () {
