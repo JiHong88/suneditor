@@ -66,7 +66,8 @@
             tag_div: 'Базовый',
             tag_h: 'Заголовок',
             tag_blockquote: 'Цитата',
-            tag_pre: 'Код'
+            tag_pre: 'Код',
+            template: 'Шаблон'
         },
         dialogBox: {
             linkBox: {

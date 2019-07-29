@@ -113,6 +113,9 @@
 .sun-editor .se-icon-map-pin::before{content:'\0021';}
 .sun-editor .se-icon-magic-stick::before{content:'\0022';}
 .sun-editor .se-icon-math::before{content:'\0023';}
+.sun-editor .se-icon-audio::before{content:'\0024';}
+.sun-editor .se-icon-emoji::before{content:'\0025';}
+.sun-editor .se-icon-template::before{content:'\0026';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}

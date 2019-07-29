@@ -66,7 +66,8 @@
             tag_div: 'Normal (DIV)',
             tag_h: 'Header',
             tag_blockquote: 'Zitat',
-            tag_pre: 'Quellcode'
+            tag_pre: 'Quellcode',
+            template: 'Skabelon'
         },
         dialogBox: {
             linkBox: {

@@ -401,6 +401,10 @@ export default {
                 '<i class="se-icon-grid"></i>'
             ],
 
+            template: ['', lang.toolbar.template, 'template', 'submenu',
+                '<i class="se-icon-template></i>'
+            ],
+
             /** plugins - dialog */
             link: ['', lang.toolbar.link, 'link', 'dialog',
                 '<i class="se-icon-link"></i>'
