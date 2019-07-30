@@ -246,7 +246,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
-            
+
             this.submenu = element.nextElementSibling;
             this.submenu.style.display = 'block';
             util.addClass(element, 'on');
@@ -2206,6 +2206,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Sets the HTML string
+         * @param {String} html HTML string
+         */
+        setContents: function (html) {
+            if (core._variable.wysiwygActive) {
+                const cleanHTML = util.convertContentsForEditor(html);
+                if (cleanHTML !== context.element.wysiwyg.innerHTML) {
+                    context.element.wysiwyg.innerHTML = cleanHTML;
+
+                    // history stack
+                    core.history.push();
+                }
+            } else {
+                const value = util.convertHTMLForCodeView(html);
+                if (value !== context.element.code.value) {
+                    context.element.code.value = value;
+                }
+            }
+        },
+
+        /**
          * @description Gets the current contents
          * @returns {Object}
          */
@@ -3488,20 +3509,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} contents Contents to Input
          */
         setContents: function (contents) {
-            if (core._variable.wysiwygActive) {
-                const html = util.convertContentsForEditor(contents);
-                if (html !== context.element.wysiwyg.innerHTML) {
-                    context.element.wysiwyg.innerHTML = html;
-
-                    // history stack
-                    core.history.push();
-                }
-            } else {
-                const value = util.convertHTMLForCodeView(contents);
-                if (value !== context.element.code.value) {
-                    context.element.code.value = value;
-                }
-            }
+            core.setContents(contents);
         },
 
         /**

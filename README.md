@@ -107,8 +107,7 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor,
-        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {font, fontSize, fontColor, horizontalRule, list, image} from 'suneditor/src/plugins'
 // How to import language files (default: en)
 import lang from 'suneditor/src/lang'
 import {en, ko} from 'suneditor/src/lang'
@@ -116,24 +115,18 @@ import de from 'suneditor/src/lang/de'
 
 suneditor.create('sample', {
     plugins: [
-        align,
         font,
         fontSize,
         fontColor,
-        hiliteColor,
         horizontalRule,
-        list,
-        table,
-        formatBlock,
         link,
         image,
-        video
     ],
     buttonList: [
-        ['font', 'fontSize', 'formatBlock'],
-        ['fontColor', 'hiliteColor'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video']
+        ['font', 'fontSize'],
+        ['fontColor'],
+        ['horizontalRule'],
+        ['link', 'image']
     ],
     lang: lang['ko']
 });
@@ -159,13 +152,8 @@ suneditor.create('sample', {
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save']
-    ],
-    // Callback functions that is called when the Save button is clicked
-    // default: userFunction.save
-    callBackSave: function (contents) {
-        alert(contents)
-    }
+        ['save', 'template']
+    ]
 })
 
 // You can also load what you want
@@ -176,8 +164,7 @@ suneditor.create('sample', {
         plugins.formatBlock
     ],
     buttonList: [
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['font', 'fontSize', 'formatBlock', 'removeFormat', 'preview', 'print']
+        ['font', 'fontSize', 'formatBlock']
     ]
 })
 ```
@@ -186,8 +173,8 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor,
-        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
+        list, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
@@ -202,7 +189,7 @@ suneditor.create('sample', {
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save']
+        ['save', template]
     ],
 })
 ```
@@ -220,6 +207,7 @@ import plugins from 'suneditor/src/plugins'
 // all plugins
 const initEditor = suneditor.init({
     plugins: plugins,
+    height: 200,
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -230,7 +218,7 @@ const initEditor = suneditor.init({
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save']
+        'preview', 'print', 'save', 'template']
     ]
 });
 
@@ -239,6 +227,7 @@ initEditor.create('sample_1', {
 });
 initEditor.create('sample_2', {
     // The value of the option argument put in the "create" function call takes precedence
+    height: 'auto',
     buttonList: [
         ['undo', 'redo'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -262,6 +251,7 @@ plugins: [
     horizontalRule,
     list,
     table,
+    template,
     link,
     image,
     video
@@ -366,6 +356,20 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
 
+// Templates Array------------------------------------------------------------------------------------------------
+templates       : If you use a template plugin, add it.
+                  Defines a list of templates.                       default: null {Array} 
+                  ex) [
+                    {
+                        name: 'Template-1',
+                        html: '<p>HTML source</p>'
+                    },
+                    {
+                        name: 'Template-2',
+                        html: '<p><br></p>'
+                    }
+                  ]
+
 // Buttons--------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
                   default: [
@@ -380,7 +384,7 @@ buttonList      : Defines button list to array {Array}
                     // ['link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
-                    // ['save'],
+                    // ['save', 'template'],
                   ]
 ```
 

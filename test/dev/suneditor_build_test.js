@@ -164,10 +164,7 @@ const editor = suneditor.init({
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
-    plugins: [
-        plugins.hiliteColor,
-        plugins.fontColor
-    ],
+    plugins: plugins,
     maxHeight: '400px',
     height: 150,
     imageWidth: '100%',
@@ -182,7 +179,21 @@ let s2 = editor.create(document.getElementById('editor2'), {
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save'],
+        ['save', 'template'],
+    ],
+    templates: [
+        {
+            name: 'template1',
+            html: '<p>fdkjslfjdslkf</p>'
+        },
+        {
+            name: 'template1',
+            html: '<p><strong>11111</strong></p>'
+        },
+        {
+            name: 'template1',
+            html: '<p><u>22222</u></p>'
+        }
     ],
     callBackSave: function (contents) {
         alert(contents)
@@ -193,7 +204,10 @@ let s2 = editor.create(document.getElementById('editor2'), {
 
 const newOption = {
     mode: 'balloon',
-    plugins: plugins,
+    plugins: [
+        plugins.hiliteColor,
+        plugins.fontColor
+    ],
     minHeight: '300',
     buttonList: [
         ['undo', 'redo'],

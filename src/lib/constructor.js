@@ -278,7 +278,7 @@ export default {
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         // template
-        // options.template = options.template;
+        // options.templates = options.templates;
         // callBack function
         // options.callBackSave = options.callBackSave;
         // buttons
@@ -404,7 +404,7 @@ export default {
             ],
 
             template: ['', lang.toolbar.template, 'template', 'submenu',
-                '<i class="se-icon-template></i>'
+                '<i class="se-icon-template"></i>'
             ],
 
             /** plugins - dialog */
