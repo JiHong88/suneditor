@@ -276,7 +276,9 @@ export default {
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? options.videoWidth.toString().match(/\d+/)[0] : 560;
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
-        options.youtubeQuery = options.youtubeQuery || '';
+        options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
+        // template
+        // options.template = options.template;
         // callBack function
         // options.callBackSave = options.callBackSave;
         // buttons

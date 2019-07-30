@@ -246,8 +246,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
-            if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
-
+            
             this.submenu = element.nextElementSibling;
             this.submenu.style.display = 'block';
             util.addClass(element, 'on');
@@ -259,6 +258,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             _d.addEventListener('mousedown', this._bindedSubmenuOff, false);
+
+            if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
         },
 
         /**

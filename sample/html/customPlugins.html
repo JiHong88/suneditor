@@ -109,6 +109,11 @@
         <span class="pl-k">return</span> listDiv;
     },
 
+    <span class="pl-c"><span class="pl-c">//</span> Called after the submenu has been rendered</span>
+    <span class="pl-en">on</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+        <span class="pl-c1">this</span>.<span class="pl-en">context</span>.<span class="pl-en">custom</span>.<span class="pl-en">textElement</span>.<span class="pl-c1">focus</span>();
+    }
+
     <span class="pl-en">onClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
         <span class="pl-c"><span class="pl-c">//</span> Get Input value</span>
         <span class="pl-k">const</span> <span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-c1">this</span>.<span class="pl-en">util</span>.<span class="pl-c1">createTextNode</span>(<span class="pl-c1">this</span>.<span class="pl-smi">context</span>.<span class="pl-smi">custom</span>.<span class="pl-smi">textElement</span>.<span class="pl-c1">value</span>);
@@ -211,14 +216,17 @@
 
             return listDiv;
         },
+        on: function () {
+            this.context.custom.textElement.focus();
+        },
         onClick: function () {
-        const value = this.util.createTextNode(this.context.custom.textElement.value);
+            const value = this.util.createTextNode(this.context.custom.textElement.value);
 
-        this.insertNode(value);
-        this.setRange(value, value.length, value, value.length);
+            this.insertNode(value);
+            this.setRange(value, value.length, value, value.length);
 
-        this.submenuOff();
-        this.focus();
+            this.submenuOff();
+            this.focus();
         }
     };
 
