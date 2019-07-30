@@ -165,9 +165,9 @@ const editor = suneditor.init({
 
 let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
-    maxHeight: '400px',
-    height: 150,
-    imageWidth: '100%',
+    // maxHeight: '400px',
+    height: 400,
+    // imageWidth: '100%',
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -187,11 +187,11 @@ let s2 = editor.create(document.getElementById('editor2'), {
             html: '<p>fdkjslfjdslkf</p>'
         },
         {
-            name: 'template1',
+            name: 'templeeeeeeeeeeeeeate2',
             html: '<p><strong>11111</strong></p>'
         },
         {
-            name: 'template1',
+            name: 'template3',
             html: '<p><u>22222</u></p>'
         }
     ],
