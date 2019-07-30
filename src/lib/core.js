@@ -1001,8 +1001,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const range = this.getRange();
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
-            this._editorRange();
-            
+
             const isRemoveNode = !appendNode;
             const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
             let startCon = range.startContainer;
@@ -1089,8 +1088,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (!onlyBreak) {
                     while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                         tempChild = tempCon.childNodes;
-                        tempCon = tempChild[tempOffset - 1] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
-                        tempOffset = tempCon.textContent.length;
+                        tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
+                        tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
                     }
     
                     let format = util.getFormatElement(tempCon);
@@ -1901,6 +1900,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
                     offset = container.textContent.length;
+                } else if (util.onlyZeroWidthSpace(container)) {
+                    container = pNode;
+                    offset = 0;
                 }
                 
                 // node change
