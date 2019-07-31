@@ -409,8 +409,12 @@ export default {
             case 'revert':
                 if (contextPlugin.setAutoSize) {
                     contextPlugin.setAutoSize.call(this);
-                    contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                } else {
+                    contextPlugin.resetAlign.call(this);
+                    this.plugins.resizing.resetTransform.call(this, contextEl);
                 }
+    
+                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'update':
                 contextPlugin.openModify.call(this);
@@ -495,6 +499,10 @@ export default {
                 default:
                     translate = '';
             }
+        }
+
+        if (r % 180 === 0) {
+            element.style.maxWidth = '100%';
         }
         
         element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');

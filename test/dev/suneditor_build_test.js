@@ -53,6 +53,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     ],
     width: '100%',
     stickyToolbar: 0,
+    imageWidth: 300,
     mode: 'inline',
     // toolbarWidth: 800,
     height: 'auto',

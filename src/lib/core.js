@@ -2312,8 +2312,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (this.plugins.video) {
-                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideos.bind(this));
-                else this.plugins.video.checkVideos.call(this);
+                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this));
+                else this.plugins.video.checkVideosInfo.call(this);
             }
         },
 
