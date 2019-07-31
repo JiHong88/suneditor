@@ -31,11 +31,11 @@
 /** controllers on tag */
 .sun-editor-editable td, .sun-editor-editable th, 
 .sun-editor-editable figure, .sun-editor-editable figcaption, .sun-editor-editable img, 
-.sun-editor-editable iframe {
+.sun-editor-editable iframe, .sun-editor-editable video, .sun-editor-editable audio {
     position: relative;
 }
 
-.sun-editor-editable img, .sun-editor-editable iframe {
+.sun-editor-editable img, .sun-editor-editable iframe, .sun-editor-editable video, .sun-editor-editable audio {
     display: block;
     margin: 0;
     padding: 0;

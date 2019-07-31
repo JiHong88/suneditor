@@ -2715,31 +2715,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _showToolbarBalloon: function (rangeObj) {
-            const range = rangeObj || core.getRange();
-            const padding = 20;
-            const toolbar = context.element.toolbar;
-            const selection = _w.getSelection();
-
-            let isDirTop;
-            if (selection.focusNode === selection.anchorNode) {
-                isDirTop = selection.focusOffset < selection.anchorOffset;
-            } else {
-                const childNodes = util.getListChildNodes(range.commonAncestorContainer);
-                isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode);
-            }
-
-            let rects = range.getClientRects();
-            rects = rects[isDirTop ? 0 : rects.length - 1];
-            
-            toolbar.style.display = 'block';
-
+        _setToolbarOffset: function (isDirTop, rects, toolbar) {
+            const padding = 16;
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
-            let t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
-
+            const l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
+            const t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
             const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
 
             toolbar.style.left = (l < 0 ? padding : overRight < 0 ? l : l - overRight - padding) + 'px';
@@ -2760,6 +2742,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const arrow_point_width = arrow_width / 2;
             const left = _w.Math.abs(arrow_left < arrow_point_width ? arrow_point_width : arrow_left + arrow_point_width >= toolbarWidth ? arrow_left - arrow_point_width : arrow_left - (isDirTop ? 0 : padding));
             context.element._arrow.style.left = (left + 11 > toolbar.offsetWidth ? toolbar.offsetWidth - 11 : left < 11 ? 11 : left) + 'px';
+        },
+
+        _showToolbarBalloon: function (rangeObj) {
+            const range = rangeObj || core.getRange();
+            const toolbar = context.element.toolbar;
+            const selection = _w.getSelection();
+
+            let isDirTop;
+            if (selection.focusNode === selection.anchorNode) {
+                isDirTop = selection.focusOffset < selection.anchorOffset;
+            } else {
+                const childNodes = util.getListChildNodes(range.commonAncestorContainer);
+                isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode);
+            }
+
+            let rects = range.getClientRects();
+            rects = rects[isDirTop ? 0 : rects.length - 1];
+            
+            toolbar.style.display = 'block';
+            
+            const toolbarWidth = toolbar.offsetWidth;
+            const toolbarHeight = toolbar.offsetHeight;
+
+            event._setToolbarOffset(isDirTop, rects, toolbar);
+            if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
+                event._setToolbarOffset(isDirTop, rects, toolbar);
+            }
+
+            
         },
 
         _showToolbarInline: function () {

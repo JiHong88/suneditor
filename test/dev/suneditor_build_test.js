@@ -54,7 +54,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     stickyToolbar: 0,
     mode: 'inline',
-    toolbarWidth: 800,
+    // toolbarWidth: 800,
     height: 'auto',
     // callBackSave: (contents) => {
     //     console.log('callback')
@@ -167,7 +167,8 @@ let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
     height: 400,
-    // imageWidth: '100%',
+    imageResizing: true,
+    // imageWidth: '400',
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],

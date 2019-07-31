@@ -364,7 +364,7 @@
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
 /** --- notice */
-.sun-editor .se-notice {position:relative; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7;}
+.sun-editor .se-notice {position:relative; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
 .sun-editor .se-notice button {float:right;}
 
 /** --- tooltip */

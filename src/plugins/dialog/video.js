@@ -366,8 +366,33 @@ export default {
 
     setSize: function (w, h) {
         const contextVideo = this.context.video;
-        contextVideo._element.style.width = w + 'px';
-        contextVideo._element.style.height = h + 'px';
+
+        if (!/^\d+%$/.test(w)) {
+            const padding = 16;
+            const limit = this.context.element.wysiwyg.clientWidth - (padding * 2) - 2;
+            
+            if (w.toString().match(/\d+/)[0] > limit) {
+                w = limit;
+                h = ((h / w) * w);
+            }
+        }
+        
+        contextVideo._element.style.width =/^\d+$/.test(w) ? w + 'px' : w;
+        contextVideo._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
+    },
+
+    setAutoSize: function () {
+        const contextVideo = this.context.video;
+
+        this.plugins.resizing.resetTransform.call(this, contextVideo._element);
+        this.plugins.video.cancelPercentAttr.call(this);
+
+        const originSize = (contextVideo._element.getAttribute('data-origin') || '').split(',');
+        const w = (originSize[0] || this.context.option.videoWidth) + 'px';
+        const h = (originSize[1] || this.context.option.videoHeight) + 'px';
+
+        contextVideo._cover.style.width = contextVideo._element.style.width = w;
+        contextVideo._cover.style.height = contextVideo._element.style.height = h;
     },
 
     setPercentSize: function (w) {
