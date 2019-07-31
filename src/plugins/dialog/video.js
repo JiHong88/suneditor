@@ -369,8 +369,8 @@ export default {
 
     setSize: function (w, h) {
         const contextVideo = this.context.video;
-        contextVideo._element.style.width = w + 'px';
-        contextVideo._element.style.height = h + 'px';
+        contextVideo._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
+        contextVideo._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
     },
 
     setAutoSize: function () {

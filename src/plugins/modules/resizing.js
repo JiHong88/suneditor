@@ -584,10 +584,20 @@ export default {
         this.controllersOff();
         this.context.element.resizeBackground.style.display = 'none';
 
-        const w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);
-        const h = this._w.Math.round(isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h);
+        let w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);
+        let h = this._w.Math.round(isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h);
 
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, isVertical);
+        if (!isVertical && !/^\d+%$/.test(w)) {
+            const padding = 16;
+            const limit = this.context.element.wysiwyg.clientWidth - (padding * 2) - 2;
+            
+            if (w.toString().match(/\d+/)[0] > limit) {
+                w = limit;
+                h = this.context.resizing._resize_plugin === 'video' ? (h / w) * limit : 'auto';
+            }
+        }
+
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h);
         this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
         
         this.plugins[this.context.resizing._resize_plugin].init.call(this);

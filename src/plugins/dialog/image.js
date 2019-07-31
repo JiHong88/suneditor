@@ -742,8 +742,8 @@ export default {
 
     setSize: function (w, h) {
         const contextImage = this.context.image;
-        contextImage._element.style.width = w + 'px';
-        contextImage._element.style.height = h + 'px';
+        contextImage._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
+        contextImage._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
     },
     
     setAutoSize: function () {

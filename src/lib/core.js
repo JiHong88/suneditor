@@ -3124,6 +3124,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         onResize_window: function () {
+            core.controllersOff();
             if (context.element.toolbar.offsetWidth === 0) return;
 
             if (core._variable.isFullScreen) {
