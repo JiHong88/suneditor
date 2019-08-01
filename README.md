@@ -492,8 +492,8 @@ editor.onImageUploadError = function (errorMessage, result) {
 ## Examples
 **<a href="http://suneditor.com/sample/html/examples.html" target="_blank">Examples</a>**
 
-## Customize
-**<a href="http://suneditor.com/sample/html/customize.html" target="_blank">Customize</a>**
+## Options custom
+**<a href="http://suneditor.com/sample/html/options.html" target="_blank">Customize</a>**
 
 ## customPlugins
 **<a href="http://suneditor.com/sample/html/customPlugins.html" target="_blank">customPlugins</a>**

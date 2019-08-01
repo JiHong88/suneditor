@@ -31,7 +31,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="getting-started.html" title="Getting started">Getting started</a></li>
                 <li><a href="examples.html" title="Examples">Examples</a></li>
-                <li><a href="customize.html" style="color:#fff;" title="Customize">Customize</a></li>
+                <li><a href="options.html" style="color:#fff;" title="Options">Options</a></li>
                 <li><a href="customPlugins.html" title="CustomPlugins">CustomPlugins</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li class="badge">
@@ -200,7 +200,7 @@ function sun_create () {
 
     imageTable.innerHTML = '';
 
-    editorImageSample = SUNEDITOR.create('sample_editor', {
+    var options = {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
@@ -254,8 +254,9 @@ function sun_create () {
             'preview', 'print']
         ],
         lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
-    });
+    };
 
+    editorImageSample = SUNEDITOR.create('sample_editor', options);
     editorImageSample.onImageUpload = imageUpload;
 }
 
