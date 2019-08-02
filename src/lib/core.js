@@ -3339,7 +3339,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             context.element.wysiwyg.removeEventListener('blur', event._hideToolbar);
 
             context.element.code.removeEventListener('keyup', event._codeViewAutoScroll);
-            context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
+            
+            if (context.element.resizingBar) {
+                context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
+            }
             
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);

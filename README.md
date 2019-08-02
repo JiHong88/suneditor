@@ -80,30 +80,14 @@ const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample
 ### 4. Contents display
 ```text
 When you display a document created by suneditor
-
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
-
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
-
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
 ```
 
 ### Use import statement
 
-### 1. Default options
-```javascript
-// import 'suneditor/src/assets/css/suneditor.css'
-// import 'suneditor/src/assets/css/suneditor-contents.css'
-import 'suneditor/dist/css/suneditor.min.css'
-import suneditor from 'suneditor'
-
-// The default button list is created.
-suneditor.create('sample', {
-    // insert options
-});
-```
-
-### 2. Load only what you want
+### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
@@ -132,7 +116,7 @@ suneditor.create('sample', {
 });
 ```
 
-### 3. Load all plugins
+### 2. Load all plugins
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
@@ -169,7 +153,7 @@ suneditor.create('sample', {
 })
 ```
 
-### 4. Plugins can be used directly in the button list
+### 3. Plugins can be used directly in the button list
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
@@ -194,7 +178,7 @@ suneditor.create('sample', {
 })
 ```
 
-### 5. Use init function
+### 4. Use init function
 ```text
 The init function can be used by predefining options and calling the create function on the returned object.
 The value of the option argument put in the "create" function call takes precedence
@@ -363,11 +347,11 @@ templates       : If you use a template plugin, add it.
                   ex) [
                     {
                         name: 'Template-1',
-                        html: '<p>HTML source</p>'
+                        html: '<p>HTML source1</p>'
                     },
                     {
                         name: 'Template-2',
-                        html: '<p><br></p>'
+                        html: '<p>HTML source2</p>'
                     }
                   ]
 
