@@ -354,7 +354,8 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                     // https://developers.google.com/youtube/player_parameters
 
 // Defining save button-------------------------------------------------------------------------------------------
-callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
+callBackSave    : Callback functions that is called when the Save button is clicked. 
+                  Arguments - (contents).                            default: userFunction.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -396,7 +397,7 @@ const editor = suneditor.create('example');
 
 // Add or reset option property
 editor.setOptions({
-    minHeight: '300',
+    minHeight: '300px',
     buttonList: [
         ['fontColor', 'hiliteColor']
     ],
