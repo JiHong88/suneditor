@@ -2720,12 +2720,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            const l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
             const t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
-            const overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
+            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
+            let overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
 
-            toolbar.style.left = (l < 0 ? padding : overRight < 0 ? l : l - overRight - padding) + 'px';
-            toolbar.style.top = (t) + 'px';
+            l = l < 0 ? padding : overRight < 0 ? l : l - overRight - padding;
+            overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
+
+            toolbar.style.left = l + 'px';
+            toolbar.style.top = t + 'px';
 
             if (isDirTop) {
                 util.removeClass(context.element._arrow, 'se-arrow-up');

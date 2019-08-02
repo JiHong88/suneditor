@@ -38,7 +38,7 @@ export default {
             _floatClassRegExp: 'float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
-            _defaultAuto: context.option.imageWidth === 'auto' ? true : false,
+            _defaultAuto: context.option.imageWidth === 'auto',
             _uploadFileLength: 0
         };
 
@@ -735,7 +735,7 @@ export default {
     on: function (update) {
         if (!update) {
             const contextImage = this.context.image;
-            contextImage.imageX.value = contextImage._origin_w = this.context.option.imageWidth === 'auto' ? '' : this.context.option.imageWidth;
+            contextImage.imageX.value = contextImage._origin_w = contextImage._defaultAuto ? '' : this.context.option.imageWidth;
             contextImage.imageY.value = contextImage._origin_h = '';
         }
     },
@@ -839,12 +839,10 @@ export default {
         this.plugins.image.openTab.call(this, 'init');
 
         if (contextImage._resizing) {
-            const autoWidth = this.context.option.imageWidth === 'auto';
-
             contextImage.proportion.checked = false;
-            contextImage.imageX.value = autoWidth ? '' : this.context.option.imageWidth;
+            contextImage.imageX.value = contextImage._defaultAuto ? '' : this.context.option.imageWidth;
             contextImage.imageY.value = '';
-            contextImage.imageX.disabled = autoWidth;
+            contextImage.imageX.disabled = contextImage._defaultAuto;
             contextImage.imageY.disabled = true;
             contextImage.proportion.disabled = true;
         }

@@ -371,6 +371,7 @@ export default {
             font: ['se-btn-select se-btn-tool-font _se_command_font_family', lang.toolbar.font, 'font', 'submenu',
                 '<span class="txt">' + lang.toolbar.font + '</span><i class="se-icon-arrow-down"></i>'
             ],
+            
             formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu',
                 '<span class="txt _se_command_format">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
             ],
