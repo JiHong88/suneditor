@@ -46,7 +46,7 @@ export default {
         return listDiv;
     },
 
-    pickup(e) {
+    pickup: function (e) {
         if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
         e.preventDefault();
