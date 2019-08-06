@@ -1336,15 +1336,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         startPass = true;
 
                         if (newNode !== textNode) newNode.appendChild(startContainer);
-
-                        if (!isSameNode) {
-                            continue;
-                        } else if (endOff === startOffset || endOff === textNode.data.length) {
-                            endContainer = textNode;
-                            endOffset = textNode.data.length;
-                            endPass = true;
-                            continue;
-                        }
+                        if (!isSameNode) continue;
                     }
 
                     // endContainer
