@@ -2715,17 +2715,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _setToolbarOffset: function (isDirTop, rects, toolbar) {
+        _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft) {
             const padding = 16;
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
+            const absoluteLeft = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
+            const overRight = absoluteLeft + toolbarWidth - context.element.topArea.offsetWidth;
+            
             const t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
-            let l = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
-            let overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
-
-            l = l < 0 ? padding : overRight < 0 ? l : l - overRight - padding;
-            overRight = l + toolbarWidth - context.element.topArea.offsetWidth;
+            const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding;
 
             toolbar.style.left = l + 'px';
             toolbar.style.top = t + 'px';
@@ -2733,18 +2732,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (isDirTop) {
                 util.removeClass(context.element._arrow, 'se-arrow-up');
                 util.addClass(context.element._arrow, 'se-arrow-down');
-                context.element._arrow.style.top = (toolbarHeight) + 'px';
+                context.element._arrow.style.top = toolbarHeight + 'px';
             } else {
                 util.removeClass(context.element._arrow, 'se-arrow-down');
                 util.addClass(context.element._arrow, 'se-arrow-up');
                 context.element._arrow.style.top = '-11px';
             }
 
-            const arrow_width = context.element._arrow.offsetWidth;
-            const arrow_left = toolbarWidth / 2 + (l < 0 ? l - arrow_width : overRight < 0 ? 0 : overRight + arrow_width);
-            const arrow_point_width = arrow_width / 2;
-            const left = _w.Math.abs(arrow_left < arrow_point_width ? arrow_point_width : arrow_left + arrow_point_width >= toolbarWidth ? arrow_left - arrow_point_width : arrow_left - (isDirTop ? 0 : padding));
-            context.element._arrow.style.left = (left + 11 > toolbar.offsetWidth ? toolbar.offsetWidth - 11 : left < 11 ? 11 : left) + 'px';
+            context.element._arrow.style.left = ((toolbarWidth / 2) + (absoluteLeft - l) - editorLeft) + 'px';
         },
 
         _showToolbarBalloon: function (rangeObj) {
@@ -2762,15 +2757,22 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
+
+            let editorLeft = 0;
+            let topArea = context.element.topArea;
+            while (topArea && !/^(BODY|HTML)$/i.test(topArea.nodeName)) {
+                editorLeft += topArea.offsetLeft;
+                topArea = topArea.offsetParent;
+            }
             
             toolbar.style.display = 'block';
             
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            event._setToolbarOffset(isDirTop, rects, toolbar);
+            event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft);
             if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-                event._setToolbarOffset(isDirTop, rects, toolbar);
+                event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft);
             }
 
             
