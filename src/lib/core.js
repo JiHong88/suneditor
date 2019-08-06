@@ -2715,17 +2715,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft) {
-            const padding = 16;
+        _setToolbarOffset: function (isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
+            const padding = 1;
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            const absoluteLeft = (isDirTop ? rects.left : rects.right) - context.element.topArea.offsetLeft + (_w.scrollX || _d.documentElement.scrollLeft) - toolbarWidth / 2;
-            const overRight = absoluteLeft + toolbarWidth - context.element.topArea.offsetWidth;
+            const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorOffsetLeft + scrollLeft - toolbarWidth / 2;
+            const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
-            const t = (isDirTop ? rects.top - toolbarHeight - 11 : rects.bottom + 11) - event._getStickyOffsetTop() + (_w.scrollY || _d.documentElement.scrollTop);
-            const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding;
-
+            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
+            let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
+            
             toolbar.style.left = l + 'px';
             toolbar.style.top = t + 'px';
 
@@ -2736,10 +2736,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             } else {
                 util.removeClass(context.element._arrow, 'se-arrow-down');
                 util.addClass(context.element._arrow, 'se-arrow-up');
-                context.element._arrow.style.top = '-11px';
+                context.element._arrow.style.top = -arrowMargin + 'px';
             }
 
-            context.element._arrow.style.left = ((toolbarWidth / 2) + (absoluteLeft - l) - editorLeft) + 'px';
+            const arrow_left = (toolbarWidth / 2) + (absoluteLeft - l) - editorLeft;
+            context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
         },
 
         _showToolbarBalloon: function (rangeObj) {
@@ -2758,6 +2759,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
 
+            const scrollLeft = _w.scrollX || _d.documentElement.scrollLeft;
+            const scrollTop = _w.scrollY || _d.documentElement.scrollTop;
+            const editorOffsetLeft = context.element.topArea.offsetLeft;
+            const editorWidth = context.element.topArea.offsetWidth;
+            const stickyTop = event._getStickyOffsetTop();
             let editorLeft = 0;
             let topArea = context.element.topArea;
             while (topArea && !/^(BODY|HTML)$/i.test(topArea.nodeName)) {
@@ -2767,15 +2773,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             toolbar.style.display = 'block';
             
+            const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
-
-            event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft);
-            if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-                event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft);
-            }
-
             
+            event._setToolbarOffset(isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+            if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
+                event._setToolbarOffset(isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+            }
         },
 
         _showToolbarInline: function () {
@@ -3103,6 +3108,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
+            if (core._isBalloon) event._hideToolbar();
             if (userFunction.onScroll) userFunction.onScroll(e);
         },
 
