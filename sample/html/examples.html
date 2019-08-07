@@ -274,11 +274,70 @@
 
 
 <!-- user function -->
-        <a id="functions" href="#functions"><h4 class="sub-title" style="margin-top: 60px;">User Function</h4></a>
-        <div class="highlight highlight-source-js">
+<a id="functions" href="#functions"><h4 class="sub-title" style="margin-top: 60px;">User Function</h4></a>
+
+<form id="frm" name="frm">
+    <textarea id="exampleFunction" style="width:100%; height:250px;">
+        <p>User Function Test</p>
+        <p><br></p>
+        <p><br></p>
+        <p><br></p>
+        <p><br></p>
+        <p><br></p>
+    </textarea>
+    <p></p>
+    <button type="button" class="btn btn-md btn-default" onclick="sun_setOptions()" id="opt1">setOptions</button>
+    <button type="button" class="btn btn-md btn-default" onclick="sun_replaceOptions()" id="opt2" style="display: none;">replaceOptions</button>
+    <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
+    <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
+    <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
+    <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
+    <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
+    <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
+    <div>
+        <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
+    </div>
+    <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
+    <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
+    <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
+    <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
+    <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
+    <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
+    <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
+    <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
+    <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
+</form>
+
+<div class="highlight highlight-source-js">
 <pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 
 <span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
+
+<span class="pl-c"><span class="pl-c">//</span> Add or reset option property</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
+    minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
+    colorList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
+    ],
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
+    ]
+});
+
+<span class="pl-k">function</span> <span class="pl-en">replaceOptions</span>() {
+    minHeight<span class="pl-k">:</span> null,
+    colorList<span class="pl-k">:</span> null,
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
+    ]
+}
 
 <span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
@@ -362,39 +421,7 @@
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
     <span class="pl-c1">alert</span>(errorMessage)
 }</pre>
-        </div>
-        
-
-<form id="frm" name="frm">
-            <textarea id="exampleFunction" style="width:100%; height:250px;">
-                <p>User Function Test</p>
-                <p><br></p>
-                <p><br></p>
-                <p><br></p>
-                <p><br></p>
-                <p><br></p>
-            </textarea>
-            <p></p>
-            <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
-            <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
-            <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
-            <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
-            <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
-            <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
-            <div>
-                <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
-                <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
-            </div>
-            <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
-            <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
-            <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
-            <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
-            <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
-            <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
-            <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
-            <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
-            <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
-        </form>
+</div>
         
     </article>
 
@@ -476,6 +503,55 @@
 
     // user function
     var suneditor = null;
+    var opt1 = document.getElementById('opt1');
+    var opt2 = document.getElementById('opt2');
+
+    var options = {
+        buttonList: [
+            ['undo', 'redo'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+            ['removeFormat'],
+            ['outdent', 'indent'],
+            ['fullScreen', 'showBlocks', 'codeView'],
+            ['preview', 'print'],
+            ['image']
+        ],
+        width: '100%'
+    }
+
+    function sun_setOptions() {
+        suneditor.setOptions({
+            minHeight: '300px',
+            colorList: [
+                ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
+            ],
+            buttonList: [
+                ['fontColor', 'hiliteColor']
+            ]
+        });
+
+        opt1.style.display = 'none';
+        opt2.style.display = 'inline-block';
+    }
+
+    function sun_replaceOptions() {
+        suneditor.setOptions({
+            minHeight: null,
+            colorList: null,
+            buttonList: [
+                ['undo', 'redo'],
+                ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                ['removeFormat'],
+                ['outdent', 'indent'],
+                ['fullScreen', 'showBlocks', 'codeView'],
+                ['preview', 'print'],
+                ['image']
+            ],
+        });
+
+        opt1.style.display = 'inline-block';
+        opt2.style.display = 'none';
+    }
 
     function sun_noticeOpen(message) {
         suneditor.noticeOpen(message);
@@ -539,18 +615,7 @@
     }
 
     function sun_create() {
-        suneditor = SUNEDITOR.create('exampleFunction', {
-            buttonList: [
-                ['undo', 'redo'],
-                ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                ['removeFormat'],
-                ['outdent', 'indent'],
-                ['fullScreen', 'showBlocks', 'codeView'],
-                ['preview', 'print'],
-                ['image']
-            ],
-            width: '100%'
-        });
+        suneditor = SUNEDITOR.create('exampleFunction', options);
 
         suneditor.onScroll = function (e) { console.log('onScroll', e); }
         suneditor.onClick = function (e) { console.log('onClick', e) }

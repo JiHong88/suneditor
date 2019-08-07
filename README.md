@@ -462,13 +462,30 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
+/**
+ * targetImgElement: Current img element
+ * index: Uploaded index (key value)
+ * state: Upload status ('create', 'update', 'delete')
+ * imageInfo: {
+ * * index: data index
+ * * name: file name
+ * * size: file size
+ * * select: select function
+ * * delete: delete function
+ * }
+ * remainingFilesCount: Count of remaining image files
+*/
 editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create','update','delete'):${state}`)
+    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
+/**
+ * errorMessage: Error message to show
+ * result: Result object 
+*/
 editor.onImageUploadError = function (errorMessage, result) {
     alert(errorMessage)
 }
