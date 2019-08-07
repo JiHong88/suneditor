@@ -151,6 +151,7 @@ function JSONstringify(json) {
     });
 
     arr.unshift(json);
+    console.log.apply(console, arr);
 
     return arr;
 }
