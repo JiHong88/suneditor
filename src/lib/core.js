@@ -2707,19 +2707,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _setToolbarOffset: function (isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
+        _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
             const padding = 1;
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
-            const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorOffsetLeft + scrollLeft - toolbarWidth / 2;
+            const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
             const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
             const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
             
-            toolbar.style.left = l + 'px';
-            toolbar.style.top = t + 'px';
+            toolbar.style.left = _w.Math.floor(l) + 'px';
+            toolbar.style.top = _w.Math.floor(t) + 'px';
 
             if (isDirTop) {
                 util.removeClass(context.element._arrow, 'se-arrow-up');
@@ -2731,7 +2731,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 context.element._arrow.style.top = -arrowMargin + 'px';
             }
 
-            const arrow_left = (toolbarWidth / 2) + (absoluteLeft - l) - editorLeft;
+            const arrow_left = _w.Math.floor((toolbarWidth / 2) + (absoluteLeft - l));
             context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
         },
 
@@ -2753,7 +2753,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             const scrollLeft = _w.scrollX || _d.documentElement.scrollLeft;
             const scrollTop = _w.scrollY || _d.documentElement.scrollTop;
-            const editorOffsetLeft = context.element.topArea.offsetLeft;
             const editorWidth = context.element.topArea.offsetWidth;
             const stickyTop = event._getStickyOffsetTop();
             let editorLeft = 0;
@@ -2769,9 +2768,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
             
-            event._setToolbarOffset(isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+            event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
             if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-                event._setToolbarOffset(isDirTop, rects, toolbar, editorOffsetLeft, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+                event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
             }
         },
 
