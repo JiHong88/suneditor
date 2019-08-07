@@ -16,7 +16,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Media embeds.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=1)
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2180)
 
 > #### Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
