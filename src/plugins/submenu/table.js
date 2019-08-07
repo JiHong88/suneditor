@@ -1122,6 +1122,7 @@ export default {
             tablePlugin._fixedCellName = null;
         }
 
+        this._editorRange();
         this.focus();
     },
 
