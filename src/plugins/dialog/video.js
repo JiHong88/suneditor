@@ -195,6 +195,9 @@ export default {
             this._variable._videosCnt++;
         }
 
+        contextVideo._cover = cover;
+        contextVideo._container = container;
+
         const changeSize = w * 1 !== oIframe.offsetWidth || h * 1 !== oIframe.offsetHeight;
 
         if (contextVideo._resizing) {
@@ -349,7 +352,7 @@ export default {
         if (!notOpen) this.plugins.dialog.open.call(this, 'video', true);
     },
 
-    checkVideos: function () {
+    checkVideosInfo: function () {
         const videos = this.context.element.wysiwyg.getElementsByTagName('IFRAME');
         if (videos.length === this._variable._videosCnt) return;
 
@@ -366,13 +369,29 @@ export default {
 
     setSize: function (w, h) {
         const contextVideo = this.context.video;
-        contextVideo._element.style.width = w + 'px';
-        contextVideo._element.style.height = h + 'px';
+        contextVideo._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
+        contextVideo._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
+    },
+
+    setAutoSize: function () {
+        const contextVideo = this.context.video;
+
+        this.plugins.resizing.resetTransform.call(this, contextVideo._element);
+        this.plugins.video.cancelPercentAttr.call(this);
+
+        const originSize = (contextVideo._element.getAttribute('data-origin') || '').split(',');
+        const w = (originSize[0] || this.context.option.videoWidth) + 'px';
+        const h = (originSize[1] || this.context.option.videoHeight) + 'px';
+
+        contextVideo._element.style.maxWidth = '100%';
+        contextVideo._cover.style.width = contextVideo._element.style.width = w;
+        contextVideo._cover.style.height = contextVideo._element.style.height = h;
     },
 
     setPercentSize: function (w) {
         const contextVideo = this.context.video;
 
+        contextVideo._element.style.maxWidth = '100%';
         contextVideo._container.style.width = w;
         contextVideo._container.style.height = '';
         contextVideo._cover.style.width = '100%';
@@ -389,6 +408,7 @@ export default {
     cancelPercentAttr: function () {
         const contextVideo = this.context.video;
         
+        contextVideo._element.style.maxWidth = 'none';
         contextVideo._cover.style.width = '';
         contextVideo._cover.style.height = '';
         contextVideo._container.style.width = '';

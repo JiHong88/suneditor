@@ -31,7 +31,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="getting-started.html" title="Getting started">Getting started</a></li>
                 <li><a href="examples.html" title="Examples">Examples</a></li>
-                <li><a href="customize.html" style="color:#fff;" title="Customize">Customize</a></li>
+                <li><a href="options.html" style="color:#fff;" title="Options">Options</a></li>
                 <li><a href="customPlugins.html" title="CustomPlugins">CustomPlugins</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li class="badge">
@@ -153,6 +153,25 @@
             <br><br>
             <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
             <input type="text" id="youtubeQuery_value" placeholder="String">
+
+            <br>
+            <h4 style="color: #b94a48;">--Defining save button</h4>
+            <label><input type="checkbox" id="callBackSave">&nbsp;&nbsp;callBackSave</label><br>
+            <span>function (contents) { alert(contents) }</span>
+            
+            <br>
+            <h4 style="color: #b94a48;">--Templates Array</h4>
+            <label><input type="checkbox" id="templates">&nbsp;&nbsp;templates</label><br>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;{</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;name: 'Template-1',</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;html: '&lt;p&gt;HTML source1&lt;/p&gt;'</span><br>
+            <span>&nbsp;&nbsp;},</span><br>
+            <span>&nbsp;&nbsp;{</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;name: 'Template-2',</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;html: '&lt;p&gt;HTML source2&lt;/p&gt;'</span><br>
+            <span>&nbsp;&nbsp;},</span><br>
+            <span>]</span>
         </div>
         <br>
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
@@ -173,6 +192,10 @@
                 </ul>
             </div>
         </div>
+
+        <div id="option_display">
+
+        </div>
     </article>
 
     <footer>
@@ -192,15 +215,16 @@
 <script src="../../src/lang/ru.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
-const langSelect = document.getElementById('language');
-const modeSelect = document.getElementById('mode');
+var optionDisplay = document.getElementById('option_display');
+var langSelect = document.getElementById('language');
+var modeSelect = document.getElementById('mode');
 
 function sun_create () {
     if (editorImageSample && editorImageSample.destroy) editorImageSample.destroy();
 
     imageTable.innerHTML = '';
 
-    editorImageSample = SUNEDITOR.create('sample_editor', {
+    var options = {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
@@ -241,6 +265,8 @@ function sun_create () {
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : null,
+        callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : null,
+        templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : null,
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
@@ -251,11 +277,14 @@ function sun_create () {
             'align', 'horizontalRule', 'list', 'table',
             'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
-            'preview', 'print']
+            'preview', 'print', 'save', 'template']
         ],
         lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
-    });
+    };
 
+    JSONstringify(options)
+
+    editorImageSample = SUNEDITOR.create('sample_editor', options);
     editorImageSample.onImageUpload = imageUpload;
 }
 

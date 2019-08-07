@@ -66,7 +66,8 @@
             tag_div: '基本（DIV）',
             tag_h: 'タイトル',
             tag_blockquote: '引用',
-            tag_pre: 'コード'
+            tag_pre: 'コード',
+            template: 'テンプレート'
         },
         dialogBox: {
             linkBox: {

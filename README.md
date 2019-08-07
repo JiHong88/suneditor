@@ -16,7 +16,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Media embeds.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png)
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=1)
 
 > #### Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
@@ -80,35 +80,18 @@ const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample
 ### 4. Contents display
 ```text
 When you display a document created by suneditor
-
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
-
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
-
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
 ```
 
 ### Use import statement
 
-### 1. Default options
-```javascript
-// import 'suneditor/src/assets/css/suneditor.css'
-// import 'suneditor/src/assets/css/suneditor-contents.css'
-import 'suneditor/dist/css/suneditor.min.css'
-import suneditor from 'suneditor'
-
-// The default button list is created.
-suneditor.create('sample', {
-    // insert options
-});
-```
-
-### 2. Load only what you want
+### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor,
-        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {font, fontSize, fontColor, horizontalRule, list, image} from 'suneditor/src/plugins'
 // How to import language files (default: en)
 import lang from 'suneditor/src/lang'
 import {en, ko} from 'suneditor/src/lang'
@@ -116,30 +99,24 @@ import de from 'suneditor/src/lang/de'
 
 suneditor.create('sample', {
     plugins: [
-        align,
         font,
         fontSize,
         fontColor,
-        hiliteColor,
         horizontalRule,
-        list,
-        table,
-        formatBlock,
         link,
         image,
-        video
     ],
     buttonList: [
-        ['font', 'fontSize', 'formatBlock'],
-        ['fontColor', 'hiliteColor'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video']
+        ['font', 'fontSize'],
+        ['fontColor'],
+        ['horizontalRule'],
+        ['link', 'image']
     ],
     lang: lang['ko']
 });
 ```
 
-### 3. Load all plugins
+### 2. Load all plugins
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
@@ -159,13 +136,8 @@ suneditor.create('sample', {
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save']
-    ],
-    // Callback functions that is called when the Save button is clicked
-    // default: userFunction.save
-    callBackSave: function (contents) {
-        alert(contents)
-    }
+        ['save', 'template']
+    ]
 })
 
 // You can also load what you want
@@ -176,18 +148,17 @@ suneditor.create('sample', {
         plugins.formatBlock
     ],
     buttonList: [
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['font', 'fontSize', 'formatBlock', 'removeFormat', 'preview', 'print']
+        ['font', 'fontSize', 'formatBlock']
     ]
 })
 ```
 
-### 4. Plugins can be used directly in the button list
+### 3. Plugins can be used directly in the button list
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor,
-        horizontalRule, list, table, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
+        list, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
@@ -202,12 +173,12 @@ suneditor.create('sample', {
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save']
+        ['save', template]
     ],
 })
 ```
 
-### 5. Use init function
+### 4. Use init function
 ```text
 The init function can be used by predefining options and calling the create function on the returned object.
 The value of the option argument put in the "create" function call takes precedence
@@ -220,6 +191,7 @@ import plugins from 'suneditor/src/plugins'
 // all plugins
 const initEditor = suneditor.init({
     plugins: plugins,
+    height: 200,
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -230,7 +202,7 @@ const initEditor = suneditor.init({
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save']
+        'preview', 'print', 'save', 'template']
     ]
 });
 
@@ -239,6 +211,7 @@ initEditor.create('sample_1', {
 });
 initEditor.create('sample_2', {
     // The value of the option argument put in the "create" function call takes precedence
+    height: 'auto',
     buttonList: [
         ['undo', 'redo'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -262,6 +235,7 @@ plugins: [
     horizontalRule,
     list,
     table,
+    template,
     link,
     image,
     video
@@ -271,7 +245,7 @@ plugins: [
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
-                  'inline' or 'balloon' mode. default: 'max-content' {Number|String}
+                  'inline' or 'balloon' mode. default: 'auto' {Number|String}
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
@@ -364,7 +338,22 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                     // https://developers.google.com/youtube/player_parameters
 
 // Defining save button-------------------------------------------------------------------------------------------
-callBackSave    : Callback functions that is called when the Save button is clicked. default: userFunction.save {Function}
+callBackSave    : Callback functions that is called when the Save button is clicked. 
+                  Arguments - (contents).                            default: userFunction.save {Function}
+
+// Templates Array------------------------------------------------------------------------------------------------
+templates       : If you use a template plugin, add it.
+                  Defines a list of templates.                       default: null {Array} 
+                  ex) [
+                    {
+                        name: 'Template-1',
+                        html: '<p>HTML source1</p>'
+                    },
+                    {
+                        name: 'Template-2',
+                        html: '<p>HTML source2</p>'
+                    }
+                  ]
 
 // Buttons--------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
@@ -380,7 +369,7 @@ buttonList      : Defines button list to array {Array}
                     // ['link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
-                    // ['save'],
+                    // ['save', 'template'],
                   ]
 ```
 
@@ -389,6 +378,17 @@ buttonList      : Defines button list to array {Array}
 import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
+
+// Add or reset option property
+editor.setOptions({
+    minHeight: '300px',
+    buttonList: [
+        ['fontColor', 'hiliteColor']
+    ],
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
+    ]
+});
 
 // Open a notice area
 editor.noticeOpen('test notice');
@@ -462,13 +462,30 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
+/**
+ * targetImgElement: Current img element
+ * index: Uploaded index (key value)
+ * state: Upload status ('create', 'update', 'delete')
+ * imageInfo: {
+ * * index: data index
+ * * name: file name
+ * * size: file size
+ * * select: select function
+ * * delete: delete function
+ * }
+ * remainingFilesCount: Count of remaining image files
+*/
 editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create','update','delete'):${state}`)
+    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
+/**
+ * errorMessage: Error message to show
+ * result: Result object 
+*/
 editor.onImageUploadError = function (errorMessage, result) {
     alert(errorMessage)
 }
@@ -477,8 +494,8 @@ editor.onImageUploadError = function (errorMessage, result) {
 ## Examples
 **<a href="http://suneditor.com/sample/html/examples.html" target="_blank">Examples</a>**
 
-## Customize
-**<a href="http://suneditor.com/sample/html/customize.html" target="_blank">Customize</a>**
+## Options custom
+**<a href="http://suneditor.com/sample/html/options.html" target="_blank">Customize</a>**
 
 ## customPlugins
 **<a href="http://suneditor.com/sample/html/customPlugins.html" target="_blank">customPlugins</a>**

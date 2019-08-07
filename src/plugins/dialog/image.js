@@ -38,7 +38,7 @@ export default {
             _floatClassRegExp: 'float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
-            _defaultAuto: context.option.imageWidth === 'auto' ? true : false,
+            _defaultAuto: context.option.imageWidth === 'auto',
             _uploadFileLength: 0
         };
 
@@ -732,10 +732,18 @@ export default {
         if (!notOpen) this.plugins.dialog.open.call(this, 'image', true);
     },
 
+    on: function (update) {
+        if (!update) {
+            const contextImage = this.context.image;
+            contextImage.imageX.value = contextImage._origin_w = contextImage._defaultAuto ? '' : this.context.option.imageWidth;
+            contextImage.imageY.value = contextImage._origin_h = '';
+        }
+    },
+
     setSize: function (w, h) {
         const contextImage = this.context.image;
-        contextImage._element.style.width = w + 'px';
-        contextImage._element.style.height = h + 'px';
+        contextImage._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
+        contextImage._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
     },
     
     setAutoSize: function () {
@@ -744,8 +752,10 @@ export default {
         this.plugins.resizing.resetTransform.call(this, contextImage._element);
         this.plugins.image.cancelPercentAttr.call(this);
 
+        const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
+
         contextImage._element.style.maxWidth = '100%';
-        contextImage._element.style.width = '100%';
+        contextImage._element.style.width = originSize[0] ? originSize[0] + 'px' : '100%';
         contextImage._element.style.height = '';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
@@ -754,6 +764,7 @@ export default {
     setPercentSize: function (w) {
         const contextImage = this.context.image;
 
+        contextImage._element.style.maxWidth = '100%';
         contextImage._container.style.width = w;
         contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
@@ -828,12 +839,10 @@ export default {
         this.plugins.image.openTab.call(this, 'init');
 
         if (contextImage._resizing) {
-            const autoWidth = this.context.option.imageWidth === 'auto';
-
             contextImage.proportion.checked = false;
-            contextImage.imageX.value = autoWidth ? '' : this.context.option.imageWidth;
+            contextImage.imageX.value = contextImage._defaultAuto ? '' : this.context.option.imageWidth;
             contextImage.imageY.value = '';
-            contextImage.imageX.disabled = autoWidth;
+            contextImage.imageX.disabled = contextImage._defaultAuto;
             contextImage.imageY.disabled = true;
             contextImage.proportion.disabled = true;
         }

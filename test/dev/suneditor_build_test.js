@@ -53,8 +53,9 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     ],
     width: '100%',
     stickyToolbar: 0,
+    imageWidth: 300,
     mode: 'inline',
-    toolbarWidth: 800,
+    // toolbarWidth: 800,
     height: 'auto',
     // callBackSave: (contents) => {
     //     console.log('callback')
@@ -165,14 +166,51 @@ const editor = suneditor.init({
 
 let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
-    minHeight: '150px',
-    maxHeight: '500px',
-    height: 450,
-    imageWidth: '100%',
-    colorList: [
-        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
-        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+    // maxHeight: '400px',
+    height: 400,
+    imageResizing: true,
+    // imageWidth: '400',
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        ['fontColor', 'hiliteColor'],
+        ['outdent', 'indent'],
+        ['align', 'horizontalRule', 'list', 'table'],
+        ['link', 'image', 'video'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print'],
+        ['save', 'template'],
     ],
+    templates: [
+        {
+            name: 'template1',
+            html: '<p>fdkjslfjdslkf</p>'
+        },
+        {
+            name: 'templeeeeeeeeeeeeeate2',
+            html: '<p><strong>11111</strong></p>'
+        },
+        {
+            name: 'template3',
+            html: '<p><u>22222</u></p>'
+        }
+    ],
+    callBackSave: function (contents) {
+        alert(contents)
+    },
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    // imageUploadSizeLimit: 30000
+});
+
+const newOption = {
+    mode: 'balloon',
+    plugins: [
+        plugins.hiliteColor,
+        plugins.fontColor
+    ],
+    minHeight: '300',
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -186,12 +224,21 @@ let s2 = editor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['save'],
     ],
-    callBackSave: function (contents) {
-        alert(contents)
-    },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
-    // imageUploadSizeLimit: 30000
-});
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
+        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+    ],
+}
+const newOption2 = {
+    mode: 'classic',
+    maxHeight: '400px',
+    height: 150,
+    imageWidth: '100%',
+    colorList: null,
+}
+const newOption3 = {
+    mode: 'inline'
+}
 
 let imageList = [];
 let selectedImages = [];
@@ -294,6 +341,16 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
         console.log('imageList', imageList)
         setImageList(imageList)
     }
+}
+
+window.sun_setOptions2 = function () {
+    s2.setOptions(newOption);
+}
+window.sun_setOptions3 = function () {
+    s2.setOptions(newOption2);
+}
+window.sun_setOptions4 = function () {
+    s2.setOptions(newOption3);
 }
 
 window.sun_insertImage2 = function () {

@@ -25,8 +25,34 @@
             <h3 class="subsection-title">Methods</h3>
 
 
+            <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions<span
+                    class="signature">(options)</span></h4>
+            <div class="description">
+                Add or reset option property.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>options</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Options</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="noticeOpen"><span class="type-signature"></span>noticeOpen<span
-                    class="signature">()</span></h4>
+                    class="signature">(message)</span></h4>
             <div class="description">
                 Open a notice area.
             </div>
@@ -247,7 +273,7 @@
             </div>
 
             <h4 class="name" id="onScroll"><span class="type-signature"></span>onScroll<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(event)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Scroll event
             </div>
@@ -273,7 +299,7 @@
 
 
             <h4 class="name" id="onClick"><span class="type-signature"></span>onClick<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(event)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Click event
             </div>
@@ -299,7 +325,7 @@
 
 
             <h4 class="name" id="onKeyDown"><span class="type-signature"></span>onKeyDown<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(event)</span><span class="type-signature"></span></h4>
             <div class="description">
                 KeyDown event
             </div>
@@ -325,7 +351,7 @@
 
 
             <h4 class="name" id="onKeyUp"><span class="type-signature"></span>onKeyUp<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(event)</span><span class="type-signature"></span></h4>
             <div class="description">
                 KeyUp event
             </div>
@@ -351,7 +377,7 @@
 
 
             <h4 class="name" id="onDrop"><span class="type-signature"></span>onDrop<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(event)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Drop event
             </div>
@@ -376,8 +402,34 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="onChange"><span class="type-signature"></span>onChange<span
+                    class="signature">(contents)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                When the contents change
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>contents</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="onImageUpload"><span class="type-signature"></span>onImageUpload<span
-                    class="signature">()</span><span class="type-signature"></span></h4>
+                    class="signature">(targetImgElement, index, state, imageInfo, remainingFilesCount)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Called when the image is uploaded or the uploaded image is deleted
             </div>
@@ -402,14 +454,68 @@
                     <td class="type">
                         <span class="param-type">Number</span>
                     </td>
-                    <td class="description last">Uploaded index</td>
+                    <td class="description last">Uploaded index (key value)</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>isDelete</code></td>
+                    <td class="name"><code>state</code></td>
                     <td class="type">
-                        <span class="param-type">Boolean</span>
+                        <span class="param-type">String</span>
                     </td>
-                    <td class="description last">Whether or not it was called after the delete operation</td>
+                    <td class="description last">Upload status ('create', 'update', 'delete')</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>imageInfo</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        <strong>src</strong>: imgage src<br>
+                        <strong>index</strong>: data index<br>
+                        <strong>name</strong>: file name<br>
+                        <strong>size</strong>: file size<br>
+                        <strong>select</strong>: select function<br>
+                        <strong>delete</strong>: delete function
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>remainingFilesCount</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Count of remaining image files</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onImageUploadError"><span class="type-signature"></span>onImageUploadError<span
+                    class="signature">(errorMessage, result)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called when the image is uploaded or the uploaded image is deleted
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>errorMessage</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Error message to show</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>result</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Result object</td>
                 </tr>
                 </tbody>
             </table>
@@ -425,6 +531,7 @@
     <h3>SUNEDITOR.create -></h3>
     <h3>{return functions}</h3>
     <ul>
+        <li><a href="document-user.html#setOptions">setOptions</a></li>
         <li><a href="document-user.html#noticeOpen">noticeOpen</a></li>
         <li><a href="document-user.html#noticeClose">noticeClose</a></li>
         <li><a href="document-user.html#save">save</a></li>
@@ -442,14 +549,16 @@
         <li><a href="document-user.html#destroy">destroy</a></li>
     </ul>
 
-    <h3>Useable events</h3>
+    <h3>Useable events</h3>
     <ul>
         <li><a href="document-user.html#onScroll">onScroll</a></li>
         <li><a href="document-user.html#onClick">onClick</a></li>
         <li><a href="document-user.html#onKeyDown">onKeyDown</a></li>
         <li><a href="document-user.html#onKeyUp">onKeyUp</a></li>
         <li><a href="document-user.html#onDrop">onDrop</a></li>
+        <li><a href="document-user.html#onChange">onChange</a></li>
         <li><a href="document-user.html#onImageUpload">onImageUpload</a></li>
+        <li><a href="document-user.html#onImageUploadError">onImageUploadError</a></li>
     </ul>
 </nav>
 

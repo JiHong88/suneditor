@@ -75,6 +75,8 @@ export default {
         this.modalForm = this.context[kind].modal;
         const focusElement = this.context[kind].focusElement;
 
+        if (typeof this.plugins[kind].on === 'function') this.plugins[kind].on.call(this, update);
+
         this.context.dialog.modalArea.style.display = 'block';
         this.context.dialog.back.style.display = 'block';
         this.context.dialog.modal.style.display = 'block';

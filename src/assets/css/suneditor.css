@@ -113,6 +113,9 @@
 .sun-editor .se-icon-map-pin::before{content:'\0021';}
 .sun-editor .se-icon-magic-stick::before{content:'\0022';}
 .sun-editor .se-icon-math::before{content:'\0023';}
+.sun-editor .se-icon-audio::before{content:'\0024';}
+.sun-editor .se-icon-emoji::before{content:'\0025';}
+.sun-editor .se-icon-template::before{content:'\0026';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
@@ -190,6 +193,7 @@
 /* submenu layer - common list form */
 .sun-editor .se-list-inner .se-list-basic {width:100%; padding:0;}
 .sun-editor .se-list-inner .se-list-basic li {width:100%;}
+.sun-editor .se-list-inner .se-list-basic li > button {min-width:100%; width:max-content;}
 /* submenu layer - common list form button on */
 .sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
@@ -200,10 +204,10 @@
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
 /** --- submenu layer - se-list-inner > exception */
 /* submenu layer - font family */
-.sun-editor .se-list-layer .se-list-font-family {width:156px;}
+.sun-editor .se-list-layer .se-list-font-family {min-width:156px;}
 .sun-editor .se-list-layer .se-list-font-family .default {border-bottom:1px solid #CCC;}
 /** submenu layer - format block */
-.sun-editor .se-list-layer .se-list-format {width:175px;}
+.sun-editor .se-list-layer .se-list-format {min-width:156px;}
 .sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list {height:auto; min-height:32px; line-height:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
@@ -219,11 +223,10 @@
 .sun-editor .se-list-layer .se-list-format blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
 .sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /* submenu layer - font size */
-.sun-editor .se-list-layer .se-list-font-size {max-height:300px; overflow-x:hidden; overflow-y:auto;}
-.sun-editor .se-list-layer .se-list-font-size-inner {width:140px;}
-.sun-editor .se-list-layer .se-list-font-size-inner .se-btn-list {height:auto; min-height:32px; line-height:normal;}
+.sun-editor .se-list-layer .se-list-font-size {min-width:140px; max-height:300px; overflow-x:hidden; overflow-y:auto;}
+.sun-editor .se-list-layer .se-list-font-size .se-btn-list {height:auto; min-height:32px; line-height:normal;}
 /* submenu layer - hr */
-.sun-editor .se-list-layer .se-list-line {width:158px;}
+.sun-editor .se-list-layer .se-list-line {width:125px;}
 /* submenu layer - align */
 .sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
@@ -264,7 +267,7 @@
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
 .sun-editor .se-resizing-bar .se-resizing-back {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 /** resizing bar - nabigation */
-.sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
+.sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
 .sun-editor .se-resizing-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; font-size:10px; background:transparent;}
 .sun-editor .se-resizing-bar .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
@@ -318,7 +321,7 @@
 
 /* controller - button group */
 .sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px 2px 2px 0; top:0; left:0;}
-.sun-editor .se-controller .se-btn-group .se-btn-group-sub {left:50%; width:max-content; display:none;/* display: inline-table; */}
+.sun-editor .se-controller .se-btn-group .se-btn-group-sub {left:50%; min-width:auto; width:max-content; display:none;/* display: inline-table; */}
 .sun-editor .se-controller .se-btn-group .se-btn-group-sub button {margin:0; min-width:72px;}
 .sun-editor .se-controller .se-btn-group button {position:relative; min-height:35px; height:auto; border:none; border-radius:2px; border-top-right-radius:0; border-bottom-right-radius:0; margin:0 0 0 2px; padding:5px 10px; font-size:12px; line-height:1.5; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation;}
 .sun-editor .se-controller .se-btn-group button:hover:enabled, .sun-editor .se-controller .se-btn-group button:focus:enabled {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
@@ -361,7 +364,7 @@
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
 /** --- notice */
-.sun-editor .se-notice {position:relative; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7;}
+.sun-editor .se-notice {position:relative; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
 .sun-editor .se-notice button {float:right;}
 
 /** --- tooltip */

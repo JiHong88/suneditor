@@ -66,7 +66,8 @@
             tag_div: '기본 (DIV)',
             tag_h: '제목',
             tag_blockquote: '인용문',
-            tag_pre: '코드'
+            tag_pre: '코드',
+            template: '템플릿'
         },
         dialogBox: {
             linkBox: {

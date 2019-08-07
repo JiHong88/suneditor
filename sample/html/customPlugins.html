@@ -31,7 +31,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="getting-started.html" title="Getting started">Getting started</a></li>
                 <li><a href="examples.html" title="Examples">Examples</a></li>
-                <li><a href="customize.html" title="Customize">Customize</a></li>
+                <li><a href="options.html" title="Options">Options</a></li>
                 <li><a href="customPlugins.html" style="color:#fff;" title="CustomPlugins">CustomPlugins</a></li>
                 <li><a href="document.html" title="Document">Document</a></li>
                 <li class="badge">
@@ -108,6 +108,11 @@
 
         <span class="pl-k">return</span> listDiv;
     },
+
+    <span class="pl-c"><span class="pl-c">//</span> Called after the submenu has been rendered</span>
+    <span class="pl-en">on</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+        <span class="pl-c1">this</span>.<span class="pl-en">context</span>.<span class="pl-en">custom</span>.<span class="pl-en">textElement</span>.<span class="pl-c1">focus</span>();
+    }
 
     <span class="pl-en">onClick</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
         <span class="pl-c"><span class="pl-c">//</span> Get Input value</span>
@@ -211,14 +216,17 @@
 
             return listDiv;
         },
+        on: function () {
+            this.context.custom.textElement.focus();
+        },
         onClick: function () {
-        const value = this.util.createTextNode(this.context.custom.textElement.value);
+            const value = this.util.createTextNode(this.context.custom.textElement.value);
 
-        this.insertNode(value);
-        this.setRange(value, value.length, value, value.length);
+            this.insertNode(value);
+            this.setRange(value, value.length, value, value.length);
 
-        this.submenuOff();
-        this.focus();
+            this.submenuOff();
+            this.focus();
         }
     };
 

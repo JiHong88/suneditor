@@ -12,7 +12,7 @@
  * @param {HTMLElement} element textarea element
  * @param {object} cons Toolbar element you created
  * @param {json} options Inserted options
- * @returns Elements, variables of the editor
+ * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
 const _Context = function (element, cons, options) {
@@ -52,35 +52,7 @@ const _Context = function (element, cons, options) {
             save: cons._toolBar.querySelector('._se_command_save'),
             outdent: cons._toolBar.querySelector('._se_command_outdent')
         },
-        option: {
-            mode: options.mode,
-            toolbarWidth: options.toolbarWidth,
-            stickyToolbar: options.stickyToolbar,
-            resizingBar: options.resizingBar,
-            showPathLabel: options.showPathLabel,
-            popupDisplay: options.popupDisplay,
-            display: options.display,
-            height: options.height,
-            minHeight: options.minHeight,
-            maxHeight: options.maxHeight,
-            maxCharCount: options.maxCharCount,
-            font: options.font,
-            fontSize: options.fontSize,
-            formats: options.formats,
-            colorList: options.colorList,
-            imageResizing: options.imageResizing,
-            imageWidth: options.imageWidth,
-            imageFileInput: options.imageFileInput,
-            imageUrlInput: options.imageUrlInput,
-            imageUploadHeader: options.imageUploadHeader,
-            imageUploadUrl: options.imageUploadUrl,
-            imageUploadSizeLimit: options.imageUploadSizeLimit,
-            videoResizing: options.videoResizing,
-            videoWidth: options.videoWidth,
-            videoHeight: options.videoHeight,
-            youtubeQuery: options.youtubeQuery.replace('?', ''),
-            callBackSave: options.callBackSave
-        }
+        option: options
     };
 };
 

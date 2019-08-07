@@ -69,7 +69,8 @@
             tag_div: 'Normal (DIV)',
             tag_h: 'Overskrift',
             tag_blockquote: 'Citer',
-            tag_pre: 'Code'
+            tag_pre: 'Code',
+            template: 'Schablone'
         },
         dialogBox: {
             linkBox: {

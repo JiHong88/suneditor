@@ -395,6 +395,7 @@ export default {
                                 arr.row = i + 1;
                                 if (arr.rs < 1) {
                                     spanIndex.splice(r, 1);
+                                    r--;
                                 }
                             }
                         }
@@ -691,6 +692,7 @@ export default {
                                 arr.row = i + 1;
                                 if (arr.rs < 1) {
                                     spanIndex.splice(r, 1);
+                                    r--;
                                 }
                             }
                         }
@@ -827,6 +829,7 @@ export default {
                                     arr.row = i + 1;
                                     if (arr.rs < 1) {
                                         spanIndex.splice(r, 1);
+                                        r--;
                                     }
                                 }
                             }
@@ -1191,6 +1194,7 @@ export default {
                             arr.row = i + 1;
                             if (arr.rs < 1) {
                                 spanIndex.splice(r, 1);
+                                r--;
                             }
                         }
                     }

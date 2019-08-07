@@ -66,7 +66,8 @@
             tag_div: 'Normal (DIV)',
             tag_h: 'Header',
             tag_blockquote: 'Quote',
-            tag_pre: 'Code'
+            tag_pre: 'Code',
+            template: 'Template'
         },
         dialogBox: {
             linkBox: {
