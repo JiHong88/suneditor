@@ -174,7 +174,6 @@
             <span>]</span>
         </div>
         <br>
-        <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div>
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
@@ -194,9 +193,7 @@
             </div>
         </div>
 
-        <div id="option_display">
-
-        </div>
+        <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;" id="option_display"></div>
     </article>
 
     <footer>
@@ -282,11 +279,12 @@ function sun_create () {
         ],
         lang: SUNEDITOR_LANG[langSelect.options[langSelect.selectedIndex].value]
     };
-
-    JSONstringify(options)
-
+    
     editorImageSample = SUNEDITOR.create('sample_editor', options);
     editorImageSample.onImageUpload = imageUpload;
+
+    // option string
+    displayJson(JSONstringify(options, langSelect.options[langSelect.selectedIndex].value), optionDisplay);
 }
 
 sun_create();

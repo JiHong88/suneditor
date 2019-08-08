@@ -119,8 +119,11 @@ function deleteCheckedImages() {
 }
 
 // utils
-function JSONstringify(json) {
-    if (typeof json != 'string') {
+function JSONstringify(json, lang) {
+    var jsonVar = Object.assign(JSON.parse(JSON.stringify(json)), {lang: lang})
+    json = Object.assign(JSON.parse(JSON.stringify(json)), {lang: lang})
+    
+    if (typeof json !== 'string') {
         json = JSON.stringify(json, undefined, '\t');
     }
 
@@ -132,7 +135,7 @@ function JSONstringify(json) {
         _null = 'color:magenta',
         _key = 'color:red';
 
-    json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var style = _number;
         if (/^"/.test(match)) {
             if (/:$/.test(match)) {
@@ -152,6 +155,31 @@ function JSONstringify(json) {
 
     arr.unshift(json);
     console.log.apply(console, arr);
+    
+    return jsonVar;
+}
 
-    return arr;
+function displayJson (jsonVar, displayDiv) {
+    jsonStr = JSON.stringify(jsonVar),
+    regeStr = '',
+    f = { brace: 0 };
+
+    regeStr = jsonStr.replace(/({|}[,]*|[^{}:]+:[^{}:,]*[,{]*)/g, function (m, p1) {
+    var rtnFn = function() {
+            return '<div style="text-indent: ' + (f['brace'] * 20) + 'px;">' + p1 + '</div>';
+        },
+        rtnStr = 0;
+        if (p1.lastIndexOf('{') === (p1.length - 1)) {
+            rtnStr = rtnFn();
+            f['brace'] += 1;
+        } else if (p1.indexOf('}') === 0) {
+            f['brace'] -= 1;
+            rtnStr = rtnFn();
+        } else {
+            rtnStr = rtnFn();
+        }
+        return rtnStr;
+    });
+
+    displayDiv.innerHTML = regeStr;
 }
