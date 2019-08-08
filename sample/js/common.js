@@ -120,7 +120,6 @@ function deleteCheckedImages() {
 
 // utils
 function JSONstringify(json, lang) {
-    var jsonVar = Object.assign(JSON.parse(JSON.stringify(json)), {lang: lang})
     json = Object.assign(JSON.parse(JSON.stringify(json)), {lang: lang})
     
     if (typeof json !== 'string') {
@@ -155,31 +154,4 @@ function JSONstringify(json, lang) {
 
     arr.unshift(json);
     console.log.apply(console, arr);
-    
-    return jsonVar;
-}
-
-function displayJson (jsonVar, displayDiv) {
-    jsonStr = JSON.stringify(jsonVar),
-    regeStr = '',
-    f = { brace: 0 };
-
-    regeStr = jsonStr.replace(/({|}[,]*|[^{}:]+:[^{}:,]*[,{]*)/g, function (m, p1) {
-    var rtnFn = function() {
-            return '<div style="text-indent: ' + (f['brace'] * 20) + 'px;">' + p1 + '</div>';
-        },
-        rtnStr = 0;
-        if (p1.lastIndexOf('{') === (p1.length - 1)) {
-            rtnStr = rtnFn();
-            f['brace'] += 1;
-        } else if (p1.indexOf('}') === 0) {
-            f['brace'] -= 1;
-            rtnStr = rtnFn();
-        } else {
-            rtnStr = rtnFn();
-        }
-        return rtnStr;
-    });
-
-    displayDiv.innerHTML = regeStr;
 }

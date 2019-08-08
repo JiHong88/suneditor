@@ -174,6 +174,7 @@
             <span>]</span>
         </div>
         <br>
+        <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div>
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
@@ -284,7 +285,7 @@ function sun_create () {
     editorImageSample.onImageUpload = imageUpload;
 
     // option string
-    displayJson(JSONstringify(options, langSelect.options[langSelect.selectedIndex].value), optionDisplay);
+    JSONstringify(options, langSelect.options[langSelect.selectedIndex].value)
 }
 
 sun_create();
