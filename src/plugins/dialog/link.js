@@ -15,7 +15,12 @@ export default {
         core.addModule([dialog]);
 
         const context = core.context;
-        context.link = {};
+        context.link = {
+            focusElement: null,
+            linkNewWindowCheck: null,
+            linkAnchorText: null,
+            _linkAnchor: null
+        };
 
         /** link dialog */
         let link_dialog = this.setDialog.call(core);
@@ -110,30 +115,31 @@ export default {
         const submitAction = function () {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
-            const url = this.context.link.focusElement.value;
-            const anchor = this.context.link.linkAnchorText;
+            const contextLink = this.context.link;
+            const url = contextLink.focusElement.value;
+            const anchor = contextLink.linkAnchorText;
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
             if (!this.context.dialog.updateModal) {
                 const oA = this.util.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
-                oA.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
+                oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
 
                 this.insertNode(oA);
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
-                this.context.link._linkAnchor.href = url;
-                this.context.link._linkAnchor.textContent = anchorText;
-                this.context.link._linkAnchor.target = (this.context.link.linkNewWindowCheck.checked ? '_blank' : '');
+                contextLink._linkAnchor.href = url;
+                contextLink._linkAnchor.textContent = anchorText;
+                contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
                 // history stack
                 this.history.push();
                 // set range
-                this.setRange(this.context.link._linkAnchor.childNodes[0], 0, this.context.link._linkAnchor.childNodes[0], this.context.link._linkAnchor.textContent.length);
+                this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
             }
 
-            this.context.link.focusElement.value = '';
-            this.context.link.linkAnchorText.value = '';
+            contextLink.focusElement.value = '';
+            contextLink.linkAnchorText.value = '';
         }.bind(this);
 
         try {
@@ -145,6 +151,12 @@ export default {
         }
 
         return false;
+    },
+
+    on: function (update) {
+        if (!update) {
+            this.context.link.linkAnchorText.value = this._w.getSelection().toString();
+        }
     },
 
     call_controller_linkButton: function (selectionATag) {
