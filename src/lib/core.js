@@ -257,7 +257,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             else this.submenu.style.left = '1px';
 
             this._bindedSubmenuOff = this.submenuOff.bind(this);
-            _d.addEventListener('mousedown', this._bindedSubmenuOff, false);
+            this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
             if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
         },
@@ -266,7 +266,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Disable submenu
          */
         submenuOff: function () {
-            _d.removeEventListener('mousedown', this._bindedSubmenuOff);
+            this.removeDocEvent('mousedown', this._bindedSubmenuOff);
             this._bindedSubmenuOff = null;
 
             if (this.submenu) {
@@ -294,8 +294,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             this._bindControllersOff = this.controllersOff.bind(this);
-            _d.addEventListener('mousedown', this._bindControllersOff, false);
-            if (!this._resizingName) _d.addEventListener('keydown', this._bindControllersOff, false);
+            this.addDocEvent('mousedown', this._bindControllersOff, false);
+            if (!this._resizingName) this.addDocEvent('keydown', this._bindControllersOff, false);
         },
 
         /**
@@ -305,8 +305,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._resizingName = '';
             if (!this._bindControllersOff) return;
 
-            _d.removeEventListener('mousedown', this._bindControllersOff);
-            _d.removeEventListener('keydown', this._bindControllersOff);
+            this.removeDocEvent('mousedown', this._bindControllersOff);
+            this.removeDocEvent('keydown', this._bindControllersOff);
             this._bindControllersOff = null;
 
             const len = this.controllerArray.length;
@@ -336,7 +336,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Focus to wysiwyg area
          */
         focus: function () {
-            if (context.element.wysiwyg.style.display === 'none') return;
+            if (context.element.wysiwygFrame.style.display === 'none') return;
 
             const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
             if (caption) {
@@ -365,7 +365,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             range.setStart(startCon, startOff);
             range.setEnd(endCon, endOff);
 
-            const selection = _w.getSelection();
+            const selection = this.getSelection();
 
             if (selection.removeAllRanges) {
                 selection.removeAllRanges();
@@ -384,6 +384,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Get window selection obejct
+         * @returns {Object}
+         */
+        getSelection: function () {
+            return this._ww.getSelection();
+        },
+
+        /**
          * @description Get current select node
          * @returns {Node}
          */
@@ -396,7 +404,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _editorRange: function () {
-            const selection = _w.getSelection();
+            const selection = this.getSelection();
             let range = null;
             let selectionNode = null;
 
@@ -2035,9 +2043,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
-                context.element.wysiwyg.scrollTop = 0;
+                context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
-                context.element.wysiwyg.style.display = 'block';
+                context.element.wysiwygFrame.style.display = 'block';
 
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
@@ -2049,7 +2057,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             else {
                 context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
                 context.element.code.style.display = 'block';
-                context.element.wysiwyg.style.display = 'none';
+                context.element.wysiwygFrame.style.display = 'none';
 
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
@@ -2246,6 +2254,33 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Add an event to document.
+         * When created as an Iframe, the same event is added to the document in the Iframe.
+         * @param {String} type Event type
+         * @param {Function} listener Event listener
+         * @param {Boolean} useCapture Use event capture
+         */
+        addDocEvent: function (type, listener, useCapture) {
+            _d.addEventListener(type, listener, useCapture);
+            if (_options.iframe) {
+                this._wd.addEventListener(type, listener);
+            }
+        },
+
+        /**
+         * @description Remove events from document.
+         * When created as an Iframe, the event of the document inside the Iframe is also removed.
+         * @param {String} type Event type
+         * @param {Function} listener Event listener
+         */
+        removeDocEvent: function (type, listener) {
+            _d.removeEventListener(type, listener);
+            if (_options.iframe) {
+                this._wd.removeEventListener(type, listener);
+            }
+        },
+
+        /**
          * @description The current number of characters is counted and displayed.
          * @param {Number} nextCharCount Length of character to be added.
          * @private
@@ -2314,6 +2349,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _init: function () {
+            core._wd = context.option.iframe ? context.element.wysiwygFrame.contentDocument : _d,
+            core._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w,
+
             core.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             core._isInline = /inline/i.test(context.option.mode);
             core._isBalloon = /balloon/i.test(context.option.mode);
@@ -2738,7 +2776,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _showToolbarBalloon: function (rangeObj) {
             const range = rangeObj || core.getRange();
             const toolbar = context.element.toolbar;
-            const selection = _w.getSelection();
+            const selection = core.getSelection();
 
             let isDirTop;
             if (selection.focusNode === selection.anchorNode) {
@@ -3121,7 +3159,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         _resize_editor: function (e) {
             const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - core._variable.resizeClientY);
-            context.element.wysiwyg.style.height = context.element.code.style.height = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval) + 'px';
+            context.element.wysiwygFrame.style.height = context.element.code.style.height = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval) + 'px';
             core._variable.resizeClientY = e.clientY;
         },
 
@@ -3271,12 +3309,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
             /** editor area */
             context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
             context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
             context.element.wysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+            (context.option.iframe ? core._ww : context.element.wysiwyg).addEventListener('scroll', event.onScroll_wysiwyg, false);
 
             /** Events are registered only a balloon mode or when there is a table plugin. */
             if (core._isBalloon || core.plugins.table) {
@@ -3327,12 +3365,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
             context.element.wysiwyg.removeEventListener('click', event.onClick_wysiwyg);
-            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
             context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             context.element.wysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
             context.element.wysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
             context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
+            (context.option.iframe ? core._ww : context.element.wysiwyg).removeEventListener('scroll', event.onScroll_wysiwyg);
             
             context.element.wysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
             context.element.wysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
@@ -3418,7 +3456,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 _relative: el.relative,
                 _toolBar: el.toolbar,
                 _editorArea: el.editorArea,
-                _wysiwygArea: el.wysiwyg,
+                _wysiwygArea: el.wysiwygFrame,
                 _codeArea: el.code,
                 _resizingBar: el.resizingBar,
                 _navigation: el.navigation,
@@ -3607,7 +3645,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _w.setTimeout(function () {
             core.callPlugin('image', function () {
                 const setImagesInfo = this.plugins.image.setImagesInfo;
-                const images = context.element.wysiwyg.getElementsByTagName('IMG');
+                const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
                 this.context.image._uploadFileLength = images.length;
     
                 for (let i = 0, len = images.length, img; i < len; i++) {

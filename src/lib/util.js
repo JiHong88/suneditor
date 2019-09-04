@@ -222,12 +222,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the edit region top div element.
+     * @description It is judged whether it is the edit region top div element or iframe's body tag.
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
-        if (element && element.nodeType === 1 && this.hasClass(element, 'se-wrapper-wysiwyg')) return true;
+        if (element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))) return true;
         return false;
     },
 

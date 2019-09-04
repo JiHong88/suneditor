@@ -25,7 +25,8 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     mode: 'balloon',
     stickyToolbar: '0',
     videoResizing: false,
-    imageWidth: 150
+    imageWidth: 150,
+    // iframe: true,
 });
 
 window.sun_destroy1 = function () {
@@ -57,6 +58,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'inline',
     // toolbarWidth: 800,
     height: 'auto',
+    // iframe: true,
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
@@ -161,7 +163,7 @@ const editor = suneditor.init({
         custom_plugin_submenu
     ],
     width: '100%',
-    
+    // iframe: true,
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
@@ -201,11 +203,13 @@ let s2 = editor.create(document.getElementById('editor2'), {
         alert(contents)
     },
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    iframe: true,
     // imageUploadSizeLimit: 30000
 });
 
 const newOption = {
     mode: 'balloon',
+    iframe: false,
     plugins: [
         plugins.hiliteColor,
         plugins.fontColor
@@ -235,9 +239,11 @@ const newOption2 = {
     height: 150,
     imageWidth: '100%',
     colorList: null,
+    iframe: true,
 }
 const newOption3 = {
-    mode: 'inline'
+    mode: 'inline',
+    iframe: false,
 }
 
 let imageList = [];
@@ -392,6 +398,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     width: '100%',
     stickyToolbar: false,
     popupDisplay: 'local',
+    // iframe: true,
     // maxCharCount: 300,
     // resizingBar: false
     // showPathLabel:false
