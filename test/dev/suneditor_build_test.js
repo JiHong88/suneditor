@@ -204,6 +204,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     },
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
     iframe: true,
+    fullPage: true
     // imageUploadSizeLimit: 30000
 });
 

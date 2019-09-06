@@ -2042,7 +2042,25 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             if (!wysiwygActive) {
                 const code_html = context.element.code.value.trim();
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
+
+                if (context.option.fullPage) {
+                    const parseDocument = (new this._w.DOMParser()).parseFromString(code_html, 'text/html');
+                    const headChildren = parseDocument.head.children;
+
+                    for (let i = 0, len = headChildren.length; i < len; i++) {
+                        if (/script/i.test(headChildren[i].tagName)) {
+                            parseDocument.head.removeChild(headChildren[i]);
+                        }
+                    }
+
+                    parseDocument.body.innerHTML = util.convertHTMLForCodeView(parseDocument.body);
+
+                    this._wd.head.outerHTML = parseDocument.head.outerHTML;
+                    this._wd.body.outerHTML = parseDocument.body.outerHTML;
+                } else {
+                    context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
+                }
+
                 context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwygFrame.style.display = 'block';
@@ -2055,7 +2073,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this.focus();
             }
             else {
-                context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
+                if (context.option.fullPage) {
+                    const headChildren = this._wd.head.children;
+                    let headTags = '';
+                    for (let i = 0, len = headChildren.length; i < len; i++) {
+                        headTags += headChildren[i].outerHTML + '\n';
+                    }
+                    context.element.code.value = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>\B/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>\B/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+                } else {
+                    context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
+                }
+
                 context.element.code.style.display = 'block';
                 context.element.wysiwygFrame.style.display = 'none';
 
@@ -2190,19 +2218,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            windowObject.document.write('' +
-                '<!doctype html><html>' +
-                '<head>' +
-                '<meta charset="utf-8" />' +
-                '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<title>' + lang.toolbar.preview + '</title>' +
-                '<style>' + cssText + '</style>' +
-                '</head>' +
-                '<body>' +
-                '<div class="sun-editor-editable">' + contentsHTML + '</div>' +
-                '</body>' +
-                '</html>'
-            );
+
+            if (context.option.fullPage) {
+                windowObject.document.write('' +
+                    '<!DOCTYPE html><html>' +
+                    this._wd.head.outerHTML +
+                    this._wd.body.outerHTML +
+                    '</html>'
+                );
+            } else {
+                windowObject.document.write('' +
+                    '<!DOCTYPE html><html>' +
+                    '<head>' +
+                    '<meta charset="utf-8" />' +
+                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                    '<title>' + lang.toolbar.preview + '</title>' +
+                    '<style>' + cssText + '</style>' +
+                    '</head>' +
+                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '</html>'
+                );
+            }
         },
 
         /**
@@ -2231,14 +2267,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {Object}
          */
         getContents: function () {
-            let contents = '';
-
-            if (core._variable.wysiwygActive) {
-                contents = context.element.wysiwyg.innerHTML;
-            } else {
-                contents = util.convertContentsForEditor(context.element.code.value);
-            }
-
+            const contents = context.element.wysiwyg.innerHTML;
             const renderHTML = util.createElement('DIV');
             renderHTML.innerHTML = contents;
 
@@ -2250,7 +2279,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 figcaptions[i].removeAttribute('contenteditable');
             }
 
-            return renderHTML.innerHTML;
+            if (context.option.fullPage) {
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + this._wd.body.outerHTML + '</html>';
+            } else {
+                return renderHTML.innerHTML;
+            }
         },
 
         /**
@@ -2262,7 +2295,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         addDocEvent: function (type, listener, useCapture) {
             _d.addEventListener(type, listener, useCapture);
-            if (_options.iframe) {
+            if (context.option.iframe) {
                 this._wd.addEventListener(type, listener);
             }
         },
@@ -2275,7 +2308,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         removeDocEvent: function (type, listener) {
             _d.removeEventListener(type, listener);
-            if (_options.iframe) {
+            if (context.option.iframe) {
                 this._wd.removeEventListener(type, listener);
             }
         },
@@ -3370,7 +3403,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             context.element.wysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
             context.element.wysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
             context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
-            (context.option.iframe ? core._ww : context.element.wysiwyg).removeEventListener('scroll', event.onScroll_wysiwyg);
+            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
+            core._ww.removeEventListener('scroll', event.onScroll_wysiwyg);
             
             context.element.wysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
             context.element.wysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
@@ -3431,14 +3465,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         setOptions: function (options) {
             core.plugins = options.plugins || core.plugins;
-            const mergeOptions = [_options, options].reduce(function (init, option) {
+            const mergeOptions = [context.option, options].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
                     init[key] = option[key];
                 });
                 return init;
             }, {});
 
-            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
+            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, context.option);
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
