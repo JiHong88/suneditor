@@ -262,7 +262,7 @@
 /** --- resizing bar */
 .sun-editor .se-resizing-bar {display:flex; width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 4px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
-.sun-editor .se-resizing-bar .se-resizing-back {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-resizing-back {position:absolute; display:none; cursor:ns-resize; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 /** resizing bar - nabigation */
 .sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
