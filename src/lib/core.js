@@ -3272,9 +3272,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         onPaste_wysiwyg: function (e) {
-            const clipboardData = e.clipboardData;
-            if (!clipboardData) return true;
+            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
 
+            const clipboardData = e.clipboardData;
+
+            if (!clipboardData) return true;
             if (!core._charCount(clipboardData.getData('text/plain').length, true)) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -3442,6 +3448,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onKeyUp: null,
         onDrop: null,
         onChange: null,
+        onPaste: null,
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
