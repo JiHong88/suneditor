@@ -250,6 +250,8 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
+fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
 
 // Display-------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}
@@ -460,6 +462,10 @@ editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
 editor.onDrop = function (e) { console.log('onDrop', e) }
 
 editor.onChange = function (contents) { console.log('onChange', contents) }
+
+// cleanData : HTML string modified for editor format
+// maxCharCount : maxChartCount option (true if max character is exceeded)
+editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
 /**

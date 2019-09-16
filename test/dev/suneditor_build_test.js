@@ -169,6 +169,7 @@ const editor = suneditor.init({
 let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
+    // height: 'auto',
     height: 400,
     imageResizing: true,
     // imageWidth: '400',

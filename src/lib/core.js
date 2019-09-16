@@ -2316,6 +2316,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         /**
          * @description The current number of characters is counted and displayed.
          * @param {Number} nextCharCount Length of character to be added.
+         * @returns {Boolean}
          * @private
          */
         _charCount: function (nextCharCount, blink) {
@@ -3272,22 +3273,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         onPaste_wysiwyg: function (e) {
-            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e)) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-
             const clipboardData = e.clipboardData;
-
             if (!clipboardData) return true;
-            if (!core._charCount(clipboardData.getData('text/plain').length, true)) {
+
+            const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
+            const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
+
+            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
 
-            const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
+            if (!maxCharCount) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             if (cleanData) {
                 e.stopPropagation();
                 e.preventDefault();
