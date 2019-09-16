@@ -186,7 +186,7 @@ export default {
 
         const resizeContainer = contextResizing.resizeContainer;
         const resizeDiv = contextResizing.resizeDiv;
-        const offset = this.util.getOffset(targetElement);
+        const offset = this.util.getOffset(targetElement, this.context.element.wysiwygFrame);
 
         const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 

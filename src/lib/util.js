@@ -633,9 +633,10 @@ const util = {
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
      * @param {Element} element Element node
+     * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
      * @returns {Object}
      */
-    getOffset: function (element) {
+    getOffset: function (element, wysiwygFrame) {
         let offsetLeft = 0;
         let offsetTop = 0;
         let offsetElement = element.nodeType === 3 ? element.parentElement : element;
@@ -647,9 +648,11 @@ const util = {
             offsetElement = offsetElement.offsetParent;
         }
 
+        const iframe = wysiwygFrame && /iframe/i.test(wysiwygFrame.nodeName);
+
         return {
-            left: offsetLeft,
-            top: offsetTop - wysiwyg.scrollTop
+            left: offsetLeft + (iframe ? wysiwygFrame.offsetLeft : 0),
+            top: (offsetTop - wysiwyg.scrollTop) + (iframe ? wysiwygFrame.offsetTop : 0)
         };
     },
 

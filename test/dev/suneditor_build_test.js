@@ -26,7 +26,7 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     stickyToolbar: '0',
     videoResizing: false,
     imageWidth: 150,
-    // iframe: true,
+    fullPage: true,
 });
 
 window.sun_destroy1 = function () {
@@ -58,6 +58,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'inline',
     // toolbarWidth: 800,
     height: 'auto',
+    fullPage: true,
     // iframe: true,
     // callBackSave: (contents) => {
     //     console.log('callback')

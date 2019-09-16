@@ -296,7 +296,7 @@ export default {
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
         const tableElement = contextTable._element;
-        const offset = this.util.getOffset(tableElement);
+        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
 
         contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
         tablePlugin.resizeTable.call(this);
@@ -315,7 +315,7 @@ export default {
 
         resizeDiv.style.display = 'block';
 
-        const offset = this.util.getOffset(tdElement);
+        const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
         resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
 
