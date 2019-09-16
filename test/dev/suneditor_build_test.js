@@ -2,6 +2,7 @@
 
 import '../../src/assets/css/suneditor.css';
 import '../../src/assets/css/suneditor-contents.css';
+import 'codemirror/lib/codemirror.css'
 
 import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
@@ -9,6 +10,9 @@ import { ko } from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
+import codeMirror from 'codemirror'
+
+window.cm = codeMirror
 
 let s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
@@ -26,7 +30,8 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     stickyToolbar: '0',
     videoResizing: false,
     imageWidth: 150,
-    fullPage: true,
+    // fullPage: true,
+    
 });
 
 window.sun_destroy1 = function () {
@@ -63,6 +68,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
+    codeMirror: codeMirror
 });
 
 ss.onScroll = function (e) {

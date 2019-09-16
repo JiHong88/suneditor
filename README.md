@@ -463,8 +463,13 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
-// cleanData : HTML string modified for editor format
-// maxCharCount : maxChartCount option (true if max character is exceeded)
+// Paste event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
+/**
+ * cleanData : HTML string modified for editor format
+ * maxCharCount : maxChartCount option (true if max character is exceeded)
+*/
 editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
 
 // Called when the image is uploaded or the uploaded image is deleted.

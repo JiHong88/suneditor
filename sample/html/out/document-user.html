@@ -431,7 +431,9 @@
             <h4 class="name" id="onPaste"><span class="type-signature"></span>onPaste<span
                     class="signature">(event, cleanData, maxCharCount)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Paste event
+                Paste event.<br>
+                Called before the editor's default event action.<br>
+                If it returns false, it stops without executing the rest of the action.
             </div>
             <table class="params">
                 <thead>

@@ -112,7 +112,19 @@
 </head>
 <body>
     <div style="position: relative; top: 50px;">
-        aaa
+        <textarea id="cmtest">afda</textarea>
+        <button type="button" onclick="aaa()">cm</button>
+        <script>
+            function aaa () {
+                var ed = cm.fromTextArea(document.getElementById('cmtest'), {
+                    mode: 'htmlmixed',
+                    htmlMode: true,
+                    lineNumbers: true,
+                });
+
+                console.log(ed)
+            }
+        </script>
     </div>
     <div style="position: relative;">
             <div style="max-width: 960px; margin: 60px auto 0 auto; height: 1200px; position: relative;">
