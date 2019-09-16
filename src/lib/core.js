@@ -2041,7 +2041,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.controllersOff();
 
             if (!wysiwygActive) {
-                const code_html = context.element.code.value.trim();
+                const code_html = this._getCodeView();
 
                 if (context.option.fullPage) {
                     const parseDocument = (new this._w.DOMParser()).parseFromString(code_html, 'text/html');
@@ -2071,18 +2071,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (context.option.height === 'auto') context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
-            }
-            else {
+            } else {
+                let codeValue = '';
                 if (context.option.fullPage) {
                     const headChildren = this._wd.head.children;
                     let headTags = '';
                     for (let i = 0, len = headChildren.length; i < len; i++) {
                         headTags += headChildren[i].outerHTML + '\n';
                     }
-                    context.element.code.value = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>\B/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>\B/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+                    codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>\B/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>\B/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
                 } else {
-                    context.element.code.value = util.convertHTMLForCodeView(context.element.wysiwyg);
+                    codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
                 }
+
+                this._setCodeView(codeValue);
 
                 context.element.code.style.display = 'block';
                 context.element.wysiwygFrame.style.display = 'none';
@@ -2091,6 +2093,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
                 if (context.option.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
             }
@@ -2256,8 +2259,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             } else {
                 const value = util.convertHTMLForCodeView(html);
-                if (value !== context.element.code.value) {
-                    context.element.code.value = value;
+                if (value !== core._getCodeView()) {
+                    core._setCodeView(value);
                 }
             }
         },
@@ -2376,6 +2379,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this));
                 else this.plugins.video.checkVideosInfo.call(this);
             }
+        },
+
+        /**
+         * @description Set method in the code view area
+         * @param {String} value HTML string
+         * @private
+         */
+        _setCodeView: function (value) {
+            if (context.option.codeMirrorEditor) {
+                context.option.codeMirrorEditor.getDoc().setValue(value);
+            } else {
+                context.element.code.value = value;
+            }
+        },
+
+        /**
+         * @description Get method in the code view area
+         * @private
+         */
+        _getCodeView: function () {
+            return context.option.codeMirrorEditor ? context.option.codeMirrorEditor.getDoc().getValue() : context.element.code.value;
         },
 
         /**
@@ -3269,7 +3293,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _codeViewAutoScroll: function () {
-            context.element.code.style.height = context.element.code.scrollHeight + 'px';
+            if (context.option.codeMirrorEditor) {
+                context.element.code.style.height = context.option.codeMirrorEditor.display.lineDiv.offsetHeight + 'px';
+            } else {
+                context.element.code.style.height = context.element.code.scrollHeight + 'px';
+            }
         },
 
         onPaste_wysiwyg: function (e) {
@@ -3370,7 +3398,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             /** code view area auto line */
             if (context.option.height === 'auto') {
-                context.element.code.addEventListener('keyup', event._codeViewAutoScroll, false);
+                context.element.code.addEventListener('keydown', event._codeViewAutoScroll, false);
             }
 
             /** resizingBar */
@@ -3619,7 +3647,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (core._variable.wysiwygActive) {
                 context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
             } else {
-                context.element.code.value += util.convertHTMLForCodeView(contents);
+                core._setCodeView(core._getCodeView() + util.convertHTMLForCodeView(contents));
             }
 
             // history stack

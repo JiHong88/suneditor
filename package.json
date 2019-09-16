@@ -40,6 +40,7 @@
     "@webpack-cli/init": "^0.2.2",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^0.1.19",
+    "codemirror": "^5.48.4",
     "css-loader": "^1.0.1",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
@@ -56,8 +57,7 @@
     "webpack": "^4.36.1",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1",
-    "codemirror": "^5.48.4"
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",

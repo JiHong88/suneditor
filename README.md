@@ -252,6 +252,17 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
+                  ex) codeMirror: {
+                      src: CodeMirror,
+                      options: {
+                        /** default options **
+                        * mode: 'text/html',
+                        * htmlMode: true,
+                        * lineNumbers: true
+                        */
+                      }
+                  }
 
 // Display-------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}

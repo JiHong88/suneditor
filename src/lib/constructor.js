@@ -54,7 +54,7 @@ export default {
 
         const bottomBar = initElements.bottomBar;
         const wysiwyg_div = initElements.wysiwygFrame;
-        const textarea = initElements.codeView;
+        let textarea = initElements.codeView;
 
         // resizing bar
         const resizing_bar = bottomBar.resizingBar;
@@ -78,10 +78,10 @@ export default {
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
-        if (resizing_bar) {
-            relative.appendChild(resizing_bar);
-        }
+        if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
+
+        textarea = this._checkCodeMirror(options, textarea);
     
         return {
             constructed: {
@@ -103,6 +103,29 @@ export default {
             plugins: tool_bar.plugins,
             pluginCallButtons: tool_bar.pluginCallButtons
         };
+    },
+
+    /**
+     * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
+     * @param {Object} options options
+     * @param {Element} textarea textarea element
+     * @private
+     */
+    _checkCodeMirror: function(options, textarea) {
+        if (options.codeMirror) {
+            const cm = options.codeMirror.src.fromTextArea(textarea, options.codeMirror.options || {
+                mode: 'text/html',
+                htmlMode: true,
+                lineNumbers: true
+            });
+
+            cm.display.wrapper.style.cssText = textarea.style.cssText;
+            
+            options.codeMirrorEditor = cm;
+            textarea = cm.display.wrapper;
+        }
+
+        return textarea;
     },
 
     /**
@@ -138,7 +161,7 @@ export default {
 
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
-        const code = initElements.codeView;
+        let code = initElements.codeView;
 
         if (el.resizingBar) relative.removeChild(el.resizingBar);
         if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
@@ -151,6 +174,8 @@ export default {
         editorArea.removeChild(el.code);
         editorArea.appendChild(wysiwygFrame);
         editorArea.appendChild(code);
+
+        code = this._checkCodeMirror(mergeOptions, code);
 
         el.wysiwygFrame = wysiwygFrame;
         el.code = code;
@@ -341,6 +366,7 @@ export default {
         // --callBack function
         // options.callBackSave = options.callBackSave;
         // --editor area
+        options.codeMirror = options.codeMirror && options.codeMirror.src ? options.codeMirror : null;
         options.iframe = options.fullPage || options.iframe;
         // options.iframeCSSPath = options.iframeCSSPath;
         // options.fullPage = options.fullPage;
