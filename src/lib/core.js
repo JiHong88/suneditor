@@ -2055,8 +2055,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     parseDocument.body.innerHTML = util.convertHTMLForCodeView(parseDocument.body);
 
-                    this._wd.head.outerHTML = parseDocument.head.outerHTML;
-                    this._wd.body.outerHTML = parseDocument.body.outerHTML;
+                    this._wd.head.innerHTML = parseDocument.head.innerHTML;
+                    this._wd.body.innerHTML = parseDocument.body.innerHTML;
+
+                    const attrs = parseDocument.body.attributes;
+                    for (let i = 0, len = attrs.length; i < len; i++) {
+                        if (attrs[i].name === 'contenteditable') continue;
+                        this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
+                    }
                 } else {
                     context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
                 }
@@ -2068,7 +2074,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-                if (context.option.height === 'auto') context.element.code.style.height = '0px';
+                if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
                 this.focus();
             } else {
@@ -2084,15 +2090,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
                 }
 
-                this._setCodeView(codeValue);
-
                 context.element.code.style.display = 'block';
                 context.element.wysiwygFrame.style.display = 'none';
+
+                this._setCodeView(codeValue);
 
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
-                if (context.option.height === 'auto') context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
@@ -3293,11 +3299,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _codeViewAutoScroll: function () {
-            if (context.option.codeMirrorEditor) {
-                context.element.code.style.height = context.option.codeMirrorEditor.display.lineDiv.offsetHeight + 'px';
-            } else {
-                context.element.code.style.height = context.element.code.scrollHeight + 'px';
-            }
+            context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
         onPaste_wysiwyg: function (e) {
@@ -3397,7 +3399,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
             
             /** code view area auto line */
-            if (context.option.height === 'auto') {
+            if (context.option.height === 'auto' && !context.option.codeMirrorEditor) {
                 context.element.code.addEventListener('keydown', event._codeViewAutoScroll, false);
             }
 

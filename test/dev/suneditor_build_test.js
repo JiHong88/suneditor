@@ -2,7 +2,6 @@
 
 import '../../src/assets/css/suneditor.css';
 import '../../src/assets/css/suneditor-contents.css';
-import 'codemirror/lib/codemirror.css'
 
 import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
@@ -10,9 +9,11 @@ import { ko } from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
-import codeMirror from 'codemirror'
+import CodeMirror from 'codemirror'
+import 'codemirror/mode/htmlmixed/htmlmixed'
+import 'codemirror/lib/codemirror.css'
 
-window.cm = codeMirror
+window.cm = CodeMirror
 
 let s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
@@ -60,7 +61,7 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     stickyToolbar: 0,
     imageWidth: 300,
-    mode: 'inline',
+    // mode: 'inline',
     // toolbarWidth: 800,
     height: 'auto',
     // fullPage: true,
@@ -68,7 +69,9 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
-    codeMirror: codeMirror
+    codeMirror: {
+        src: CodeMirror,
+    }
 });
 
 ss.onScroll = function (e) {
@@ -177,7 +180,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
     height: 'auto',
-    // height: 400,
+    height: 400,
     imageResizing: true,
     // imageWidth: '400',
     buttonList: [
@@ -212,9 +215,9 @@ let s2 = editor.create(document.getElementById('editor2'), {
     },
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
     // iframe: true,
-    // fullPage: true,
+    fullPage: true,
     codeMirror: {
-        src: codeMirror,
+        src: CodeMirror,
     }
     // imageUploadSizeLimit: 30000
 });

@@ -257,7 +257,7 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                       src: CodeMirror,
                       options: {
                         /** default options **
-                        * mode: 'text/html',
+                        * mode: 'htmlmixed',
                         * htmlMode: true,
                         * lineNumbers: true
                         */

@@ -113,12 +113,17 @@ export default {
      */
     _checkCodeMirror: function(options, textarea) {
         if (options.codeMirror) {
-            const cm = options.codeMirror.src.fromTextArea(textarea, options.codeMirror.options || {
-                mode: 'text/html',
+            const cmOptions = options.codeMirror.options || {
+                mode: 'htmlmixed',
                 htmlMode: true,
                 lineNumbers: true
-            });
+            };
 
+            if (options.height === 'auto') {
+                cmOptions.viewportMargin = Infinity;
+            }
+            
+            const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
             cm.display.wrapper.style.cssText = textarea.style.cssText;
             
             options.codeMirrorEditor = cm;
