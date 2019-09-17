@@ -230,15 +230,15 @@ export default {
             wysiwygDiv.innerHTML = initHTML;
         } else {
             const cssTags = (function () {
-                let path = options.iframeCSSPath || [];
-                if (!path || path.length === 0) {
-                    for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-                        styleTag = c[i].href.match(/(^|.*[\\\/])suneditor(.+)?\.css(?:\?.*|;.*)?$/i);
-                        if (styleTag) path.push(styleTag[0]);
-                    }
+                const CSSFileName = new RegExp('(^|.*[\\/])' + (options.iframeCSSFileName || 'suneditor') + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
+                const path = [];
+
+                for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+                    styleTag = c[i].href.match(CSSFileName);
+                    if (styleTag) path.push(styleTag[0]);
                 }
     
-                if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSPath" before creating editor instances.';
+                if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
     
                 let tagString = '';
                 for (let i = 0, len = path.length; i < len; i++) {
@@ -373,7 +373,7 @@ export default {
         // --editor area
         options.codeMirror = options.codeMirror && options.codeMirror.src ? options.codeMirror : null;
         options.iframe = options.fullPage || options.iframe;
-        // options.iframeCSSPath = options.iframeCSSPath;
+        // options.iframeCSSFileName = options.iframeCSSFileName;
         // options.fullPage = options.fullPage;
         // buttons
         options.buttonList = options.buttonList || [
