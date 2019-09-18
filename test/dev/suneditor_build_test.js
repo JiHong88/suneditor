@@ -61,10 +61,10 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     stickyToolbar: 0,
     imageWidth: 300,
-    // mode: 'inline',
+    mode: 'balloon',
     // toolbarWidth: 800,
     height: 'auto',
-    fullPage: true,
+    // fullPage: true,
     iframeCSSFileName: 'suneditor',
     // iframe: true,
     // callBackSave: (contents) => {
@@ -98,6 +98,10 @@ ss.onChange = function (contents) {
 ss.onImageUpload = function () {
     console.log(ss.getImagesInfo());
 }
+
+ss.showInline = function (toolbar, context) {
+
+},
 
 window.sun_noticeOpen = function () {
     ss.noticeOpen('test notice');
@@ -217,9 +221,10 @@ let s2 = editor.create(document.getElementById('editor2'), {
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
     // iframe: true,
     fullPage: true,
+    mode: 'balloon',
     codeMirror: {
         src: CodeMirror,
-    }
+    },
     // imageUploadSizeLimit: 30000
 });
 

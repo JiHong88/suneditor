@@ -2809,34 +2809,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (userFunction.onClick) userFunction.onClick(e);
         },
 
-        _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
-            const padding = 1;
-            const toolbarWidth = toolbar.offsetWidth;
-            const toolbarHeight = toolbar.offsetHeight;
-
-            const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
-            const overRight = absoluteLeft + toolbarWidth - editorWidth;
-            
-            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
-            let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
-            
-            toolbar.style.left = _w.Math.floor(l) + 'px';
-            toolbar.style.top = _w.Math.floor(t) + 'px';
-
-            if (isDirTop) {
-                util.removeClass(context.element._arrow, 'se-arrow-up');
-                util.addClass(context.element._arrow, 'se-arrow-down');
-                context.element._arrow.style.top = toolbarHeight + 'px';
-            } else {
-                util.removeClass(context.element._arrow, 'se-arrow-down');
-                util.addClass(context.element._arrow, 'se-arrow-up');
-                context.element._arrow.style.top = -arrowMargin + 'px';
-            }
-
-            const arrow_left = _w.Math.floor((toolbarWidth / 2) + (absoluteLeft - l));
-            context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
-        },
-
         _showToolbarBalloon: function (rangeObj) {
             const range = rangeObj || core.getRange();
             const toolbar = context.element.toolbar;
@@ -2864,25 +2836,71 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 topArea = topArea.offsetParent;
             }
             
+            toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
             
             const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
+
+            const iframeRects = /iframe/i.test(context.element.wysiwygFrame.nodeName) ? context.element.wysiwygFrame.getClientRects()[0] : null;
+            if (iframeRects) {
+                rects = {
+                    left: rects.left + iframeRects.left,
+                    top: rects.top + iframeRects.top,
+                    right: rects.right + iframeRects.right - iframeRects.width,
+                    bottom: rects.bottom + iframeRects.bottom - iframeRects.height
+                };
+            }
             
             event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
             if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
                 event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
             }
+
+            toolbar.style.visibility = '';
+        },
+
+        _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
+            const padding = 1;
+            const toolbarWidth = toolbar.offsetWidth;
+            const toolbarHeight = toolbar.offsetHeight;
+
+            const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
+            const overRight = absoluteLeft + toolbarWidth - editorWidth;
+            
+            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
+            let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
+
+            toolbar.style.left = _w.Math.floor(l) + 'px';
+            toolbar.style.top = _w.Math.floor(t) + 'px';
+
+            if (isDirTop) {
+                util.removeClass(context.element._arrow, 'se-arrow-up');
+                util.addClass(context.element._arrow, 'se-arrow-down');
+                context.element._arrow.style.top = toolbarHeight + 'px';
+            } else {
+                util.removeClass(context.element._arrow, 'se-arrow-down');
+                util.addClass(context.element._arrow, 'se-arrow-up');
+                context.element._arrow.style.top = -arrowMargin + 'px';
+            }
+
+            const arrow_left = _w.Math.floor((toolbarWidth / 2) + (absoluteLeft - l));
+            context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
         },
 
         _showToolbarInline: function () {
             const toolbar = context.element.toolbar;
+            toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
             core._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
             core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            
+            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context);
+
             event.onScroll_window();
             core._inlineToolbarAttr.isShow = true;
+            toolbar.style.visibility = '';
         },
 
         _hideToolbar: function () {
@@ -3482,6 +3500,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onDrop: null,
         onChange: null,
         onPaste: null,
+        showInline: null,
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
