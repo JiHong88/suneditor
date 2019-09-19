@@ -256,15 +256,16 @@ iframeCSSFileName : Name of the CSS file to apply inside the iframe.
                     Applied by searching by filename in the link tag of document.  default: 'suneditor' {String}
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   ex) codeMirror: {
-                      src: CodeMirror,
-                      options: {
-                        /** default options **
-                        * mode: 'htmlmixed',
-                        * htmlMode: true,
-                        * lineNumbers: true
-                        */
-                      }
-                  }
+                        src: CodeMirror,
+                        options: {
+                            /** default options **
+                            * mode: 'htmlmixed',
+                            * htmlMode: true,
+                            * lineNumbers: true
+                            */
+                        }
+                      },
+                      codeMirror: CodeMirror
 
 // Display-------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}

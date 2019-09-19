@@ -227,9 +227,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     // iframe: true,
     fullPage: true,
     // mode: 'balloon',
-    codeMirror: {
-        src: CodeMirror,
-    },
+    codeMirror: CodeMirror,
     // imageUploadSizeLimit: 30000
 });
 

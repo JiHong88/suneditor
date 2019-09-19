@@ -371,7 +371,7 @@ export default {
         // --callBack function
         // options.callBackSave = options.callBackSave;
         // --editor area
-        options.codeMirror = options.codeMirror && options.codeMirror.src ? options.codeMirror : null;
+        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
         options.iframe = options.fullPage || options.iframe;
         // options.iframeCSSFileName = options.iframeCSSFileName;
         // options.fullPage = options.fullPage;
