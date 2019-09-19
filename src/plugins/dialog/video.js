@@ -31,7 +31,7 @@ export default {
             _captionChecked: false,
             _proportionChecked: true,
             _align: 'none',
-            _floatClassRegExp: 'float\\-[a-z]+',
+            _floatClassRegExp: '__se__float\\-[a-z]+',
             _resizing: context.option.videoResizing,
             _youtubeQuery: context.option.youtubeQuery
         };
@@ -231,7 +231,7 @@ export default {
         }
         
         this.util.removeClass(container, this.context.video._floatClassRegExp);
-        this.util.addClass(container, 'float-' + contextVideo._align);
+        this.util.addClass(container, '__se__float-' + contextVideo._align);
         oIframe.setAttribute('data-align', contextVideo._align);
 
         if (!this.context.dialog.updateModal) {
@@ -401,7 +401,7 @@ export default {
 
         if (/100/.test(w)) {
             this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-            this.util.addClass(contextVideo._container, 'float-center');
+            this.util.addClass(contextVideo._container, '__se__float-center');
         }
     },
 
@@ -415,7 +415,7 @@ export default {
         contextVideo._container.style.height = '';
 
         this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
-        this.util.addClass(contextVideo._container, 'float-' + contextVideo._align);
+        this.util.addClass(contextVideo._container, '__se__float-' + contextVideo._align);
     },
 
     resetAlign: function () {

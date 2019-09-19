@@ -23,7 +23,7 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|ol|ul|dl|li|hr|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        return text.replace(/(<\/?)(b|strong|var|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -840,9 +840,10 @@ const util = {
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:colspan|rowspan|target|href|src|data-file-size|data-file-name|data-origin|origin-size)\s*=\s*"[^"]*")/ig);
+                const v = m.match(/((?:colspan|rowspan|target|href|src|data-file-size|data-file-name|data-origin|origin-size|class)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
+                        if (/^class="(?!__se__)/.test(v[i])) continue;
                         t += ' ' + v[i];
                     }
                 }

@@ -371,7 +371,7 @@ export default {
                 }
     
                 this.util.removeClass(currentContext._container, currentContext._floatClassRegExp);
-                this.util.addClass(currentContext._container, 'float-' + alignValue);
+                this.util.addClass(currentContext._container, '__se__float-' + alignValue);
                 contextEl.setAttribute('data-align', alignValue);
     
                 contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
