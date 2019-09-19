@@ -218,10 +218,15 @@ let s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+        tag: 'div',
+        class: '__se__aaa',
+        title: 'red div',
+        command: 'range'
+    }],
     // iframe: true,
     fullPage: true,
-    mode: 'balloon',
+    // mode: 'balloon',
     codeMirror: {
         src: CodeMirror,
     },
@@ -396,7 +401,7 @@ window.sun_create2 = function () {
 
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
+        [plugins.formatBlock, 'align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
         [
             {
                 // plugin's name attribute
@@ -423,7 +428,13 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     // maxCharCount: 300,
     // resizingBar: false
     // showPathLabel:false
-    charCounter: true
+    charCounter: true,
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+        tag: 'div',
+        class: '__se__aaa',
+        title: 'red div',
+        command: 'replace'
+    }],
 });
 window.sun_destroy3 = function () {
     s3.destroy();

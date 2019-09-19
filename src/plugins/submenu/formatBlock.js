@@ -40,18 +40,26 @@ export default {
         listDiv.className = 'se-submenu se-list-layer';
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-            for (let i = 0, len = formatList.length, format, command, title, h; i < len; i++) {
+        for (let i = 0, len = formatList.length, format, command, title, h, oClass; i < len; i++) {
+            if (typeof formatList[i] === 'string') {
                 format = formatList[i].toLowerCase();
                 command = format === 'pre' || format === 'blockquote' ? 'range' : 'replace';
                 h = /^h/.test(format) ? format.match(/\d+/)[0] : '';
                 title = lang_toolbar['tag_' + (h ? 'h' : format)] + h;
-
-                list += '<li>' +
-                    '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + format + '" title="' + title + '">' +
-                    '<' + format + '>' + title + '</' + format + '>' +
-                    '</button></li>';
+                oClass = '';
+            } else {
+                format = formatList[i].tag.toLowerCase();
+                command = 'replace';
+                title = formatList[i].title || format;
+                oClass = (' class="' + formatList[i].class + '"' || '') + 'data-format="' + command + '"';
             }
-            list += '</ul></div>';
+
+            list += '<li>' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + format + '" title="' + title + '">' +
+                '<' + format + oClass + '>' + title + '</' + format + '>' +
+                '</button></li>';
+        }
+        list += '</ul></div>';
 
         listDiv.innerHTML = list;
 
@@ -81,19 +89,23 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let command = null, value = null;
+        let command = null, value = null, tag = null;
         
         while (!command && !/UL/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');
+            if (command) {
+                tag = target.firstChild;
+                break;
+            }
             target = target.parentNode;
         }
 
-        if (!command || !value) return;
+        if (!command) return;
 
         // blockquote, pre
         if (command === 'range') {
-            const rangeElement = this.util.createElement(value);
+            const rangeElement = tag.cloneNode(false);
             this.applyRangeFormatElement(rangeElement);
         }
         // others
@@ -161,7 +173,7 @@ export default {
                 node = selectedFormsts[i];
                 
                 if (node.nodeName.toLowerCase() !== value.toLowerCase() && !this.util.isComponent(node)) {
-                    newFormat = this.util.createElement(value);
+                    newFormat = tag.cloneNode(false);
                     newFormat.innerHTML = node.innerHTML;
                     node.parentNode.insertBefore(newFormat, node);
                     this.util.removeItem(node);

@@ -327,7 +327,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} value javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
-            _d.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
+            this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
             // history stack
             this.history.push();
         },
@@ -361,7 +361,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
             if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             
-            const range = _d.createRange();
+            const range = this._wd.createRange();
             range.setStart(startCon, startOff);
             range.setEnd(endCon, endOff);
 
@@ -432,7 +432,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _createDefaultRange: function () {
-            const range = _d.createRange();
+            const range = this._wd.createRange();
             if (!context.element.wysiwyg.firstChild) this.execCommand('formatBlock', false, 'P');
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);

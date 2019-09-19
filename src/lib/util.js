@@ -248,7 +248,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || element.getAttribute('data-format') === 'range')) return true;
         return false;
     },
 
@@ -840,7 +840,7 @@ const util = {
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:colspan|rowspan|target|href|src|data-file-size|data-file-name|data-origin|origin-size|class)\s*=\s*"[^"]*")/ig);
+                const v = m.match(/((?:colspan|rowspan|target|href|src|class|data-file-size|data-file-name|data-origin|origin-size|data-format)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
                         if (/^class="(?!__se__)/.test(v[i])) continue;
