@@ -2413,8 +2413,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _init: function () {
-            core._wd = context.option.iframe ? context.element.wysiwygFrame.contentDocument : _d,
-            core._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w,
+            core._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
+            core._wd = _d;
+
+            if (_options.iframe) {
+                _w.setTimeout(function () {
+                    core._wd = context.element.wysiwygFrame.contentDocument;
+                    context.element.wysiwyg = core._wd.body;
+                });
+            }
 
             core.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             core._isInline = /inline/i.test(context.option.mode);
@@ -3394,26 +3401,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _addEvent: function () {
+            const eventWysiwyg = _options.iframe ? core._ww : context.element.wysiwyg;
+
             /** toolbar event */
             context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
             /** editor area */
-            context.element.wysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
-            context.element.wysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
-            (context.option.iframe ? core._ww : context.element.wysiwyg).addEventListener('scroll', event.onScroll_wysiwyg, false);
+            eventWysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+            eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
+            eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
+            eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+            eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
+            eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
+            eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
 
             /** Events are registered only a balloon mode or when there is a table plugin. */
             if (core._isBalloon || core.plugins.table) {
-                context.element.wysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
+                eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
             }
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
-                context.element.wysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+                eventWysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             }
             
             /** code view area auto line */
@@ -3432,12 +3441,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             /** inline editor */
             if (core._isInline) {
-                context.element.wysiwyg.addEventListener('focus', event._showToolbarInline, false);
+                eventWysiwyg.addEventListener('focus', event._showToolbarInline, false);
             }
 
             /** inline, balloon editor */
             if (core._isInline || core._isBalloon) {
-                context.element.wysiwyg.addEventListener('blur', event._hideToolbar, false);
+                eventWysiwyg.addEventListener('blur', event._hideToolbar, false);
             }
             
             /** window event */
@@ -3451,23 +3460,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _removeEvent: function () {
+            const eventWysiwyg = _options.iframe ? core._ww : context.element.wysiwyg;
+
             context.element.toolbar.removeEventListener('mousedown', event.onMouseDown_toolbar);
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
-            context.element.wysiwyg.removeEventListener('click', event.onClick_wysiwyg);
-            context.element.wysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
-            context.element.wysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
-            context.element.wysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
-            context.element.wysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
-            context.element.wysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
-            context.element.wysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
-            core._ww.removeEventListener('scroll', event.onScroll_wysiwyg);
+            eventWysiwyg.removeEventListener('click', event.onClick_wysiwyg);
+            eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
+            eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
+            eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
+            eventWysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
+            eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
+            eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
             
-            context.element.wysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
-            context.element.wysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
+            eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
-            context.element.wysiwyg.removeEventListener('focus', event._showToolbarInline);
-            context.element.wysiwyg.removeEventListener('blur', event._hideToolbar);
+            eventWysiwyg.removeEventListener('focus', event._showToolbarInline);
+            eventWysiwyg.removeEventListener('blur', event._hideToolbar);
 
             context.element.code.removeEventListener('keyup', event._codeViewAutoScroll);
             
@@ -3477,13 +3487,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
-        },
-
-        _init: function () {
-            this._removeEvent();
-            this._addEvent();
-            this._offStickyToolbar();
-            this.onResize_window();
         }
     };
 
@@ -3523,6 +3526,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {Object} options Options
          */
         setOptions: function (options) {
+            event._removeEvent();
+
             core.plugins = options.plugins || core.plugins;
             const mergeOptions = [context.option, options].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
@@ -3565,9 +3570,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.context = context = _Context(context.element.originElement, constructed, _options);
 
             core._init();
-            event._init();
+            event._addEvent();
+            event._offStickyToolbar();
+            event.onResize_window();
 
             core._checkComponents();
+            core.history = _history(core, event._onChange_historyStack);
             core._charCount(0, false);
             core.focus();
         },

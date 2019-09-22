@@ -9,7 +9,7 @@
 
 export default function (core, change) {
     const _w = window;
-    const editor = core.context.element.wysiwyg;
+    const editor = core.context.element;
     const util = core.util;
     const undo = core.context.tool.undo;
     const redo = core.context.tool.redo;
@@ -29,9 +29,9 @@ export default function (core, change) {
 
     function setContentsFromStack () {
         const item = stack[stackIndex];
-        editor.innerHTML = item.contents;
+        editor.wysiwyg.innerHTML = item.contents;
 
-        core.setRange(util.getNodeFromPath(item.s.path, editor), item.s.offset, util.getNodeFromPath(item.e.path, editor), item.e.offset);
+        core.setRange(util.getNodeFromPath(item.s.path, editor.wysiwyg), item.s.offset, util.getNodeFromPath(item.e.path, editor.wysiwyg), item.e.offset);
         core.focus();
 
         if (stackIndex === 0) {
