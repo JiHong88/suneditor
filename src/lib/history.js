@@ -47,6 +47,8 @@ export default function (core, change) {
 
         core._checkComponents();
         core._charCount(0, false);
+        core._iframeAutoHeight();
+        
         // onChange
         change();
     }
@@ -88,6 +90,8 @@ export default function (core, change) {
          * @description Saving the current status to the history object stack
          */
         push: function () {
+            core._iframeAutoHeight();
+            
             if (pushDelay) {
                 _w.clearTimeout(pushDelay);
             }

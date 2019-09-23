@@ -246,7 +246,7 @@ export default {
                 }
 
                 return tagString;
-            })();
+            })() + (options.height === 'auto' ? '<style>body{height: min-content; overflow: hidden;}</style>' : '');
 
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;

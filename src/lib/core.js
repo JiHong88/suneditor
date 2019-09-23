@@ -2420,6 +2420,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 _w.setTimeout(function () {
                     core._wd = context.element.wysiwygFrame.contentDocument;
                     context.element.wysiwyg = core._wd.body;
+
+                    if (_options.height === 'auto') {
+                        core._iframeAuto = core._wd.body;
+                        core._iframeAutoHeight();
+                    }
+
+                    /** excute history function */
+                    core.history = _history(core, event._onChange_historyStack);
                 });
             }
 
@@ -2445,6 +2453,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             };
 
             core._variable._originCssText = context.element.topArea.style.cssText;
+        },
+
+        _iframeAutoHeight: function () {
+            if (core._iframeAuto) {
+                context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px';
+            }
         }
     };
 
@@ -2925,6 +2939,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
+            core._iframeAutoHeight();
+
             if (core._isBalloon) {
                 event._hideToolbar();
             }
@@ -3353,6 +3369,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
         },
 
+        onCut_wysiwyg: function () {
+            _w.setTimeout(function () {
+                core._iframeAutoHeight();
+                core._charCount(0, false);
+                // history stack
+                core.history.push();
+            });
+        },
+
         onDragOver_wysiwyg: function (e) {
             e.preventDefault();
         },
@@ -3411,6 +3436,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+            eventWysiwyg.addEventListener('cut', event.onCut_wysiwyg, false);
             eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
@@ -3469,6 +3495,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
+            eventWysiwyg.removeEventListener('cut', event.onCut_wysiwyg);
             eventWysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
@@ -3762,7 +3789,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this.history = _history(this, event._onChange_historyStack);
             }.bind(core));
         });
-    } else {
+    } else if (!_options.iframe) {
         /** excute history function */
         core.history = _history(core, event._onChange_historyStack);
     }
