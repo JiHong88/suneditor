@@ -2053,10 +2053,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
                     }
 
-                    parseDocument.body.innerHTML = util.convertHTMLForCodeView(parseDocument.body);
-
                     this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                    this._wd.body.innerHTML = parseDocument.body.innerHTML;
+                    this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML);
 
                     const attrs = parseDocument.body.attributes;
                     for (let i = 0, len = attrs.length; i < len; i++) {
@@ -2416,20 +2414,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             core._wd = _d;
 
-            if (_options.iframe) {
-                _w.setTimeout(function () {
+            _w.setTimeout(function () {
+                if (_options.iframe) {
                     core._wd = context.element.wysiwygFrame.contentDocument;
                     context.element.wysiwyg = core._wd.body;
-
                     if (_options.height === 'auto') {
                         core._iframeAuto = core._wd.body;
                         core._iframeAutoHeight();
                     }
+                }
 
-                    /** excute history function */
-                    core.history = _history(core, event._onChange_historyStack);
-                });
-            }
+                /** Excute history function, check components */
+                core._checkComponents();
+                core.history = _history(core, event._onChange_historyStack);
+            });
 
             core.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             core._isInline = /inline/i.test(context.option.mode);
@@ -2939,7 +2937,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            core._iframeAutoHeight();
+            _w.setTimeout(core._iframeAutoHeight);
 
             if (core._isBalloon) {
                 event._hideToolbar();
@@ -3339,7 +3337,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core._sticky = false;
         },
 
-        _codeViewAutoScroll: function () {
+        _codeViewAutoHeight: function () {
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
@@ -3453,7 +3451,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             /** code view area auto line */
             if (context.option.height === 'auto' && !context.option.codeMirrorEditor) {
-                context.element.code.addEventListener('keydown', event._codeViewAutoScroll, false);
+                context.element.code.addEventListener('keydown', event._codeViewAutoHeight, false);
+                context.element.code.addEventListener('keyup', event._codeViewAutoHeight, false);
+                context.element.code.addEventListener('paste', event._codeViewAutoHeight, false);
             }
 
             /** resizingBar */
@@ -3506,7 +3506,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.removeEventListener('focus', event._showToolbarInline);
             eventWysiwyg.removeEventListener('blur', event._hideToolbar);
 
-            context.element.code.removeEventListener('keyup', event._codeViewAutoScroll);
+            context.element.code.removeEventListener('keydown', event._codeViewAutoHeight);
+            context.element.code.removeEventListener('keyup', event._codeViewAutoHeight);
+            context.element.code.removeEventListener('paste', event._codeViewAutoHeight);
             
             if (context.element.resizingBar) {
                 context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
@@ -3767,33 +3769,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
     /** initialize core and add event listeners */
     core._init();
     event._addEvent();
-
-    /** check image elements */
-    if (core.plugins.image && context.element.wysiwyg.getElementsByTagName('IMG').length > 0) {
-        _w.setTimeout(function () {
-            core.callPlugin('image', function () {
-                const setImagesInfo = this.plugins.image.setImagesInfo;
-                const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
-                this.context.image._uploadFileLength = images.length;
-    
-                for (let i = 0, len = images.length, img; i < len; i++) {
-                    img = images[i];
-                    img.removeAttribute('data-index');
-                    setImagesInfo.call(this, img, {
-                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
-                        'size': img.getAttribute('data-file-size') || 0
-                    });
-                }
-
-                /** excute history function */
-                this.history = _history(this, event._onChange_historyStack);
-            }.bind(core));
-        });
-    } else if (!_options.iframe) {
-        /** excute history function */
-        core.history = _history(core, event._onChange_historyStack);
-    }
-
     core._charCount(0, false);
 
     return userFunction;

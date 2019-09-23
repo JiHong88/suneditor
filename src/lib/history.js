@@ -90,7 +90,7 @@ export default function (core, change) {
          * @description Saving the current status to the history object stack
          */
         push: function () {
-            core._iframeAutoHeight();
+            _w.setTimeout(core._iframeAutoHeight);
             
             if (pushDelay) {
                 _w.clearTimeout(pushDelay);

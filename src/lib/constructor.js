@@ -246,20 +246,20 @@ export default {
                 }
 
                 return tagString;
-            })() + (options.height === 'auto' ? '<style>body{height: min-content; overflow: hidden;}</style>' : '');
+            })() + (options.height === 'auto' ? '<style>\n  /** Iframe height auto */\n  body{height: min-content; overflow: hidden;}\n</style>' : '');
 
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
             wysiwygDiv.addEventListener('load', function () {
                 this.setAttribute('scrolling', 'auto');
-                this.contentWindow.document.head.innerHTML = '' +
+                this.contentDocument.head.innerHTML = '' +
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title></title>' + 
                     cssTags;
-                this.contentWindow.document.body.className = 'sun-editor-editable';
-                this.contentWindow.document.body.setAttribute('contenteditable', true);
-                this.contentWindow.document.body.innerHTML = initHTML;
+                this.contentDocument.body.className = 'sun-editor-editable';
+                this.contentDocument.body.setAttribute('contenteditable', true);
+                this.contentDocument.body.innerHTML = initHTML;
             });
         }
         
@@ -275,6 +275,7 @@ export default {
         textarea.style.height = options.height;
         textarea.style.minHeight = options.minHeight;
         textarea.style.maxHeight = options.maxHeight;
+        if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
         /** resize bar */
         let resizingBar = null;

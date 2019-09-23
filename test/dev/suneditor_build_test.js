@@ -376,6 +376,7 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
 window.sun_setOptions2 = function () {
     s2.setOptions(newOption);
 }
+
 window.sun_setOptions3 = function () {
     s2.setOptions(newOption2);
 }
