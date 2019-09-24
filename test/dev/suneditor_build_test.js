@@ -9,9 +9,9 @@ import { ko } from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
-import CodeMirror from 'codemirror'
-import 'codemirror/mode/htmlmixed/htmlmixed'
-import 'codemirror/lib/codemirror.css'
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import CodeMirror from 'codemirror';
 
 window.cm = CodeMirror
 

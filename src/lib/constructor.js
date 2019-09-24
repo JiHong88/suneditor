@@ -246,7 +246,7 @@ export default {
                 }
 
                 return tagString;
-            })() + (options.height === 'auto' ? '<style>\n  /** Iframe height auto */\n  body{height: min-content; overflow: hidden;}\n</style>' : '');
+            })() + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
 
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;

@@ -2097,6 +2097,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
                 if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                if (context.option.codeMirrorEditor) context.option.codeMirrorEditor.refresh();
                 
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
@@ -3718,7 +3719,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         disabled: function () {
             context.tool.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
-            context.element.code.setAttribute('disabled', 'disabled');
+
+            if (context.option.codeMirrorEditor) {
+                context.option.codeMirrorEditor.setOption('readOnly', true);
+            } else {
+                context.element.code.setAttribute('disabled', 'disabled');
+            }
         },
 
         /**
@@ -3727,7 +3733,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         enabled: function () {
             context.tool.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
-            context.element.code.removeAttribute('disabled');
+
+            if (context.option.codeMirrorEditor) {
+                context.option.codeMirrorEditor.setOption('readOnly', false);
+            } else {
+                context.element.code.removeAttribute('disabled');
+            }
         },
 
         /**

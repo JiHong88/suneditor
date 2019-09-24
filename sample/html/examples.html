@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <!-- codeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -83,7 +87,7 @@
             <div>});</div>
         </textarea>
 
-        <!-- char count-->
+        <!-- char count, button groups -->
         <a id="groups" href="#groups"><h4 class="sub-title" style="margin-top: 60px;">Char count, Button groups</h4></a>
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">
@@ -109,9 +113,26 @@
             <div>});</div>
         </textarea>
 
+        <!-- Iframe, fullPage and use CodeMirror -->
+        <a id="CodeMirror" href="#CodeMirror"><h4 class="sub-title">Iframe, fullPage and use CodeMirror</h4></a>
+        <p></p>
+        <textarea id="useCodeMirror" style="width:100%; height:120px;">
+            <p><em><strong>iframe</strong></em></p>
+            <p>Content will be placed in an iframe and isolated from the rest of the page.</p>
+            <p></p>
+            <p><br></p>
+            <p><em><strong>fullPage</strong></em></p>
+            <p>Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.</p>
+            <p><br></p>
+            <p><em><strong>CodeMirror</strong></em></p>
+            <p>If you put the <strong>CodeMirror</strong> object as an option, you can do Codeview using <strong>CodeMirror</strong>.</p>
+            <p><ins><strong>Use version </strong><strong><strong>5.0.0</strong></strong><strong> or later.</strong></ins></p>
+            <p></p>
+        </textarea>
+
+        <!-- image management editor-->
         <a id="image" href="#image"><h4 class="sub-title" style="margin-top: 60px;">Image management</h4></a>
         <p></p>
-<!-- image management editor-->
         <textarea id="imageManagement" style="display: none;">
             <p>cat</p>
             <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,199" data-origin="300,199" data-index="0" data-file-name="s-cat.jpg" data-file-size="40500" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
@@ -420,6 +441,14 @@
 <span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
     <span class="pl-c1">alert</span>(errorMessage)
+}
+
+<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
+<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context)
 }</pre>
 </div>
         
@@ -489,6 +518,16 @@
         }
     });
 
+    SUNEDITOR.create('useCodeMirror', {
+        codeMirror: CodeMirror,
+        buttonList: [
+            ['codeView']
+        ],
+        height: 320,
+        width: 'auto',
+        fullPage: true,
+    });
+
     editorImageSample = SUNEDITOR.create('imageManagement', {
         buttonList: [
             ['undo', 'redo'],
@@ -521,6 +560,7 @@
 
     function sun_setOptions() {
         suneditor.setOptions({
+            mode: 'inline',
             minHeight: '300px',
             colorList: [
                 ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
@@ -536,6 +576,7 @@
 
     function sun_replaceOptions() {
         suneditor.setOptions({
+            mode: 'classic',
             minHeight: null,
             colorList: null,
             buttonList: [
@@ -625,6 +666,10 @@
         suneditor.onChange = function (contents) { console.log('onChange', contents) }
         suneditor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) { 
             console.log('targetImgElement:' + targetImgElement + ', index:' + index + ', state("create","update","delete"):' + state + ', imageInfo:' + imageInfo + ', remainingFilesCount:' + remainingFilesCount)
+        }
+        suneditor.showInline = function (toolbar, context) {
+            console.log('toolbar', toolbar);
+            console.log('context', context);
         }
     }
 
