@@ -872,7 +872,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const so = range.startOffset;
             const eo = range.endOffset;
 
-            const children = rangeElement.children;
+            const children = rangeElement.childNodes;
             const parent = rangeElement.parentNode;
             let firstNode = null;
             let lastNode = null;
@@ -883,6 +883,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             function appendNode (parent, insNode, sibling) {
                 if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
+
+                if (insNode.nodeType === 3) {
+                    parent.insertBefore(insNode, sibling);
+                    return insNode;
+                }
                 
                 const children = insNode.childNodes;
                 let format = insNode.cloneNode(false);
@@ -2959,7 +2964,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const selectRange = range.startContainer !== range.endContainer;
             const resizingName = core._resizingName;
             let formatEl = util.getFormatElement(selectionNode) || selectionNode;
-            let rangeEl = util.getRangeFormatElement(formatEl);
+            let rangeEl = util.getRangeFormatElement(selectionNode);
 
             switch (keyCode) {
                 case 8: /** backspace key */
@@ -3109,7 +3114,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (selectRange) break;
 
                     formatEl = util.getFormatElement(selectionNode);
-                    rangeEl = util.getRangeFormatElement(formatEl);
+                    rangeEl = util.getRangeFormatElement(selectionNode);
                     const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();

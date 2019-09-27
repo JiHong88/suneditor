@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -116,18 +118,34 @@
         <!-- Iframe, fullPage and use CodeMirror -->
         <a id="CodeMirror" href="#CodeMirror"><h4 class="sub-title">Iframe, fullPage and use CodeMirror</h4></a>
         <p></p>
-        <textarea id="useCodeMirror" style="width:100%; height:120px;">
-            <p><em><strong>iframe</strong></em></p>
-            <p>Content will be placed in an iframe and isolated from the rest of the page.</p>
-            <p></p>
-            <p><br></p>
-            <p><em><strong>fullPage</strong></em></p>
-            <p>Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.</p>
-            <p><br></p>
-            <p><em><strong>CodeMirror</strong></em></p>
-            <p>If you put the <strong>CodeMirror</strong> object as an option, you can do Codeview using <strong>CodeMirror</strong>.</p>
-            <p><ins><strong>Use version </strong><strong><strong>5.0.0</strong></strong><strong> or later.</strong></ins></p>
-            <p></p>
+        <textarea id="useCodeMirror">
+            <div><span style="color: rgb(189, 189, 189);">&lt;!-- codeMirror --&gt;</span></div>
+            <div><span style="color: rgb(189, 189, 189);">&lt;!-- Use version 5.0.0 or later. --&gt;</span></div>
+            <div>&lt;<span style="color: rgb(107, 153, 0);">link</span> <span style="color: rgb(61, 0, 153);">rel</span>=<span style="color: rgb(0, 51, 153);">"stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css"</span>&gt;</div>
+            <div>&lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"</span>&gt;&lt;/<span style="color: rgb(107, 153, 0);">script</span>&gt;</div>
+            <div>&lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"</span>&gt;&lt;/<span style="color: rgb(107, 153, 0);">script</span>&gt;</div>
+            <div>&lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"</span>&gt;&lt;/<span style="color: rgb(107, 153, 0);">script</span>&gt;</div>
+            <div>&lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"</span>&gt;&lt;/<span style="color: rgb(107, 153, 0);">script</span>&gt;</div>
+            <div><br/></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> <span style="color: rgb(0, 51, 153);">'suneditor/dist/css/suneditor.min.css'</span></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> <span style="color: rgb(0, 51, 153);">suneditor</span> <span style="color: rgb(255, 94, 0);">from</span> <span style="color: rgb(0, 51, 153);">'suneditor'</span></div>
+            <div><span style="color: rgb(189, 189, 189);">// Import codeMirror</span></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> CodeMirror <span style="color: rgb(255, 94, 0);">from</span> 'codemirror'</div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> 'codemirror/mode/htmlmixed/htmlmixed'</div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> 'codemirror/lib/codemirror.css'</div>
+            <div><br/></div>
+            <div>suneditor.<span style="color: rgb(61, 0, 153);">create</span>(<span style="color: rgb(0, 51, 153);">'sample'</span>, {</div>
+            <div>    &nbsp;&nbsp;&nbsp;&nbsp;codeMirror<span style="color: rgb(255, 94, 0);">:</span> <span style="color: rgb(107, 153, 0);">CodeMirror</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    <span style="color: rgb(189, 189, 189);">// Set options</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    // codeMirror: {</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    //     src: CodeMirror,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    //     options: {...}</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    // }</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    buttonList<span style="color: rgb(255, 94, 0);">:</span> [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;       [<span style="color: rgb(0, 51, 153);">'codeView'</span>]</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    ],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    height<span style="color: rgb(255, 94, 0);">:</span> <span style="color: rgb(0, 85, 255);">400</span></div>
+            <div>});</div>
         </textarea>
 
         <!-- image management editor-->
@@ -521,10 +539,11 @@
     SUNEDITOR.create('useCodeMirror', {
         codeMirror: CodeMirror,
         buttonList: [
-            ['codeView']
+            ['codeView', 'fontColor']
         ],
-        height: 320,
+        height: 330,
         width: 'auto',
+        maxWidth: 780,
         fullPage: true,
     });
 

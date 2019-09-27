@@ -113,11 +113,16 @@ export default {
      */
     _checkCodeMirror: function(options, textarea) {
         if (options.codeMirror) {
-            const cmOptions = options.codeMirror.options || {
+            const cmOptions = [{
                 mode: 'htmlmixed',
                 htmlMode: true,
                 lineNumbers: true
-            };
+            }, (options.codeMirror.options || {})].reduce(function (init, option) {
+                Object.keys(option).forEach(function (key) {
+                    init[key] = option[key];
+                });
+                return init;
+            }, {});
 
             if (options.height === 'auto') {
                 cmOptions.viewportMargin = Infinity;
@@ -128,6 +133,7 @@ export default {
             
             options.codeMirrorEditor = cm;
             textarea = cm.display.wrapper;
+            textarea.className += ' se-wrapper-code-mirror';
         }
 
         return textarea;

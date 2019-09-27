@@ -533,11 +533,18 @@ editor.showInline = function (toolbar, context) {
 ```
 
 ### Use CodeMirror
+```html
+<!-- codeMirror -->
+<!-- Use version 5.0.0 or later. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+```
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-
-// Use version 5.0.0 or later.
 // Import codeMirror
 import CodeMirror from 'codemirror'
 import 'codemirror/mode/htmlmixed/htmlmixed'
