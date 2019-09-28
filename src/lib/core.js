@@ -24,8 +24,8 @@ import notice from '../plugins/modules/notice';
  * @returns {Object} UserFunction Object
  */
 export default function (context, pluginCallButtons, plugins, lang, _options) {
-    const _d = document;
-    const _w = window;
+    const _d = context.element.originElement.ownerDocument || document;
+    const _w = _d.defaultView || window;
     const util = _util;
 
     /**
