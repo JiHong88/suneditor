@@ -36,7 +36,7 @@
             superscript: 'Superscript',
             removeFormat: 'Remove Format',
             fontColor: 'Font Color',
-            hiliteColor: 'Hilite Color',
+            hiliteColor: 'Highlight Color',
             indent: 'Indent',
             outdent: 'Outdent',
             align: 'Align',
