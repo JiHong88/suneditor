@@ -181,7 +181,7 @@ const util = {
             }
         }
 
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
         contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
