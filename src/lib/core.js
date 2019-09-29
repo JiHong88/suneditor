@@ -2427,9 +2427,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     context.element.wysiwyg = core._wd.body;
                     if (_options.height === 'auto') {
                         core._iframeAuto = core._wd.body;
-                        _w.setTimeout(function () {
-                            core._iframeAutoHeight();
-                        });
+                        core._iframeAutoHeight();
                     }
                 }
 
