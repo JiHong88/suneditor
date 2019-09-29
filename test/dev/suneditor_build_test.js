@@ -405,3 +405,36 @@ window.sun_create3 = function () {
     s3 = suneditor.create(document.getElementsByName('editor3')[0], {
     });
 }
+
+let s4;
+
+window.sun_create4 = function() {
+    const win = window.open();
+    document.querySelectorAll('link').forEach(function (linkNode) {
+        win.document.write(linkNode.outerHTML);
+    })
+    win.document.write('<textarea name="editor4" id="editor4" style="width: 1080px; height: 200px;"></textarea>');
+    s4 = suneditor.create(win.document.querySelector('#editor4'), {
+        plugins: plugins,
+        buttonList: [
+            ['undo', 'redo','removeFormat',
+            'font', 'fontSize', 'formatBlock',
+            'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+            'fontColor', 'hiliteColor',
+            'outdent', 'indent',
+            'align', 'horizontalRule', 'list', 'table',
+            'link', 'image', 'video',
+            'fullScreen', 'showBlocks', 'codeView',
+            'preview', 'print', 'save']
+        ],
+        width: '100%',
+        stickyToolbar: 0,
+        imageWidth: 300,
+        mode: 'classic',
+        // toolbarWidth: 800,
+        height: 'auto',
+        // callBackSave: (contents) => {
+        //     console.log('callback')
+        // }
+    });
+}
