@@ -106,7 +106,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
         [<span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
     ],
-    lang<span class="pl-k">:</span> lang[<span class="pl-s"><span class="pl-pds">'</span>ko<span class="pl-pds">'</span></span>]
+    lang<span class="pl-k">:</span> <span class="pl-smi">lang</span>.<span class="pl-smi">ko</span>
 });</pre></div>
 
 <a id="loadAll" href="#loadAll"><h4 class="sub-title">2. Load all plugins</h4></a>
@@ -136,11 +136,12 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
     plugins<span class="pl-k">:</span> [
         <span class="pl-smi">plugins</span>.<span class="pl-smi">font</span>
-        <span class="pl-smi">plugins</span>.<span class="pl-c1">fontSize</span>,
-        <span class="pl-smi">plugins</span>.<span class="pl-smi">formatBlock</span>
+        <span class="pl-smi">plugins</span>.<span class="pl-c1">fontSize</span>
     ],
     buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>]
+        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
+        <span class="pl-c"><span class="pl-c">//</span> Plugins can be used directly in the button list</span>
+        [<span class="pl-smi">plugins</span>.<span class="pl-smi">formatBlock</span>]
     ]
 })</pre></div>
 
@@ -156,7 +157,6 @@ In "suneditor-contents.css", you can define the style of all the tags created in
         [font, fontSize, formatBlock],
         [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-        <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Line break</span>
         [fontColor, hiliteColor],
         [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
         [align, horizontalRule, list, table],
@@ -200,17 +200,14 @@ The value of the option argument put in the "create" function call takes precede
     <span class="pl-c"><span class="pl-c">//</span> The value of the option argument put in the "create" function call takes precedence</span>
     height<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>,
     buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
     ]
 });</pre></div>
 
 <a id="options" href="#options"><h4 class="sub-title">options</h4></a>
-<div class="highlight highlight-source-js"><pre>plugins<span class="pl-k">:</span> [
+<div class="highlight highlight-source-java"><pre>plugins<span class="pl-k">:</span> [
     font,
     fontSize,
     formatBlock,
@@ -224,60 +221,84 @@ The value of the option argument put in the "create" function call takes precede
     link,
     image,
     video
-]               <span class="pl-k">:</span> Plugins <span class="pl-smi">array</span>.                                    <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>}
+]               <span class="pl-k">:</span> <span class="pl-smi">Plugins</span> array.     <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Array</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Layout-------------------------------------------------------------------------------------------------------</span>
-lang            <span class="pl-k">:</span> language <span class="pl-smi">object</span>.   <span class="pl-smi">default</span> <span class="pl-k">:</span> en {<span class="pl-c1">Object</span>}
-mode            <span class="pl-k">:</span> The mode <span class="pl-k">of</span> the <span class="pl-en">editor</span> (<span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span>). <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-toolbarWidth    <span class="pl-k">:</span> The width <span class="pl-k">of</span> the <span class="pl-smi">toolbar</span>. <span class="pl-smi">Applies</span> only when the editor mode is 
-                  <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span> <span class="pl-smi">mode</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-stickyToolbar   <span class="pl-k">:</span> Reference height value that should be changed to sticky toolbar mode.
-                  It can also be used when there is another fixed toolbar at the top.
-                  <span class="pl-c1">Set</span> to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
-                  If set to <span class="pl-k">-</span><span class="pl-c1">1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn <span class="pl-smi">off</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">0</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span><span class="pl-k">|</span><span class="pl-c1">Boolean</span>}
+lang            <span class="pl-k">:</span> language object.   <span class="pl-k">default</span> <span class="pl-k">:</span> en {<span class="pl-smi">Object</span>}
+mode            <span class="pl-k">:</span> <span class="pl-smi">The</span> mode of the editor (<span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span>)<span class="pl-c1">.</span> <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
+toolbarWidth    <span class="pl-k">:</span> <span class="pl-smi">The</span> width of the toolbar. <span class="pl-smi">Applies</span> only when the editor mode is 
+                  <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>balloon<span class="pl-pds">'</span></span> mode. <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
+stickyToolbar   <span class="pl-k">:</span> <span class="pl-smi">Reference</span> height value that should be changed to sticky toolbar mode.
+                  <span class="pl-smi">It</span> can also be used when there is another fixed toolbar at the top.
+                  <span class="pl-smi">Set</span> to <span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>0px<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>50px<span class="pl-pds">'</span></span>, etc.
+                  <span class="pl-smi">If</span> set to <span class="pl-k">-</span><span class="pl-c1">1</span> or <span class="pl-c1">false</span> or <span class="pl-c1">null</span> to turn off.        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">0</span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span><span class="pl-k">|</span><span class="pl-smi">Boolean</span>}
+iframe          <span class="pl-k">:</span> <span class="pl-smi">Content</span> will be placed in an iframe and isolated from the rest of the page.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">false</span> {<span class="pl-smi">Boolean</span>}
+fullPage        <span class="pl-k">:</span> <span class="pl-smi">Allows</span> the usage of <span class="pl-c1">HTML</span>, <span class="pl-c1">HEAD</span>, <span class="pl-c1">BODY</span> tags and <span class="pl-c1">DOCTYPE</span> declaration.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">false</span> {<span class="pl-smi">Boolean</span>}
+iframeCSSFileName <span class="pl-k">:</span> <span class="pl-smi">Name</span> of the <span class="pl-c1">CSS</span> file to apply inside the iframe.
+                    <span class="pl-smi">Applied</span> by searching by filename in the link tag of document.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
+codeMirror      <span class="pl-k">:</span> <span class="pl-smi">If</span> you put the <span class="pl-smi">CodeMirror</span> object as an option, you can <span class="pl-k">do</span> <span class="pl-smi">Codeview</span> using <span class="pl-smi">CodeMirror</span>. <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Object</span>}
+                  <span class="pl-smi">Use</span> version <span class="pl-c1">5.0</span><span class="pl-k">.</span><span class="pl-c1">0</span> or later.
+                  ex) codeMirror<span class="pl-k">:</span> <span class="pl-smi">CodeMirror</span> <span class="pl-c"><span class="pl-c">//</span> Default option</span>
+                      codeMirror<span class="pl-k">:</span> { <span class="pl-c"><span class="pl-c">//</span> Custom option</span>
+                        src<span class="pl-k">:</span> <span class="pl-smi">CodeMirror</span>,
+                        options<span class="pl-k">:</span> {
+                            <span class="pl-c"><span class="pl-c">/*</span>* default options **</span>
+<span class="pl-c">                            * mode: 'htmlmixed',</span>
+<span class="pl-c">                            * htmlMode: true,</span>
+<span class="pl-c">                            * lineNumbers: true</span>
+<span class="pl-c">                            <span class="pl-c">*/</span></span>
+                        }
+                      }
 
 <span class="pl-c"><span class="pl-c">//</span> Display-------------------------------------------------------------------------------------------------------</span>
-display         <span class="pl-k">:</span> The display property <span class="pl-k">of</span> <span class="pl-smi">suneditor</span>.                <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>block<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-popupDisplay    <span class="pl-k">:</span> Size <span class="pl-k">of</span> background area when activating dialog <span class="pl-c1">window</span> (<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span><span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>) default<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
+position        <span class="pl-k">:</span> <span class="pl-smi">The</span> position property of suneditor.               <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">String</span>}
+display         <span class="pl-k">:</span> <span class="pl-smi">The</span> display property of suneditor.                <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>block<span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
+popupDisplay    <span class="pl-k">:</span> <span class="pl-smi">Size</span> of background area when activating dialog window (<span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span><span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>local<span class="pl-pds">'</span></span>) <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>full<span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Bottom resizing bar-------------------------------------------------------------------------------------------</span>
-resizingBar     <span class="pl-k">:</span> Show the bottom resizing bar.
-                  If <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be <span class="pl-smi">resized</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-showPathLabel   <span class="pl-k">:</span> Displays the current node structure to <span class="pl-smi">resizingBar</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-charCounter     <span class="pl-k">:</span> Shows the number <span class="pl-k">of</span> characters <span class="pl-k">in</span> the editor.     
-                  If the maxCharCount option has a value, it becomes <span class="pl-c1">true</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">false</span> {<span class="pl-c1">Boolean</span>}
-maxCharCount    <span class="pl-k">:</span> The maximum number <span class="pl-k">of</span> characters allowed to be inserted into the <span class="pl-smi">editor</span>. <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span>}
+resizingBar     <span class="pl-k">:</span> <span class="pl-smi">Show</span> the bottom resizing bar.
+                  <span class="pl-smi">If</span> <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>, it will not be resized. <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+showPathLabel   <span class="pl-k">:</span> <span class="pl-smi">Displays</span> the current node structure to resizingBar.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+charCounter     <span class="pl-k">:</span> <span class="pl-smi">Shows</span> the number of characters in the editor.     
+                  <span class="pl-smi">If</span> the maxCharCount option has a value, it becomes <span class="pl-c1">true</span>. <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">false</span> {<span class="pl-smi">Boolean</span>}
+maxCharCount    <span class="pl-k">:</span> <span class="pl-smi">The</span> maximum number of characters allowed to be inserted into the editor. <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Width size----------------------------------------------------------------------------------------------------</span>
-width           <span class="pl-k">:</span> The width size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                     <span class="pl-smi">default</span><span class="pl-k">:</span> clientWidth<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-minWidth        <span class="pl-k">:</span> The min<span class="pl-k">-</span>width size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>~%<span class="pl-pds">'</span></span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-maxWidth        <span class="pl-k">:</span> The max<span class="pl-k">-</span>width size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>~%<span class="pl-pds">'</span></span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+width           <span class="pl-k">:</span> <span class="pl-smi">The</span> width size of the editor.                     <span class="pl-k">default</span><span class="pl-k">:</span> clientWidth<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>100%<span class="pl-pds">'</span></span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
+minWidth        <span class="pl-k">:</span> <span class="pl-smi">The</span> min<span class="pl-k">-</span>width size of the editor.
+                  <span class="pl-smi">Used</span> when <span class="pl-s"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>~%<span class="pl-pds">'</span></span><span class="pl-c1">.</span>        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
+maxWidth        <span class="pl-k">:</span> <span class="pl-smi">The</span> max<span class="pl-k">-</span>width size of the editor.
+                  <span class="pl-smi">Used</span> when <span class="pl-s"><span class="pl-pds">'</span>width<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> or <span class="pl-s"><span class="pl-pds">'</span>~%<span class="pl-pds">'</span></span><span class="pl-c1">.</span>        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Height size---------------------------------------------------------------------------------------------------</span>
-height          <span class="pl-k">:</span> The height size <span class="pl-k">of</span> the <span class="pl-smi">editor</span>.                    <span class="pl-smi">default</span><span class="pl-k">:</span> clientHeight<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-minHeight       <span class="pl-k">:</span> The min<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
-maxHeight       <span class="pl-k">:</span> The max<span class="pl-k">-</span>height size <span class="pl-k">of</span> the editor.
-                  Used when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span>.               <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span><span class="pl-k">|</span><span class="pl-c1">String</span>}
+height          <span class="pl-k">:</span> <span class="pl-smi">The</span> height size of the editor.                    <span class="pl-k">default</span><span class="pl-k">:</span> clientHeight<span class="pl-k">||</span><span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
+minHeight       <span class="pl-k">:</span> <span class="pl-smi">The</span> min<span class="pl-k">-</span>height size of the editor.
+                  <span class="pl-smi">Used</span> when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span><span class="pl-c1">.</span>               <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
+maxHeight       <span class="pl-k">:</span> <span class="pl-smi">The</span> max<span class="pl-k">-</span>height size of the editor.
+                  <span class="pl-smi">Used</span> when <span class="pl-s"><span class="pl-pds">'</span>height<span class="pl-pds">'</span></span> value is <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span><span class="pl-c1">.</span>               <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span><span class="pl-k">|</span><span class="pl-smi">String</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Defining menu items-------------------------------------------------------------------------------------------</span>
-font            <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>family <span class="pl-smi">array</span>.                 <span class="pl-smi">default</span><span class="pl-k">:</span> [<span class="pl-k">...</span>] {<span class="pl-c1">Array</span>}
-                  Default value<span class="pl-k">:</span> [
+font            <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> font<span class="pl-k">-</span>family array.                 <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">...</span>] {<span class="pl-smi">Array</span>}
+                  <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
                     <span class="pl-s"><span class="pl-pds">'</span>Arial<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Comic Sans MS<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Courier New<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Impact<span class="pl-pds">'</span></span>,
                     <span class="pl-s"><span class="pl-pds">'</span>Georgia<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>tahoma<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Trebuchet MS<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Verdana<span class="pl-pds">'</span></span>
                   ]
-fontSize        <span class="pl-k">:</span> Change default font<span class="pl-k">-</span>size <span class="pl-smi">array</span>.                   <span class="pl-smi">default</span><span class="pl-k">:</span> [<span class="pl-k">...</span>] {<span class="pl-c1">Array</span>}
-                  Default value<span class="pl-k">:</span> [
+fontSize        <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> font<span class="pl-k">-</span>size array.                   <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">...</span>] {<span class="pl-smi">Array</span>}
+                  <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
                     <span class="pl-c1">8</span>, <span class="pl-c1">9</span>, <span class="pl-c1">10</span>, <span class="pl-c1">11</span>, <span class="pl-c1">12</span>, <span class="pl-c1">14</span>, <span class="pl-c1">16</span>, <span class="pl-c1">18</span>, <span class="pl-c1">20</span>, <span class="pl-c1">22</span>, <span class="pl-c1">24</span>, <span class="pl-c1">26</span>, <span class="pl-c1">28</span>, <span class="pl-c1">36</span>, <span class="pl-c1">48</span>, <span class="pl-c1">72</span>
                   ]
-formats         <span class="pl-k">:</span> Change default formatBlock <span class="pl-smi">array</span>.                 <span class="pl-smi">default</span><span class="pl-k">:</span> [<span class="pl-k">...</span>] {<span class="pl-c1">Array</span>}
-                  Default value<span class="pl-k">:</span> [
+formats         <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> formatBlock array.                 <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">...</span>] {<span class="pl-smi">Array</span>}
+                  <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
                       <span class="pl-s"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>blockquote<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>pre<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h1<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h2<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h3<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h4<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h5<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h6<span class="pl-pds">'</span></span>
-                  ]
-colorList       <span class="pl-k">:</span> Change default color array <span class="pl-k">of</span> color <span class="pl-smi">picker</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> [..[..]..] {<span class="pl-c1">Array</span>}
-                  Default value<span class="pl-k">:</span> [
+                  ],
+                  <span class="pl-smi">Custom</span><span class="pl-k">:</span> [{
+                      tag<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Tag name</span>
+                      class<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>__se__xxx<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> Class names must always begin with "__se__"</span>
+                      title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Custom div<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> default: tag name</span>
+                      command<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>replace<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>range<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">//</span> default: "replace"</span>
+                  }]
+colorList       <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> color array of color picker.       <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">..</span>[<span class="pl-c1">..</span>]<span class="pl-c1">..</span>] {<span class="pl-smi">Array</span>}
+                  <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
                     <span class="pl-s"><span class="pl-pds">'</span>#ff0000<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ff5e00<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ffe400<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#abf200<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#00d8ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#0055ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#6600ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ff00dd<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#000000<span class="pl-pds">'</span></span>,
                     <span class="pl-s"><span class="pl-pds">'</span>#ffd8d8<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#fae0d4<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#faf4c0<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#e4f7ba<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#d4f4fa<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#d9e5ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#e8d9ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ffd9fa<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#f1f1f1<span class="pl-pds">'</span></span>,
                     <span class="pl-s"><span class="pl-pds">'</span>#ffa7a7<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ffc19e<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#faed7d<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#cef279<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#b2ebf4<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#b2ccff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#d1b2ff<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#ffb2f5<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#bdbdbd<span class="pl-pds">'</span></span>,
@@ -291,15 +312,15 @@ colorList       <span class="pl-k">:</span> Change default color array <span cla
                   ]
 
 <span class="pl-c"><span class="pl-c">//</span> Image---------------------------------------------------------------------------------------------------------</span>
-imageResizing   <span class="pl-k">:</span> Can resize the <span class="pl-smi">image</span>.                             <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the image <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-c1">Number</span>}
-imageFileInput  <span class="pl-k">:</span> Choose whether to create a file input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageUrlInput   <span class="pl-k">:</span> Choose whether to create a image url input tag <span class="pl-k">in</span> the image upload <span class="pl-c1">window</span>.
-                  If the value <span class="pl-k">of</span> imageFileInput is <span class="pl-c1">false</span>, it will be <span class="pl-smi">unconditionally</span>.   <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-imageUploadHeader <span class="pl-k">:</span> Http Header when uploading <span class="pl-smi">images</span>.              <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Object</span>}
-imageUploadUrl  <span class="pl-k">:</span> The image upload to server mapping <span class="pl-smi">address</span>.       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">String</span>}
+imageResizing   <span class="pl-k">:</span> <span class="pl-smi">Can</span> resize the image.                             <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+imageWidth      <span class="pl-k">:</span> <span class="pl-smi">The</span> <span class="pl-k">default</span> width size of the image frame.        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>auto<span class="pl-pds">'</span></span> {<span class="pl-smi">Number</span>}
+imageFileInput  <span class="pl-k">:</span> <span class="pl-smi">Choose</span> whether to create a file input tag in the image upload window.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+imageUrlInput   <span class="pl-k">:</span> <span class="pl-smi">Choose</span> whether to create a image url input tag in the image upload window.
+                  <span class="pl-smi">If</span> the value of imageFileInput is <span class="pl-c1">false</span>, it will be unconditionally.   <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+imageUploadHeader <span class="pl-k">:</span> <span class="pl-smi">Http</span> <span class="pl-smi">Header</span> when uploading images.              <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Object</span>}
+imageUploadUrl  <span class="pl-k">:</span> <span class="pl-smi">The</span> image upload to server mapping address.       <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">String</span>}
                   ex) <span class="pl-s"><span class="pl-pds">"</span>/editor/uploadImage.ajax<span class="pl-pds">"</span></span>
-                  When not used, it enters base64 data
+                  <span class="pl-smi">When</span> not used, it enters base64 data
                   <span class="pl-k">return</span> {
                             <span class="pl-s"><span class="pl-pds">"</span>errorMessage<span class="pl-pds">"</span></span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>insert error message<span class="pl-pds">"</span></span>,
                             <span class="pl-s"><span class="pl-pds">"</span>result<span class="pl-pds">"</span></span><span class="pl-k">:</span> [
@@ -310,25 +331,25 @@ imageUploadUrl  <span class="pl-k">:</span> The image upload to server mapping <
                                 }
                             ]
                         }
-imageUploadSizeLimit<span class="pl-k">:</span> The size <span class="pl-k">of</span> the total uploadable <span class="pl-en">images</span> (<span class="pl-k">in</span> bytes).
-                      Invokes the <span class="pl-s"><span class="pl-pds">"</span>onImageUploadError<span class="pl-pds">"</span></span> <span class="pl-smi">method</span>.  <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Number</span>}
+imageUploadSizeLimit<span class="pl-k">:</span> <span class="pl-smi">The</span> size of the total uploadable images (in bytes)<span class="pl-c1">.</span>
+                      <span class="pl-smi">Invokes</span> the <span class="pl-s"><span class="pl-pds">"</span>onImageUploadError<span class="pl-pds">"</span></span> method.  <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Number</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Video----------------------------------------------------------------------------------------------------------</span>
-videoResizing   <span class="pl-k">:</span> Can resize the video <span class="pl-smi">iframe</span>.                       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-c1">Boolean</span>}
-videoWidth      <span class="pl-k">:</span> The default width size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.         <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">560</span> {<span class="pl-c1">Number</span>}
-videoHeight     <span class="pl-k">:</span> The default heigth size <span class="pl-k">of</span> the video <span class="pl-smi">frame</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">315</span> {<span class="pl-c1">Number</span>}
-youtubeQuery    <span class="pl-k">:</span> The query string <span class="pl-k">of</span> a YouTube embedded <span class="pl-c1">URL</span>.        <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> {<span class="pl-c1">String</span>}
-                  It takes precedence over the value user entered.
+videoResizing   <span class="pl-k">:</span> <span class="pl-smi">Can</span> resize the video iframe.                       <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> {<span class="pl-smi">Boolean</span>}
+videoWidth      <span class="pl-k">:</span> <span class="pl-smi">The</span> <span class="pl-k">default</span> width size of the video frame.         <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">560</span> {<span class="pl-smi">Number</span>}
+videoHeight     <span class="pl-k">:</span> <span class="pl-smi">The</span> <span class="pl-k">default</span> heigth size of the video frame.        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">315</span> {<span class="pl-smi">Number</span>}
+youtubeQuery    <span class="pl-k">:</span> <span class="pl-smi">The</span> query string of a <span class="pl-smi">YouTube</span> embedded <span class="pl-c1">URL</span>.        <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
+                  <span class="pl-smi">It</span> takes precedence over the value user entered.
                   ex) <span class="pl-s"><span class="pl-pds">'</span>autoplay=1&amp;mute=1&amp;enablejsapi=1&amp;controls=0&amp;rel=0&amp;modestbranding=1<span class="pl-pds">'</span></span>
                     <span class="pl-c"><span class="pl-c">//</span> https://developers.google.com/youtube/player_parameters</span>
 
 <span class="pl-c"><span class="pl-c">//</span> Defining save button-------------------------------------------------------------------------------------------</span>
-callBackSave    <span class="pl-k">:</span> Callback functions that is called when the Save button is clicked. 
-                  Arguments <span class="pl-k">-</span> (contents).                            <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-smi">userFunction</span>.<span class="pl-smi">save</span> {<span class="pl-c1">Function</span>}
+callBackSave    <span class="pl-k">:</span> <span class="pl-smi">Callback</span> functions that is called when the <span class="pl-smi">Save</span> button is clicked. 
+                  <span class="pl-smi">Arguments</span> <span class="pl-k">-</span> (contents)<span class="pl-c1">.</span>                            <span class="pl-k">default</span><span class="pl-k">:</span> userFunction<span class="pl-k">.</span>save {<span class="pl-smi">Function</span>}
 
 <span class="pl-c"><span class="pl-c">//</span> Templates Array------------------------------------------------------------------------------------------------</span>
-templates       <span class="pl-k">:</span> If you use a template plugin, add it.
-                  Defines a list <span class="pl-k">of</span> <span class="pl-smi">templates</span>.                       <span class="pl-smi">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-c1">Array</span>} 
+templates       <span class="pl-k">:</span> <span class="pl-smi">If</span> you use a template plugin, add it.
+                  <span class="pl-smi">Defines</span> a list of templates.                       <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">null</span> {<span class="pl-smi">Array</span>} 
                   ex) [
                     {
                         name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Template-1<span class="pl-pds">'</span></span>,
@@ -341,8 +362,8 @@ templates       <span class="pl-k">:</span> If you use a template plugin, add it
                   ]
 
 <span class="pl-c"><span class="pl-c">//</span> Buttons--------------------------------------------------------------------------------------------------------</span>
-buttonList      <span class="pl-k">:</span> Defines button list to array {<span class="pl-c1">Array</span>}
-                  default<span class="pl-k">:</span> [
+buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> button list to array {<span class="pl-smi">Array</span>}
+                  <span class="pl-k">default</span><span class="pl-k">:</span> [
                     [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
                     <span class="pl-c"><span class="pl-c">//</span> ['font', 'fontSize', 'formatBlock'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
@@ -444,13 +465,21 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
 
+<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
+<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * cleanData : HTML string modified for editor format</span>
+<span class="pl-c"> * maxCharCount : maxChartCount option (true if max character is exceeded)</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onPaste</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">cleanData</span>, <span class="pl-smi">maxCharCount</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onPaste<span class="pl-pds">'</span></span>, e, cleanData, maxCharCount) }
+
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted.</span>
-<span class="pl-c"><span class="pl-c">/**</span> </span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * targetImgElement: Current img element</span>
 <span class="pl-c"> * index: Uploaded index (key value)</span>
 <span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
 <span class="pl-c"> * imageInfo: {</span>
-<span class="pl-c"> * * src: imgage src</span>
 <span class="pl-c"> * * index: data index</span>
 <span class="pl-c"> * * name: file name</span>
 <span class="pl-c"> * * size: file size</span>
@@ -458,20 +487,32 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
 <span class="pl-c"> * * delete: delete function</span>
 <span class="pl-c"> * }</span>
 <span class="pl-c"> * remainingFilesCount: Count of remaining image files</span>
-<span class="pl-c"> *<span class="pl-c">*/</span></span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create','update','delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>imageInfo:<span class="pl-s1"><span class="pl-pse">${</span>imageInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
 }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
 <span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
-<span class="pl-c"><span class="pl-c">/**</span> </span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * errorMessage: Error message to show</span>
-<span class="pl-c"> * result: Result object</span>
-<span class="pl-c"> *<span class="pl-c">*/</span></span>
+<span class="pl-c"> * result: Result object </span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
     <span class="pl-en">alert</span>(errorMessage)
+}
+
+<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
+<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * toolbar: Toolbar Element</span>
+<span class="pl-c"> * context: The editor's context object (editor.getContext())</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar);
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
 }</pre></div>
     
     </article>
