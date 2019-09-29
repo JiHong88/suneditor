@@ -266,6 +266,7 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                       }
 
 // Display-------------------------------------------------------------------------------------------------------
+position        : The position property of suneditor.               default: null {String}
 display         : The display property of suneditor.                default: 'block' {String}
 popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
 

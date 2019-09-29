@@ -213,6 +213,7 @@ export default {
         topDiv.style.minWidth = options.minWidth;
         topDiv.style.maxWidth = options.maxWidth;
         topDiv.style.display = options.display;
+        if (typeof options.position === 'string') topDiv.style.position = options.position;
 
         /** toolbar */
         if (/inline/i.test(options.mode)) {
@@ -336,6 +337,10 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
+        // popup, editor display
+        // options.position = options.position;
+        options.popupDisplay = options.popupDisplay || 'full';
+        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
         // toolbar
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
@@ -345,9 +350,6 @@ export default {
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.maxCharCount = /^\d+$/.test(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-        // popup, editor display
-        options.popupDisplay = options.popupDisplay || 'full';
-        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
         // size
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.minWidth = (/^\d+$/.test(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
