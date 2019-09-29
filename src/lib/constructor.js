@@ -47,22 +47,14 @@ export default {
         // inner editor div
         const editor_div = doc.createElement('DIV');
         editor_div.className = 'se-wrapper';
-    
-        // wysiwyg div
-        const wysiwyg_div = doc.createElement('DIV');
-        wysiwyg_div.setAttribute('contenteditable', true);
-        wysiwyg_div.setAttribute('scrolling', 'auto');
-        wysiwyg_div.className = 'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable';
-        wysiwyg_div.style.display = 'block';
-        wysiwyg_div.innerHTML = util.convertContentsForEditor(element.value);
-    
-        // textarea for code view
-        const textarea = doc.createElement('TEXTAREA');
-        textarea.className = 'se-wrapper-inner se-wrapper-code';
-        textarea.style.display = 'none';
 
         /** --- init elements and create bottom bar --- */
-        const bottomBar = this._initElements(options, top_div, tool_bar.element, arrow, wysiwyg_div, textarea);
+        const initHTML = util.convertContentsForEditor(element.value);
+        const initElements = this._initElements(options, top_div, tool_bar.element, arrow, initHTML);
+
+        const bottomBar = initElements.bottomBar;
+        const wysiwyg_div = initElements.wysiwygFrame;
+        let textarea = initElements.codeView;
 
         // resizing bar
         const resizing_bar = bottomBar.resizingBar;
@@ -86,10 +78,10 @@ export default {
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
-        if (resizing_bar) {
-            relative.appendChild(resizing_bar);
-        }
+        if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
+
+        textarea = this._checkCodeMirror(options, textarea);
     
         return {
             constructed: {
@@ -114,6 +106,40 @@ export default {
     },
 
     /**
+     * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
+     * @param {Object} options options
+     * @param {Element} textarea textarea element
+     * @private
+     */
+    _checkCodeMirror: function(options, textarea) {
+        if (options.codeMirror) {
+            const cmOptions = [{
+                mode: 'htmlmixed',
+                htmlMode: true,
+                lineNumbers: true
+            }, (options.codeMirror.options || {})].reduce(function (init, option) {
+                Object.keys(option).forEach(function (key) {
+                    init[key] = option[key];
+                });
+                return init;
+            }, {});
+
+            if (options.height === 'auto') {
+                cmOptions.viewportMargin = Infinity;
+            }
+            
+            const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
+            cm.display.wrapper.style.cssText = textarea.style.cssText;
+            
+            options.codeMirrorEditor = cm;
+            textarea = cm.display.wrapper;
+            textarea.className += ' se-wrapper-code-mirror';
+        }
+
+        return textarea;
+    },
+
+    /**
      * @description Add or reset options
      * @param {Object} mergeOptions New options property
      * @param {Object} context Context object of core
@@ -127,6 +153,7 @@ export default {
 
         const el = context.element;
         const relative = el.relative;
+        const editorArea = el.editorArea;
         const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode;
         const isNewPlugins = !!mergeOptions.plugins;
 
@@ -141,13 +168,28 @@ export default {
             el._arrow = arrow;
         }
         
-        const bottomBar = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow, el.wysiwyg, el.code);
+        const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow, el.wysiwyg.innerHTML);
+
+        const bottomBar = initElements.bottomBar;
+        const wysiwygFrame = initElements.wysiwygFrame;
+        let code = initElements.codeView;
+
         if (el.resizingBar) relative.removeChild(el.resizingBar);
         if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
         
         el.resizingBar = bottomBar.resizingBar;
         el.navigation = bottomBar.navigation;
         el.charCounter = bottomBar.charCounter;
+
+        editorArea.removeChild(el.wysiwygFrame);
+        editorArea.removeChild(el.code);
+        editorArea.appendChild(wysiwygFrame);
+        editorArea.appendChild(code);
+
+        code = this._checkCodeMirror(mergeOptions, code);
+
+        el.wysiwygFrame = wysiwygFrame;
+        el.code = code;
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
@@ -161,12 +203,11 @@ export default {
      * @param {Element} topDiv Suneditor top div
      * @param {Element} toolBar Tool bar
      * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
-     * @param {Element} wysiwygDiv WYSIWYG view div
-     * @param {Element} textarea Code view textarea
+     * @param {Element} initValue Code view textarea
      * @returns {Object} Bottom bar elements (resizingBar, navigation, charCounter)
      * @private
      */
-    _initElements: function (options, topDiv, toolBar, toolBarArrow, wysiwygDiv, textarea) {
+    _initElements: function (options, topDiv, toolBar, toolBarArrow, initHTML) {
         /** top div */
         topDiv.style.width = options.width;
         topDiv.style.minWidth = options.minWidth;
@@ -183,13 +224,64 @@ export default {
         }
 
         /** editor */
+        // wysiwyg div or iframe
+        const wysiwygDiv = document.createElement(!options.iframe ? 'DIV' : 'IFRAME');
+        wysiwygDiv.className = 'se-wrapper-inner se-wrapper-wysiwyg';
+        wysiwygDiv.style.display = 'block';
+
+        if (!options.iframe) {
+            wysiwygDiv.setAttribute('contenteditable', true);
+            wysiwygDiv.setAttribute('scrolling', 'auto');
+            wysiwygDiv.className += ' sun-editor-editable';
+            wysiwygDiv.innerHTML = initHTML;
+        } else {
+            const cssTags = (function () {
+                const CSSFileName = new RegExp('(^|.*[\\/])' + (options.iframeCSSFileName || 'suneditor') + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
+                const path = [];
+
+                for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+                    styleTag = c[i].href.match(CSSFileName);
+                    if (styleTag) path.push(styleTag[0]);
+                }
+    
+                if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
+    
+                let tagString = '';
+                for (let i = 0, len = path.length; i < len; i++) {
+                    tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+                }
+
+                return tagString;
+            })() + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
+
+            wysiwygDiv.allowFullscreen = true;
+            wysiwygDiv.frameBorder = 0;
+            wysiwygDiv.addEventListener('load', function () {
+                this.setAttribute('scrolling', 'auto');
+                this.contentDocument.head.innerHTML = '' +
+                    '<meta charset="utf-8" />' +
+                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                    '<title></title>' + 
+                    cssTags;
+                this.contentDocument.body.className = 'sun-editor-editable';
+                this.contentDocument.body.setAttribute('contenteditable', true);
+                this.contentDocument.body.innerHTML = initHTML;
+            });
+        }
+        
         wysiwygDiv.style.height = options.height;
         wysiwygDiv.style.minHeight = options.minHeight;
         wysiwygDiv.style.maxHeight = options.maxHeight;
 
+        // textarea for code view
+        const textarea = document.createElement('TEXTAREA');
+        textarea.className = 'se-wrapper-inner se-wrapper-code';
+        textarea.style.display = 'none';
+
         textarea.style.height = options.height;
         textarea.style.minHeight = options.minHeight;
         textarea.style.maxHeight = options.maxHeight;
+        if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
         /** resize bar */
         let resizingBar = null;
@@ -225,9 +317,13 @@ export default {
         }
 
         return {
-            resizingBar: resizingBar,
-            navigation: navigation,
-            charCounter: charCounter
+            bottomBar: {
+                resizingBar: resizingBar,
+                navigation: navigation,
+                charCounter: charCounter
+            },
+            wysiwygFrame: wysiwygDiv,
+            codeView: textarea
         };
     },
 
@@ -277,10 +373,15 @@ export default {
         options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? options.videoWidth.toString().match(/\d+/)[0] : 560;
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
-        // template
+        // --template
         // options.templates = options.templates;
-        // callBack function
+        // --callBack function
         // options.callBackSave = options.callBackSave;
+        // --editor area
+        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
+        options.iframe = options.fullPage || options.iframe;
+        // options.iframeCSSFileName = options.iframeCSSFileName;
+        // options.fullPage = options.fullPage;
         // buttons
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],

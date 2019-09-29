@@ -186,14 +186,14 @@ export default {
 
         const resizeContainer = contextResizing.resizeContainer;
         const resizeDiv = contextResizing.resizeDiv;
-        const offset = this.util.getOffset(targetElement);
+        const offset = this.util.getOffset(targetElement, this.context.element.wysiwygFrame);
 
         const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
 
         const w = isVertical ? targetElement.offsetHeight : targetElement.offsetWidth;
         const h = isVertical ? targetElement.offsetWidth : targetElement.offsetHeight;
         const t = offset.top;
-        const l = offset.left - this.context.element.wysiwyg.scrollLeft;
+        const l = offset.left - this.context.element.wysiwygFrame.scrollLeft;
 
         resizeContainer.style.top = t + 'px';
         resizeContainer.style.left = l + 'px';
@@ -239,7 +239,7 @@ export default {
         this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
 
         // button group
-        const overLeft = this.context.element.wysiwyg.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
+        const overLeft = this.context.element.wysiwygFrame.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
 
         contextResizing.resizeButton.style.top = (h + t + 60) + 'px';
         contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft : 0)) + 'px';
@@ -273,11 +273,11 @@ export default {
         this.plugins.resizing._closeAlignMenu = function () {
             this.util.removeClass(this.context.resizing.alignButton, 'on');
             this.context.resizing.alignMenu.style.display = 'none';
-            this._d.removeEventListener('mousedown', this.plugins.resizing._closeAlignMenu);
+            this.removeDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
             this.plugins.resizing._closeAlignMenu = null;
         }.bind(this);
 
-        this._d.addEventListener('mousedown', this.plugins.resizing._closeAlignMenu);
+        this.addDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
     },
 
     create_caption: function () {
@@ -371,7 +371,7 @@ export default {
                 }
     
                 this.util.removeClass(currentContext._container, currentContext._floatClassRegExp);
-                this.util.addClass(currentContext._container, 'float-' + alignValue);
+                this.util.addClass(currentContext._container, '__se__float-' + alignValue);
                 contextEl.setAttribute('data-align', alignValue);
     
                 contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
@@ -589,7 +589,7 @@ export default {
 
         if (!isVertical && !/^\d+%$/.test(w)) {
             const padding = 16;
-            const limit = this.context.element.wysiwyg.clientWidth - (padding * 2) - 2;
+            const limit = this.context.element.wysiwygFrame.clientWidth - (padding * 2) - 2;
             
             if (w.toString().match(/\d+/)[0] > limit) {
                 w = limit;

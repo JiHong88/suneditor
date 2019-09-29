@@ -13,6 +13,12 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <!-- codeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -83,7 +89,7 @@
             <div>});</div>
         </textarea>
 
-        <!-- char count-->
+        <!-- char count, button groups -->
         <a id="groups" href="#groups"><h4 class="sub-title" style="margin-top: 60px;">Char count, Button groups</h4></a>
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">
@@ -109,14 +115,47 @@
             <div>});</div>
         </textarea>
 
+        <!-- Iframe, fullPage and use CodeMirror -->
+        <a id="CodeMirror" href="#CodeMirror"><h4 class="sub-title">Iframe, fullPage and use CodeMirror</h4></a>
+        <p></p>
+        <textarea id="useCodeMirror">
+            <div><span style="color: rgb(189, 189, 189);"></span></div>
+            <div><span style="color: rgb(189, 189, 189);"></span></div>
+            <div>&amp;lt;<span style="color: rgb(107, 153, 0);">link</span> <span style="color: rgb(61, 0, 153);">rel</span>=<span style="color: rgb(0, 51, 153);">"stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css"</span>&amp;gt;</div>
+            <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
+            <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
+            <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
+            <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
+            <div><br></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> <span style="color: rgb(0, 51, 153);">'suneditor/dist/css/suneditor.min.css'</span></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> <span style="color: rgb(0, 51, 153);">suneditor</span> <span style="color: rgb(255, 94, 0);">from</span> <span style="color: rgb(0, 51, 153);">'suneditor'</span></div>
+            <div><span style="color: rgb(189, 189, 189);">// Import codeMirror</span></div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> CodeMirror <span style="color: rgb(255, 94, 0);">from</span> 'codemirror'</div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> 'codemirror/mode/htmlmixed/htmlmixed'</div>
+            <div><span style="color: rgb(255, 94, 0);">import</span> 'codemirror/lib/codemirror.css'</div>
+            <div><br></div>
+            <div>suneditor.<span style="color: rgb(61, 0, 153);">create</span>(<span style="color: rgb(0, 51, 153);">'sample'</span>, {</div>
+            <div>    &nbsp;&nbsp;&nbsp;&nbsp;codeMirror<span style="color: rgb(255, 94, 0);">:</span> <span style="color: rgb(107, 153, 0);">CodeMirror</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    <span style="color: rgb(189, 189, 189);">// Set options</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    // codeMirror: {</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    //     src: CodeMirror,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    //     options: {...}</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(189, 189, 189);">    // }</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    buttonList<span style="color: rgb(255, 94, 0);">:</span> [</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;       [<span style="color: rgb(0, 51, 153);">'codeView'</span>]</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    ],</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;    height<span style="color: rgb(255, 94, 0);">:</span> <span style="color: rgb(0, 85, 255);">400</span></div>
+            <div>});</div>
+        </textarea>
+
+        <!-- image management editor-->
         <a id="image" href="#image"><h4 class="sub-title" style="margin-top: 60px;">Image management</h4></a>
         <p></p>
-<!-- image management editor-->
         <textarea id="imageManagement" style="display: none;">
             <p>cat</p>
-            <div class="se-component se-image-container float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,199" data-origin="300,199" data-index="0" data-file-name="s-cat.jpg" data-file-size="40500" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
+            <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,199" data-origin="300,199" data-index="0" data-file-name="s-cat.jpg" data-file-size="40500" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
             <p>cat1</p>
-            <div class="se-component se-image-container float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-index="1" data-file-name="s-cat1.jpg" data-file-size="52000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
+            <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-index="1" data-file-name="s-cat1.jpg" data-file-size="52000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
             <p><br></p>
         </textarea>
         <div class="image-list">
@@ -136,21 +175,21 @@
         </div>
 
 <!-- image management html-->
-<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_wrapper<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>image-list<span class="pl-pds">"</span></span>&gt;
-    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list-info<span class="pl-pds">"</span></span>&gt;
-        &lt;<span class="pl-ent">span</span>&gt;Attached files&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>xefu-btn<span class="pl-pds">"</span></span>&gt;
-            &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text<span class="pl-pds">"</span></span>&gt;Attach image&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>file<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>files_upload<span class="pl-pds">"</span></span> <span class="pl-e">accept</span>=<span class="pl-s"><span class="pl-pds">"</span>image/*<span class="pl-pds">"</span></span> <span class="pl-e">multiple</span>=<span class="pl-s"><span class="pl-pds">"</span>multiple<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text files-input<span class="pl-pds">"</span></span>/&gt;
-        &lt;<span class="pl-ent">span</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_size<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>total-size text-small-2<span class="pl-pds">"</span></span>&gt;0KB&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">button</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>btn btn-md btn-danger<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_remove<span class="pl-pds">"</span></span> <span class="pl-e">disabled</span> <span class="pl-e">onclick</span>=<span class="pl-s"><span class="pl-pds">"</span>deleteCheckedImages()<span class="pl-pds">"</span></span>&gt;Remove&lt;/<span class="pl-ent">button</span>&gt;
-    &lt;/<span class="pl-ent">div</span>&gt;
-    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list<span class="pl-pds">"</span></span>&gt;
-        &lt;<span class="pl-ent">ul</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_list<span class="pl-pds">"</span></span>&gt;
-        &lt;/<span class="pl-ent">ul</span>&gt;
-    &lt;/<span class="pl-ent">div</span>&gt;
-&lt;/<span class="pl-ent">div</span>&gt;</pre></div>
+<div class="highlight highlight-text-html-basic"><pre>&amp;lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_wrapper<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>image-list<span class="pl-pds">"</span></span>&amp;gt;
+    &amp;lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list-info<span class="pl-pds">"</span></span>&amp;gt;
+        &amp;lt;<span class="pl-ent">span</span>&amp;gt;Attached files&amp;lt;/<span class="pl-ent">span</span>&amp;gt;
+        &amp;lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>xefu-btn<span class="pl-pds">"</span></span>&amp;gt;
+            &amp;lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text<span class="pl-pds">"</span></span>&amp;gt;Attach image&amp;lt;/<span class="pl-ent">span</span>&amp;gt;
+        &amp;lt;/<span class="pl-ent">span</span>&amp;gt;
+        &amp;lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>file<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>files_upload<span class="pl-pds">"</span></span> <span class="pl-e">accept</span>=<span class="pl-s"><span class="pl-pds">"</span>image/*<span class="pl-pds">"</span></span> <span class="pl-e">multiple</span>=<span class="pl-s"><span class="pl-pds">"</span>multiple<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text files-input<span class="pl-pds">"</span></span>/&amp;gt;
+        &amp;lt;<span class="pl-ent">span</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_size<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>total-size text-small-2<span class="pl-pds">"</span></span>&amp;gt;0KB&amp;lt;/<span class="pl-ent">span</span>&amp;gt;
+        &amp;lt;<span class="pl-ent">button</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>btn btn-md btn-danger<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_remove<span class="pl-pds">"</span></span> <span class="pl-e">disabled</span> <span class="pl-e">onclick</span>=<span class="pl-s"><span class="pl-pds">"</span>deleteCheckedImages()<span class="pl-pds">"</span></span>&amp;gt;Remove&amp;lt;/<span class="pl-ent">button</span>&amp;gt;
+    &amp;lt;/<span class="pl-ent">div</span>&amp;gt;
+    &amp;lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list<span class="pl-pds">"</span></span>&amp;gt;
+        &amp;lt;<span class="pl-ent">ul</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_list<span class="pl-pds">"</span></span>&amp;gt;
+        &amp;lt;/<span class="pl-ent">ul</span>&amp;gt;
+    &amp;lt;/<span class="pl-ent">div</span>&amp;gt;
+&amp;lt;/<span class="pl-ent">div</span>&amp;gt;</pre></div>
 
 <!-- image management js-->
 <div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">imageWrapper</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_wrapper<span class="pl-pds">'</span></span>);
@@ -199,17 +238,17 @@
     <span class="pl-k">let</span> list <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;
     <span class="pl-k">let</span> size <span class="pl-k">=</span> <span class="pl-c1">0</span>;
 
-    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>, image, fixSize; i <span class="pl-k">&lt;</span> <span class="pl-smi">imageList</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
+    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>, image, fixSize; i <span class="pl-k">&amp;lt;</span> <span class="pl-smi">imageList</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
         image <span class="pl-k">=</span> imageList[i];
         fixSize <span class="pl-k">=</span> (<span class="pl-smi">image</span>.<span class="pl-c1">size</span> <span class="pl-k">/</span> <span class="pl-c1">1000</span>).<span class="pl-en">toFixed</span>(<span class="pl-c1">1</span>) <span class="pl-k">*</span> <span class="pl-c1">1</span>
             
-        list <span class="pl-k">+=</span> <span class="pl-s"><span class="pl-pds">'</span>&lt;li id="img_<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&lt;div onclick="checkImage(<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                        <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="image-wrapper"&gt;&lt;img src="<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-smi">src</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&gt;&lt;/div&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&lt;/div&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&lt;a href="javascript:void(0)" onclick="selectImage(<span class="pl-cce">\'</span>select<span class="pl-cce">\'</span>,<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)" class="image-size"&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span> fixSize <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>KB&lt;/a&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&lt;div class="image-check"&gt;&lt;svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""&gt;&lt;path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/div&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                <span class="pl-s"><span class="pl-pds">'</span>&lt;/li&gt;<span class="pl-pds">'</span></span>;
+        list <span class="pl-k">+=</span> <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;li id="img_<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div onclick="checkImage(<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                        <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div class="image-wrapper"&amp;gt;&amp;lt;img src="<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-smi">src</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&amp;gt;&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;a href="javascript:void(0)" onclick="selectImage(<span class="pl-cce">\'</span>select<span class="pl-cce">\'</span>,<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)" class="image-size"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span> fixSize <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>KB&amp;lt;/a&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div class="image-check"&amp;gt;&amp;lt;svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""&amp;gt;&amp;lt;path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/svg&amp;gt;&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;/li&amp;gt;<span class="pl-pds">'</span></span>;
         
         size <span class="pl-k">+=</span> fixSize;
     }
@@ -243,7 +282,7 @@
     <span class="pl-k">const</span> <span class="pl-c1">li</span> <span class="pl-k">=</span> <span class="pl-smi">imageTable</span>.<span class="pl-c1">querySelector</span>(<span class="pl-s"><span class="pl-pds">'</span>#img_<span class="pl-pds">'</span></span> <span class="pl-k">+</span> index);
     <span class="pl-k">const</span> <span class="pl-c1">currentImageIdx</span> <span class="pl-k">=</span> <span class="pl-en">findIndex</span>(selectedImages, index)
 
-    <span class="pl-k">if</span> (currentImageIdx <span class="pl-k">&gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
+    <span class="pl-k">if</span> (currentImageIdx <span class="pl-k">&amp;gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
         <span class="pl-smi">selectedImages</span>.<span class="pl-c1">splice</span>(currentImageIdx, <span class="pl-c1">1</span>)
         <span class="pl-smi">li</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;
     } <span class="pl-k">else</span> {
@@ -251,7 +290,7 @@
         <span class="pl-smi">li</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>checked<span class="pl-pds">'</span></span>;
     }
 
-    <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">length</span> <span class="pl-k">&gt;</span> <span class="pl-c1">0</span>) {
+    <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">length</span> <span class="pl-k">&amp;gt;</span> <span class="pl-c1">0</span>) {
         <span class="pl-smi">imageRemove</span>.<span class="pl-c1">removeAttribute</span>(<span class="pl-s"><span class="pl-pds">'</span>disabled<span class="pl-pds">'</span></span>);
     } <span class="pl-k">else</span> {
         <span class="pl-smi">imageRemove</span>.<span class="pl-c1">setAttribute</span>(<span class="pl-s"><span class="pl-pds">'</span>disabled<span class="pl-pds">'</span></span>, <span class="pl-c1">true</span>);
@@ -262,8 +301,8 @@
 <span class="pl-k">function</span> <span class="pl-en">deleteCheckedImages</span>() {
     <span class="pl-k">const</span> <span class="pl-c1">iamgesInfo</span> <span class="pl-k">=</span> <span class="pl-smi">editorImageSample</span>.<span class="pl-en">getImagesInfo</span>();
 
-    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>; i <span class="pl-k">&lt;</span> <span class="pl-smi">iamgesInfo</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
-        <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">indexOf</span>(iamgesInfo[i].<span class="pl-c1">index</span>) <span class="pl-k">&gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
+    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>; i <span class="pl-k">&amp;lt;</span> <span class="pl-smi">iamgesInfo</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
+        <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">indexOf</span>(iamgesInfo[i].<span class="pl-c1">index</span>) <span class="pl-k">&amp;gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
             iamgesInfo[i].<span class="pl-c1">delete</span>();
             i<span class="pl-k">--</span>;
         }
@@ -372,7 +411,7 @@
 
 
 <span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
+<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&amp;lt;img src="http://suneditor.com/sample/img/sunset.jpg"&amp;gt;<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
@@ -420,6 +459,14 @@
 <span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
     <span class="pl-c1">alert</span>(errorMessage)
+}
+
+<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
+<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context)
 }</pre>
 </div>
         
@@ -489,6 +536,16 @@
         }
     });
 
+    SUNEDITOR.create('useCodeMirror', {
+        codeMirror: CodeMirror,
+        buttonList: [
+            ['codeView']
+        ],
+        height: 330,
+        width: 'auto',
+        fullPage: true,
+    });
+
     editorImageSample = SUNEDITOR.create('imageManagement', {
         buttonList: [
             ['undo', 'redo'],
@@ -521,6 +578,7 @@
 
     function sun_setOptions() {
         suneditor.setOptions({
+            mode: 'inline',
             minHeight: '300px',
             colorList: [
                 ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
@@ -536,6 +594,7 @@
 
     function sun_replaceOptions() {
         suneditor.setOptions({
+            mode: 'classic',
             minHeight: null,
             colorList: null,
             buttonList: [
@@ -625,6 +684,10 @@
         suneditor.onChange = function (contents) { console.log('onChange', contents) }
         suneditor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) { 
             console.log('targetImgElement:' + targetImgElement + ', index:' + index + ', state("create","update","delete"):' + state + ', imageInfo:' + imageInfo + ', remainingFilesCount:' + remainingFilesCount)
+        }
+        suneditor.showInline = function (toolbar, context) {
+            console.log('toolbar', toolbar);
+            console.log('context', context);
         }
     }
 

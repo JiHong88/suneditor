@@ -9,6 +9,11 @@ import { ko } from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import CodeMirror from 'codemirror';
+
+window.cm = CodeMirror
 
 let s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
@@ -25,7 +30,9 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     mode: 'balloon',
     stickyToolbar: '0',
     videoResizing: false,
-    imageWidth: 150
+    imageWidth: 150,
+    // fullPage: true,
+    
 });
 
 window.sun_destroy1 = function () {
@@ -54,12 +61,18 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     stickyToolbar: 0,
     imageWidth: 300,
-    mode: 'inline',
+    mode: 'balloon',
     // toolbarWidth: 800,
     height: 'auto',
+    // fullPage: true,
+    iframeCSSFileName: 'suneditor',
+    // iframe: true,
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
+    codeMirror: {
+        src: CodeMirror,
+    }
 });
 
 ss.onScroll = function (e) {
@@ -85,6 +98,10 @@ ss.onChange = function (contents) {
 ss.onImageUpload = function () {
     console.log(ss.getImagesInfo());
 }
+
+ss.showInline = function (toolbar, context) {
+
+},
 
 window.sun_noticeOpen = function () {
     ss.noticeOpen('test notice');
@@ -161,13 +178,14 @@ const editor = suneditor.init({
         custom_plugin_submenu
     ],
     width: '100%',
-    
+    // iframe: true,
 });
 
 let s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
-    height: 400,
+    height: 'auto',
+    // height: 400,
     imageResizing: true,
     // imageWidth: '400',
     buttonList: [
@@ -200,12 +218,28 @@ let s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote'],
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+        tag: 'div',
+        class: '__se__aaa',
+        title: 'red div',
+        command: 'range'
+    }],
+    // iframe: true,
+    fullPage: true,
+    // mode: 'balloon',
+    // codeMirror: CodeMirror,
+    codeMirror: {
+        src: CodeMirror,
+        options: {
+            mode: 'xml'
+        }
+    },
     // imageUploadSizeLimit: 30000
 });
 
 const newOption = {
     mode: 'balloon',
+    iframe: false,
     plugins: [
         plugins.hiliteColor,
         plugins.fontColor
@@ -235,9 +269,11 @@ const newOption2 = {
     height: 150,
     imageWidth: '100%',
     colorList: null,
+    iframe: true,
 }
 const newOption3 = {
-    mode: 'inline'
+    mode: 'inline',
+    iframe: false,
 }
 
 let imageList = [];
@@ -346,6 +382,7 @@ s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainin
 window.sun_setOptions2 = function () {
     s2.setOptions(newOption);
 }
+
 window.sun_setOptions3 = function () {
     s2.setOptions(newOption2);
 }
@@ -369,7 +406,7 @@ window.sun_create2 = function () {
 
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
-        ['align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
+        [plugins.formatBlock, 'align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
         [
             {
                 // plugin's name attribute
@@ -392,10 +429,17 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     width: '100%',
     stickyToolbar: false,
     popupDisplay: 'local',
+    // iframe: true,
     // maxCharCount: 300,
     // resizingBar: false
     // showPathLabel:false
-    charCounter: true
+    charCounter: true,
+    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+        tag: 'div',
+        class: '__se__aaa',
+        title: 'red div',
+        command: 'replace'
+    }],
 });
 window.sun_destroy3 = function () {
     s3.destroy();

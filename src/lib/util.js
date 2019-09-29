@@ -23,7 +23,7 @@ const util = {
      */
     _tagConvertor: function (text) {
         const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(pre|blockquote|h[1-6]|ol|ul|dl|li|hr|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        return text.replace(/(<\/?)(b|strong|var|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -181,7 +181,7 @@ const util = {
             }
         }
 
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
         contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -222,12 +222,12 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the edit region top div element.
+     * @description It is judged whether it is the edit region top div element or iframe's body tag.
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
-        if (element && element.nodeType === 1 && this.hasClass(element, 'se-wrapper-wysiwyg')) return true;
+        if (element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))) return true;
         return false;
     },
 
@@ -248,7 +248,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName)) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || element.getAttribute('data-format') === 'range')) return true;
         return false;
     },
 
@@ -633,9 +633,10 @@ const util = {
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
      * @param {Element} element Element node
+     * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
      * @returns {Object}
      */
-    getOffset: function (element) {
+    getOffset: function (element, wysiwygFrame) {
         let offsetLeft = 0;
         let offsetTop = 0;
         let offsetElement = element.nodeType === 3 ? element.parentElement : element;
@@ -647,9 +648,11 @@ const util = {
             offsetElement = offsetElement.offsetParent;
         }
 
+        const iframe = wysiwygFrame && /iframe/i.test(wysiwygFrame.nodeName);
+
         return {
-            left: offsetLeft,
-            top: offsetTop - wysiwyg.scrollTop
+            left: offsetLeft + (iframe ? wysiwygFrame.offsetLeft : 0),
+            top: (offsetTop - wysiwyg.scrollTop) + (iframe ? wysiwygFrame.offsetTop : 0)
         };
     },
 
@@ -837,9 +840,10 @@ const util = {
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:colspan|rowspan|target|href|src|data-file-size|data-file-name|data-origin|origin-size)\s*=\s*"[^"]*")/ig);
+                const v = m.match(/((?:colspan|rowspan|target|href|src|class|data-file-size|data-file-name|data-origin|origin-size|data-format)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
+                        if (/^class="(?!__se__)/.test(v[i])) continue;
                         t += ' ' + v[i];
                     }
                 }

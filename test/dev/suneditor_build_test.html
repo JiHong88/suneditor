@@ -112,7 +112,20 @@
 </head>
 <body>
     <div style="position: relative; top: 50px;">
-        aaa
+        <textarea id="cmtest">afda</textarea>
+        <button type="button" onclick="aaa()">cm</button>
+        <script>
+            function aaa () {
+                console.log('cm', cm)
+                var ed = cm.fromTextArea(document.getElementById('cmtest'), {
+                    mode: 'htmlmixed',
+                    htmlMode: true,
+                    lineNumbers: true,
+                });
+
+                console.log(ed)
+            }
+        </script>
     </div>
     <div style="position: relative;">
             <div style="max-width: 960px; margin: 60px auto 0 auto; height: 1200px; position: relative;">
@@ -120,7 +133,7 @@
                     <p><br></p>
                     <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
                     <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
-                    <div class="se-component se-image-container float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
+                    <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,360" data-origin="640,360" style="transform: rotate(0deg); max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
                     <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
                     <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
                     <p><br></p>
@@ -153,9 +166,9 @@
                     <p>image testddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
                     <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
                     <p>bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb</p>
-                    <div class="se-component se-image-container float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="752,500" data-origin="466,310" data-index="0" data-file-name="cat.jpg" data-file-size="25000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
+                    <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="752,500" data-origin="466,310" data-index="0" data-file-name="cat.jpg" data-file-size="25000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
                     <p><br></p>
-                    <div class="se-component se-image-container float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="727,485" data-origin="449,300" data-index="1" data-file-name="cat1.jpg" data-file-size="0" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
+                    <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="727,485" data-origin="449,300" data-index="1" data-file-name="cat1.jpg" data-file-size="0" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
                     <p><br></p>
                 </textarea>
                 <div id="image_wrapper" class="image-list" style="display: none;">

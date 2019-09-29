@@ -112,7 +112,7 @@ suneditor.create('sample', {
         ['horizontalRule'],
         ['link', 'image']
     ],
-    lang: lang['ko']
+    lang: lang.ko
 });
 ```
 
@@ -144,11 +144,12 @@ suneditor.create('sample', {
 suneditor.create('sample', {
     plugins: [
         plugins.font
-        plugins.fontSize,
-        plugins.formatBlock
+        plugins.fontSize
     ],
     buttonList: [
-        ['font', 'fontSize', 'formatBlock']
+        ['font', 'fontSize'],
+        // Plugins can be used directly in the button list
+        [plugins.formatBlock]
     ]
 })
 ```
@@ -166,7 +167,6 @@ suneditor.create('sample', {
         [font, fontSize, formatBlock],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['removeFormat'],
-        '/', // Line break
         [fontColor, hiliteColor],
         ['outdent', 'indent'],
         [align, horizontalRule, list, table],
@@ -213,11 +213,8 @@ initEditor.create('sample_2', {
     // The value of the option argument put in the "create" function call takes precedence
     height: 'auto',
     buttonList: [
-        ['undo', 'redo'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['bold', 'underline', 'italic'],
         ['removeFormat'],
-        ['outdent', 'indent'],
-        ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print']
     ]
 });
@@ -250,6 +247,23 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
+fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+iframeCSSFileName : Name of the CSS file to apply inside the iframe.
+                    Applied by searching by filename in the link tag of document.  default: 'suneditor' {String}
+codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
+                  Use version 5.0.0 or later.
+                  ex) codeMirror: CodeMirror // Default option
+                      codeMirror: { // Custom option
+                        src: CodeMirror,
+                        options: {
+                            /** default options **
+                            * mode: 'htmlmixed',
+                            * htmlMode: true,
+                            * lineNumbers: true
+                            */
+                        }
+                      }
 
 // Display-------------------------------------------------------------------------------------------------------
 display         : The display property of suneditor.                default: 'block' {String}
@@ -290,7 +304,13 @@ fontSize        : Change default font-size array.                   default: [..
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                       'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
-                  ]
+                  ],
+                  Custom: [{
+                      tag: 'div', // Tag name
+                      class: '__se__xxx' || null, // Class names must always begin with "__se__"
+                      title: 'Custom div' || null, // default: tag name
+                      command: 'replace' || 'range' // default: "replace"
+                  }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
                     '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000',
@@ -461,6 +481,15 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
+// Paste event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
+/**
+ * cleanData : HTML string modified for editor format
+ * maxCharCount : maxChartCount option (true if max character is exceeded)
+*/
+editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
+
 // Called when the image is uploaded or the uploaded image is deleted.
 /**
  * targetImgElement: Current img element
@@ -489,6 +518,50 @@ editor.onImageUpload = function (targetImgElement, index, state, imageInfo, rema
 editor.onImageUploadError = function (errorMessage, result) {
     alert(errorMessage)
 }
+
+// Paste event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
+/**
+ * toolbar: Toolbar Element
+ * context: The editor's context object (editor.getContext())
+*/
+editor.showInline = function (toolbar, context) {
+    console.log('toolbar', toolbar);
+    console.log('context', context);
+}
+```
+
+### Use CodeMirror
+```html
+<!-- codeMirror -->
+<!-- Use version 5.0.0 or later. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+```
+```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+// Import codeMirror
+import CodeMirror from 'codemirror'
+import 'codemirror/mode/htmlmixed/htmlmixed'
+import 'codemirror/lib/codemirror.css'
+
+suneditor.create('sample', {
+    codeMirror: CodeMirror,
+    // Set options
+    // codeMirror: {
+    //     src: CodeMirror,
+    //     options: {...}
+    // }
+    buttonList: [
+        ['codeView']
+    ],
+    height: 400
+});
 ```
 
 ## Examples

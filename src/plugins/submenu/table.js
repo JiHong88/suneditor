@@ -296,7 +296,7 @@ export default {
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
         const tableElement = contextTable._element;
-        const offset = this.util.getOffset(tableElement);
+        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
 
         contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
         tablePlugin.resizeTable.call(this);
@@ -315,11 +315,11 @@ export default {
 
         resizeDiv.style.display = 'block';
 
-        const offset = this.util.getOffset(tdElement);
-        resizeDiv.style.left = (offset.left - this.context.element.wysiwyg.scrollLeft) + 'px';
+        const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
+        resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
         resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
 
-        const overLeft = this.context.element.wysiwyg.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
         if (overLeft < 0) {
             resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
             resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
@@ -770,11 +770,11 @@ export default {
         this.plugins.table._closeSplitMenu = function () {
             this.util.removeClass(this.context.table.splitButton, 'on');
             this.context.table.splitMenu.style.display = 'none';
-            this._d.removeEventListener('mousedown', this.plugins.table._closeSplitMenu);
+            this.removeDocEvent('mousedown', this.plugins.table._closeSplitMenu);
             this.plugins.table._closeSplitMenu = null;
         }.bind(this);
 
-        this._d.addEventListener('mousedown', this.plugins.table._closeSplitMenu);
+        this.addDocEvent('mousedown', this.plugins.table._closeSplitMenu);
     },
 
     splitCells: function (direction) {
@@ -1105,7 +1105,7 @@ export default {
             tablePlugin._removeEvents.call(this);
             tablePlugin._toggleEditor.call(this, true);
         } else if (tablePlugin._initBind) {
-            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            this._wd.removeEventListener('touchmove', tablePlugin._initBind);
             tablePlugin._initBind = null;
         }
 
@@ -1259,23 +1259,23 @@ export default {
         const tablePlugin = this.plugins.table;
 
         if (tablePlugin._initBind) {
-            this._d.removeEventListener('touchmove', tablePlugin._initBind);
+            this._wd.removeEventListener('touchmove', tablePlugin._initBind);
             tablePlugin._initBind = null;
         }
 
         if (tablePlugin._bindOnSelect) {
-            this._d.removeEventListener('mousedown', tablePlugin._bindOnSelect);
-            this._d.removeEventListener('mousemove', tablePlugin._bindOnSelect);
+            this._wd.removeEventListener('mousedown', tablePlugin._bindOnSelect);
+            this._wd.removeEventListener('mousemove', tablePlugin._bindOnSelect);
             tablePlugin._bindOnSelect = null;
         }
 
         if (tablePlugin._bindOffSelect) {
-            this._d.removeEventListener('mouseup', tablePlugin._bindOffSelect);
+            this._wd.removeEventListener('mouseup', tablePlugin._bindOffSelect);
             tablePlugin._bindOffSelect = null;
         }
 
         if (tablePlugin._bindOffShift) {
-            this._d.removeEventListener('keyup', tablePlugin._bindOffShift);
+            this._wd.removeEventListener('keyup', tablePlugin._bindOffShift);
             tablePlugin._bindOffShift = null;
         }
     },
@@ -1303,21 +1303,21 @@ export default {
         tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
 
         if (!shift) {
-            this._d.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
+            this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
                 this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this));
                 if (!tablePlugin._ref) this.controllersOff();
             }.bind(this);
 
-            this._d.addEventListener('keyup', tablePlugin._bindOffShift, false);
-            this._d.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
+            this._wd.addEventListener('keyup', tablePlugin._bindOffShift, false);
+            this._wd.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
         }
 
-        this._d.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
+        this._wd.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
 
         tablePlugin._initBind = tablePlugin.init.bind(this);
-        this._d.addEventListener('touchmove', tablePlugin._initBind, false);
+        this._wd.addEventListener('touchmove', tablePlugin._initBind, false);
     },
 
     onClick_tableController: function (e) {

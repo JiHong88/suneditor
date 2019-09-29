@@ -78,7 +78,7 @@ export default {
 
         if (!value) return;
 
-        this.plugins.horizontalRule.appendHr.call(this, value);
+        this.plugins.horizontalRule.appendHr.call(this, '__se__' + value);
 
         this.submenuOff();
     }

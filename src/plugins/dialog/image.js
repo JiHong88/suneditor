@@ -35,7 +35,7 @@ export default {
             _align: 'none',
             _captionChecked: false,
             _proportionChecked: true,
-            _floatClassRegExp: 'float\\-[a-z]+',
+            _floatClassRegExp: '__se__float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
             _defaultAuto: context.option.imageWidth === 'auto',
@@ -544,7 +544,7 @@ export default {
         }
         
         this.util.removeClass(container, contextImage._floatClassRegExp);
-        this.util.addClass(container, 'float-' + align);
+        this.util.addClass(container, '__se__float-' + align);
 
         if (!contextImage._resizing || !/\d+/.test(width)) {
             this.context.resizing._resize_plugin = 'image';
@@ -612,7 +612,7 @@ export default {
         }
 
         this.util.removeClass(container, this.context.image._floatClassRegExp);
-        this.util.addClass(container, 'float-' + contextImage._align);
+        this.util.addClass(container, '__se__float-' + contextImage._align);
         imageEl.setAttribute('data-align', contextImage._align);
 
         // link
@@ -774,7 +774,7 @@ export default {
 
         if (/100/.test(w)) {
             this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-            this.util.addClass(contextImage._container, 'float-center');
+            this.util.addClass(contextImage._container, '__se__float-center');
         }
     },
 
@@ -788,7 +788,7 @@ export default {
         contextImage._container.style.height = '';
 
         this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-        this.util.addClass(contextImage._container, 'float-' + contextImage._align);
+        this.util.addClass(contextImage._container, '__se__float-' + contextImage._align);
     },
 
     resetAlign: function () {
