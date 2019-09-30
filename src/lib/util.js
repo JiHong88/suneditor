@@ -828,12 +828,12 @@ const util = {
      */
     cleanHTML: function (html) {
         const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
-        const domTree = this._d.createRange().createContextualFragment(html).children;
+        const domTree = this._d.createRange().createContextualFragment(html).childNodes;
         let cleanHTML = '';
 
         for (let i = 0, len = domTree.length; i < len; i++) {
             if (!tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].outerHTML;
+                cleanHTML += domTree[i].nodeType === 1 ? domTree[i].outerHTML : domTree[i].nodeType === 3 ? domTree[i].textContent : '';
             }
         }
 
