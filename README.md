@@ -1,6 +1,8 @@
 # SunEditor
 Pure javscript based WYSIWYG web editor, with no dependencies
 
+> #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
 [![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
@@ -18,32 +20,31 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2180)
 
-> #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
-
 ## Table of contents
 - [Browser Support](#browser-support)
 - [Install](#install)
-    - [npm](#npm)
-    - [bower](#bower)
-    - [CDN](#cdn)
 - [Getting Started](#getting-started)
-    1. [Include](#1-include)
-    2. [Target Element](#2-target-element)
-    3. [Create](#3-create)
-    4. [Contents display](#4-contents-display)
 - [Use import statement](#use-import-statement)
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
-    - [Use init function](#4-use-init-function)
+- [Init function](#init-function)
+- [Use CodeMirror](#use-codemirror)
 - [Options](#options)
 - [Functions](#functions)
-- [Use CodeMirror](#use-codemirror)
 - [Examples](#examples)
+    - [Defining menu items](#defining-menu-items)
+    - [Char count, Button groups](#char-count-button-groups)
+    - [Iframe, fullPage and use CodeMirror](#iframe-fullpage-and-use-codemirror)
+    - [Image management](#image-management)
+    - [User Functions](#user-functions)
 - [Options template](#options-template)
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
 - [Other libraries using SunEditor](#other-libraries-using-sunEditor)
+    - [Plugin for Pluxml](#lib-pluxml)
+    - [AEM-SunEditor](#lib-pluxml)
+    - [SunEditor-React](#lib-suneditor-react)
 - [License](#license)
 
 
@@ -112,7 +113,7 @@ Then add "sun-editor-editable" to the class name of the Tag element that display
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
 ```
 
-### Use import statement
+## Use import statement
 
 ### 1. Load only what you want
 ```javascript
@@ -205,7 +206,7 @@ suneditor.create('sample', {
 })
 ```
 
-### 4. Use init function
+## Init function
 ```text
 The init function can be used by predefining options and calling the create function on the returned object.
 The value of the option argument put in the "create" function call takes precedence
@@ -236,6 +237,7 @@ const initEditor = suneditor.init({
 initEditor.create('sample_1', {
     // The value of the option argument put in the "create" function call takes precedence
 });
+
 initEditor.create('sample_2', {
     // The value of the option argument put in the "create" function call takes precedence
     height: 'auto',
@@ -247,7 +249,39 @@ initEditor.create('sample_2', {
 });
 ```
 
-### Options
+## Use CodeMirror
+```html
+<!-- codeMirror -->
+<!-- Use version 5.0.0 or later. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+```
+```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+// Import codeMirror
+import CodeMirror from 'codemirror'
+import 'codemirror/mode/htmlmixed/htmlmixed'
+import 'codemirror/lib/codemirror.css'
+
+suneditor.create('sample', {
+    codeMirror: CodeMirror,
+    // Set options
+    // codeMirror: {
+    //     src: CodeMirror,
+    //     options: {...}
+    // }
+    buttonList: [
+        ['codeView']
+    ],
+    height: 400
+});
+```
+
+## Options
 ```java
 plugins: [
     font,
@@ -421,7 +455,7 @@ buttonList      : Defines button list to array {Array}
                   ]
 ```
 
-### Functions
+## Functions
 ```javascript
 import suneditor from 'suneditor'
 
@@ -560,57 +594,32 @@ editor.showInline = function (toolbar, context) {
 }
 ```
 
-### Use CodeMirror
-```html
-<!-- codeMirror -->
-<!-- Use version 5.0.0 or later. -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
-```
-```javascript
-import 'suneditor/dist/css/suneditor.min.css'
-import suneditor from 'suneditor'
-// Import codeMirror
-import CodeMirror from 'codemirror'
-import 'codemirror/mode/htmlmixed/htmlmixed'
-import 'codemirror/lib/codemirror.css'
+## Examples
+<a id="defining-menu-items"></a> [Defining menu items](http://suneditor.com/sample/html/examples.html#setting)
 
-suneditor.create('sample', {
-    codeMirror: CodeMirror,
-    // Set options
-    // codeMirror: {
-    //     src: CodeMirror,
-    //     options: {...}
-    // }
-    buttonList: [
-        ['codeView']
-    ],
-    height: 400
-});
-```
+<a id="char-count-button-groups"></a> [Char count, Button groups](http://suneditor.com/sample/html/examples.html#groups)
 
-### Examples
-[Examples](http://suneditor.com/sample/html/examples.html)
+<a id="iframe-fullpage-and-use-codemirror"></a> [Iframe, fullPage and use CodeMirror](http://suneditor.com/sample/html/examples.html#CodeMirror)
 
-### Options template
+<a id="image-management"></a> [Image management](http://suneditor.com/sample/html/examples.html#image)
+
+<a id="user-functions"></a> [User Functions](http://suneditor.com/sample/html/examples.html#functions)
+
+## Options template
 [Options template](http://suneditor.com/sample/html/options.html)
 
-### Custom plugins
+## Custom plugins
 [Custom plugins](http://suneditor.com/sample/html/customPlugins.html)
-<a href="" target="_blank">Custom plugins</a>
 
-### Document
+## Document
 [Document](http://suneditor.com/sample/html/document.html)
 
-### Other libraries using SunEditor
-| Url | Description |
-|:---:|:---|
-| [Pluxml](https://forum.pluxml.org/discussion/comment/59339/#Comment_59339) | Plugin for Pluxml.org [@sudwebdesign](https://github.com/sudwebdesign) |
-| [AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) | Enables using SunEditor in AEM dialogs as an RTE replacement. [@ahmed-musallam/AEM-SunEditor](https://github.com/ahmed-musallam/AEM-SunEditor) |
-| [suneditor-react](https://github.com/mkhstar/suneditor-react) | Pure React Component for SunEditor [@mkhstar](https://github.com/mkhstar) |
+## Other libraries using SunEditor
+<a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
+
+<a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
+
+<a id="lib-suneditor-react"></a>[SunEditor-React](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
     
-### License
+## License
 Suneditor may be freely distributed under the MIT license.
