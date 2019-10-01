@@ -13,6 +13,12 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <!-- codeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -71,9 +77,19 @@
             <br><br>
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
+            <br><br>
+            <label><input type="checkbox" id="iframe">&nbsp;&nbsp;iframe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="fullPage">&nbsp;&nbsp;fullPage</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
+            <input type="text" id="iframeCSSFileName_value" placeholder="String ('suneditor')">
+            <br><br>
+            <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }
 
             <br>
             <h4 style="color: #b94a48;">--Display</h4>
+            <label><input type="checkbox" id="position">&nbsp;&nbsp;position</label>
+            <input type="text" id="position_value" placeholder="static, relative, etc.">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="display">&nbsp;&nbsp;display</label>
             <input type="text" id="display_value" placeholder="block, inline, etc.">
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -227,6 +243,11 @@ function sun_create () {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
+        iframe: document.getElementById('iframe').checked,
+        fullPage: document.getElementById('fullPage').checked,
+        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : false,
+        codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : null,
+        position: document.getElementById('position').checked ? document.getElementById('position_value').value : null,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
         resizingBar: document.getElementById('resizingBar').checked,
         showPathLabel: document.getElementById('showPathLabel').checked,

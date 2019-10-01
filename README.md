@@ -1,4 +1,4 @@
-# [SunEditor](http://suneditor.com)
+# SunEditor
 Pure javscript based WYSIWYG web editor, with no dependencies
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
@@ -18,7 +18,34 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2180)
 
-> #### Demo site : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+> #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+
+## Table of contents
+- [Browser Support](#browser-support)
+- [Install](#install)
+    - [npm](#npm)
+    - [bower](#bower)
+    - [CDN](#cdn)
+- [Getting Started](#getting-started)
+    1. [Include](#1-include)
+    2. [Target Element](#2-target-element)
+    3. [Create](#3-create)
+    4. [Contents display](#4-contents-display)
+- [Use import statement](#use-import-statement)
+    - [Load only what you want](#1-load-only-what-you-want)
+    - [Load all plugins](#2-load-all-plugins)
+    - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
+    - [Use init function](#4-use-init-function)
+- [Options](#options)
+- [Functions](#functions)
+- [Use CodeMirror](#use-codemirror)
+- [Examples](#examples)
+- [Options template](#options-template)
+- [Custom plugins](#custom-plugins)
+- [Document](#document)
+- [Other libraries using SunEditor](#other-libraries-using-sunEditor)
+- [License](#license)
+
 
 #### Browser Support
 
@@ -565,18 +592,25 @@ suneditor.create('sample', {
 });
 ```
 
-## Examples
-**<a href="http://suneditor.com/sample/html/examples.html" target="_blank">Examples</a>**
+### Examples
+[Examples](http://suneditor.com/sample/html/examples.html)
 
-## Options
-**<a href="http://suneditor.com/sample/html/options.html" target="_blank">Options</a>**
+### Options template
+[Options template](http://suneditor.com/sample/html/options.html)
 
-## customPlugins
-**<a href="http://suneditor.com/sample/html/customPlugins.html" target="_blank">customPlugins</a>**
+### Custom plugins
+[Custom plugins](http://suneditor.com/sample/html/customPlugins.html)
+<a href="" target="_blank">Custom plugins</a>
 
-## Document
-**<a href="http://suneditor.com/sample/html/document.html" target="_blank">Document</a>**
-    
+### Document
+[Document](http://suneditor.com/sample/html/document.html)
+
+### Other libraries using SunEditor
+| Url | Description |
+|:---:|:---|
+| [Pluxml](https://forum.pluxml.org/discussion/comment/59339/#Comment_59339) | Plugin for Pluxml.org [@sudwebdesign](https://github.com/sudwebdesign) |
+| [AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) | Enables using SunEditor in AEM dialogs as an RTE replacement. [@ahmed-musallam/AEM-SunEditor](https://github.com/ahmed-musallam/AEM-SunEditor) |
+| [suneditor-react](https://github.com/mkhstar/suneditor-react) | Pure React Component for SunEditor [@mkhstar](https://github.com/mkhstar) |
     
 ### License
 Suneditor may be freely distributed under the MIT license.
