@@ -2487,7 +2487,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _togglePlaceholder: function () {
             if (this._placeholder) {
                 const wysiwyg = context.element.wysiwyg;
-                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || wysiwyg.innerText.match(/\n/g).length > 1) {
+                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
                     this._placeholder.style.display = 'none';
                 } else {
                     this._placeholder.style.display = 'block';
