@@ -2433,7 +2433,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._placeholder = context.element.placeholder;
                 
                 /** Excute history function, check components */
-                this.resourcesStateChange();
+                this._resourcesStateChange();
                 this._checkComponents();
                 this.history = _history(this, event._onChange_historyStack);
             }.bind(this));
@@ -2974,7 +2974,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            if (!event._directionKeyKeyCode.test(keyCode)) _w.setTimeout(core.resourcesStateChange);
+            if (!event._directionKeyKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
 
             if (core._isBalloon) {
                 event._hideToolbar();
@@ -3406,7 +3406,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
-                core.resourcesStateChange();
+                core._resourcesStateChange();
                 core._charCount(0, false);
                 // history stack
                 core.history.push();
