@@ -2328,6 +2328,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Call when there are changes to tags in the wysiwyg region.
+         */
+        resourcesStateChange: function () {
+            core._iframeAutoHeight();
+            core._togglePlaceholder();
+        },
+
+        /**
          * @description The current number of characters is counted and displayed.
          * @param {Number} nextCharCount Length of character to be added.
          * @returns {Boolean}
@@ -2418,29 +2426,31 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _init: function () {
-            core._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-            core._wd = _d;
+            this._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
+            this._wd = _d;
 
             _w.setTimeout(function () {
                 if (_options.iframe) {
-                    core._wd = context.element.wysiwygFrame.contentDocument;
-                    context.element.wysiwyg = core._wd.body;
+                    this._wd = context.element.wysiwygFrame.contentDocument;
+                    context.element.wysiwyg = this._wd.body;
                     if (_options.height === 'auto') {
-                        core._iframeAuto = core._wd.body;
-                        core._iframeAutoHeight();
+                        this._iframeAuto = this._wd.body;
                     }
                 }
 
+                this._placeholder = context.element.placeholder;
+                
                 /** Excute history function, check components */
-                core._checkComponents();
-                core.history = _history(core, event._onChange_historyStack);
-            });
+                this.resourcesStateChange();
+                this._checkComponents();
+                this.history = _history(this, event._onChange_historyStack);
+            }.bind(this));
 
-            core.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
-            core._isInline = /inline/i.test(context.option.mode);
-            core._isBalloon = /balloon/i.test(context.option.mode);
+            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
+            this._isInline = /inline/i.test(context.option.mode);
+            this._isBalloon = /balloon/i.test(context.option.mode);
 
-            core.commandMap = {
+            this.commandMap = {
                 FORMAT: context.tool.format,
                 FONT: context.tool.font,
                 FONT_TOOLTIP: context.tool.fontTooltip,
@@ -2457,12 +2467,31 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 OUTDENT: context.tool.outdent
             };
 
-            core._variable._originCssText = context.element.topArea.style.cssText;
+            this._variable._originCssText = context.element.topArea.style.cssText;
         },
 
+        /**
+         * @description Modify the height value of the iframe when the height of the iframe is automatic.
+         * @private
+         */
         _iframeAutoHeight: function () {
-            if (core._iframeAuto) {
-                context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px';
+            if (this._iframeAuto) {
+                context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
+            }
+        },
+
+        /**
+         * @description Set display property when there is placeholder.
+         * @private
+         */
+        _togglePlaceholder: function () {
+            if (this._placeholder) {
+                const wysiwyg = context.element.wysiwyg;
+                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
+                    this._placeholder.style.display = 'none';
+                } else {
+                    this._placeholder.style.display = 'block';
+                }
             }
         }
     };
@@ -2944,7 +2973,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            _w.setTimeout(core._iframeAutoHeight);
+            if (!event._directionKeyKeyCode.test(keyCode)) _w.setTimeout(core.resourcesStateChange);
 
             if (core._isBalloon) {
                 event._hideToolbar();
@@ -3376,7 +3405,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
-                core._iframeAutoHeight();
+                core.resourcesStateChange();
                 core._charCount(0, false);
                 // history stack
                 core.history.push();

@@ -19,7 +19,7 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
     buttonList: [
         [
-        'formatBlock', 'fontColor', 'fontSize',
+        'formatBlock', 'image', 'fontColor', 'fontSize',
         'bold', 'underline', 'italic', 'strike',
         'removeFormat', 'table',
         'link',
@@ -27,10 +27,11 @@ let s1 = suneditor.create(document.getElementById('editor'), {
     ],
     height: 'auto',
     width: '500px',
-    mode: 'balloon',
+    // mode: 'balloon',
     stickyToolbar: '0',
     videoResizing: false,
     imageWidth: 150,
+    placeholder: 'Start typing something...'
     // fullPage: true,
     
 });
@@ -72,7 +73,8 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     // }
     codeMirror: {
         src: CodeMirror,
-    }
+    },
+    placeholder: 'Start typing something2...'
 });
 
 ss.onScroll = function (e) {
@@ -178,6 +180,7 @@ const editor = suneditor.init({
         custom_plugin_submenu
     ],
     width: '100%',
+    placeholder: 'Start typing something3...'
     // iframe: true,
 });
 
@@ -234,6 +237,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
             mode: 'xml'
         }
     },
+    placeholder: 'Start typing something.3..'
     // imageUploadSizeLimit: 30000
 });
 
@@ -440,6 +444,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
         title: 'red div',
         command: 'replace'
     }],
+    placeholder: 'Start typing something.4..'
 });
 window.sun_destroy3 = function () {
     s3.destroy();
@@ -477,6 +482,7 @@ window.sun_create4 = function() {
         mode: 'classic',
         // toolbarWidth: 800,
         height: 'auto',
+        placeholder: 'Start typing something..5.'
         // callBackSave: (contents) => {
         //     console.log('callback')
         // }

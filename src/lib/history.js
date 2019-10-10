@@ -47,7 +47,7 @@ export default function (core, change) {
 
         core._checkComponents();
         core._charCount(0, false);
-        core._iframeAutoHeight();
+        core.resourcesStateChange();
         
         // onChange
         change();
@@ -90,7 +90,7 @@ export default function (core, change) {
          * @description Saving the current status to the history object stack
          */
         push: function () {
-            _w.setTimeout(core._iframeAutoHeight);
+            _w.setTimeout(core.resourcesStateChange);
             
             if (pushDelay) {
                 _w.clearTimeout(pushDelay);
