@@ -47,7 +47,7 @@ export default function (core, change) {
 
         core._checkComponents();
         core._charCount(0, false);
-        core.resourcesStateChange();
+        core._resourcesStateChange();
         
         // onChange
         change();
@@ -90,7 +90,7 @@ export default function (core, change) {
          * @description Saving the current status to the history object stack
          */
         push: function () {
-            _w.setTimeout(core.resourcesStateChange);
+            _w.setTimeout(core._resourcesStateChange);
             
             if (pushDelay) {
                 _w.clearTimeout(pushDelay);
