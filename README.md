@@ -437,6 +437,9 @@ templates       : If you use a template plugin, add it.
                     }
                   ]
 
+// ETC------------------------------------------------------------------------------------------------------------
+placeholder     : The placeholder text.                              default: null {String}
+
 // Buttons--------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
                   default: [

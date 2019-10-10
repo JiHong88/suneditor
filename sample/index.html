@@ -7,11 +7,11 @@
     <meta name="keywords" content="wysiwyg,editor,javascript,suneditor,wysiwyg eidtor,rich text editor,html editor,contenteditable,위지위그 에디터 웹에디터">
     <meta name="description" content="Pure javascript wysiwyg web editor" />
     <title>SunEditor</title>
-    <!-- suneditor -->
-    <link href="../dist/css/suneditor.min.css" rel="stylesheet" type="text/css">
     <!-- sample css -->
     <link rel="stylesheet" href="./css/bootstrap.css" media="all">
     <link rel="stylesheet" href="./css/sample.css" media="all">
+    <!-- suneditor -->
+    <link href="../dist/css/suneditor.min.css?v=2.20.0" rel="stylesheet" type="text/css">
     <style>
         .tab {
             overflow: hidden;
@@ -159,7 +159,7 @@
 </div>
 
 <script src="js/common.js"></script>
-<script src="../dist/suneditor.min.js"></script>
+<script src="../dist/suneditor.min.js?v=2.20.0"></script>
 <script>
     SUNEDITOR.create('editor_classic', {
         display: 'block',
@@ -178,7 +178,8 @@
             ['link', 'image', 'video'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
-        ]
+        ],
+        placeholder: 'Start typing something...'
     });
 
     SUNEDITOR.create('editor_balloon', {
@@ -189,7 +190,8 @@
         popupDisplay: 'full',
         buttonList: [
             ['fontSize', 'fontColor', 'bold', 'align', 'horizontalRule', 'table']
-        ]
+        ],
+        placeholder: 'Start typing something...'
     });
 
     SUNEDITOR.create('editor_inline1', {
@@ -201,7 +203,8 @@
         buttonList: [
             ['font', 'fontSize', 'formatBlock'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript']
-        ]
+        ],
+        placeholder: 'Start typing something...'
     });
     SUNEDITOR.create('editor_inline2', {
         mode: 'inline',
@@ -211,7 +214,8 @@
         popupDisplay: 'full',
         buttonList: [
             ['bold', 'underline', 'align', 'horizontalRule', 'list', 'table']
-        ]
+        ],
+        placeholder: 'Start typing something...'
     });
     SUNEDITOR.create('editor_inline3', {
         mode: 'inline',
@@ -221,7 +225,8 @@
         popupDisplay: 'full',
         buttonList: [
             ['link', 'image', 'video']
-        ]
+        ],
+        placeholder: 'Start typing something...'
     });
 
 
