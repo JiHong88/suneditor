@@ -2328,14 +2328,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Call when there are changes to tags in the wysiwyg region.
-         */
-        resourcesStateChange: function () {
-            core._iframeAutoHeight();
-            core._togglePlaceholder();
-        },
-
-        /**
          * @description The current number of characters is counted and displayed.
          * @param {Number} nextCharCount Length of character to be added.
          * @returns {Boolean}
@@ -2468,6 +2460,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             };
 
             this._variable._originCssText = context.element.topArea.style.cssText;
+        },
+
+        /**
+         * @description Called when there are changes to tags in the wysiwyg region.
+         * @private
+         */
+        _resourcesStateChange: function () {
+            core._iframeAutoHeight();
+            core._togglePlaceholder();
         },
 
         /**
