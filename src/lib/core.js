@@ -2486,7 +2486,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _togglePlaceholder: function () {
             if (this._placeholder) {
-                if (!util.onlyZeroWidthSpace(context.element.wysiwyg.textContent) || context.element.wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video')) {
+                const wysiwyg = context.element.wysiwyg;
+                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || wysiwyg.innerText.match(/\n/g).length > 1) {
                     this._placeholder.style.display = 'none';
                 } else {
                     this._placeholder.style.display = 'block';
@@ -2972,7 +2973,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            _w.setTimeout(core.resourcesStateChange);
+            if (!event._directionKeyKeyCode.test(keyCode)) _w.setTimeout(core.resourcesStateChange);
 
             if (core._isBalloon) {
                 event._hideToolbar();
