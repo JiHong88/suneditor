@@ -54,6 +54,7 @@ export default {
 
         const bottomBar = initElements.bottomBar;
         const wysiwyg_div = initElements.wysiwygFrame;
+        const placeholder_span = initElements.placeholder;
         let textarea = initElements.codeView;
 
         // resizing bar
@@ -73,6 +74,7 @@ export default {
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
+        if (placeholder_span) editor_div.appendChild(placeholder_span);
         relative.appendChild(tool_bar.element);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
@@ -91,6 +93,7 @@ export default {
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
+                _placeholder: placeholder_span,
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
                 _charCounter: char_counter,
@@ -172,6 +175,7 @@ export default {
 
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
+        const placeholder_span = initElements.placeholder;
         let code = initElements.codeView;
 
         if (el.resizingBar) relative.removeChild(el.resizingBar);
@@ -186,10 +190,14 @@ export default {
         editorArea.appendChild(wysiwygFrame);
         editorArea.appendChild(code);
 
+        if (el.placeholder) editorArea.removeChild(el.placeholder);
+        if (placeholder_span) editorArea.appendChild(placeholder_span);
+
         code = this._checkCodeMirror(mergeOptions, code);
 
         el.wysiwygFrame = wysiwygFrame;
         el.code = code;
+        el.placeholder = placeholder_span;
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
@@ -316,6 +324,13 @@ export default {
                 resizingBar.appendChild(charWrapper);
             }
         }
+        
+        let placeholder = null;
+        if (options.placeholder) {
+            placeholder = document.createElement('SPAN');
+            placeholder.className = 'se-placeholder';
+            placeholder.innerText = options.placeholder;
+        }
 
         return {
             bottomBar: {
@@ -324,7 +339,8 @@ export default {
                 charCounter: charCounter
             },
             wysiwygFrame: wysiwygDiv,
-            codeView: textarea
+            codeView: textarea,
+            placeholder: placeholder
         };
     },
 
@@ -337,32 +353,37 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
-        // popup, editor display
-        // options.position = options.position;
-        options.popupDisplay = options.popupDisplay || 'full';
-        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
-        // toolbar
+        /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
-        // bottom resizing bar
+        // options.iframeCSSFileName = options.iframeCSSFileName;
+        // options.fullPage = options.fullPage;
+        options.iframe = options.fullPage || options.iframe;
+        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
+        /** Display */
+        // options.position = options.position;
+        options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
+        options.popupDisplay = options.popupDisplay || 'full';
+        /** Bottom resizing bar */
         options.resizingBar = options.resizingBar === undefined ? (/inline|balloon/i.test(options.mode) ? false : true) : options.resizingBar;
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
-        options.maxCharCount = /^\d+$/.test(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-        // size
+        options.maxCharCount = /^\d+$/.test(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
+        /** Width size */
         options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.minWidth = (/^\d+$/.test(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
         options.maxWidth = (/^\d+$/.test(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+        /** Height size */
         options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        // font, size, formats, color list
+        /** Defining menu items */
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
         options.formats = options.formats || null;
         options.colorList = options.colorList || null;
-        // images
+        /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
@@ -370,21 +391,18 @@ export default {
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? options.imageUploadSizeLimit.toString().match(/\d+/)[0] * 1 : null;
-        // video
+        /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? options.videoWidth.toString().match(/\d+/)[0] : 560;
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
-        // --template
-        // options.templates = options.templates;
-        // --callBack function
+        /** Defining save button */
         // options.callBackSave = options.callBackSave;
-        // --editor area
-        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
-        options.iframe = options.fullPage || options.iframe;
-        // options.iframeCSSFileName = options.iframeCSSFileName;
-        // options.fullPage = options.fullPage;
-        // buttons
+        /** Templates Array */
+        // options.templates = options.templates;
+        /** ETC */
+        options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        /** Buttons */
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],

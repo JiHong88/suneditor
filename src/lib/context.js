@@ -29,6 +29,7 @@ const _Context = function (element, cons, options) {
             wysiwygFrame: cons._wysiwygArea,
             wysiwyg: options.iframe ? cons._wysiwygArea.contentDocument.body : cons._wysiwygArea,
             code: cons._codeArea,
+            placeholder: cons._placeholder,
             loading: cons._loading,
             resizeBackground: cons._resizeBack,
             _stickyDummy: cons._stickyDummy,
