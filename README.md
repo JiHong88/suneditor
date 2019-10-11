@@ -251,7 +251,7 @@ initEditor.create('sample_2', {
 
 ## Use CodeMirror
 ```html
-<!-- codeMirror -->
+<!-- codeMirror (5.x.x) -->
 <!-- Use version 5.0.0 or later. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
