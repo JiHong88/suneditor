@@ -246,7 +246,7 @@
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {border:3px solid #fff;}
 /* submenu layer - form group (color selector) */
 .sun-editor .se-submenu-form-group {display:flex; width:100%; height:auto; padding:4px;}
-.sun-editor .se-submenu-form-group input {flex:auto; display:inline-block; width:72px; height:33px; font-size:12px; margin:1px 0 1px 0; padding:0; border-bottom:2px solid #b1b1b1; outline:none; text-transform:uppercase;}
+.sun-editor .se-submenu-form-group input {flex:auto; display:inline-block; width:72px; height:33px; color:#555; font-size:12px; margin:1px 0 1px 0; padding:0; border-radius:0.25rem; border-bottom:2px solid #b1b1b1; outline:none; text-transform:uppercase;}
 .sun-editor .se-submenu-form-group input:focus {outline:none; border-bottom:3px solid #b1b1b1;}
 .sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; padding:0; margin:0 0 0 4px !important;}
 .sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}
