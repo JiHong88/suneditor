@@ -1,7 +1,7 @@
 # SunEditor
 Pure javscript based WYSIWYG web editor, with no dependencies
 
-> #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
@@ -251,7 +251,7 @@ initEditor.create('sample_2', {
 
 ## Use CodeMirror
 ```html
-<!-- codeMirror -->
+<!-- codeMirror (^5.0.0) -->
 <!-- Use version 5.0.0 or later. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
