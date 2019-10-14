@@ -1,7 +1,7 @@
 # SunEditor
 Pure javscript based WYSIWYG web editor, with no dependencies
 
-> #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
