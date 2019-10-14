@@ -681,6 +681,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             if (range.deleteContents) {
                 range.deleteContents();
+
+                // history stack
+                this.history.push();
                 return;
             }
 
