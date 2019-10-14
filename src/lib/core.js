@@ -3622,6 +3622,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 _editorArea: el.editorArea,
                 _wysiwygArea: el.wysiwygFrame,
                 _codeArea: el.code,
+                _placeholder: el.placeholder,
                 _resizingBar: el.resizingBar,
                 _navigation: el.navigation,
                 _charCounter: el.charCounter,

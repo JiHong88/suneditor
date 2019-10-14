@@ -651,8 +651,8 @@ const util = {
         const iframe = wysiwygFrame && /iframe/i.test(wysiwygFrame.nodeName);
 
         return {
-            left: offsetLeft + (iframe ? wysiwygFrame.offsetLeft : 0),
-            top: (offsetTop - wysiwyg.scrollTop) + (iframe ? wysiwygFrame.offsetTop : 0)
+            left: offsetLeft + (iframe ? wysiwygFrame.parentElement.offsetLeft : 0),
+            top: (offsetTop - wysiwyg.scrollTop) + (iframe ? wysiwygFrame.parentElement.offsetTop : 0)
         };
     },
 

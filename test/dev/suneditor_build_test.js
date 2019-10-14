@@ -180,7 +180,6 @@ const editor = suneditor.init({
         custom_plugin_submenu
     ],
     width: '100%',
-    placeholder: 'Start typing something3...'
     // iframe: true,
 });
 
@@ -237,7 +236,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
             mode: 'xml'
         }
     },
-    placeholder: 'Start typing something.3..'
+    // placeholder: 'Start typing something.3..'
     // imageUploadSizeLimit: 30000
 });
 
@@ -266,6 +265,7 @@ const newOption = {
         ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
         ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
     ],
+    placeholder: 'Placeholder...'
 }
 const newOption2 = {
     mode: 'classic',
