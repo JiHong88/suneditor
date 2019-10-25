@@ -5,16 +5,17 @@
   "main": "src/suneditor.js",
   "keywords": [
     "wysiwyg",
-    "editor",
     "wysiwyg editor",
+    "wysiwyg html editor",
     "rich text",
     "rich editor",
     "rich text editor",
-    "web",
     "html",
+    "text",
+    "editor",
     "contenteditable",
-    "suneditor",
-    "javascript"
+    "javascript",
+    "vanillajs"
   ],
   "author": "JiHong.Lee",
   "license": "MIT",
