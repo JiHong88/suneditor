@@ -3404,6 +3404,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 e.stopPropagation();
                 e.preventDefault();
                 core.execCommand('insertHTML', false, cleanData);
+            } else {
+                // history stack
+                core.history.push();
             }
         },
 
