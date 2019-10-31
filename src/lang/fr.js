@@ -24,8 +24,8 @@
     const lang = {
         toolbar: {
             default: 'Défaut',
-            save: 'Sauver',
-            font: 'Fonte',
+            save: 'Sauvegarder',
+            font: 'Police',
             formats: 'Formats',
             fontSize: 'Taille',
             bold: 'Gras',
@@ -42,8 +42,8 @@
             align: 'Alignenement',
             alignLeft: 'À gauche',
             alignRight: 'À droite',
-            alignCenter: 'Centrer',
-            alignJustify: 'Justifier',
+            alignCenter: 'Centré',
+            alignJustify: 'Justifié',
             list: 'Liste',
             orderList: 'Ordonnée',
             unorderList: 'Non-ordonnée',
@@ -59,34 +59,34 @@
             showBlocks: 'Voir les blocs',
             codeView: 'Voir le code',
             undo: 'Annuler',
-            redo: 'Refaire',
+            redo: 'Rétablir',
             preview: 'Previsualiser',
             print: 'Imprimer',
             tag_p: 'Paragraphe',
             tag_div: 'Normal (DIV)',
-            tag_h: 'Entête',
-            tag_blockquote: 'Guillemet',
+            tag_h: 'Titre',
+            tag_blockquote: 'Citation',
             tag_pre: 'Code',
             template: 'Template'
         },
         dialogBox: {
             linkBox: {
-                title: 'Inserer un Lien',
+                title: 'Insérer un lien',
                 url: 'Adresse URL du lien',
-                text: 'Texte a afficher',
-                newWindowCheck: 'Ouvrir ds une nouvelle fenêtre'
+                text: 'Texte à afficher',
+                newWindowCheck: 'Ouvrir dans une nouvelle fenêtre'
             },
             imageBox: {
-                title: 'Inserer une image',
+                title: 'Insérer une image',
                 file: 'Sélectionner le fichier',
                 url: 'Adresse URL du fichier',
                 altText: 'Texte Alternatif'
             },
             videoBox: {
-                title: 'Inserer une Video',
+                title: 'Insérer une Vidéo',
                 url: 'URL d’intégration du média, YouTube'
             },
-            caption: 'Inserer une description',
+            caption: 'Insérer une description',
             close: 'Fermer',
             submitButton: 'Appliquer',
             revertButton: 'Revenir en arrière',
@@ -101,11 +101,11 @@
         controller: {
             edit: 'Modifier',
             remove: 'Effacer',
-            insertRowAbove: 'Inserer une ligne en dessous',
-            insertRowBelow: 'Inserer une ligne au dessus',
+            insertRowAbove: 'Insérer une ligne en dessous',
+            insertRowBelow: 'Insérer une ligne au dessus',
             deleteRow: 'Effacer la ligne',
-            insertColumnBefore: 'Inserer une colonne avant',
-            insertColumnAfter: 'Inserer une colonne après',
+            insertColumnBefore: 'Insérer une colonne avant',
+            insertColumnAfter: 'Insérer une colonne après',
             deleteColumn: 'Effacer la colonne',
             resize100: 'Redimensionner à 100%',
             resize75: 'Redimensionner à 75%',
