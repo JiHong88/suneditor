@@ -2000,7 +2000,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Remove format of the currently selected range
          */
         removeFormat: function () {
-            this.nodeChange();
+            this.nodeChange(null, null, null);
         },
 
         /**
