@@ -3565,6 +3565,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
     /** User function */
     const userFunction = {
         /**
+         * @description Core, Util object
+         */
+        core: core,
+        util: util,
+
+        /**
          * @description Event functions
          * @param {Object} event Event Object
          */

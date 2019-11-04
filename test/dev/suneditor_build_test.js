@@ -15,7 +15,7 @@ import CodeMirror from 'codemirror';
 
 window.cm = CodeMirror
 
-let s1 = suneditor.create(document.getElementById('editor'), {
+let s1 = window.s1 = suneditor.create(document.getElementById('editor'), {
     plugins: plugins,
     buttonList: [
         [
