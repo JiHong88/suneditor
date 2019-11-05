@@ -42,7 +42,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         context: context,
 
         /**
-         * @description loaded plugins
+         * @description Plugin buttons
+         */
+        pluginCallButtons: pluginCallButtons,
+
+        /**
+         * @description Loaded plugins
          */
         plugins: plugins || {},
 
@@ -240,7 +245,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Enabled submenu
-         * @param {Element} element Submenu element to call
+         * @param {Element} element Submenu's button element to call
          */
         submenuOn: function (element) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
