@@ -525,6 +525,10 @@ export default {
                 '<i class="se-icon-grid"></i>'
             ],
 
+            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu',
+                '<i class="se-icon-lineHeight"></i>'
+            ],
+
             template: ['', lang.toolbar.template, 'template', 'submenu',
                 '<i class="se-icon-template"></i>'
             ],

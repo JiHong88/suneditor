@@ -13,16 +13,15 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+import lineHeight from '../../src/plugins/submenu/lineHeight'
+
 window.cm = CodeMirror
 
 let s1 = window.s1 = suneditor.create(document.getElementById('editor'), {
-    plugins: plugins,
+    plugins: [lineHeight],
     buttonList: [
         [
-        'formatBlock', 'image', 'fontColor', 'fontSize',
-        'bold', 'underline', 'italic', 'strike',
-        'removeFormat', 'table',
-        'link',
+            'lineHeight'
         ]
     ],
     height: 'auto',
