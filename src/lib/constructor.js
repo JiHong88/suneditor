@@ -526,7 +526,7 @@ export default {
             ],
 
             lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu',
-                '<i class="se-icon-lineHeight"></i>'
+                '<i class="se-icon-line-height"></i>'
             ],
 
             template: ['', lang.toolbar.template, 'template', 'submenu',

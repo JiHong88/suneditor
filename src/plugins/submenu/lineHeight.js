@@ -13,7 +13,7 @@ export default {
         const context = core.context;
         context.lineHeight = {
             _sizeList: null,
-            currentSize: ''
+            currentSize: -1
         };
 
         /** set submenu */
@@ -41,6 +41,7 @@ export default {
 
         const sizeList = !option.lineHeight ? [
             {text: '0.75', value: 0.75},
+            {text: '1', value: 1},
             {text: '1.15', value: 1.15},
             {text: '1.5', value: 1.5},
             {text: '2', value: 2}
@@ -65,7 +66,7 @@ export default {
         const lineHeightContext = this.context.lineHeight;
         const sizeList = lineHeightContext._sizeList;
         // @todo
-        const currentSize = (this.commandMap.SIZE.textContent.match(/\d+/) || [''])[0];
+        const currentSize = this.util.getFormatElement(this.getSelectionNode()).style.lineHeight + '';
 
         if (currentSize !== lineHeightContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {
@@ -86,12 +87,11 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const value = e.target.getAttribute('data-value');
+        const value = e.target.getAttribute('data-value') || '';
+        const formats = this.getSelectedElements();
 
-        if (value) {
-            
-        } else {
-            
+        for (let i = 0, len = formats.length; i < len; i++) {
+            formats[i].style.lineHeight = value;
         }
 
         this.submenuOff();

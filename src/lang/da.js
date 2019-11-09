@@ -70,7 +70,8 @@
             tag_h: 'Overskrift',
             tag_blockquote: 'Citer',
             tag_pre: 'Code',
-            template: 'Schablone'
+            template: 'Schablone',
+            lineHeight: 'Linjehøjde'
         },
         dialogBox: {
             linkBox: {

@@ -67,7 +67,8 @@
             tag_h: '제목',
             tag_blockquote: '인용문',
             tag_pre: '코드',
-            template: '템플릿'
+            template: '템플릿',
+            lineHeight: '줄 높이'
         },
         dialogBox: {
             linkBox: {
