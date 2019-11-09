@@ -2142,7 +2142,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const topArea = context.element.topArea;
             const toolbar = context.element.toolbar;
             const editorArea = context.element.editorArea;
-            const wysiwyg = context.element.wysiwyg;
+            const wysiwygFrame = context.element.wysiwygFrame;
             const code = context.element.code;
 
             if (!this._variable.isFullScreen) {
@@ -2165,13 +2165,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 _d.body.style.overflow = 'hidden';
 
                 this._variable._editorAreaOriginCssText = editorArea.style.cssText;
-                this._variable._wysiwygOriginCssText = wysiwyg.style.cssText;
+                this._variable._wysiwygOriginCssText = wysiwygFrame.style.cssText;
                 this._variable._codeOriginCssText = code.style.cssText;
 
                 editorArea.style.cssText = toolbar.style.cssText = '';
-                wysiwyg.style.cssText = (wysiwyg.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
+                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
                 code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
-                toolbar.style.width = wysiwyg.style.height = code.style.height = '100%';
+                toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
                 toolbar.style.position = 'relative';
 
                 this._variable.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
@@ -2183,7 +2183,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             else {
                 this._variable.isFullScreen = false;
 
-                wysiwyg.style.cssText = this._variable._wysiwygOriginCssText;
+                wysiwygFrame.style.cssText = this._variable._wysiwygOriginCssText;
                 code.style.cssText = this._variable._codeOriginCssText;
                 toolbar.style.cssText = '';
                 editorArea.style.cssText = this._variable._editorAreaOriginCssText;
@@ -2192,7 +2192,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (context.option.stickyToolbar > -1) {
                     util.removeClass(toolbar, 'se-toolbar-sticky');
-                    event.onScroll_window();
                 }
 
                 if (this._variable._fullScreenSticky) {
@@ -2200,6 +2199,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     context.element._stickyDummy.style.display = 'block';
                     util.addClass(toolbar, "se-toolbar-sticky");
                 }
+
+                event.onScroll_window();
 
                 util.removeClass(element.firstElementChild, 'se-icon-reduction');
                 util.addClass(element.firstElementChild, 'se-icon-expansion');

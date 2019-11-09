@@ -39,19 +39,18 @@ export default {
 
         listDiv.className = 'se-submenu se-list-layer';
 
-        const sizeList = !option.lineHeight ? [
-            {text: '0.75', value: 0.75},
+        const sizeList = !option.lineHeights ? [
             {text: '1', value: 1},
             {text: '1.15', value: 1.15},
             {text: '1.5', value: 1.5},
             {text: '2', value: 2}
-        ] : option.lineHeight;
+        ] : option.lineHeights;
 
         let list = '<div class="se-list-inner">' +
             '   <ul class="se-list-basic">' +
             '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
-        for (let i = 0, len = sizeList.length; i < len; i++) {
-            const size = sizeList[i];
+        for (let i = 0, len = sizeList.length, text, size; i < len; i++) {
+            size = sizeList[i];
             list += '<li><button type="button" class="se-btn-list" data-value="' + size.value + '" title="' + size.text + '">' + size.text + '</button></li>';
         }
         list += '   </ul>' +
@@ -65,7 +64,6 @@ export default {
     on: function () {
         const lineHeightContext = this.context.lineHeight;
         const sizeList = lineHeightContext._sizeList;
-        // @todo
         const currentSize = this.util.getFormatElement(this.getSelectionNode()).style.lineHeight + '';
 
         if (currentSize !== lineHeightContext.currentSize) {
