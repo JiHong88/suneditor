@@ -226,7 +226,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
         command: 'range'
     }],
     // iframe: true,
-    // fullPage: true,
+    fullPage: true,
     // mode: 'balloon',
     // codeMirror: CodeMirror,
     codeMirror: {

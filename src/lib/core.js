@@ -2179,6 +2179,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 util.removeClass(element.firstElementChild, 'se-icon-expansion');
                 util.addClass(element.firstElementChild, 'se-icon-reduction');
+
+                if (context.option.iframe && context.option.height === 'auto') {
+                    editorArea.style.overflow = 'auto';
+                    this._iframeAutoHeight();
+                }
             }
             else {
                 this._variable.isFullScreen = false;
