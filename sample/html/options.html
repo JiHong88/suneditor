@@ -129,6 +129,18 @@
             <br><br>
             <label><input type="checkbox" id="colorList">&nbsp;&nbsp;colorList</label>
             <span>[ ['#ff0000', '#ff5e00', '#ffe400', '#abf200'], ['#00d8ff', '#0055ff', '#6600ff', '#ff00dd'] ]</span>
+            <br><br>
+            <label><input type="checkbox" id="lineHeights">&nbsp;&nbsp;lineHeights</label><br>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;{</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;text: 'Single',</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;value: 1</span><br>
+            <span>&nbsp;&nbsp;},</span><br>
+            <span>&nbsp;&nbsp;{</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;text: 'Double',</span><br>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;html: 2</span><br>
+            <span>&nbsp;&nbsp;},</span><br>
+            <span>]</span>
 
             <br>
             <h4 style="color: #b94a48;">--Image</h4>
@@ -219,8 +231,10 @@
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+<script src="../../dist/suneditor.min.js"></script>
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script> -->
 <!-- codeMirror -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
@@ -293,6 +307,7 @@ function sun_create () {
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : null,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : null,
+        lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : null,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : null,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : null,
         buttonList: [
@@ -302,7 +317,7 @@ function sun_create () {
             'removeFormat',
             'fontColor', 'hiliteColor',
             'outdent', 'indent',
-            'align', 'horizontalRule', 'list', 'table',
+            'align', 'horizontalRule', 'list', 'lineHeight', 'table',
             'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print', 'save', 'template']
