@@ -67,7 +67,8 @@
             tag_h: 'タイトル',
             tag_blockquote: '引用',
             tag_pre: 'コード',
-            template: 'テンプレート'
+            template: 'テンプレート',
+            lineHeight: '行の高さ'
         },
         dialogBox: {
             linkBox: {

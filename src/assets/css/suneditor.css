@@ -30,7 +30,7 @@
          url('../fonts/Suneditor-icon.woff2') format('woff2'),
          url('../fonts/Suneditor-icon.woff') format('woff'),
          url('../fonts/Suneditor-icon.ttf') format('truetype'),
-         url('../fonts/Suneditor-icon.svg#Glyphter') format('svg');
+         url('../fonts/Suneditor-icon.svg#Suneditor-icon') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -116,6 +116,7 @@
 .sun-editor .se-icon-audio::before{content:'\0024';}
 .sun-editor .se-icon-emoji::before{content:'\0025';}
 .sun-editor .se-icon-template::before{content:'\0026';}
+.sun-editor .se-icon-line-height::before{content:'\0027';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}

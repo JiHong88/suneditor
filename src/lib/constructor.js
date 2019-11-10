@@ -383,6 +383,7 @@ export default {
         options.fontSize = options.fontSize || null;
         options.formats = options.formats || null;
         options.colorList = options.colorList || null;
+        options.lineHeights = typeof options.lineHeights === 'object' ? options.lineHeights : null;
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
@@ -523,6 +524,10 @@ export default {
 
             table: ['', lang.toolbar.table, 'table', 'submenu',
                 '<i class="se-icon-grid"></i>'
+            ],
+
+            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu',
+                '<i class="se-icon-line-height"></i>'
             ],
 
             template: ['', lang.toolbar.template, 'template', 'submenu',

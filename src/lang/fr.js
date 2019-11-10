@@ -67,7 +67,8 @@
             tag_h: 'Titre',
             tag_blockquote: 'Citation',
             tag_pre: 'Code',
-            template: 'Template'
+            template: 'Template',
+            lineHeight: 'Hauteur de la ligne'
         },
         dialogBox: {
             linkBox: {

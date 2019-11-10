@@ -67,7 +67,8 @@
             tag_h: '标题',
             tag_blockquote: '引用',
             tag_pre: '代码',
-            template: '模板'
+            template: '模板',
+            lineHeight: '线高'
         },
         dialogBox: {
             linkBox: {
