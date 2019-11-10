@@ -199,6 +199,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             tabSize: 4,
             minResizingSize: 65,
             currentNodes: [],
+            formatStyles: ['marginLeft', 'textAlign', 'lineHeight'],
             _range: null,
             _selectionNode: null,
             _originCssText: context.element.topArea.style.cssText,
@@ -2354,6 +2355,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             _d.removeEventListener(type, listener);
             if (context.option.iframe) {
                 this._wd.removeEventListener(type, listener);
+            }
+        },
+
+        /**
+         * @description Copy the style attribute of 'core._variable.formatStyles' from the 'copyFormat' element to 'originFormat'.
+         * @param {Element} copyFormat Copy element
+         * @param {Element} originFormat Origin element
+         */
+        copyFormatStyles: function (copyFormat, originFormat) {
+            const formatStyles = this._variable.formatStyles;
+            for (let i = 0, len = formatStyles.length; i < len; i++) {
+                copyFormat.style[formatStyles[i]] = originFormat.style[formatStyles[i]];
             }
         },
 

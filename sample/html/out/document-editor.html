@@ -891,6 +891,16 @@
                     </td>
                     <td class="description last">An array of the current cursor's node structure</td>
                 </tr>
+                <tr>
+                    <td class="name"><code>formatStyles</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">
+                        List of styles that should be kept when formatting changes<br>
+                        ['marginLeft', 'textAlign', 'lineHeight']
+                    </td>
+                </tr>
                 </tbody>
             </table>
             <dl class="details"></dl>
@@ -1642,6 +1652,40 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="copyFormatStyles"><span class="type-signature"></span>copyFormatStyles<span
+                    class="signature">(copyElement, originElement)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                    Copy the style attribute of 'core._variable.formatStyles' from the 'copyFormat' element to 'originFormat'.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>copyElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Copy element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>originElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Origin element</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="addDocEvent"><span class="type-signature"></span>addDocEvent<span 
                 class="signature">(type, listener, useCapture)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1780,6 +1824,7 @@
         <li><a href="document-editor.html#preview">preview</a></li>
         <li><a href="document-editor.html#setContents">setContents</a></li>
         <li><a href="document-editor.html#getContents">getContents</a></li>
+        <li><a href="document-editor.html#copyFormatStyles">copyFormatStyles</a></li>
         <li><a href="document-editor.html#addDocEvent">addDocEvent</a></li>
         <li><a href="document-editor.html#removeDocEvent">removeDocEvent</a></li>
     </ul>
