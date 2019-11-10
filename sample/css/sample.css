@@ -30,6 +30,7 @@ footer {
 
 /** badge */
 .badge {
+    width: 230px;
     padding: 10px 0;
     background-color: inherit;
  }

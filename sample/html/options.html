@@ -120,9 +120,12 @@
             <h4 style="color: #b94a48;">--Defining menu items</h4>
             <label><input type="checkbox" id="font">&nbsp;&nbsp;font</label>
             <span>[ 'Arial', 'tahoma', 'Courier New,Courier' ]</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
             <label><input type="checkbox" id="fontSize">&nbsp;&nbsp;fontSize</label>
             <span>[ 8, 10, 14, 18, 24, 36 ]</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="fontSizeUnit">&nbsp;&nbsp;fontSizeUnit</label>
+            <input type="text" id="fontSizeUnit_value" placeholder="String">
             <br><br>
             <label><input type="checkbox" id="formats">&nbsp;&nbsp;formats</label>
             <span>['p', 'blockquote', 'h1', 'h2', 'h3']</span>
@@ -256,11 +259,11 @@ function sun_create () {
 
     var options = {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
-        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
-        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
+        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : null,
+        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : null,
         iframe: document.getElementById('iframe').checked,
         fullPage: document.getElementById('fullPage').checked,
-        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : false,
+        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : null,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : null,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : null,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
@@ -283,6 +286,7 @@ function sun_create () {
         fontSize: !document.getElementById('fontSize').checked ? null : [
             8, 10, 14, 18, 24, 36
         ],
+        fontSizeUnit: document.getElementById('fontSizeUnit').checked ? document.getElementById('fontSizeUnit_value').value : null,
         formats: !document.getElementById('formats').checked ? null : [
             'p', 'blockquote', 'h1', 'h2', 'h3'
         ],
