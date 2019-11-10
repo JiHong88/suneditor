@@ -11,14 +11,6 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
-    <!-- codeMirror -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
-    <!-- suneditor -->
-    <link href="../../dist/css/suneditor.min.css?v=2.20.1" rel="stylesheet" type="text/css">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -128,15 +120,24 @@
             <h4 style="color: #b94a48;">--Defining menu items</h4>
             <label><input type="checkbox" id="font">&nbsp;&nbsp;font</label>
             <span>[ 'Arial', 'tahoma', 'Courier New,Courier' ]</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
             <label><input type="checkbox" id="fontSize">&nbsp;&nbsp;fontSize</label>
             <span>[ 8, 10, 14, 18, 24, 36 ]</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="fontSizeUnit">&nbsp;&nbsp;fontSizeUnit</label>
+            <input type="text" id="fontSizeUnit_value" placeholder="String">
             <br><br>
             <label><input type="checkbox" id="formats">&nbsp;&nbsp;formats</label>
             <span>['p', 'blockquote', 'h1', 'h2', 'h3']</span>
             <br><br>
             <label><input type="checkbox" id="colorList">&nbsp;&nbsp;colorList</label>
             <span>[ ['#ff0000', '#ff5e00', '#ffe400', '#abf200'], ['#00d8ff', '#0055ff', '#6600ff', '#ff00dd'] ]</span>
+            <br><br>
+            <label><input type="checkbox" id="lineHeights">&nbsp;&nbsp;lineHeights</label><br>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;{text: 'Single', value: 1},</span><br>
+            <span>&nbsp;&nbsp;{text: 'Double', value: 2}</span><br>
+            <span>]</span>
 
             <br>
             <h4 style="color: #b94a48;">--Image</h4>
@@ -186,7 +187,7 @@
             <span>&nbsp;&nbsp;{</span><br>
             <span>&nbsp;&nbsp;&nbsp;&nbsp;name: 'Template-2',</span><br>
             <span>&nbsp;&nbsp;&nbsp;&nbsp;html: '&lt;p&gt;HTML source2&lt;/p&gt;'</span><br>
-            <span>&nbsp;&nbsp;},</span><br>
+            <span>&nbsp;&nbsp;}</span><br>
             <span>]</span>
 
             <br>
@@ -226,15 +227,26 @@
 </div>
 
 <script src="../js/common.js"></script>
-<script src="../../dist/suneditor.min.js?v=2.20.1"></script>
-<script src="../../src/lang/da.js"></script>
-<script src="../../src/lang/de.js"></script>
-<script src="../../src/lang/en.js"></script>
-<script src="../../src/lang/fr.js"></script>
-<script src="../../src/lang/ja.js"></script>
-<script src="../../src/lang/ko.js"></script>
-<script src="../../src/lang/ru.js"></script>
-<script src="../../src/lang/zh_cn.js"></script>
+<!-- suneditor -->
+<!-- <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+<script src="../../dist/suneditor.min.js"></script> -->
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<!-- codeMirror -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+<!-- languages -->
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/da.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/de.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/en.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/fr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ja.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ru.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/zh_cn.js"></script>
 <script>
 var optionDisplay = document.getElementById('option_display');
 var langSelect = document.getElementById('language');
@@ -247,11 +259,11 @@ function sun_create () {
 
     var options = {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
-        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : false,
-        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : false,
+        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : null,
+        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : null,
         iframe: document.getElementById('iframe').checked,
         fullPage: document.getElementById('fullPage').checked,
-        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : false,
+        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : null,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : null,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : null,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
@@ -274,6 +286,7 @@ function sun_create () {
         fontSize: !document.getElementById('fontSize').checked ? null : [
             8, 10, 14, 18, 24, 36
         ],
+        fontSizeUnit: document.getElementById('fontSizeUnit').checked ? document.getElementById('fontSizeUnit_value').value : null,
         formats: !document.getElementById('formats').checked ? null : [
             'p', 'blockquote', 'h1', 'h2', 'h3'
         ],
@@ -292,6 +305,7 @@ function sun_create () {
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : null,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : null,
+        lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : null,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : null,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : null,
         buttonList: [
@@ -301,7 +315,7 @@ function sun_create () {
             'removeFormat',
             'fontColor', 'hiliteColor',
             'outdent', 'indent',
-            'align', 'horizontalRule', 'list', 'table',
+            'align', 'horizontalRule', 'list', 'lineHeight', 'table',
             'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print', 'save', 'template']

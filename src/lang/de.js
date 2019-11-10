@@ -67,7 +67,8 @@
             tag_h: 'Header',
             tag_blockquote: 'Zitat',
             tag_pre: 'Quellcode',
-            template: 'Skabelon'
+            template: 'Skabelon',
+            lineHeight: 'Linienhöhe'
         },
         dialogBox: {
             linkBox: {

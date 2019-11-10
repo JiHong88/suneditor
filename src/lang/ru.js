@@ -67,7 +67,8 @@
             tag_h: 'Заголовок',
             tag_blockquote: 'Цитата',
             tag_pre: 'Код',
-            template: 'Шаблон'
+            template: 'Шаблон',
+            lineHeight: 'Высота линии'
         },
         dialogBox: {
             linkBox: {

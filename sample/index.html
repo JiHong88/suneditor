@@ -10,8 +10,6 @@
     <!-- sample css -->
     <link rel="stylesheet" href="./css/bootstrap.css" media="all">
     <link rel="stylesheet" href="./css/sample.css" media="all">
-    <!-- suneditor -->
-    <link href="../dist/css/suneditor.min.css?v=2.20.1" rel="stylesheet" type="text/css">
     <style>
         .tab {
             overflow: hidden;
@@ -88,7 +86,7 @@
 </nav>
 
 
-<div class="content" style="max-width: 1265px;">
+<div class="content" style="max-width: 1302px;">
     <!-- Tab links -->
     <div class="tab">
         <button class="tablinks active" onclick="openTab(event, 'classic')">Classic</button>
@@ -104,7 +102,7 @@
             <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="width: 640px; max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
             <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
             <pre><p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p></pre>
-            <blockquote><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></blockquote>
+            <blockquote><p>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</p></blockquote>
             <p><strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong> <em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the<strong> </strong><a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a><strong> </strong>license.</p>
             <p><hr class="dashed"></p>
             <p><span style="font-size: 16px;"><span style="font-family: Impact;">Table</span></span></p>
@@ -121,7 +119,7 @@
             <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="width: 640px; max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
             <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
             <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
-            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
+            <pre><p>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
             <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>
@@ -139,7 +137,7 @@
         <div class="inline-margin"></div>
         <textarea id="editor_inline2" style="display:none;">
             <p><br></p>
-            <pre><p>Supports Chrome, Safari, Opeera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
+            <pre><p>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</p></pre>
             <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>
@@ -158,8 +156,12 @@
     </footer>
 </div>
 
+<!-- suneditor -->
+<!-- <link href="../dist/css/suneditor.min.css" rel="stylesheet">
+<script src="../dist/suneditor.min.js"></script> -->
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <script src="js/common.js"></script>
-<script src="../dist/suneditor.min.js?v=2.20.1"></script>
 <script>
     SUNEDITOR.create('editor_classic', {
         display: 'block',
@@ -174,8 +176,8 @@
             ['removeFormat'],
             ['fontColor', 'hiliteColor'],
             ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'table'],
-            ['link', 'image', 'video'],
+            ['align', 'horizontalRule', 'list', 'lineHeight'],
+            ['table', 'link', 'image', 'video'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ],

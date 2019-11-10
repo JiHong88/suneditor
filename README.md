@@ -28,6 +28,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
+    - [Plugins list](#4-plugins-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
 - [Options](#options)
@@ -55,13 +56,13 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 | Yes | Yes | Yes | Yes | Yes | 11+ |
 
 ## Install
-#### npm
+#### Npm
 ``` sh
-$ npm install --save suneditor
+$ npm install suneditor --save
 ```
-#### bower
+#### Bower
 ``` sh
-$ bower install --save suneditor
+$ bower install suneditor --save
 ```
 #### CDN
 ``` html
@@ -72,32 +73,20 @@ $ bower install --save suneditor
 ```
 [jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
 
-[jsdelivr/suneditor-languages-list](https://www.jsdelivr.com/package/npm/suneditor?path=src%2Flang)
-
-
 ## Getting Started
-### 1. Include
-```html
-<!-- <link href="../src/assets/css/suneditor.css" rel="stylesheet"> -->
-<!-- <link  href="../src/assets/css/suneditor-contents.css" rel="stylesheet"> -->
-<link href="../dist/css/suneditor.min.css" rel="stylesheet">
-<script src="../dist/suneditor.min.js"></script>
-<script src="../src/lang/ko.js"></script>
-```
-
-### 2. Target Element
+### 1. Target Element
 ```html
 <textarea id="sample">Hi</textarea>
 ```
 
-### 3. Create
+### 2. Create
 ```javascript
 /**
 * ID : 'suneditor_sample'
 * ClassName : 'sun-eidtor'
 */
 // ID or DOM object
-const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),{
+const editor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),{
     // All of the plugins are loaded in the "window.SUNEDITOR" object in dist/suneditor.min.js file
     // Insert options
     // Language global object (default: en)
@@ -105,8 +94,8 @@ const suneditor = SUNEDITOR.create((document.getElementById('sample') || 'sample
 });
 ```
 
-### 4. Contents display
-```text
+### 3. Contents display
+```java
 When you display a document created by suneditor
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
@@ -119,26 +108,21 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {font, fontSize, fontColor, horizontalRule, list, image} from 'suneditor/src/plugins'
+
+// How to import plugins
+import image from 'suneditor/src/plugins/dialog/link'
+import list from 'suneditor/src/plugins/submenu/list'
+import {font, video} from 'suneditor/src/plugins'
+
 // How to import language files (default: en)
 import lang from 'suneditor/src/lang'
-import {en, ko} from 'suneditor/src/lang'
+import {ko} from 'suneditor/src/lang'
 import de from 'suneditor/src/lang/de'
 
 suneditor.create('sample', {
-    plugins: [
-        font,
-        fontSize,
-        fontColor,
-        horizontalRule,
-        link,
-        image,
-    ],
+    plugins: [font, video, image, list],
     buttonList: [
-        ['font', 'fontSize'],
-        ['fontColor'],
-        ['horizontalRule'],
-        ['link', 'image']
+        ['font', 'video', 'image', 'list']
     ],
     lang: lang.ko
 });
@@ -160,8 +144,8 @@ suneditor.create('sample', {
         '/', // Line break
         ['fontColor', 'hiliteColor'],
         ['outdent', 'indent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video'],
+        ['align', 'horizontalRule', 'list', 'lineHeight'],
+        ['table', 'link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template']
@@ -170,14 +154,10 @@ suneditor.create('sample', {
 
 // You can also load what you want
 suneditor.create('sample', {
-    plugins: [
-        plugins.font
-        plugins.fontSize
-    ],
+    plugins: [plugins.font],
+    // Plugins can be used directly in the button list
     buttonList: [
-        ['font', 'fontSize'],
-        // Plugins can be used directly in the button list
-        [plugins.formatBlock]
+        ['font', plugins.image]
     ]
 })
 ```
@@ -187,23 +167,25 @@ suneditor.create('sample', {
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
-        list, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
+        list, lineHeight, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
-        ['undo', 'redo'],
+        ['undo', 'redo', 'removeFormat'],
         [font, fontSize, formatBlock],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
         [fontColor, hiliteColor],
-        ['outdent', 'indent'],
-        [align, horizontalRule, list, table],
-        [link, image, video],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print'],
-        ['save', template]
+        [align, horizontalRule, list, lineHeight],
+        [table, link, image, video, template]
     ],
 })
+```
+
+### 4. Plugins list
+```javascript
+'suneditor/src/plugins/dialog/...'
+// image, video, link
+'suneditor/src/plugins/submenu/...'
+// align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, list, table, template
 ```
 
 ## Init function
@@ -227,8 +209,8 @@ const initEditor = suneditor.init({
         'removeFormat',
         'fontColor', 'hiliteColor',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'table',
-        'link', 'image', 'video',
+        'align', 'horizontalRule', 'list', 'lineHeight',
+        'table', 'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ]
@@ -284,6 +266,7 @@ suneditor.create('sample', {
 ## Options
 ```java
 plugins: [
+    // Submenu
     font,
     fontSize,
     formatBlock,
@@ -294,6 +277,7 @@ plugins: [
     list,
     table,
     template,
+    // Dialog
     link,
     image,
     video
@@ -363,15 +347,16 @@ fontSize        : Change default font-size array.                   default: [..
                   Default value: [
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
+fontSizeUnit    : The font size unit.                               default: 'px' {String}
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
-                      'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+                    'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
                   ],
                   Custom: [{
-                      tag: 'div', // Tag name
-                      class: '__se__xxx' || null, // Class names must always begin with "__se__"
-                      title: 'Custom div' || null, // default: tag name
-                      command: 'replace' || 'range' // default: "replace"
+                    tag: 'div', // Tag name
+                    class: '__se__xxx' || null, // Class names must always begin with "__se__"
+                    title: 'Custom div' || null, // default: tag name
+                    command: 'replace' || 'range' // default: "replace"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
@@ -385,6 +370,17 @@ colorList       : Change default color array of color picker.       default: [..
                   ex) [
                     ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'], // Line break
                     ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
+                  ]
+lineHeights     : Change default line-height array.                 default: [{}..] {Array}
+                  Default value: [
+                    {text: '1', value: 1},
+                    {text: '1.15', value: 1.15},
+                    {text: '1.5', value: 1.5},
+                    {text: '2', value: 2}
+                  ]
+                  ex) [
+                    {text: 'Single', value: 1},
+                    {text: 'Double', value: 2}
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------
@@ -450,8 +446,8 @@ buttonList      : Defines button list to array {Array}
                     // '/', Line break
                     // ['fontColor', 'hiliteColor'],
                     ['outdent', 'indent'],
-                    // ['align', 'horizontalRule', 'list', 'table'],
-                    // ['link', 'image', 'video'],
+                    // ['align', 'horizontalRule', 'list', 'lineHeight'],
+                    // ['table', 'link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],

@@ -1,20 +1,21 @@
 {
   "name": "suneditor",
-  "version": "2.20.1",
+  "version": "2.21.0",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
   "keywords": [
     "wysiwyg",
-    "editor",
     "wysiwyg editor",
+    "wysiwyg html editor",
     "rich text",
     "rich editor",
     "rich text editor",
-    "web",
     "html",
+    "text",
+    "editor",
     "contenteditable",
-    "suneditor",
-    "javascript"
+    "javascript",
+    "vanillajs"
   ],
   "author": "JiHong.Lee",
   "license": "MIT",

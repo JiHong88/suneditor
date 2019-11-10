@@ -42,7 +42,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         context: context,
 
         /**
-         * @description loaded plugins
+         * @description Plugin buttons
+         */
+        pluginCallButtons: pluginCallButtons,
+
+        /**
+         * @description Loaded plugins
          */
         plugins: plugins || {},
 
@@ -240,7 +245,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Enabled submenu
-         * @param {Element} element Submenu element to call
+         * @param {Element} element Submenu's button element to call
          */
         submenuOn: function (element) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
@@ -1421,7 +1426,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (util.isIgnoreNodeChange(child)) {
+                            if (!collapsed && util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -2000,7 +2005,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Remove format of the currently selected range
          */
         removeFormat: function () {
-            this.nodeChange();
+            this.nodeChange(null, null, null);
         },
 
         /**
@@ -2050,30 +2055,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.controllersOff();
 
             if (!wysiwygActive) {
-                const code_html = this._getCodeView();
-
-                if (context.option.fullPage) {
-                    const parseDocument = (new this._w.DOMParser()).parseFromString(code_html, 'text/html');
-                    const headChildren = parseDocument.head.children;
-
-                    for (let i = 0, len = headChildren.length; i < len; i++) {
-                        if (/script/i.test(headChildren[i].tagName)) {
-                            parseDocument.head.removeChild(headChildren[i]);
-                        }
-                    }
-
-                    this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                    this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML);
-
-                    const attrs = parseDocument.body.attributes;
-                    for (let i = 0, len = attrs.length; i < len; i++) {
-                        if (attrs[i].name === 'contenteditable') continue;
-                        this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
-                    }
-                } else {
-                    context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
-                }
-
+                this._setCodeDataToEditor();
                 context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwygFrame.style.display = 'block';
@@ -2085,23 +2067,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable.wysiwygActive = true;
                 this.focus();
             } else {
-                let codeValue = '';
-                if (context.option.fullPage) {
-                    const headChildren = this._wd.head.children;
-                    let headTags = '';
-                    for (let i = 0, len = headChildren.length; i < len; i++) {
-                        headTags += headChildren[i].outerHTML + '\n';
-                    }
-                    codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>\B/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>\B/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
-                } else {
-                    codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
-                }
-
-                context.element.code.style.display = 'block';
-                context.element.wysiwygFrame.style.display = 'none';
-
-                this._setCodeView(codeValue);
-
+                this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
@@ -2111,6 +2077,61 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable.wysiwygActive = false;
                 context.element.code.focus();
             }
+
+            this._checkPlaceholder();
+        },
+
+        /**
+         * @description Convert the data of the code view and put it in the WYSIWYG area.
+         * @private
+         */
+        _setCodeDataToEditor: function () {
+            const code_html = this._getCodeView();
+
+            if (context.option.fullPage) {
+                const parseDocument = (new this._w.DOMParser()).parseFromString(code_html, 'text/html');
+                const headChildren = parseDocument.head.children;
+
+                for (let i = 0, len = headChildren.length; i < len; i++) {
+                    if (/script/i.test(headChildren[i].tagName)) {
+                        parseDocument.head.removeChild(headChildren[i]);
+                    }
+                }
+
+                this._wd.head.innerHTML = parseDocument.head.innerHTML;
+                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML);
+
+                const attrs = parseDocument.body.attributes;
+                for (let i = 0, len = attrs.length; i < len; i++) {
+                    if (attrs[i].name === 'contenteditable') continue;
+                    this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
+                }
+            } else {
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
+            }
+        },
+
+        /**
+         * @description Convert the data of the WYSIWYG area and put it in the code view area.
+         * @private
+         */
+        _setEditorDataToCodeView: function () {
+            let codeValue = '';
+            if (context.option.fullPage) {
+                const headChildren = this._wd.head.children;
+                let headTags = '';
+                for (let i = 0, len = headChildren.length; i < len; i++) {
+                    headTags += headChildren[i].outerHTML + '\n';
+                }
+                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+            } else {
+                codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
+            }
+
+            context.element.code.style.display = 'block';
+            context.element.wysiwygFrame.style.display = 'none';
+
+            this._setCodeView(codeValue);
         },
 
         /**
@@ -2121,7 +2142,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const topArea = context.element.topArea;
             const toolbar = context.element.toolbar;
             const editorArea = context.element.editorArea;
-            const wysiwyg = context.element.wysiwyg;
+            const wysiwygFrame = context.element.wysiwygFrame;
             const code = context.element.code;
 
             if (!this._variable.isFullScreen) {
@@ -2144,13 +2165,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 _d.body.style.overflow = 'hidden';
 
                 this._variable._editorAreaOriginCssText = editorArea.style.cssText;
-                this._variable._wysiwygOriginCssText = wysiwyg.style.cssText;
+                this._variable._wysiwygOriginCssText = wysiwygFrame.style.cssText;
                 this._variable._codeOriginCssText = code.style.cssText;
 
                 editorArea.style.cssText = toolbar.style.cssText = '';
-                wysiwyg.style.cssText = wysiwyg.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/)[0];
-                code.style.cssText = code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/)[0];
-                toolbar.style.width = wysiwyg.style.height = code.style.height = '100%';
+                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
+                code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
+                toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
                 toolbar.style.position = 'relative';
 
                 this._variable.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
@@ -2158,11 +2179,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 util.removeClass(element.firstElementChild, 'se-icon-expansion');
                 util.addClass(element.firstElementChild, 'se-icon-reduction');
+
+                if (context.option.iframe && context.option.height === 'auto') {
+                    editorArea.style.overflow = 'auto';
+                    this._iframeAutoHeight();
+                }
             }
             else {
                 this._variable.isFullScreen = false;
 
-                wysiwyg.style.cssText = this._variable._wysiwygOriginCssText;
+                wysiwygFrame.style.cssText = this._variable._wysiwygOriginCssText;
                 code.style.cssText = this._variable._codeOriginCssText;
                 toolbar.style.cssText = '';
                 editorArea.style.cssText = this._variable._editorAreaOriginCssText;
@@ -2171,7 +2197,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (context.option.stickyToolbar > -1) {
                     util.removeClass(toolbar, 'se-toolbar-sticky');
-                    event.onScroll_window();
                 }
 
                 if (this._variable._fullScreenSticky) {
@@ -2179,6 +2204,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     context.element._stickyDummy.style.display = 'block';
                     util.addClass(toolbar, "se-toolbar-sticky");
                 }
+
+                event.onScroll_window();
 
                 util.removeClass(element.firstElementChild, 'se-icon-reduction');
                 util.addClass(element.firstElementChild, 'se-icon-expansion');
@@ -2471,7 +2498,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _resourcesStateChange: function () {
             core._iframeAutoHeight();
-            core._togglePlaceholder();
+            core._checkPlaceholder();
         },
 
         /**
@@ -2488,8 +2515,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Set display property when there is placeholder.
          * @private
          */
-        _togglePlaceholder: function () {
+        _checkPlaceholder: function () {
             if (this._placeholder) {
+                if (!this._variable.wysiwygActive) {
+                    this._placeholder.style.display = 'none';
+                    return;
+                }
+
                 const wysiwyg = context.element.wysiwyg;
                 if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
                     this._placeholder.style.display = 'none';
@@ -3404,6 +3436,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 e.stopPropagation();
                 e.preventDefault();
                 core.execCommand('insertHTML', false, cleanData);
+            } else {
+                // history stack
+                core.history.push();
             }
         },
 
@@ -3561,6 +3596,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
     /** User function */
     const userFunction = {
+        /**
+         * @description Core, Util object
+         */
+        core: core,
+        util: util,
+
         /**
          * @description Event functions
          * @param {Object} event Event Object

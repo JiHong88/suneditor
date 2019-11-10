@@ -49,17 +49,10 @@
 <span class="pl-c"><span class="pl-c">&lt;!--</span> languages (Basic Language: English/en) <span class="pl-c">--&gt;</span></span>
 &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
 
-<a id="include" href="#include"><h4 class="sub-title">1. Include JS/CSS</h4></a>
-<div class="highlight highlight-text-html-basic"><pre><span class="pl-c"><span class="pl-c">&lt;!--</span> &lt;link href="../src/assets/css/suneditor.css" rel="stylesheet"&gt; <span class="pl-c">--&gt;</span></span>
-<span class="pl-c"><span class="pl-c">&lt;!--</span> &lt;link href="../src/assets/css/suneditor-contents.css" rel="stylesheet"&gt; <span class="pl-c">--&gt;</span></span>
-&lt;<span class="pl-ent">link</span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/css/suneditor.min.css<span class="pl-pds">"</span></span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../dist/suneditor.min.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;
-&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>../src/lang/ko.js<span class="pl-pds">"</span></span>&gt;<span class="pl-s1">&lt;</span>/<span class="pl-ent">script</span>&gt;</pre></div>
-
-    <a id="target" href="#target"><h4 class="sub-title">2. Target a element</h4></a>
+<a id="target" href="#target"><h4 class="sub-title">1. Target Element</h4></a>
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">textarea</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>sample<span class="pl-pds">"</span></span>&gt;Hi&lt;/<span class="pl-ent">textarea</span>&gt;</pre></div>
         
-    <a id="create" href="#create"><h4 class="sub-title">3. Create</h4></a>
+    <a id="create" href="#create"><h4 class="sub-title">2. Create</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c">* ID : 'suneditor_sample'</span>
 <span class="pl-c">* ClassName : 'sun-eidtor'</span>
@@ -72,39 +65,33 @@
     lang<span class="pl-k">:</span> <span class="pl-c1">SUNEDITOR_LANG</span>[<span class="pl-s"><span class="pl-pds">'</span>ko<span class="pl-pds">'</span></span>]
 });</pre></div>
 
-<a id="contentsDisplay" href="#contentsDisplay"><h4 class="sub-title">4. Contents display</h4></a>
-<pre lang="text"><code>When you display a document created by suneditor
-You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
-Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
-In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
-</code></pre>
+<a id="contentsDisplay" href="#contentsDisplay"><h4 class="sub-title">3. Contents display</h4></a>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">When</span> you display a document created by suneditor
+<span class="pl-smi">You</span> need to include <span class="pl-s"><span class="pl-pds">"</span>src/assets/css/suneditor-contents.css<span class="pl-pds">"</span></span> or <span class="pl-s"><span class="pl-pds">"</span>dist/css/suneditor.min.css<span class="pl-pds">"</span></span> file.
+<span class="pl-smi">Then</span> add <span class="pl-s"><span class="pl-pds">"</span>sun-editor-editable<span class="pl-pds">"</span></span> to the <span class="pl-k">class</span> <span class="pl-en">name</span> of the Tag element that displays the content.
+In "suneditor-contents.css", you can define the style of all the tags created in suneditor.</pre></div>
 
-    <a id="importStatement" href="#importStatement"><h4 class="sub-title">Use import statement</h4></a>
-    <p></p>
+<a id="importStatement" href="#importStatement"><h4 class="sub-title">Use import statement</h4></a>
+<p></p>
 
 <a id="loadOnly" href="#loadOnly"><h4 class="sub-title">1. Load only what you want</h4></a>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
-<span class="pl-k">import</span> {<span class="pl-smi">font</span>, <span class="pl-smi">fontSize</span>, <span class="pl-smi">fontColor</span>, <span class="pl-smi">horizontalRule</span>, <span class="pl-smi">list</span>, <span class="pl-smi">image</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
+
+<span class="pl-c"><span class="pl-c">//</span> How to import plugins</span>
+<span class="pl-k">import</span> <span class="pl-smi">image</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins/dialog/link<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-smi">list</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins/submenu/list<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> {<span class="pl-smi">font</span>, <span class="pl-smi">video</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
+
 <span class="pl-c"><span class="pl-c">//</span> How to import language files (default: en)</span>
 <span class="pl-k">import</span> <span class="pl-smi">lang</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
-<span class="pl-k">import</span> {<span class="pl-smi">en</span>, <span class="pl-smi">ko</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> {<span class="pl-smi">ko</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">de</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/lang/de<span class="pl-pds">'</span></span>
 
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
-    plugins<span class="pl-k">:</span> [
-        font,
-        fontSize,
-        fontColor,
-        horizontalRule,
-        link,
-        image,
-    ],
+    plugins<span class="pl-k">:</span> [font, video, image, list],
     buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
+        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>]
     ],
     lang<span class="pl-k">:</span> <span class="pl-smi">lang</span>.<span class="pl-smi">ko</span>
 });</pre></div>
@@ -124,8 +111,8 @@ In "suneditor-contents.css", you can define the style of all the tags created in
         <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Line break</span>
         [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>lineHeight<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
         [<span class="pl-s"><span class="pl-pds">'</span>save<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>template<span class="pl-pds">'</span></span>]
@@ -134,14 +121,10 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 
 <span class="pl-c"><span class="pl-c">//</span> You can also load what you want</span>
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
-    plugins<span class="pl-k">:</span> [
-        <span class="pl-smi">plugins</span>.<span class="pl-smi">font</span>
-        <span class="pl-smi">plugins</span>.<span class="pl-c1">fontSize</span>
-    ],
+    plugins<span class="pl-k">:</span> [<span class="pl-smi">plugins</span>.<span class="pl-smi">font</span>],
+    <span class="pl-c"><span class="pl-c">//</span> Plugins can be used directly in the button list</span>
     buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fontSize<span class="pl-pds">'</span></span>],
-        <span class="pl-c"><span class="pl-c">//</span> Plugins can be used directly in the button list</span>
-        [<span class="pl-smi">plugins</span>.<span class="pl-smi">formatBlock</span>]
+        [<span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, <span class="pl-smi">plugins</span>.<span class="pl-smi">image</span>]
     ]
 })</pre></div>
 
@@ -149,26 +132,26 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
 <span class="pl-k">import</span> {<span class="pl-smi">align</span>, <span class="pl-smi">font</span>, <span class="pl-smi">fontSize</span>, <span class="pl-smi">fontColor</span>, <span class="pl-smi">hiliteColor</span>, <span class="pl-smi">horizontalRule</span>,
-        <span class="pl-smi">list</span>, <span class="pl-smi">table</span>, <span class="pl-smi">template</span>, <span class="pl-smi">formatBlock</span>, <span class="pl-smi">link</span>, <span class="pl-smi">image</span>, <span class="pl-smi">video</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
+        <span class="pl-smi">list</span>, <span class="pl-smi">lineHeight</span>, <span class="pl-smi">table</span>, <span class="pl-smi">template</span>, <span class="pl-smi">formatBlock</span>, <span class="pl-smi">link</span>, <span class="pl-smi">image</span>, <span class="pl-smi">video</span>} <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins<span class="pl-pds">'</span></span>
 
 <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
     buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
         [font, fontSize, formatBlock],
-        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
         [fontColor, hiliteColor],
-        [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-        [align, horizontalRule, list, table],
-        [link, image, video],
-        [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>save<span class="pl-pds">'</span></span>, template]
+        [align, horizontalRule, list, lineHeight],
+        [table, link, image, video, template]
     ],
 })</pre></div>
 
+<a id="pluginsList" href="#pluginsList"><h4 class="sub-title">4. Plugins list</h4></a>
+<div class="highlight highlight-source-js"><pre><span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins/dialog/...<span class="pl-pds">'</span></span>
+<span class="pl-c"><span class="pl-c">//</span> image, video, link</span>
+<span class="pl-s"><span class="pl-pds">'</span>suneditor/src/plugins/submenu/...<span class="pl-pds">'</span></span>
+<span class="pl-c"><span class="pl-c">//</span> align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, list, table, template</span></pre></div>
+
 <a id="initFunction" href="#initFunction"><h4 class="sub-title">Init function</h4></a>
-    <pre lang="text"><code>The init function can be used by predefining options and calling the create function on the returned object.
+<pre lang="text"><code>The init function can be used by predefining options and calling the create function on the returned object.
 The value of the option argument put in the "create" function call takes precedence
 </code></pre>
 <div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
@@ -186,8 +169,8 @@ The value of the option argument put in the "create" function call takes precede
         <span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>,
         <span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>,
         <span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>,
-        <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>,
-        <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
+        <span class="pl-s"><span class="pl-pds">'</span>align<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>lineHeight<span class="pl-pds">'</span></span>,
+        <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>link<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>,
         <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>,
         <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>save<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>template<span class="pl-pds">'</span></span>]
     ]
@@ -207,8 +190,38 @@ The value of the option argument put in the "create" function call takes precede
     ]
 });</pre></div>
 
+<a id="useCodeMirror" href="#useCodeMirror"><h4 class="sub-title">Use CodeMirror</h4></a>
+<div class="highlight highlight-text-html-basic"><pre><span class="pl-c"><span class="pl-c">&lt;!--</span> codeMirror (^5.0.0) <span class="pl-c">--&gt;</span></span>
+<span class="pl-c"><span class="pl-c">&lt;!--</span> Use version 5.0.0 or later. <span class="pl-c">--&gt;</span></span>
+&lt;<span class="pl-ent">link</span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css<span class="pl-pds">"</span></span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor/dist/css/suneditor.min.css<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+<span class="pl-c"><span class="pl-c">//</span> Import codeMirror</span>
+<span class="pl-k">import</span> <span class="pl-smi">CodeMirror</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>codemirror<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>codemirror/mode/htmlmixed/htmlmixed<span class="pl-pds">'</span></span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">'</span>codemirror/lib/codemirror.css<span class="pl-pds">'</span></span>
+
+<span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>sample<span class="pl-pds">'</span></span>, {
+    codeMirror<span class="pl-k">:</span> CodeMirror,
+    <span class="pl-c"><span class="pl-c">//</span> Set options</span>
+    <span class="pl-c"><span class="pl-c">//</span> codeMirror: {</span>
+    <span class="pl-c"><span class="pl-c">//</span>     src: CodeMirror,</span>
+    <span class="pl-c"><span class="pl-c">//</span>     options: {...}</span>
+    <span class="pl-c"><span class="pl-c">//</span> }</span>
+    buttonList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>]
+    ],
+    height<span class="pl-k">:</span> <span class="pl-c1">400</span>
+});</pre></div>
+
 <a id="options" href="#options"><h4 class="sub-title">Options</h4></a>
 <div class="highlight highlight-source-java"><pre>plugins<span class="pl-k">:</span> [
+    <span class="pl-c"><span class="pl-c">//</span> Submenu</span>
     font,
     fontSize,
     formatBlock,
@@ -219,6 +232,7 @@ The value of the option argument put in the "create" function call takes precede
     list,
     table,
     template,
+    <span class="pl-c"><span class="pl-c">//</span> Dialog</span>
     link,
     image,
     video
@@ -288,15 +302,16 @@ fontSize        <span class="pl-k">:</span> <span class="pl-smi">Change</span> <
                   <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
                     <span class="pl-c1">8</span>, <span class="pl-c1">9</span>, <span class="pl-c1">10</span>, <span class="pl-c1">11</span>, <span class="pl-c1">12</span>, <span class="pl-c1">14</span>, <span class="pl-c1">16</span>, <span class="pl-c1">18</span>, <span class="pl-c1">20</span>, <span class="pl-c1">22</span>, <span class="pl-c1">24</span>, <span class="pl-c1">26</span>, <span class="pl-c1">28</span>, <span class="pl-c1">36</span>, <span class="pl-c1">48</span>, <span class="pl-c1">72</span>
                   ]
+fontSizeUnit    <span class="pl-k">:</span> <span class="pl-smi">The</span> font size unit.                               <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>px<span class="pl-pds">'</span></span> {<span class="pl-smi">String</span>}
 formats         <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> formatBlock array.                 <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">...</span>] {<span class="pl-smi">Array</span>}
                   <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
-                      <span class="pl-s"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>blockquote<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>pre<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h1<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h2<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h3<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h4<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h5<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h6<span class="pl-pds">'</span></span>
+                    <span class="pl-s"><span class="pl-pds">'</span>p<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>blockquote<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>pre<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h1<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h2<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h3<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h4<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h5<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>h6<span class="pl-pds">'</span></span>
                   ],
                   <span class="pl-smi">Custom</span><span class="pl-k">:</span> [{
-                      tag<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Tag name</span>
-                      class<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>__se__xxx<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> Class names must always begin with "__se__"</span>
-                      title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Custom div<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> default: tag name</span>
-                      command<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>replace<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>range<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">//</span> default: "replace"</span>
+                    tag<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>div<span class="pl-pds">'</span></span>, <span class="pl-c"><span class="pl-c">//</span> Tag name</span>
+                    class<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>__se__xxx<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> Class names must always begin with "__se__"</span>
+                    title<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Custom div<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-c1">null</span>, <span class="pl-c"><span class="pl-c">//</span> default: tag name</span>
+                    command<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>replace<span class="pl-pds">'</span></span> <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>range<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">//</span> default: "replace"</span>
                   }]
 colorList       <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> color array of color picker.       <span class="pl-k">default</span><span class="pl-k">:</span> [<span class="pl-c1">..</span>[<span class="pl-c1">..</span>]<span class="pl-c1">..</span>] {<span class="pl-smi">Array</span>}
                   <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
@@ -310,6 +325,17 @@ colorList       <span class="pl-k">:</span> <span class="pl-smi">Change</span> <
                   ex) [
                     [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>], <span class="pl-c"><span class="pl-c">//</span> Line break</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>SlateGray<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>BurlyWood<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>DeepPink<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>FireBrick<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Gold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SeaGreen<span class="pl-pds">'</span></span>]
+                  ]
+lineHeights     <span class="pl-k">:</span> <span class="pl-smi">Change</span> <span class="pl-k">default</span> line<span class="pl-k">-</span>height array.                 <span class="pl-k">default</span><span class="pl-k">:</span> [{}<span class="pl-c1">..</span>] {<span class="pl-smi">Array</span>}
+                  <span class="pl-smi">Default</span> value<span class="pl-k">:</span> [
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>1<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">1</span>},
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>1.15<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">1.15</span>},
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>1.5<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">1.5</span>},
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>2<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">2</span>}
+                  ]
+                  ex) [
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Single<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">1</span>},
+                    {text<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>Double<span class="pl-pds">'</span></span>, value<span class="pl-k">:</span> <span class="pl-c1">2</span>}
                   ]
 
 <span class="pl-c"><span class="pl-c">//</span> Image---------------------------------------------------------------------------------------------------------</span>
@@ -375,8 +401,8 @@ buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> 
                     <span class="pl-c"><span class="pl-c">//</span> '/', Line break</span>
                     <span class="pl-c"><span class="pl-c">//</span> ['fontColor', 'hiliteColor'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-                    <span class="pl-c"><span class="pl-c">//</span> ['align', 'horizontalRule', 'list', 'table'],</span>
-                    <span class="pl-c"><span class="pl-c">//</span> ['link', 'image', 'video'],</span>
+                    <span class="pl-c"><span class="pl-c">//</span> ['align', 'horizontalRule', 'list', 'lineHeight'],</span>
+                    <span class="pl-c"><span class="pl-c">//</span> ['table', 'link', 'image', 'video'],</span>
                     [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
                     [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
                     <span class="pl-c"><span class="pl-c">//</span> ['save', 'template'],</span>

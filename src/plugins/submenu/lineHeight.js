@@ -2,18 +2,18 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 20197 JiHong Lee.
  * MIT license.
  */
 'use strict';
 
 export default {
-    name: 'fontSize',
+    name: 'lineHeight',
     add: function (core, targetElement) {
         const context = core.context;
-        context.fontSize = {
+        context.lineHeight = {
             _sizeList: null,
-            currentSize: ''
+            currentSize: -1
         };
 
         /** set submenu */
@@ -23,7 +23,7 @@ export default {
         /** add event listeners */
         listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.fontSize._sizeList = listUl.querySelectorAll('li button');
+        context.lineHeight._sizeList = listUl.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -39,14 +39,19 @@ export default {
 
         listDiv.className = 'se-submenu se-list-layer';
 
-        const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
+        const sizeList = !option.lineHeights ? [
+            {text: '1', value: 1},
+            {text: '1.15', value: 1.15},
+            {text: '1.5', value: 1.5},
+            {text: '2', value: 2}
+        ] : option.lineHeights;
 
-        let list = '<div class="se-list-inner se-list-font-size">' +
+        let list = '<div class="se-list-inner">' +
             '   <ul class="se-list-basic">' +
             '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
-        for (let i = 0, unit = option.fontSizeUnit, len = sizeList.length, size; i < len; i++) {
+        for (let i = 0, len = sizeList.length, text, size; i < len; i++) {
             size = sizeList[i];
-            list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
+            list += '<li><button type="button" class="se-btn-list" data-value="' + size.value + '" title="' + size.text + '">' + size.text + '</button></li>';
         }
         list += '   </ul>' +
             '</div>';
@@ -57,11 +62,11 @@ export default {
     },
 
     on: function () {
-        const fontSizeContext = this.context.fontSize;
-        const sizeList = fontSizeContext._sizeList;
-        const currentSize = this.commandMap.SIZE.textContent;
+        const lineHeightContext = this.context.lineHeight;
+        const sizeList = lineHeightContext._sizeList;
+        const currentSize = this.util.getFormatElement(this.getSelectionNode()).style.lineHeight + '';
 
-        if (currentSize !== fontSizeContext.currentSize) {
+        if (currentSize !== lineHeightContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {
                 if (currentSize === sizeList[i].getAttribute('data-value')) {
                     this.util.addClass(sizeList[i], 'active');
@@ -70,7 +75,7 @@ export default {
                 }
             }
 
-            fontSizeContext.currentSize = currentSize;
+            lineHeightContext.currentSize = currentSize;
         }
     },
 
@@ -80,14 +85,11 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const value = e.target.getAttribute('data-value');
+        const value = e.target.getAttribute('data-value') || '';
+        const formats = this.getSelectedElements();
 
-        if (value) {
-            const newNode = this.util.createElement('SPAN');
-            newNode.style.fontSize = value;
-            this.nodeChange(newNode, ['font-size'], null);
-        } else {
-            this.nodeChange(null, ['font-size'], null);
+        for (let i = 0, len = formats.length; i < len; i++) {
+            formats[i].style.lineHeight = value;
         }
 
         this.submenuOff();

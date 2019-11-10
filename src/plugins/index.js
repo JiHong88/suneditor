@@ -9,11 +9,12 @@ import horizontalRule from './submenu/horizontalRule';
 import list from './submenu/list';
 import table from './submenu/table';
 import formatBlock from './submenu/formatBlock';
+import lineHeight from './submenu/lineHeight';
 import template from './submenu/template';
 
 import link from './dialog/link';
 import image from './dialog/image';
 import video from './dialog/video';
 
-export { align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, template, link, image, video };
-export default { align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, template, link, image, video };
+export { align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, link, image, video };
+export default { align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, link, image, video };
