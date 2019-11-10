@@ -160,7 +160,7 @@ suneditor.create('sample', {
         '/', // Line break
         ['fontColor', 'hiliteColor'],
         ['outdent', 'indent'],
-        ['align', 'horizontalRule', 'list', 'table'],
+        ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
         ['link', 'image', 'video'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
@@ -187,7 +187,7 @@ suneditor.create('sample', {
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
-        list, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
+        list, lineHeight, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
@@ -197,7 +197,7 @@ suneditor.create('sample', {
         ['removeFormat'],
         [fontColor, hiliteColor],
         ['outdent', 'indent'],
-        [align, horizontalRule, list, table],
+        [align, horizontalRule, list, lineHeight, table],
         [link, image, video],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
@@ -227,7 +227,7 @@ const initEditor = suneditor.init({
         'removeFormat',
         'fontColor', 'hiliteColor',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'table',
+        'align', 'horizontalRule', 'list', 'lineHeight', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
@@ -450,7 +450,7 @@ buttonList      : Defines button list to array {Array}
                     // '/', Line break
                     // ['fontColor', 'hiliteColor'],
                     ['outdent', 'indent'],
-                    // ['align', 'horizontalRule', 'list', 'table'],
+                    // ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
                     // ['link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
