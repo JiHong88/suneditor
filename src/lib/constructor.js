@@ -379,12 +379,12 @@ export default {
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Defining menu items */
-        options.font = options.font || null;
-        options.fontSize = options.fontSize || null;
-        options.fontSizeUnit = options.fontSizeUnit || 'px';
-        options.formats = options.formats || null;
-        options.colorList = options.colorList || null;
-        options.lineHeights = typeof options.lineHeights === 'object' ? options.lineHeights : null;
+        // options.font = options.font;
+        // options.fontSize = options.fontSize;
+        // options.formats = options.formats;
+        // options.colorList = options.colorList;
+        // options.lineHeights = options.lineHeights;
+        options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
