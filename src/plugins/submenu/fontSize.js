@@ -44,9 +44,9 @@ export default {
         let list = '<div class="se-list-inner se-list-font-size">' +
             '   <ul class="se-list-basic">' +
             '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
-        for (let i = 0, len = sizeList.length; i < len; i++) {
-            const size = sizeList[i];
-            list += '<li><button type="button" class="se-btn-list" data-value="' + size + '" title="' + size + '" style="font-size:' + size + 'px;">' + size + '</button></li>';
+        for (let i = 0, unit = option.fontSizeUnit, len = sizeList.length, size; i < len; i++) {
+            size = sizeList[i];
+            list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
         }
         list += '   </ul>' +
             '</div>';
@@ -59,7 +59,7 @@ export default {
     on: function () {
         const fontSizeContext = this.context.fontSize;
         const sizeList = fontSizeContext._sizeList;
-        const currentSize = (this.commandMap.SIZE.textContent.match(/\d+/) || [''])[0];
+        const currentSize = this.commandMap.SIZE.textContent;
 
         if (currentSize !== fontSizeContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {
@@ -82,11 +82,9 @@ export default {
 
         const value = e.target.getAttribute('data-value');
 
-        // if (value !== this.context.fontSize.currentSize) {}
-
         if (value) {
             const newNode = this.util.createElement('SPAN');
-            newNode.style.fontSize = value + 'px';
+            newNode.style.fontSize = value;
             this.nodeChange(newNode, ['font-size'], null);
         } else {
             this.nodeChange(null, ['font-size'], null);

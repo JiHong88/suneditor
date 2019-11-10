@@ -381,6 +381,7 @@ export default {
         /** Defining menu items */
         options.font = options.font || null;
         options.fontSize = options.fontSize || null;
+        options.fontSizeUnit = options.fontSizeUnit || 'px';
         options.formats = options.formats || null;
         options.colorList = options.colorList || null;
         options.lineHeights = typeof options.lineHeights === 'object' ? options.lineHeights : null;

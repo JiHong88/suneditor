@@ -187,6 +187,7 @@ let s2 = editor.create(document.getElementById('editor2'), {
     // maxHeight: '400px',
     height: 'auto',
     // height: 400,
+    fontSizeUnit: 'pt',
     imageResizing: true,
     // imageWidth: '400',
     buttonList: [
