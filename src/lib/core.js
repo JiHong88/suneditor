@@ -199,7 +199,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             tabSize: 4,
             minResizingSize: 65,
             currentNodes: [],
-            formatStyles: ['marginLeft', 'textAlign', 'lineHeight'],
             _range: null,
             _selectionNode: null,
             _originCssText: context.element.topArea.style.cssText,
@@ -949,9 +948,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        const inner = insNode.innerHTML;
+                        const inner = insNode;
                         insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
-                        insNode.innerHTML = inner;
+                        insNode.innerHTML = inner.innerHTML;
+                        insNode.style.cssText = inner.style.cssText;
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
@@ -2359,18 +2359,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Copy the style attribute of 'core._variable.formatStyles' from the 'copyFormat' element to 'originFormat'.
-         * @param {Element} copyFormat Copy element
-         * @param {Element} originFormat Origin element
-         */
-        copyFormatStyles: function (copyFormat, originFormat) {
-            const formatStyles = this._variable.formatStyles;
-            for (let i = 0, len = formatStyles.length; i < len; i++) {
-                copyFormat.style[formatStyles[i]] = originFormat.style[formatStyles[i]];
-            }
-        },
-
-        /**
          * @description The current number of characters is counted and displayed.
          * @param {Number} nextCharCount Length of character to be added.
          * @returns {Boolean}
@@ -3057,6 +3045,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
+                        selectionNode.removeAttribute('style');
+                        selectionNode.removeAttribute('class');
+                        core.execCommand('formatBlock', false, 'P');
                         return false;
                     }
 

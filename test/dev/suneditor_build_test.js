@@ -182,7 +182,7 @@ const editor = suneditor.init({
     // iframe: true,
 });
 
-let s2 = editor.create(document.getElementById('editor2'), {
+let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
     height: 'auto',
