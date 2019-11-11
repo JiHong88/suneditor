@@ -3046,9 +3046,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
-                        selectionNode.removeAttribute('style');
-                        selectionNode.removeAttribute('class');
-                        core.execCommand('formatBlock', false, 'P');
+                        if (!selectionNode.nextElementSibling) {
+                            selectionNode.removeAttribute('style');
+                            selectionNode.removeAttribute('class');
+                            core.execCommand('formatBlock', false, 'P');
+                        }
                         return false;
                     }
 
@@ -3190,6 +3192,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
+                            newEl.style.cssText = formatEl.style.cssText;
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
