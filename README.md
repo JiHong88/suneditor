@@ -501,6 +501,7 @@ editor.getContents(onlyContents: Boolean);
 editor.getImagesInfo();
 
 // Upload images using image plugin
+// document.getElementById('example_files_input').files
 editor.insertImage(FileList);
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
