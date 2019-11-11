@@ -92,6 +92,8 @@ export default {
             formats[i].style.lineHeight = value;
         }
 
+        // history stack
+        this.history.push();
         this.submenuOff();
     }
 };

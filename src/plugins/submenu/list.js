@@ -176,6 +176,7 @@ export default {
                 siblingTag = isCell && !this.util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
                 newCell = this.util.createElement('LI');
+                newCell.style.cssText = fTag.style.cssText;
                 if (this.util.isComponent(fTag)) {
                     const isHR = /^HR$/i.test(fTag.nodeName);
                     if (!isHR) newCell.innerHTML = '<br>';

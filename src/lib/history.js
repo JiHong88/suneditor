@@ -54,7 +54,7 @@ export default function (core, change) {
     }
 
     function pushStack () {
-        const current = core.getContents();
+        const current = core.getContents(true);
         if (current === stack[stackIndex].contents) return;
 
         stackIndex++;

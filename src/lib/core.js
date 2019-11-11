@@ -948,9 +948,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        const inner = insNode.innerHTML;
+                        const inner = insNode;
                         insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
-                        insNode.innerHTML = inner;
+                        insNode.innerHTML = inner.innerHTML;
+                        insNode.style.cssText = inner.style.cssText;
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
@@ -2308,9 +2309,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Gets the current contents
+         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {Object}
          */
-        getContents: function () {
+        getContents: function (onlyContents) {
             const contents = context.element.wysiwyg.innerHTML;
             const renderHTML = util.createElement('DIV');
             renderHTML.innerHTML = contents;
@@ -2323,8 +2325,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 figcaptions[i].removeAttribute('contenteditable');
             }
 
-            if (context.option.fullPage) {
-                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + this._wd.body.outerHTML + '</html>';
+            if (context.option.fullPage && !onlyContents) {
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + renderHTML.innerHTML + '</body></html>';
             } else {
                 return renderHTML.innerHTML;
             }
@@ -3044,6 +3046,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
+                        if (!selectionNode.nextElementSibling) {
+                            selectionNode.removeAttribute('style');
+                            selectionNode.removeAttribute('class');
+                            core.execCommand('formatBlock', false, 'P');
+                        }
                         return false;
                     }
 
@@ -3185,6 +3192,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
+                            newEl.style.cssText = formatEl.style.cssText;
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
@@ -3725,10 +3733,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Gets the contents of the suneditor
+         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {String}
          */
-        getContents: function () {
-            return core.getContents();
+        getContents: function (onlyContents) {
+            return core.getContents(onlyContents);
         },
 
         /**

@@ -340,35 +340,56 @@
     <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
 </form>
 
-<div class="highlight highlight-source-js">
-<pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+<div class="highlight highlight-source-js"><pre><span class="pl-k">function</span> <span class="pl-en">sun_setOptions</span>() {
+    <span class="pl-smi">suneditor</span>.<span class="pl-en">setOptions</span>({
+        mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>,
+        minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
+        colorList<span class="pl-k">:</span> [
+            [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
+        ],
+        buttonList<span class="pl-k">:</span> [
+            [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
+        ]
+    });
 
-<span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>exampleFunction<span class="pl-pds">'</span></span>);
+    <span class="pl-smi">opt1</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">opt2</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>inline-block<span class="pl-pds">'</span></span>;
+}
+
+<span class="pl-k">function</span> <span class="pl-en">sun_replaceOptions</span>() {
+    <span class="pl-smi">suneditor</span>.<span class="pl-en">setOptions</span>({
+        mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>,
+        minHeight<span class="pl-k">:</span> <span class="pl-c1">null</span>,
+        colorList<span class="pl-k">:</span> <span class="pl-c1">null</span>,
+        buttonList<span class="pl-k">:</span> [
+            [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
+            [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
+        ],
+    });
+
+    <span class="pl-smi">opt1</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>inline-block<span class="pl-pds">'</span></span>;
+    <span class="pl-smi">opt2</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
+}</pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Add or reset option property</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
     minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
-    colorList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
-    ],
     buttonList<span class="pl-k">:</span> [
         [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
+    ],
+    colorList<span class="pl-k">:</span> [
+        [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
     ]
 });
-
-<span class="pl-k">function</span> <span class="pl-en">replaceOptions</span>() {
-    minHeight<span class="pl-k">:</span> null,
-    colorList<span class="pl-k">:</span> null,
-    buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
-    ]
-}
 
 <span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
@@ -387,23 +408,23 @@
 
 <span class="pl-c"><span class="pl-c">//</span> Gets a list of images uploaded to the editor</span>
 <span class="pl-c"><span class="pl-c">/**</span> </span>
-<span class="pl-c"><span class="pl-c">* {</span> </span>
-<span class="pl-c"><span class="pl-c">*</span>  src: imgage src</span>
-<span class="pl-c"><span class="pl-c">*</span>  index: data index</span>
-<span class="pl-c"><span class="pl-c">*</span>  name: file name</span>
-<span class="pl-c"><span class="pl-c">*</span>  size: file size</span>
-<span class="pl-c"><span class="pl-c">*</span>  select: select function</span>
-<span class="pl-c"><span class="pl-c">*</span>  delete: delete function</span>
-<span class="pl-c"><span class="pl-c">* }</span> </span>
-<span class="pl-c"><span class="pl-c">**/</span> </span>
+<span class="pl-c"> * {</span>
+<span class="pl-c"> *  src: imgage src</span>
+<span class="pl-c"> *  index: data index</span>
+<span class="pl-c"> *  name: file name</span>
+<span class="pl-c"> *  size: file size</span>
+<span class="pl-c"> *  select: select function</span>
+<span class="pl-c"> *  delete: delete function</span>
+<span class="pl-c"> * }</span>
+<span class="pl-c"> *<span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Upload images using image plugin</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">insertImage</span>(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>example_files_input<span class="pl-pds">'</span></span>).<span class="pl-c1">files</span>);
-
+<span class="pl-c"><span class="pl-c">//</span> document.getElementById('example_files_input').files</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">insertImage</span>(<span class="pl-c1">FileList</span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&amp;lt;img src="http://suneditor.com/sample/img/sunset.jpg"&amp;gt;<span class="pl-pds">'</span></span>);
+<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
 
 <span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
@@ -425,6 +446,7 @@
     
 <span class="pl-c"><span class="pl-c">//</span> Destroy the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();
+editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
 
 <span class="pl-c"><span class="pl-c">//</span> Event functions</span>
 <span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
@@ -441,26 +463,55 @@
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
 
+<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
+<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * cleanData : HTML string modified for editor format</span>
+<span class="pl-c"> * maxCharCount : maxChartCount option (true if max character is exceeded)</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onPaste</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">cleanData</span>, <span class="pl-smi">maxCharCount</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onPaste<span class="pl-pds">'</span></span>, e, cleanData, maxCharCount) }
+
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * targetImgElement: Current img element</span>
+<span class="pl-c"> * index: Uploaded index (key value)</span>
+<span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
+<span class="pl-c"> * imageInfo: {</span>
+<span class="pl-c"> * * index: data index</span>
+<span class="pl-c"> * * name: file name</span>
+<span class="pl-c"> * * size: file size</span>
+<span class="pl-c"> * * select: select function</span>
+<span class="pl-c"> * * delete: delete function</span>
+<span class="pl-c"> * }</span>
+<span class="pl-c"> * remainingFilesCount: Count of remaining image files</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create','update','delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>imageInfo:<span class="pl-s1"><span class="pl-pse">${</span>imageInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
 }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
 <span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * errorMessage: Error message to show</span>
+<span class="pl-c"> * result: Result object </span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>) {
-    <span class="pl-c1">alert</span>(errorMessage)
+    <span class="pl-en">alert</span>(errorMessage)
 }
 
 <span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
 <span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
 <span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * toolbar: Toolbar Element</span>
+<span class="pl-c"> * context: The editor's context object (editor.getContext())</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context)
-}</pre>
-</div>
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar);
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
+}</pre></div>
         
     </article>
 
@@ -472,8 +523,8 @@
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/suneditor@2.21.1/dist/css/suneditor.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.1/dist/suneditor.min.js"></script>
 <!-- codeMirror -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>

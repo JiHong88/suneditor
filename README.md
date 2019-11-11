@@ -484,7 +484,8 @@ editor.save();
 editor.getContext();
 
 // Gets the contents of the suneditor
-editor.getContents();
+// onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
+editor.getContents(onlyContents: Boolean);
 
 // Gets a list of images uploaded to the editor
 /** 
@@ -500,6 +501,7 @@ editor.getContents();
 editor.getImagesInfo();
 
 // Upload images using image plugin
+// document.getElementById('example_files_input').files
 editor.insertImage(FileList);
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
