@@ -45,7 +45,7 @@ window.sun_create1 = function () {
 }
 
 
-let ss = suneditor.create(document.getElementById('editor1'), {
+let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
     buttonList: [
         ['undo', 'redo','removeFormat',
@@ -61,10 +61,10 @@ let ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     stickyToolbar: 0,
     imageWidth: 300,
-    mode: 'balloon',
+    mode: 'classic',
     // toolbarWidth: 800,
     height: 'auto',
-    // fullPage: true,
+    fullPage: true,
     iframeCSSFileName: 'suneditor',
     // iframe: true,
     // callBackSave: (contents) => {
