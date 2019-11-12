@@ -1980,7 +1980,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     break;
                 case 'save':
                     if (typeof context.option.callBackSave === 'function') {
-                        context.option.callBackSave(this.getContents());
+                        context.option.callBackSave(this.getContents(false));
                     } else if (typeof userFunction.save === 'function') {
                         userFunction.save();
                     } else {
@@ -2119,12 +2119,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _setEditorDataToCodeView: function () {
             let codeValue = '';
             if (context.option.fullPage) {
-                const headChildren = this._wd.head.children;
-                let headTags = '';
-                for (let i = 0, len = headChildren.length; i < len; i++) {
-                    headTags += headChildren[i].outerHTML + '\n';
+                const attrs = this._wd.body.attributes;
+                let attrString = '';
+                for (let i = 0, len = attrs.length; i < len; i++) {
+                    attrString += attrs[i].name + '="' + attrs[i].value + '" ';
                 }
-                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+
+                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrString + '>\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
             } else {
                 codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
             }
@@ -2219,56 +2220,69 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         print: function () {
             const iframe = util.createElement('IFRAME');
             iframe.style.display = 'none';
-
-            const contents = util.createElement('DIV');
-            const style = util.createElement('STYLE');
-            style.innerHTML = util.getPageStyle();
-            contents.className = 'sun-editor-editable';
-            contents.innerHTML = this.getContents();
-
             _d.body.appendChild(iframe);
-            
-            let printDocument = iframe.contentWindow || iframe.contentDocument;
-            if (printDocument.document) printDocument = printDocument.document;
 
-            printDocument.head.appendChild(style);
-            printDocument.body.appendChild(contents);
+            const printDocument = util.getIframeDocument(iframe);
+            const contentsHTML = this.getContents(false);
 
-            try {
-                iframe.focus();
-                // IE or Edge
-                if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
-                    try {
-                        iframe.contentWindow.document.execCommand('print', false, null);
-                    } catch (e) {
+            if (context.option.fullPage) {
+                printDocument.write(contentsHTML);
+            } else if (context.option.iframe) {
+                printDocument.write('' +
+                    '<!DOCTYPE html><html>' +
+                    util.getIframeDocument(context.element.wysiwygFrame).head.outerHTML +
+                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '</html>'
+                );
+            } else {
+                const contents = util.createElement('DIV');
+                const style = util.createElement('STYLE');
+
+                style.innerHTML = util.getPageStyle();
+                contents.className = 'sun-editor-editable';
+                contents.innerHTML = contentsHTML;
+
+                printDocument.head.appendChild(style);
+                printDocument.body.appendChild(contents);
+            }
+
+            setTimeout(function () {
+                try {
+                    iframe.focus();
+                    // IE or Edge
+                    if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
+                        try {
+                            iframe.contentWindow.document.execCommand('print', false, null);
+                        } catch (e) {
+                            iframe.contentWindow.print();
+                        }
+                    } else {
+                        // Other browsers
                         iframe.contentWindow.print();
                     }
-                } else {
-                    // Other browsers
-                    iframe.contentWindow.print();
+                } catch (error) {
+                    throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
+                } finally {
+                    util.removeItem(iframe);
                 }
-            } catch (error) {
-                throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
-            } finally {
-                util.removeItem(iframe);
-            }
+            }, 100);
         },
 
         /**
          * @description Open the preview window.
          */
         preview: function () {
-            const cssText = util.getPageStyle();
-            const contentsHTML = this.getContents();
-            
+            const contentsHTML = this.getContents(false);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
 
             if (context.option.fullPage) {
+                windowObject.document.write(contentsHTML);
+            } else if (context.option.iframe) {
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
-                    this._wd.head.outerHTML +
-                    this._wd.body.outerHTML +
+                    util.getIframeDocument(context.element.wysiwygFrame).head.outerHTML +
+                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
@@ -2278,7 +2292,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
-                    '<style>' + cssText + '</style>' +
+                    '<style>' + util.getPageStyle() + '</style>' +
                     '</head>' +
                     '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
                     '</html>'
@@ -2309,7 +2323,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Gets the current contents
-         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
+         * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {Object}
          */
         getContents: function (onlyContents) {
@@ -2326,7 +2340,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (context.option.fullPage && !onlyContents) {
-                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + renderHTML.innerHTML + '</body></html>';
+                const attrs = this._wd.body.attributes;
+                let attrString = '';
+                for (let i = 0, len = attrs.length; i < len; i++) {
+                    if (attrs[i].name === 'contenteditable') continue;
+                    attrString += attrs[i].name + '="' + attrs[i].value + '" ';
+                }
+                
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrString + '>' + renderHTML.innerHTML + '</body></html>';
             } else {
                 return renderHTML.innerHTML;
             }
@@ -3047,8 +3068,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
                         if (!selectionNode.nextElementSibling) {
-                            selectionNode.removeAttribute('style');
-                            selectionNode.removeAttribute('class');
+                            const attrs = selectionNode.attributes;
+                            for (let i = 0, len = attrs.length; i < len; i++) {
+                                selectionNode.removeAttribute(attrs[i].name);
+                            }
                             core.execCommand('formatBlock', false, 'P');
                         }
                         return false;
@@ -3503,7 +3526,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         _onChange_historyStack: function () {
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (userFunction.onChange) userFunction.onChange(core.getContents());
+            if (userFunction.onChange) userFunction.onChange(core.getContents(true));
         },
 
         _addEvent: function () {
@@ -3720,7 +3743,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Copying the contents of the editor to the original textarea
          */
         save: function () {
-            context.element.originElement.value = core.getContents();
+            context.element.originElement.value = core.getContents(false);
         },
 
         /**

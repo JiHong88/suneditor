@@ -16,7 +16,7 @@ export default function (core, change) {
     let pushDelay = null;
     let stackIndex = 0;
     let stack = [{
-        contents: core.getContents(),
+        contents: core.getContents(true),
         s: {
             path: [0, 0],
             offset: 0
