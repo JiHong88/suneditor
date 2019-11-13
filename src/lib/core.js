@@ -187,7 +187,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize Indented size when tab button clicked (4)
-         * @property {Number} minResizingSize Minimum size of editing area when resized (65)
+         * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
          */
@@ -197,7 +197,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
-            minResizingSize: 65,
+            minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
             currentNodes: [],
             _range: null,
             _selectionNode: null,
