@@ -159,11 +159,30 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="getPageStyle"><span class="type-signature"></span>getPageStyle<span class="signature">()</span><span
+            <h4 class="name" id="getPageStyle"><span class="type-signature"></span>getPageStyle<span class="signature">(iframe)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
-                Returns the CSS text that has been applied to the current page.
+                Returns the Style text that has been applied to the current page.
             </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>iframe</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|null</span>
+                    </td>
+                    <td class="description last">To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)</td>
+                </tr>
+                </tbody>
+            </table>
             <dl class="details"></dl>
 
 
@@ -187,7 +206,41 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Iframe element</td>
+                    <td class="description last">Iframe element (context.element.wysiwygFrame)</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getAttributesToString"><span class="type-signature"></span>getAttributesToString<span class="signature">(element, exceptAttrs)</span><span
+                    class="type-signature"> &rarr; {String}</span></h4>
+            <div class="description">
+                Get attributes of argument element to string ('class="---" name="---" ')
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>exceptAttrs</code></td>
+                    <td class="type">
+                        <span class="param-type">Array|null</span>
+                    </td>
+                    <td class="description last">Array of attribute names to exclude from the result</td>
                 </tr>
                 </tbody>
             </table>
@@ -1401,6 +1454,7 @@
         <li><a href="document-util.html#getIncludePath">getIncludePath</a></li>
         <li><a href="document-util.html#getPageStyle">getPageStyle</a></li>
         <li><a href="document-util.html#getIframeDocument">getIframeDocument</a></li>
+        <li><a href="document-util.html#getAttributesToString">getAttributesToString</a></li>
         <li><a href="document-util.html#convertContentsForEditor">convertContentsForEditor</a></li>
         <li><a href="document-util.html#convertHTMLForCodeView">convertHTMLForCodeView</a></li>
         <li><a href="document-util.html#isWysiwygDiv">isWysiwygDiv</a></li>

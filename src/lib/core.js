@@ -2119,13 +2119,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _setEditorDataToCodeView: function () {
             let codeValue = '';
             if (context.option.fullPage) {
-                const attrs = this._wd.body.attributes;
-                let attrString = '';
-                for (let i = 0, len = attrs.length; i < len; i++) {
-                    attrString += attrs[i].name + '="' + attrs[i].value + '" ';
-                }
-
-                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrString + '>\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+                const attrs = util.getAttributesToString(this._wd.body, null);
+                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
             } else {
                 codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
             }
@@ -2223,15 +2218,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             _d.body.appendChild(iframe);
 
             const printDocument = util.getIframeDocument(iframe);
-            const contentsHTML = this.getContents(false);
+            const contentsHTML = this.getContents(true);
 
-            if (context.option.fullPage) {
-                printDocument.write(contentsHTML);
-            } else if (context.option.iframe) {
+            if (context.option.iframe) {
+                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
+                const arrts = context.option.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+
                 printDocument.write('' +
                     '<!DOCTYPE html><html>' +
-                    util.getIframeDocument(context.element.wysiwygFrame).head.outerHTML +
-                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '<head>' +
+                    wDocument.head.innerHTML +
+                    '<style>' + util.getPageStyle(context.element.wysiwygFrame) + '</style>' +
+                    '</head>' +
+                    '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
@@ -2246,26 +2245,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 printDocument.body.appendChild(contents);
             }
 
-            setTimeout(function () {
-                try {
-                    iframe.focus();
-                    // IE or Edge
-                    if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
-                        try {
-                            iframe.contentWindow.document.execCommand('print', false, null);
-                        } catch (e) {
-                            iframe.contentWindow.print();
-                        }
-                    } else {
-                        // Other browsers
+            try {
+                iframe.focus();
+                // IE or Edge
+                if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
+                    try {
+                        iframe.contentWindow.document.execCommand('print', false, null);
+                    } catch (e) {
                         iframe.contentWindow.print();
                     }
-                } catch (error) {
-                    throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
-                } finally {
-                    util.removeItem(iframe);
+                } else {
+                    // Other browsers
+                    iframe.contentWindow.print();
                 }
-            }, 100);
+            } catch (error) {
+                throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
+            } finally {
+                util.removeItem(iframe);
+            }
         },
 
         /**
@@ -2340,14 +2337,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (context.option.fullPage && !onlyContents) {
-                const attrs = this._wd.body.attributes;
-                let attrString = '';
-                for (let i = 0, len = attrs.length; i < len; i++) {
-                    if (attrs[i].name === 'contenteditable') continue;
-                    attrString += attrs[i].name + '="' + attrs[i].value + '" ';
-                }
-                
-                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrString + '>' + renderHTML.innerHTML + '</body></html>';
+                const attrs = util.getAttributesToString(this._wd.body, ['contenteditable']);
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
             } else {
                 return renderHTML.innerHTML;
             }

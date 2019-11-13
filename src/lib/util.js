@@ -134,11 +134,12 @@ const util = {
 
     /**
      * @description Returns the CSS text that has been applied to the current page.
+     * @param {Element|null} iframe To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)
      * @returns {String}
      */
-    getPageStyle: function () {
+    getPageStyle: function (iframe) {
         let cssText = '';
-        const sheets = this._d.styleSheets;
+        const sheets = (iframe ? this.getIframeDocument(iframe) : this._d).styleSheets;
         
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
             try {
@@ -157,13 +158,33 @@ const util = {
 
     /**
      * @description Get the argument iframe's document object
-     * @param {Element} iframe Iframe element
+     * @param {Element} iframe Iframe element (context.element.wysiwygFrame)
      * @returns {Document}
      */
     getIframeDocument: function (iframe) {
         let wDocument = iframe.contentWindow || iframe.contentDocument;
         if (wDocument.document) wDocument = wDocument.document;
         return wDocument;
+    },
+
+    /**
+     * @description Get attributes of argument element to string ('class="---" name="---" ')
+     * @param {Element} element Element object
+     * @param {Array|null} exceptAttrs Array of attribute names to exclude from the result
+     * @returns {String}
+     */
+    getAttributesToString: function (element, exceptAttrs) {
+        if (!element.attributes) return '';
+
+        const attrs = element.attributes;
+        let attrString = '';
+
+        for (let i = 0, len = attrs.length; i < len; i++) {
+            if (exceptAttrs && exceptAttrs.indexOf(attrs[i].name) > -1) continue;
+            attrString += attrs[i].name + '="' + attrs[i].value + '" ';
+        }
+
+        return attrString;
     },
 
     /**
