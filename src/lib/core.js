@@ -951,7 +951,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const inner = insNode;
                         insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
                         insNode.innerHTML = inner.innerHTML;
-                        insNode.style.cssText = inner.style.cssText;
+                        util.copyFormatAttributes(insNode, inner);
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
@@ -992,7 +992,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 cc: rangeParent,
                 sc: firstNode,
                 ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
-            } : this.util.getEdgeChildNodes(firstNode, lastNode);
+            } : util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistory) return edge;
             
@@ -3210,7 +3210,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
-                            newEl.style.cssText = formatEl.style.cssText;
+                            util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;

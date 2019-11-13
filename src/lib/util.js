@@ -339,6 +339,16 @@ const util = {
     },
 
     /**
+     * @description Copy and apply attributes of format tag that should be maintained. (style, class)
+     * @param {Element} newEl New element
+     * @param {Element} originEl Origin element
+     */
+    copyFormatAttributes: function (newEl, originEl) {
+        newEl.style.cssText = originEl.style.cssText;
+        newEl.className = originEl.className;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {Array} array element array
      * @param {Element} element The element to find index

@@ -174,7 +174,7 @@ export default {
                 
                 if (node.nodeName.toLowerCase() !== value.toLowerCase() && !this.util.isComponent(node)) {
                     newFormat = tag.cloneNode(false);
-                    newFormat.style.cssText = node.style.cssText;
+                    this.util.copyFormatAttributes(newFormat, node);
                     newFormat.innerHTML = node.innerHTML;
                     node.parentNode.insertBefore(newFormat, node);
                     this.util.removeItem(node);
