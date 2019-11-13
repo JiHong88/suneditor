@@ -230,28 +230,6 @@ const util = {
      */
     convertHTMLForCodeView: function (wysiwygDiv) {
         return wysiwygDiv.innerHTML.replace(/>(?!\n)(?!\b)/g, '>\n');
-        // let html = '';
-        // const reg = this._w.RegExp;
-
-        // (function recursionFunc (element) {
-        //     const children = element.childNodes;
-
-        //     for (let i = 0, len = children.length, node; i < len; i++) {
-        //         node = children[i];
-        //         if (/^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|OL|UL|FIGCAPTION)$/i.test(node.nodeName)) {
-        //             node.innerHTML = node.innerHTML.replace(/\n/g, '');
-        //             const tag = node.nodeName.toLowerCase();
-        //             html += node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + '\n';
-        //             recursionFunc(node);
-        //             html += '</' + tag + '>\n';
-        //         } else {
-        //             html += node.nodeType === 3 ? /^\n+$/.test(node.data) ? '' : node.data : node.outerHTML + '\n';
-        //         }
-        //     }
-
-        // }(wysiwygDiv));
-
-        // return html;
     },
 
     /**
