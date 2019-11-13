@@ -134,11 +134,12 @@ const util = {
 
     /**
      * @description Returns the CSS text that has been applied to the current page.
+     * @param {Element|null} iframe To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)
      * @returns {String}
      */
-    getPageStyle: function () {
+    getPageStyle: function (iframe) {
         let cssText = '';
-        const sheets = this._d.styleSheets;
+        const sheets = (iframe ? this.getIframeDocument(iframe) : this._d).styleSheets;
         
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
             try {
@@ -153,6 +154,37 @@ const util = {
         }
 
         return cssText;
+    },
+
+    /**
+     * @description Get the argument iframe's document object
+     * @param {Element} iframe Iframe element (context.element.wysiwygFrame)
+     * @returns {Document}
+     */
+    getIframeDocument: function (iframe) {
+        let wDocument = iframe.contentWindow || iframe.contentDocument;
+        if (wDocument.document) wDocument = wDocument.document;
+        return wDocument;
+    },
+
+    /**
+     * @description Get attributes of argument element to string ('class="---" name="---" ')
+     * @param {Element} element Element object
+     * @param {Array|null} exceptAttrs Array of attribute names to exclude from the result
+     * @returns {String}
+     */
+    getAttributesToString: function (element, exceptAttrs) {
+        if (!element.attributes) return '';
+
+        const attrs = element.attributes;
+        let attrString = '';
+
+        for (let i = 0, len = attrs.length; i < len; i++) {
+            if (exceptAttrs && exceptAttrs.indexOf(attrs[i].name) > -1) continue;
+            attrString += attrs[i].name + '="' + attrs[i].value + '" ';
+        }
+
+        return attrString;
     },
 
     /**
@@ -197,28 +229,7 @@ const util = {
      * @returns {String}
      */
     convertHTMLForCodeView: function (wysiwygDiv) {
-        let html = '';
-        const reg = this._w.RegExp;
-
-        (function recursionFunc (element) {
-            const children = element.childNodes;
-
-            for (let i = 0, len = children.length, node; i < len; i++) {
-                node = children[i];
-                if (/^(BLOCKQUOTE|TABLE|THEAD|TBODY|TR|OL|UL|FIGCAPTION)$/i.test(node.nodeName)) {
-                    node.innerHTML = node.innerHTML.replace(/\n/g, '');
-                    const tag = node.nodeName.toLowerCase();
-                    html += node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + '\n';
-                    recursionFunc(node);
-                    html += '</' + tag + '>\n';
-                } else {
-                    html += node.nodeType === 3 ? /^\n+$/.test(node.data) ? '' : node.data : node.outerHTML + '\n';
-                }
-            }
-
-        }(wysiwygDiv));
-
-        return html;
+        return wysiwygDiv.innerHTML.replace(/>(?!\n)(?!\b)/g, '>\n');
     },
 
     /**
@@ -303,6 +314,16 @@ const util = {
         }
 
         return null;
+    },
+
+    /**
+     * @description Copy and apply attributes of format tag that should be maintained. (style, class)
+     * @param {Element} newEl New element
+     * @param {Element} originEl Origin element
+     */
+    copyFormatAttributes: function (newEl, originEl) {
+        newEl.style.cssText = originEl.style.cssText;
+        newEl.className = originEl.className;
     },
 
     /**

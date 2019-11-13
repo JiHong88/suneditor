@@ -187,7 +187,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize Indented size when tab button clicked (4)
-         * @property {Number} minResizingSize Minimum size of editing area when resized (65)
+         * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
          */
@@ -197,7 +197,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
-            minResizingSize: 65,
+            minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
             currentNodes: [],
             _range: null,
             _selectionNode: null,
@@ -951,7 +951,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const inner = insNode;
                         insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
                         insNode.innerHTML = inner.innerHTML;
-                        insNode.style.cssText = inner.style.cssText;
+                        util.copyFormatAttributes(insNode, inner);
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
@@ -992,7 +992,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 cc: rangeParent,
                 sc: firstNode,
                 ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
-            } : this.util.getEdgeChildNodes(firstNode, lastNode);
+            } : util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistory) return edge;
             
@@ -1980,7 +1980,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     break;
                 case 'save':
                     if (typeof context.option.callBackSave === 'function') {
-                        context.option.callBackSave(this.getContents());
+                        context.option.callBackSave(this.getContents(false));
                     } else if (typeof userFunction.save === 'function') {
                         userFunction.save();
                     } else {
@@ -2119,12 +2119,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _setEditorDataToCodeView: function () {
             let codeValue = '';
             if (context.option.fullPage) {
-                const headChildren = this._wd.head.children;
-                let headTags = '';
-                for (let i = 0, len = headChildren.length; i < len; i++) {
-                    headTags += headChildren[i].outerHTML + '\n';
-                }
-                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.match(/^<head[^>]*>/)[0] + '\n' + headTags + '</head>\n' + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + '\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+                const attrs = util.getAttributesToString(this._wd.body, null);
+                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
             } else {
                 codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
             }
@@ -2219,20 +2215,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         print: function () {
             const iframe = util.createElement('IFRAME');
             iframe.style.display = 'none';
-
-            const contents = util.createElement('DIV');
-            const style = util.createElement('STYLE');
-            style.innerHTML = util.getPageStyle();
-            contents.className = 'sun-editor-editable';
-            contents.innerHTML = this.getContents();
-
             _d.body.appendChild(iframe);
-            
-            let printDocument = iframe.contentWindow || iframe.contentDocument;
-            if (printDocument.document) printDocument = printDocument.document;
 
-            printDocument.head.appendChild(style);
-            printDocument.body.appendChild(contents);
+            const printDocument = util.getIframeDocument(iframe);
+            const contentsHTML = this.getContents(true);
+
+            if (context.option.iframe) {
+                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
+                const arrts = context.option.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+
+                printDocument.write('' +
+                    '<!DOCTYPE html><html>' +
+                    '<head>' +
+                    wDocument.head.innerHTML +
+                    '<style>' + util.getPageStyle(context.element.wysiwygFrame) + '</style>' +
+                    '</head>' +
+                    '<body ' + arrts + '>' + contentsHTML + '</body>' +
+                    '</html>'
+                );
+            } else {
+                const contents = util.createElement('DIV');
+                const style = util.createElement('STYLE');
+
+                style.innerHTML = util.getPageStyle();
+                contents.className = 'sun-editor-editable';
+                contents.innerHTML = contentsHTML;
+
+                printDocument.head.appendChild(style);
+                printDocument.body.appendChild(contents);
+            }
 
             try {
                 iframe.focus();
@@ -2258,17 +2269,21 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Open the preview window.
          */
         preview: function () {
-            const cssText = util.getPageStyle();
-            const contentsHTML = this.getContents();
-            
+            const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
 
-            if (context.option.fullPage) {
+            if (context.option.iframe) {
+                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
+                const arrts = context.option.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
-                    this._wd.head.outerHTML +
-                    this._wd.body.outerHTML +
+                    '<head>' +
+                    wDocument.head.innerHTML +
+                    '<style>body {overflow: auto !important;}</style>' +
+                    '</head>' +
+                    '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
@@ -2278,7 +2293,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
-                    '<style>' + cssText + '</style>' +
+                    '<style>' + util.getPageStyle() + '</style>' +
                     '</head>' +
                     '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
                     '</html>'
@@ -2309,7 +2324,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Gets the current contents
-         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
+         * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {Object}
          */
         getContents: function (onlyContents) {
@@ -2326,7 +2341,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (context.option.fullPage && !onlyContents) {
-                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + this._wd.body.outerHTML.match(/^<body[^>]*>/)[0] + renderHTML.innerHTML + '</body></html>';
+                const attrs = util.getAttributesToString(this._wd.body, ['contenteditable']);
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
             } else {
                 return renderHTML.innerHTML;
             }
@@ -3047,8 +3063,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
                         if (!selectionNode.nextElementSibling) {
-                            selectionNode.removeAttribute('style');
-                            selectionNode.removeAttribute('class');
+                            const attrs = selectionNode.attributes;
+                            for (let i = 0, len = attrs.length; i < len; i++) {
+                                selectionNode.removeAttribute(attrs[i].name);
+                            }
                             core.execCommand('formatBlock', false, 'P');
                         }
                         return false;
@@ -3192,7 +3210,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
-                            newEl.style.cssText = formatEl.style.cssText;
+                            util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
@@ -3503,7 +3521,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         _onChange_historyStack: function () {
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (userFunction.onChange) userFunction.onChange(core.getContents());
+            if (userFunction.onChange) userFunction.onChange(core.getContents(true));
         },
 
         _addEvent: function () {
@@ -3720,7 +3738,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Copying the contents of the editor to the original textarea
          */
         save: function () {
-            context.element.originElement.value = core.getContents();
+            context.element.originElement.value = core.getContents(false);
         },
 
         /**
