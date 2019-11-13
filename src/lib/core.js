@@ -2269,17 +2269,21 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Open the preview window.
          */
         preview: function () {
-            const contentsHTML = this.getContents(false);
+            const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
 
-            if (context.option.fullPage) {
-                windowObject.document.write(contentsHTML);
-            } else if (context.option.iframe) {
+            if (context.option.iframe) {
+                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
+                const arrts = context.option.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
-                    util.getIframeDocument(context.element.wysiwygFrame).head.outerHTML +
-                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '<head>' +
+                    wDocument.head.innerHTML +
+                    '<style>body {overflow: auto !important;}</style>' +
+                    '</head>' +
+                    '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
