@@ -294,8 +294,10 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
-iframeCSSFileName : Name of the CSS file to apply inside the iframe.
-                    Applied by searching by filename in the link tag of document.  default: 'suneditor' {String}
+iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
+                    Applied by searching by filename in the link tag of document,
+                    or put the URL value.                                        default: 'suneditor' {Array|String}
+                    ex) 'main' or ['suneditor', 'http://suneditor.com/sample/css/sample.css']
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.0.0 or later.
                   ex) codeMirror: CodeMirror // Default option

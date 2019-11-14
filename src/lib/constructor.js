@@ -245,19 +245,28 @@ export default {
             wysiwygDiv.innerHTML = initHTML;
         } else {
             const cssTags = (function () {
-                const CSSFileName = new RegExp('(^|.*[\\/])' + (options.iframeCSSFileName || 'suneditor') + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
-                const path = [];
-
-                for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-                    styleTag = c[i].href.match(CSSFileName);
-                    if (styleTag) path.push(styleTag[0]);
-                }
-    
-                if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
-    
+                const linkNames = options.iframeCSSFileName;
                 let tagString = '';
-                for (let i = 0, len = path.length; i < len; i++) {
-                    tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+
+                for (let f = 0, len = linkNames.length, path; f < len; f++) {
+                    path = [];
+
+                    if (/^https?:\/\//.test(linkNames[f])) {
+                        path.push(linkNames[f]);
+                    } else {
+                        const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
+        
+                        for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+                            styleTag = c[i].href.match(CSSFileName);
+                            if (styleTag) path.push(styleTag[0]);
+                        }
+                    }
+        
+                    if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
+        
+                    for (let i = 0, len = path.length; i < len; i++) {
+                        tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+                    }
                 }
 
                 return tagString;
@@ -357,9 +366,9 @@ export default {
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
-        // options.iframeCSSFileName = options.iframeCSSFileName;
         // options.fullPage = options.fullPage;
         options.iframe = options.fullPage || options.iframe;
+        options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
         /** Display */
         // options.position = options.position;
