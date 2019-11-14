@@ -64,7 +64,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'classic',
     // toolbarWidth: 800,
     height: 'auto',
-    fullPage: true,
+    // fullPage: true,
     iframe: true,
     iframeCSSFileName: 'suneditor',
     // callBackSave: (contents) => {

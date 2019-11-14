@@ -1942,7 +1942,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             switch (command) {
                 case 'selectAll':
                     const wysiwyg = context.element.wysiwyg;
-                    const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }) || wysiwyg.firstChild;
+                    const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     this.setRange(first, 0, last, last.textContent.length);
                     break;
@@ -2066,6 +2066,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = '0px';
                 this._variable.wysiwygActive = true;
+                this._resourcesStateChange();
+                this._checkComponents();
                 this.focus();
             } else {
                 this._setEditorDataToCodeView();
