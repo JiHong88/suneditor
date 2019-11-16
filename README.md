@@ -356,9 +356,9 @@ formats         : Change default formatBlock array.                 default: [..
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
-                    class: '__se__xxx' || null, // Class names must always begin with "__se__"
                     title: 'Custom div' || null, // default: tag name
-                    command: 'replace' || 'range' // default: "replace"
+                    command: 'replace' || 'range', // default: "replace"
+                    class: '__se__format__xxx' || null, // Class names must always begin with "__se__format__"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [

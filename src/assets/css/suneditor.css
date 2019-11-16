@@ -265,7 +265,7 @@
 /** --- resizing bar */
 .sun-editor .se-resizing-bar {display:flex; width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 4px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
-.sun-editor .se-resizing-back {position:absolute; display:none; cursor:ns-resize; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-resizing-back {position:absolute; display:none; cursor:default; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 /** resizing bar - nabigation */
 .sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
@@ -373,9 +373,11 @@
 .sun-editor .se-tooltip:hover .se-tooltip-inner {visibility:visible; opacity:1;}
 
 /** --- show blocks mode */
-.se-show-block p, .se-show-block div, .se-show-block h1, .se-show-block h2, .se-show-block h3, .se-show-block h4, .se-show-block h5, .se-show-block h6 {
-    border:1px dashed #3f9dff;
-    padding:10px 8px 8px 8px;
+.sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
+.sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
+.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6 {
+    border:1px dashed #3f9dff !important;
+    padding:10px 8px 8px 8px !important;
 }
 .se-show-block p {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;}
 .se-show-block div {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;}

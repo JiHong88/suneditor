@@ -2043,6 +2043,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         toggleDisplayBlocks: function () {
             util.toggleClass(context.element.wysiwyg, 'se-show-block');
+            this._resourcesStateChange();
         },
 
         /**
@@ -3076,8 +3077,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         selectionNode.innerHTML = '<br>';
                         if (!selectionNode.nextElementSibling) {
                             const attrs = selectionNode.attributes;
-                            for (let i = 0, len = attrs.length; i < len; i++) {
-                                selectionNode.removeAttribute(attrs[i].name);
+                            while (attrs[0]) {
+                                selectionNode.removeAttribute(attrs[0].name);
                             }
                             core.execCommand('formatBlock', false, 'P');
                         }

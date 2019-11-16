@@ -360,8 +360,19 @@ const util = {
      * @param {Element} originEl Origin element
      */
     copyFormatAttributes: function (newEl, originEl) {
-        newEl.style.cssText = originEl.style.cssText;
-        newEl.className = originEl.className;
+        if (originEl.style.cssText) {
+            newEl.style.cssText = originEl.style.cssText;
+        }
+
+        const classes = originEl.classList;
+        newEl.className = '';
+        for (let i = 0, len = classes.length, first = true; i < len; i++) {
+            if (/__se__format__/.test(classes[i])) continue;
+            newEl.className += (first ? '' : ' ') + classes[i];
+            first = false;
+        }
+        
+        if (!newEl.className) newEl.removeAttribute('class');
     },
 
     /**

@@ -40,23 +40,24 @@ export default {
         listDiv.className = 'se-submenu se-list-layer';
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = formatList.length, format, command, title, h, oClass; i < len; i++) {
-            if (typeof formatList[i] === 'string') {
-                format = formatList[i].toLowerCase();
-                command = format === 'pre' || format === 'blockquote' ? 'range' : 'replace';
-                h = /^h/.test(format) ? format.match(/\d+/)[0] : '';
-                title = lang_toolbar['tag_' + (h ? 'h' : format)] + h;
-                oClass = '';
+        for (let i = 0, len = formatList.length, format, tagName, command, title, h, attrs; i < len; i++) {
+            format = formatList[i];
+            if (typeof format === 'string') {
+                tagName = format.toLowerCase();
+                command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
+                h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
+                title = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+                attrs = '';
             } else {
-                format = formatList[i].tag.toLowerCase();
-                command = 'replace';
-                title = formatList[i].title || format;
-                oClass = (' class="' + formatList[i].class + '"' || '') + 'data-format="' + command + '"';
+                tagName = format.tag.toLowerCase();
+                command = format.command;
+                title = format.title || tagName;
+                attrs = format.class ? ' class="' + format.class + '"' : '';
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + format + '" title="' + title + '">' +
-                '<' + format + oClass + '>' + title + '</' + format + '>' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + title + '">' +
+                '<' + tagName + attrs + '>' + title + '</' + tagName + '>' +
                 '</button></li>';
         }
         list += '</ul></div>';
@@ -127,6 +128,7 @@ export default {
             let listFirst = false;
             let listLast = false;
             const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
+
             for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
                 lastIndex = i === len - 1;
                 o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
@@ -176,6 +178,11 @@ export default {
                     newFormat = tag.cloneNode(false);
                     this.util.copyFormatAttributes(newFormat, node);
                     newFormat.innerHTML = node.innerHTML;
+                    
+                    if (/__se__format__/.test(tag.className)) {
+                        newFormat.className += (newFormat.className.length > 0 ? ' ' : '') + tag.className;
+                    }
+
                     node.parentNode.insertBefore(newFormat, node);
                     this.util.removeItem(node);
                 }

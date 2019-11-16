@@ -527,22 +527,31 @@ export default {
         contextResizing.resizeButton.style.display = 'none';
         contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
-        const closureFunc_bind = function closureFunc() {
+        const closureFunc_bind = function closureFunc(e) {
+            if (e.type === 'keydown' && e.keyCode !== 27) return;
+
             const change = contextResizing._isChange;
             contextResizing._isChange = false;
 
             document.removeEventListener('mousemove', resizing_element_bind);
             document.removeEventListener('mouseup', closureFunc_bind);
 
-            // element resize
-            this.plugins.resizing.cancel_controller_resize.call(this);
-            // history stack
-            if (change) this.history.push();
+            if (e.type === 'keydown') {
+                this.controllersOff();
+                this.context.element.resizeBackground.style.display = 'none';
+                this.plugins[this.context.resizing._resize_plugin].init.call(this);
+            } else {
+                // element resize
+                this.plugins.resizing.cancel_controller_resize.call(this);
+                // history stack
+                if (change) this.history.push();
+            }
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
         document.addEventListener('mousemove', resizing_element_bind);
         document.addEventListener('mouseup', closureFunc_bind);
+        document.addEventListener('keydown', closureFunc_bind);
     },
 
     resizing_element: function (contextResizing, direction, plugin, e) {

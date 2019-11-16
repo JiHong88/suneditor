@@ -220,11 +220,12 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+    formats: ['h1', 'p', 'blockquote', {
         tag: 'div',
-        class: '__se__aaa',
+        class: '__se__format__aaa',
+        style: 'margin: 10px; background-color: #f5f5f5;',
         title: 'red div',
-        command: 'range'
+        command: 'replace'
     }],
     // iframe: true,
     // fullPage: true,
@@ -440,8 +441,9 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     charCounter: true,
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
         tag: 'div',
-        class: '__se__aaa',
+        class: '__se__format__aaa',
         title: 'red div',
+        style: 'margin: 10px; background-color: #f5f5f5;',
         command: 'replace'
     }],
     placeholder: 'Start typing something.4..'
