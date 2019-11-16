@@ -274,7 +274,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(wysiwygDiv)</span><span
+            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html, indentSize)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Converts wysiwyg area element into a format that can be placed in an editor of code view mode
@@ -290,11 +290,18 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>wysiwygDiv</code></td>
+                    <td class="name"><code>html</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
+                        <span class="param-type">Element|String</span>
                     </td>
-                    <td class="description last">WYSIWYG element (context.element.wysiwyg)</td>
+                    <td class="description last">WYSIWYG element (context.element.wysiwyg) or HTML string</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>indentSize</code></td>
+                    <td class="type">
+                        <span class="param-type">Number|null</span>
+                    </td>
+                    <td class="description last">The indent size of the tag (default: 0)</td>
                 </tr>
                 </tbody>
             </table>

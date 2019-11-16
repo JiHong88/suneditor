@@ -64,9 +64,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'classic',
     // toolbarWidth: 800,
     height: 'auto',
-    // fullPage: true,
-    iframe: true,
-    iframeCSSFileName: 'suneditor',
+    fullPage: true,
+    // iframe: true,
+    // iframeCSSFileName: ['suneditor', 'http://suneditor.com/sample/css/sample.css'],
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
@@ -229,13 +229,13 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // iframe: true,
     // fullPage: true,
     // mode: 'balloon',
-    // codeMirror: CodeMirror,
-    codeMirror: {
-        src: CodeMirror,
-        options: {
-            mode: 'xml'
-        }
-    },
+    codeMirror: CodeMirror,
+    // codeMirror: {
+    //     src: CodeMirror,
+    //     options: {
+    //         mode: 'xml'
+    //     }
+    // },
     // placeholder: 'Start typing something.3..'
     // imageUploadSizeLimit: 30000
 });

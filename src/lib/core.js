@@ -186,7 +186,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @property {Boolean} isFullScreen State of full screen
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
-         * @property {Number} tabSize Indented size when tab button clicked (4)
+         * @property {Number} tabSize Indent size of tab (4)
+         * @property {Number} codeIndent Indent size of Code view mode (4)
          * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
@@ -197,6 +198,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
+            codeIndent: 2,
             minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
             currentNodes: [],
             _range: null,
@@ -2119,12 +2121,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _setEditorDataToCodeView: function () {
+            const codeContents = util.convertHTMLForCodeView(context.element.wysiwyg, this._variable.codeIndent);
             let codeValue = '';
+
             if (context.option.fullPage) {
                 const attrs = util.getAttributesToString(this._wd.body, null);
-                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + util.convertHTMLForCodeView(context.element.wysiwyg) + '</body>\n</html>';
+                codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContents + '</body>\n</html>';
             } else {
-                codeValue = util.convertHTMLForCodeView(context.element.wysiwyg);
+                codeValue = codeContents;
             }
 
             context.element.code.style.display = 'block';
@@ -2308,19 +2312,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} html HTML string
          */
         setContents: function (html) {
+            const convertValue = util.convertContentsForEditor(html);
             if (core._variable.wysiwygActive) {
-                const cleanHTML = util.convertContentsForEditor(html);
-                if (cleanHTML !== context.element.wysiwyg.innerHTML) {
-                    context.element.wysiwyg.innerHTML = cleanHTML;
-
-                    // history stack
-                    core.history.push();
-                }
+                context.element.wysiwyg.innerHTML = convertValue;
+                // history stack
+                core.history.push();
             } else {
-                const value = util.convertHTMLForCodeView(html);
-                if (value !== core._getCodeView()) {
-                    core._setCodeView(value);
-                }
+                const value = util.convertHTMLForCodeView(convertValue, core._variable.codeIndent);
+                core._setCodeView(value);
             }
         },
 
@@ -2849,8 +2848,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onClick_wysiwyg: function (e) {
             const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
+
             e.stopPropagation();
-            
+
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
                 const imageComponent = targetElement.querySelector('IMG');
                 const videoComponent = targetElement.querySelector('IFRAME');
@@ -2901,14 +2901,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const formatEl = util.getFormatElement(core.getSelectionNode());
-            const rangeEl = util.getRangeFormatElement(core.getSelectionNode());
+            core._editorRange();
+
+            const selectionNode = core.getSelectionNode();
+            const formatEl = util.getFormatElement(selectionNode);
+            const rangeEl = util.getRangeFormatElement(selectionNode);
             if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
-                core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                if (util.isList(rangeEl)) {
+                    const oLi = util.createElement('LI');
+                    const prevLi = selectionNode.nextElementSibling;
+                    oLi.appendChild(selectionNode);
+                    rangeEl.insertBefore(oLi, prevLi);
+                } else {
+                    core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                }
+
                 core.focus();
             }
 
-            core._editorRange();
             event._findButtonEffectTag();
 
             if (core._isBalloon) {
@@ -3178,7 +3188,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     const lines = core.getSelectedElements();
 
                     if (!shift) {
-                        const tabText = util.createTextNode(new Array(core._variable.tabSize + 1).join('\u00A0'));
+                        const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
                         if (lines.length === 1) {
                             core.insertNode(tabText);
                             core.setRange(tabText, core._variable.tabSize, tabText, core._variable.tabSize);
@@ -3813,10 +3823,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
+            const convertValue = util.convertContentsForEditor(contents);
+            
             if (core._variable.wysiwygActive) {
-                context.element.wysiwyg.innerHTML += util.convertContentsForEditor(contents);
+                context.element.wysiwyg.innerHTML += convertValue;
             } else {
-                core._setCodeView(core._getCodeView() + util.convertHTMLForCodeView(contents));
+                core._setCodeView(core._getCodeView() + '\n' + util.convertHTMLForCodeView(convertValue, core._variable.codeIndent));
             }
 
             // history stack

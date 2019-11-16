@@ -193,10 +193,8 @@ const util = {
      * @returns {String}
      */
     convertContentsForEditor: function (contents) {
-        let tag, baseHtml, innerHTML = '';
-        contents = contents.trim();
-
-        tag = this._d.createRange().createContextualFragment(contents).childNodes;
+        let baseHtml, innerHTML = '';
+        let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
         for (let i = 0, len = tag.length; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
@@ -206,38 +204,44 @@ const util = {
                 let text = '';
                 for (let t = 0, tLen = textArray.length; t < tLen; t++) {
                     text = textArray[t].trim();
-                    if (text.length > 0) innerHTML += '<P>' + text + '</p>';
+                    if (text.length > 0) innerHTML += '<p>' + text + '</p>';
                 }
             } else {
-                innerHTML += baseHtml;
+                innerHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, '');
             }
         }
 
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
-        contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
-            return (typeof ec[m] === 'string') ? ec[m] : m;
-        });
-
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+        if (innerHTML.length === 0) {
+            const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
+            contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
+                return (typeof ec[m] === 'string') ? ec[m] : m;
+            });
+            innerHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+        }
 
         return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
     },
 
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-     * @param {Element} wysiwygDiv WYSIWYG element (context.element.wysiwyg)
+     * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+     * @param {Number|null} indentSize The indent size of the tag (default: 0)
      * @returns {String}
      */
-    convertHTMLForCodeView: function (wysiwygDiv) {
-        let html = '';
+    convertHTMLForCodeView: function (html, indentSize) {
+        let returnHTML = '';
         const reg = this._w.RegExp;
         const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR)$', 'i');
         const isFormatElement = this.isFormatElement.bind(this);
+        const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
 
-        (function recursionFunc (element, indentSize, lineBR) {
+        indentSize *= 1;
+        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+
+        (function recursionFunc (element, indent, lineBR) {
             const children = element.childNodes;
             const elementRegTest = brReg.test(element.nodeName);
-            const indent = (elementRegTest ? indentSize : '');
+            const elementIndent = (elementRegTest ? indent : '');
 
             for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
                 node = children[i];
@@ -246,24 +250,24 @@ const util = {
                 lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
 
                 if (node.nodeType === 3) {
-                    html += (/^\n+$/.test(node.data) ? '' : node.data);
+                    returnHTML += (/^\n+$/.test(node.data) ? '' : node.data);
                     continue;
                 }
 
                 if (node.childNodes.length === 0) {
-                    html += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + indent + node.outerHTML + br;
+                    returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                     continue;
                 }
                 
                 node.innerHTML = node.innerHTML.replace(/\n/g, '');
                 const tag = node.nodeName.toLowerCase();
-                html += (lineBR || (elementRegTest ? '' : br)) + (indent || nodeRegTest ? indentSize : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
-                recursionFunc(node, indentSize + '  ', '');
-                html += (nodeRegTest ? indentSize : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
+                recursionFunc(node, indent + indentSize, '');
+                returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
             }
-        }(wysiwygDiv, '', '\n'));
+        }(wDoc, '', '\n'));
 
-        return html.trim();
+        return returnHTML.trim();
     },
 
     /**
