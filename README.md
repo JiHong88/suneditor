@@ -139,10 +139,11 @@ suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
+        ['paragraphStyle'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
         '/', // Line break
-        ['fontColor', 'hiliteColor'],
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
         ['table', 'link', 'image', 'video'],
@@ -166,14 +167,14 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
-        list, lineHeight, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, lineHeight, 
+    table, template, formatBlock, paragraphStyle, textStyle, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo', 'removeFormat'],
         [font, fontSize, formatBlock],
-        [fontColor, hiliteColor],
+        [paragraphStyle, textStyle, fontColor, hiliteColor],
         [align, horizontalRule, list, lineHeight],
         [table, link, image, video, template]
     ],
@@ -185,7 +186,7 @@ suneditor.create('sample', {
 'suneditor/src/plugins/dialog/...'
 // image, video, link
 'suneditor/src/plugins/submenu/...'
-// align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, list, table, template
+// align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, paragraphStyle, textStyle, list, table, template
 ```
 
 ## Init function
@@ -205,9 +206,10 @@ const initEditor = suneditor.init({
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
+        'paragraphStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
-        'fontColor', 'hiliteColor',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
         'table', 'link', 'image', 'video',
@@ -356,7 +358,7 @@ formats         : Change default formatBlock array.                 default: [..
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
-                    title: 'Custom div' || null, // default: tag name
+                    name: 'Custom div' || null, // default: tag name
                     command: 'replace' || 'range', // default: "replace"
                     class: '__se__format__xxx' || null, // Class names must always begin with "__se__format__"
                   }]
@@ -383,6 +385,34 @@ lineHeights     : Change default line-height array.                 default: [{}
                   ex) [
                     {text: 'Single', value: 1},
                     {text: 'Double', value: 2}
+                  ]
+paragraphStyles : You can apply custom style to text.
+                  Default value: [
+                    {
+                        name: 'Highlighted', // Format style name
+                        class: '__se__p-highlighted' // Define style for used class (Class names must always begin with "__se__")
+                    },
+                    {
+                        name: 'Bordered',
+                        class: '__se__p-bordered'
+                    },
+                    {
+                        name: 'Spaced',
+                        class: '__se__p-spaced'
+                    }
+                  ]
+textStyles      : You can apply custom style to format.
+                  Default value: [
+                    {
+                        name: 'Translucent', // Text style Name
+                        style: 'opacity: 0.5;', // Style query
+                        tag: 'span', // Style tag name (default: span)
+                    },
+                    {
+                        name: 'Emphasis',
+                        style: '-webkit-text-emphasis: filled;',
+                        tag: 'span',
+                    }
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------
@@ -443,16 +473,17 @@ buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
+                    // ['paragraphStyle'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                    // ['fontColor', 'hiliteColor', 'textStyle'],
                     ['removeFormat'],
-                    // '/', Line break
-                    // ['fontColor', 'hiliteColor'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
                     // ['table', 'link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
+                    // '/', Line break
                   ]
 ```
 

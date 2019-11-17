@@ -80,9 +80,9 @@ export default {
         listDiv.className = 'se-submenu se-selector-table';
         listDiv.innerHTML = '' +
             '<div class="se-table-size">' +
-            '   <div class="se-table-size-picker se-controller-table-picker"></div>' +
-            '   <div class="se-table-size-highlighted"></div>' +
-            '   <div class="se-table-size-unhighlighted"></div>' +
+                '<div class="se-table-size-picker se-controller-table-picker"></div>' +
+                '<div class="se-table-size-highlighted"></div>' +
+                '<div class="se-table-size-unhighlighted"></div>' +
             '</div>' +
             '<div class="se-table-size-display">1 x 1</div>';
 
@@ -96,20 +96,20 @@ export default {
         tableResize.className = 'se-controller se-controller-table';
         tableResize.innerHTML = '' +
             '<div>' +
-            '   <div class="se-btn-group">' +
-            '       <button type="button" data-command="resize" class="se-tooltip _se_table_resize">' +
-            '           <i class="se-icon-expansion"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="header" class="se-tooltip _se_table_header">' +
-            '           <i class="se-icon-table-header"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="remove" class="se-tooltip">' +
-            '           <i class="se-icon-delete"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-            '       </button>' +
-            '   </div>' +
+                '<div class="se-btn-group">' +
+                    '<button type="button" data-command="resize" class="se-tooltip _se_table_resize">' +
+                        '<i class="se-icon-expansion"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="header" class="se-tooltip _se_table_header">' +
+                        '<i class="se-icon-table-header"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="remove" class="se-tooltip">' +
+                        '<i class="se-icon-delete"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+                    '</button>' +
+                '</div>' +
             '</div>';
 
         return tableResize;
@@ -123,54 +123,54 @@ export default {
         tableResize.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +
-            '   <div class="se-btn-group">' +
-            '       <button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
-            '           <i class="se-icon-insert-row-above"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
-            '           <i class="se-icon-insert-row-below"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
-            '           <i class="se-icon-delete-row"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="merge" class="_se_table_merge_button se-tooltip" disabled>' +
-            '           <i class="se-icon-merge-cell"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
-            '       </button>' +
-            '   </div>' +
+                '<div class="se-btn-group">' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
+                        '<i class="se-icon-insert-row-above"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
+                        '<i class="se-icon-insert-row-below"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
+                        '<i class="se-icon-delete-row"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="merge" class="_se_table_merge_button se-tooltip" disabled>' +
+                        '<i class="se-icon-merge-cell"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
+                    '</button>' +
+                '</div>' +
             '</div>' +
             '<div>' +
-            '   <div class="se-btn-group">' +
-            '     <button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
-            '       <i class="se-icon-insert-column-left"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
-            '           <i class="se-icon-insert-column-right"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
-            '           <i class="se-icon-delete-column"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
-            '           <i class="se-icon-split-cell"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
-            '       </button>' +
-            '       <div class="se-btn-group-sub sun-editor-common se-list-layer">' +
-            '           <div class="se-list-inner">' +
-            '               <ul class="se-list-basic">' +
-            '                   <li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
-            '                   ' + lang.controller.VerticalSplit + '</li>' +
-            '                   <li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
-            '                   ' + lang.controller.HorizontalSplit + '</li>' +
-            '               </ul>' +
-            '           </div>' +
-            '       </div>' +
-            '   </div>' +
+                '<div class="se-btn-group">' +
+                    '<button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
+                        '<i class="se-icon-insert-column-left"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
+                        '<i class="se-icon-insert-column-right"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
+                        '<i class="se-icon-delete-column"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
+                        '<i class="se-icon-split-cell"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
+                    '</button>' +
+                    '<div class="se-btn-group-sub sun-editor-common se-list-layer">' +
+                        '<div class="se-list-inner">' +
+                            '<ul class="se-list-basic">' +
+                                '<li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
+                                    lang.controller.VerticalSplit + '</li>' +
+                                '<li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
+                                    lang.controller.HorizontalSplit + '</li>' +
+                            '</ul>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
             '</div>';
 
         return tableResize;

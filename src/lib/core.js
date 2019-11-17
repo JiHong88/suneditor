@@ -1013,12 +1013,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Adds a node to the selected region, or deletes the node.
-         * 1. If there is a node in the "appendNode" argument, "appendNode" is added to the selection range.
-         * 2. If the "appendNode" argument has a null value, the node is modified without adding a new node.
-         * 3. Styles such as the style property of the "styleArray" argument will be deleted.
-         * 4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.
-         * 5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
+         * @description Add, update, and delete nodes from selected text.
+         * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.
+         * 2. If the "appendNode" argument is null, the node of the selection is modified without adding a new node.
+         * 3. The same style as the style attribute of the "styleArray" argument is deleted.
+         * 4. If a node with all styles removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.
+         * 5. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
          * @param {Element|null} appendNode The element to be added to the selection. If it is null, delete the node.
          * @param {Array|null} styleArray The style attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
          * @param {Array|null} removeNodeArray An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
@@ -1198,6 +1198,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // change
                 if (style || vNode.nodeName !== newNodeName) {
                     if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
+                    if (!vNode.style.cssText) {
+                        vNode.removeAttribute('style');
+                        if (vNode.nodeName === newNodeName) return false;
+                    }
                     return true;
                 }
 

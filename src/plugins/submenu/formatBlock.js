@@ -40,24 +40,24 @@ export default {
         listDiv.className = 'se-submenu se-list-layer';
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = formatList.length, format, tagName, command, title, h, attrs; i < len; i++) {
+        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs; i < len; i++) {
             format = formatList[i];
             if (typeof format === 'string') {
                 tagName = format.toLowerCase();
                 command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
-                title = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+                name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
                 attrs = '';
             } else {
                 tagName = format.tag.toLowerCase();
                 command = format.command;
-                title = format.title || tagName;
+                name = format.name || tagName;
                 attrs = format.class ? ' class="' + format.class + '"' : '';
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + title + '">' +
-                '<' + tagName + attrs + '>' + title + '</' + tagName + '>' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + name + '">' +
+                    '<' + tagName + attrs + '>' + name + '</' + tagName + '>' +
                 '</button></li>';
         }
         list += '</ul></div>';
@@ -178,10 +178,6 @@ export default {
                     newFormat = tag.cloneNode(false);
                     this.util.copyFormatAttributes(newFormat, node);
                     newFormat.innerHTML = node.innerHTML;
-                    
-                    if (/__se__format__/.test(tag.className)) {
-                        newFormat.className += (newFormat.className.length > 0 ? ' ' : '') + tag.className;
-                    }
 
                     node.parentNode.insertBefore(newFormat, node);
                     this.util.removeItem(node);

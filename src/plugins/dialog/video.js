@@ -78,42 +78,44 @@ export default {
         dialog.style.display = 'none';
         let html = '' +
             '<form class="editor_video">' +
-            '   <div class="se-dialog-header">' +
-            '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
-            '       </button>' +
-            '       <span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
-            '   </div>' +
-            '   <div class="se-dialog-body">' +
-            '       <div class="se-dialog-form">' +
-            '           <label>' + lang.dialogBox.videoBox.url + '</label>' +
-            '           <input class="se-input-form _se_video_url" type="text" />' +
-            '       </div>';
+                '<div class="se-dialog-header">' +
+                    '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                        '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                    '</button>' +
+                    '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
+                '</div>' +
+                '<div class="se-dialog-body">' +
+                    '<div class="se-dialog-form">' +
+                        '<label>' + lang.dialogBox.videoBox.url + '</label>' +
+                        '<input class="se-input-form _se_video_url" type="text" />' +
+                    '</div>';
 
             if (option.videoResizing) {
                 html += '' +
-                '   <div class="se-dialog-form">' +
-                '       <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '       <input type="number" class="se-input-control _se_video_size_x" /><label class="se-dialog-size-x">x</label><input type="number" class="se-input-control _se_video_size_y" />' +
-                '       <label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '       <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
-                '   </div>';
+                    '<div class="se-dialog-form">' +
+                        '<div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+                        '<input type="number" class="se-input-control _se_video_size_x" />' +
+                        '<label class="se-dialog-size-x">x</label>' +
+                        '<input type="number" class="se-input-control _se_video_size_y" />' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                        '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                    '</div>';
             }
 
             html += '' +
-            '       <div class="se-dialog-form-footer">' +
-            '           <label><input type="checkbox" class="se-dialog-btn-check _se_video_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="se-dialog-footer">' +
-            '       <div>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
-            '           <label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
-            '       </div>' +
-            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   </div>' +
+                    '<div class="se-dialog-form-footer">' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="se-dialog-footer">' +
+                    '<div>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
+                    '</div>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '</div>' +
             '</form>';
 
         dialog.innerHTML = html;

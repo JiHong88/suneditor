@@ -365,14 +365,13 @@ const util = {
         }
 
         const classes = originEl.classList;
-        newEl.className = '';
-        for (let i = 0, len = classes.length, first = true; i < len; i++) {
+        for (let i = 0, len = classes.length; i < len; i++) {
             if (/__se__format__/.test(classes[i])) continue;
-            newEl.className += (first ? '' : ' ') + classes[i];
-            first = false;
+            this.addClass(newEl, classes[i]);
         }
         
         if (!newEl.className) newEl.removeAttribute('class');
+        if (!newEl.style.cssText) newEl.removeAttribute('style');
     },
 
     /**
@@ -775,7 +774,7 @@ const util = {
         const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) return;
 
-        element.className += ' ' + className;
+        element.className += (element.className.length > 0 ? ' ' : '') + className;
     },
 
     /**

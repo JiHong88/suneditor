@@ -56,27 +56,27 @@ export default {
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
             '<form class="editor_link">' +
-            '   <div class="se-dialog-header">' +
-            '       <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '           <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
-            '       </button>' +
-            '       <span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
-            '   </div>' +
-            '   <div class="se-dialog-body">' +
-            '       <div class="se-dialog-form">' +
-            '           <label>' + lang.dialogBox.linkBox.url + '</label>' +
-            '           <input class="se-input-form _se_link_url" type="text" />' +
-            '       </div>' +
-            '       <div class="se-dialog-form">' +
-            '           <label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
-            '       </div>' +
-            '       <div class="se-dialog-form-footer">' +
-            '           <label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="se-dialog-footer">' +
-            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   </div>' +
+                '<div class="se-dialog-header">' +
+                    '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                        '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                    '</button>' +
+                    '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
+                '</div>' +
+                '<div class="se-dialog-body">' +
+                    '<div class="se-dialog-form">' +
+                        '<label>' + lang.dialogBox.linkBox.url + '</label>' +
+                        '<input class="se-input-form _se_link_url" type="text" />' +
+                    '</div>' +
+                    '<div class="se-dialog-form">' +
+                        '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
+                    '</div>' +
+                    '<div class="se-dialog-form-footer">' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="se-dialog-footer">' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '</div>' +
             '</form>';
 
         return dialog;
@@ -91,16 +91,16 @@ export default {
         link_btn.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
-            '   <div class="se-btn-group">' +
-            '       <button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-            '           <i class="se-icon-edit"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
-            '       </button>' +
-            '       <button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-            '           <i class="se-icon-delete"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-            '       </button>' +
-            '   </div>' +
+                '<div class="se-btn-group">' +
+                    '<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
+                        '<i class="se-icon-edit"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
+                        '<i class="se-icon-delete"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+                    '</button>' +
+                '</div>' +
             '</div>';
 
         return link_btn;

@@ -87,73 +87,73 @@ export default {
 
         let html = '' +
             '<div class="se-dialog-header">' +
-            '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '       <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
-            '   </button>' +
-            '   <span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
+                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                '</button>' +
+                '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
             '<div class="se-dialog-tabs">' +
-            '   <button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
-            '   <button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+                '<button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
+                '<button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
-            '   <div class="_se_tab_content _se_tab_content_image">' +
-            '       <div class="se-dialog-body">';
+                '<div class="_se_tab_content _se_tab_content_image">' +
+                    '<div class="se-dialog-body">';
 
             if (option.imageFileInput) {
                 html += '' +
-                    '   <div class="se-dialog-form">' +
-                    '       <label>' + lang.dialogBox.imageBox.file + '</label>' +
-                    '       <input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
-                    '   </div>' ;
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.file + '</label>' +
+                            '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                        '</div>' ;
             }
 
             if (option.imageUrlInput) {
                 html += '' +
-                    '   <div class="se-dialog-form">' +
-                    '       <label>' + lang.dialogBox.imageBox.url + '</label>' +
-                    '       <input class="se-input-form _se_image_url" type="text" />' +
-                    '   </div>';
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.url + '</label>' +
+                            '<input class="se-input-form _se_image_url" type="text" />' +
+                        '</div>';
             }
 
             html += '' +
-            '           <div class="se-dialog-form">' +
-            '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
-            '           </div>';
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
+                        '</div>';
 
             if (option.imageResizing) {
                 html += '' +
-                '       <div class="se-dialog-form">' +
-                '           <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '           <input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
-                '           <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
-                '       </div>' ;
+                        '<div class="se-dialog-form">' +
+                            '<div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
+                            '<input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
+                            '<label><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                        '</div>' ;
             }
 
             html += '' +
-            '           <div class="se-dialog-form-footer">' +
-            '               <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
-            '           </div>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="_se_tab_content _se_tab_content_url" style="display: none">' +
-            '       <div class="se-dialog-body">' +
-            '           <div class="se-dialog-form">' +
-            '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
-            '           </div>' +
-            '           <label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="se-dialog-footer">' +
-            '       <div>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
-            '       </div>' +
-            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   </div>' +
+                        '<div class="se-dialog-form-footer">' +
+                            '<label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="_se_tab_content _se_tab_content_url" style="display: none">' +
+                    '<div class="se-dialog-body">' +
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
+                        '</div>' +
+                        '<label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="se-dialog-footer">' +
+                    '<div>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
+                    '</div>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '</div>' +
             '</form>';
 
         dialog.innerHTML = html;

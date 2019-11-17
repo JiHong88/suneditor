@@ -68,7 +68,9 @@
             tag_blockquote: 'Quote',
             tag_pre: 'Code',
             template: 'Template',
-            lineHeight: 'Line height'
+            lineHeight: 'Line height',
+            paragraphStyle: 'Paragraph style',
+            textStyle: 'Text style'
         },
         dialogBox: {
             linkBox: {

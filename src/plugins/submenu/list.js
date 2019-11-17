@@ -39,16 +39,16 @@ export default {
         listDiv.className = 'se-submenu se-list-layer';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
-            '   <ul class="se-list-basic">' +
-            '       <li><button type="button" class="se-btn-list se-tooltip" data-command="OL">' +
-            '           <i class="se-icon-list-number"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
-            '       </button></li>' +
-            '       <li><button type="button" class="se-btn-list se-tooltip" data-command="UL">' +
-            '           <i class="se-icon-list-bullets"></i>' +
-            '           <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
-            '       </button></li>' +
-            '   </ul>' +
+                '<ul class="se-list-basic">' +
+                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="OL">' +
+                        '<i class="se-icon-list-number"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
+                    '</button></li>' +
+                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="UL">' +
+                        '<i class="se-icon-list-bullets"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
+                    '</button></li>' +
+                '</ul>' +
             '</div>';
 
         return listDiv;

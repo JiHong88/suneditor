@@ -33,13 +33,12 @@ export default {
         listDiv.className = 'se-list-layer';
 
         let list = '<div class="se-submenu se-list-inner">' +
-            '   <ul class="se-list-basic">';
+                '<ul class="se-list-basic">';
         for (let i = 0, len = templateList.length, t; i < len; i++) {
             t = templateList[i];
             list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '">' + t.name + '</button></li>';
         }
-        list += '   </ul>';
-        list += '</div>';
+        list += '</ul></div>';
 
         listDiv.innerHTML = list;
 

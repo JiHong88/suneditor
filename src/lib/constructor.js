@@ -393,6 +393,8 @@ export default {
         // options.formats = options.formats;
         // options.colorList = options.colorList;
         // options.lineHeights = options.lineHeights;
+        // options.paragraphStyles = options.paragraphStyles;
+        // options.textStyles = options.textStyles;
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
@@ -542,6 +544,12 @@ export default {
 
             template: ['', lang.toolbar.template, 'template', 'submenu',
                 '<i class="se-icon-template"></i>'
+            ],
+            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'submenu',
+                '<i class="se-icon-paragraph-style"></i>'
+            ],
+            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'submenu',
+                '<i class="se-icon-text-style"></i>'
             ],
 
             /** plugins - dialog */

@@ -75,17 +75,17 @@ export default {
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
             '<div class="se-modal-resize">' +
-            '   <div class="se-resize-display"></div>' +
+                '<div class="se-resize-display"></div>' +
             '</div>' +
             '<div class="se-resize-dot">' +
-            '   <span class="tl"></span>' +
-            '   <span class="tr"></span>' +
-            '   <span class="bl"></span>' +
-            '   <span class="br"></span>' +
-            '   <span class="lw"></span>' +
-            '   <span class="th"></span>' +
-            '   <span class="rw"></span>' +
-            '   <span class="bh"></span>' +
+                '<span class="tl"></span>' +
+                '<span class="tr"></span>' +
+                '<span class="bl"></span>' +
+                '<span class="br"></span>' +
+                '<span class="lw"></span>' +
+                '<span class="th"></span>' +
+                '<span class="rw"></span>' +
+                '<span class="bh"></span>' +
             '</div>';
 
         return resize_container;
@@ -99,82 +99,82 @@ export default {
         resize_button.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="se-btn-group _se_resizing_btn_group">' +
-            '   <button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
-            '       <span>100%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
-            '       <span>75%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
-            '       <span>50%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
-            '       <span>25%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
-            '       <i class="se-icon-rotate-left"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
-            '       <i class="se-icon-rotate-right"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
-            '   </button>' +
+                '<button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
+                    '<span>100%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
+                    '<span>75%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
+                    '<span>50%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
+                    '<span>25%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
+                    '<i class="se-icon-rotate-left"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
+                    '<i class="se-icon-rotate-right"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
+                '</button>' +
             '</div>' +
             '<div class="se-btn-group">' +
-            '   <button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
-            '       <i class="se-icon-mirror-horizontal"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
-            '       <i class="se-icon-mirror-vertical"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
-            '       <i class="se-icon-align-justify"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
-            '   </button>' +
-            '   <div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
-            '       <div class="se-list-inner">' +
-            '           <ul class="se-list-basic">' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
-            '                   <i class="se-icon-align-justify"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
-            '                   <i class="se-icon-align-left"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
-            '                   <i class="se-icon-align-center"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
-            '                   <i class="se-icon-align-right"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
-            '               </button></li>' +
-            '           </ul>' +
-            '       </div>' +
-            '   </div>' +
-            '   <button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
-            '       <i class="se-icon-caption"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="revert" class="se-tooltip">' +
-            '       <i class="se-icon-revert"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="update" class="se-tooltip">' +
-            '       <i class="se-icon-modify"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="delete" class="se-tooltip">' +
-            '       <i class="se-icon-delete"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-            '   </button>' +
+                '<button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
+                    '<i class="se-icon-mirror-horizontal"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
+                    '<i class="se-icon-mirror-vertical"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
+                    '<i class="se-icon-align-justify"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
+                '</button>' +
+                '<div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
+                    '<div class="se-list-inner">' +
+                        '<ul class="se-list-basic">' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
+                                '<i class="se-icon-align-justify"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
+                                '<i class="se-icon-align-left"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
+                                '<i class="se-icon-align-center"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
+                                '<i class="se-icon-align-right"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
+                            '</button></li>' +
+                        '</ul>' +
+                    '</div>' +
+                '</div>' +
+                '<button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
+                    '<i class="se-icon-caption"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
+                '</button>' +
+                    '<button type="button" data-command="revert" class="se-tooltip">' +
+                    '<i class="se-icon-revert"></i>' +
+                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="update" class="se-tooltip">' +
+                    '<i class="se-icon-modify"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="delete" class="se-tooltip">' +
+                    '<i class="se-icon-delete"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+                '</button>' +
             '</div>';
 
         return resize_button;

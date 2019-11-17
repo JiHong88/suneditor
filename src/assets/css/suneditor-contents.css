@@ -320,3 +320,55 @@
 .sun-editor-editable .se-video-container iframe {
     outline: 1px solid #9e9e9e;
 }
+
+/** -- paragraph styles -- */
+/* Highlighted */
+.sun-editor-editable .__se__p-highlighted {
+    background-color: #e1e94642;
+    padding: 4px 0;
+}
+/* Bordered */
+.sun-editor-editable .__se__p-bordered {
+    border-top: solid 1px #b1b1b1;
+    border-bottom: solid 1px #b1b1b1;
+    padding: 4px 0;
+}
+/* Spaced */
+.sun-editor-editable .__se__p-spaced {
+    letter-spacing: 1px;
+}
+/* Neon (https://codepen.io/GeorgePark/pen/MrjbEr) */
+.sun-editor-editable .__se__p-neon {
+    font-weight: 200;
+    font-style: italic;
+    background: #000;
+    color: #fff;
+    padding: 6px 4px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    text-transform: uppercase;
+    animation: neonFlicker 1.5s infinite alternate;     
+}
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow:
+            -0.2rem -0.2rem 1rem #fff,
+            0.2rem 0.2rem 1rem #fff,
+            0 0 2px #f40,
+            0 0 4px #f40,
+            0 0 6px #f40,
+            0 0 8px #f40,
+            0 0 10px #f40;
+        box-shadow:
+            0 0 .5px #fff,
+            inset 0 0 .5px #fff,
+            0 0 2px #08f,
+            inset 0 0 2px #08f,
+            0 0 4px #08f,
+            inset 0 0 4px #08f;        
+    }
+    20%, 24%, 55% {        
+        text-shadow: none;
+        box-shadow: none;
+    }    
+}
