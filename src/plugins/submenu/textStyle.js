@@ -34,28 +34,35 @@ export default {
     setSubmenu: function () {
         const option = this.context.option;
         const listDiv = this.util.createElement('DIV');
-
         listDiv.className = 'se-submenu se-list-layer';
 
-        const styleList = !option.textStyles ? [
-            {
+        const defaultList = {
+            translucent: {
                 name: 'Translucent',
                 style: 'opacity: 0.5;',
                 tag: 'span',
             },
-            {
-                name: 'Emphasis',
-                style: '-webkit-text-emphasis: filled;',
+            shadow: {
+                name: 'Shadow',
+                class: '__se__t-neon',
                 tag: 'span',
             }
-        ] : option.textStyles;
+        };
+        const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = styleList.length, t, tag, name, attrs; i < len; i++) {
             t = styleList[i];
+
+            if (typeof t === 'string') {
+                const defaultStyle = defaultList[t.toLowerCase()];
+                if (!defaultStyle) continue;
+                t = defaultStyle;
+            }
+
             name = t.name;
             tag = t.tag || 'span';
-            attrs = t.style ? ' style="' + t.style + '"' : '';
+            attrs = (t.style ? ' style="' + t.style + '"' : '') + (t.class ? ' class="' + t.class + '"' : '');
 
             list += '<li>' +
                 '<button type="button" class="se-btn-list" data-command="textStyle" title="' + name + '">' +
@@ -87,10 +94,16 @@ export default {
 
         if (!command) return;
 
-        const styles = tag.style;
         const checkStyles = [];
+
+        const styles = tag.style;
         for (let i = 0, len = styles.length; i < len; i++) {
             checkStyles.push(styles[i]);
+        }
+
+        const classes = tag.classList;
+        for (let i = 0, len = classes.length; i < len; i++) {
+            checkStyles.push('.' + classes[i]);
         }
 
         const newNode = tag.cloneNode(false);

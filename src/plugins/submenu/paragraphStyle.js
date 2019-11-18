@@ -33,35 +33,43 @@ export default {
     setSubmenu: function () {
         const option = this.context.option;
         const listDiv = this.util.createElement('DIV');
-        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? [
-            {
-                name: 'Highlighted',
-                class: '__se__p-highlighted'
-            },
-            {
+        listDiv.className = 'se-submenu se-list-layer';
+
+        const defaultList = {
+            bordered: {
                 name: 'Bordered',
                 class: '__se__p-bordered'
             },
-            {
+            spaced: {
                 name: 'Spaced',
                 class: '__se__p-spaced'
             },
-            {
+            invert: {
+                name: 'Invert',
+                class: '__se__p-invert'
+            },
+            neon: {
                 name: 'Neon',
                 class: '__se__p-neon'
             }
-        ] : option.paragraphStyles;
-
-        listDiv.className = 'se-submenu se-list-layer';
+        };
+        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['bordered', 'spaced', 'invert', 'neon'] : option.paragraphStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
         for (let i = 0, len = paragraphStyles.length, p, name, attrs; i < len; i++) {
             p = paragraphStyles[i];
+
+            if (typeof p === 'string') {
+                const defaultStyle = defaultList[p.toLowerCase()];
+                if (!defaultStyle) continue;
+                p = defaultStyle;
+            }
+
             name = p.name;
             attrs = p.class ? ' class="' + p.class + '"' : '';
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-value="' + p.class + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list' + (name === 'Invert' ? ' se-invert': '') + '" data-value="' + p.class + '" title="' + name + '">' +
                     '<div' + attrs + '>' + name + '</div>' +
                 '</button></li>';
         }

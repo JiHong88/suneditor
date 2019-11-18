@@ -259,7 +259,7 @@ const util = {
                     continue;
                 }
                 
-                node.innerHTML = node.innerHTML.replace(/\n/g, '');
+                node.innerHTML = node.innerHTML;
                 const tag = node.nodeName.toLowerCase();
                 returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
                 recursionFunc(node, indent + indentSize, '');

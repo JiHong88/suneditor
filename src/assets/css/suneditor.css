@@ -213,14 +213,14 @@
 .sun-editor .se-list-layer .se-list-format .se-btn-list {height:auto; min-height:32px; line-height:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
-.sun-editor .se-list-layer .se-list-format p {font-size:13px; margin:0; padding:0;}
-.sun-editor .se-list-layer .se-list-format div {font-size:13px; margin:0; padding:0;}
-.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; margin:0; padding:0; color:#333;}
+.sun-editor .se-list-layer .se-list-format p {font-size:13px;}
+.sun-editor .se-list-layer .se-list-format div {font-size:13px;}
+.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; color:#333;}
 .sun-editor .se-list-layer .se-list-format blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
 .sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /* submenu layer - font size */
@@ -231,6 +231,9 @@
 /* submenu layer - align */
 .sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
+/* submenu layer - paragraph style, text style */
+.sun-editor .se-list-layer .se-list-format div {padding:4px 2px;}
+.sun-editor .se-list-layer .se-list-format button.se-invert div {color:#fff; background-color:#333;}
 /* submenu layer --- table selector */
 .sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:4; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
@@ -318,7 +321,7 @@
 
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
-.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:6; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:4; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 
 /* controller - button group */
 .sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px 2px 2px 0; top:0; left:0;}
@@ -340,7 +343,7 @@
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {margin-top:-50px !important; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-resizing .se-btn-group .se-btn-group-sub.se-resizing-align-list {left:57px;}
-.sun-editor .se-resizing-container {position:absolute; display:none; z-index:6; border:1px solid #80bdff;}
+.sun-editor .se-resizing-container {position:absolute; display:none; z-index:4; border:1px solid #80bdff;}
 .sun-editor .se-resizing-container .se-modal-resize {position:absolute; display:inline-block; background-color:#3f9dff; opacity:0.3;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
 .sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}

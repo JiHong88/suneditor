@@ -35,14 +35,16 @@ export default {
         const option = this.context.option;
         const lang_toolbar = this.lang.toolbar;
         const listDiv = this.util.createElement('DIV');
-        const formatList = !option.formats || option.formats.length === 0 ? ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] : option.formats;
-
         listDiv.className = 'se-submenu se-list-layer';
+
+        const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
         for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs; i < len; i++) {
             format = formatList[i];
-            if (typeof format === 'string') {
+            
+            if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
                 tagName = format.toLowerCase();
                 command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';

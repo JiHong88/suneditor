@@ -20,10 +20,6 @@
 }
 
 .sun-editor-editable * {
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    background-color: inherit;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -86,7 +82,9 @@
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
-    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: visible;
 }
 
 /* ol, ul */
@@ -321,24 +319,26 @@
     outline: 1px solid #9e9e9e;
 }
 
-/** -- paragraph styles -- */
-/* Highlighted */
-.sun-editor-editable .__se__p-highlighted {
-    background-color: #e1e94642;
-    padding: 4px 0;
-}
+
+/** -- Paragraph styles custom -- */
 /* Bordered */
-.sun-editor-editable .__se__p-bordered {
+.sun-editor-editable .__se__p-bordered, .sun-editor .__se__p-bordered {
     border-top: solid 1px #b1b1b1;
     border-bottom: solid 1px #b1b1b1;
     padding: 4px 0;
 }
 /* Spaced */
-.sun-editor-editable .__se__p-spaced {
+.sun-editor-editable .__se__p-spaced, .sun-editor .__se__p-spaced {
     letter-spacing: 1px;
 }
+/* Invert */
+.sun-editor-editable .__se__p-invert, .sun-editor .__se__p-invert {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+    padding: 4px 0;
+}
 /* Neon (https://codepen.io/GeorgePark/pen/MrjbEr) */
-.sun-editor-editable .__se__p-neon {
+.sun-editor-editable .__se__p-neon, .sun-editor .__se__p-neon {
     font-weight: 200;
     font-style: italic;
     background: #000;
@@ -371,4 +371,18 @@
         text-shadow: none;
         box-shadow: none;
     }    
+}
+
+
+/* -- Text styles custom -- */
+/* Shadow */
+.sun-editor-editable .__se__t-neon, .sun-editor .__se__t-neon {
+    text-shadow:
+        -0.2rem -0.2rem 1rem #fff,
+        0.2rem 0.2rem 1rem #fff,
+        0 0 0.2rem #c1c1c1,
+        0 0 0.4rem #c1c1c1,
+        0 0 0.6rem #c1c1c1,
+        0 0 0.8rem #c1c1c1,
+        0 0 1rem #c1c1c1;
 }

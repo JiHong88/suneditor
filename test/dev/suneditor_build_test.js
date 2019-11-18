@@ -49,7 +49,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     plugins: plugins,
     buttonList: [
         ['undo', 'redo','removeFormat',
-        'font', 'fontSize', 'formatBlock', 'paragraphStyle',
+        'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'textStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor',
         'outdent', 'indent',
@@ -70,6 +70,18 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // callBackSave: (contents) => {
     //     console.log('callback')
     // }
+    textStyles: [
+        {
+            name: 'Emphasis',
+            style: '-webkit-text-emphasis: filled;',
+            tag: 'span',
+        },
+        'shadow'
+    ],
+    paragraphStyles: [
+        'neon',
+        'invert'
+    ],
     codeMirror: {
         src: CodeMirror,
     },
