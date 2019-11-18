@@ -376,13 +376,13 @@
 
 /* -- Text styles custom -- */
 /* Shadow */
-.sun-editor-editable .__se__t-neon, .sun-editor .__se__t-neon {
+.sun-editor-editable .__se__t-shadow, .sun-editor .__se__t-shadow {
     text-shadow:
         -0.2rem -0.2rem 1rem #fff,
         0.2rem 0.2rem 1rem #fff,
-        0 0 0.2rem #c1c1c1,
-        0 0 0.4rem #c1c1c1,
-        0 0 0.6rem #c1c1c1,
-        0 0 0.8rem #c1c1c1,
-        0 0 1rem #c1c1c1;
+        0 0 0.2rem #b1b1b1,
+        0 0 0.4rem #b1b1b1,
+        0 0 0.6rem #b1b1b1,
+        0 0 0.8rem #b1b1b1,
+        0 0 1rem #b1b1b1;
 }

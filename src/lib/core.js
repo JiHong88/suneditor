@@ -1017,10 +1017,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.
          * 2. If the "appendNode" argument is null, the node of the selection is modified without adding a new node.
          * 3. The same style as the style attribute of the "styleArray" argument is deleted.
-         * 4. If a node with all styles removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.
-         * 5. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
+         *    Styles should be put with attribute names from css. ["background-color"]
+         * 4. The same class name as the class attribute of the "styleArray" argument is deleted.
+         *    The class name is preceded by "." [".className"]
+         * 6. If a node with all styles and class removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.
+         * 7. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
          * @param {Element|null} appendNode The element to be added to the selection. If it is null, delete the node.
-         * @param {Array|null} styleArray The style attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])
+         * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
          * @param {Array|null} removeNodeArray An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray) {
@@ -1052,13 +1055,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 } else if (styleArray.length > 0) {
                     let checkCnt = 0;
 
-                    for (let i = 0; i < styleArray.length; i++) {
-                        while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
-                            if (sNode.nodeType === 1 && (isRemoveNode ? sNode.style[styleArray[i]] : sNode.style[styleArray[i]] === appendNode.style[styleArray[i]])) {
-                                checkCnt++;
+                    while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
+                        for (let i = 0; i < styleArray.length; i++) {
+                            if(sNode.nodeType === 1) {
+                                const s = styleArray[i];
+                                const classReg = /^\./.test(s) ? new _w.RegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
+
+                                const styleCheck = isRemoveNode ? !!sNode.style[s] : (!!sNode.style[s] && !!appendNode.style[s] && sNode.style[s] === appendNode.style[s]);
+                                const classCheck = classReg === false ? false : isRemoveNode ? !!sNode.className.match(classReg) : !!sNode.className.match(classReg) && !!appendNode.className.match(classReg);
+                                if (styleCheck || classCheck) {
+                                    checkCnt++;
+                                }
                             }
-                            sNode = sNode.parentNode;
                         }
+                        sNode = sNode.parentNode;
                     }
     
                     if (!isRemoveNode && checkCnt >= styleArray.length) return;
@@ -1146,15 +1156,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.setRange(startCon, startOff, endCon, endOff);
 
             let start = {}, end = {};
-            let newNode, styleRegExp, removeRegExp;
+            let newNode, styleRegExp = '', classRegExp = '', removeRegExp = '';
 
             if (styleArray) {
-                styleRegExp = '(?:;|^|\\s)(?:' + styleArray[0];
-                for (let i = 1; i < styleArray.length; i++) {
-                    styleRegExp += '|' + styleArray[i];
+                for (let i = 0, len = styleArray.length, s; i < len; i++) {
+                    s = styleArray[i];
+                    if (/^\./.test(s)) {
+                        classRegExp += (classRegExp ? '|' : '\\s*(?:') + s.replace(/^\./, '');
+                    } else {
+                        styleRegExp += (styleRegExp ? '|' : '(?:;|^|\\s)(?:') + s;
+                    }
                 }
-                styleRegExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                styleRegExp = new _w.RegExp(styleRegExp, 'ig');
+
+                if (styleRegExp) {
+                    styleRegExp += ')\\s*:[^;]*\\s*(?:;|$)';
+                    styleRegExp = new _w.RegExp(styleRegExp, 'ig');
+                }
+
+                if (classRegExp) {
+                    classRegExp += ')(\\s+|$)';
+                    classRegExp = new _w.RegExp(classRegExp, 'ig');
+                }
             }
 
             if (removeNodeArray) {
@@ -1180,13 +1202,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     style = originStyle.replace(styleRegExp, '').trim();
                 }
 
+                // class check
+                const originClasses = vNode.className;
+                let classes = '';
+                if (classRegExp && originClasses.length > 0) {
+                    classes = originClasses.replace(classRegExp, '').trim();
+                }
+
                 // remove
                 if (isRemoveNode) {
-                    if (styleRegExp && removeRegExp) {
-                        if (!style && removeRegExp.test(vNode.nodeName)) return false;
+                    if ((styleRegExp || classRegExp) && removeRegExp) {
+                        if (!style && !classes && removeRegExp.test(vNode.nodeName)) return false;
                     }
 
-                    if (styleRegExp && !style && originStyle) {
+                    if ((styleRegExp && !style && originStyle) || (classRegExp && !classes && originClasses)) {
                         return false;
                     }
 
@@ -1196,12 +1225,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 // change
-                if (style || vNode.nodeName !== newNodeName) {
+                if (style || classes || vNode.nodeName !== newNodeName || (!classRegExp !== !vNode.className) || (!styleRegExp !== !vNode.style.cssText)) {
                     if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
                     if (!vNode.style.cssText) {
                         vNode.removeAttribute('style');
-                        if (vNode.nodeName === newNodeName) return false;
                     }
+
+                    if (classRegExp && originClasses.length > 0) vNode.className = classes;
+                    if (!vNode.className) {
+                        vNode.removeAttribute('class');
+                    }
+
+                    if (!vNode.style.cssText && !vNode.className && vNode.nodeName === newNodeName) return false;
+
                     return true;
                 }
 
@@ -3388,7 +3424,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (core._variable.isFullScreen) {
                 core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
-            } else if (core._sticky) {
+                return;
+            }
+            
+            core._iframeAutoHeight();
+
+            if (core._sticky) {
                 context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }

@@ -76,6 +76,12 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
             style: '-webkit-text-emphasis: filled;',
             tag: 'span',
         },
+        {
+            name: 'Neon',
+            class: '__se__p-neon',
+            style: 'font-size: 40px;',
+            tag: 'span',
+        },
         'shadow'
     ],
     paragraphStyles: [

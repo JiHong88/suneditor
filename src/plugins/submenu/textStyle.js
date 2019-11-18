@@ -44,7 +44,7 @@ export default {
             },
             shadow: {
                 name: 'Shadow',
-                class: '__se__t-neon',
+                class: '__se__t-shadow',
                 tag: 'span',
             }
         };

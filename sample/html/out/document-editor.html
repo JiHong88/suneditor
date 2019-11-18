@@ -1445,8 +1445,11 @@
                 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.<br>
                 2. If the "appendNode" argument is null, the node of the selection is modified without adding a new node.<br>
                 3. The same style as the style attribute of the "styleArray" argument is deleted.<br>
-                4. If a node with all styles removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.<br>
-                5. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
+                   Styles should be put with attribute names from css. ["background-color"]<br>
+                4. The same class name as the class attribute of the "styleArray" argument is deleted.<br>
+                   The class name is preceded by "." [".className"]<br>
+                6. If a node with all styles and class removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.<br>
+                7. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1470,7 +1473,7 @@
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])</td>
+                    <td class="description last">The css attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])</td>
                 </tr>
                 <tr>
                     <td class="name"><code>removeNodeArray</code></td>
