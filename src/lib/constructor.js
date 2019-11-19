@@ -119,7 +119,8 @@ export default {
             const cmOptions = [{
                 mode: 'htmlmixed',
                 htmlMode: true,
-                lineNumbers: true
+                lineNumbers: true,
+                lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
                     init[key] = option[key];
@@ -129,6 +130,7 @@ export default {
 
             if (options.height === 'auto') {
                 cmOptions.viewportMargin = Infinity;
+                cmOptions.height = 'auto';
             }
             
             const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);

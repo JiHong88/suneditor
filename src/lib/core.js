@@ -1015,18 +1015,21 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         /**
          * @description Add, update, and delete nodes from selected text.
          * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.
-         * 2. If the "appendNode" argument is null, the node of the selection is modified without adding a new node.
+         * 2. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.
          * 3. The same style as the style attribute of the "styleArray" argument is deleted.
-         *    Styles should be put with attribute names from css. ["background-color"]
+         *    (Styles should be put with attribute names from css. ["background-color"])
          * 4. The same class name as the class attribute of the "styleArray" argument is deleted.
-         *    The class name is preceded by "." [".className"]
-         * 6. If a node with all styles and class removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.
-         * 7. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
-         * @param {Element|null} appendNode The element to be added to the selection. If it is null, delete the node.
+         *    (The class name is preceded by "." [".className"])
+         * 5. You can put the list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
+         * 6. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.
+         * 7. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
+         * 8. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
+         * @param {Element|null} appendNode The element to be added to the selection. If it is null, only delete the node.
          * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
-         * @param {Array|null} removeNodeArray An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])
+         * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "appendNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
+         * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
-        nodeChange: function (appendNode, styleArray, removeNodeArray) {
+        nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
             const range = this.getRange();
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
@@ -1047,20 +1050,31 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 appendNode = this.util.createElement('DIV');
             }
 
+            const newNodeName = appendNode.nodeName;
+
             /* checked same style property */
-            if (!isRemoveFormat && startCon === endCon) {
+            if (!isRemoveFormat && startCon === endCon && !removeNodeArray && appendNode) {
                 let sNode = startCon;
-                if (isRemoveFormat) {
-                    if (util.getFormatElement(sNode) === sNode.parentNode) return;
-                } else if (styleArray.length > 0) {
-                    let checkCnt = 0;
+                let checkCnt = 0;
+                const checkAttrs = [];
+                
+                const checkStyles = appendNode.style;
+                for (let i = 0, len = checkStyles.length; i < len; i++) {
+                    checkAttrs.push(checkStyles[i]);
+                }
 
+                const ckeckClasses = appendNode.classList;
+                for (let i = 0, len = ckeckClasses.length; i < len; i++) {
+                    checkAttrs.push('.' + ckeckClasses[i]);
+                }
+
+                if (checkAttrs.length > 0) {
                     while(!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
-                        for (let i = 0; i < styleArray.length; i++) {
-                            if(sNode.nodeType === 1) {
-                                const s = styleArray[i];
+                        for (let i = 0; i < checkAttrs.length; i++) {
+                            if (sNode.nodeType === 1) {
+                                const s = checkAttrs[i];
                                 const classReg = /^\./.test(s) ? new _w.RegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
-
+    
                                 const styleCheck = isRemoveNode ? !!sNode.style[s] : (!!sNode.style[s] && !!appendNode.style[s] && sNode.style[s] === appendNode.style[s]);
                                 const classCheck = classReg === false ? false : isRemoveNode ? !!sNode.className.match(classReg) : !!sNode.className.match(classReg) && !!appendNode.className.match(classReg);
                                 if (styleCheck || classCheck) {
@@ -1071,8 +1085,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         sNode = sNode.parentNode;
                     }
     
-                    if (!isRemoveNode && checkCnt >= styleArray.length) return;
-                    if (isRemoveNode && checkCnt === 0) return;
+                    if (checkCnt >= checkAttrs.length) return;
                 }
             }
 
@@ -1152,11 +1165,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             endOff = tempOffset;
 
             // set Range
-            const newNodeName = appendNode.nodeName;
             this.setRange(startCon, startOff, endCon, endOff);
 
             let start = {}, end = {};
-            let newNode, styleRegExp = '', classRegExp = '', removeRegExp = '';
+            let newNode, styleRegExp = '', classRegExp = '', removeNodeRegExp = '';
 
             if (styleArray) {
                 for (let i = 0, len = styleArray.length, s; i < len; i++) {
@@ -1174,18 +1186,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (classRegExp) {
-                    classRegExp += ')(\\s+|$)';
+                    classRegExp += ')(?=\\s+|$)';
                     classRegExp = new _w.RegExp(classRegExp, 'ig');
                 }
             }
 
             if (removeNodeArray) {
-                removeRegExp = '^(?:' + removeNodeArray[0];
+                removeNodeRegExp = '^(?:' + removeNodeArray[0];
                 for (let i = 1; i < removeNodeArray.length; i++) {
-                    removeRegExp += '|' + removeNodeArray[i];
+                    removeNodeRegExp += '|' + removeNodeArray[i];
                 }
-                removeRegExp += ')$';
-                removeRegExp = new _w.RegExp(removeRegExp, 'i');
+                removeNodeRegExp += ')$';
+                removeNodeRegExp = new _w.RegExp(removeNodeRegExp, 'i');
             }
 
             /** validation check function*/
@@ -1209,23 +1221,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     classes = originClasses.replace(classRegExp, '').trim();
                 }
 
-                // remove
-                if (isRemoveNode) {
-                    if ((styleRegExp || classRegExp) && removeRegExp) {
-                        if (!style && !classes && removeRegExp.test(vNode.nodeName)) return false;
-                    }
+                // remove node check
+                const remove = removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName);
 
-                    if ((styleRegExp && !style && originStyle) || (classRegExp && !classes && originClasses)) {
+                // remove only
+                if (isRemoveNode) {
+                    if ((styleRegExp || classRegExp) && !style && !classes && remove) {
                         return false;
                     }
 
-                    if (removeRegExp && removeRegExp.test(vNode.nodeName)) {
+                    if ((styleRegExp && !style && originStyle) || (classRegExp && !classes && originClasses) || remove) {
                         return false;
                     }
                 }
 
+                // remove
+                if (remove && !strictRemove) {
+                    return false;
+                }
+
                 // change
-                if (style || classes || vNode.nodeName !== newNodeName || (!classRegExp !== !vNode.className) || (!styleRegExp !== !vNode.style.cssText)) {
+                if (style || classes || vNode.nodeName !== newNodeName || (_w.Boolean(styleRegExp) !== _w.Boolean(originStyle)) || (_w.Boolean(classRegExp) !== _w.Boolean(originClasses))) {
                     if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
                     if (!vNode.style.cssText) {
                         vNode.removeAttribute('style');
@@ -1236,7 +1252,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         vNode.removeAttribute('class');
                     }
 
-                    if (!vNode.style.cssText && !vNode.className && vNode.nodeName === newNodeName) return false;
+                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || remove)) return false;
 
                     return true;
                 }

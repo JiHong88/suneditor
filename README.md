@@ -310,6 +310,7 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                             * mode: 'htmlmixed',
                             * htmlMode: true,
                             * lineNumbers: true
+                            * lineWrapping: true
                             */
                         }
                       }

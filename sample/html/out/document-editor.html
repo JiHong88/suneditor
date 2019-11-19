@@ -1438,18 +1438,20 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, checkCSSPropertyText, removeNodeArray)</span><span
+            <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, styleArray, removeNodeArray, strictRemove)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 Add, update, and delete nodes from selected text.<br>
                 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.<br>
-                2. If the "appendNode" argument is null, the node of the selection is modified without adding a new node.<br>
+                2. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.<br>
                 3. The same style as the style attribute of the "styleArray" argument is deleted.<br>
-                   Styles should be put with attribute names from css. ["background-color"]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;(Styles should be put with attribute names from css. ["background-color"])<br>
                 4. The same class name as the class attribute of the "styleArray" argument is deleted.<br>
-                   The class name is preceded by "." [".className"]<br>
-                6. If a node with all styles and class removed is a tag like "appendNode" or the "appendNode" argument is null, that node is deleted.<br>
-                7. The tag with the same name as the "removeNodeArray" argument value is deleted. Only valid if "appendNode" is null.
+                &nbsp;&nbsp;&nbsp;&nbsp;(The class name is preceded by "." [".className"])<br>
+                5. You can put the list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.<br>
+                6. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.<br>
+                7. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.<br>
+                8. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1466,21 +1468,31 @@
                     <td class="type">
                         <span class="param-type">Element|null</span>
                     </td>
-                    <td class="description last">The element to be added to the selection</td>
+                    <td class="description last">The element to be added to the selection. If it is null, only delete the node.</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>checkCSSPropertyArray</code></td>
+                    <td class="name"><code>styleArray</code></td>
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">The css attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])</td>
+                    <td class="description last">The style or className attribute name Array to check (['font-family', 'color', '.className']...])</td>
                 </tr>
                 <tr>
                     <td class="name"><code>removeNodeArray</code></td>
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])</td>
+                    <td class="description last">
+                        An array of node names to remove types from, <br>
+                        remove all formats when "appendNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>strictRemove</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean|null</span>
+                    </td>
+                    <td class="description last">If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.</td>
                 </tr>
                 </tbody>
             </table>
