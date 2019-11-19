@@ -84,9 +84,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontSize = value;
-            this.nodeChange(newNode, ['font-size'], null);
+            this.nodeChange(newNode, ['font-size'], null, false);
         } else {
-            this.nodeChange(null, ['font-size'], null);
+            this.nodeChange(null, ['font-size'], null, false);
         }
 
         this.submenuOff();
