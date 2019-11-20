@@ -182,12 +182,68 @@ suneditor.create('sample', {
 ```
 
 ### 4. Plugins list
-```javascript
-'suneditor/src/plugins/dialog/...'
-// image, video, link
-'suneditor/src/plugins/submenu/...'
-// align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, paragraphStyle, textStyle, list, table, template
-```
+> The plugin and the button have the same name.
+
+<table class="rich-diff-level-zero">
+    <thead class="rich-diff-level-one">
+        <tr>
+            <th align="left">Name</th>
+            <th align="left">Type</th>
+        </tr>
+    </thead>
+    <tbody class="rich-diff-level-one">
+        <tr>
+            <td align="left">image</td>
+            <td align="left" rowspan="3"><strong>dialog</strong></td>
+        </tr>
+        <tr>
+            <td align="left">link</td>
+        </tr>
+        <tr>
+            <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">align</td>
+            <td align="left" rowspan="13"><strong>submenu</strong></td>
+        </tr>
+        <tr>
+            <td align="left">font</td>
+        </tr>
+        <tr>
+            <td align="left">fontColor</td>
+        </tr>
+        <tr>
+            <td align="left">fontSize</td>
+        </tr>
+        <tr>
+            <td align="left">formatBlock</td>
+        </tr>
+        <tr>
+            <td align="left">hiliteColor</td>
+        </tr>
+        <tr>
+            <td align="left">horizontalRule</td>
+        </tr>
+        <tr>
+            <td align="left">lineHeight</td>
+        </tr>
+        <tr>
+            <td align="left">list</td>
+        </tr>
+        <tr>
+            <td align="left">paragraphStyle</td>
+        </tr>
+        <tr>
+            <td align="left">table</td>
+        </tr>
+        <tr>
+            <td align="left">template</td>
+        </tr>
+        <tr>
+            <td align="left">textStyle</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Init function
 ```text
@@ -269,19 +325,22 @@ suneditor.create('sample', {
 ```java
 plugins: [
     // Submenu
+    align,
     font,
+    fontColor,
     fontSize,
     formatBlock,
-    fontColor,
     hiliteColor,
-    align,
     horizontalRule,
+    lineHeight,
     list,
+    paragraphStyle,
     table,
     template,
+    textStyle,
     // Dialog
-    link,
     image,
+    link,
     video
 ]               : Plugins array.     default: null {Array}
 
@@ -420,7 +479,7 @@ textStyles      : You can apply custom style or class to selected text.
                                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
-                        name: 'Translucent', // Text style bame
+                        name: 'Translucent', // Text style name
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
                     },
