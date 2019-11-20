@@ -22,7 +22,7 @@ export default {
         /** add event listeners */
         listUl.addEventListener('click', this.pickup.bind(core));
 
-        context.textStyle._styleList = listUl.querySelectorAll('li button');
+        context.textStyle._styleList = listDiv.querySelectorAll('li button');
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -51,8 +51,9 @@ export default {
         const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic">';
-        for (let i = 0, len = styleList.length, t, tag, name, attrs; i < len; i++) {
+        for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value; i < len; i++) {
             t = styleList[i];
+            attrs = '', value = '', command = [];
 
             if (typeof t === 'string') {
                 const defaultStyle = defaultList[t.toLowerCase()];
@@ -62,10 +63,22 @@ export default {
 
             name = t.name;
             tag = t.tag || 'span';
-            attrs = (t.style ? ' style="' + t.style + '"' : '') + (t.class ? ' class="' + t.class + '"' : '');
+
+            if (t.style) {
+                attrs += ' style="' + t.style + '"';
+                value += t.style.replace(/:[^;]+(;|$)\s*/g, ',');
+                command.push('style');
+            }
+            if (t.class) {
+                attrs += ' class="' + t.class + '"';
+                value += '.' + t.class.trim().replace(/\s+/g, ',.');
+                command.push('class');
+            }
+
+            value = value.replace(/,$/, '');
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="textStyle" title="' + name + '">' +
+                '<button type="button" class="se-btn-list" data-command="' + tag + '" data-value="' + value + '" title="' + name + '">' +
                     '<' + tag + attrs + '>' + name +  '</' + tag + '>' +
                 '</button></li>';
         }
@@ -74,6 +87,39 @@ export default {
         listDiv.innerHTML = list;
 
         return listDiv;
+    },
+
+    on: function () {
+        const util = this.util;
+        const textStyleContext = this.context.textStyle;
+        const styleList = textStyleContext._styleList;
+        // let selectionNode = this.getSelectionNode();
+
+        for (let i = 0, len = styleList.length, btn, data, active; i < len; i++) {
+            btn = styleList[i];
+            data = btn.getAttribute('data-value').split(',');
+            
+            for (let v = 0, value; v < data.length; v++) {
+                let selectionNode = this.getSelectionNode();
+                if (selectionNode.nodeType !== 1 || selectionNode.nodeName.toLowerCase() !== btn.getAttribute('data-command').toLowerCase()) continue;
+
+                while (!util.isFormatElement(selectionNode)) {
+                    value = data[v];
+                    if (/^\./.test(value) ? util.hasClass(selectionNode, value.replace(/^\./, '')) : btn.firstElementChild.style[value] === selectionNode.style[value]) {
+                        active = true;
+                        break;
+                    } else {
+                        active = false;
+                    }
+                }
+
+                if (active) break;
+                selectionNode = selectionNode.parentNode;
+            }
+
+            active ? util.addClass(btn, 'active') : util.removeClass(btn, 'active');
+        }
+
     },
 
     pickup: function (e) {
@@ -106,7 +152,7 @@ export default {
             checkStyles.push('.' + classes[i]);
         }
 
-        const newNode = tag.cloneNode(false);
+        const newNode = this.util.hasClass(target, 'active') ? null : tag.cloneNode(false);
         this.nodeChange(newNode, checkStyles, null, false);
 
         this.submenuOff();

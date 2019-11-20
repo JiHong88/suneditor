@@ -1020,10 +1020,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          *    (Styles should be put with attribute names from css. ["background-color"])
          * 4. The same class name as the class attribute of the "styleArray" argument is deleted.
          *    (The class name is preceded by "." [".className"])
-         * 5. You can put the list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
+         * 5. Use a list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
          * 6. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.
          * 7. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
          * 8. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
+         * 9. It won't work if the parent node has the same class and same value style.
+         *    However, if there is a value in "removeNodeArray", it works and the text node is separated even if there is no node to replace.
          * @param {Element|null} appendNode The element to be added to the selection. If it is null, only delete the node.
          * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
          * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "appendNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
