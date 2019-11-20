@@ -2044,14 +2044,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
-                    const on = util.hasClass(this.commandMap[command], 'active');
+                    const btn = util.hasClass(this.commandMap[command], 'active') ? null : this.util.createElement(command);
+                    let removeNode = command;
 
                     if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'active')) {
-                        this.nodeChange(null, null, ['SUP']);
+                        removeNode = 'SUP';
                     } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'active')) {
-                        this.nodeChange(null, null, ['SUB']);
+                        removeNode = 'SUB';
                     }
-                    this.nodeChange(on ? null : this.util.createElement(command), null, [command]);
+
+                    this.nodeChange(btn, null, [removeNode], false);
                     this.focus();
             }
         },
@@ -2060,7 +2062,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Remove format of the currently selected range
          */
         removeFormat: function () {
-            this.nodeChange(null, null, null);
+            this.nodeChange(null, null, null, false);
         },
 
         /**

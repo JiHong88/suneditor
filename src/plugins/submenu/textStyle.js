@@ -107,7 +107,7 @@ export default {
         }
 
         const newNode = tag.cloneNode(false);
-        this.nodeChange(newNode, checkStyles, null);
+        this.nodeChange(newNode, checkStyles, null, false);
 
         this.submenuOff();
     }
