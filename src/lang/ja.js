@@ -68,7 +68,9 @@
             tag_blockquote: '引用',
             tag_pre: 'コード',
             template: 'テンプレート',
-            lineHeight: '行の高さ'
+            lineHeight: '行の高さ',
+            paragraphStyle: '段落スタイル',
+            textStyle: 'テキストスタイル'
         },
         dialogBox: {
             linkBox: {
@@ -101,6 +103,7 @@
         },
         controller: {
             edit: '編集',
+            unlink: 'リンク解除',
             remove: '削除',
             insertRowAbove: '上に行を挿入',
             insertRowBelow: '下に行を挿入',

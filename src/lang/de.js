@@ -68,7 +68,9 @@
             tag_blockquote: 'Zitat',
             tag_pre: 'Quellcode',
             template: 'Skabelon',
-            lineHeight: 'Linienhöhe'
+            lineHeight: 'Linienhöhe',
+            paragraphStyle: 'Absatzstil',
+            textStyle: 'Textstil'
         },
         dialogBox: {
             linkBox: {
@@ -101,6 +103,7 @@
         },
         controller: {
             edit: 'Bearbeiten',
+            unlink: 'Link entfernen',
             remove: 'Löschen',
             insertRowAbove: 'Zeile oberhalb einfügen',
             insertRowBelow: 'Zeile unterhalb einfügen',

@@ -71,7 +71,9 @@
             tag_blockquote: 'Citer',
             tag_pre: 'Code',
             template: 'Schablone',
-            lineHeight: 'Linjehøjde'
+            lineHeight: 'Linjehøjde',
+            paragraphStyle: 'Afsnitstil',
+            textStyle: 'Tekststil'
         },
         dialogBox: {
             linkBox: {
@@ -104,6 +106,7 @@
         },
         controller: {
             edit: 'Rediger',
+            unlink: 'Fjern link',
             remove: 'Fjern',
             insertRowAbove: 'Indsæt række foroven',
             insertRowBelow: 'Indsæt række nedenfor',

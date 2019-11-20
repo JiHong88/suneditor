@@ -103,6 +103,7 @@
         },
         controller: {
             edit: 'Edit',
+            unlink: 'Unlink',
             remove: 'Remove',
             insertRowAbove: 'Insert row above',
             insertRowBelow: 'Insert row below',

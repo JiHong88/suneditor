@@ -103,6 +103,7 @@
         },
         controller: {
             edit: '편집',
+            unlink: '링크 해제',
             remove: '삭제',
             insertRowAbove: '위에 행 삽입',
             insertRowBelow: '아래에 행 삽입',

@@ -68,7 +68,9 @@
             tag_blockquote: '引用',
             tag_pre: '代码',
             template: '模板',
-            lineHeight: '线高'
+            lineHeight: '线高',
+            paragraphStyle: '段落样式',
+            textStyle: '文字样式'
         },
         dialogBox: {
             linkBox: {
@@ -101,6 +103,7 @@
         },
         controller: {
             edit: '编辑',
+            unlink: '去除链接',
             remove: '删除',
             insertRowAbove: '在上方插入',
             insertRowBelow: '在下方插入',

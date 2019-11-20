@@ -68,7 +68,9 @@
             tag_blockquote: 'Цитата',
             tag_pre: 'Код',
             template: 'Шаблон',
-            lineHeight: 'Высота линии'
+            lineHeight: 'Высота линии',
+            paragraphStyle: 'Стиль абзаца',
+            textStyle: 'Стиль текста'
         },
         dialogBox: {
             linkBox: {
@@ -101,6 +103,7 @@
         },
         controller: {
             edit: 'Изменить',
+            unlink: 'Убрать ссылку',
             remove: 'Удалить',
             insertRowAbove: 'Вставить строку выше',
             insertRowBelow: 'Вставить строку ниже',

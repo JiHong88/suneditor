@@ -1207,6 +1207,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // all remove
                 if (isRemoveFormat) return false;
 
+                // remove node check
+                const tagRemove = removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName);
+
+                // tag remove
+                if (tagRemove && !strictRemove) {
+                    return false;
+                }
+
                 // style regexp
                 const originStyle = vNode.style.cssText;
                 let style = '';
@@ -1221,23 +1229,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     classes = originClasses.replace(classRegExp, '').trim();
                 }
 
-                // remove node check
-                const remove = removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName);
-
                 // remove only
                 if (isRemoveNode) {
-                    if ((styleRegExp || classRegExp) && !style && !classes && remove) {
+                    if ((classRegExp || !originClasses) && (styleRegExp || !originStyle) && !style && !classes && tagRemove) {
                         return false;
                     }
-
-                    if ((styleRegExp && !style && originStyle) || (classRegExp && !classes && originClasses) || remove) {
-                        return false;
-                    }
-                }
-
-                // remove
-                if (remove && !strictRemove) {
-                    return false;
                 }
 
                 // change
@@ -1252,7 +1248,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         vNode.removeAttribute('class');
                     }
 
-                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || remove)) return false;
+                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) return false;
 
                     return true;
                 }

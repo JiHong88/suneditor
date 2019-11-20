@@ -96,6 +96,10 @@ export default {
                         '<i class="se-icon-edit"></i>' +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                     '</button>' +
+                    '<button type="button" data-command="unlink" tabindex="-1" class="se-tooltip">' +
+                        '<i class="se-icon-unlink"></i>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.unlink + '</span></span>' +
+                    '</button>' +
                     '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
                         '<i class="se-icon-delete"></i>' +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
@@ -198,6 +202,10 @@ export default {
             this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
             this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
             this.plugins.dialog.open.call(this, 'link', true);
+        }
+        else if (/unlink/.test(command)) {
+            this.setRange(this.context.link._linkAnchor, 0, this.context.link._linkAnchor, 1);
+            this.nodeChange(null, null, ['A'], false);
         }
         else {
             /** delete */
