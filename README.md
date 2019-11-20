@@ -387,33 +387,56 @@ lineHeights     : Change default line-height array.                 default: [{}
                     {text: 'Single', value: 1},
                     {text: 'Double', value: 2}
                   ]
-paragraphStyles : You can apply custom style to text.
+paragraphStyles : You can apply custom class to format.
+                  ex) '.sun-editor-editable .__se__customClass'
+                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
-                        name: 'Highlighted', // Format style name
-                        class: '__se__p-highlighted' // Define style for used class (Class names must always begin with "__se__")
+                        name: 'Spaced', // Format style name
+                        class: '__se__p-spaced' // Define style for used class (Class names must always begin with "__se__")
                     },
                     {
                         name: 'Bordered',
                         class: '__se__p-bordered'
                     },
                     {
-                        name: 'Spaced',
-                        class: '__se__p-spaced'
+                        name: 'Invert',
+                        class: '__se__p-invert'
+                    },
+                    {
+                        name: 'Neon',
+                        class: '__se__p-neon'
                     }
                   ]
-textStyles      : You can apply custom style to format.
+                  ex) [
+                      'invert', 'neon', // The default value is called by name only and the name is called in the language file.
+                      {
+                          name: 'Custom',
+                          class: '__se__customClass'
+                      }
+                  ]
+textStyles      : You can apply custom style or class to selected text.
+                  ex(using a class)) '.sun-editor-editable .__se__customClass'
+                                     '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
-                        name: 'Translucent', // Text style Name
+                        name: 'Translucent', // Text style bame
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
                     },
                     {
-                        name: 'Emphasis',
-                        style: '-webkit-text-emphasis: filled;',
+                        name: 'Shadow',
+                        class: '__se__t-shadow', // Class names (Class names must always begin with "__se__")
                         tag: 'span',
                     }
+                  ]
+                  ex) [
+                      'translucent', // The default value is called by name only and the name is called in the language file.
+                      {
+                          name: 'Emphasis',
+                          style: '-webkit-text-emphasis: filled;',
+                          tag: 'span'
+                      }
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------

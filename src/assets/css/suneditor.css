@@ -199,7 +199,7 @@
 .sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 /* submenu layer - list button */
-.sun-editor .se-btn-list {width:100%; height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
+.sun-editor .se-btn-list {width:100%; height:auto; min-height:32px; max-height:100px; padding:0 14px; cursor:pointer; font-size:12px; line-height:normal; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 .sun-editor .se-btn-list:hover, .sun-editor .se-btn-list:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
@@ -210,7 +210,7 @@
 /** submenu layer - format block */
 .sun-editor .se-list-layer .se-list-format {min-width:156px;}
 .sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list {height:auto; min-height:32px; line-height:100%;}
+.sun-editor .se-list-layer .se-list-format .se-btn-list {line-height:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
 .sun-editor .se-list-layer .se-list-format p {font-size:13px;}
@@ -225,7 +225,6 @@
 .sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /* submenu layer - font size */
 .sun-editor .se-list-layer .se-list-font-size {min-width:140px; max-height:300px; overflow-x:hidden; overflow-y:auto;}
-.sun-editor .se-list-layer .se-list-font-size .se-btn-list {height:auto; min-height:32px; line-height:normal;}
 /* submenu layer - hr */
 .sun-editor .se-list-layer .se-list-line {width:125px;}
 /* submenu layer - align */

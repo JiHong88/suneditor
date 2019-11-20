@@ -1210,7 +1210,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (isRemoveFormat) return false;
 
                 // remove node check
-                const tagRemove = removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName);
+                const tagRemove = (!removeNodeRegExp && isRemoveNode) || (removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName));
 
                 // tag remove
                 if (tagRemove && !strictRemove) {

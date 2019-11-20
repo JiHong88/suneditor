@@ -50,7 +50,7 @@ export default {
         };
         const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
 
-        let list = '<div class="se-list-inner"><ul class="se-list-basic">';
+        let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
         for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value; i < len; i++) {
             t = styleList[i];
             attrs = '', value = '', command = [];
@@ -92,29 +92,29 @@ export default {
     on: function () {
         const util = this.util;
         const textStyleContext = this.context.textStyle;
-        const styleList = textStyleContext._styleList;
-        // let selectionNode = this.getSelectionNode();
+        const styleButtonList = textStyleContext._styleList;
+        const selectionNode = this.getSelectionNode();
 
-        for (let i = 0, len = styleList.length, btn, data, active; i < len; i++) {
-            btn = styleList[i];
+        for (let i = 0, len = styleButtonList.length, btn, data, active; i < len; i++) {
+            btn = styleButtonList[i];
             data = btn.getAttribute('data-value').split(',');
             
-            for (let v = 0, value; v < data.length; v++) {
-                let selectionNode = this.getSelectionNode();
-                if (selectionNode.nodeType !== 1 || selectionNode.nodeName.toLowerCase() !== btn.getAttribute('data-command').toLowerCase()) continue;
-
-                while (!util.isFormatElement(selectionNode)) {
-                    value = data[v];
-                    if (/^\./.test(value) ? util.hasClass(selectionNode, value.replace(/^\./, '')) : btn.firstElementChild.style[value] === selectionNode.style[value]) {
-                        active = true;
-                        break;
-                    } else {
-                        active = false;
+            for (let v = 0, node, value; v < data.length; v++) {
+                node = selectionNode;
+                active = false;
+                
+                while (!util.isFormatElement(node)) {
+                    if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
+                        value = data[v];
+                        if (/^\./.test(value) ? util.hasClass(node, value.replace(/^\./, '')) : btn.firstElementChild.style[value] === node.style[value]) {
+                            active = true;
+                            break;
+                        }
                     }
+                    node = node.parentNode;
                 }
 
-                if (active) break;
-                selectionNode = selectionNode.parentNode;
+                if (!active) break;
             }
 
             active ? util.addClass(btn, 'active') : util.removeClass(btn, 'active');

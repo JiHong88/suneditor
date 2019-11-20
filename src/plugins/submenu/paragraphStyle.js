@@ -36,13 +36,13 @@ export default {
         listDiv.className = 'se-submenu se-list-layer';
 
         const defaultList = {
-            bordered: {
-                name: 'Bordered',
-                class: '__se__p-bordered'
-            },
             spaced: {
                 name: 'Spaced',
                 class: '__se__p-spaced'
+            },
+            bordered: {
+                name: 'Bordered',
+                class: '__se__p-bordered'
             },
             invert: {
                 name: 'Invert',
@@ -53,7 +53,7 @@ export default {
                 class: '__se__p-neon'
             }
         };
-        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['bordered', 'spaced', 'invert', 'neon'] : option.paragraphStyles;
+        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'invert', 'neon'] : option.paragraphStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
         for (let i = 0, len = paragraphStyles.length, p, name, attrs; i < len; i++) {
