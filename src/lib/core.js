@@ -293,7 +293,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {*} arguments controller elements, functions..
          */
         controllersOn: function () {
-            if (this._bindControllersOff) this._bindControllersOff();
+            if (this._bindControllersOff) {
+                const tempName = this._resizingName;
+                this._bindControllersOff();
+                this._resizingName = tempName;
+            }
 
             for (let i = 0; i < arguments.length; i++) {
                 if (arguments[i].style) arguments[i].style.display = 'block';
@@ -302,13 +306,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             this._bindControllersOff = this.controllersOff.bind(this);
             this.addDocEvent('mousedown', this._bindControllersOff, false);
-            if (!this._resizingName) this.addDocEvent('keydown', this._bindControllersOff, false);
+            this.addDocEvent('keydown', this._bindControllersOff, false);
         },
 
         /**
          * @description Hide controller at editor area (link button, image resize button..)
          */
-        controllersOff: function () {
+        controllersOff: function (e) {
+            if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
+
             this._resizingName = '';
             if (!this._bindControllersOff) return;
 
@@ -3310,7 +3316,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(resizingName, function () {
-                            core.controllersOff();
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
                         });

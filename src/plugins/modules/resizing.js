@@ -533,10 +533,12 @@ export default {
             const change = contextResizing._isChange;
             contextResizing._isChange = false;
 
-            document.removeEventListener('mousemove', resizing_element_bind);
-            document.removeEventListener('mouseup', closureFunc_bind);
-
+            this.removeDocEvent('mousemove', resizing_element_bind);
+            this.removeDocEvent('mouseup', closureFunc_bind);
+            this.removeDocEvent('keydown', closureFunc_bind);
+            
             if (e.type === 'keydown') {
+
                 this.controllersOff();
                 this.context.element.resizeBackground.style.display = 'none';
                 this.plugins[this.context.resizing._resize_plugin].init.call(this);
@@ -549,9 +551,9 @@ export default {
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
-        document.addEventListener('mousemove', resizing_element_bind);
-        document.addEventListener('mouseup', closureFunc_bind);
-        document.addEventListener('keydown', closureFunc_bind);
+        this.addDocEvent('mousemove', resizing_element_bind);
+        this.addDocEvent('mouseup', closureFunc_bind);
+        this.addDocEvent('keydown', closureFunc_bind);
     },
 
     resizing_element: function (contextResizing, direction, plugin, e) {
