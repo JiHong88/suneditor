@@ -28,11 +28,11 @@ Pure javscript based WYSIWYG web editor, with no dependencies
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
-    - [Plugins list](#4-plugins-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
 - [Options](#options)
 - [Functions](#functions)
+- [Plugins list](#plugins-list)
 - [Examples](#examples)
     - [Defining menu items](#defining-menu-items)
     - [Char count, Button groups](#char-count-button-groups)
@@ -180,70 +180,6 @@ suneditor.create('sample', {
     ],
 })
 ```
-
-### 4. Plugins list
-> The plugin and the button have the same name.
-
-<table>
-    <thead>
-        <tr>
-            <th align="left">Name</th>
-            <th align="left">Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td align="left">image</td>
-            <td align="left" rowspan="3"><strong>dialog</strong></td>
-        </tr>
-        <tr>
-            <td align="left">link</td>
-        </tr>
-        <tr>
-            <td align="left">video</td>
-        </tr>
-        <tr>
-            <td align="left">align</td>
-            <td align="left" rowspan="13"><strong>submenu</strong></td>
-        </tr>
-        <tr>
-            <td align="left">font</td>
-        </tr>
-        <tr>
-            <td align="left">fontColor</td>
-        </tr>
-        <tr>
-            <td align="left">fontSize</td>
-        </tr>
-        <tr>
-            <td align="left">formatBlock</td>
-        </tr>
-        <tr>
-            <td align="left">hiliteColor</td>
-        </tr>
-        <tr>
-            <td align="left">horizontalRule</td>
-        </tr>
-        <tr>
-            <td align="left">lineHeight</td>
-        </tr>
-        <tr>
-            <td align="left">list</td>
-        </tr>
-        <tr>
-            <td align="left">paragraphStyle</td>
-        </tr>
-        <tr>
-            <td align="left">table</td>
-        </tr>
-        <tr>
-            <td align="left">template</td>
-        </tr>
-        <tr>
-            <td align="left">textStyle</td>
-        </tr>
-    </tbody>
-</table>
 
 ## Init function
 ```text
@@ -709,6 +645,70 @@ editor.showInline = function (toolbar, context) {
     console.log('context', context);
 }
 ```
+
+## Plugins list
+> The plugin and the button have the same name.
+
+<table>
+    <thead>
+        <tr>
+            <th align="left">Name</th>
+            <th align="left">Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="left">image</td>
+            <td align="left" rowspan="3"><strong>dialog</strong></td>
+        </tr>
+        <tr>
+            <td align="left">link</td>
+        </tr>
+        <tr>
+            <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">align</td>
+            <td align="left" rowspan="13"><strong>submenu</strong></td>
+        </tr>
+        <tr>
+            <td align="left">font</td>
+        </tr>
+        <tr>
+            <td align="left">fontColor</td>
+        </tr>
+        <tr>
+            <td align="left">fontSize</td>
+        </tr>
+        <tr>
+            <td align="left">formatBlock</td>
+        </tr>
+        <tr>
+            <td align="left">hiliteColor</td>
+        </tr>
+        <tr>
+            <td align="left">horizontalRule</td>
+        </tr>
+        <tr>
+            <td align="left">lineHeight</td>
+        </tr>
+        <tr>
+            <td align="left">list</td>
+        </tr>
+        <tr>
+            <td align="left">paragraphStyle</td>
+        </tr>
+        <tr>
+            <td align="left">table</td>
+        </tr>
+        <tr>
+            <td align="left">template</td>
+        </tr>
+        <tr>
+            <td align="left">textStyle</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Examples
 <a id="defining-menu-items"></a> [Defining menu items](http://suneditor.com/sample/html/examples.html#setting)

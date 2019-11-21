@@ -231,7 +231,7 @@ const util = {
     convertHTMLForCodeView: function (html, indentSize) {
         let returnHTML = '';
         const reg = this._w.RegExp;
-        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR)$', 'i');
+        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
         const isFormatElement = this.isFormatElement.bind(this);
         const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
 
@@ -267,7 +267,7 @@ const util = {
             }
         }(wDoc, '', '\n'));
 
-        return returnHTML.trim();
+        return returnHTML.trim() + '\n';
     },
 
     /**
