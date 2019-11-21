@@ -64,7 +64,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     mode: 'classic',
     // toolbarWidth: 800,
     height: 'auto',
-    fullPage: true,
+    // fullPage: true,
     // iframe: true,
     // iframeCSSFileName: ['suneditor', 'http://suneditor.com/sample/css/sample.css'],
     // callBackSave: (contents) => {
@@ -149,6 +149,7 @@ window.sun_insertHTML = function (html) {
 
 window.sun_getContents = function () {
     alert(ss.getContents());
+    console.log(ss.getContents());
 }
 
 window.sun_setContents = function (content) {

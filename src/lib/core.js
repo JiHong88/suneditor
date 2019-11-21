@@ -1858,8 +1858,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (child.nodeType === 1) {
                             if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child);
-                                pNode.appendChild(newInnerNode);
+                                pNode.insertBefore(child, node);
+                                pNode.insertBefore(newInnerNode, child);
                                 nNodeArray.push(newInnerNode);
                                 i--;
                             } else {
