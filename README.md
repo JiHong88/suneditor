@@ -184,14 +184,14 @@ suneditor.create('sample', {
 ### 4. Plugins list
 > The plugin and the button have the same name.
 
-<table class="rich-diff-level-zero">
-    <thead class="rich-diff-level-one">
+<table>
+    <thead>
         <tr>
             <th align="left">Name</th>
             <th align="left">Type</th>
         </tr>
     </thead>
-    <tbody class="rich-diff-level-one">
+    <tbody>
         <tr>
             <td align="left">image</td>
             <td align="left" rowspan="3"><strong>dialog</strong></td>
@@ -643,7 +643,6 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
-editor = null;
 
 // Event functions
 // It can be redefined by receiving event object as parameter.
