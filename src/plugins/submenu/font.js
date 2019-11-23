@@ -94,9 +94,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontFamily = value;
-            this.nodeChange(newNode, ['font-family'], null, false);
+            this.nodeChange(newNode, ['font-family'], null, null);
         } else {
-            this.nodeChange(null, ['font-family'], null, false);
+            this.nodeChange(null, ['font-family'], null, true);
         }
         
         this.submenuOff();

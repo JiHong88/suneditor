@@ -1210,17 +1210,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             /** validation check function*/
             const validation = function (vNode) {
+                vNode = vNode.cloneNode(false);
+
                 // all path
-                if (vNode.nodeType === 3 || util.isBreak(vNode)) return true;
+                if (vNode.nodeType === 3 || util.isBreak(vNode)) return vNode;
                 // all remove
-                if (isRemoveFormat) return false;
+                if (isRemoveFormat) return null;
 
                 // remove node check
                 const tagRemove = (!removeNodeRegExp && isRemoveNode) || (removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName));
 
                 // tag remove
                 if (tagRemove && !strictRemove) {
-                    return false;
+                    return null;
                 }
 
                 // style regexp
@@ -1240,7 +1242,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // remove only
                 if (isRemoveNode) {
                     if ((classRegExp || !originClasses) && (styleRegExp || !originStyle) && !style && !classes && tagRemove) {
-                        return false;
+                        return null;
                     }
                 }
 
@@ -1256,12 +1258,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         vNode.removeAttribute('class');
                     }
 
-                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) return false;
+                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) return null;
 
-                    return true;
+                    return vNode;
                 }
 
-                return false;
+                return null;
             };
 
             // get line nodes
@@ -1375,7 +1377,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
 
-                for (let i = 0, len = childNodes.length; i < len; i++) {
+                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
                     let child = childNodes[i];
                     if (!child) continue;
                     let coverNode = node;
@@ -1398,8 +1400,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== pNode && newNode !== el && newNode !== null) {
-                            if (validation(newNode) && newNode.nodeType === 1 && checkCss(newNode)) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
+                                pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
                             newNode = newNode.parentNode;
@@ -1456,8 +1459,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== pNode && newNode !== el && newNode !== null) {
-                            if (validation(newNode) && newNode.nodeType === 1 && checkCss(newNode)) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
+                                pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
                             newNode = newNode.parentNode;
@@ -1505,8 +1509,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || validation(newNode)) && checkCss(newNode)) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || vNode) && checkCss(newNode)) {
+                                pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
                             newNode = newNode.parentNode;
@@ -1628,11 +1633,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         node = newInnerNode;
                         i--;
                         continue;
-                    } else if (validation(child)) {
-                        noneChange = false;
-                        let cloneNode = child.cloneNode(false);
-                        node.appendChild(cloneNode);
-                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
+                    } else {
+                        let vNode = validation(child);
+                        if (vNode) {
+                            noneChange = false;
+                            node.appendChild(vNode);
+                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
+                        }
                     }
 
                     recursionFunc(child, coverNode);
@@ -1687,7 +1694,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
-                for (let i = 0, len = childNodes.length; i < len; i++) {
+
+                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
                     const child = childNodes[i];
                     if (!child) continue;
                     let coverNode = node;
@@ -1709,8 +1717,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = child;
                         pCurrent = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            if (newNode.nodeType === 1 && validation(newNode)) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (newNode.nodeType === 1 && vNode) {
+                                pCurrent.push(vNode);
                             }
                             newNode = newNode.parentNode;
                         }
@@ -1742,8 +1751,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = node;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
-                            if (newNode.nodeType === 1 && validation(newNode)) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (newNode.nodeType === 1 && vNode) {
+                                pCurrent.push(vNode);
                             }
                             newNode = newNode.parentNode;
                         }
@@ -1774,10 +1784,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         continue;
                     }
 
-                    if (!passNode || validation(child)) {
-                        const cloneNode = child.cloneNode(false);
-                        node.appendChild(cloneNode);
-                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
+                    vNode = !passNode ? child.cloneNode(false) : validation(child);
+                    if (vNode) {
+                        node.appendChild(vNode);
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -1849,7 +1859,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             (function recursionFunc(current, node) {
                 const childNodes = current.childNodes;
-                for (let i = childNodes.length -1; 0 <= i; i--) {
+
+                for (let i = childNodes.length - 1, vNode; 0 <= i; i--) {
                     const child = childNodes[i];
                     if (!child) continue;
                     let coverNode = node;
@@ -1871,8 +1882,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = child;
                         pCurrent = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            if (validation(newNode) && newNode.nodeType === 1) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (vNode && newNode.nodeType === 1) {
+                                pCurrent.push(vNode);
                             }
                             newNode = newNode.parentNode;
                         }
@@ -1904,8 +1916,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = node;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
-                            if (validation(newNode) && newNode.nodeType === 1) {
-                                pCurrent.push(newNode.cloneNode(false));
+                            vNode = validation(newNode);
+                            if (vNode && newNode.nodeType === 1) {
+                                pCurrent.push(vNode);
                             }
                             newNode = newNode.parentNode;
                         }
@@ -1936,10 +1949,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         continue;
                     }
 
-                    if (!passNode || validation(child)) {
-                        const cloneNode = child.cloneNode(false);
-                        node.insertBefore(cloneNode, node.firstChild);
-                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
+                    vNode = !passNode ? child.cloneNode(false) : validation(child);
+                    if (vNode) {
+                        node.insertBefore(vNode, node.firstChild);
+                        if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
                     }
 
                     recursionFunc(child, coverNode);
@@ -2070,7 +2083,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Remove format of the currently selected range
          */
         removeFormat: function () {
-            this.nodeChange(null, null, null, false);
+            this.nodeChange(null, null, null, null);
         },
 
         /**
@@ -2133,6 +2146,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable.wysiwygActive = true;
                 this._resourcesStateChange();
                 this._checkComponents();
+
+                // history stack
+                this.history.push();
+
                 this.focus();
             } else {
                 this._setEditorDataToCodeView();

@@ -106,7 +106,7 @@ export default {
                 while (!util.isFormatElement(node)) {
                     if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
                         value = data[v];
-                        if (/^\./.test(value) ? util.hasClass(node, value.replace(/^\./, '')) : btn.firstElementChild.style[value] === node.style[value]) {
+                        if (/^\./.test(value) ? util.hasClass(node, value.replace(/^\./, '')) : !!node.style[value]) {
                             active = true;
                             break;
                         }
@@ -153,7 +153,7 @@ export default {
         }
 
         const newNode = this.util.hasClass(target, 'active') ? null : tag.cloneNode(false);
-        this.nodeChange(newNode, checkStyles, null, false);
+        this.nodeChange(newNode, checkStyles, null, true);
 
         this.submenuOff();
     }

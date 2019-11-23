@@ -65,12 +65,6 @@ export default {
     onChangeInput: function (e) {
         this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);
     },
-    
-    remove: function () {
-        this.nodeChange(null, ['color'], null, false);
-        this.submenuOff();
-        this.focus();
-    },
 
     submit: function () {
         this.plugins.fontColor.applyColor.call(this, this.context.colorPicker._currentColor);
@@ -83,12 +77,17 @@ export default {
         this.plugins.fontColor.applyColor.call(this, e.target.getAttribute('data-value'));
     },
 
+    remove: function () {
+        this.nodeChange(null, ['color'], null, true);
+        this.submenuOff();
+    },
+
     applyColor: function (color) {
         if (!color) return;
 
         const newNode = this.util.createElement('SPAN');
         newNode.style.color = color;
-        this.nodeChange(newNode, ['color'], null, false);
+        this.nodeChange(newNode, ['color'], null, null);
 
         this.submenuOff();
     }
