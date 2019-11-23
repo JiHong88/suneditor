@@ -2541,13 +2541,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         this._iframeAuto = this._wd.body;
                     }
                 }
-
-                this._placeholder = context.element.placeholder;
-                
-                /** Excute history function, check components */
-                this._resourcesStateChange();
-                this._checkComponents();
-                this.history = _history(this, event._onChange_historyStack);
+                this._iframeAutoHeight();
             }.bind(this));
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
@@ -2572,6 +2566,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             };
 
             this._variable._originCssText = context.element.topArea.style.cssText;
+            this._placeholder = context.element.placeholder;
+
+            /** Excute history function, check components */
+            this._checkPlaceholder();
+            this._checkComponents();
+            this.history = _history(this, event._onChange_historyStack);
         },
 
         /**
@@ -3787,12 +3787,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core._init();
             event._addEvent();
+            core._charCount(0, false);
+
             event._offStickyToolbar();
             event.onResize_window();
-
-            core._checkComponents();
-            core.history = _history(core, event._onChange_historyStack);
-            core._charCount(0, false);
+            
             core.focus();
         },
 

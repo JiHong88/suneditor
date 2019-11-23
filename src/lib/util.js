@@ -29,6 +29,19 @@ const util = {
     },
 
     /**
+     * @description HTML Reserved Word Converter.
+     * @param {String} contents 
+     * @returns {String}
+     * @private
+     */
+    _HTMLConvertor: function (contents) {
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
+        return contents.replace(/&|\u00A0|'|<|>/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
      * @description Unicode Character 'ZERO WIDTH SPACE'
      */
     zeroWidthSpace: '\u200B',
@@ -193,10 +206,10 @@ const util = {
      * @returns {String}
      */
     convertContentsForEditor: function (contents) {
-        let baseHtml, innerHTML = '';
+        let returnHTML = '';
         let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
-        for (let i = 0, len = tag.length; i < len; i++) {
+        for (let i = 0, len = tag.length, baseHtml; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
 
             if (tag[i].nodeType === 3) {
@@ -204,22 +217,19 @@ const util = {
                 let text = '';
                 for (let t = 0, tLen = textArray.length; t < tLen; t++) {
                     text = textArray[t].trim();
-                    if (text.length > 0) innerHTML += '<p>' + text + '</p>';
+                    if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                innerHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, '');
+                returnHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, '');
             }
         }
 
-        if (innerHTML.length === 0) {
-            const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
-            contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
-                return (typeof ec[m] === 'string') ? ec[m] : m;
-            });
-            innerHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+        if (returnHTML.length === 0) {
+            contents = this._HTMLConvertor(contents);
+            returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
         }
 
-        return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
+        return this._tagConvertor(returnHTML.replace(this._deleteExclusionTags, ''));
     },
 
     /**
@@ -234,6 +244,7 @@ const util = {
         const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
         const isFormatElement = this.isFormatElement.bind(this);
         const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+        const util = this;
 
         indentSize *= 1;
         indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
@@ -250,7 +261,7 @@ const util = {
                 lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
 
                 if (node.nodeType === 3) {
-                    returnHTML += (/^\n+$/.test(node.data) ? '' : node.data);
+                    returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
                     continue;
                 }
 
