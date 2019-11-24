@@ -1253,8 +1253,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         vNode.removeAttribute('style');
                     }
 
-                    if (classRegExp && originClasses.length > 0) vNode.className = classes;
-                    if (!vNode.className) {
+                    if (classRegExp && originClasses.length > 0) vNode.className = classes.trim();
+                    if (!vNode.className.trim()) {
                         vNode.removeAttribute('class');
                     }
 
@@ -1350,6 +1350,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed) {
+            // not add tag
+            const startParent = startCon.parentNode;
+            if (!isRemoveNode && startParent === endCon.parentNode && startParent.nodeName === newInnerNode.nodeName &&
+                (collapsed || (startCon.textContent.length - startOff) + (endOff - endCon.textContent.length) === startParent.textContent.length)) {
+
+                if (newInnerNode.style.cssText) {
+                    startParent.style.cssText += newInnerNode.style.cssText;
+                }
+                if (newInnerNode.className) {
+                    this.util.addClass(startParent, newInnerNode.className);
+                }
+
+                return {
+                    startContainer: startCon,
+                    startOffset: startOff,
+                    endContainer: endCon,
+                    endOffset: endOff
+                };
+            }
+
+            // add tag
             const el = element;
             const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
@@ -1612,6 +1633,32 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode) {
+            // not add tag
+            if (!isRemoveNode && element.children.length === element.childNodes.length) {
+                const tempNode = element.cloneNode(true);
+                const children = tempNode.children;
+                const newNodeName = newInnerNode.nodeName;
+                const newCssText = newInnerNode.style.cssText;
+                const newClass = newInnerNode.className;
+                let i = 0, len = children.length;
+
+                for (let child; i < len; i++) {
+                    child = children[i];
+                    if (child.nodeName === newNodeName) {
+                        child.style.cssText += newCssText;
+                        this.util.addClass(newClass);
+                    } else {
+                        break;
+                    }
+                }
+
+                if (i === len) {
+                    element.innerHTML = tempNode.innerHTML;
+                    return;
+                }
+            }
+            
+            // add tag
             const pNode = element.cloneNode(false);
             const nNodeArray = [newInnerNode];
             let noneChange = true;
@@ -1683,6 +1730,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode) {
+            // not add tag
+            const startParent = startCon.parentNode;
+            if (!isRemoveNode && startParent.nodeName === newInnerNode.nodeName && startOff === 0 && startParent.textContent === startCon.textContent) {
+
+                if (newInnerNode.style.cssText) {
+                    startParent.style.cssText += newInnerNode.style.cssText;
+                }
+                if (newInnerNode.className) {
+                    this.util.addClass(startParent, newInnerNode.className);
+                }
+
+                return {
+                    container: startCon,
+                    offset: startOff
+                };
+            }
+
+            // add tag
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
@@ -1848,6 +1913,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode) {
+            // not add tag
+            const endParent = endCon.parentNode;
+            if (!isRemoveNode && endParent.nodeName === newInnerNode.nodeName && endOff === endCon.textContent.length && endParent.textContent === endCon.textContent) {
+
+                if (newInnerNode.style.cssText) {
+                    endParent.style.cssText += newInnerNode.style.cssText;
+                }
+                if (newInnerNode.className) {
+                    this.util.addClass(endParent, newInnerNode.className);
+                }
+
+                return {
+                    container: endCon,
+                    offset: endOff
+                };
+            }
+
+            // add tag
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
