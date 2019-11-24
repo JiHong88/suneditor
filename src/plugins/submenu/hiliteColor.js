@@ -78,7 +78,7 @@ export default {
     },
 
     remove: function () {
-        this.nodeChange(null, ['background-color'], null, true);
+        this.nodeChange(null, ['background-color'], ['span'], true);
         this.submenuOff();
     },
 

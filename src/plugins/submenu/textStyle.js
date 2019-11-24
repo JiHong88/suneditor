@@ -153,7 +153,8 @@ export default {
         }
 
         const newNode = this.util.hasClass(target, 'active') ? null : tag.cloneNode(false);
-        this.nodeChange(newNode, checkStyles, null, true);
+        const removeNodes = newNode ? null : [tag.nodeName];
+        this.nodeChange(newNode, checkStyles, removeNodes, true);
 
         this.submenuOff();
     }

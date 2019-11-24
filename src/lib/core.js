@@ -1360,7 +1360,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck) {
             // not add tag
-            const parentCon = startCon.parentNode;
+            let parentCon = startCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                parentCon = parentCon.parentNode;
+            }
+
             if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
                 if (this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
                     const children = parentCon.childNodes;
@@ -1556,8 +1560,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            vNode = validation(newNode);
-                            if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || vNode) && checkCss(newNode)) {
+                            vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
+                            if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
                                 if (vNode) pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
@@ -1771,8 +1775,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
-            const parentCon = startCon.parentNode;
-            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
+            let parentCon = startCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                parentCon = parentCon.parentNode;
+            }
+
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.nextSibling && this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
                 let sameTag = true;
                 let s = startCon.previousSibling;
                 while (s) {
@@ -1935,7 +1943,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            if (!isRemoveFormat && pNode.children.length === 0) {
+            if (!isRemoveFormat && pNode.childNodes.length === 0) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
@@ -1974,8 +1982,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
-            const parentCon = endCon.parentNode;
-            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+            let parentCon = endCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                parentCon = parentCon.parentNode;
+            }
+            
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.previousSibling && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
                 let sameTag = true;
                 let e = endCon.nextSibling;
                 while (e) {

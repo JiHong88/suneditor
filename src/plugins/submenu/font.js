@@ -96,7 +96,7 @@ export default {
             newNode.style.fontFamily = value;
             this.nodeChange(newNode, ['font-family'], null, null);
         } else {
-            this.nodeChange(null, ['font-family'], null, true);
+            this.nodeChange(null, ['font-family'], ['span'], true);
         }
         
         this.submenuOff();
