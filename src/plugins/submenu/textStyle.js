@@ -140,12 +140,8 @@ export default {
 
         if (!command) return;
 
-        const checkStyles = [];
-
-        const styles = tag.style;
-        for (let i = 0, len = styles.length; i < len; i++) {
-            checkStyles.push(styles[i]);
-        }
+        const checkStyles = tag.style.cssText.replace(/:.+(;|$)/g, ',').split(',');
+        checkStyles.pop();
 
         const classes = tag.classList;
         for (let i = 0, len = classes.length; i < len; i++) {
