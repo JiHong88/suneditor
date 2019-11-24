@@ -1360,23 +1360,39 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck) {
             // not add tag
-            const startParent = startCon.parentNode;
-            if (!isRemoveNode && startParent === endCon.parentNode && startParent.nodeName === newInnerNode.nodeName &&
-                (startCon.textContent.length - startOff) + (endOff - endCon.textContent.length) === startParent.textContent.length) {
-
-                if (newInnerNode.style.cssText) {
-                    startParent.style.cssText += newInnerNode.style.cssText;
+            const parentCon = startCon.parentNode;
+            if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
+                if (this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+                    const children = parentCon.childNodes;
+                    let sameTag = true;
+    
+                    for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
+                        c = children[i];
+                        z = !this.util.onlyZeroWidthSpace(c);
+                        if (c === startCon) s = true;
+                        if (c === endCon) e = true;
+                        if ((!s && z) || (s && e && z)) {
+                            sameTag = false;
+                            break;
+                        }
+                    }
+    
+                    if (sameTag) {
+                        if (newInnerNode.style.cssText) {
+                            parentCon.style.cssText += newInnerNode.style.cssText;
+                        }
+                        if (newInnerNode.className) {
+                            this.util.addClass(parentCon, newInnerNode.className);
+                        }
+        
+                        return {
+                            startContainer: startCon,
+                            startOffset: startOff,
+                            endContainer: endCon,
+                            endOffset: endOff
+                        };
+                    }
                 }
-                if (newInnerNode.className) {
-                    this.util.addClass(startParent, newInnerNode.className);
-                }
-
-                return {
-                    startContainer: startCon,
-                    startOffset: startOff,
-                    endContainer: endCon,
-                    endOffset: endOff
-                };
             }
 
             // add tag
@@ -1654,9 +1670,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
-            if (!isRemoveNode && element.children.length === element.childNodes.length) {
+            if (!isRemoveNode) {
                 const tempNode = element.cloneNode(true);
-                const children = tempNode.children;
+                const children = tempNode.childNodes;
                 const newNodeName = newInnerNode.nodeName;
                 const newCssText = newInnerNode.style.cssText;
                 const newClass = newInnerNode.className;
@@ -1664,6 +1680,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 for (let child; i < len; i++) {
                     child = children[i];
+                    if (child.nodeType === 3 && this.util.onlyZeroWidthSpace(child)) continue;
+
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
                         this.util.addClass(newClass);
@@ -1753,20 +1771,31 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
-            const startParent = startCon.parentNode;
-            if (!isRemoveNode && startParent.nodeName === newInnerNode.nodeName && startOff === 0 && startParent.textContent === startCon.textContent) {
-
-                if (newInnerNode.style.cssText) {
-                    startParent.style.cssText += newInnerNode.style.cssText;
+            const parentCon = startCon.parentNode;
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
+                let sameTag = true;
+                let s = startCon.previousSibling;
+                while (s) {
+                    if (!this.util.onlyZeroWidthSpace(s)) {
+                        sameTag = false;
+                        break;
+                    }
+                    s = s.previousSibling;
                 }
-                if (newInnerNode.className) {
-                    this.util.addClass(startParent, newInnerNode.className);
-                }
 
-                return {
-                    container: startCon,
-                    offset: startOff
-                };
+                if (sameTag) {
+                    if (newInnerNode.style.cssText) {
+                        parentCon.style.cssText += newInnerNode.style.cssText;
+                    }
+                    if (newInnerNode.className) {
+                        this.util.addClass(parentCon, newInnerNode.className);
+                    }
+    
+                    return {
+                        container: startCon,
+                        offset: startOff
+                    };
+                }
             }
 
             // add tag
@@ -1945,20 +1974,31 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
-            const endParent = endCon.parentNode;
-            if (!isRemoveNode && endParent.nodeName === newInnerNode.nodeName && endOff === endCon.textContent.length && endParent.textContent === endCon.textContent) {
-
-                if (newInnerNode.style.cssText) {
-                    endParent.style.cssText += newInnerNode.style.cssText;
+            const parentCon = endCon.parentNode;
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+                let sameTag = true;
+                let e = endCon.nextSibling;
+                while (e) {
+                    if (!this.util.onlyZeroWidthSpace(e)) {
+                        sameTag = false;
+                        break;
+                    }
+                    e = e.nextSibling;
                 }
-                if (newInnerNode.className) {
-                    this.util.addClass(endParent, newInnerNode.className);
-                }
 
-                return {
-                    container: endCon,
-                    offset: endOff
-                };
+                if (sameTag) {
+                    if (newInnerNode.style.cssText) {
+                        parentCon.style.cssText += newInnerNode.style.cssText;
+                    }
+                    if (newInnerNode.className) {
+                        this.util.addClass(parentCon, newInnerNode.className);
+                    }
+    
+                    return {
+                        container: endCon,
+                        offset: endOff
+                    };
+                }
             }
 
             // add tag

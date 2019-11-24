@@ -42,12 +42,12 @@ const util = {
     },
 
     /**
-     * @description Unicode Character 'ZERO WIDTH SPACE'
+     * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
     zeroWidthSpace: '\u200B',
 
     /**
-     * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+     * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
      * @param {String|Node} text String value or Node
      * @returns {Boolean}
      */
