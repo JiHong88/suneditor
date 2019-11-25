@@ -705,7 +705,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     return {
                         startOffset: previousText.length,
                         endOffset: oNode.textContent.length - nextText.length
-                    }
+                    };
                 }
             }
         },
@@ -1671,6 +1671,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // endContainer reset
             const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
+            const startConLength = startContainer.textContent.length;
+
             if (endContainer.textContent.length === 0) {
                 util.removeItem(endContainer);
                 endContainer = startContainer;
@@ -1680,10 +1682,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // node change
             const newStartOffset = {s: 0, e: 0};
             const startPath = util.getNodePath(startContainer, pNode, newStartOffset);
-            const endPath = util.getNodePath(endContainer, pNode, null);
+
+            const mergeEndCon = !endContainer.parentNode;
+            if (mergeEndCon) endContainer = startContainer;
+            const newEndOffset = {s: 0, e: 0};
+            const endPath = util.getNodePath(endContainer , pNode, (!mergeEndCon && !endConReset) ? newEndOffset : null);
 
             startOffset += newStartOffset.s;
-            endOffset += newStartOffset.s;
+            endOffset += (mergeEndCon ? startConLength : endConReset ? newStartOffset.s : newEndOffset.s);
 
             pNode.innerHTML = pNode.innerHTML;
             element.parentNode.insertBefore(pNode, element);
