@@ -1664,10 +1664,26 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             util.removeEmptyNode(pNode);
             if (preventDelete) newInnerNode.textContent = util.zeroWidthSpace;
 
+            if (collapsed) {
+                startOffset = startContainer.textContent.length;
+                endOffset = endContainer.textContent.length;
+            }
+
+            // endContainer reset
+            const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
+            if (endContainer.textContent.length === 0) {
+                util.removeItem(endContainer);
+                endContainer = startContainer;
+            }
+            endOffset = endConReset ? endContainer.textContent.length : endOffset;
+
             // node change
-            const endConReset = isRemoveFormat || !endContainer.textContent;
-            const startPath = util.getNodePath(startContainer, pNode);
-            const endPath = util.getNodePath(endContainer, pNode);
+            const newStartOffset = {s: 0, e: 0};
+            const startPath = util.getNodePath(startContainer, pNode, newStartOffset);
+            const endPath = util.getNodePath(endContainer, pNode, null);
+
+            startOffset += newStartOffset.s;
+            endOffset += newStartOffset.s;
 
             pNode.innerHTML = pNode.innerHTML;
             element.parentNode.insertBefore(pNode, element);
@@ -1675,22 +1691,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             startContainer = util.getNodeFromPath(startPath, pNode);
             endContainer = util.getNodeFromPath(endPath, pNode);
-
-            if (collapsed) {
-                startOffset = startContainer.textContent.length;
-                endOffset = endContainer.textContent.length;
-            }
-
-            if (endContainer.textContent.length === 0) {
-                util.removeItem(endContainer);
-                endContainer = startContainer;
-            }
             
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
                 endContainer: endContainer,
-                endOffset: endConReset ? endContainer.textContent.length : endOffset
+                endOffset: endOffset
             };
         },
 
@@ -1989,13 +1995,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 // node change
-                const path = util.getNodePath(container, pNode);
+                const newOffsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, newOffsets);
 
                 pNode.innerHTML = pNode.innerHTML;
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
 
                 container = util.getNodeFromPath(path, pNode);
+                offset += newOffsets.s;
             }
 
             return {
@@ -2208,13 +2216,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
                 
                 // node change
-                const path = util.getNodePath(container, pNode);
+                const newOffsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, newOffsets);
 
                 pNode.innerHTML = pNode.innerHTML;
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
 
                 container = util.getNodeFromPath(path, pNode);
+                offset += newOffsets.s;
             }
 
             return {

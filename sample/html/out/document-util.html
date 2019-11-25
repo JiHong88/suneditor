@@ -664,7 +664,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode)</span><span
+        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode, _newOffsets)</span><span
                 class="type-signature"> &rarr; {Array}</span></h4>
         <div class="description">
             Returns the position of the "node" in the "parentNode" in a numerical array.<br>
@@ -693,6 +693,17 @@
                     <span class="param-type">Element|null</span>
                 </td>
                 <td class="description last">Parent node. If null, wysiwyg div area</td>
+            </tr>
+            <tr>
+                <td class="name"><code>_newOffsets</code></td>
+                <td class="type">
+                    <span class="param-type">Object|null</span>
+                </td>
+                <td class="description last">
+                    If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.<br>
+                    "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".<br>
+                    Do not use unless absolutely necessary.
+                </td>
             </tr>
             </tbody>
         </table>

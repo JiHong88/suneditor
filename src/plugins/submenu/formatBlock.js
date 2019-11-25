@@ -122,8 +122,8 @@ export default {
 
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
-            const firstPath = this.util.getNodePath(range.startContainer, first);
-            const lastPath = this.util.getNodePath(range.endContainer, last);
+            const firstPath = this.util.getNodePath(range.startContainer, first, null);
+            const lastPath = this.util.getNodePath(range.endContainer, last, null);
             
             // remove list
             let rangeArr = {};

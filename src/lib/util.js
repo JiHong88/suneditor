@@ -454,15 +454,47 @@ const util = {
      * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
      * @param {Node} node The Node to find position path
      * @param {Element|null} parentNode Parent node. If null, wysiwyg div area
+     * @param {Object|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+     * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
+     * Do not use unless absolutely necessary.
      * @returns {Array}
      */
-    getNodePath: function (node, parentNode) {
+    getNodePath: function (node, parentNode, _newOffsets) {
         const path = [];
         let finds = true;
 
         this.getParentElement(node, function (el) {
             if (el === parentNode) finds = false;
-            if (finds && !this.isWysiwygDiv(el)) path.push(el);
+            if (finds && !this.isWysiwygDiv(el)) {
+                // merge text nodes
+                if (_newOffsets && el.nodeType === 3) {
+                    let temp = null, tempText = null;
+                    _newOffsets.s = _newOffsets.e = 0;
+
+                    let previous = el.previousSibling;
+                    while (previous && previous.nodeType === 3) {
+                        tempText = previous.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.s += tempText.length;
+                        el.textContent = tempText + el.textContent;
+                        temp = previous;
+                        previous = previous.previousSibling;
+                        this.removeItem(temp);
+                    }
+
+                    let next = el.nextSibling;
+                    while (next && next.nodeType === 3) {
+                        tempText = next.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.e += tempText.length;
+                        el.textContent += tempText;
+                        temp = next;
+                        next = next.nextSibling;
+                        this.removeItem(temp);
+                    }
+                }
+
+                // index push
+                path.push(el);
+            }
             return false;
         }.bind(this));
         
