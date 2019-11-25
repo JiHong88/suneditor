@@ -1688,7 +1688,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
-                        this.util.addClass(newClass);
+                        this.util.addClass(child, newClass);
                     } else {
                         break;
                     }
@@ -3546,7 +3546,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         onKeyUp_wysiwyg: function (e) {
             core._editorRange();
-            const keyCode = e.keyCode;            
+            const keyCode = e.keyCode;
+            const ctrl = e.ctrlKey || e.metaKey;
+            const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
             
             if (core._isBalloon && !core.getRange().collapsed) {
@@ -3595,7 +3597,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            if (!event._historyIgnoreKeycode.test(keyCode)) {
+            if (!ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode)) {
                 core.history.push();
             }
 
