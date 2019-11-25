@@ -1185,7 +1185,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     const emptyText = util.createTextNode(util.zeroWidthSpace);
                     tempCon.parentNode.insertBefore(emptyText, tempCon);
                     tempCon = emptyText;
-                    tempOffset = 0;
+                    tempOffset = 1;
                     if (onlyBreak) {
                         util.removeItem(endCon);
                     }
@@ -1365,6 +1365,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             element.removeChild(removeNode);
+        },
+
+        /**
+         * @description Delete a empty child node of argument element
+         * @param {Element} formatNode The format node
+         * @param {Element} notRemoveNode Do not remove node
+         * @private
+         */
+        _removeEmptyNode: function (formatNode, notRemoveNode) {
+            const preventDelete = util.onlyZeroWidthSpace(notRemoveNode.textContent);
+            if (preventDelete) notRemoveNode.textContent = ' ';
+            util.removeEmptyNode(formatNode);
+            if (preventDelete) notRemoveNode.textContent = util.zeroWidthSpace;
         },
 
         /**
@@ -1659,10 +1672,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const preventDelete = util.onlyZeroWidthSpace(newInnerNode.textContent);
-            if (preventDelete) newInnerNode.textContent = ' ';
-            util.removeEmptyNode(pNode);
-            if (preventDelete) newInnerNode.textContent = util.zeroWidthSpace;
+            this._removeEmptyNode(pNode, newInnerNode);
 
             if (collapsed) {
                 startOffset = startContainer.textContent.length;
@@ -1797,7 +1807,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            util.removeEmptyNode(pNode);
+            this._removeEmptyNode(pNode, newInnerNode);
 
             // node change
             element.parentNode.insertBefore(pNode, element);
@@ -1994,7 +2004,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                util.removeEmptyNode(pNode);
+                this._removeEmptyNode(pNode, newInnerNode);
+
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
                     offset = 0;
@@ -2212,7 +2223,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                util.removeEmptyNode(pNode);
+                this._removeEmptyNode(pNode, newInnerNode);
+
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
                     offset = container.textContent.length;
@@ -2252,6 +2264,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     this.setRange(first, 0, last, last.textContent.length);
+                    this.focus();
                     break;
                 case 'codeView':
                     this.toggleCodeView();
@@ -2870,6 +2883,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
         _historyIgnoreKeycode: new _w.RegExp('^(1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
+        _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
             66: 'B',
@@ -3502,19 +3516,38 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             const r = core.insertNode(tabText);
                             core.setRange(tabText, r.endOffset, tabText, r.endOffset);
                         } else {
-                            for (let i = 0, len = lines.length; i < len; i++) {
-                                lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
+                            const len = lines.length - 1;
+                            for (let i = 0, child; i <= len; i++) {
+                                child = lines[i].firstChild;
+                                if (!child) continue;
+
+                                if (util.isBreak(child)) {
+                                    lines[i].insertBefore(tabText.cloneNode(false), child);
+                                } else {
+                                    child.textContent = tabText.textContent + child.textContent;
+                                }
                             }
+
+                            const firstChild = util.getChildElement(lines[0], 'text', false);
+                            const endChild = util.getChildElement(lines[len], 'text', true);
+                            if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
                         }
                     } else {
-                        for (let i = 0, len = lines.length, child; i < len; i++) {
+                        const len = lines.length - 1;
+                        for (let i = 0, child; i <= len; i++) {
                             child = lines[i].firstChild;
+                            if (!child) continue;
+
                             if (/^\s{1,4}$/.test(child.textContent)) {
                                 util.removeItem(child);
                             } else if (/^\s{1,4}/.test(child.textContent)) {
                                 child.textContent = child.textContent.replace(/^\s{1,4}/, '');
                             }
                         }
+
+                        const firstChild = util.getChildElement(lines[0], 'text', false);
+                        const endChild = util.getChildElement(lines[len], 'text', true);
+                        if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
                     }
                     
                     break;
@@ -3640,8 +3673,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
 
             if (textKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+                const range = core.getRange();
+                const s = range.startOffset, e = range.endOffset;
+                const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
-                core.setRange(selectionNode, selectionNode.textContent.length, selectionNode, selectionNode.textContent.length);
+                core.setRange(selectionNode, s - frontZeroWidthCnt, selectionNode, e - frontZeroWidthCnt);
             }
 
             if (!core._charCount(1, textKey)) {
