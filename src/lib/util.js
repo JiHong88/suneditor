@@ -13,7 +13,6 @@
 const util = {
     _d: document,
     _w: window,
-    _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -47,13 +46,23 @@ const util = {
     zeroWidthSpace: '\u200B',
 
     /**
+     * @description Regular expression to find 'zero width space' (/\u200B/g)
+     */
+    zeroWidthRegExp: new RegExp(String.fromCharCode(8203), 'g'),
+
+    /**
+     * @description Regular expression to find only 'zero width space' (/^\u200B+$/)
+     */
+    onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
+
+    /**
      * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
      * @param {String|Node} text String value or Node
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
         if (typeof text !== 'string') text = text.textContent;
-        return text === '' || this._onlyZeroWidthRegExp.test(text);
+        return text === '' || this.onlyZeroWidthRegExp.test(text);
     },
 
     /**

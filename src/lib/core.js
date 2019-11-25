@@ -1642,8 +1642,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // node change
             const endConReset = isRemoveFormat || !endContainer.textContent;
+            const startPath = util.getNodePath(startContainer, pNode);
+            const endPath = util.getNodePath(endContainer, pNode);
+
+            pNode.innerHTML = pNode.innerHTML;
             element.parentNode.insertBefore(pNode, element);
             util.removeItem(element);
+
+            startContainer = util.getNodeFromPath(startPath, pNode);
+            endContainer = util.getNodeFromPath(endPath, pNode);
 
             if (collapsed) {
                 startOffset = startContainer.textContent.length;
@@ -1654,7 +1661,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 util.removeItem(endContainer);
                 endContainer = startContainer;
             }
-
+            
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
@@ -1958,8 +1965,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 // node change
+                const path = util.getNodePath(container, pNode);
+
+                pNode.innerHTML = pNode.innerHTML;
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
+
+                container = util.getNodeFromPath(path, pNode);
             }
 
             return {
@@ -2172,8 +2184,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
                 
                 // node change
+                const path = util.getNodePath(container, pNode);
+
+                pNode.innerHTML = pNode.innerHTML;
                 element.parentNode.insertBefore(pNode, element);
                 util.removeItem(element);
+
+                container = util.getNodeFromPath(path, pNode);
             }
 
             return {
@@ -2811,7 +2828,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
      */
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _keyCodeShortcut: {
             65: 'A',
@@ -3404,9 +3421,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                         core.plugins.video.onModifyMode.call(core, iframe, size);
                                     });
                                 }
-
-                                // history stack
-                                core.history.push();
                             }
 
                             break;
@@ -3462,9 +3476,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                         }
                     }
-
-                    // history stack
-                    core.history.push();
+                    
                     break;
                 case 13: /** enter key */
                     if (selectRange) break;
@@ -3511,9 +3523,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
                         });
-
-                        // history stack
-                        core.history.push();
                     }
                     
                     break;
@@ -3532,7 +3541,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const textKey = !ctrl && !alt && e.key.length === 1;
+            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
             if (!core._charCount(1, textKey)) {
                 if (textKey) {
                     e.preventDefault();
@@ -3550,7 +3559,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
-            
+
             if (core._isBalloon && !core.getRange().collapsed) {
                 event._showToolbarBalloon();
                 return;
@@ -3588,7 +3597,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core._checkComponents();
 
-            if (!core._charCount(1, e.key.length === 1)) {
+            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
+
+            if (textKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+                selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
+                core.setRange(selectionNode, selectionNode.textContent.length, selectionNode, selectionNode.textContent.length);
+            }
+
+            if (!core._charCount(1, textKey)) {
                 if (e.key.length === 1) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -3597,7 +3613,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            if (!ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode)) {
+            if (textKey) {
                 core.history.push();
             }
 
