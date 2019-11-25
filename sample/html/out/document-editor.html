@@ -1312,10 +1312,11 @@
 
             
             <h4 class="name" id="insertNode"><span class="type-signature"></span>insertNode<span class="signature">(oNode, afterNode)</span><span
-                    class="type-signature"></span></h4>
+                    class="type-signature"> &rarr; {undefined|Object}</span></h4>
             <div class="description">
                 Deletes the selected area and inserts the node.<br>
-                If the "afterNode" exists, it is inserted after the "afterNode"
+                If the "afterNode" exists, it is inserted after the "afterNode"<br>
+                Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
             </div>
             <h5>Parameters:</h5>
             <table class="params">

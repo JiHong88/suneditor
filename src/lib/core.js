@@ -616,8 +616,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         /**
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
+         * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
          * @param {Element} oNode Element to be inserted
          * @param {Element|null} afterNode If the node exists, it is inserted after the node
+         * @returns {undefined|Object}
          */
         insertNode: function (oNode, afterNode) {
             const range = this.getRange();
@@ -683,6 +685,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             } finally {
                 // history stack
                 this.history.push();
+                
+                if (oNode.nodeType === 3) {
+                    const previous = oNode.previousSibling;
+                    const next = oNode.nextSibling;
+                    const previousText = (!previous || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                    const nextText = (!next || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+    
+                    if (previous) {
+                        oNode.textContent = previousText + oNode.textContent;
+                        util.removeItem(previous);
+                    }
+    
+                    if (next) {
+                        oNode.textContent += nextText;
+                        util.removeItem(next);
+                    }
+
+                    return {
+                        startOffset: previousText.length,
+                        endOffset: oNode.textContent.length - nextText.length
+                    }
+                }
             }
         },
 
@@ -3459,8 +3483,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!shift) {
                         const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
                         if (lines.length === 1) {
-                            core.insertNode(tabText);
-                            core.setRange(tabText, core._variable.tabSize, tabText, core._variable.tabSize);
+                            const r = core.insertNode(tabText);
+                            core.setRange(tabText, r.endOffset, tabText, r.endOffset);
                         } else {
                             for (let i = 0, len = lines.length; i < len; i++) {
                                 lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
@@ -4082,7 +4106,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 afterNode = util.getFormatElement(core.getSelectionNode());
             }
 
-            core.insertNode(html, afterNode);
+            if (util.isComponent(html)) {
+                core.insertComponent(html);
+            } else {
+                core.insertNode(html, afterNode);
+            }
+            
             core.focus();
         },
 
