@@ -1381,6 +1381,21 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Add style and className of newElement to element
+         * @param {Element} element Origin element
+         * @param {Element} newElement New element
+         * @private
+         */
+        _copyNodeAttrs: function (element, newElement) {
+            if (newElement.style.cssText) {
+                element.style.cssText += newElement.style.cssText;
+            }
+            if (newElement.className) {
+                this.util.addClass(element, newElement.className);
+            }
+        },
+
+        /**
          * @description wraps text nodes of line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
@@ -1426,12 +1441,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
     
                     if (sameTag) {
-                        if (newInnerNode.style.cssText) {
-                            parentCon.style.cssText += newInnerNode.style.cssText;
-                        }
-                        if (newInnerNode.className) {
-                            this.util.addClass(parentCon, newInnerNode.className);
-                        }
+                        this._copyNodeAttrs(parentCon, newInnerNode);
         
                         return {
                             startContainer: startCon,
@@ -1753,12 +1763,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    if (newInnerNode.style.cssText) {
-                        parentCon.style.cssText += newInnerNode.style.cssText;
-                    }
-                    if (newInnerNode.className) {
-                        this.util.addClass(parentCon, newInnerNode.className);
-                    }
+                    this._copyNodeAttrs(parentCon, newInnerNode);
     
                     return {
                         container: startCon,
@@ -2064,12 +2069,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    if (newInnerNode.style.cssText) {
-                        parentCon.style.cssText += newInnerNode.style.cssText;
-                    }
-                    if (newInnerNode.className) {
-                        this.util.addClass(parentCon, newInnerNode.className);
-                    }
+                    this._copyNodeAttrs(parentCon, newInnerNode);
     
                     return {
                         container: endCon,
