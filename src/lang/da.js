@@ -129,6 +129,14 @@
             splitCells: 'Opdel celler',
             HorizontalSplit: 'Opdel horisontalt',
             VerticalSplit: 'Opdel vertikalt'
+        },
+        menu: {
+            spaced: 'Brev Afstand',
+            bordered: 'Afgrænsningslinje',
+            invert: 'Inverter farve',
+            neon: 'Neon',
+            translucent: 'Gennemsigtig',
+            shadow: 'Skygge'
         }
     };
 

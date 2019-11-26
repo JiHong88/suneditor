@@ -126,6 +126,14 @@
             splitCells: 'Diviser les Cellules',
             HorizontalSplit: 'Scission horizontale',
             VerticalSplit: 'Scission verticale'
+        },
+        menu: {
+            spaced: 'Espacement',
+            bordered: 'Ligne de démarcation',
+            invert: 'Inverser la couleur',
+            neon: 'Néon',
+            translucent: 'Translucide',
+            shadow: 'L\'ombre'
         }
     };
 

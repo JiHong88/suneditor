@@ -38,12 +38,12 @@ export default {
 
         const defaultList = {
             translucent: {
-                name: 'Translucent',
+                name: this.lang.menu.translucent,
                 style: 'opacity: 0.5;',
                 tag: 'span',
             },
             shadow: {
-                name: 'Shadow',
+                name: this.lang.menu.shadow,
                 class: '__se__t-shadow',
                 tag: 'span',
             }
@@ -51,7 +51,7 @@ export default {
         const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value; i < len; i++) {
+        for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
             t = styleList[i];
             attrs = '', value = '', command = [];
 
@@ -63,6 +63,7 @@ export default {
 
             name = t.name;
             tag = t.tag || 'span';
+            _class = t._class;
 
             if (t.style) {
                 attrs += ' style="' + t.style + '"';
@@ -78,7 +79,7 @@ export default {
             value = value.replace(/,$/, '');
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + tag + '" data-value="' + value + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-command="' + tag + '" data-value="' + value + '" title="' + name + '">' +
                     '<' + tag + attrs + '>' + name +  '</' + tag + '>' +
                 '</button></li>';
         }

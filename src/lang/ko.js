@@ -126,6 +126,14 @@
             splitCells: '셀 분할',
             HorizontalSplit: '가로 분할',
             VerticalSplit: '세로 분할'
+        },
+        menu: {
+            spaced: '글자 간격',
+            bordered: '경계선',
+            invert: '색상 반전',
+            neon: '네온',
+            translucent: '반투명',
+            shadow: '그림자'
         }
     };
 

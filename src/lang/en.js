@@ -126,6 +126,14 @@
             splitCells: 'Split Cells',
             HorizontalSplit: 'Horizontal split',
             VerticalSplit: 'Vertical split'
+        },
+        menu: {
+            spaced: 'Spaced',
+            bordered: 'Bordered',
+            invert: 'Invert color',
+            neon: 'Neon',
+            translucent: 'Translucent',
+            shadow: 'Shadow'
         }
     };
 

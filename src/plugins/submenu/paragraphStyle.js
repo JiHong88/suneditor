@@ -35,28 +35,33 @@ export default {
         const listDiv = this.util.createElement('DIV');
         listDiv.className = 'se-submenu se-list-layer';
 
+        const menuLang = this.lang.menu;
         const defaultList = {
             spaced: {
-                name: 'Spaced',
-                class: '__se__p-spaced'
+                name: menuLang.spaced,
+                class: '__se__p-spaced',
+                _class: ''
             },
             bordered: {
-                name: 'Bordered',
-                class: '__se__p-bordered'
+                name: menuLang.bordered,
+                class: '__se__p-bordered',
+                _class: ''
             },
             invert: {
-                name: 'Invert',
-                class: '__se__p-invert'
+                name: menuLang.invert,
+                class: '__se__p-invert',
+                _class: 'se-invert'
             },
             neon: {
-                name: 'Neon',
-                class: '__se__p-neon'
+                name: menuLang.neon,
+                class: '__se__p-neon',
+                _class: ''
             }
         };
         const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'invert', 'neon'] : option.paragraphStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = paragraphStyles.length, p, name, attrs; i < len; i++) {
+        for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
             p = paragraphStyles[i];
 
             if (typeof p === 'string') {
@@ -67,9 +72,10 @@ export default {
 
             name = p.name;
             attrs = p.class ? ' class="' + p.class + '"' : '';
+            _class = p._class;
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list' + (name === 'Invert' ? ' se-invert': '') + '" data-value="' + p.class + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-value="' + p.class + '" title="' + name + '">' +
                     '<div' + attrs + '>' + name + '</div>' +
                 '</button></li>';
         }

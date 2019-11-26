@@ -6,6 +6,7 @@ import '../../src/assets/css/suneditor-contents.css';
 import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
 import { ko } from '../../src/lang';
+import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
@@ -202,6 +203,7 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
+    lang: lang.ru,
     plugins: plugins,
     // maxHeight: '400px',
     height: 'auto',

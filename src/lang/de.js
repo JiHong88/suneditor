@@ -126,6 +126,14 @@
             splitCells: 'Zellen Teilung',
             HorizontalSplit: 'Horizontale Teilung',
             VerticalSplit: 'Vertikale Teilung'
+        },
+        menu: {
+            spaced: 'Buchstaben Abstand',
+            bordered: 'Grenzlinie',
+            invert: 'Farbe umkehren',
+            neon: 'Neon',
+            translucent: 'Durchscheinend',
+            shadow: 'Schatten'
         }
     };
 

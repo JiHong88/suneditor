@@ -388,15 +388,17 @@ paragraphStyles : You can apply custom class to format.
                   Default value: [
                     {
                         name: 'Spaced', // Format style name
-                        class: '__se__p-spaced' // Define style for used class (Class names must always begin with "__se__")
+                        class: '__se__p-spaced', // Define style for used class (Class names must always begin with "__se__")
+                        _class: '' // You can control the style of the tags displayed in the menu by putting a class on the button of the menu.
                     },
                     {
                         name: 'Bordered',
                         class: '__se__p-bordered'
                     },
                     {
-                        name: 'Invert',
-                        class: '__se__p-invert'
+                        name: 'Invert color',
+                        class: '__se__p-invert',
+                        _class: 'se-invert' // .sun-editor .se-invert > div {color: #fff; background-color: #333;}
                     },
                     {
                         name: 'Neon',
@@ -418,11 +420,12 @@ textStyles      : You can apply custom style or class to selected text.
                         name: 'Translucent', // Text style name
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
+                        _class: '' // You can control the style of the tags displayed in the menu by putting a class on the button of the menu.
                     },
                     {
                         name: 'Shadow',
                         class: '__se__t-shadow', // Class names (Class names must always begin with "__se__")
-                        tag: 'span',
+                        tag: 'span'
                     }
                   ]
                   ex) [
