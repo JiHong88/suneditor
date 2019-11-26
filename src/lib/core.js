@@ -1701,12 +1701,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             startOffset += newStartOffset.s;
             endOffset += (mergeEndCon ? startConLength : endConReset ? newStartOffset.s : newEndOffset.s);
 
-            pNode.innerHTML = pNode.innerHTML;
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            element.innerHTML = pNode.innerHTML;
 
-            startContainer = util.getNodeFromPath(startPath, pNode);
-            endContainer = util.getNodeFromPath(endPath, pNode);
+            startContainer = util.getNodeFromPath(startPath, element);
+            endContainer = util.getNodeFromPath(endPath, element);
             
             return {
                 startContainer: startContainer,
@@ -1714,104 +1712,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 endContainer: endContainer,
                 endOffset: endOffset
             };
-        },
-
-        /**
-         * @description wraps mid lines selected text.
-         * @param {Element} element The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
-         * @param {Boolean} isRemoveFormat Is the remove all formats command?
-         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @private
-         */
-        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
-            // not add tag
-            if (!isRemoveNode) {
-                const tempNode = element.cloneNode(true);
-                const children = tempNode.childNodes;
-                const newNodeName = newInnerNode.nodeName;
-                const newCssText = newInnerNode.style.cssText;
-                const newClass = newInnerNode.className;
-                let i = 0, len = children.length;
-
-                for (let child; i < len; i++) {
-                    child = children[i];
-                    if (child.nodeType === 3 && this.util.onlyZeroWidthSpace(child)) continue;
-
-                    if (child.nodeName === newNodeName) {
-                        child.style.cssText += newCssText;
-                        this.util.addClass(child, newClass);
-                    } else {
-                        break;
-                    }
-                }
-
-                if (i === len) {
-                    element.innerHTML = tempNode.innerHTML;
-                    return;
-                }
-            }
-            
-            // add tag
-            _removeCheck.v = false;
-            const pNode = element.cloneNode(false);
-            const nNodeArray = [newInnerNode];
-            let noneChange = true;
-
-            (function recursionFunc(current, node) {
-                const childNodes = current.childNodes;
-
-                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
-                    let child = childNodes[i];
-                    if (!child) continue;
-                    let coverNode = node;
-
-                    if (util.isIgnoreNodeChange(child)) {
-                        pNode.appendChild(newInnerNode);
-                        newInnerNode = newInnerNode.cloneNode(false);
-                        pNode.appendChild(child);
-                        pNode.appendChild(newInnerNode);
-                        nNodeArray.push(newInnerNode);
-                        node = newInnerNode;
-                        i--;
-                        continue;
-                    } else {
-                        vNode = validation(child);
-                        if (vNode) {
-                            noneChange = false;
-                            node.appendChild(vNode);
-                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
-                        }
-                    }
-
-                    recursionFunc(child, coverNode);
-                }
-            })(element.cloneNode(true), newInnerNode);
-
-            // not remove tag
-            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
-
-            pNode.appendChild(newInnerNode);
-
-            if (isRemoveFormat && isRemoveNode) {
-                for (let i = 0; i < nNodeArray.length; i++) {
-                    let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
-                }
-            } else if (isRemoveNode) {
-                for (let i = 0; i < nNodeArray.length; i++) {
-                    this._stripRemoveNode(pNode, nNodeArray[i]);
-                }
-            }
-
-            this._removeEmptyNode(pNode, newInnerNode);
-
-            // node change
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
         },
 
         /**
@@ -2015,11 +1915,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 const newOffsets = {s: 0, e: 0};
                 const path = util.getNodePath(container, pNode, newOffsets);
 
-                pNode.innerHTML = pNode.innerHTML;
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                element.innerHTML = pNode.innerHTML;
 
-                container = util.getNodeFromPath(path, pNode);
+                container = util.getNodeFromPath(path, element);
                 offset += newOffsets.s;
             }
 
@@ -2027,6 +1925,103 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 container: container,
                 offset: offset
             };
+        },
+
+        /**
+         * @description wraps mid lines selected text.
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+         * @private
+         */
+        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
+            // not add tag
+            if (!isRemoveNode) {
+                const tempNode = element.cloneNode(true);
+                const children = tempNode.childNodes;
+                const newNodeName = newInnerNode.nodeName;
+                const newCssText = newInnerNode.style.cssText;
+                const newClass = newInnerNode.className;
+                let i = 0, len = children.length;
+
+                for (let child; i < len; i++) {
+                    child = children[i];
+                    if (child.nodeType === 3 && this.util.onlyZeroWidthSpace(child)) continue;
+
+                    if (child.nodeName === newNodeName) {
+                        child.style.cssText += newCssText;
+                        this.util.addClass(child, newClass);
+                    } else {
+                        break;
+                    }
+                }
+
+                if (i === len) {
+                    element.innerHTML = tempNode.innerHTML;
+                    return;
+                }
+            }
+            
+            // add tag
+            _removeCheck.v = false;
+            const pNode = element.cloneNode(false);
+            const nNodeArray = [newInnerNode];
+            let noneChange = true;
+
+            (function recursionFunc(current, node) {
+                const childNodes = current.childNodes;
+
+                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                    let child = childNodes[i];
+                    if (!child) continue;
+                    let coverNode = node;
+
+                    if (util.isIgnoreNodeChange(child)) {
+                        pNode.appendChild(newInnerNode);
+                        newInnerNode = newInnerNode.cloneNode(false);
+                        pNode.appendChild(child);
+                        pNode.appendChild(newInnerNode);
+                        nNodeArray.push(newInnerNode);
+                        node = newInnerNode;
+                        i--;
+                        continue;
+                    } else {
+                        vNode = validation(child);
+                        if (vNode) {
+                            noneChange = false;
+                            node.appendChild(vNode);
+                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
+                        }
+                    }
+
+                    recursionFunc(child, coverNode);
+                }
+            })(element.cloneNode(true), newInnerNode);
+
+            // not remove tag
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
+
+            pNode.appendChild(newInnerNode);
+
+            if (isRemoveFormat && isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+                }
+            } else if (isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                }
+            }
+
+            this._removeEmptyNode(pNode, newInnerNode);
+
+            // node change
+            element.innerHTML = pNode.innerHTML;
         },
 
         /**
@@ -2237,11 +2232,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 const newOffsets = {s: 0, e: 0};
                 const path = util.getNodePath(container, pNode, newOffsets);
 
-                pNode.innerHTML = pNode.innerHTML;
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                element.innerHTML = pNode.innerHTML;
 
-                container = util.getNodeFromPath(path, pNode);
+                container = util.getNodeFromPath(path, element);
                 offset += newOffsets.s;
             }
 
