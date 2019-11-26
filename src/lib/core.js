@@ -1953,30 +1953,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // not add tag
             if (!isRemoveNode) {
                 const tempNode = element.cloneNode(true);
-                const children = tempNode.childNodes;
                 const newNodeName = newInnerNode.nodeName;
                 const newCssText = newInnerNode.style.cssText;
                 const newClass = newInnerNode.className;
+
+                let children = tempNode.children;
                 let i = 0, len = children.length;
 
                 for (let child; i < len; i++) {
                     child = children[i];
-                    if (child.nodeType === 3 && this.util.onlyZeroWidthSpace(child)) continue;
-
+                    
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
                         this.util.addClass(child, newClass);
+                    } else if (len === 1) {
+                        children = child.children;
+                        len = children.length;
+                        i = -1;
+                        continue;
                     } else {
                         break;
                     }
                 }
 
-                if (i === len) {
+                if (len > 0 && i === len) {
                     element.innerHTML = tempNode.innerHTML;
                     return;
                 }
             }
-            
+
             // add tag
             _removeCheck.v = false;
             const pNode = element.cloneNode(false);
