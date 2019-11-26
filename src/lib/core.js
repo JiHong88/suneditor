@@ -1399,6 +1399,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
 
@@ -1410,8 +1411,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
                         c = children[i];
                         z = !this.util.onlyZeroWidthSpace(c);
-                        if (c === startCon) s = true;
-                        if (c === endCon) e = true;
+                        if (c === startCon) {
+                            s = true;
+                            continue;
+                        }
+                        if (c === endCon) {
+                            e = true;
+                            continue;
+                        }
                         if ((!s && z) || (s && e && z)) {
                             sameTag = false;
                             break;
@@ -1730,6 +1737,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
 
@@ -2040,6 +2048,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // not add tag
             let parentCon = endCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
             
