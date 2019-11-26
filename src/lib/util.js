@@ -13,7 +13,6 @@
 const util = {
     _d: document,
     _w: window,
-    _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -42,18 +41,28 @@ const util = {
     },
 
     /**
-     * @description Unicode Character 'ZERO WIDTH SPACE'
+     * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
     zeroWidthSpace: '\u200B',
 
     /**
-     * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+     * @description Regular expression to find 'zero width space' (/\u200B/g)
+     */
+    zeroWidthRegExp: new RegExp(String.fromCharCode(8203), 'g'),
+
+    /**
+     * @description Regular expression to find only 'zero width space' (/^\u200B+$/)
+     */
+    onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
+
+    /**
+     * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
      * @param {String|Node} text String value or Node
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
         if (typeof text !== 'string') text = text.textContent;
-        return text === '' || this._onlyZeroWidthRegExp.test(text);
+        return text === '' || this.onlyZeroWidthRegExp.test(text);
     },
 
     /**
@@ -445,15 +454,47 @@ const util = {
      * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
      * @param {Node} node The Node to find position path
      * @param {Element|null} parentNode Parent node. If null, wysiwyg div area
+     * @param {Object|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+     * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
+     * Do not use unless absolutely necessary.
      * @returns {Array}
      */
-    getNodePath: function (node, parentNode) {
+    getNodePath: function (node, parentNode, _newOffsets) {
         const path = [];
         let finds = true;
 
         this.getParentElement(node, function (el) {
             if (el === parentNode) finds = false;
-            if (finds && !this.isWysiwygDiv(el)) path.push(el);
+            if (finds && !this.isWysiwygDiv(el)) {
+                // merge text nodes
+                if (_newOffsets && el.nodeType === 3) {
+                    let temp = null, tempText = null;
+                    _newOffsets.s = _newOffsets.e = 0;
+
+                    let previous = el.previousSibling;
+                    while (previous && previous.nodeType === 3) {
+                        tempText = previous.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.s += tempText.length;
+                        el.textContent = tempText + el.textContent;
+                        temp = previous;
+                        previous = previous.previousSibling;
+                        this.removeItem(temp);
+                    }
+
+                    let next = el.nextSibling;
+                    while (next && next.nodeType === 3) {
+                        tempText = next.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.e += tempText.length;
+                        el.textContent += tempText;
+                        temp = next;
+                        next = next.nextSibling;
+                        this.removeItem(temp);
+                    }
+                }
+
+                // index push
+                path.push(el);
+            }
             return false;
         }.bind(this));
         

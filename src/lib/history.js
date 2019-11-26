@@ -68,11 +68,11 @@ export default function (core, change) {
         stack[stackIndex] = {
             contents: current,
             s: {
-                path: util.getNodePath(range.startContainer),
+                path: util.getNodePath(range.startContainer, null),
                 offset: range.startOffset
             },
             e: {
-                path: util.getNodePath(range.endContainer),
+                path: util.getNodePath(range.endContainer, null),
                 offset: range.endOffset
             }
         };

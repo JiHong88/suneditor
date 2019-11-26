@@ -616,8 +616,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         /**
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
+         * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
          * @param {Element} oNode Element to be inserted
          * @param {Element|null} afterNode If the node exists, it is inserted after the node
+         * @returns {undefined|Object}
          */
         insertNode: function (oNode, afterNode) {
             const range = this.getRange();
@@ -683,6 +685,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             } finally {
                 // history stack
                 this.history.push();
+                
+                if (oNode.nodeType === 3) {
+                    const previous = oNode.previousSibling;
+                    const next = oNode.nextSibling;
+                    const previousText = (!previous || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                    const nextText = (!next || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+    
+                    if (previous) {
+                        oNode.textContent = previousText + oNode.textContent;
+                        util.removeItem(previous);
+                    }
+    
+                    if (next) {
+                        oNode.textContent += nextText;
+                        util.removeItem(next);
+                    }
+
+                    return {
+                        startOffset: previousText.length,
+                        endOffset: oNode.textContent.length - nextText.length
+                    };
+                }
             }
         },
 
@@ -1161,7 +1185,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     const emptyText = util.createTextNode(util.zeroWidthSpace);
                     tempCon.parentNode.insertBefore(emptyText, tempCon);
                     tempCon = emptyText;
-                    tempOffset = 0;
+                    tempOffset = 1;
                     if (onlyBreak) {
                         util.removeItem(endCon);
                     }
@@ -1209,8 +1233,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             /** validation check function*/
-            const validation = function (vNode) {
-                vNode = vNode.cloneNode(false);
+            const _removeCheck = {v: false};
+            const validation = function (checkNode) {
+                const vNode = checkNode.cloneNode(false);
 
                 // all path
                 if (vNode.nodeType === 3 || util.isBreak(vNode)) return vNode;
@@ -1222,6 +1247,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 // tag remove
                 if (tagRemove && !strictRemove) {
+                    _removeCheck.v = true;
                     return null;
                 }
 
@@ -1230,6 +1256,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 let style = '';
                 if (styleRegExp && originStyle.length > 0) {
                     style = originStyle.replace(styleRegExp, '').trim();
+                    if (style !== originStyle) _removeCheck.v = true;
                 }
 
                 // class check
@@ -1237,11 +1264,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 let classes = '';
                 if (classRegExp && originClasses.length > 0) {
                     classes = originClasses.replace(classRegExp, '').trim();
+                    if (classes !== originClasses) _removeCheck.v = true;
                 }
 
                 // remove only
                 if (isRemoveNode) {
                     if ((classRegExp || !originClasses) && (styleRegExp || !originStyle) && !style && !classes && tagRemove) {
+                        _removeCheck.v = true;
                         return null;
                     }
                 }
@@ -1253,16 +1282,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         vNode.removeAttribute('style');
                     }
 
-                    if (classRegExp && originClasses.length > 0) vNode.className = classes;
-                    if (!vNode.className) {
+                    if (classRegExp && originClasses.length > 0) vNode.className = classes.trim();
+                    if (!vNode.className.trim()) {
                         vNode.removeAttribute('class');
                     }
 
-                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) return null;
+                    if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) {
+                        _removeCheck.v = true;
+                        return null;
+                    }
 
                     return vNode;
                 }
 
+                _removeCheck.v = true;
                 return null;
             };
 
@@ -1287,25 +1320,25 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             newNode = appendNode.cloneNode(false);
             // startCon
             if (oneLine) {
-                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed);
+                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
             } else {
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck);
             }
 
             // mid
             for (let i = 1; i < endLength; i++) {
                 newNode = appendNode.cloneNode(false);
-                this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode);
+                this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
             }
 
             // endCon
             if (endLength > 0 && !oneLine) {
                 newNode = appendNode.cloneNode(false);
-                end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode);
+                end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck);
             } else if (!oneLine) {
                 end = start;
             }
@@ -1335,6 +1368,34 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Delete a empty child node of argument element
+         * @param {Element} formatNode The format node
+         * @param {Element} notRemoveNode Do not remove node
+         * @private
+         */
+        _removeEmptyNode: function (formatNode, notRemoveNode) {
+            const preventDelete = util.onlyZeroWidthSpace(notRemoveNode.textContent);
+            if (preventDelete) notRemoveNode.textContent = ' ';
+            util.removeEmptyNode(formatNode);
+            if (preventDelete) notRemoveNode.textContent = util.zeroWidthSpace;
+        },
+
+        /**
+         * @description Add style and className of newElement to element
+         * @param {Element} element Origin element
+         * @param {Element} newElement New element
+         * @private
+         */
+        _copyNodeAttrs: function (element, newElement) {
+            if (newElement.style.cssText) {
+                element.style.cssText += newElement.style.cssText;
+            }
+            if (newElement.className) {
+                this.util.addClass(element, newElement.className);
+            }
+        },
+
+        /**
          * @description wraps text nodes of line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
@@ -1349,7 +1410,51 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed) {
+        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck) {
+            // not add tag
+            let parentCon = startCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
+                parentCon = parentCon.parentNode;
+            }
+
+            if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
+                if (this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+                    const children = parentCon.childNodes;
+                    let sameTag = true;
+    
+                    for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
+                        c = children[i];
+                        z = !this.util.onlyZeroWidthSpace(c);
+                        if (c === startCon) {
+                            s = true;
+                            continue;
+                        }
+                        if (c === endCon) {
+                            e = true;
+                            continue;
+                        }
+                        if ((!s && z) || (s && e && z)) {
+                            sameTag = false;
+                            break;
+                        }
+                    }
+    
+                    if (sameTag) {
+                        this._copyNodeAttrs(parentCon, newInnerNode);
+        
+                        return {
+                            startContainer: startCon,
+                            startOffset: startOff,
+                            endContainer: endCon,
+                            endOffset: endOff
+                        };
+                    }
+                }
+            }
+
+            // add tag
+            _removeCheck.v = false;
             const el = element;
             const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
@@ -1509,9 +1614,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
-                            vNode = validation(newNode);
-                            if (newNode.nodeType === 1 && !util.isBreak(child) && (endPass || vNode) && checkCss(newNode)) {
-                                pCurrent.push(vNode);
+                            vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
+                            if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
+                                if (vNode) pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
                             newNode = newNode.parentNode;
@@ -1545,6 +1650,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             })(element, pNode);
 
+            // not remove tag
+            if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
+                return {
+                    startContainer: startCon,
+                    startOffset: startOff,
+                    endContainer: endCon,
+                    endOffset: endOff
+                };
+            }
+
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
@@ -1574,100 +1689,46 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const preventDelete = util.onlyZeroWidthSpace(newInnerNode.textContent);
-            if (preventDelete) newInnerNode.textContent = ' ';
-            util.removeEmptyNode(pNode);
-            if (preventDelete) newInnerNode.textContent = util.zeroWidthSpace;
-
-            // node change
-            const endConReset = isRemoveFormat || !endContainer.textContent;
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
+            this._removeEmptyNode(pNode, newInnerNode);
 
             if (collapsed) {
                 startOffset = startContainer.textContent.length;
                 endOffset = endContainer.textContent.length;
             }
 
+            // endContainer reset
+            const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
+            const startConLength = startContainer.textContent.length;
+
             if (endContainer.textContent.length === 0) {
                 util.removeItem(endContainer);
                 endContainer = startContainer;
             }
+            endOffset = endConReset ? endContainer.textContent.length : endOffset;
 
+            // node change
+            const newStartOffset = {s: 0, e: 0};
+            const startPath = util.getNodePath(startContainer, pNode, newStartOffset);
+
+            const mergeEndCon = !endContainer.parentNode;
+            if (mergeEndCon) endContainer = startContainer;
+            const newEndOffset = {s: 0, e: 0};
+            const endPath = util.getNodePath(endContainer , pNode, (!mergeEndCon && !endConReset) ? newEndOffset : null);
+
+            startOffset += newStartOffset.s;
+            endOffset += (mergeEndCon ? startConLength : endConReset ? newStartOffset.s : newEndOffset.s);
+
+            element.innerHTML = pNode.innerHTML;
+
+            startContainer = util.getNodeFromPath(startPath, element);
+            endContainer = util.getNodeFromPath(endPath, element);
+            
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
                 endContainer: endContainer,
-                endOffset: endConReset ? endContainer.textContent.length : endOffset
+                endOffset: endOffset
             };
-        },
-
-        /**
-         * @description wraps mid lines selected text.
-         * @param {Element} element The node of the line that contains the selected text node.
-         * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
-         * @param {Boolean} isRemoveFormat Is the remove all formats command?
-         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @private
-         */
-        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode) {
-            const pNode = element.cloneNode(false);
-            const nNodeArray = [newInnerNode];
-            let noneChange = true;
-
-            (function recursionFunc(current, node) {
-                const childNodes = current.childNodes;
-
-                for (let i = 0, len = childNodes.length; i < len; i++) {
-                    let child = childNodes[i];
-                    if (!child) continue;
-                    let coverNode = node;
-
-                    if (util.isIgnoreNodeChange(child)) {
-                        pNode.appendChild(newInnerNode);
-                        newInnerNode = newInnerNode.cloneNode(false);
-                        pNode.appendChild(child);
-                        pNode.appendChild(newInnerNode);
-                        nNodeArray.push(newInnerNode);
-                        node = newInnerNode;
-                        i--;
-                        continue;
-                    } else {
-                        let vNode = validation(child);
-                        if (vNode) {
-                            noneChange = false;
-                            node.appendChild(vNode);
-                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
-                        }
-                    }
-
-                    recursionFunc(child, coverNode);
-                }
-            })(element.cloneNode(true), newInnerNode);
-
-            if (noneChange) return;
-
-            pNode.appendChild(newInnerNode);
-
-            if (isRemoveFormat && isRemoveNode) {
-                for (let i = 0; i < nNodeArray.length; i++) {
-                    let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
-                }
-            } else if (isRemoveNode) {
-                for (let i = 0; i < nNodeArray.length; i++) {
-                    this._stripRemoveNode(pNode, nNodeArray[i]);
-                }
-            }
-
-            util.removeEmptyNode(pNode);
-
-            // node change
-            element.parentNode.insertBefore(pNode, element);
-            util.removeItem(element);
         },
 
         /**
@@ -1682,7 +1743,37 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck) {
+            // not add tag
+            let parentCon = startCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
+                parentCon = parentCon.parentNode;
+            }
+
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.nextSibling && this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
+                let sameTag = true;
+                let s = startCon.previousSibling;
+                while (s) {
+                    if (!this.util.onlyZeroWidthSpace(s)) {
+                        sameTag = false;
+                        break;
+                    }
+                    s = s.previousSibling;
+                }
+
+                if (sameTag) {
+                    this._copyNodeAttrs(parentCon, newInnerNode);
+    
+                    return {
+                        container: startCon,
+                        offset: startOff
+                    };
+                }
+            }
+
+            // add tag
+            _removeCheck.v = false;
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
@@ -1794,6 +1885,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             })(element, pNode);
 
+            // not remove tag
+            if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
+                return {
+                    container: startCon,
+                    offset: startOff
+                };
+            }
+
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
@@ -1810,7 +1909,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            if (!isRemoveFormat && pNode.children.length === 0) {
+            if (!isRemoveFormat && pNode.childNodes.length === 0) {
                 if (element.childNodes) {
                     container = element.childNodes[0];
                 } else {
@@ -1818,21 +1917,129 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                util.removeEmptyNode(pNode);
+                this._removeEmptyNode(pNode, newInnerNode);
+
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
                     offset = 0;
                 }
 
                 // node change
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                const newOffsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, newOffsets);
+
+                element.innerHTML = pNode.innerHTML;
+
+                container = util.getNodeFromPath(path, element);
+                offset += newOffsets.s;
             }
 
             return {
                 container: container,
                 offset: offset
             };
+        },
+
+        /**
+         * @description wraps mid lines selected text.
+         * @param {Element} element The node of the line that contains the selected text node.
+         * @param {Element} newInnerNode The dom that will wrap the selected text area
+         * @param {function} validation Check if the node should be stripped.
+         * @param {Boolean} isRemoveFormat Is the remove all formats command?
+         * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+         * @private
+         */
+        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
+            // not add tag
+            if (!isRemoveNode) {
+                const tempNode = element.cloneNode(true);
+                const newNodeName = newInnerNode.nodeName;
+                const newCssText = newInnerNode.style.cssText;
+                const newClass = newInnerNode.className;
+
+                let children = tempNode.children;
+                let i = 0, len = children.length;
+
+                for (let child; i < len; i++) {
+                    child = children[i];
+                    
+                    if (child.nodeName === newNodeName) {
+                        child.style.cssText += newCssText;
+                        this.util.addClass(child, newClass);
+                    } else if (len === 1) {
+                        children = child.children;
+                        len = children.length;
+                        i = -1;
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (len > 0 && i === len) {
+                    element.innerHTML = tempNode.innerHTML;
+                    return;
+                }
+            }
+
+            // add tag
+            _removeCheck.v = false;
+            const pNode = element.cloneNode(false);
+            const nNodeArray = [newInnerNode];
+            let noneChange = true;
+
+            (function recursionFunc(current, node) {
+                const childNodes = current.childNodes;
+
+                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                    let child = childNodes[i];
+                    if (!child) continue;
+                    let coverNode = node;
+
+                    if (util.isIgnoreNodeChange(child)) {
+                        pNode.appendChild(newInnerNode);
+                        newInnerNode = newInnerNode.cloneNode(false);
+                        pNode.appendChild(child);
+                        pNode.appendChild(newInnerNode);
+                        nNodeArray.push(newInnerNode);
+                        node = newInnerNode;
+                        i--;
+                        continue;
+                    } else {
+                        vNode = validation(child);
+                        if (vNode) {
+                            noneChange = false;
+                            node.appendChild(vNode);
+                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
+                        }
+                    }
+
+                    recursionFunc(child, coverNode);
+                }
+            })(element.cloneNode(true), newInnerNode);
+
+            // not remove tag
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
+
+            pNode.appendChild(newInnerNode);
+
+            if (isRemoveFormat && isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    let removeNode = nNodeArray[i];
+                    let textNode = util.createTextNode(removeNode.textContent);
+                    pNode.insertBefore(textNode, removeNode);
+                    pNode.removeChild(removeNode);
+                }
+            } else if (isRemoveNode) {
+                for (let i = 0; i < nNodeArray.length; i++) {
+                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                }
+            }
+
+            this._removeEmptyNode(pNode, newInnerNode);
+
+            // node change
+            element.innerHTML = pNode.innerHTML;
         },
 
         /**
@@ -1847,7 +2054,37 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode) {
+        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck) {
+            // not add tag
+            let parentCon = endCon.parentNode;
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+                if (parentCon.nodeName === newInnerNode.nodeName) break;
+                parentCon = parentCon.parentNode;
+            }
+            
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.previousSibling && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+                let sameTag = true;
+                let e = endCon.nextSibling;
+                while (e) {
+                    if (!this.util.onlyZeroWidthSpace(e)) {
+                        sameTag = false;
+                        break;
+                    }
+                    e = e.nextSibling;
+                }
+
+                if (sameTag) {
+                    this._copyNodeAttrs(parentCon, newInnerNode);
+    
+                    return {
+                        container: endCon,
+                        offset: endOff
+                    };
+                }
+            }
+
+            // add tag
+            _removeCheck.v = false;
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
@@ -1959,6 +2196,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             })(element, pNode);
 
+            // not remove tag
+            if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
+                return {
+                    container: endCon,
+                    offset: endOff
+                };
+            }
+
             isRemoveFormat = isRemoveFormat && isRemoveNode;
 
             if (isRemoveFormat) {
@@ -1987,7 +2232,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                util.removeEmptyNode(pNode);
+                this._removeEmptyNode(pNode, newInnerNode);
+
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
                     offset = container.textContent.length;
@@ -1997,8 +2243,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
                 
                 // node change
-                element.parentNode.insertBefore(pNode, element);
-                util.removeItem(element);
+                const newOffsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, newOffsets);
+
+                element.innerHTML = pNode.innerHTML;
+
+                container = util.getNodeFromPath(path, element);
+                offset += newOffsets.s;
             }
 
             return {
@@ -2020,6 +2271,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     this.setRange(first, 0, last, last.textContent.length);
+                    this.focus();
                     break;
                 case 'codeView':
                     this.toggleCodeView();
@@ -2636,8 +2888,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
      */
     const event = {
         _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(9|1[6-8]|20|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
+        _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
             66: 'B',
@@ -3229,9 +3482,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                         core.plugins.video.onModifyMode.call(core, iframe, size);
                                     });
                                 }
-
-                                // history stack
-                                core.history.push();
                             }
 
                             break;
@@ -3270,26 +3520,43 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!shift) {
                         const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
                         if (lines.length === 1) {
-                            core.insertNode(tabText);
-                            core.setRange(tabText, core._variable.tabSize, tabText, core._variable.tabSize);
+                            const r = core.insertNode(tabText);
+                            core.setRange(tabText, r.endOffset, tabText, r.endOffset);
                         } else {
-                            for (let i = 0, len = lines.length; i < len; i++) {
-                                lines[i].insertBefore(tabText.cloneNode(false), lines[i].firstChild);
+                            const len = lines.length - 1;
+                            for (let i = 0, child; i <= len; i++) {
+                                child = lines[i].firstChild;
+                                if (!child) continue;
+
+                                if (util.isBreak(child)) {
+                                    lines[i].insertBefore(tabText.cloneNode(false), child);
+                                } else {
+                                    child.textContent = tabText.textContent + child.textContent;
+                                }
                             }
+
+                            const firstChild = util.getChildElement(lines[0], 'text', false);
+                            const endChild = util.getChildElement(lines[len], 'text', true);
+                            if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
                         }
                     } else {
-                        for (let i = 0, len = lines.length, child; i < len; i++) {
+                        const len = lines.length - 1;
+                        for (let i = 0, child; i <= len; i++) {
                             child = lines[i].firstChild;
+                            if (!child) continue;
+
                             if (/^\s{1,4}$/.test(child.textContent)) {
                                 util.removeItem(child);
                             } else if (/^\s{1,4}/.test(child.textContent)) {
                                 child.textContent = child.textContent.replace(/^\s{1,4}/, '');
                             }
                         }
-                    }
 
-                    // history stack
-                    core.history.push();
+                        const firstChild = util.getChildElement(lines[0], 'text', false);
+                        const endChild = util.getChildElement(lines[len], 'text', true);
+                        if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
+                    }
+                    
                     break;
                 case 13: /** enter key */
                     if (selectRange) break;
@@ -3336,9 +3603,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
                         });
-
-                        // history stack
-                        core.history.push();
                     }
                     
                     break;
@@ -3357,7 +3621,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const textKey = !ctrl && !alt && e.key.length === 1;
+            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
             if (!core._charCount(1, textKey)) {
                 if (textKey) {
                     e.preventDefault();
@@ -3371,9 +3635,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         onKeyUp_wysiwyg: function (e) {
             core._editorRange();
-            const keyCode = e.keyCode;            
+            const keyCode = e.keyCode;
+            const ctrl = e.ctrlKey || e.metaKey;
+            const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
-            
+
             if (core._isBalloon && !core.getRange().collapsed) {
                 event._showToolbarBalloon();
                 return;
@@ -3411,7 +3677,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core._checkComponents();
 
-            if (!core._charCount(1, e.key.length === 1)) {
+            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
+
+            if (textKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+                const range = core.getRange();
+                const s = range.startOffset, e = range.endOffset;
+                const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
+                selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
+                core.setRange(selectionNode, s - frontZeroWidthCnt, selectionNode, e - frontZeroWidthCnt);
+            }
+
+            if (!core._charCount(1, textKey)) {
                 if (e.key.length === 1) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -3420,7 +3696,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            if (!event._historyIgnoreKeycode.test(keyCode)) {
+            if (textKey) {
                 core.history.push();
             }
 
@@ -3889,7 +4165,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 afterNode = util.getFormatElement(core.getSelectionNode());
             }
 
-            core.insertNode(html, afterNode);
+            if (util.isComponent(html)) {
+                core.insertComponent(html);
+            } else {
+                core.insertNode(html, afterNode);
+            }
+            
             core.focus();
         },
 

@@ -86,7 +86,7 @@ export default {
             newNode.style.fontSize = value;
             this.nodeChange(newNode, ['font-size'], null, null);
         } else {
-            this.nodeChange(null, ['font-size'], null, true);
+            this.nodeChange(null, ['font-size'], ['span'], true);
         }
 
         this.submenuOff();

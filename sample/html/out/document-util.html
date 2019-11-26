@@ -33,12 +33,28 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="zeroWidthRegExp"><span class="type-signature"></span>zeroWidthRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Regular expression to find 'zero width space' (/\u200B/g)
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onlyZeroWidthRegExp"><span class="type-signature"></span>onlyZeroWidthRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Regular expression to find only 'zero width space' (/^\u200B+$/)
+            </div>
+            <dl class="details"></dl>
+
+
             <h3 class="subsection-title">Methods</h3>
 
             <h4 class="name" id="onlyZeroWidthSpace"><span class="type-signature"></span>onlyZeroWidthSpace<span
                     class="signature">(text)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+                A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -648,7 +664,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode)</span><span
+        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode, _newOffsets)</span><span
                 class="type-signature"> &rarr; {Array}</span></h4>
         <div class="description">
             Returns the position of the "node" in the "parentNode" in a numerical array.<br>
@@ -677,6 +693,17 @@
                     <span class="param-type">Element|null</span>
                 </td>
                 <td class="description last">Parent node. If null, wysiwyg div area</td>
+            </tr>
+            <tr>
+                <td class="name"><code>_newOffsets</code></td>
+                <td class="type">
+                    <span class="param-type">Object|null</span>
+                </td>
+                <td class="description last">
+                    If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.<br>
+                    "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".<br>
+                    Do not use unless absolutely necessary.
+                </td>
             </tr>
             </tbody>
         </table>
@@ -1487,6 +1514,8 @@
     <ul>
         <li><b>Members</b></li>
         <li><a href="document-util.html#zeroWidthSpace">zeroWidthSpace</a></li>
+        <li><a href="document-util.html#zeroWidthRegExp">zeroWidthRegExp</a></li>
+        <li><a href="document-util.html#onlyZeroWidthRegExp">onlyZeroWidthRegExp</a></li>
         <li><b>Methods</b></li>
         <li><a href="document-util.html#onlyZeroWidthSpace">onlyZeroWidthSpace</a></li>
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
