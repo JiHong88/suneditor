@@ -1044,17 +1044,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Add, update, and delete nodes from selected text.
-         * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection.
-         * 2. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.
-         * 3. The same style as the style attribute of the "styleArray" argument is deleted.
+         * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection text.
+         * 2. If it is in the same tag, only the tag's attributes are changed without adding a tag.
+         * 3. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.
+         * 4. The same style as the style attribute of the "styleArray" argument is deleted.
          *    (Styles should be put with attribute names from css. ["background-color"])
-         * 4. The same class name as the class attribute of the "styleArray" argument is deleted.
+         * 5. The same class name as the class attribute of the "styleArray" argument is deleted.
          *    (The class name is preceded by "." [".className"])
-         * 5. Use a list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
-         * 6. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.
-         * 7. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
-         * 8. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
-         * 9. It won't work if the parent node has the same class and same value style.
+         * 6. Use a list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
+         * 7. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.
+         * 8. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
+         * 9. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
+         *10. It won't work if the parent node has the same class and same value style.
          *    However, if there is a value in "removeNodeArray", it works and the text node is separated even if there is no node to replace.
          * @param {Element|null} appendNode The element to be added to the selection. If it is null, only delete the node.
          * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
@@ -1386,12 +1387,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {Element} newElement New element
          * @private
          */
-        _copyNodeAttrs: function (element, newElement) {
+        _copyTagAttrs: function (element, newElement) {
             if (newElement.style.cssText) {
                 element.style.cssText += newElement.style.cssText;
             }
             if (newElement.className) {
                 this.util.addClass(element, newElement.className);
+            }
+
+            if (!element.style.cssText) {
+                element.removeAttribute('style');
+            }
+            if (!element.className.trim()) {
+                element.removeAttribute('class');
             }
         },
 
@@ -1441,7 +1449,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
     
                     if (sameTag) {
-                        this._copyNodeAttrs(parentCon, newInnerNode);
+                        this._copyTagAttrs(parentCon, newInnerNode);
         
                         return {
                             startContainer: startCon,
@@ -1698,7 +1706,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // endContainer reset
             const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
-            const startConLength = startContainer.textContent.length;
 
             if (endContainer.textContent.length === 0) {
                 util.removeItem(endContainer);
@@ -1716,13 +1723,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const endPath = util.getNodePath(endContainer , pNode, (!mergeEndCon && !endConReset) ? newEndOffset : null);
 
             startOffset += newStartOffset.s;
-            endOffset += (mergeEndCon ? startConLength : endConReset ? newStartOffset.s : newEndOffset.s);
+            endOffset = (mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s);
 
             element.innerHTML = pNode.innerHTML;
 
             startContainer = util.getNodeFromPath(startPath, element);
             endContainer = util.getNodeFromPath(endPath, element);
-            
+
             return {
                 startContainer: startContainer,
                 startOffset: startOffset,
@@ -1763,7 +1770,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this._copyNodeAttrs(parentCon, newInnerNode);
+                    this._copyTagAttrs(parentCon, newInnerNode);
     
                     return {
                         container: startCon,
@@ -2074,7 +2081,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this._copyNodeAttrs(parentCon, newInnerNode);
+                    this._copyTagAttrs(parentCon, newInnerNode);
     
                     return {
                         container: endCon,
