@@ -107,8 +107,9 @@ export default {
         let target = e.target;
         let value = null;
         
-        while (!value && !/^UL$/i.test(target.tagName)) {
+        while (!/^UL$/i.test(target.tagName)) {
             value = target.getAttribute('data-value');
+            if (value) break;
             target = target.parentNode;
         }
 
@@ -118,9 +119,11 @@ export default {
         if (selectedFormsts.length === 0) return;
 
         // change format class
+        const toggleClass = this.util.hasClass(target, 'active') ? this.util.removeClass.bind(this.util) : this.util.addClass.bind(this.util);
         selectedFormsts = this.getSelectedElementsAndComponents();
+        
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            this.util.toggleClass(selectedFormsts[i], value);
+            toggleClass(selectedFormsts[i], value);
         }
 
         // history stack
