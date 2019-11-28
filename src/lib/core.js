@@ -1381,26 +1381,60 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (preventDelete) notRemoveNode.textContent = util.zeroWidthSpace;
         },
 
-        /**
-         * @description Add style and className of newElement to element
-         * @param {Element} element Origin element
-         * @param {Element} newElement New element
-         * @private
-         */
-        _copyTagAttrs: function (element, newElement) {
-            if (newElement.style.cssText) {
-                element.style.cssText += newElement.style.cssText;
-            }
-            if (newElement.className) {
-                this.util.addClass(element, newElement.className);
-            }
+        _mergeSameTags: function (element, nodePath_a, nodePath_b) {
+            const inst = this;
+            const offsets = {a: 0, b: 0};
 
-            if (!element.style.cssText) {
-                element.removeAttribute('style');
-            }
-            if (!element.className.trim()) {
-                element.removeAttribute('class');
-            }
+            (function recursionFunc(current, depth) {
+                const children = current.childNodes;
+                
+                for (let i = 0, len = children.length, child, next; i < len; i++) {
+                    child = children[i];
+                    next = children[i + 1];
+                    if (!child) break;
+                    if (!next) {
+                        if (child.nodeType === 1) recursionFunc(child, depth + 1);
+                        break;
+                    }
+                    if (child.nodeType === 3 || next.nodeType === 3) continue;
+                    
+                    if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next)) {
+                        const childLength = child.childNodes.length;
+                        const l = child.lastChild;
+                        const r = next.firstChild;
+                        const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
+
+                        if (nodePath_a && nodePath_a[depth] >= i + 1) {
+                            nodePath_a[depth] -= 1;
+                            if (nodePath_a[depth + 1] >= 0) {
+                                nodePath_a[depth + 1] += childLength;
+                                if (textOffset) {
+                                    offsets.a += child.textContent.length;
+                                }
+                            }
+                        }
+
+                        if (nodePath_b && nodePath_b[depth] >= i + 1) {
+                            nodePath_b[depth] -= 1;
+                            if (nodePath_b[depth + 1] >= 0) {
+                                nodePath_b[depth + 1] += childLength;
+                                if (textOffset) {
+                                    offsets.b += child.textContent.length;
+                                }
+                            }
+                        }
+    
+                        child.innerHTML += next.innerHTML;
+                        inst.util.removeItem(next);
+                        i--;
+                    }
+                    else if (child.nodeType === 1) {
+                        recursionFunc(child, depth + 1);
+                    }
+                }
+            })(element, 0);
+
+            return offsets;
         },
 
         /**
@@ -1449,7 +1483,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
     
                     if (sameTag) {
-                        this._copyTagAttrs(parentCon, newInnerNode);
+                        this.util.copyTagAttributes(parentCon, newInnerNode);
         
                         return {
                             startContainer: startCon,
@@ -1725,6 +1759,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             startOffset += newStartOffset.s;
             endOffset = (mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s);
 
+            // tag merge
+            const newOffsets = this._mergeSameTags(pNode, startPath, endPath);
+
             element.innerHTML = pNode.innerHTML;
 
             startContainer = util.getNodeFromPath(startPath, element);
@@ -1732,9 +1769,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             return {
                 startContainer: startContainer,
-                startOffset: startOffset,
+                startOffset: startOffset + newOffsets.a,
                 endContainer: endContainer,
-                endOffset: endOffset
+                endOffset: endOffset + newOffsets.b
             };
         },
 
@@ -1770,7 +1807,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this._copyTagAttrs(parentCon, newInnerNode);
+                    this.util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
                         container: startCon,
@@ -2081,7 +2118,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this._copyTagAttrs(parentCon, newInnerNode);
+                    this.util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
                         container: endCon,

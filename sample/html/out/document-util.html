@@ -501,10 +501,10 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="copyFormatAttributes"><span class="type-signature"></span>copyFormatAttributes<span
-                class="signature">(newEl, originEl)</span><span class="type-signature"></span></h4>
+            <h4 class="name" id="copyTagAttributes"><span class="type-signature"></span>copyTagAttributes<span
+                class="signature">(originEl, copyEl)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Copy and apply attributes of format tag that should be maintained. (style, class)
+                Add style and className of copyEl to originEl. (style, class)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -517,18 +517,52 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>newEl</code></td>
+                    <td class="name"><code>originEl</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">New element.</td>
+                    <td class="description last">Origin element</td>
                 </tr>
+                <tr>
+                    <td class="name"><code>copyEl</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element to copy</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="copyFormatAttributes"><span class="type-signature"></span>copyFormatAttributes<span
+                class="signature">(originEl, copyEl)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Copy and apply attributes of format tag that should be maintained. (style, class), Ignore "__se__format__" class
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td class="name"><code>originEl</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Origin element.</td>
+                    <td class="description last">Origin element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>copyEl</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element to copy</td>
                 </tr>
                 </tbody>
             </table>
@@ -738,6 +772,41 @@
                     <span class="param-type">Element</span>
                 </td>
                 <td class="description last">Base parent element</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isSameAttributes"><span class="type-signature"></span>isSameAttributes<span class="signature">(a, b)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Compares the style and class for equal values.<br>
+            Returns true if both are text nodes.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>a</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Node object</td>
+            </tr>
+            <tr>
+                <td class="name"><code>b</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Node object</td>
             </tr>
             </tbody>
         </table>
@@ -1533,6 +1602,7 @@
         <li><a href="document-util.html#isComponent">isComponent</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
+        <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
@@ -1540,6 +1610,7 @@
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
         <li><a href="document-util.html#getNodePath">getNodePath</a></li>
         <li><a href="document-util.html#getNodeFromPath">getNodeFromPath</a></li>
+        <li><a href="document-util.html#isSameAttributes">isSameAttributes</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isTable">isTable</a></li>

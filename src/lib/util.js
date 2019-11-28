@@ -375,23 +375,34 @@ const util = {
     },
 
     /**
-     * @description Copy and apply attributes of format tag that should be maintained. (style, class)
-     * @param {Element} newEl New element
+     * @description Add style and className of copyEl to originEl
      * @param {Element} originEl Origin element
+     * @param {Element} copyEl Element to copy
+     * @private
      */
-    copyFormatAttributes: function (newEl, originEl) {
-        if (originEl.style.cssText) {
-            newEl.style.cssText = originEl.style.cssText;
+    copyTagAttributes: function (originEl, copyEl) {
+        if (copyEl.style.cssText) {
+            originEl.style.cssText += copyEl.style.cssText;
         }
 
-        const classes = originEl.classList;
+        const classes = copyEl.classList;
         for (let i = 0, len = classes.length; i < len; i++) {
-            if (/__se__format__/.test(classes[i])) continue;
-            this.addClass(newEl, classes[i]);
+            this.addClass(originEl, classes[i]);
         }
-        
-        if (!newEl.className) newEl.removeAttribute('class');
-        if (!newEl.style.cssText) newEl.removeAttribute('style');
+
+        if (!originEl.style.cssText) originEl.removeAttribute('style');
+        if (!originEl.className.trim()) originEl.removeAttribute('class');
+    },
+
+    /**
+     * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+     * @param {Element} originEl Origin element
+     * @param {Element} copyEl Element to copy
+     */
+    copyFormatAttributes: function (originEl, copyEl) {
+        copyEl = copyEl.cloneNode(false);
+        copyEl.className = copyEl.className.replace(/(\s|^)__se__format__(\s|$)/g, '');
+        this.copyTagAttributes(originEl, copyEl);
     },
 
     /**
@@ -522,6 +533,36 @@ const util = {
         }
 
         return current;
+    },
+
+    /**
+     * @description Compares the style and class for equal values.
+     * Returns true if both are text nodes.
+     * @param {Node} a Node object
+     * @param {Node} b Node object
+     * @returns {Boolean}
+     */
+    isSameAttributes: function (a, b) {
+        if (a.nodeType === 3 && b.nodeType === 3) return true;
+
+        const style_a = a.style;
+        const style_b = b.style;
+        let compStyle = 0;
+
+        for (let i = 0, len = style_a.length; i < len; i++) {
+            if (style_a[style_a[i]] === style_b[style_a[i]]) compStyle++;
+        }
+
+        const class_a = a.classList;
+        const class_b = b.classList;
+        const reg = this._w.RegExp;
+        let compClass = 0;
+
+        for (let i = 0, len = class_a.length; i < len; i++) {
+            if (reg('(\s|^)' + class_a[i] + '(\s|$)').test(class_b.value)) compClass++;
+        }
+
+        return compStyle === style_b.length && compClass === class_b.length;
     },
 
     /**
