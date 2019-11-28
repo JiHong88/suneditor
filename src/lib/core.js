@@ -2419,6 +2419,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (context.option.codeMirrorEditor) context.option.codeMirrorEditor.refresh();
                 
                 this._variable.wysiwygActive = false;
+                core._notHideToolbar = true;
                 context.element.code.focus();
             }
 
