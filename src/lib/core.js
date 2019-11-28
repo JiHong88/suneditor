@@ -847,7 +847,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
 
-                    if (i === len - 1 || !this.util.getParentElement(rangeLines[i + 1], function (current) { return current === originParent; })) {
+                    if (i === len - 1 || !util.getParentElement(rangeLines[i + 1], function (current) { return current === originParent; })) {
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
 
                         if (parentDepth >= depth) {
@@ -890,7 +890,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // history stack
             this.history.push();
 
-            const edge = this.util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
+            const edge = util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
             if (rangeLines.length > 1) {
                 this.setRange(edge.sc, 0, edge.ec, edge.ec.textContent.length);
             } else {
@@ -1080,7 +1080,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (isRemoveNode) {
-                appendNode = this.util.createElement('DIV');
+                appendNode = util.createElement('DIV');
             }
 
             const newNodeName = appendNode.nodeName;
@@ -1478,19 +1478,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck) {
             // not add tag
             let parentCon = startCon.parentNode;
-            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
                 if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
 
             if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
-                if (this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+                if (util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
                     const children = parentCon.childNodes;
                     let sameTag = true;
     
                     for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
                         c = children[i];
-                        z = !this.util.onlyZeroWidthSpace(c);
+                        z = !util.onlyZeroWidthSpace(c);
                         if (c === startCon) {
                             s = true;
                             continue;
@@ -1506,7 +1506,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
     
                     if (sameTag) {
-                        this.util.copyTagAttributes(parentCon, newInnerNode);
+                        util.copyTagAttributes(parentCon, newInnerNode);
         
                         return {
                             startContainer: startCon,
@@ -1813,16 +1813,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
             let parentCon = startCon.parentNode;
-            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
                 if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
 
-            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.nextSibling && this.util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.nextSibling && util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
                 let sameTag = true;
                 let s = startCon.previousSibling;
                 while (s) {
-                    if (!this.util.onlyZeroWidthSpace(s)) {
+                    if (!util.onlyZeroWidthSpace(s)) {
                         sameTag = false;
                         break;
                     }
@@ -1830,7 +1830,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this.util.copyTagAttributes(parentCon, newInnerNode);
+                    util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
                         container: startCon,
@@ -2036,7 +2036,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (child.nodeType === 3) break;
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
-                        this.util.addClass(child, newClass);
+                        util.addClass(child, newClass);
                     } else if (len === 1) {
                         children = child.childNodes;
                         len = children.length;
@@ -2129,16 +2129,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck) {
             // not add tag
             let parentCon = endCon.parentNode;
-            while (!parentCon.nextSibling && !parentCon.previousSibling && !this.util.isFormatElement(parentCon.parentNode) && !this.util.isWysiwygDiv(parentCon.parentNode)) {
+            while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
                 if (parentCon.nodeName === newInnerNode.nodeName) break;
                 parentCon = parentCon.parentNode;
             }
             
-            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.previousSibling && this.util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+            if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !util.isFormatElement(parentCon) && !parentCon.previousSibling && util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
                 let sameTag = true;
                 let e = endCon.nextSibling;
                 while (e) {
-                    if (!this.util.onlyZeroWidthSpace(e)) {
+                    if (!util.onlyZeroWidthSpace(e)) {
                         sameTag = false;
                         break;
                     }
@@ -2146,7 +2146,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 if (sameTag) {
-                    this.util.copyTagAttributes(parentCon, newInnerNode);
+                    util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
                         container: endCon,
@@ -2393,7 +2393,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
-                    const btn = util.hasClass(this.commandMap[command], 'active') ? null : this.util.createElement(command);
+                    const btn = util.hasClass(this.commandMap[command], 'active') ? null : util.createElement(command);
                     let removeNode = command;
 
                     if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'active')) {
