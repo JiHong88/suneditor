@@ -544,6 +544,7 @@ const util = {
      */
     isSameAttributes: function (a, b) {
         if (a.nodeType === 3 && b.nodeType === 3) return true;
+        if (a.nodeType === 3 || b.nodeType === 3) return false;
 
         const style_a = a.style;
         const style_b = b.style;

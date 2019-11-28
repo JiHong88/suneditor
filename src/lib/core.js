@@ -1381,6 +1381,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (preventDelete) notRemoveNode.textContent = util.zeroWidthSpace;
         },
 
+        /**
+         * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
+         * If "offset" has been changed, it will return as much "offset" as it has been modified.
+         * "a", "b" You can send a maximum of two nodepaths.
+         * @param {Object} nodePath_a NodePath object (util.getNodePath)
+         * @param {Object|null} nodePath_b NodePath object (util.getNodePath)
+         * @returns {Object} {a: 0, b: 0}
+         * @private
+         */
         _mergeSameTags: function (element, nodePath_a, nodePath_b) {
             const inst = this;
             const offsets = {a: 0, b: 0};
@@ -1392,11 +1401,25 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     child = children[i];
                     next = children[i + 1];
                     if (!child) break;
+                    if (len === 1 && current.nodeName === child.nodeName) {
+                        inst.util.copyTagAttributes(child, current);
+                        current.parentNode.insertBefore(child, current);
+                        inst.util.removeItem(current);
+
+                        // update nodePath
+                        if (nodePath_a && nodePath_a[depth] === i) {
+                            nodePath_a.splice(depth, 1);
+                            nodePath_a[depth] = i;
+                        }
+                        if (nodePath_b && nodePath_b[depth] === i) {
+                            nodePath_b.splice(depth, 1);
+                            nodePath_b[depth] = i;
+                        }
+                    }
                     if (!next) {
                         if (child.nodeType === 1) recursionFunc(child, depth + 1);
                         break;
                     }
-                    if (child.nodeType === 3 || next.nodeType === 3) continue;
                     
                     if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next)) {
                         const childLength = child.childNodes.length;
@@ -1404,6 +1427,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const r = next.firstChild;
                         const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
 
+                        // update nodePath
                         if (nodePath_a && nodePath_a[depth] >= i + 1) {
                             nodePath_a[depth] -= 1;
                             if (nodePath_a[depth + 1] >= 0) {
@@ -1413,7 +1437,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 }
                             }
                         }
-
                         if (nodePath_b && nodePath_b[depth] >= i + 1) {
                             nodePath_b[depth] -= 1;
                             if (nodePath_b[depth + 1] >= 0) {
@@ -1969,13 +1992,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 // node change
-                const newOffsets = {s: 0, e: 0};
-                const path = util.getNodePath(container, pNode, newOffsets);
+                const offsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, offsets);
+                offset += offsets.s;
+
+                // tag merge
+                const newOffsets = this._mergeSameTags(pNode, path, null);
 
                 element.innerHTML = pNode.innerHTML;
 
                 container = util.getNodeFromPath(path, element);
-                offset += newOffsets.s;
+                offset += newOffsets.a;
             }
 
             return {
@@ -2001,17 +2028,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 const newCssText = newInnerNode.style.cssText;
                 const newClass = newInnerNode.className;
 
-                let children = tempNode.children;
+                let children = tempNode.childNodes;
                 let i = 0, len = children.length;
 
                 for (let child; i < len; i++) {
                     child = children[i];
-                    
+                    if (child.nodeType === 3) break;
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
                         this.util.addClass(child, newClass);
                     } else if (len === 1) {
-                        children = child.children;
+                        children = child.childNodes;
                         len = children.length;
                         i = -1;
                         continue;
@@ -2081,6 +2108,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             this._removeEmptyNode(pNode, newInnerNode);
+            this._mergeSameTags(pNode, null, null);
 
             // node change
             element.innerHTML = pNode.innerHTML;
@@ -2287,13 +2315,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
                 
                 // node change
-                const newOffsets = {s: 0, e: 0};
-                const path = util.getNodePath(container, pNode, newOffsets);
+                const offsets = {s: 0, e: 0};
+                const path = util.getNodePath(container, pNode, offsets);
+                offset += offsets.s;
+
+                // tag merge
+                const newOffsets = this._mergeSameTags(pNode, path, null);
 
                 element.innerHTML = pNode.innerHTML;
 
                 container = util.getNodeFromPath(path, element);
-                offset += newOffsets.s;
+                offset += newOffsets.a;
             }
 
             return {
