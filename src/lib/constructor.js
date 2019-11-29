@@ -231,6 +231,7 @@ export default {
             toolBar.style.width = options.toolbarWidth;
         } else if (/balloon/i.test(options.mode)) {
             toolBar.className += ' se-toolbar-balloon';
+            toolBar.style.width = options.toolbarWidth;
             toolBar.appendChild(toolBarArrow);
         }
 

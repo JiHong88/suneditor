@@ -131,7 +131,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Required value when using inline mode to sticky toolbar
          * @private
          */
-        _inlineToolbarAttr: {width: 0, height: 0, isShow: false},
+        _inlineToolbarAttr: {top: '', width: '', isShow: false},
 
         /**
          * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to submenu
@@ -182,7 +182,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Variables used internally in editor operation
-         * @property {Boolean} wysiwygActive The wysiwyg frame or code view state
+         * @property {Boolean} isCodeView State of code view
          * @property {Boolean} isFullScreen State of full screen
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
@@ -193,7 +193,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _variable: {
-            wysiwygActive: true,
+            isCodeView: false,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
@@ -2455,15 +2455,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Changes to code view or wysiwyg view
          */
         toggleCodeView: function () {
-            const wysiwygActive = this._variable.wysiwygActive;
+            const isCodeView = this._variable.isCodeView;
             const disButtons = this.codeViewDisabledButtons;
             for (let i = 0, len = disButtons.length; i < len; i++) {
-                disButtons[i].disabled = wysiwygActive;
+                disButtons[i].disabled = !isCodeView;
             }
 
             this.controllersOff();
 
-            if (!wysiwygActive) {
+            if (isCodeView) {
                 this._setCodeDataToEditor();
                 context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
@@ -2474,11 +2474,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = '0px';
                 
-                this._variable.wysiwygActive = true;
+                this._variable.isCodeView = false;
                 
                 if (!this._variable.isFullScreen) {
                     this._notHideToolbar = false;
                     if (/balloon/i.test(context.option.mode)) {
+                        context.element._arrow.style.display = '';
                         this._isInline = false;
                         this._isBalloon = true;
                         event._hideToolbar();    
@@ -2500,14 +2501,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
                 if (context.option.codeMirrorEditor) context.option.codeMirrorEditor.refresh();
                 
-                this._variable.wysiwygActive = false;
+                this._variable.isCodeView = true;
 
                 if (!this._variable.isFullScreen) {
                     this._notHideToolbar = true;
                     if (this._isBalloon) {
+                        context.element._arrow.style.display = 'none';
+                        context.element.toolbar.style.left = '';
                         this._isInline = true;
                         this._isBalloon = false;
-                        event._showToolbarInline();    
+                        event._showToolbarInline();
                     }
                 }
                 
@@ -2758,7 +2761,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         setContents: function (html) {
             const convertValue = util.convertContentsForEditor(html);
-            if (core._variable.wysiwygActive) {
+            if (!core._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
                 // history stack
                 core.history.push();
@@ -2981,7 +2984,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         _checkPlaceholder: function () {
             if (this._placeholder) {
-                if (!this._variable.wysiwygActive) {
+                if (this._variable.isCodeView) {
                     this._placeholder.style.display = 'none';
                     return;
                 }
@@ -3853,6 +3856,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
                 return;
             }
+
+            if (core._variable.isCodeView && core._isInline) {
+                event._showToolbarInline();
+                return;
+            }
             
             core._iframeAutoHeight();
 
@@ -4302,7 +4310,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         appendContents: function (contents) {
             const convertValue = util.convertContentsForEditor(contents);
             
-            if (core._variable.wysiwygActive) {
+            if (!core._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML += convertValue;
             } else {
                 core._setCodeView(core._getCodeView() + '\n' + util.convertHTMLForCodeView(convertValue, core._variable.codeIndent));
