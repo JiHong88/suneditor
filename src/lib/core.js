@@ -208,7 +208,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             _editorAreaOriginCssText: '',
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
-            _fullScreenSticky: false,
+            _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _imagesInfo: [],
             _imageIndex: 0,
             _videosCnt: 0
@@ -304,6 +304,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this.controllerArray[i] = arguments[i];
             }
 
+            this._notHideToolbar = true;
             this._bindControllersOff = this.controllersOff.bind(this);
             this.addDocEvent('mousedown', this._bindControllersOff, false);
             this.addDocEvent('keydown', this._bindControllersOff, false);
@@ -315,6 +316,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         controllersOff: function (e) {
             if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
 
+            this._notHideToolbar = false;
             this._resizingName = '';
             if (!this._bindControllersOff) return;
 
@@ -2471,7 +2473,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
                 if (context.option.height === 'auto' && !context.option.codeMirrorEditor) context.element.code.style.height = '0px';
+                
                 this._variable.wysiwygActive = true;
+                
+                if (!this._variable.isFullScreen) {
+                    this._notHideToolbar = false;
+                    if (/balloon/i.test(context.option.mode)) {
+                        this._isInline = false;
+                        this._isBalloon = true;
+                        event._hideToolbar();    
+                    }
+                }
+
                 this._resourcesStateChange();
                 this._checkComponents();
 
@@ -2488,7 +2501,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (context.option.codeMirrorEditor) context.option.codeMirrorEditor.refresh();
                 
                 this._variable.wysiwygActive = false;
-                core._notHideToolbar = true;
+
+                if (!this._variable.isFullScreen) {
+                    this._notHideToolbar = true;
+                    if (this._isBalloon) {
+                        this._isInline = true;
+                        this._isBalloon = false;
+                        event._showToolbarInline();    
+                    }
+                }
+                
                 context.element.code.focus();
             }
 
@@ -2556,9 +2578,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const editorArea = context.element.editorArea;
             const wysiwygFrame = context.element.wysiwygFrame;
             const code = context.element.code;
+            const _var = this._variable;
 
-            if (!this._variable.isFullScreen) {
-                this._variable.isFullScreen = true;
+            if (!_var.isFullScreen) {
+                _var.isFullScreen = true;
+                
+                _var._fullScreenAttrs.inline = this._isInline;
+                _var._fullScreenAttrs.balloon = this._isBalloon;
+
+                if (this._isInline || this._isBalloon) {
+                    this._isInline = false;
+                    this._isBalloon = false;
+                }
 
                 topArea.style.position = 'fixed';
                 topArea.style.top = '0';
@@ -2567,27 +2598,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 topArea.style.height = '100%';
                 topArea.style.zIndex = '2147483647';
 
-                if (context.element._stickyDummy.style.display !== 'none') {
-                    this._variable._fullScreenSticky = true;
+                if (context.element._stickyDummy.style.display !== ('none' && '')) {
+                    _var._fullScreenAttrs.sticky = true;
                     context.element._stickyDummy.style.display = 'none';
-                    util.removeClass(toolbar, "se-toolbar-sticky");
+                    util.removeClass(toolbar, 'se-toolbar-sticky');
                 }
 
-                this._variable._bodyOverflow = _d.body.style.overflow;
+                _var._bodyOverflow = _d.body.style.overflow;
                 _d.body.style.overflow = 'hidden';
 
-                this._variable._editorAreaOriginCssText = editorArea.style.cssText;
-                this._variable._wysiwygOriginCssText = wysiwygFrame.style.cssText;
-                this._variable._codeOriginCssText = code.style.cssText;
+                _var._editorAreaOriginCssText = editorArea.style.cssText;
+                _var._wysiwygOriginCssText = wysiwygFrame.style.cssText;
+                _var._codeOriginCssText = code.style.cssText;
 
                 editorArea.style.cssText = toolbar.style.cssText = '';
                 wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
                 code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
                 toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
                 toolbar.style.position = 'relative';
+                toolbar.style.display = 'block';
 
-                this._variable.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
-                editorArea.style.height = this._variable.innerHeight_fullScreen + 'px';
+                _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
+                editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
                 util.removeClass(element.firstElementChild, 'se-icon-expansion');
                 util.addClass(element.firstElementChild, 'se-icon-reduction');
@@ -2598,24 +2630,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
             else {
-                this._variable.isFullScreen = false;
+                _var.isFullScreen = false;
 
-                wysiwygFrame.style.cssText = this._variable._wysiwygOriginCssText;
-                code.style.cssText = this._variable._codeOriginCssText;
+                wysiwygFrame.style.cssText = _var._wysiwygOriginCssText;
+                code.style.cssText = _var._codeOriginCssText;
                 toolbar.style.cssText = '';
-                editorArea.style.cssText = this._variable._editorAreaOriginCssText;
-                topArea.style.cssText = this._variable._originCssText;
-                _d.body.style.overflow = this._variable._bodyOverflow;
+                editorArea.style.cssText = _var._editorAreaOriginCssText;
+                topArea.style.cssText = _var._originCssText;
+                _d.body.style.overflow = _var._bodyOverflow;
 
                 if (context.option.stickyToolbar > -1) {
                     util.removeClass(toolbar, 'se-toolbar-sticky');
                 }
 
-                if (this._variable._fullScreenSticky) {
-                    this._variable._fullScreenSticky = false;
+                if (_var._fullScreenAttrs.sticky) {
+                    _var._fullScreenAttrs.sticky = false;
                     context.element._stickyDummy.style.display = 'block';
                     util.addClass(toolbar, "se-toolbar-sticky");
                 }
+
+                this._isInline = _var._fullScreenAttrs.inline;
+                this._isBalloon = _var._fullScreenAttrs.balloon;
+                if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
 
@@ -3341,6 +3377,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _showToolbarBalloon: function (rangeObj) {
+            if (!core._isBalloon) return;
+
             const range = rangeObj || core.getRange();
             const toolbar = context.element.toolbar;
             const selection = core.getSelection();
@@ -3421,6 +3459,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _showToolbarInline: function () {
+            if (!core._isInline) return;
+
             const toolbar = context.element.toolbar;
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
@@ -3435,12 +3475,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _hideToolbar: function () {
-            if (!core._notHideToolbar) {
+            if (!core._notHideToolbar && !core._variable.isFullScreen) {
                 context.element.toolbar.style.display = 'none';
                 core._inlineToolbarAttr.isShow = false;
             }
-
-            core._notHideToolbar = false;
         },
 
         onKeyDown_wysiwyg: function (e) {
@@ -3638,8 +3676,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 case 13: /** enter key */
                     if (selectRange) break;
 
-                    formatEl = util.getFormatElement(selectionNode);
-                    rangeEl = util.getRangeFormatElement(selectionNode);
                     const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
@@ -3827,7 +3863,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         onScroll_window: function () {
-            if (core._variable.isFullScreen || context.element.toolbar.offsetWidth === 0) return;
+            if (core._variable.isFullScreen || context.element.toolbar.offsetWidth === 0 || context.option.stickyToolbar < 0) return;
 
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;

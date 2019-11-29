@@ -98,5 +98,6 @@ export default {
         this.modalForm = null;
         this.context.dialog.updateModal = false;
         this.plugins[this.context.dialog.kind].init.call(this);
+        this.focus();
     }
 };

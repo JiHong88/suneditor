@@ -205,6 +205,7 @@ const editor = suneditor.init({
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     lang: lang.ru,
+    mode: 'balloon',
     plugins: plugins,
     // maxHeight: '400px',
     height: 'auto',
