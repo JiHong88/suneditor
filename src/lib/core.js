@@ -198,7 +198,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
-            codeIndent: 2,
+            codeIndent: 4,
             minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
             currentNodes: [],
             _range: null,
@@ -1544,13 +1544,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 return !style;
             }
 
-            (function recursionFunc(current, node) {
+            (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
                 for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
                     let child = childNodes[i];
                     if (!child) continue;
-                    let coverNode = node;
+                    let coverNode = ancestor;
                     let cloneNode;
 
                     // startContainer
@@ -1563,7 +1563,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             );
 
                         if (prevNode.data.length > 0) {
-                            node.appendChild(prevNode);
+                            ancestor.appendChild(prevNode);
                         }
 
                         newNode = child;
@@ -1696,19 +1696,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
                         
                         if (childNode === child) {
-                            if (!endPass) node = newInnerNode;
-                            else node = pNode;
+                            if (!endPass) ancestor = newInnerNode;
+                            else ancestor = pNode;
                         } else if (endPass) {
                             pNode.appendChild(childNode);
-                            node = newNode;
+                            ancestor = newNode;
                         } else {
                             newInnerNode.appendChild(childNode);
-                            node = newNode;
+                            ancestor = newNode;
                         }
                     }
 
                     cloneNode = child.cloneNode(false);
-                    node.appendChild(cloneNode);
+                    ancestor.appendChild(cloneNode);
                     if (child.nodeType === 1 && !util.isBreak(child)) coverNode = cloneNode;
 
                     recursionFunc(child, coverNode);
@@ -1850,13 +1850,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let passNode = false;
             let pCurrent, newNode, appendNode;
 
-            (function recursionFunc(current, node) {
+            (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
                 for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
                     const child = childNodes[i];
                     if (!child) continue;
-                    let coverNode = node;
+                    let coverNode = ancestor;
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
@@ -1891,9 +1891,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 appendNode = newNode;
                             }
                             newInnerNode.appendChild(childNode);
-                            node = newNode;
+                            ancestor = newNode;
                         } else {
-                            node = newInnerNode;
+                            ancestor = newInnerNode;
                         }
                     }
 
@@ -1903,10 +1903,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
 
                         if (prevNode.data.length > 0) {
-                            node.appendChild(prevNode);
+                            ancestor.appendChild(prevNode);
                         }
 
-                        newNode = node;
+                        newNode = ancestor;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
                             vNode = validation(newNode);
@@ -1916,7 +1916,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || ancestor;
                         appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
@@ -1924,11 +1924,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (childNode !== node) {
+                        if (childNode !== ancestor) {
                             newInnerNode.appendChild(childNode);
-                            node = newNode;
+                            ancestor = newNode;
                         } else {
-                            node = newInnerNode;
+                            ancestor = newInnerNode;
                         }
 
                         if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
@@ -1938,13 +1938,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         offset = 0;
                         passNode = true;
 
-                        node.appendChild(container);
+                        ancestor.appendChild(container);
                         continue;
                     }
 
                     vNode = !passNode ? child.cloneNode(false) : validation(child);
                     if (vNode) {
-                        node.appendChild(vNode);
+                        ancestor.appendChild(vNode);
                         if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
                     }
 
@@ -2059,13 +2059,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const nNodeArray = [newInnerNode];
             let noneChange = true;
 
-            (function recursionFunc(current, node) {
+            (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
                 for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
                     let child = childNodes[i];
                     if (!child) continue;
-                    let coverNode = node;
+                    let coverNode = ancestor;
 
                     if (util.isIgnoreNodeChange(child)) {
                         pNode.appendChild(newInnerNode);
@@ -2073,14 +2073,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pNode.appendChild(child);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
-                        node = newInnerNode;
+                        ancestor = newInnerNode;
                         i--;
                         continue;
                     } else {
                         vNode = validation(child);
                         if (vNode) {
                             noneChange = false;
-                            node.appendChild(vNode);
+                            ancestor.appendChild(vNode);
                             if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
                         }
                     }
@@ -2166,19 +2166,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let passNode = false;
             let pCurrent, newNode, appendNode;
 
-            (function recursionFunc(current, node) {
+            (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
                 for (let i = childNodes.length - 1, vNode; 0 <= i; i--) {
                     const child = childNodes[i];
                     if (!child) continue;
-                    let coverNode = node;
+                    let coverNode = ancestor;
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             if (util.isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.insertBefore(child, node);
+                                pNode.insertBefore(child, ancestor);
                                 pNode.insertBefore(newInnerNode, child);
                                 nNodeArray.push(newInnerNode);
                                 i--;
@@ -2207,9 +2207,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 appendNode = newNode;
                             }
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
-                            node = newNode;
+                            ancestor = newNode;
                         } else {
-                            node = newInnerNode;
+                            ancestor = newInnerNode;
                         }
                     }
 
@@ -2219,10 +2219,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
 
                         if (afterNode.data.length > 0) {
-                            node.insertBefore(afterNode, node.firstChild);
+                            ancestor.insertBefore(afterNode, ancestor.firstChild);
                         }
 
-                        newNode = node;
+                        newNode = ancestor;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
                             vNode = validation(newNode);
@@ -2232,7 +2232,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newNode = newNode.parentNode;
                         }
 
-                        const childNode = pCurrent.pop() || node;
+                        const childNode = pCurrent.pop() || ancestor;
                         appendNode = newNode = childNode;
                         while (pCurrent.length > 0) {
                             newNode = pCurrent.pop();
@@ -2240,11 +2240,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (childNode !== node) {
+                        if (childNode !== ancestor) {
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
-                            node = newNode;
+                            ancestor = newNode;
                         } else {
-                            node = newInnerNode;
+                            ancestor = newInnerNode;
                         }
 
                         if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
@@ -2254,13 +2254,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         offset = textNode.data.length;
                         passNode = true;
 
-                        node.insertBefore(container, node.firstChild);
+                        ancestor.insertBefore(container, ancestor.firstChild);
                         continue;
                     }
 
                     vNode = !passNode ? child.cloneNode(false) : validation(child);
                     if (vNode) {
-                        node.insertBefore(vNode, node.firstChild);
+                        ancestor.insertBefore(vNode, ancestor.firstChild);
                         if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
                     }
 
