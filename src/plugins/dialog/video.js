@@ -154,9 +154,10 @@ export default {
             oIframe = this.util.createElement('IFRAME');
             /** youtube */
             if (/youtu\.?be/.test(url)) {
+                if (!/^http/.test(url)) url = 'https://' + url;
                 url = url.replace('watch?v=', '');
                 if (!/^\/\/.+\/embed\//.test(url)) {
-                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
+                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
                 }
 
                 if (contextVideo._youtubeQuery.length > 0) {
