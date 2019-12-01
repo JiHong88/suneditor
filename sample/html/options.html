@@ -165,7 +165,12 @@
             <br><br>
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
             <input type="text" id="imageWidth_value" placeholder="Number" style="width: 200px">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+            <label> -&nbsp;&nbsp;imageSizeUnit</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageSizeUnit_1" name="radio_imageSizeUnit" value="px" checked>&nbsp;&nbsp;px</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageSizeUnit_2" name="radio_imageSizeUnit" value="%">&nbsp;&nbsp;%</label>
             <br><br>
             <label><input type="checkbox" id="imageUploadHeader">&nbsp;&nbsp;imageUploadHeader</label>
             <textarea id="imageUploadHeader_value" placeholder='{"Access-Control-Allow-Origin": "*"}' style="width: 300px; vertical-align: top;"></textarea>
@@ -313,6 +318,7 @@ function sun_create () {
         imageFileInput: document.getElementById('imageFileInput').checked,
         imageUrlInput: document.getElementById('imageUrlInput').checked,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : null,
+        imageSizeUnit: document.getElementById('radio_imageSizeUnit_1').checked ? 'px' : '%',
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : null,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : null,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : null,
