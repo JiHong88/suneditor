@@ -94,12 +94,13 @@
             submitButton: 'Übernehmen',
             revertButton: 'Rückgängig',
             proportion: 'Seitenverhältnis beibehalten',
-            width: 'Breite',
-            height: 'Höhe',
             basic: 'Standard',
             left: 'Links',
             right: 'Rechts',
-            center: 'Zentriert'
+            center: 'Zentriert',
+            width: 'Breite',
+            height: 'Höhe',
+            size: 'Größe'
         },
         controller: {
             edit: 'Bearbeiten',

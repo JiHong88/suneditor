@@ -33,7 +33,9 @@ export default {
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _resizing: context.option.videoResizing,
-            _youtubeQuery: context.option.youtubeQuery
+            _rotation: true,
+            _youtubeQuery: context.option.youtubeQuery,
+            _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
         };
 
         /** video dialog */
@@ -154,9 +156,10 @@ export default {
             oIframe = this.util.createElement('IFRAME');
             /** youtube */
             if (/youtu\.?be/.test(url)) {
+                if (!/^http/.test(url)) url = 'https://' + url;
                 url = url.replace('watch?v=', '');
                 if (!/^\/\/.+\/embed\//.test(url)) {
-                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/');
+                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
                 }
 
                 if (contextVideo._youtubeQuery.length > 0) {
@@ -394,7 +397,7 @@ export default {
         const contextVideo = this.context.video;
 
         contextVideo._element.style.maxWidth = '100%';
-        contextVideo._container.style.width = w;
+        contextVideo._container.style.width = w + '%';
         contextVideo._container.style.height = '';
         contextVideo._cover.style.width = '100%';
         contextVideo._cover.style.height = '';

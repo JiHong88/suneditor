@@ -99,7 +99,8 @@
             right: '右',
             center: '居中',
             width: '宽度',
-            height: '高度'
+            height: '高度',
+            size: '尺寸'
         },
         controller: {
             edit: '编辑',

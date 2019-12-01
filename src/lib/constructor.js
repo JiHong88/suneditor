@@ -391,17 +391,19 @@ export default {
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Defining menu items */
-        // options.font = options.font;
-        // options.fontSize = options.fontSize;
-        // options.formats = options.formats;
-        // options.colorList = options.colorList;
-        // options.lineHeights = options.lineHeights;
-        // options.paragraphStyles = options.paragraphStyles;
-        // options.textStyles = options.textStyles;
+        options.font = !options.font ? null : options.font;
+        options.fontSize = !options.fontSize ? null : options.fontSize;
+        options.formats = !options.formats ? null : options.formats;
+        options.colorList = !options.colorList ? null : options.colorList;
+        options.lineHeights = !options.lineHeights ? null : options.lineHeights;
+        options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
+        options.textStyles = !options.textStyles ? null : options.textStyles;
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
+        options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
+        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
@@ -413,9 +415,9 @@ export default {
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
-        // options.callBackSave = options.callBackSave;
+        options.callBackSave = !options.callBackSave ? null : options.callBackSave;
         /** Templates Array */
-        // options.templates = options.templates;
+        options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
         /** Buttons */

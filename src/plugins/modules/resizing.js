@@ -39,6 +39,7 @@ export default {
 
         let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
+        context.resizing.rotationButtons = resize_button.querySelectorAll('._se_resizing_btn_group ._se_rotation');
 
         context.resizing.alignMenu = resize_button.querySelector('.se-resizing-align-list');
         context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
@@ -115,11 +116,11 @@ export default {
                     '<span>25%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
+                '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip _se_rotation">' +
                     '<i class="se-icon-rotate-left"></i>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
+                '<button type="button" data-command="rotate" data-value="90" class="se-tooltip _se_rotation">' +
                     '<i class="se-icon-rotate-right"></i>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
                 '</button>' +
@@ -182,6 +183,7 @@ export default {
 
     call_controller_resize: function (targetElement, plugin) {
         const contextResizing = this.context.resizing;
+        const contextPlugin = this.context[plugin];
         contextResizing._resize_plugin = plugin;
 
         const resizeContainer = contextResizing.resizeContainer;
@@ -209,12 +211,18 @@ export default {
         align = align === 'none' ? 'basic' : align;
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
 
-        const resizeDisplay = this.context[plugin]._resizing ? 'flex' : 'none';
+        // resizing display
+        contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
+        
+        const resizeDisplay = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
-
-        contextResizing.resizeButtonGroup.style.display = resizeDisplay;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
             resizeHandles[i].style.display = resizeDisplay;
+        }
+
+        if (contextPlugin._resizing) {
+            const rotations = contextResizing.rotationButtons;
+            rotations[0].style.display = rotations[1].style.display = contextPlugin._rotation ? '' : 'none';
         }
 
         // align icon
@@ -229,10 +237,10 @@ export default {
         // caption active
         if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
             this.util.addClass(contextResizing.captionButton, 'active');
-            this.context[plugin]._captionChecked = true;
+            contextPlugin._captionChecked = true;
         } else {
             this.util.removeClass(contextResizing.captionButton, 'active');
-            this.context[plugin]._captionChecked = false;
+            contextPlugin._captionChecked = false;
         }
 
         this._resizingName = plugin;
@@ -328,7 +336,7 @@ export default {
         switch (command) {
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-                contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
+                contextPlugin.setPercentSize.call(this, (value * 100), 'auto');
                 contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':
@@ -452,14 +460,14 @@ export default {
 
         const offsetW = width || element.offsetWidth;
         const offsetH = height || element.offsetHeight;
-        const w = isVertical ? offsetH : offsetW;
-        const h = isVertical ? offsetW : offsetH;
+        const w = (isVertical ? offsetH : offsetW) + 'px';
+        const h = (isVertical ? offsetW : offsetH) + 'px';
 
         this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px');
 
-        cover.style.width = w + 'px';
-        cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h + 'px');
+        cover.style.width = w;
+        cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
 
         let transOrigin = '';
         if (isVertical) {

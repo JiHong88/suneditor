@@ -99,7 +99,8 @@
             right: '右',
             center: '中央',
             width: '横',
-            height: '縦'
+            height: '縦',
+            size: 'サイズ'
         },
         controller: {
             edit: '編集',

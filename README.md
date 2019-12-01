@@ -8,7 +8,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 [![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
 [![bower version](https://img.shields.io/bower/v/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases/latest)
 [![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
-![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)
+[![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
@@ -439,7 +439,9 @@ textStyles      : You can apply custom style or class to selected text.
 
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
+                  The percentage button is active even if it is "px".   default: 'px' {String}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}

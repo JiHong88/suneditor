@@ -97,12 +97,13 @@
             submitButton: 'Gennemfør',
             revertButton: 'Gendan',
             proportion: 'Bevar proportioner',
-            width: 'Bredde',
-            height: 'Højde',
             basic: 'Basis',
             left: 'Venstre',
             right: 'Højre',
-            center: 'Center'
+            center: 'Center',
+            width: 'Bredde',
+            height: 'Højde',
+            size: 'Størrelse'
         },
         controller: {
             edit: 'Rediger',
