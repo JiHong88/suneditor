@@ -60,6 +60,21 @@
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen'</span>],</div>
             <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; paragraphStyles : [</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'invert'</span>,</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'neon'</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; name: <span style="color: rgb(152, 0, 0);"> 'Custom'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; class: <span style="color: rgb(152, 0, 0);"> '__se__customClass'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; }</div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; textStyles : [</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'translucent'</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; name: <span style="color: rgb(152, 0, 0);"> 'Emphasis'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; style: <span style="color: rgb(152, 0, 0);"> '-webkit-text-emphasis: filled;'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; }</div>
+            <div>&nbsp; &nbsp; ],</div>
             <div>&nbsp; &nbsp; width : <span style="color: rgb(152, 0, 0);">'100%'</span>,</div>
             <div>&nbsp; &nbsp; maxWidth : <span style="color: rgb(152, 0, 0);">'600px'</span>,</div>
             <div>&nbsp; &nbsp; minWidth : <span style="color: rgb(152, 0, 0);">'400px'</span>,</div>
@@ -538,6 +553,22 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
             ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
             ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
         ],
+        paragraphStyles: [
+            'invert',
+            'neon',
+            {
+                name: 'Custom',
+                class: '__se__customClass'
+            }
+        ],
+        textStyles: [
+            'translucent',
+            {
+                name: 'Emphasis',
+                style: '-webkit-text-emphasis: filled;',
+                tag: 'span'
+            }
+        ],
         width: '100%',
         maxWidth: '600px',
         minWidth: 400,
@@ -551,8 +582,8 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
         buttonList : [
             ['font', 'fontSize',
             'fontColor', 'hiliteColor', 'video',
-            'fullScreen', 'codeView',
-            'preview', 'save']
+            'paragraphStyle', 'textStyle',
+            'fullScreen', 'codeView']
         ],
         callBackSave: function (contents) {
             alert(contents);
