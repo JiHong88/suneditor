@@ -18,8 +18,7 @@ export default {
         
         const context = core.context;
         context.image = {
-            _initImageUnit: context.option._initImageUnit,
-            sizeUnit: context.option._imageSizeUnit,
+            sizeUnit: context.option.imageSizeUnit,
             _linkElement: null,
             _container: null,
             _cover: null,
@@ -40,10 +39,10 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
-            _rotation: !context.option.imageSizeOnlyPercentage,
+            _rotation: !context.option._imageSizeOnlyPercentage,
             _defaultAuto: context.option.imageWidth === 'auto',
             _uploadFileLength: 0,
-            imageSizeOnlyPercentage: context.option.imageSizeOnlyPercentage
+            _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
         };
 
         /** image dialog */
@@ -126,9 +125,9 @@ export default {
                         '</div>';
 
             if (option.imageResizing) {
-                const onlyPercentDisplay = option.imageSizeOnlyPercentage ? ' style="display: none !important;"' : '';
-                html += '<div class="se-dialog-form">';
-                            if (option.imageSizeOnlyPercentage) {
+                const onlyPercentDisplay = option._imageSizeOnlyPercentage ? ' style="display: none !important;"' : '';
+                html += '<div class="se-dialog-form _se_image_size_form">';
+                            if (option._imageSizeOnlyPercentage) {
                                 html += '' +
                                 '<div class="se-dialog-size-text">' +
                                     '<label class="size-w">' + lang.dialogBox.size + '</label>' +
@@ -142,11 +141,11 @@ export default {
                                 '</div>';
                             }
                             html += '' +
-                            '<input class="se-input-control _se_image_size_x" type="number" min="1"' + (option._initImageUnit === 'auto' ? ' disabled' : '') + (option.imageSizeOnlyPercentage ? ' max="100"' : '') + ' />' +
-                            '<label class="se-dialog-size-x">' + (option.imageSizeOnlyPercentage ? '%' : 'x') + '</label>' +
-                            '<input class="se-input-control _se_image_size_y" type="number" min="1" disabled' + onlyPercentDisplay + '/>' +
-                            '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                                '<input class="se-input-control _se_image_size_x" type="number" min="1"' + (option.imageWidth === 'auto' ? ' disabled' : '') + (option._imageSizeOnlyPercentage ? ' max="100"' : '') + ' />' +
+                                '<label class="se-dialog-size-x">' + (option._imageSizeOnlyPercentage ? '%' : 'x') + '</label>' +
+                                '<input class="se-input-control _se_image_size_y" type="number" min="1" disabled' + onlyPercentDisplay + '/>' +
+                                '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                                '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                         '</div>' ;
             }
 
@@ -377,8 +376,8 @@ export default {
     setInputSize: function (xy) {
         const contextImage = this.context.image;
 
-        if (xy === 'x' && contextImage.imageSizeOnlyPercentage) {
-            if (contextImage.imageX.value > 100) contextImage.imageX.value = 100;
+        if (contextImage._imageSizeOnlyPercentage) {
+            if (xy === 'x' && contextImage.imageX.value > 100) contextImage.imageX.value = 100;
             return;
         }
 
@@ -479,7 +478,7 @@ export default {
         }.bind(this);
 
         img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
-        img.setAttribute('data-origin', /%$/.test(img.style.width) ? img.style.width.match(/\d+/)[0] : (img.offsetWidth + ',' + img.offsetHeight));
+        img.setAttribute('data-origin', /%$/.test(img.style.width) ? (this.util.getParentElement(img, this.util.isComponent).style.width || img.style.width).match(/\d+/)[0] : (img.offsetWidth + ',' + img.offsetHeight));
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
     },
@@ -546,7 +545,7 @@ export default {
         if (contextImage._resizing) {
             if (/\d+/.test(width)) {
                 width = width.match(/\d+/)[0] * 1;
-                if (width > 0) oImg.style.width = (contextImage.imageSizeOnlyPercentage ? '100%' : width + contextImage.sizeUnit);
+                if (width > 0) oImg.style.width = (contextImage._imageSizeOnlyPercentage ? '100%' : width + contextImage.sizeUnit);
                 else width = '';
             }
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
@@ -580,7 +579,7 @@ export default {
             this.plugins.image.setAutoSize.call(this);
         }
 
-        if (contextImage.imageSizeOnlyPercentage) {
+        if (contextImage._imageSizeOnlyPercentage) {
             container.style.width = width + contextImage.sizeUnit;
         }
 
@@ -619,7 +618,7 @@ export default {
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
             if (changeSize) {
-                if (contextImage.imageSizeOnlyPercentage) {
+                if (contextImage._imageSizeOnlyPercentage) {
                     this.plugins.image.setPercentSize.call(this, contextImage.imageX.value, 'auto');
                 } else {
                     this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
@@ -683,7 +682,7 @@ export default {
         }
 
         // transform
-        if (!contextImage.imageSizeOnlyPercentage) {
+        if (!contextImage._imageSizeOnlyPercentage) {
             if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
                 this.plugins.resizing.setTransformSize.call(this, imageEl, null, null);
             }
@@ -714,7 +713,12 @@ export default {
 
     sizeRevert: function () {
         const contextImage = this.context.image;
-        if (contextImage._origin_w) {
+
+        if (!contextImage._origin_w) return;
+
+        if (contextImage._imageSizeOnlyPercentage) {
+            contextImage.imageX.value = contextImage._origin_w > 100 ? 100 : contextImage._origin_w;
+        } else {
             contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
             contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
         }
@@ -760,10 +764,10 @@ export default {
         
         if (contextImage._resizing) {
             contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
-            contextImage.imageX.value = !contextImage.imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
+            contextImage.imageX.value = !contextImage._imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
             this.plugins.image.setInputSize.call(this, 'x');
             
-            if (!contextImage.imageSizeOnlyPercentage) contextImage.imageY.value = contextImage._element.offsetHeight;
+            if (!contextImage._imageSizeOnlyPercentage) contextImage.imageY.value = contextImage._element.offsetHeight;
             contextImage.imageX.disabled = false;
             contextImage.imageY.disabled = false;
             contextImage.proportion.disabled = false;

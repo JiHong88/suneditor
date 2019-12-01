@@ -214,7 +214,7 @@ export default {
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
         
-        const resizeDisplay = contextPlugin._resizing && !contextPlugin.imageSizeOnlyPercentage ? 'flex' : 'none';
+        const resizeDisplay = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
             resizeHandles[i].style.display = resizeDisplay;

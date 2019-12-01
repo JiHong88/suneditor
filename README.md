@@ -439,8 +439,9 @@ textStyles      : You can apply custom style or class to selected text.
 
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame ('..px', '..%').    default: 'auto' {Number|String}
-imageSizeOnlyPercentage : If true, the image will only be size by percentage.   default: false {Boolean}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
+                  The percentage button is active even if it is "px".   default: 'px' {String}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}

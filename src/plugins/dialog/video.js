@@ -35,7 +35,7 @@ export default {
             _resizing: context.option.videoResizing,
             _rotation: true,
             _youtubeQuery: context.option.youtubeQuery,
-            imageSizeOnlyPercentage: context.option.imageSizeOnlyPercentage
+            _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
         };
 
         /** video dialog */
