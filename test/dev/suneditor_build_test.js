@@ -47,6 +47,7 @@ window.sun_create1 = function () {
 
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
+    lang: lang.ko,
     plugins: plugins,
     buttonList: [
         ['undo', 'redo','removeFormat',
@@ -61,8 +62,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     width: '100%',
     stickyToolbar: 0,
-    imageWidth: 'auto',
-    imageResizing: false,
+    imageWidth: '50%',
+    // imageSizeOnlyPercentage: true,
+    // imageResizing: false,
     mode: 'classic',
     // toolbarWidth: 800,
     height: 'auto',

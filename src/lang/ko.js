@@ -99,7 +99,8 @@
             right: '오른쪽',
             center: '가운데',
             width: '가로',
-            height: '세로'
+            height: '세로',
+            size: '크기'
         },
         controller: {
             edit: '편집',

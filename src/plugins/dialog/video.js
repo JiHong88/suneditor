@@ -33,7 +33,9 @@ export default {
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _resizing: context.option.videoResizing,
-            _youtubeQuery: context.option.youtubeQuery
+            _rotation: true,
+            _youtubeQuery: context.option.youtubeQuery,
+            imageSizeOnlyPercentage: context.option.imageSizeOnlyPercentage
         };
 
         /** video dialog */
@@ -395,7 +397,7 @@ export default {
         const contextVideo = this.context.video;
 
         contextVideo._element.style.maxWidth = '100%';
-        contextVideo._container.style.width = w;
+        contextVideo._container.style.width = w + '%';
         contextVideo._container.style.height = '';
         contextVideo._cover.style.width = '100%';
         contextVideo._cover.style.height = '';

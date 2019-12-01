@@ -94,12 +94,13 @@
             submitButton: 'Appliquer',
             revertButton: 'Revenir en arrière',
             proportion: 'Maintenir le rapport hauteur/largeur',
-            width: 'Largeur',
-            height: 'Hauteur',
             basic: 'Basique',
             left: 'Gauche',
             right: 'Droite',
-            center: 'Centré'
+            center: 'Centré',
+            width: 'Largeur',
+            height: 'Hauteur',
+            size: 'La taille'
         },
         controller: {
             edit: 'Modifier',

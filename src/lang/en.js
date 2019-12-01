@@ -94,12 +94,13 @@
             submitButton: 'Submit',
             revertButton: 'Revert',
             proportion: 'constrain proportions',
-            width: 'Width',
-            height: 'Height',
             basic: 'Basic',
             left: 'Left',
             right: 'Right',
-            center: 'Center'
+            center: 'Center',
+            width: 'Width',
+            height: 'Height',
+            size: 'Size'
         },
         controller: {
             edit: 'Edit',

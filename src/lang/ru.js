@@ -99,7 +99,8 @@
             right: 'Справа',
             center: 'По центру',
             width: 'Ширина',
-            height: 'Высота'
+            height: 'Высота',
+            size: 'Размер'
         },
         controller: {
             edit: 'Изменить',
