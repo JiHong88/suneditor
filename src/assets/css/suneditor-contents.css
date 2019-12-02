@@ -141,6 +141,8 @@
 /* blockquote */
 .sun-editor-editable blockquote {
     display: block;
+    font-family: inherit;
+    font-size: inherit;
     color: #999;
     margin-block-start: 1em;
     margin-block-end: 1em;
