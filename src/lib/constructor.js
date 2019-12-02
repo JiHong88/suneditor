@@ -404,9 +404,9 @@ export default {
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
         options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
+        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation :!options._imageSizeOnlyPercentage;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
-        options.imageRotation = options._imageRotation !== undefined ? options._imageRotation :!options._imageSizeOnlyPercentage;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? options.imageUploadSizeLimit.toString().match(/\d+/)[0] * 1 : null;
