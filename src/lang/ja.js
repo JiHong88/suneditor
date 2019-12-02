@@ -68,7 +68,9 @@
             tag_blockquote: '引用',
             tag_pre: 'コード',
             template: 'テンプレート',
-            lineHeight: '行の高さ'
+            lineHeight: '行の高さ',
+            paragraphStyle: '段落スタイル',
+            textStyle: 'テキストスタイル'
         },
         dialogBox: {
             linkBox: {
@@ -97,10 +99,12 @@
             right: '右',
             center: '中央',
             width: '横',
-            height: '縦'
+            height: '縦',
+            size: 'サイズ'
         },
         controller: {
             edit: '編集',
+            unlink: 'リンク解除',
             remove: '削除',
             insertRowAbove: '上に行を挿入',
             insertRowBelow: '下に行を挿入',
@@ -123,6 +127,14 @@
             splitCells: 'セルを分割',
             HorizontalSplit: '横分割',
             VerticalSplit: '垂直分割'
+        },
+        menu: {
+            spaced: '文字間隔',
+            bordered: '境界線',
+            invert: '色反転',
+            neon: 'ネオン',
+            translucent: '半透明',
+            shadow: '影'
         }
     };
 

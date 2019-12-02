@@ -68,7 +68,9 @@
             tag_blockquote: 'Quote',
             tag_pre: 'Code',
             template: 'Template',
-            lineHeight: 'Line height'
+            lineHeight: 'Line height',
+            paragraphStyle: 'Paragraph style',
+            textStyle: 'Text style'
         },
         dialogBox: {
             linkBox: {
@@ -92,15 +94,17 @@
             submitButton: 'Submit',
             revertButton: 'Revert',
             proportion: 'constrain proportions',
-            width: 'Width',
-            height: 'Height',
             basic: 'Basic',
             left: 'Left',
             right: 'Right',
-            center: 'Center'
+            center: 'Center',
+            width: 'Width',
+            height: 'Height',
+            size: 'Size'
         },
         controller: {
             edit: 'Edit',
+            unlink: 'Unlink',
             remove: 'Remove',
             insertRowAbove: 'Insert row above',
             insertRowBelow: 'Insert row below',
@@ -123,6 +127,14 @@
             splitCells: 'Split Cells',
             HorizontalSplit: 'Horizontal split',
             VerticalSplit: 'Vertical split'
+        },
+        menu: {
+            spaced: 'Spaced',
+            bordered: 'Bordered',
+            invert: 'Invert color',
+            neon: 'Neon',
+            translucent: 'Translucent',
+            shadow: 'Shadow'
         }
     };
 

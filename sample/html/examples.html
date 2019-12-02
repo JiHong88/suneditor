@@ -60,6 +60,21 @@
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'</span>],</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; [<span style="color: rgb(152, 0, 0);">'SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen'</span>],</div>
             <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; paragraphStyles : [</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'invert'</span>,</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'neon'</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; name: <span style="color: rgb(152, 0, 0);"> 'Custom'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; class: <span style="color: rgb(152, 0, 0);"> '__se__customClass'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; }</div>
+            <div>&nbsp; &nbsp; ],</div>
+            <div>&nbsp; &nbsp; textStyles : [</div>
+            <div><span style="color: rgb(152, 0, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 'translucent'</span>,</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; name: <span style="color: rgb(152, 0, 0);"> 'Emphasis'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; style: <span style="color: rgb(152, 0, 0);"> '-webkit-text-emphasis: filled;'</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; }</div>
+            <div>&nbsp; &nbsp; ],</div>
             <div>&nbsp; &nbsp; width : <span style="color: rgb(152, 0, 0);">'100%'</span>,</div>
             <div>&nbsp; &nbsp; maxWidth : <span style="color: rgb(152, 0, 0);">'600px'</span>,</div>
             <div>&nbsp; &nbsp; minWidth : <span style="color: rgb(152, 0, 0);">'400px'</span>,</div>
@@ -111,8 +126,6 @@
         <a id="CodeMirror" href="#CodeMirror"><h4 class="sub-title">Iframe, fullPage and use CodeMirror (^5.0.0)</h4></a>
         <p></p>
         <textarea id="useCodeMirror">
-            <div><span style="color: rgb(189, 189, 189);"></span></div>
-            <div><span style="color: rgb(189, 189, 189);"></span></div>
             <div>&amp;lt;<span style="color: rgb(107, 153, 0);">link</span> <span style="color: rgb(61, 0, 153);">rel</span>=<span style="color: rgb(0, 51, 153);">"stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css"</span>&amp;gt;</div>
             <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
             <div>&amp;lt;<span style="color: rgb(107, 153, 0);">script</span> <span style="color: rgb(61, 0, 153);">src</span>=<span style="color: rgb(0, 51, 153);">"https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"</span>&amp;gt;&amp;lt;/<span style="color: rgb(107, 153, 0);">script</span>&amp;gt;</div>
@@ -310,11 +323,6 @@
 <form id="frm" name="frm">
     <textarea id="exampleFunction" style="width:100%; height:250px;">
         <p>User Function Test</p>
-        <p><br></p>
-        <p><br></p>
-        <p><br></p>
-        <p><br></p>
-        <p><br></p>
     </textarea>
     <p></p>
     <button type="button" class="btn btn-md btn-default" onclick="sun_setOptions()" id="opt1">setOptions</button>
@@ -523,8 +531,8 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<link href="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/dist/css/suneditor.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/dist/suneditor.min.js"></script>
+<link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+<script src="../../dist/suneditor.min.js"></script>
 <!-- codeMirror -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
@@ -545,6 +553,22 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
             ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
             ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
         ],
+        paragraphStyles: [
+            'invert',
+            'neon',
+            {
+                name: 'Custom',
+                class: '__se__customClass'
+            }
+        ],
+        textStyles: [
+            'translucent',
+            {
+                name: 'Emphasis',
+                style: '-webkit-text-emphasis: filled;',
+                tag: 'span'
+            }
+        ],
         width: '100%',
         maxWidth: '600px',
         minWidth: 400,
@@ -558,8 +582,8 @@ editor <span class="pl-k">=</span> <span class="pl-c1">null</span>;
         buttonList : [
             ['font', 'fontSize',
             'fontColor', 'hiliteColor', 'video',
-            'fullScreen', 'codeView',
-            'preview', 'save']
+            'paragraphStyle', 'textStyle',
+            'fullScreen', 'codeView']
         ],
         callBackSave: function (contents) {
             alert(contents);

@@ -39,6 +39,8 @@ export default {
 
         let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
+        context.resizing.rotationButtons = resize_button.querySelectorAll('._se_resizing_btn_group ._se_rotation');
+        context.resizing.percentageButtons = resize_button.querySelectorAll('._se_resizing_btn_group ._se_percentage');
 
         context.resizing.alignMenu = resize_button.querySelector('.se-resizing-align-list');
         context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
@@ -75,17 +77,17 @@ export default {
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
             '<div class="se-modal-resize">' +
-            '   <div class="se-resize-display"></div>' +
+                '<div class="se-resize-display"></div>' +
             '</div>' +
             '<div class="se-resize-dot">' +
-            '   <span class="tl"></span>' +
-            '   <span class="tr"></span>' +
-            '   <span class="bl"></span>' +
-            '   <span class="br"></span>' +
-            '   <span class="lw"></span>' +
-            '   <span class="th"></span>' +
-            '   <span class="rw"></span>' +
-            '   <span class="bh"></span>' +
+                '<span class="tl"></span>' +
+                '<span class="tr"></span>' +
+                '<span class="bl"></span>' +
+                '<span class="br"></span>' +
+                '<span class="lw"></span>' +
+                '<span class="th"></span>' +
+                '<span class="rw"></span>' +
+                '<span class="bh"></span>' +
             '</div>';
 
         return resize_container;
@@ -99,82 +101,82 @@ export default {
         resize_button.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="se-btn-group _se_resizing_btn_group">' +
-            '   <button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
-            '       <span>100%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
-            '       <span>75%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
-            '       <span>50%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
-            '       <span>25%</span>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="rotate" data-value="-90" class="se-tooltip">' +
-            '       <i class="se-icon-rotate-left"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="rotate" data-value="90" class="se-tooltip">' +
-            '       <i class="se-icon-rotate-right"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
-            '   </button>' +
+                '<button type="button" data-command="percent" data-value="1" class="se-tooltip _se_percentage">' +
+                    '<span>100%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.75" class="se-tooltip _se_percentage">' +
+                    '<span>75%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.5" class="se-tooltip _se_percentage">' +
+                    '<span>50%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="percent" data-value="0.25" class="se-tooltip _se_percentage">' +
+                    '<span>25%</span>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip _se_rotation">' +
+                    '<i class="se-icon-rotate-left"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="rotate" data-value="90" class="se-tooltip _se_rotation">' +
+                    '<i class="se-icon-rotate-right"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
+                '</button>' +
             '</div>' +
             '<div class="se-btn-group">' +
-            '   <button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
-            '       <i class="se-icon-mirror-horizontal"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
-            '       <i class="se-icon-mirror-vertical"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
-            '       <i class="se-icon-align-justify"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
-            '   </button>' +
-            '   <div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
-            '       <div class="se-list-inner">' +
-            '           <ul class="se-list-basic">' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
-            '                   <i class="se-icon-align-justify"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
-            '                   <i class="se-icon-align-left"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
-            '                   <i class="se-icon-align-center"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
-            '               </button></li>' +
-            '               <li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
-            '                   <i class="se-icon-align-right"></i>' +
-            '                   <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
-            '               </button></li>' +
-            '           </ul>' +
-            '       </div>' +
-            '   </div>' +
-            '   <button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
-            '       <i class="se-icon-caption"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="revert" class="se-tooltip">' +
-            '       <i class="se-icon-revert"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="update" class="se-tooltip">' +
-            '       <i class="se-icon-modify"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
-            '   </button>' +
-            '   <button type="button" data-command="delete" class="se-tooltip">' +
-            '       <i class="se-icon-delete"></i>' +
-            '       <span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-            '   </button>' +
+                '<button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
+                    '<i class="se-icon-mirror-horizontal"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
+                    '<i class="se-icon-mirror-vertical"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
+                    '<i class="se-icon-align-justify"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
+                '</button>' +
+                '<div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
+                    '<div class="se-list-inner">' +
+                        '<ul class="se-list-basic">' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
+                                '<i class="se-icon-align-justify"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
+                                '<i class="se-icon-align-left"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
+                                '<i class="se-icon-align-center"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
+                            '</button></li>' +
+                            '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
+                                '<i class="se-icon-align-right"></i>' +
+                                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
+                            '</button></li>' +
+                        '</ul>' +
+                    '</div>' +
+                '</div>' +
+                '<button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
+                    '<i class="se-icon-caption"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
+                '</button>' +
+                    '<button type="button" data-command="revert" class="se-tooltip">' +
+                    '<i class="se-icon-revert"></i>' +
+                '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="update" class="se-tooltip">' +
+                    '<i class="se-icon-modify"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="delete" class="se-tooltip">' +
+                    '<i class="se-icon-delete"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+                '</button>' +
             '</div>';
 
         return resize_button;
@@ -182,6 +184,7 @@ export default {
 
     call_controller_resize: function (targetElement, plugin) {
         const contextResizing = this.context.resizing;
+        const contextPlugin = this.context[plugin];
         contextResizing._resize_plugin = plugin;
 
         const resizeContainer = contextResizing.resizeContainer;
@@ -207,14 +210,22 @@ export default {
 
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
 
-        const resizeDisplay = this.context[plugin]._resizing ? 'flex' : 'none';
+        // text
+        const container = this.util.getParentElement(targetElement, this.util.isComponent);
+        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' ' + (/%$/.test(targetElement.style.width) ? (/%$/.test(container.style.width) ? container.style.width : 'auto') : '(' + w + ' x ' + h + ')'));
+
+        // resizing display
+        contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
+        const resizeDotShow = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
-
-        contextResizing.resizeButtonGroup.style.display = resizeDisplay;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
-            resizeHandles[i].style.display = resizeDisplay;
+            resizeHandles[i].style.display = resizeDotShow;
+        }
+
+        if (contextPlugin._resizing) {
+            const rotations = contextResizing.rotationButtons;
+            rotations[0].style.display = rotations[1].style.display = contextPlugin._rotation ? '' : 'none';
         }
 
         // align icon
@@ -229,10 +240,21 @@ export default {
         // caption active
         if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
             this.util.addClass(contextResizing.captionButton, 'active');
-            this.context[plugin]._captionChecked = true;
+            contextPlugin._captionChecked = true;
         } else {
             this.util.removeClass(contextResizing.captionButton, 'active');
-            this.context[plugin]._captionChecked = false;
+            contextPlugin._captionChecked = false;
+        }
+
+        // percentage active
+        const pButtons = contextResizing.percentageButtons;
+        const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? ((container.style.width.match(/\d+/)[0] * 1) / 100) + '' : '' ;
+        for (let i = 0, len = pButtons.length; i < len; i++) {
+            if (pButtons[i].getAttribute('data-value') === value) {
+                this.util.addClass(pButtons[i], 'active');
+            } else {
+                this.util.removeClass(pButtons[i], 'active');
+            }
         }
 
         this._resizingName = plugin;
@@ -328,7 +350,7 @@ export default {
         switch (command) {
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-                contextPlugin.setPercentSize.call(this, (value * 100) + '%', 'auto');
+                contextPlugin.setPercentSize.call(this, (value * 100), 'auto');
                 contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':
@@ -441,31 +463,36 @@ export default {
 
         element.style.width = originSize[0] ? originSize[0] + 'px' : 'auto';
         element.style.height = originSize[1] ? originSize[1] + 'px' : '';
-        this.plugins.resizing.setTransformSize.call(this, element, null, null);
+        // this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 
     setTransformSize: function (element, width, height) {
-        const cover = this.util.getParentElement(element, 'FIGURE');
-
+        const percentage = element.getAttribute('data-percentage');
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
-
-        const offsetW = width || element.offsetWidth;
-        const offsetH = height || element.offsetHeight;
-        const w = isVertical ? offsetH : offsetW;
-        const h = isVertical ? offsetW : offsetH;
-
-        this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW, offsetH);
-
-        cover.style.width = w + 'px';
-        cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h + 'px');
-
         let transOrigin = '';
-        if (isVertical) {
-            let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
-            let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
-            transOrigin = deg === 90 || deg === -270 ? transH : transW;
+
+        if (percentage && !isVertical) {
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, 'auto');
+        } else {
+            const cover = this.util.getParentElement(element, 'FIGURE');
+    
+            const offsetW = width || element.offsetWidth;
+            const offsetH = height || element.offsetHeight;
+            const w = (isVertical ? offsetH : offsetW) + 'px';
+            const h = (isVertical ? offsetW : offsetH) + 'px';
+    
+            this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
+            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px', true);
+    
+            cover.style.width = w;
+            cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
+
+            if (isVertical) {
+                let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
+                let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
+                transOrigin = deg === 90 || deg === -270 ? transH : transW;
+            }
         }
 
         element.style.transformOrigin = transOrigin;
@@ -527,22 +554,33 @@ export default {
         contextResizing.resizeButton.style.display = 'none';
         contextResizing.resizeDiv.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 
-        const closureFunc_bind = function closureFunc() {
+        const closureFunc_bind = function closureFunc(e) {
+            if (e.type === 'keydown' && e.keyCode !== 27) return;
+
             const change = contextResizing._isChange;
             contextResizing._isChange = false;
 
-            document.removeEventListener('mousemove', resizing_element_bind);
-            document.removeEventListener('mouseup', closureFunc_bind);
+            this.removeDocEvent('mousemove', resizing_element_bind);
+            this.removeDocEvent('mouseup', closureFunc_bind);
+            this.removeDocEvent('keydown', closureFunc_bind);
+            
+            if (e.type === 'keydown') {
 
-            // element resize
-            this.plugins.resizing.cancel_controller_resize.call(this);
-            // history stack
-            if (change) this.history.push();
+                this.controllersOff();
+                this.context.element.resizeBackground.style.display = 'none';
+                this.plugins[this.context.resizing._resize_plugin].init.call(this);
+            } else {
+                // element resize
+                this.plugins.resizing.cancel_controller_resize.call(this);
+                // history stack
+                if (change) this.history.push();
+            }
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
-        document.addEventListener('mousemove', resizing_element_bind);
-        document.addEventListener('mouseup', closureFunc_bind);
+        this.addDocEvent('mousemove', resizing_element_bind);
+        this.addDocEvent('mouseup', closureFunc_bind);
+        this.addDocEvent('keydown', closureFunc_bind);
     },
 
     resizing_element: function (contextResizing, direction, plugin, e) {

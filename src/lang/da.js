@@ -71,7 +71,9 @@
             tag_blockquote: 'Citer',
             tag_pre: 'Code',
             template: 'Schablone',
-            lineHeight: 'Linjehøjde'
+            lineHeight: 'Linjehøjde',
+            paragraphStyle: 'Afsnitstil',
+            textStyle: 'Tekststil'
         },
         dialogBox: {
             linkBox: {
@@ -95,15 +97,17 @@
             submitButton: 'Gennemfør',
             revertButton: 'Gendan',
             proportion: 'Bevar proportioner',
-            width: 'Bredde',
-            height: 'Højde',
             basic: 'Basis',
             left: 'Venstre',
             right: 'Højre',
-            center: 'Center'
+            center: 'Center',
+            width: 'Bredde',
+            height: 'Højde',
+            size: 'Størrelse'
         },
         controller: {
             edit: 'Rediger',
+            unlink: 'Fjern link',
             remove: 'Fjern',
             insertRowAbove: 'Indsæt række foroven',
             insertRowBelow: 'Indsæt række nedenfor',
@@ -126,6 +130,14 @@
             splitCells: 'Opdel celler',
             HorizontalSplit: 'Opdel horisontalt',
             VerticalSplit: 'Opdel vertikalt'
+        },
+        menu: {
+            spaced: 'Brev Afstand',
+            bordered: 'Afgrænsningslinje',
+            invert: 'Inverter farve',
+            neon: 'Neon',
+            translucent: 'Gennemsigtig',
+            shadow: 'Skygge'
         }
     };
 

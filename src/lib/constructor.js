@@ -119,7 +119,8 @@ export default {
             const cmOptions = [{
                 mode: 'htmlmixed',
                 htmlMode: true,
-                lineNumbers: true
+                lineNumbers: true,
+                lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
                     init[key] = option[key];
@@ -129,6 +130,7 @@ export default {
 
             if (options.height === 'auto') {
                 cmOptions.viewportMargin = Infinity;
+                cmOptions.height = 'auto';
             }
             
             const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
@@ -229,6 +231,7 @@ export default {
             toolBar.style.width = options.toolbarWidth;
         } else if (/balloon/i.test(options.mode)) {
             toolBar.className += ' se-toolbar-balloon';
+            toolBar.style.width = options.toolbarWidth;
             toolBar.appendChild(toolBarArrow);
         }
 
@@ -245,19 +248,28 @@ export default {
             wysiwygDiv.innerHTML = initHTML;
         } else {
             const cssTags = (function () {
-                const CSSFileName = new RegExp('(^|.*[\\/])' + (options.iframeCSSFileName || 'suneditor') + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
-                const path = [];
-
-                for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-                    styleTag = c[i].href.match(CSSFileName);
-                    if (styleTag) path.push(styleTag[0]);
-                }
-    
-                if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
-    
+                const linkNames = options.iframeCSSFileName;
                 let tagString = '';
-                for (let i = 0, len = path.length; i < len; i++) {
-                    tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+
+                for (let f = 0, len = linkNames.length, path; f < len; f++) {
+                    path = [];
+
+                    if (/^https?:\/\//.test(linkNames[f])) {
+                        path.push(linkNames[f]);
+                    } else {
+                        const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
+        
+                        for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+                            styleTag = c[i].href.match(CSSFileName);
+                            if (styleTag) path.push(styleTag[0]);
+                        }
+                    }
+        
+                    if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
+        
+                    for (let i = 0, len = path.length; i < len; i++) {
+                        tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+                    }
                 }
 
                 return tagString;
@@ -357,9 +369,9 @@ export default {
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
-        // options.iframeCSSFileName = options.iframeCSSFileName;
         // options.fullPage = options.fullPage;
         options.iframe = options.fullPage || options.iframe;
+        options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
         /** Display */
         // options.position = options.position;
@@ -379,15 +391,20 @@ export default {
         options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Defining menu items */
-        // options.font = options.font;
-        // options.fontSize = options.fontSize;
-        // options.formats = options.formats;
-        // options.colorList = options.colorList;
-        // options.lineHeights = options.lineHeights;
+        options.font = !options.font ? null : options.font;
+        options.fontSize = !options.fontSize ? null : options.fontSize;
+        options.formats = !options.formats ? null : options.formats;
+        options.colorList = !options.colorList ? null : options.colorList;
+        options.lineHeights = !options.lineHeights ? null : options.lineHeights;
+        options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
+        options.textStyles = !options.textStyles ? null : options.textStyles;
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
+        options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
+        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
+        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options._imageSizeOnlyPercentage;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
@@ -399,9 +416,9 @@ export default {
         options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
-        // options.callBackSave = options.callBackSave;
+        options.callBackSave = !options.callBackSave ? null : options.callBackSave;
         /** Templates Array */
-        // options.templates = options.templates;
+        options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
         /** Buttons */
@@ -533,6 +550,12 @@ export default {
 
             template: ['', lang.toolbar.template, 'template', 'submenu',
                 '<i class="se-icon-template"></i>'
+            ],
+            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'submenu',
+                '<i class="se-icon-paragraph-style"></i>'
+            ],
+            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'submenu',
+                '<i class="se-icon-text-style"></i>'
             ],
 
             /** plugins - dialog */

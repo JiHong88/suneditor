@@ -66,12 +66,6 @@ export default {
         this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);
     },
 
-    remove: function () {
-        this.nodeChange(null, ['background-color'], null);
-        this.submenuOff();
-        this.focus();
-    },
-
     submit: function () {
         this.plugins.hiliteColor.applyColor.call(this, this.context.colorPicker._currentColor);
     },
@@ -83,12 +77,17 @@ export default {
         this.plugins.hiliteColor.applyColor.call(this, e.target.getAttribute('data-value'));
     },
 
+    remove: function () {
+        this.nodeChange(null, ['background-color'], ['span'], true);
+        this.submenuOff();
+    },
+
     applyColor: function (color) {
         if (!color) return;
         
         const newNode = this.util.createElement('SPAN');
         newNode.style.backgroundColor = color;
-        this.nodeChange(newNode, ['background-color'], null);
+        this.nodeChange(newNode, ['background-color'], null, null);
         
         this.submenuOff();
     }

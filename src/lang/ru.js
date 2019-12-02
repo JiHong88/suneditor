@@ -68,7 +68,9 @@
             tag_blockquote: 'Цитата',
             tag_pre: 'Код',
             template: 'Шаблон',
-            lineHeight: 'Высота линии'
+            lineHeight: 'Высота линии',
+            paragraphStyle: 'Стиль абзаца',
+            textStyle: 'Стиль текста'
         },
         dialogBox: {
             linkBox: {
@@ -97,10 +99,12 @@
             right: 'Справа',
             center: 'По центру',
             width: 'Ширина',
-            height: 'Высота'
+            height: 'Высота',
+            size: 'Размер'
         },
         controller: {
             edit: 'Изменить',
+            unlink: 'Убрать ссылку',
             remove: 'Удалить',
             insertRowAbove: 'Вставить строку выше',
             insertRowBelow: 'Вставить строку ниже',
@@ -123,6 +127,14 @@
             splitCells: 'Разделить ячейку',
             HorizontalSplit: 'Разделить горизонтально',
             VerticalSplit: 'Разделить вертикально'
+        },
+        menu: {
+            spaced: 'интервал',
+            bordered: 'Граничная Линия',
+            invert: 'Инвертировать цвет',
+            neon: 'неон',
+            translucent: 'полупрозрачный',
+            shadow: 'Тень'
         }
     };
 

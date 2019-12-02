@@ -843,11 +843,11 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>wysiwygActive</code></td>
+                    <td class="name"><code>isCodeView</code></td>
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">The wysiwyg frame or code view state</td>
+                    <td class="description last">State of code view</td>
                 </tr>
                 <tr>
                     <td class="name"><code>isFullScreen</code></td>
@@ -875,7 +875,14 @@
                     <td class="type">
                         <span class="param-type">Number</span>
                     </td>
-                    <td class="description last">Indented size when tab button clicked (4)</td>
+                    <td class="description last">Indent size of tab (4)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>codeIndent</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Indent size of Code view mode (4)</td>
                 </tr>
                 <tr>
                     <td class="name"><code>minResizingSize</code></td>
@@ -1305,10 +1312,11 @@
 
             
             <h4 class="name" id="insertNode"><span class="type-signature"></span>insertNode<span class="signature">(oNode, afterNode)</span><span
-                    class="type-signature"></span></h4>
+                    class="type-signature"> &rarr; {undefined|Object}</span></h4>
             <div class="description">
                 Deletes the selected area and inserts the node.<br>
-                If the "afterNode" exists, it is inserted after the "afterNode"
+                If the "afterNode" exists, it is inserted after the "afterNode"<br>
+                Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1431,15 +1439,23 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, checkCSSPropertyText, removeNodeArray)</span><span
+            <h4 class="name" id="nodeChange"><span class="type-signature"></span>nodeChange<span class="signature">(appendNode, styleArray, removeNodeArray, strictRemove)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Adds a node to the selected region, or deletes the node.<br>
-                1. If there is a node in the "appendNode" argument, "appendNode" is added to the selection range.<br>
-                2. If the "appendNode" argument has a null value, the node is modified without adding a new node.<br>
-                3. Styles such as the style property of the "styleArray" argument will be deleted.<br>
-                4. If the node is "appendNode" or if "appendNode" is null, Nodes with all styles removed will be deleted.<br>
-                5. Tags with the same name as the value of the "removeNodeArray" argument will be deleted. Valid only when "appendNode" is null.
+                Add, update, and delete nodes from selected text.<br>
+                1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection text.<br>
+                2. If it is in the same tag, only the tag's attributes are changed without adding a tag.<br>
+                3. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.<br>
+                4. The same style as the style attribute of the "styleArray" argument is deleted.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;(Styles should be put with attribute names from css. ["background-color"])<br>
+                5. The same class name as the class attribute of the "styleArray" argument is deleted.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;(The class name is preceded by "." [".className"])<br>
+                6. Use a list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.<br>
+                7. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.<br>
+                8. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.<br>
+                9. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.<br>
+               10. It won't work if the parent node has the same class and same value style.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;However, if there is a value in "removeNodeArray", it works and the text node is separated even if there is no node to replace.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1456,21 +1472,31 @@
                     <td class="type">
                         <span class="param-type">Element|null</span>
                     </td>
-                    <td class="description last">The element to be added to the selection</td>
+                    <td class="description last">The element to be added to the selection. If it is null, only delete the node.</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>checkCSSPropertyArray</code></td>
+                    <td class="name"><code>styleArray</code></td>
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">The css attribute name Array to check (['font-size'], ['font-family', 'background-color', 'border']...])</td>
+                    <td class="description last">The style or className attribute name Array to check (['font-family', 'color', '.className']...])</td>
                 </tr>
                 <tr>
                     <td class="name"><code>removeNodeArray</code></td>
                     <td class="type">
                         <span class="param-type">Array|null</span>
                     </td>
-                    <td class="description last">An array of node names from which to remove types, Removes all formats when there is an empty array or null value. (['span'], ['b', 'u']...])</td>
+                    <td class="description last">
+                        An array of node names to remove types from, <br>
+                        remove all formats when "appendNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>strictRemove</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean|null</span>
+                    </td>
+                    <td class="description last">If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.</td>
                 </tr>
                 </tbody>
             </table>

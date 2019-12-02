@@ -13,7 +13,6 @@
 const util = {
     _d: document,
     _w: window,
-    _onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -29,18 +28,41 @@ const util = {
     },
 
     /**
-     * @description Unicode Character 'ZERO WIDTH SPACE'
+     * @description HTML Reserved Word Converter.
+     * @param {String} contents 
+     * @returns {String}
+     * @private
+     */
+    _HTMLConvertor: function (contents) {
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
+        return contents.replace(/&|\u00A0|'|<|>/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
+     * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
     zeroWidthSpace: '\u200B',
 
     /**
-     * @description A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+     * @description Regular expression to find 'zero width space' (/\u200B/g)
+     */
+    zeroWidthRegExp: new RegExp(String.fromCharCode(8203), 'g'),
+
+    /**
+     * @description Regular expression to find only 'zero width space' (/^\u200B+$/)
+     */
+    onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
+
+    /**
+     * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
      * @param {String|Node} text String value or Node
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
         if (typeof text !== 'string') text = text.textContent;
-        return text === '' || this._onlyZeroWidthRegExp.test(text);
+        return text === '' || this.onlyZeroWidthRegExp.test(text);
     },
 
     /**
@@ -193,12 +215,10 @@ const util = {
      * @returns {String}
      */
     convertContentsForEditor: function (contents) {
-        let tag, baseHtml, innerHTML = '';
-        contents = contents.trim();
+        let returnHTML = '';
+        let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
-        tag = this._d.createRange().createContextualFragment(contents).childNodes;
-
-        for (let i = 0, len = tag.length; i < len; i++) {
+        for (let i = 0, len = tag.length, baseHtml; i < len; i++) {
             baseHtml = tag[i].outerHTML || tag[i].textContent;
 
             if (tag[i].nodeType === 3) {
@@ -206,30 +226,68 @@ const util = {
                 let text = '';
                 for (let t = 0, tLen = textArray.length; t < tLen; t++) {
                     text = textArray[t].trim();
-                    if (text.length > 0) innerHTML += '<P>' + text + '</p>';
+                    if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                innerHTML += baseHtml;
+                returnHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, '');
             }
         }
 
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&amp;lt;', '>': '&amp;gt;'};
-        contents = contents.replace(/&|\u00A0|'|<|>/g, function (m) {
-            return (typeof ec[m] === 'string') ? ec[m] : m;
-        });
+        if (returnHTML.length === 0) {
+            contents = this._HTMLConvertor(contents);
+            returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+        }
 
-        if (innerHTML.length === 0) innerHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
-
-        return this._tagConvertor(innerHTML.replace(this._deleteExclusionTags, ''));
+        return this._tagConvertor(returnHTML.replace(this._deleteExclusionTags, ''));
     },
 
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-     * @param {Element} wysiwygDiv WYSIWYG element (context.element.wysiwyg)
+     * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+     * @param {Number|null} indentSize The indent size of the tag (default: 0)
      * @returns {String}
      */
-    convertHTMLForCodeView: function (wysiwygDiv) {
-        return wysiwygDiv.innerHTML.replace(/>(?!\n)(?!\b)/g, '>\n');
+    convertHTMLForCodeView: function (html, indentSize) {
+        let returnHTML = '';
+        const reg = this._w.RegExp;
+        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
+        const isFormatElement = this.isFormatElement.bind(this);
+        const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+        const util = this;
+
+        indentSize *= 1;
+        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+
+        (function recursionFunc (element, indent, lineBR) {
+            const children = element.childNodes;
+            const elementRegTest = brReg.test(element.nodeName);
+            const elementIndent = (elementRegTest ? indent : '');
+
+            for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
+                node = children[i];
+                nodeRegTest = brReg.test(node.nodeName);
+                br = nodeRegTest ? '\n' : '';
+                lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+
+                if (node.nodeType === 3) {
+                    returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
+                    continue;
+                }
+
+                if (node.childNodes.length === 0) {
+                    returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                    continue;
+                }
+                
+                node.innerHTML = node.innerHTML;
+                const tag = node.nodeName.toLowerCase();
+                returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
+                recursionFunc(node, indent + indentSize, '');
+                returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+            }
+        }(wDoc, '', '\n'));
+
+        return returnHTML.trim() + '\n';
     },
 
     /**
@@ -317,13 +375,34 @@ const util = {
     },
 
     /**
-     * @description Copy and apply attributes of format tag that should be maintained. (style, class)
-     * @param {Element} newEl New element
+     * @description Add style and className of copyEl to originEl
      * @param {Element} originEl Origin element
+     * @param {Element} copyEl Element to copy
+     * @private
      */
-    copyFormatAttributes: function (newEl, originEl) {
-        newEl.style.cssText = originEl.style.cssText;
-        newEl.className = originEl.className;
+    copyTagAttributes: function (originEl, copyEl) {
+        if (copyEl.style.cssText) {
+            originEl.style.cssText += copyEl.style.cssText;
+        }
+
+        const classes = copyEl.classList;
+        for (let i = 0, len = classes.length; i < len; i++) {
+            this.addClass(originEl, classes[i]);
+        }
+
+        if (!originEl.style.cssText) originEl.removeAttribute('style');
+        if (!originEl.className.trim()) originEl.removeAttribute('class');
+    },
+
+    /**
+     * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+     * @param {Element} originEl Origin element
+     * @param {Element} copyEl Element to copy
+     */
+    copyFormatAttributes: function (originEl, copyEl) {
+        copyEl = copyEl.cloneNode(false);
+        copyEl.className = copyEl.className.replace(/(\s|^)__se__format__(\s|$)/g, '');
+        this.copyTagAttributes(originEl, copyEl);
     },
 
     /**
@@ -386,15 +465,47 @@ const util = {
      * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
      * @param {Node} node The Node to find position path
      * @param {Element|null} parentNode Parent node. If null, wysiwyg div area
+     * @param {Object|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+     * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
+     * Do not use unless absolutely necessary.
      * @returns {Array}
      */
-    getNodePath: function (node, parentNode) {
+    getNodePath: function (node, parentNode, _newOffsets) {
         const path = [];
         let finds = true;
 
         this.getParentElement(node, function (el) {
             if (el === parentNode) finds = false;
-            if (finds && !this.isWysiwygDiv(el)) path.push(el);
+            if (finds && !this.isWysiwygDiv(el)) {
+                // merge text nodes
+                if (_newOffsets && el.nodeType === 3) {
+                    let temp = null, tempText = null;
+                    _newOffsets.s = _newOffsets.e = 0;
+
+                    let previous = el.previousSibling;
+                    while (previous && previous.nodeType === 3) {
+                        tempText = previous.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.s += tempText.length;
+                        el.textContent = tempText + el.textContent;
+                        temp = previous;
+                        previous = previous.previousSibling;
+                        this.removeItem(temp);
+                    }
+
+                    let next = el.nextSibling;
+                    while (next && next.nodeType === 3) {
+                        tempText = next.textContent.replace(this.zeroWidthRegExp, '');
+                        _newOffsets.e += tempText.length;
+                        el.textContent += tempText;
+                        temp = next;
+                        next = next.nextSibling;
+                        this.removeItem(temp);
+                    }
+                }
+
+                // index push
+                path.push(el);
+            }
             return false;
         }.bind(this));
         
@@ -422,6 +533,37 @@ const util = {
         }
 
         return current;
+    },
+
+    /**
+     * @description Compares the style and class for equal values.
+     * Returns true if both are text nodes.
+     * @param {Node} a Node object
+     * @param {Node} b Node object
+     * @returns {Boolean}
+     */
+    isSameAttributes: function (a, b) {
+        if (a.nodeType === 3 && b.nodeType === 3) return true;
+        if (a.nodeType === 3 || b.nodeType === 3) return false;
+
+        const style_a = a.style;
+        const style_b = b.style;
+        let compStyle = 0;
+
+        for (let i = 0, len = style_a.length; i < len; i++) {
+            if (style_a[style_a[i]] === style_b[style_a[i]]) compStyle++;
+        }
+
+        const class_a = a.classList;
+        const class_b = b.classList;
+        const reg = this._w.RegExp;
+        let compClass = 0;
+
+        for (let i = 0, len = class_a.length; i < len; i++) {
+            if (reg('(\s|^)' + class_a[i] + '(\s|$)').test(class_b.value)) compClass++;
+        }
+
+        return compStyle === style_b.length && compClass === class_b.length;
     },
 
     /**
@@ -726,7 +868,7 @@ const util = {
         const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) return;
 
-        element.className += ' ' + className;
+        element.className += (element.className.length > 0 ? ' ' : '') + className;
     },
 
     /**
@@ -839,7 +981,7 @@ const util = {
      * @returns {Boolean}
      */
     isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark)$/i.test(element.nodeName);
+        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
     },
 
     /**
@@ -861,7 +1003,7 @@ const util = {
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:colspan|rowspan|target|href|src|class|data-file-size|data-file-name|data-origin|origin-size|data-format)\s*=\s*"[^"]*")/ig);
+                const v = m.match(/((?:colspan|rowspan|target|href|src|class|data-format|data-file-size|data-file-name|data-origin|origin-size|data-percentage)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
                         if (/^class="(?!__se__)/.test(v[i])) continue;

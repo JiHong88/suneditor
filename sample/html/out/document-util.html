@@ -33,12 +33,28 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="zeroWidthRegExp"><span class="type-signature"></span>zeroWidthRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Regular expression to find 'zero width space' (/\u200B/g)
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onlyZeroWidthRegExp"><span class="type-signature"></span>onlyZeroWidthRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Regular expression to find only 'zero width space' (/^\u200B+$/)
+            </div>
+            <dl class="details"></dl>
+
+
             <h3 class="subsection-title">Methods</h3>
 
             <h4 class="name" id="onlyZeroWidthSpace"><span class="type-signature"></span>onlyZeroWidthSpace<span
                     class="signature">(text)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                A method that checks If the text is blank or to see if it contains only Unicode 'ZERO WIDTH SPACE' (\u200B)
+                A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -274,7 +290,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(wysiwygDiv)</span><span
+            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html, indentSize)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Converts wysiwyg area element into a format that can be placed in an editor of code view mode
@@ -290,11 +306,18 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>wysiwygDiv</code></td>
+                    <td class="name"><code>html</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
+                        <span class="param-type">Element|String</span>
                     </td>
-                    <td class="description last">WYSIWYG element (context.element.wysiwyg)</td>
+                    <td class="description last">WYSIWYG element (context.element.wysiwyg) or HTML string</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>indentSize</code></td>
+                    <td class="type">
+                        <span class="param-type">Number|null</span>
+                    </td>
+                    <td class="description last">The indent size of the tag (default: 0)</td>
                 </tr>
                 </tbody>
             </table>
@@ -478,10 +501,10 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="copyFormatAttributes"><span class="type-signature"></span>copyFormatAttributes<span
-                class="signature">(newEl, originEl)</span><span class="type-signature"></span></h4>
+            <h4 class="name" id="copyTagAttributes"><span class="type-signature"></span>copyTagAttributes<span
+                class="signature">(originEl, copyEl)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Copy and apply attributes of format tag that should be maintained. (style, class)
+                Add style and className of copyEl to originEl. (style, class)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -494,18 +517,52 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>newEl</code></td>
+                    <td class="name"><code>originEl</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">New element.</td>
+                    <td class="description last">Origin element</td>
                 </tr>
+                <tr>
+                    <td class="name"><code>copyEl</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element to copy</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="copyFormatAttributes"><span class="type-signature"></span>copyFormatAttributes<span
+                class="signature">(originEl, copyEl)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Copy and apply attributes of format tag that should be maintained. (style, class), Ignore "__se__format__" class
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td class="name"><code>originEl</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Origin element.</td>
+                    <td class="description last">Origin element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>copyEl</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element to copy</td>
                 </tr>
                 </tbody>
             </table>
@@ -641,7 +698,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode)</span><span
+        <h4 class="name" id="getNodePath"><span class="type-signature"></span>getNodePath<span class="signature">(node, parentNode, _newOffsets)</span><span
                 class="type-signature"> &rarr; {Array}</span></h4>
         <div class="description">
             Returns the position of the "node" in the "parentNode" in a numerical array.<br>
@@ -670,6 +727,17 @@
                     <span class="param-type">Element|null</span>
                 </td>
                 <td class="description last">Parent node. If null, wysiwyg div area</td>
+            </tr>
+            <tr>
+                <td class="name"><code>_newOffsets</code></td>
+                <td class="type">
+                    <span class="param-type">Object|null</span>
+                </td>
+                <td class="description last">
+                    If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.<br>
+                    "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".<br>
+                    Do not use unless absolutely necessary.
+                </td>
             </tr>
             </tbody>
         </table>
@@ -704,6 +772,41 @@
                     <span class="param-type">Element</span>
                 </td>
                 <td class="description last">Base parent element</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isSameAttributes"><span class="type-signature"></span>isSameAttributes<span class="signature">(a, b)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Compares the style and class for equal values.<br>
+            Returns true if both are text nodes.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>a</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Node object</td>
+            </tr>
+            <tr>
+                <td class="name"><code>b</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Node object</td>
             </tr>
             </tbody>
         </table>
@@ -1480,6 +1583,8 @@
     <ul>
         <li><b>Members</b></li>
         <li><a href="document-util.html#zeroWidthSpace">zeroWidthSpace</a></li>
+        <li><a href="document-util.html#zeroWidthRegExp">zeroWidthRegExp</a></li>
+        <li><a href="document-util.html#onlyZeroWidthRegExp">onlyZeroWidthRegExp</a></li>
         <li><b>Methods</b></li>
         <li><a href="document-util.html#onlyZeroWidthSpace">onlyZeroWidthSpace</a></li>
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
@@ -1497,6 +1602,7 @@
         <li><a href="document-util.html#isComponent">isComponent</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
+        <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
@@ -1504,6 +1610,7 @@
         <li><a href="document-util.html#getPositionIndex">getPositionIndex</a></li>
         <li><a href="document-util.html#getNodePath">getNodePath</a></li>
         <li><a href="document-util.html#getNodeFromPath">getNodeFromPath</a></li>
+        <li><a href="document-util.html#isSameAttributes">isSameAttributes</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isTable">isTable</a></li>

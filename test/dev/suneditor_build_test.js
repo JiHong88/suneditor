@@ -6,6 +6,7 @@ import '../../src/assets/css/suneditor-contents.css';
 import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
 import { ko } from '../../src/lang';
+import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 
@@ -46,10 +47,11 @@ window.sun_create1 = function () {
 
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
+    lang: lang.ko,
     plugins: plugins,
     buttonList: [
         ['undo', 'redo','removeFormat',
-        'font', 'fontSize', 'formatBlock',
+        'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'textStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor',
         'outdent', 'indent',
@@ -58,22 +60,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save']
     ],
-    width: '100%',
-    stickyToolbar: 0,
-    imageWidth: 300,
-    mode: 'classic',
-    // toolbarWidth: 800,
-    height: 'auto',
-    fullPage: true,
-    iframe: true,
-    iframeCSSFileName: 'suneditor',
-    // callBackSave: (contents) => {
-    //     console.log('callback')
-    // }
-    codeMirror: {
-        src: CodeMirror,
-    },
-    placeholder: 'Start typing something2...'
 });
 
 ss.onScroll = function (e) {
@@ -131,6 +117,7 @@ window.sun_insertHTML = function (html) {
 
 window.sun_getContents = function () {
     alert(ss.getContents());
+    console.log(ss.getContents());
 }
 
 window.sun_setContents = function (content) {
@@ -183,6 +170,9 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
+    lang: lang.ru,
+    mode: 'balloon',
+    // toolbarWidth: 500,
     plugins: plugins,
     // maxHeight: '400px',
     height: 'auto',
@@ -193,9 +183,10 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
+        ['paragraphStyle'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
-        ['fontColor', 'hiliteColor'],
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
         ['link', 'image', 'video'],
@@ -220,22 +211,22 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     callBackSave: function (contents) {
         alert(contents)
     },
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+    formats: ['h1', 'p', 'blockquote', {
         tag: 'div',
-        class: '__se__aaa',
-        title: 'red div',
-        command: 'range'
+        class: '__se__format__aaa',
+        name: 'custom div',
+        command: 'replace'
     }],
     // iframe: true,
     // fullPage: true,
     // mode: 'balloon',
-    // codeMirror: CodeMirror,
-    codeMirror: {
-        src: CodeMirror,
-        options: {
-            mode: 'xml'
-        }
-    },
+    codeMirror: CodeMirror,
+    // codeMirror: {
+    //     src: CodeMirror,
+    //     options: {
+    //         mode: 'xml'
+    //     }
+    // },
     // placeholder: 'Start typing something.3..'
     // imageUploadSizeLimit: 30000
 });
@@ -248,6 +239,7 @@ const newOption = {
         plugins.fontColor
     ],
     minHeight: '300',
+    textSizeUnit: 'pt',
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
@@ -440,8 +432,9 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     charCounter: true,
     formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
         tag: 'div',
-        class: '__se__aaa',
-        title: 'red div',
+        class: '__se__format__aaa',
+        name: 'red div',
+        style: 'margin: 10px; background-color: #f5f5f5;',
         command: 'replace'
     }],
     placeholder: 'Start typing something.4..'

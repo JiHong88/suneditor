@@ -68,7 +68,9 @@
             tag_blockquote: 'Citation',
             tag_pre: 'Code',
             template: 'Template',
-            lineHeight: 'Hauteur de la ligne'
+            lineHeight: 'Hauteur de la ligne',
+            paragraphStyle: 'Style de paragraphe',
+            textStyle: 'Style de texte'
         },
         dialogBox: {
             linkBox: {
@@ -92,15 +94,17 @@
             submitButton: 'Appliquer',
             revertButton: 'Revenir en arrière',
             proportion: 'Maintenir le rapport hauteur/largeur',
-            width: 'Largeur',
-            height: 'Hauteur',
             basic: 'Basique',
             left: 'Gauche',
             right: 'Droite',
-            center: 'Centré'
+            center: 'Centré',
+            width: 'Largeur',
+            height: 'Hauteur',
+            size: 'La taille'
         },
         controller: {
             edit: 'Modifier',
+            unlink: 'Supprimer un lien',
             remove: 'Effacer',
             insertRowAbove: 'Insérer une ligne en dessous',
             insertRowBelow: 'Insérer une ligne au dessus',
@@ -123,6 +127,14 @@
             splitCells: 'Diviser les Cellules',
             HorizontalSplit: 'Scission horizontale',
             VerticalSplit: 'Scission verticale'
+        },
+        menu: {
+            spaced: 'Espacement',
+            bordered: 'Ligne de démarcation',
+            invert: 'Inverser la couleur',
+            neon: 'Néon',
+            translucent: 'Translucide',
+            shadow: 'L\'ombre'
         }
     };
 

@@ -35,28 +35,31 @@ export default {
         const option = this.context.option;
         const lang_toolbar = this.lang.toolbar;
         const listDiv = this.util.createElement('DIV');
-        const formatList = !option.formats || option.formats.length === 0 ? ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'] : option.formats;
-
         listDiv.className = 'se-submenu se-list-layer';
 
+        const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
+
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = formatList.length, format, command, title, h, oClass; i < len; i++) {
-            if (typeof formatList[i] === 'string') {
-                format = formatList[i].toLowerCase();
-                command = format === 'pre' || format === 'blockquote' ? 'range' : 'replace';
-                h = /^h/.test(format) ? format.match(/\d+/)[0] : '';
-                title = lang_toolbar['tag_' + (h ? 'h' : format)] + h;
-                oClass = '';
+        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs; i < len; i++) {
+            format = formatList[i];
+            
+            if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
+                tagName = format.toLowerCase();
+                command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
+                h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
+                name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+                attrs = '';
             } else {
-                format = formatList[i].tag.toLowerCase();
-                command = 'replace';
-                title = formatList[i].title || format;
-                oClass = (' class="' + formatList[i].class + '"' || '') + 'data-format="' + command + '"';
+                tagName = format.tag.toLowerCase();
+                command = format.command;
+                name = format.name || tagName;
+                attrs = format.class ? ' class="' + format.class + '"' : '';
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + format + '" title="' + title + '">' +
-                '<' + format + oClass + '>' + title + '</' + format + '>' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + name + '">' +
+                    '<' + tagName + attrs + '>' + name + '</' + tagName + '>' +
                 '</button></li>';
         }
         list += '</ul></div>';
@@ -119,14 +122,15 @@ export default {
 
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
-            const firstPath = this.util.getNodePath(range.startContainer, first);
-            const lastPath = this.util.getNodePath(range.endContainer, last);
+            const firstPath = this.util.getNodePath(range.startContainer, first, null);
+            const lastPath = this.util.getNodePath(range.endContainer, last, null);
             
             // remove list
             let rangeArr = {};
             let listFirst = false;
             let listLast = false;
             const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
+
             for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
                 lastIndex = i === len - 1;
                 o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
@@ -176,6 +180,7 @@ export default {
                     newFormat = tag.cloneNode(false);
                     this.util.copyFormatAttributes(newFormat, node);
                     newFormat.innerHTML = node.innerHTML;
+
                     node.parentNode.insertBefore(newFormat, node);
                     this.util.removeItem(node);
                 }

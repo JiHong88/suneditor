@@ -42,14 +42,13 @@ export default {
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
         let list = '<div class="se-list-inner se-list-font-size">' +
-            '   <ul class="se-list-basic">' +
-            '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+                '<ul class="se-list-basic">' +
+                    '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (let i = 0, unit = option.fontSizeUnit, len = sizeList.length, size; i < len; i++) {
             size = sizeList[i];
             list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
         }
-        list += '   </ul>' +
-            '</div>';
+        list += '</ul></div>';
 
         listDiv.innerHTML = list;
 
@@ -85,9 +84,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontSize = value;
-            this.nodeChange(newNode, ['font-size'], null);
+            this.nodeChange(newNode, ['font-size'], null, null);
         } else {
-            this.nodeChange(null, ['font-size'], null);
+            this.nodeChange(null, ['font-size'], ['span'], true);
         }
 
         this.submenuOff();

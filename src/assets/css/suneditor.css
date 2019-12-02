@@ -89,9 +89,9 @@
 .sun-editor .se-icon-insert-column-left::before{content:'\006d';}
 .sun-editor .se-icon-delete-row::before{content:'\006e';}
 .sun-editor .se-icon-delete-column::before{content:'\006f';}
-.sun-editor .se-icon-quote::before{content:'\0070';}
+.sun-editor .se-icon-unlink::before{content:'\0070';}
 .sun-editor .se-icon-empty-file::before{content:'\0071';}
-.sun-editor .se-icon-paragraph::before{content:'\0072';}
+.sun-editor .se-icon-paragraph-style::before{content:'\0072';}
 .sun-editor .se-icon-delete::before{content:'\0073';}
 .sun-editor .se-icon-rotate-left::before{content:'\0074';}
 .sun-editor .se-icon-rotate-right::before{content:'\0075';}
@@ -117,6 +117,7 @@
 .sun-editor .se-icon-emoji::before{content:'\0025';}
 .sun-editor .se-icon-template::before{content:'\0026';}
 .sun-editor .se-icon-line-height::before{content:'\0027';}
+.sun-editor .se-icon-text-style::before{content:'\0028';}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
@@ -153,7 +154,7 @@
 .sun-editor .se-btn:enabled.on:hover, .sun-editor .se-btn:enabled.on:focus {background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
 .sun-editor .se-btn:enabled.on:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
 /* disabled buttons, icon blur */
-.sun-editor .se-btn:disabled, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:default; background-color:inherit; color:#bdbdbd;}
+.sun-editor .se-btn:disabled, .sun-editor .se-btn-list:disabled, .sun-editor :disabled [class*='se-icon-']::before {cursor:not-allowed; background-color:inherit; color:#bdbdbd;}
 
 /** --- loading box */
 .sun-editor .se-loading-box {position:absolute; display:none; width:100%; height:100%; top:0; left:0; background-color:#fff; opacity:.7; filter:alpha(opacity=70); z-index:2147483647;}
@@ -162,7 +163,7 @@
 /** --- toolbar ---------------------------------------------------------- */
 .sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:4px 3px 0 3px; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:5;}
 .sun-editor .se-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
-.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:31px; width:1px; margin:2px; vertical-align:top;}
+.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:2px; vertical-align:top;}
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {display:none; position:absolute; z-index:2147483647; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
 /* balloon toolbar */
@@ -198,7 +199,7 @@
 .sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 /* submenu layer - list button */
-.sun-editor .se-btn-list {width:100%; height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:22px; text-indent:0; text-decoration:none; text-align:left;}
+.sun-editor .se-btn-list {width:100%; height:auto; min-height:32px; max-height:100px; padding:0 14px; cursor:pointer; font-size:12px; line-height:normal; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 .sun-editor .se-btn-list:hover, .sun-editor .se-btn-list:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
@@ -209,27 +210,29 @@
 /** submenu layer - format block */
 .sun-editor .se-list-layer .se-list-format {min-width:156px;}
 .sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list {height:auto; min-height:32px; line-height:100%;}
+.sun-editor .se-list-layer .se-list-format .se-btn-list {line-height:100%;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
 .sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
-.sun-editor .se-list-layer .se-list-format p {font-size:13px; margin:0; padding:0;}
-.sun-editor .se-list-layer .se-list-format div {font-size:13px; margin:0; padding:0;}
-.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; margin:0; padding:0; color:#333;}
-.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; margin:0; padding:0; color:#333;}
+.sun-editor .se-list-layer .se-list-format p {font-size:13px;}
+.sun-editor .se-list-layer .se-list-format div {font-size:13px;}
+.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; color:#333;}
 .sun-editor .se-list-layer .se-list-format blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
 .sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:2px;}
 /* submenu layer - font size */
 .sun-editor .se-list-layer .se-list-font-size {min-width:140px; max-height:300px; overflow-x:hidden; overflow-y:auto;}
-.sun-editor .se-list-layer .se-list-font-size .se-btn-list {height:auto; min-height:32px; line-height:normal;}
 /* submenu layer - hr */
 .sun-editor .se-list-layer .se-list-line {width:125px;}
 /* submenu layer - align */
 .sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
+/* submenu layer - paragraph style, text style */
+.sun-editor .se-list-layer .se-list-format div {padding:4px 2px;}
+.sun-editor .se-list-layer .se-list-format button.se-invert div {color:#fff; background-color:#333;}
 /* submenu layer --- table selector */
 .sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:4; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
@@ -265,7 +268,7 @@
 /** --- resizing bar */
 .sun-editor .se-resizing-bar {display:flex; width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 4px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
-.sun-editor .se-resizing-back {position:absolute; display:none; cursor:ns-resize; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-resizing-back {position:absolute; display:none; cursor:default; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 /** resizing bar - nabigation */
 .sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
@@ -317,7 +320,7 @@
 
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
-.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:6; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:4; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 
 /* controller - button group */
 .sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px 2px 2px 0; top:0; left:0;}
@@ -339,7 +342,7 @@
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {margin-top:-50px !important; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-resizing .se-btn-group .se-btn-group-sub.se-resizing-align-list {left:57px;}
-.sun-editor .se-resizing-container {position:absolute; display:none; z-index:6; border:1px solid #80bdff;}
+.sun-editor .se-resizing-container {position:absolute; display:none; z-index:4; border:1px solid #80bdff;}
 .sun-editor .se-resizing-container .se-modal-resize {position:absolute; display:inline-block; background-color:#3f9dff; opacity:0.3;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
 .sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}
@@ -373,9 +376,11 @@
 .sun-editor .se-tooltip:hover .se-tooltip-inner {visibility:visible; opacity:1;}
 
 /** --- show blocks mode */
-.se-show-block p, .se-show-block div, .se-show-block h1, .se-show-block h2, .se-show-block h3, .se-show-block h4, .se-show-block h5, .se-show-block h6 {
-    border:1px dashed #3f9dff;
-    padding:10px 8px 8px 8px;
+.sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
+.sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
+.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6 {
+    border:1px dashed #3f9dff !important;
+    padding:10px 8px 8px 8px !important;
 }
 .se-show-block p {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;}
 .se-show-block div {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;}

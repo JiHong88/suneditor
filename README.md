@@ -8,7 +8,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 [![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
 [![bower version](https://img.shields.io/bower/v/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases/latest)
 [![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
-![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)
+[![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
@@ -28,11 +28,11 @@ Pure javscript based WYSIWYG web editor, with no dependencies
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
-    - [Plugins list](#4-plugins-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
 - [Options](#options)
 - [Functions](#functions)
+- [Plugins list](#plugins-list)
 - [Examples](#examples)
     - [Defining menu items](#defining-menu-items)
     - [Char count, Button groups](#char-count-button-groups)
@@ -139,10 +139,11 @@ suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
+        ['paragraphStyle'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
         '/', // Line break
-        ['fontColor', 'hiliteColor'],
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
         ['table', 'link', 'image', 'video'],
@@ -166,26 +167,18 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule,
-        list, lineHeight, table, template, formatBlock, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, lineHeight, 
+    table, template, formatBlock, paragraphStyle, textStyle, link, image, video} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo', 'removeFormat'],
         [font, fontSize, formatBlock],
-        [fontColor, hiliteColor],
+        [paragraphStyle, textStyle, fontColor, hiliteColor],
         [align, horizontalRule, list, lineHeight],
         [table, link, image, video, template]
     ],
 })
-```
-
-### 4. Plugins list
-```javascript
-'suneditor/src/plugins/dialog/...'
-// image, video, link
-'suneditor/src/plugins/submenu/...'
-// align, font, fontColor, fontSize, formatBlock, hiliteColor, horizontalRule, lineHeight, list, table, template
 ```
 
 ## Init function
@@ -205,9 +198,10 @@ const initEditor = suneditor.init({
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
+        'paragraphStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
-        'fontColor', 'hiliteColor',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
         'table', 'link', 'image', 'video',
@@ -267,19 +261,22 @@ suneditor.create('sample', {
 ```java
 plugins: [
     // Submenu
+    align,
     font,
+    fontColor,
     fontSize,
     formatBlock,
-    fontColor,
     hiliteColor,
-    align,
     horizontalRule,
+    lineHeight,
     list,
+    paragraphStyle,
     table,
     template,
+    textStyle,
     // Dialog
-    link,
     image,
+    link,
     video
 ]               : Plugins array.     default: null {Array}
 
@@ -294,8 +291,10 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
-iframeCSSFileName : Name of the CSS file to apply inside the iframe.
-                    Applied by searching by filename in the link tag of document.  default: 'suneditor' {String}
+iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
+                    Applied by searching by filename in the link tag of document,
+                    or put the URL value.                                        default: 'suneditor' {Array|String}
+                    ex) 'main' or ['suneditor', 'http://suneditor.com/sample/css/sample.css']
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.0.0 or later.
                   ex) codeMirror: CodeMirror // Default option
@@ -306,6 +305,7 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                             * mode: 'htmlmixed',
                             * htmlMode: true,
                             * lineNumbers: true
+                            * lineWrapping: true
                             */
                         }
                       }
@@ -354,9 +354,9 @@ formats         : Change default formatBlock array.                 default: [..
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
-                    class: '__se__xxx' || null, // Class names must always begin with "__se__"
-                    title: 'Custom div' || null, // default: tag name
-                    command: 'replace' || 'range' // default: "replace"
+                    name: 'Custom div' || null, // default: tag name
+                    command: 'replace' || 'range', // default: "replace"
+                    class: '__se__format__xxx' || null, // Class names must always begin with "__se__format__"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
@@ -382,10 +382,69 @@ lineHeights     : Change default line-height array.                 default: [{}
                     {text: 'Single', value: 1},
                     {text: 'Double', value: 2}
                   ]
+paragraphStyles : You can apply custom class to format.
+                  ex) '.sun-editor-editable .__se__customClass'
+                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
+                  Default value: [
+                    {
+                        name: 'Spaced', // Format style name
+                        class: '__se__p-spaced', // Define style for used class (Class names must always begin with "__se__")
+                        _class: '' // You can control the style of the tags displayed in the menu by putting a class on the button of the menu.
+                    },
+                    {
+                        name: 'Bordered',
+                        class: '__se__p-bordered'
+                    },
+                    {
+                        name: 'Invert color',
+                        class: '__se__p-invert',
+                        _class: 'se-invert' // .sun-editor .se-invert > div {color: #fff; background-color: #333;}
+                    },
+                    {
+                        name: 'Neon',
+                        class: '__se__p-neon'
+                    }
+                  ]
+                  ex) [
+                      'invert', 'neon', // The default value is called by name only and the name is called in the language file.
+                      {
+                          name: 'Custom',
+                          class: '__se__customClass'
+                      }
+                  ]
+textStyles      : You can apply custom style or class to selected text.
+                  ex(using a class)) '.sun-editor-editable .__se__customClass'
+                                     '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
+                  Default value: [
+                    {
+                        name: 'Translucent', // Text style name
+                        style: 'opacity: 0.5;', // Style query
+                        tag: 'span', // Style tag name (default: span)
+                        _class: '' // You can control the style of the tags displayed in the menu by putting a class on the button of the menu.
+                    },
+                    {
+                        name: 'Shadow',
+                        class: '__se__t-shadow', // Class names (Class names must always begin with "__se__")
+                        tag: 'span'
+                    }
+                  ]
+                  ex) [
+                      'translucent', // The default value is called by name only and the name is called in the language file.
+                      {
+                          name: 'Emphasis',
+                          style: '-webkit-text-emphasis: filled;',
+                          tag: 'span'
+                      }
+                  ]
 
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number}
+imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
+imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
+                  The percentage button is active even if it is "px".   default: 'px' {String}
+imageRotation   : Choose whether to image rotation buttons display.
+                  When "imageSizeUnit" is "%" the default value is false.
+                  If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
@@ -441,16 +500,17 @@ buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
+                    // ['paragraphStyle'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                    // ['fontColor', 'hiliteColor', 'textStyle'],
                     ['removeFormat'],
-                    // '/', Line break
-                    // ['fontColor', 'hiliteColor'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
                     // ['table', 'link', 'image', 'video'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
+                    // '/', Line break
                   ]
 ```
 
@@ -527,7 +587,6 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
-editor = null;
 
 // Event functions
 // It can be redefined by receiving event object as parameter.
@@ -594,6 +653,70 @@ editor.showInline = function (toolbar, context) {
     console.log('context', context);
 }
 ```
+
+## Plugins list
+> The plugin and the button have the same name.
+
+<table>
+    <thead>
+        <tr>
+            <th align="left">Name</th>
+            <th align="left">Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="left">image</td>
+            <td align="left" rowspan="3"><strong>dialog</strong></td>
+        </tr>
+        <tr>
+            <td align="left">link</td>
+        </tr>
+        <tr>
+            <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">align</td>
+            <td align="left" rowspan="13"><strong>submenu</strong></td>
+        </tr>
+        <tr>
+            <td align="left">font</td>
+        </tr>
+        <tr>
+            <td align="left">fontColor</td>
+        </tr>
+        <tr>
+            <td align="left">fontSize</td>
+        </tr>
+        <tr>
+            <td align="left">formatBlock</td>
+        </tr>
+        <tr>
+            <td align="left">hiliteColor</td>
+        </tr>
+        <tr>
+            <td align="left">horizontalRule</td>
+        </tr>
+        <tr>
+            <td align="left">lineHeight</td>
+        </tr>
+        <tr>
+            <td align="left">list</td>
+        </tr>
+        <tr>
+            <td align="left">paragraphStyle</td>
+        </tr>
+        <tr>
+            <td align="left">table</td>
+        </tr>
+        <tr>
+            <td align="left">template</td>
+        </tr>
+        <tr>
+            <td align="left">textStyle</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Examples
 <a id="defining-menu-items"></a> [Defining menu items](http://suneditor.com/sample/html/examples.html#setting)

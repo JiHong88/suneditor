@@ -18,6 +18,7 @@ export default {
         
         const context = core.context;
         context.image = {
+            sizeUnit: context.option.imageSizeUnit,
             _linkElement: null,
             _container: null,
             _cover: null,
@@ -38,8 +39,10 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
+            _rotation: context.option.imageRotation,
             _defaultAuto: context.option.imageWidth === 'auto',
-            _uploadFileLength: 0
+            _uploadFileLength: 0,
+            _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
         };
 
         /** image dialog */
@@ -87,73 +90,88 @@ export default {
 
         let html = '' +
             '<div class="se-dialog-header">' +
-            '   <button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-            '       <i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
-            '   </button>' +
-            '   <span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
+                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                '</button>' +
+                '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
             '<div class="se-dialog-tabs">' +
-            '   <button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
-            '   <button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
+                '<button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
+                '<button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
-            '   <div class="_se_tab_content _se_tab_content_image">' +
-            '       <div class="se-dialog-body">';
+                '<div class="_se_tab_content _se_tab_content_image">' +
+                    '<div class="se-dialog-body">';
 
             if (option.imageFileInput) {
                 html += '' +
-                    '   <div class="se-dialog-form">' +
-                    '       <label>' + lang.dialogBox.imageBox.file + '</label>' +
-                    '       <input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
-                    '   </div>' ;
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.file + '</label>' +
+                            '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                        '</div>' ;
             }
 
             if (option.imageUrlInput) {
                 html += '' +
-                    '   <div class="se-dialog-form">' +
-                    '       <label>' + lang.dialogBox.imageBox.url + '</label>' +
-                    '       <input class="se-input-form _se_image_url" type="text" />' +
-                    '   </div>';
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.url + '</label>' +
+                            '<input class="se-input-form _se_image_url" type="text" />' +
+                        '</div>';
             }
 
             html += '' +
-            '           <div class="se-dialog-form">' +
-            '               <label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
-            '           </div>';
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
+                        '</div>';
 
             if (option.imageResizing) {
-                html += '' +
-                '       <div class="se-dialog-form">' +
-                '           <div class="se-dialog-size-text"><label class="size-w">' + lang.dialogBox.width + '</label><label class="se-dialog-size-x">&nbsp;</label><label class="size-h">' + lang.dialogBox.height + '</label></div>' +
-                '           <input class="se-input-control _se_image_size_x" type="number" min="1" ' + (option.imageWidth === 'auto' ? 'disabled' : '') + ' /><label class="se-dialog-size-x">x</label><input class="se-input-control _se_image_size_y" type="number" min="1" disabled />' +
-                '           <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                '           <button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
-                '       </div>' ;
+                const onlyPercentDisplay = option._imageSizeOnlyPercentage ? ' style="display: none !important;"' : '';
+                html += '<div class="se-dialog-form _se_image_size_form">';
+                            if (option._imageSizeOnlyPercentage) {
+                                html += '' +
+                                '<div class="se-dialog-size-text">' +
+                                    '<label class="size-w">' + lang.dialogBox.size + '</label>' +
+                                '</div>';
+                            } else {
+                                html += '' +
+                                '<div class="se-dialog-size-text">' +
+                                    '<label class="size-w">' + lang.dialogBox.width + '</label>' +
+                                    '<label class="se-dialog-size-x">&nbsp;</label>' +
+                                    '<label class="size-h">' + lang.dialogBox.height + '</label>' +
+                                '</div>';
+                            }
+                            html += '' +
+                                '<input class="se-input-control _se_image_size_x" type="number" min="1"' + (option.imageWidth === 'auto' ? ' disabled' : '') + (option._imageSizeOnlyPercentage ? ' max="100"' : '') + ' />' +
+                                '<label class="se-dialog-size-x">' + (option._imageSizeOnlyPercentage ? '%' : 'x') + '</label>' +
+                                '<input class="se-input-control _se_image_size_y" type="number" min="1" disabled' + onlyPercentDisplay + '/>' +
+                                '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                                '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                        '</div>' ;
             }
 
             html += '' +
-            '           <div class="se-dialog-form-footer">' +
-            '               <label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
-            '           </div>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="_se_tab_content _se_tab_content_url" style="display: none">' +
-            '       <div class="se-dialog-body">' +
-            '           <div class="se-dialog-form">' +
-            '               <label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
-            '           </div>' +
-            '           <label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-            '       </div>' +
-            '   </div>' +
-            '   <div class="se-dialog-footer">' +
-            '       <div>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
-            '           <label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
-            '       </div>' +
-            '       <button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
-            '   </div>' +
+                        '<div class="se-dialog-form-footer">' +
+                            '<label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="_se_tab_content _se_tab_content_url" style="display: none">' +
+                    '<div class="se-dialog-body">' +
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
+                        '</div>' +
+                        '<label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="se-dialog-footer">' +
+                    '<div>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
+                    '</div>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '</div>' +
             '</form>';
 
         dialog.innerHTML = html;
@@ -326,12 +344,13 @@ export default {
     },
 
     onRender_imgUrl: function () {
-        if (this.context.image.imgUrlFile.value.trim().length === 0) return false;
+        const contextImage = this.context.image;
+        if (contextImage.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            const file = {name: this.context.image.imgUrlFile.value.split('/').pop(), size: 0};
-            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, this.context.image.imgUrlFile.value, this.context.image._element, file);
-            else this.plugins.image.create_image.call(this, this.context.image.imgUrlFile.value, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value + 'px', this.context.image._align, file);
+            const file = {name: contextImage.imgUrlFile.value.split('/').pop(), size: 0};
+            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage.imgUrlFile.value, contextImage._element, file);
+            else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.imageX.value + contextImage.sizeUnit, contextImage._align, file);
         } catch (e) {
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -355,9 +374,15 @@ export default {
     },
 
     setInputSize: function (xy) {
+        const contextImage = this.context.image;
+
+        if (contextImage._imageSizeOnlyPercentage) {
+            if (xy === 'x' && contextImage.imageX.value > 100) contextImage.imageX.value = 100;
+            return;
+        }
+
         if (!this.context.dialog.updateModal) return;
 
-        const contextImage = this.context.image;
         if (contextImage.proportion.checked) {
             if (xy === 'x') {
                 contextImage.imageY.value = Math.round((contextImage._element_h / contextImage._element_w) * contextImage.imageX.value);
@@ -383,6 +408,10 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
+                if (contextImage.imageX.value.trim() === '') {
+                    this.this.closeLoading();
+                    return false;
+                }
                 imagePlugin.update_image.call(this, false, false);
             }
             
@@ -452,8 +481,13 @@ export default {
             }.bind(this));
         }.bind(this);
 
-        img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
-        img.setAttribute('data-origin', img.offsetWidth + ',' + img.offsetHeight);
+        if (!img.getAttribute('origin-size')) {
+            img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
+        }
+        if (!img.getAttribute('data-origin')) {
+            const container = this.util.getParentElement(img, this.util.isComponent);
+            img.setAttribute('data-origin', /%$/.test(img.style.width) ? (/%$/.test(container.style.width) ? container.style.width.match(/\d+/)[0] : '') : (img.offsetWidth + ',' + img.offsetHeight));
+        }
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
     },
@@ -520,7 +554,7 @@ export default {
         if (contextImage._resizing) {
             if (/\d+/.test(width)) {
                 width = width.match(/\d+/)[0] * 1;
-                if (width > 0) oImg.style.width = width + 'px';
+                if (width > 0) oImg.style.width = (contextImage._imageSizeOnlyPercentage ? '100%' : width + contextImage.sizeUnit);
                 else width = '';
             }
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
@@ -552,6 +586,10 @@ export default {
             contextImage._cover = cover;
             contextImage._container = container;
             this.plugins.image.setAutoSize.call(this);
+        }
+
+        if (contextImage._imageSizeOnlyPercentage) {
+            container.style.width = width + contextImage.sizeUnit;
         }
 
         this.insertComponent(container);
@@ -588,7 +626,13 @@ export default {
 
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
-            if (changeSize) this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
+            if (changeSize) {
+                if (contextImage._imageSizeOnlyPercentage) {
+                    this.plugins.image.setPercentSize.call(this, contextImage.imageX.value, 'auto');
+                } else {
+                    this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value, false);
+                }
+            }
         }
 
         // caption
@@ -647,8 +691,10 @@ export default {
         }
 
         // transform
-        if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
-            this.plugins.resizing.setTransformSize.call(this, imageEl, null, null);
+        if (!contextImage._imageSizeOnlyPercentage) {
+            if (!init && (/\d+/.test(imageEl.style.height) || (contextImage._resizing && changeSize) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
+                this.plugins.resizing.setTransformSize.call(this, imageEl, null, null);
+            }
         }
 
         // set imagesInfo
@@ -676,7 +722,12 @@ export default {
 
     sizeRevert: function () {
         const contextImage = this.context.image;
-        if (contextImage._origin_w) {
+
+        if (!contextImage._origin_w) return;
+
+        if (contextImage._imageSizeOnlyPercentage) {
+            contextImage.imageX.value = contextImage._origin_w > 100 ? 100 : contextImage._origin_w;
+        } else {
             contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
             contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
         }
@@ -720,11 +771,15 @@ export default {
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
         
+        const percentageRotation = contextImage._imageSizeOnlyPercentage && this.context.resizing && this.context.resizing._rotateVertical;
+
         if (contextImage._resizing) {
             contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
-            contextImage.imageX.value = contextImage._element.offsetWidth;
-            contextImage.imageY.value = contextImage._element.offsetHeight;
-            contextImage.imageX.disabled = false;
+            contextImage.imageX.value = percentageRotation ? '' : !contextImage._imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
+            this.plugins.image.setInputSize.call(this, 'x');
+            
+            if (!contextImage._imageSizeOnlyPercentage) contextImage.imageY.value = contextImage._element.offsetHeight;
+            contextImage.imageX.disabled = percentageRotation ? true : false;
             contextImage.imageY.disabled = false;
             contextImage.proportion.disabled = false;
         }
@@ -740,10 +795,11 @@ export default {
         }
     },
 
-    setSize: function (w, h) {
+    setSize: function (w, h, notResetPercentage) {
         const contextImage = this.context.image;
-        contextImage._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
-        contextImage._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
+        contextImage._element.style.width = /^\d+$/.test(w) ? w + contextImage.sizeUnit : w;
+        contextImage._element.style.height = /^\d+$/.test(h) ? h + contextImage.sizeUnit : h;
+        if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
     },
     
     setAutoSize: function () {
@@ -755,7 +811,7 @@ export default {
         const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
 
         contextImage._element.style.maxWidth = '100%';
-        contextImage._element.style.width = originSize[0] ? originSize[0] + 'px' : '100%';
+        contextImage._element.style.width = originSize[0] ? originSize[0] + contextImage.sizeUnit : '100%';
         contextImage._element.style.height = '';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
@@ -765,7 +821,7 @@ export default {
         const contextImage = this.context.image;
 
         contextImage._element.style.maxWidth = '100%';
-        contextImage._container.style.width = w;
+        contextImage._container.style.width = w + '%';
         contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
         contextImage._cover.style.height = '';
@@ -776,6 +832,8 @@ export default {
             this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
             this.util.addClass(contextImage._container, '__se__float-center');
         }
+
+        contextImage._element.setAttribute('data-percentage', w);
     },
 
     cancelPercentAttr: function () {

@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <style>
+        .sun-editor-editable .__se__customClass, .sun-editor .__se__customClass {
+            border: 1px solid #b1b1b1;
+            padding: 4px;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -138,6 +144,18 @@
             <span>&nbsp;&nbsp;{text: 'Single', value: 1},</span><br>
             <span>&nbsp;&nbsp;{text: 'Double', value: 2}</span><br>
             <span>]</span>
+            <br><br>
+            <label><input type="checkbox" id="paragraphStyles">&nbsp;&nbsp;paragraphStyles</label><br>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;'invert',</span><br>
+            <span>&nbsp;&nbsp;{name: 'Box', class: '__se__customClass'}</span><br>
+            <span>]</span>
+            <br><br>
+            <label><input type="checkbox" id="textStyles">&nbsp;&nbsp;textStyles</label><br>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;'translucent',</span><br>
+            <span>&nbsp;&nbsp;{name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}</span><br>
+            <span>]</span>
 
             <br>
             <h4 style="color: #b94a48;">--Image</h4>
@@ -147,7 +165,18 @@
             <br><br>
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
             <input type="text" id="imageWidth_value" placeholder="Number" style="width: 200px">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+            <label> -&nbsp;&nbsp;imageSizeUnit</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageSizeUnit_1" name="radio_imageSizeUnit" value="px" checked>&nbsp;&nbsp;px</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageSizeUnit_2" name="radio_imageSizeUnit" value="%">&nbsp;&nbsp;%</label>
+            <br><br>
+            <label><input type="checkbox" id="imageRotation">&nbsp;&nbsp;imageRotation</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageRotation_1" name="radio_imageRotation" value="px" checked>&nbsp;&nbsp;true</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_imageRotation_2" name="radio_imageRotation" value="%">&nbsp;&nbsp;false</label>
             <br><br>
             <label><input type="checkbox" id="imageUploadHeader">&nbsp;&nbsp;imageUploadHeader</label>
             <textarea id="imageUploadHeader_value" placeholder='{"Access-Control-Allow-Origin": "*"}' style="width: 300px; vertical-align: top;"></textarea>
@@ -228,10 +257,8 @@
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<!-- <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
-<script src="../../dist/suneditor.min.js"></script> -->
-<link href="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/dist/css/suneditor.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/dist/suneditor.min.js"></script>
+<link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+<script src="../../dist/suneditor.min.js"></script>
 <!-- codeMirror -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
@@ -239,14 +266,14 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
 <!-- languages -->
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/da.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/de.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/en.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/fr.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/ja.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/ko.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/ru.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suneditor@2.21.2/src/lang/zh_cn.js"></script>
+<script src="../../src/lang/da.js"></script>
+<script src="../../src/lang/de.js"></script>
+<script src="../../src/lang/en.js"></script>
+<script src="../../src/lang/fr.js"></script>
+<script src="../../src/lang/ja.js"></script>
+<script src="../../src/lang/ko.js"></script>
+<script src="../../src/lang/ru.js"></script>
+<script src="../../src/lang/zh_cn.js"></script>
 <script>
 var optionDisplay = document.getElementById('option_display');
 var langSelect = document.getElementById('language');
@@ -259,64 +286,69 @@ function sun_create () {
 
     var options = {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
-        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : null,
-        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : null,
+        toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
+        stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
         iframe: document.getElementById('iframe').checked,
         fullPage: document.getElementById('fullPage').checked,
-        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : null,
-        codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : null,
-        position: document.getElementById('position').checked ? document.getElementById('position_value').value : null,
-        popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : null,
+        iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,
+        codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
+        position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
+        popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
         resizingBar: document.getElementById('resizingBar').checked,
         showPathLabel: document.getElementById('showPathLabel').checked,
         charCounter: document.getElementById('charCounter').checked,
-        maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : null,
-        display: document.getElementById('display').checked ? document.getElementById('display_value').value : null,
-        width: document.getElementById('width').checked ? document.getElementById('width_value').value : null,
-        minWidth: document.getElementById('minWidth').checked ? document.getElementById('minWidth_value').value : null,
-        maxWidth: document.getElementById('maxWidth').checked ? document.getElementById('maxWidth_value').value : null,
-        height: document.getElementById('height').checked ? document.getElementById('height_value').value : null,
-        minHeight: document.getElementById('minHeight').checked ? document.getElementById('minHeight_value').value : null,
-        maxHeight: document.getElementById('maxHeight').checked ? document.getElementById('maxHeight_value').value : null,
-        font: !document.getElementById('font').checked ? null : [
+        maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : undefined,
+        display: document.getElementById('display').checked ? document.getElementById('display_value').value : undefined,
+        width: document.getElementById('width').checked ? document.getElementById('width_value').value : undefined,
+        minWidth: document.getElementById('minWidth').checked ? document.getElementById('minWidth_value').value : undefined,
+        maxWidth: document.getElementById('maxWidth').checked ? document.getElementById('maxWidth_value').value : undefined,
+        height: document.getElementById('height').checked ? document.getElementById('height_value').value : undefined,
+        minHeight: document.getElementById('minHeight').checked ? document.getElementById('minHeight_value').value : undefined,
+        maxHeight: document.getElementById('maxHeight').checked ? document.getElementById('maxHeight_value').value : undefined,
+        font: !document.getElementById('font').checked ? undefined : [
             'Arial',
             'tahoma',
             'Courier New,Courier'
         ],
-        fontSize: !document.getElementById('fontSize').checked ? null : [
+        fontSize: !document.getElementById('fontSize').checked ? undefined : [
             8, 10, 14, 18, 24, 36
         ],
-        fontSizeUnit: document.getElementById('fontSizeUnit').checked ? document.getElementById('fontSizeUnit_value').value : null,
-        formats: !document.getElementById('formats').checked ? null : [
+        fontSizeUnit: document.getElementById('fontSizeUnit').checked ? document.getElementById('fontSizeUnit_value').value : undefined,
+        formats: !document.getElementById('formats').checked ? undefined : [
             'p', 'blockquote', 'h1', 'h2', 'h3'
         ],
-        colorList: !document.getElementById('colorList').checked ? null : [
+        colorList: !document.getElementById('colorList').checked ? undefined : [
             ['#ff0000', '#ff5e00', '#ffe400', '#abf200'], ['#00d8ff', '#0055ff', '#6600ff', '#ff00dd']
         ],
         imageResizing: document.getElementById('imageResizing').checked,
         imageFileInput: document.getElementById('imageFileInput').checked,
         imageUrlInput: document.getElementById('imageUrlInput').checked,
-        imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : null,
-        imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : null,
-        imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : null,
-        imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : null,
+        imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
+        imageSizeUnit: document.getElementById('radio_imageSizeUnit_1').checked ? 'px' : '%',
+        imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
+        imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
+        imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
+        imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked,
-        videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : null,
-        videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : null,
-        youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : null,
-        callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : null,
-        lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : null,
-        templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : null,
-        placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : null,
+        videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
+        videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : undefined,
+        youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
+        callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
+        lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
+        paragraphStyles: document.getElementById('paragraphStyles').checked ? ['invert', {name: 'Box', class: '__se__customClass'}] : undefined,
+        textStyles: document.getElementById('textStyles').checked ? ['translucent', {name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}] : undefined,
+        templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
+        placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
+            'paragraphStyle',
             'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+            'fontColor', 'hiliteColor', 'textStyle',
             'removeFormat',
-            'fontColor', 'hiliteColor',
             'outdent', 'indent',
-            'align', 'horizontalRule', 'list', 'lineHeight', 'table',
-            'link', 'image', 'video',
+            'align', 'horizontalRule', 'list', 'lineHeight',
+            'table', 'link', 'image', 'video',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print', 'save', 'template']
         ],

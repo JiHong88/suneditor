@@ -68,7 +68,9 @@
             tag_blockquote: '引用',
             tag_pre: '代码',
             template: '模板',
-            lineHeight: '线高'
+            lineHeight: '线高',
+            paragraphStyle: '段落样式',
+            textStyle: '文字样式'
         },
         dialogBox: {
             linkBox: {
@@ -97,10 +99,12 @@
             right: '右',
             center: '居中',
             width: '宽度',
-            height: '高度'
+            height: '高度',
+            size: '尺寸'
         },
         controller: {
             edit: '编辑',
+            unlink: '去除链接',
             remove: '删除',
             insertRowAbove: '在上方插入',
             insertRowBelow: '在下方插入',
@@ -123,6 +127,14 @@
             splitCells: '分裂细胞',
             HorizontalSplit: '水平分割',
             VerticalSplit: '垂直分裂'
+        },
+        menu: {
+            spaced: '间隔开',
+            bordered: '边界线',
+            invert: '反转颜色',
+            neon: '氖',
+            translucent: '半透明',
+            shadow: '暗影'
         }
     };
 

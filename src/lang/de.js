@@ -68,7 +68,9 @@
             tag_blockquote: 'Zitat',
             tag_pre: 'Quellcode',
             template: 'Skabelon',
-            lineHeight: 'Linienhöhe'
+            lineHeight: 'Linienhöhe',
+            paragraphStyle: 'Absatzstil',
+            textStyle: 'Textstil'
         },
         dialogBox: {
             linkBox: {
@@ -92,15 +94,17 @@
             submitButton: 'Übernehmen',
             revertButton: 'Rückgängig',
             proportion: 'Seitenverhältnis beibehalten',
-            width: 'Breite',
-            height: 'Höhe',
             basic: 'Standard',
             left: 'Links',
             right: 'Rechts',
-            center: 'Zentriert'
+            center: 'Zentriert',
+            width: 'Breite',
+            height: 'Höhe',
+            size: 'Größe'
         },
         controller: {
             edit: 'Bearbeiten',
+            unlink: 'Link entfernen',
             remove: 'Löschen',
             insertRowAbove: 'Zeile oberhalb einfügen',
             insertRowBelow: 'Zeile unterhalb einfügen',
@@ -123,6 +127,14 @@
             splitCells: 'Zellen Teilung',
             HorizontalSplit: 'Horizontale Teilung',
             VerticalSplit: 'Vertikale Teilung'
+        },
+        menu: {
+            spaced: 'Buchstaben Abstand',
+            bordered: 'Grenzlinie',
+            invert: 'Farbe umkehren',
+            neon: 'Neon',
+            translucent: 'Durchscheinend',
+            shadow: 'Schatten'
         }
     };
 

@@ -52,15 +52,14 @@ export default {
             ] : option.font;
 
         let list = '<div class="se-submenu se-list-inner se-list-font-family">' +
-            '   <ul class="se-list-basic">' +
-            '       <li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+                '<ul class="se-list-basic">' +
+                    '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (i = 0, len = fontList.length; i < len; i++) {
             font = fontList[i];
             text = font.split(',')[0];
             list += '<li><button type="button" class="se-btn-list" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
         }
-        list += '   </ul>';
-        list += '</div>';
+        list += '</ul></div>';
         listDiv.innerHTML = list;
 
         return listDiv;
@@ -95,9 +94,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontFamily = value;
-            this.nodeChange(newNode, ['font-family'], null);
+            this.nodeChange(newNode, ['font-family'], null, null);
         } else {
-            this.nodeChange(null, ['font-family'], null);
+            this.nodeChange(null, ['font-family'], ['span'], true);
         }
         
         this.submenuOff();

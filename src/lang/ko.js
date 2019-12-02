@@ -36,7 +36,7 @@
             superscript: '위 첨자',
             removeFormat: '형식 제거',
             fontColor: '글자색',
-            hiliteColor: '글자 배경색',
+            hiliteColor: '배경색',
             indent: '들여쓰기',
             outdent: '내어쓰기',
             align: '정렬',
@@ -68,7 +68,9 @@
             tag_blockquote: '인용문',
             tag_pre: '코드',
             template: '템플릿',
-            lineHeight: '줄 높이'
+            lineHeight: '줄 높이',
+            paragraphStyle: '문단 스타일',
+            textStyle: '글자 스타일'
         },
         dialogBox: {
             linkBox: {
@@ -97,10 +99,12 @@
             right: '오른쪽',
             center: '가운데',
             width: '가로',
-            height: '세로'
+            height: '세로',
+            size: '크기'
         },
         controller: {
             edit: '편집',
+            unlink: '링크 해제',
             remove: '삭제',
             insertRowAbove: '위에 행 삽입',
             insertRowBelow: '아래에 행 삽입',
@@ -123,6 +127,14 @@
             splitCells: '셀 분할',
             HorizontalSplit: '가로 분할',
             VerticalSplit: '세로 분할'
+        },
+        menu: {
+            spaced: '글자 간격',
+            bordered: '경계선',
+            invert: '색상 반전',
+            neon: '네온',
+            translucent: '반투명',
+            shadow: '그림자'
         }
     };
 

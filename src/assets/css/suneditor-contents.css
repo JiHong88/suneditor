@@ -13,17 +13,13 @@
     color: #333;
     text-align: left;
     background-color: #fff;
-    word-break: normal;
+    word-break: break-all;
     word-wrap: break-word;
     padding: 16px;
     margin: 0;
 }
 
 .sun-editor-editable * {
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
-    background-color: inherit;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -86,7 +82,9 @@
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
-    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: visible;
 }
 
 /* ol, ul */
@@ -143,6 +141,8 @@
 /* blockquote */
 .sun-editor-editable blockquote {
     display: block;
+    font-family: inherit;
+    font-size: inherit;
     color: #999;
     margin-block-start: 1em;
     margin-block-end: 1em;
@@ -319,4 +319,72 @@
 /** video iframe tags */
 .sun-editor-editable .se-video-container iframe {
     outline: 1px solid #9e9e9e;
+}
+
+
+/** -- Paragraph styles custom -- */
+/* Bordered */
+.sun-editor-editable .__se__p-bordered, .sun-editor .__se__p-bordered {
+    border-top: solid 1px #b1b1b1;
+    border-bottom: solid 1px #b1b1b1;
+    padding: 4px 0;
+}
+/* Spaced */
+.sun-editor-editable .__se__p-spaced, .sun-editor .__se__p-spaced {
+    letter-spacing: 1px;
+}
+/* Invert */
+.sun-editor-editable .__se__p-invert, .sun-editor .__se__p-invert {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+    padding: 4px 0;
+}
+/* Neon (https://codepen.io/GeorgePark/pen/MrjbEr) */
+.sun-editor-editable .__se__p-neon, .sun-editor .__se__p-neon {
+    font-weight: 200;
+    font-style: italic;
+    background: #000;
+    color: #fff;
+    padding: 6px 4px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    text-transform: uppercase;
+    animation: neonFlicker 1.5s infinite alternate;     
+}
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow:
+            -0.2rem -0.2rem 1rem #fff,
+            0.2rem 0.2rem 1rem #fff,
+            0 0 2px #f40,
+            0 0 4px #f40,
+            0 0 6px #f40,
+            0 0 8px #f40,
+            0 0 10px #f40;
+        box-shadow:
+            0 0 .5px #fff,
+            inset 0 0 .5px #fff,
+            0 0 2px #08f,
+            inset 0 0 2px #08f,
+            0 0 4px #08f,
+            inset 0 0 4px #08f;        
+    }
+    20%, 24%, 55% {        
+        text-shadow: none;
+        box-shadow: none;
+    }    
+}
+
+
+/* -- Text styles custom -- */
+/* Shadow */
+.sun-editor-editable .__se__t-shadow, .sun-editor .__se__t-shadow {
+    text-shadow:
+        -0.2rem -0.2rem 1rem #fff,
+        0.2rem 0.2rem 1rem #fff,
+        0 0 0.2rem #999,
+        0 0 0.4rem #888,
+        0 0 0.6rem #777,
+        0 0 0.8rem #666,
+        0 0 1rem #555;
 }

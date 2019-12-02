@@ -108,6 +108,9 @@
             margin: 0;
             padding: 0;
         }
+        .sun-editor .__se__format__aaa, .sun-editor-editable .__se__format__aaa {
+            background-color: aquamarine;
+        }
     </style>
 </head>
 <body>
@@ -135,6 +138,17 @@
                 <br>
         
                 <textarea id="editor1" style="width: 1080px; height: 200px;">
+                    <p>Classic mode</p>
+                    <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="width: 640px; max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
+                    <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
+                    <pre><p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p></pre>
+                    <blockquote><p>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</p></blockquote>
+                    <p><strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong> <em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the<strong> </strong><a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a><strong> </strong>license.</p>
+                    <p><hr class="dashed"></p>
+                    <p><span style="font-size: 16px;"><span style="font-family: Impact;">Table</span></span></p>
+                    <table style="width: auto;"><thead><tr><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th></tr></thead><tbody><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr></tbody></table>
+                    <p><br></p>
+                    <p><br></p>
                 </textarea>
                 <button type="button" class="btn btn-md btn-primary" onclick="sun_noticeOpen()">noticeOpen</button>
                 <button type="button" class="btn btn-md btn-primary" onclick="sun_noticeClose()">noticeClose</button>
@@ -158,9 +172,7 @@
                     <p>image testddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</p>
                     <p>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
                     <p>bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb</p>
-                    <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="752,500" data-origin="466,310" data-index="0" data-file-name="cat.jpg" data-file-size="25000" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
                     <p><br></p>
-                    <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="727,485" data-origin="449,300" data-index="1" data-file-name="cat1.jpg" data-file-size="0" style="max-width: 100%; width: 100%; transform: rotate(0deg);"></figure></div>
                     <p><br></p>
                 </textarea>
                 <div id="image_wrapper" class="image-list" style="display: none;">
