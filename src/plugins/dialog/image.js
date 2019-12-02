@@ -481,9 +481,13 @@ export default {
             }.bind(this));
         }.bind(this);
 
-        const container = this.util.getParentElement(img, this.util.isComponent);
-        img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
-        img.setAttribute('data-origin', /%$/.test(img.style.width) ? (/%$/.test(container.style.width) ? container.style.width.match(/\d+/)[0] : '') : (img.offsetWidth + ',' + img.offsetHeight));
+        if (!img.getAttribute('origin-size')) {
+            img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
+        }
+        if (!img.getAttribute('data-origin')) {
+            const container = this.util.getParentElement(img, this.util.isComponent);
+            img.setAttribute('data-origin', /%$/.test(img.style.width) ? (/%$/.test(container.style.width) ? container.style.width.match(/\d+/)[0] : '') : (img.offsetWidth + ',' + img.offsetHeight));
+        }
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
     },
