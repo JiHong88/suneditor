@@ -248,7 +248,7 @@ export default {
 
         // percentage active
         const pButtons = contextResizing.percentageButtons;
-        const value = /%$/.test(targetElement.style.width) ? ((this.util.getParentElement(targetElement, this.util.isComponent).style.width.match(/\d+/)[0] * 1) / 100) + '' : '';
+        const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? ((container.style.width.match(/\d+/)[0] * 1) / 100) + '' : '' ;
         for (let i = 0, len = pButtons.length; i < len; i++) {
             if (pButtons[i].getAttribute('data-value') === value) {
                 this.util.addClass(pButtons[i], 'active');

@@ -442,6 +442,9 @@ imageResizing   : Can resize the image.                             default: tru
 imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
 imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
                   The percentage button is active even if it is "px".   default: 'px' {String}
+imageRotation   : Choose whether to image rotation buttons display.
+                  When "imageSizeUnit" is "%" the default value is false.
+                  If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}

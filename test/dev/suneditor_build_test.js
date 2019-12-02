@@ -60,43 +60,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save']
     ],
-    width: '100%',
-    stickyToolbar: 0,
-    imageWidth: 'auto',
-    imageSizeUnit: '%',
-    // imageRotation: true,
-    // imageResizing: false,
-    mode: 'classic',
-    // toolbarWidth: 800,
-    height: 'auto',
-    // fullPage: true,
-    // iframe: true,
-    // iframeCSSFileName: ['suneditor', 'http://suneditor.com/sample/css/sample.css'],
-    // callBackSave: (contents) => {
-    //     console.log('callback')
-    // }
-    textStyles: [
-        {
-            name: 'Emphasis',
-            style: '-webkit-text-emphasis: filled;',
-            tag: 'span',
-        },
-        {
-            name: 'Neon',
-            class: '__se__p-neon',
-            style: 'font-size: 40px;',
-            tag: 'span',
-        },
-        'shadow'
-    ],
-    paragraphStyles: [
-        'neon',
-        'invert'
-    ],
-    codeMirror: {
-        src: CodeMirror,
-    },
-    placeholder: 'Start typing something2...'
+    "iframe": false,	"fullPage": false,	"resizingBar": false,	"showPathLabel": false,	"charCounter": false,	"imageResizing": true,	"imageFileInput": true,	"imageUrlInput": true,	"imageSizeUnit": "%",	"imageRotation": false,	"videoResizing": false,
 });
 
 ss.onScroll = function (e) {
