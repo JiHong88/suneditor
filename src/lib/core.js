@@ -1449,7 +1449,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                         }
     
-                        child.innerHTML += next.innerHTML;
+                        if (child.nodeType === 3) child.textContent += next.textContent;
+                        else child.innerHTML += next.innerHTML;
+                        
                         inst.util.removeItem(next);
                         i--;
                     }

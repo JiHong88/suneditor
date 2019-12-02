@@ -981,7 +981,7 @@ const util = {
      * @returns {Boolean}
      */
     isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark)$/i.test(element.nodeName);
+        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
     },
 
     /**
