@@ -400,12 +400,13 @@ export default {
         options.textStyles = !options.textStyles ? null : options.textStyles;
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
+        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
         options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
-        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
+        options.imageRotation = options._imageRotation !== undefined ? options._imageRotation :!options._imageSizeOnlyPercentage;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? options.imageUploadSizeLimit.toString().match(/\d+/)[0] * 1 : null;

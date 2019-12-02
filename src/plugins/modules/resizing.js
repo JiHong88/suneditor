@@ -40,6 +40,7 @@ export default {
         let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
         context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
         context.resizing.rotationButtons = resize_button.querySelectorAll('._se_resizing_btn_group ._se_rotation');
+        context.resizing.percentageButtons = resize_button.querySelectorAll('._se_resizing_btn_group ._se_percentage');
 
         context.resizing.alignMenu = resize_button.querySelector('.se-resizing-align-list');
         context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
@@ -100,19 +101,19 @@ export default {
         resize_button.innerHTML = '' +
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div class="se-btn-group _se_resizing_btn_group">' +
-                '<button type="button" data-command="percent" data-value="1" class="se-tooltip">' +
+                '<button type="button" data-command="percent" data-value="1" class="se-tooltip _se_percentage">' +
                     '<span>100%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize100 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="percent" data-value="0.75" class="se-tooltip">' +
+                '<button type="button" data-command="percent" data-value="0.75" class="se-tooltip _se_percentage">' +
                     '<span>75%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize75 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="percent" data-value="0.5" class="se-tooltip">' +
+                '<button type="button" data-command="percent" data-value="0.5" class="se-tooltip _se_percentage">' +
                     '<span>50%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="percent" data-value="0.25" class="se-tooltip">' +
+                '<button type="button" data-command="percent" data-value="0.25" class="se-tooltip _se_percentage">' +
                     '<span>25%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
                 '</button>' +
@@ -209,15 +210,17 @@ export default {
 
         let align = targetElement.getAttribute('data-align') || 'basic';
         align = align === 'none' ? 'basic' : align;
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + w + ' x ' + h + ')');
+
+        // text
+        const container = this.util.getParentElement(targetElement, this.util.isComponent);
+        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' ' + (/%$/.test(targetElement.style.width) ? (/%$/.test(container.style.width) ? container.style.width : 'auto') : '(' + w + ' x ' + h + ')'));
 
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
-        
-        const resizeDisplay = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
+        const resizeDotShow = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
-            resizeHandles[i].style.display = resizeDisplay;
+            resizeHandles[i].style.display = resizeDotShow;
         }
 
         if (contextPlugin._resizing) {
@@ -241,6 +244,17 @@ export default {
         } else {
             this.util.removeClass(contextResizing.captionButton, 'active');
             contextPlugin._captionChecked = false;
+        }
+
+        // percentage active
+        const pButtons = contextResizing.percentageButtons;
+        const value = /%$/.test(targetElement.style.width) ? ((this.util.getParentElement(targetElement, this.util.isComponent).style.width.match(/\d+/)[0] * 1) / 100) + '' : '';
+        for (let i = 0, len = pButtons.length; i < len; i++) {
+            if (pButtons[i].getAttribute('data-value') === value) {
+                this.util.addClass(pButtons[i], 'active');
+            } else {
+                this.util.removeClass(pButtons[i], 'active');
+            }
         }
 
         this._resizingName = plugin;
@@ -449,31 +463,36 @@ export default {
 
         element.style.width = originSize[0] ? originSize[0] + 'px' : 'auto';
         element.style.height = originSize[1] ? originSize[1] + 'px' : '';
-        this.plugins.resizing.setTransformSize.call(this, element, null, null);
+        // this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 
     setTransformSize: function (element, width, height) {
-        const cover = this.util.getParentElement(element, 'FIGURE');
-
+        const percentage = element.getAttribute('data-percentage');
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
-
-        const offsetW = width || element.offsetWidth;
-        const offsetH = height || element.offsetHeight;
-        const w = (isVertical ? offsetH : offsetW) + 'px';
-        const h = (isVertical ? offsetW : offsetH) + 'px';
-
-        this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px');
-
-        cover.style.width = w;
-        cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
-
         let transOrigin = '';
-        if (isVertical) {
-            let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
-            let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
-            transOrigin = deg === 90 || deg === -270 ? transH : transW;
+
+        if (percentage && !isVertical) {
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, 'auto');
+        } else {
+            const cover = this.util.getParentElement(element, 'FIGURE');
+    
+            const offsetW = width || element.offsetWidth;
+            const offsetH = height || element.offsetHeight;
+            const w = (isVertical ? offsetH : offsetW) + 'px';
+            const h = (isVertical ? offsetW : offsetH) + 'px';
+    
+            this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
+            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px', true);
+    
+            cover.style.width = w;
+            cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
+
+            if (isVertical) {
+                let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
+                let transH = (offsetH/2) + 'px ' + (offsetH/2) + 'px 0';
+                transOrigin = deg === 90 || deg === -270 ? transH : transW;
+            }
         }
 
         element.style.transformOrigin = transOrigin;

@@ -39,7 +39,7 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
-            _rotation: !context.option._imageSizeOnlyPercentage,
+            _rotation: context.option.imageRotation,
             _defaultAuto: context.option.imageWidth === 'auto',
             _uploadFileLength: 0,
             _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
@@ -408,6 +408,10 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
+                if (contextImage.imageX.value.trim() === '') {
+                    this.this.closeLoading();
+                    return false;
+                }
                 imagePlugin.update_image.call(this, false, false);
             }
             
@@ -477,8 +481,9 @@ export default {
             }.bind(this));
         }.bind(this);
 
+        const container = this.util.getParentElement(img, this.util.isComponent);
         img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
-        img.setAttribute('data-origin', /%$/.test(img.style.width) ? (this.util.getParentElement(img, this.util.isComponent).style.width || img.style.width).match(/\d+/)[0] : (img.offsetWidth + ',' + img.offsetHeight));
+        img.setAttribute('data-origin', /%$/.test(img.style.width) ? (/%$/.test(container.style.width) ? container.style.width.match(/\d+/)[0] : '') : (img.offsetWidth + ',' + img.offsetHeight));
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
     },
@@ -621,7 +626,7 @@ export default {
                 if (contextImage._imageSizeOnlyPercentage) {
                     this.plugins.image.setPercentSize.call(this, contextImage.imageX.value, 'auto');
                 } else {
-                    this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value);
+                    this.plugins.image.setSize.call(this, contextImage.imageX.value, contextImage.imageY.value, false);
                 }
             }
         }
@@ -762,13 +767,15 @@ export default {
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
         
+        const percentageRotation = contextImage._imageSizeOnlyPercentage && this.context.resizing && this.context.resizing._rotateVertical;
+
         if (contextImage._resizing) {
             contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
-            contextImage.imageX.value = !contextImage._imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
+            contextImage.imageX.value = percentageRotation ? '' : !contextImage._imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
             this.plugins.image.setInputSize.call(this, 'x');
             
             if (!contextImage._imageSizeOnlyPercentage) contextImage.imageY.value = contextImage._element.offsetHeight;
-            contextImage.imageX.disabled = false;
+            contextImage.imageX.disabled = percentageRotation ? true : false;
             contextImage.imageY.disabled = false;
             contextImage.proportion.disabled = false;
         }
@@ -784,10 +791,11 @@ export default {
         }
     },
 
-    setSize: function (w, h) {
+    setSize: function (w, h, notResetPercentage) {
         const contextImage = this.context.image;
         contextImage._element.style.width = /^\d+$/.test(w) ? w + contextImage.sizeUnit : w;
         contextImage._element.style.height = /^\d+$/.test(h) ? h + contextImage.sizeUnit : h;
+        if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
     },
     
     setAutoSize: function () {
@@ -820,6 +828,8 @@ export default {
             this.util.removeClass(contextImage._container, this.context.image._floatClassRegExp);
             this.util.addClass(contextImage._container, '__se__float-center');
         }
+
+        contextImage._element.setAttribute('data-percentage', w);
     },
 
     cancelPercentAttr: function () {
