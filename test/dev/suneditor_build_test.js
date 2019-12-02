@@ -60,7 +60,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save']
     ],
-    "iframe": false,	"fullPage": false,	"resizingBar": false,	"showPathLabel": false,	"charCounter": false,	"imageResizing": true,	"imageFileInput": true,	"imageUrlInput": true,	"imageSizeUnit": "%",	"imageRotation": false,	"videoResizing": false,
 });
 
 ss.onScroll = function (e) {
