@@ -372,10 +372,11 @@ export default {
         }
     },
 
-    setSize: function (w, h) {
+    setSize: function (w, h, notResetPercentage) {
         const contextVideo = this.context.video;
         contextVideo._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
         contextVideo._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
+        if (!notResetPercentage) contextVideo._element.removeAttribute('data-percentage');
     },
 
     setAutoSize: function () {
@@ -408,6 +409,8 @@ export default {
             this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
             this.util.addClass(contextVideo._container, '__se__float-center');
         }
+
+        contextVideo._element.setAttribute('data-percentage', w);
     },
 
     cancelPercentAttr: function () {

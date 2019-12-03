@@ -401,7 +401,7 @@ export default {
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-        options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
+        options.imageWidth = !options.imageWidth ? 'auto' : /^\d+$/.test(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
         options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
         options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
         options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options._imageSizeOnlyPercentage;
