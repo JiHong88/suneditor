@@ -461,7 +461,7 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(originSize[0] ? originSize[0] : 'auto', originSize[1] ? originSize[1] : '', true);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, originSize[0] ? originSize[0] : 'auto', originSize[1] ? originSize[1] : '', true);
         // this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 
