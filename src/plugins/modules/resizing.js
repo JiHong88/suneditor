@@ -429,8 +429,8 @@ export default {
 
                 break;
             case 'revert':
-                if (contextPlugin.setAutoSize) {
-                    contextPlugin.setAutoSize.call(this);
+                if (contextPlugin.setOriginSize) {
+                    contextPlugin.setOriginSize.call(this);
                 } else {
                     contextPlugin.resetAlign.call(this);
                     this.plugins.resizing.resetTransform.call(this, contextEl);
@@ -461,8 +461,7 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        element.style.width = originSize[0] ? originSize[0] + 'px' : 'auto';
-        element.style.height = originSize[1] ? originSize[1] + 'px' : '';
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(originSize[0] ? originSize[0] : 'auto', originSize[1] ? originSize[1] : '', true);
         // this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 

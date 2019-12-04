@@ -36,6 +36,8 @@
     display: block;
     margin: 0;
     padding: 0;
+    width: auto;
+    height: auto;
     max-width: 100%;
 }
 
@@ -74,7 +76,7 @@
 
 /* pre */
 .sun-editor-editable pre {
-    display: block;
+    display: flex;
     padding: 8px;
     margin: 0 0 10px;
     line-height: 1.45;
@@ -232,7 +234,7 @@
 
 /* hr */
 .sun-editor-editable hr {
-    display: block;
+    display: flex;
     border-width: 1px 0 0;
     border-color: black;
     border-image: initial;
@@ -281,6 +283,12 @@
     padding: 1px;
     margin: 0 0 10px;
 }
+.sun-editor-editable .se-component.__se__float-left {
+    margin: 0 20px 10px 0;
+}
+.sun-editor-editable .se-component.__se__float-right {
+    margin: 0 0 10px 20px;
+}
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: 1px dashed #e1e1e1;
     user-select: none;
@@ -292,6 +300,11 @@
 }
 
 /** image, video iframe figure cover */
+.sun-editor-editable .se-image-container, .sun-editor-editable .se-video-container {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+}
 .sun-editor-editable figure {
     display: block;
     outline: none;

@@ -18,7 +18,7 @@ export default {
         
         const context = core.context;
         context.image = {
-            sizeUnit: context.option.imageSizeUnit,
+            sizeUnit: context.option._imageSizeUnit,
             _linkElement: null,
             _container: null,
             _cover: null,
@@ -42,7 +42,7 @@ export default {
             _rotation: context.option.imageRotation,
             _defaultAuto: context.option.imageWidth === 'auto',
             _uploadFileLength: 0,
-            _imageSizeOnlyPercentage: context.option._imageSizeOnlyPercentage
+            _imageSizeOnlyPercentage: context.option.imageSizeOnlyPercentage
         };
 
         /** image dialog */
@@ -125,9 +125,9 @@ export default {
                         '</div>';
 
             if (option.imageResizing) {
-                const onlyPercentDisplay = option._imageSizeOnlyPercentage ? ' style="display: none !important;"' : '';
+                const onlyPercentDisplay = option.imageSizeOnlyPercentage ? ' style="display: none !important;"' : '';
                 html += '<div class="se-dialog-form _se_image_size_form">';
-                            if (option._imageSizeOnlyPercentage) {
+                            if (option.imageSizeOnlyPercentage) {
                                 html += '' +
                                 '<div class="se-dialog-size-text">' +
                                     '<label class="size-w">' + lang.dialogBox.size + '</label>' +
@@ -141,10 +141,10 @@ export default {
                                 '</div>';
                             }
                             html += '' +
-                                '<input class="se-input-control _se_image_size_x" type="number" min="1"' + (option.imageWidth === 'auto' ? ' disabled' : '') + (option._imageSizeOnlyPercentage ? ' max="100"' : '') + ' />' +
-                                '<label class="se-dialog-size-x">' + (option._imageSizeOnlyPercentage ? '%' : 'x') + '</label>' +
-                                '<input class="se-input-control _se_image_size_y" type="number" min="1" disabled' + onlyPercentDisplay + '/>' +
-                                '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                                '<input class="se-input-control _se_image_size_x" placeholder="auto"' + (option.imageSizeOnlyPercentage ? ' type="number" min="1"' : 'type="text"') + (option.imageSizeOnlyPercentage ? ' max="100"' : '') + ' />' +
+                                '<label class="se-dialog-size-x">' + (option.imageSizeOnlyPercentage ? '%' : 'x') + '</label>' +
+                                '<input class="se-input-control _se_image_size_y" placeholder="auto"' + (option.imageSizeOnlyPercentage ? ' type="number" min="1"' : 'type="text"') + onlyPercentDisplay + (option.imageSizeOnlyPercentage ? ' max="100"' : '') + '/>' +
+                                '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                                 '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                         '</div>' ;
             }
@@ -265,7 +265,7 @@ export default {
                 }
 
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image.imageY.value, this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                 if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
@@ -276,7 +276,7 @@ export default {
             }
             else {
                 for (let i = 0; i < filesLen; i++) {
-                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image._align, i, filesLen - 1);
+                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.imageX.value, this.context.image.imageY.value, this.context.image._align, i, filesLen - 1);
                 }
             }
         }
@@ -291,7 +291,7 @@ export default {
         }
     },
 
-    setup_reader: function (file, imgLinkValue, newWindowCheck, width, align, index, filesLen) {
+    setup_reader: function (file, imgLinkValue, newWindowCheck, width, height, align, index, filesLen) {
         const reader = new FileReader();
         
         if (this.context.dialog.updateModal) {
@@ -302,7 +302,7 @@ export default {
         reader.onload = function (update, updateElement, file) {
             try {
                 if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
-                else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, align, file);
+                else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
 
                 if (index === filesLen) this.closeLoading();
             } catch (e) {
@@ -314,7 +314,7 @@ export default {
         reader.readAsDataURL(file);
     },
 
-    callBack_imgUpload: function (linkValue, linkNewWindow, width, align, update, updateElement) {
+    callBack_imgUpload: function (linkValue, linkNewWindow, width, height, align, update, updateElement) {
         if (this.context.image._xmlHttp.readyState === 4) {
             if (this.context.image._xmlHttp.status === 200) {
                 const response = JSON.parse(this.context.image._xmlHttp.responseText);
@@ -329,7 +329,7 @@ export default {
                     for (let i = 0, len = fileList.length, file; i < len; i++) {
                         file = {name: fileList[i].name, size: fileList[i].size};
                         if (update) this.plugins.image.update_src.call(this, fileList[i].url, updateElement, file);
-                        else this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, align, file);
+                        else this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, height, align, file);
                     }
                 }
 
@@ -350,7 +350,7 @@ export default {
         try {
             const file = {name: contextImage.imgUrlFile.value.split('/').pop(), size: 0};
             if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage.imgUrlFile.value, contextImage._element, file);
-            else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.imageX.value + contextImage.sizeUnit, contextImage._align, file);
+            else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.imageX.value, contextImage.imageY.value, contextImage._align, file);
         } catch (e) {
             throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -383,11 +383,12 @@ export default {
 
         if (!this.context.dialog.updateModal) return;
 
-        if (contextImage.proportion.checked) {
+        if (contextImage.proportion.checked && /\d/.test(contextImage.imageX.value) && /\d/.test(contextImage.imageY.value)) {
+            const unit = contextImage.imageX.value.replace(/\d+/, '');
             if (xy === 'x') {
-                contextImage.imageY.value = Math.round((contextImage._element_h / contextImage._element_w) * contextImage.imageX.value);
+                contextImage.imageY.value = Math.round((contextImage._element_h / contextImage._element_w) * (contextImage.imageX.value.match(/\d+/)[0] * 1)) + unit;
             } else {
-                contextImage.imageX.value = Math.round((contextImage._element_w / contextImage._element_h) * contextImage.imageY.value);
+                contextImage.imageX.value = Math.round((contextImage._element_w / contextImage._element_h) * (contextImage.imageY.value.match(/\d+/)[0] * 1)) + unit;
             }
         }
     },
@@ -486,7 +487,7 @@ export default {
         }
         if (!img.getAttribute('data-origin')) {
             const container = this.util.getParentElement(img, this.util.isComponent);
-            img.setAttribute('data-origin', /%$/.test(img.style.width) ? (/%$/.test(container.style.width) ? container.style.width.match(/\d+/)[0] : '') : (img.offsetWidth + ',' + img.offsetHeight));
+            img.setAttribute('data-origin', /%$/.test(img.style.width) ? (container.style.width + ',' + container.style.height) : (img.style.width + ',' + img.style.height));
         }
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
@@ -519,6 +520,10 @@ export default {
                     'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
                     'size': img.getAttribute('data-file-size') || 0
                 });
+                if (!img.style.width) {
+                    imagePlugin.onModifyMode.call(this, img, null);
+                    imagePlugin.setOriginSize.call(this);
+                }
             } else {
                 currentImages.push(img.getAttribute('data-index') * 1);
             }
@@ -539,7 +544,7 @@ export default {
         this.plugins.image.setImagesInfo.call(this, oImg, file);
     },
 
-    create_image: function (src, linkValue, linkNewWindow, width, align, file) {
+    create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
         const contextImage = this.context.image;
 
         let oImg = this.util.createElement('IMG');
@@ -552,11 +557,6 @@ export default {
         oImg.setAttribute('data-rotate', '0');
 
         if (contextImage._resizing) {
-            if (/\d+/.test(width)) {
-                width = width.match(/\d+/)[0] * 1;
-                if (width > 0) oImg.style.width = (contextImage._imageSizeOnlyPercentage ? '100%' : width + contextImage.sizeUnit);
-                else width = '';
-            }
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         }
 
@@ -580,16 +580,19 @@ export default {
         this.util.removeClass(container, contextImage._floatClassRegExp);
         this.util.addClass(container, '__se__float-' + align);
 
+        contextImage._element = oImg;
+        contextImage._cover = cover;
+        contextImage._container = container;
+
         if (!contextImage._resizing || !/\d+/.test(width)) {
             this.context.resizing._resize_plugin = 'image';
-            contextImage._element = oImg;
-            contextImage._cover = cover;
-            contextImage._container = container;
-            this.plugins.image.setAutoSize.call(this);
+            this.plugins.image.setOriginSize.call(this);
         }
 
-        if (contextImage._imageSizeOnlyPercentage) {
-            container.style.width = width + contextImage.sizeUnit;
+        if (contextImage._imageSizeOnlyPercentage || (/%$/.test(width) && (/%$/.test(height) || !/\d/.test(height)))) {
+            this.plugins.image.setPercentSize.call(this, width, height);
+        } else {
+            this.plugins.image.setSize.call(this, width, height);
         }
 
         this.insertComponent(container);
@@ -621,9 +624,10 @@ export default {
             container.appendChild(cover);
         }
 
-        // size
+        // alt
         imageEl.alt = contextImage._altText;
-
+        
+        // size
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
             if (changeSize) {
@@ -728,8 +732,8 @@ export default {
         if (contextImage._imageSizeOnlyPercentage) {
             contextImage.imageX.value = contextImage._origin_w > 100 ? 100 : contextImage._origin_w;
         } else {
-            contextImage.imageX.value = contextImage._element_w = contextImage._origin_w;
-            contextImage.imageY.value = contextImage._element_h = contextImage._origin_h;
+            contextImage.imageX.value = contextImage._origin_w;
+            contextImage.imageY.value = contextImage._origin_h;
         }
     },
 
@@ -775,13 +779,13 @@ export default {
 
         if (contextImage._resizing) {
             contextImage.proportion.checked = contextImage._proportionChecked = contextImage._element.getAttribute('data-proportion') !== 'false';
-            contextImage.imageX.value = percentageRotation ? '' : !contextImage._imageSizeOnlyPercentage ? contextImage._element.offsetWidth : (contextImage._container.style.width.replace(/[^0-9]/g, '') || contextImage._origin_w || '100');
+            contextImage.imageX.value = percentageRotation ? '' : !/%$/.test(contextImage._element.style.width) ? contextImage._element.style.width : (contextImage._container.style.width.replace(/[^0-9]/g, '') || '100') + (contextImage._imageSizeOnlyPercentage ? '' : '%');
             this.plugins.image.setInputSize.call(this, 'x');
             
-            if (!contextImage._imageSizeOnlyPercentage) contextImage.imageY.value = contextImage._element.offsetHeight;
+            if (!contextImage._imageSizeOnlyPercentage) contextImage.imageY.value = percentageRotation ? '' : !/%$/.test(contextImage._element.style.height) ? contextImage._element.style.height : (contextImage._container.style.height.replace(/[^0-9]/g, '') || '100') + (contextImage._imageSizeOnlyPercentage ? '' : '%');
             contextImage.imageX.disabled = percentageRotation ? true : false;
-            contextImage.imageY.disabled = false;
-            contextImage.proportion.disabled = false;
+            contextImage.imageY.disabled = percentageRotation ? true : false;
+            contextImage.proportion.disabled = percentageRotation ? true : false;
         }
 
         if (!notOpen) this.plugins.dialog.open.call(this, 'image', true);
@@ -801,27 +805,40 @@ export default {
         contextImage._element.style.height = /^\d+$/.test(h) ? h + contextImage.sizeUnit : h;
         if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
     },
-    
+
     setAutoSize: function () {
+        const contextImage = this.context.image;
+        
+        this.plugins.resizing.resetTransform.call(this, contextImage._element);
+        this.plugins.image.cancelPercentAttr.call(this);
+        contextImage._element.style.width = '';
+        contextImage._element.style.height = '';
+    },
+    
+    setOriginSize: function () {
         const contextImage = this.context.image;
 
         this.plugins.resizing.resetTransform.call(this, contextImage._element);
         this.plugins.image.cancelPercentAttr.call(this);
 
         const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
+        const w = originSize[0];
+        const h = originSize[1];
 
-        contextImage._element.style.maxWidth = '100%';
-        contextImage._element.style.width = originSize[0] ? originSize[0] + contextImage.sizeUnit : '100%';
-        contextImage._element.style.height = '';
-        contextImage._cover.style.width = '';
-        contextImage._cover.style.height = '';
+        if (originSize) {
+            if (contextImage._imageSizeOnlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
+                this.plugins.image.setPercentSize.call(this, w);
+            } else {
+                this.plugins.image.setSize.call(this, w, h);
+            }
+        }
     },
 
     setPercentSize: function (w) {
         const contextImage = this.context.image;
 
         contextImage._element.style.maxWidth = '100%';
-        contextImage._container.style.width = w + '%';
+        contextImage._container.style.width = /^\d+$/.test(w) ? w + '%' : w;
         contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
         contextImage._cover.style.height = '';
@@ -839,7 +856,6 @@ export default {
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
         
-        contextImage._element.style.maxWidth = 'none';
         contextImage._cover.style.width = '';
         contextImage._cover.style.height = '';
         contextImage._container.style.width = '';
@@ -897,12 +913,11 @@ export default {
         this.plugins.image.openTab.call(this, 'init');
 
         if (contextImage._resizing) {
-            contextImage.proportion.checked = false;
             contextImage.imageX.value = contextImage._defaultAuto ? '' : this.context.option.imageWidth;
             contextImage.imageY.value = '';
-            contextImage.imageX.disabled = contextImage._defaultAuto;
-            contextImage.imageY.disabled = true;
-            contextImage.proportion.disabled = true;
+            contextImage.imageX.disabled = false;
+            contextImage.imageY.disabled = false;
+            contextImage.proportion.disabled = false;
         }
     }
 };

@@ -380,6 +380,10 @@ export default {
     },
 
     setAutoSize: function () {
+
+    },
+
+    setOriginSize: function () {
         const contextVideo = this.context.video;
 
         this.plugins.resizing.resetTransform.call(this, contextVideo._element);

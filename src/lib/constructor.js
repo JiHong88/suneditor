@@ -402,9 +402,9 @@ export default {
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageWidth = !options.imageWidth ? 'auto' : /^\d+$/.test(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
-        options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
-        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
-        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options._imageSizeOnlyPercentage;
+        options.imageSizeOnlyPercentage = options.imageSizeOnlyPercentage ? '%' : '';
+        options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
+        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options.imageSizeOnlyPercentage;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;

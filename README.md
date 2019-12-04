@@ -439,9 +439,8 @@ textStyles      : You can apply custom style or class to selected text.
 
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
-imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
-                  The percentage button is active even if it is "px".   default: 'px' {String}
+imageWidth      : The default width size of the image frame.        default: 'auto' {String}
+imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
                   When "imageSizeUnit" is "%" the default value is false.
                   If you want the button to be visible, put it a true.     default: true {Boolean}
