@@ -32,15 +32,6 @@
     position: relative;
 }
 
-.sun-editor-editable img, .sun-editor-editable iframe, .sun-editor-editable video, .sun-editor-editable audio {
-    display: block;
-    margin: 0;
-    padding: 0;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-}
-
 /* float */
 .sun-editor-editable .__se__float-left {
     float: left;
@@ -297,6 +288,16 @@
     -khtml-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+}
+
+/** image, video .. */
+.sun-editor-editable img, .sun-editor-editable iframe, .sun-editor-editable video, .sun-editor-editable audio {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    max-width: 100%;
 }
 
 /** image, video iframe figure cover */

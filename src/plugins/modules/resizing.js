@@ -76,9 +76,7 @@ export default {
         resize_container.className = 'se-resizing-container';
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
-            '<div class="se-modal-resize">' +
-                '<div class="se-resize-display"></div>' +
-            '</div>' +
+            '<div class="se-modal-resize"></div>' +
             '<div class="se-resize-dot">' +
                 '<span class="tl"></span>' +
                 '<span class="tr"></span>' +
@@ -88,6 +86,7 @@ export default {
                 '<span class="th"></span>' +
                 '<span class="rw"></span>' +
                 '<span class="bh"></span>' +
+                '<div class="se-resize-display"></div>' +
             '</div>';
 
         return resize_container;
@@ -213,7 +212,10 @@ export default {
 
         // text
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' ' + (/%$/.test(targetElement.style.width) ? (/%$/.test(container.style.width) ? container.style.width : 'auto') : '(' + w + ' x ' + h + ')'));
+        const percentageRotation = contextPlugin._imageSizeOnlyPercentage && contextResizing._rotateVertical;
+        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + (contextPlugin._imageSizeOnlyPercentage ? '' : '%')) || 'auto';
+        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + (contextPlugin._imageSizeOnlyPercentage ? '' : '%')) || 'auto';
+        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + ', ' + displayY + ')');
 
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
@@ -453,7 +455,6 @@ export default {
         element.setAttribute('data-rotateY', '');
 
         this.plugins[this.context.resizing._resize_plugin].setSize.call(this, originSize[0] ? originSize[0] : 'auto', originSize[1] ? originSize[1] : '', true);
-        // this.plugins.resizing.setTransformSize.call(this, element, null, null);
     },
 
     setTransformSize: function (element, width, height) {
@@ -461,9 +462,6 @@ export default {
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
         let transOrigin = '';
-
-        if (isVertical) element.style.maxWidth = 'none';
-        else element.style.maxWidth = '';
 
         if (percentage && !isVertical) {
             this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, (!height ? '' : height + 'px'));
@@ -492,6 +490,9 @@ export default {
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
         this.plugins.resizing.setCaptionPosition.call(this, element);
+
+        if (isVertical) element.style.maxWidth = 'none';
+        else element.style.maxWidth = '';
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -542,6 +543,10 @@ export default {
         e.stopPropagation();
         e.preventDefault();
 
+        const pluginName = this.context.resizing._resize_plugin;
+        const contextEl = this.context[pluginName]._element;
+        const contextPlugin = this.plugins[pluginName];
+
         contextResizing._resizeClientX = e.clientX;
         contextResizing._resizeClientY = e.clientY;
         this.context.element.resizeBackground.style.display = 'block';
@@ -559,7 +564,6 @@ export default {
             this.removeDocEvent('keydown', closureFunc_bind);
             
             if (e.type === 'keydown') {
-
                 this.controllersOff();
                 this.context.element.resizeBackground.style.display = 'none';
                 this.plugins[this.context.resizing._resize_plugin].init.call(this);
@@ -569,6 +573,8 @@ export default {
                 // history stack
                 if (change) this.history.push();
             }
+            
+            contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
@@ -624,8 +630,8 @@ export default {
             const limit = this.context.element.wysiwygFrame.clientWidth - (padding * 2) - 2;
             
             if (this.util.getNumber(w) > limit) {
+                h = this._w.Math.round((h / w) * limit);
                 w = limit;
-                h = this.context.resizing._resize_plugin === 'video' ? (h / w) * limit : 'auto';
             }
         }
 

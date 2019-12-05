@@ -354,7 +354,7 @@
 .sun-editor .se-resizing-container .se-resize-dot > span.th {left:50%; top:-7px; cursor:n-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.rw {right:-7px; bottom:50%; cursor:e-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-7px; cursor:s-resize;}
-.sun-editor .se-resizing-container .se-resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:#fff; background-color:#000; border-radius:2px;}
+.sun-editor .se-resizing-container .se-resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:#fff; background-color:#333; border-radius:2px;}
 /* controller - table */
 .sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
