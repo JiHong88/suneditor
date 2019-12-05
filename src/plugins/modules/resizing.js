@@ -181,8 +181,87 @@ export default {
         return resize_button;
     },
 
-    _module_setInputSize: function () {
+    _module_setModifyInputSize: function (contextPlugin, currentModule) {
+        const percentageRotation = contextPlugin._onlyPercentage && this.context.resizing._rotateVertical;
 
+        contextPlugin.proportion.checked = contextPlugin._proportionChecked = contextPlugin._element.getAttribute('data-proportion') !== 'false';
+        contextPlugin.inputX.value = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.width : (this.util.getNumber(contextPlugin._container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+        currentModule.setInputSize.call(this, 'x');
+        
+        if (!contextPlugin._onlyPercentage) contextPlugin.inputY.value = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+        
+        contextPlugin.inputX.disabled = percentageRotation ? true : false;
+        contextPlugin.inputY.disabled = percentageRotation ? true : false;
+        contextPlugin.proportion.disabled = percentageRotation ? true : false;
+
+        currentModule.setRatio.call(this);
+    },
+
+    _module_setInputSize: function (contextPlugin, xy) {
+        if (contextPlugin._onlyPercentage) {
+            if (xy === 'x' && contextPlugin.inputX.value > 100) contextPlugin.inputX.value = 100;
+            return;
+        }
+
+        if (contextPlugin.proportion.checked && contextPlugin._ratio && /\d/.test(contextPlugin.inputX.value) && /\d/.test(contextPlugin.inputY.value)) {
+            const xUnit = contextPlugin.inputX.value.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
+            const yUnit = contextPlugin.inputY.value.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
+
+            if (xUnit !== yUnit) return;
+
+            const dec = xUnit === '%' ? 2 : 0;
+
+            if (xy === 'x') {
+                contextPlugin.inputY.value = this.util.getNumber(contextPlugin._ratioY * this.util.getNumber(contextPlugin.inputX.value, dec), dec) + yUnit;
+            } else {
+                contextPlugin.inputX.value = this.util.getNumber(contextPlugin._ratioX * this.util.getNumber(contextPlugin.inputY.value, dec), dec) + xUnit;
+            }
+        }
+    },
+
+    _module_setRatio: function (contextPlugin) {
+        const xValue = contextPlugin.inputX.value;
+        const yValue = contextPlugin.inputY.value;
+
+        if (contextPlugin.proportion.checked && /\d+/.test(xValue) && /\d+/.test(yValue)) {
+            const xUnit = xValue.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
+            const yUnit = yValue.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
+
+            if (xUnit !== yUnit) {
+                contextPlugin._ratio = false;
+            } else if (!contextPlugin._ratio) {
+                const x = this.util.getNumber(xValue);
+                const y = this.util.getNumber(yValue);
+
+                contextPlugin._ratio = true;
+                contextPlugin._ratioX = x / y;
+                contextPlugin._ratioY = y / x;
+            }
+        } else {
+            contextPlugin._ratio = false;
+        }
+    },
+
+    _module_isChange: function (contextPlugin) {
+        const x = this.util.isNumber(contextPlugin.inputX.value) ? contextPlugin.inputX.value + contextPlugin.sizeUnit : contextPlugin.inputX.value;
+        const y = this.util.isNumber(contextPlugin.inputY.value) ? contextPlugin.inputY.value + contextPlugin.sizeUnit : contextPlugin.inputY.value;
+
+        if (/%$/.test(contextPlugin._element.style.width)) {
+            return x !== contextPlugin._container.style.width || y !== contextPlugin._container.style.height;
+        } else {
+            return x !== contextPlugin._element.style.width || y !== contextPlugin._element.style.height;
+        }
+    },
+
+    _module_sizeRevert: function (contextPlugin) {
+        if (!contextPlugin._origin_w) return;
+
+        if (contextPlugin._onlyPercentage) {
+            contextPlugin.inputX.value = contextPlugin._origin_w > 100 ? 100 : contextPlugin._origin_w;
+        } else {
+            contextPlugin.inputX.value = contextPlugin._origin_w;
+            contextPlugin.inputY.value = contextPlugin._origin_h;
+        }
     },
 
     call_controller_resize: function (targetElement, plugin) {
@@ -217,8 +296,8 @@ export default {
         // text
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
         const percentageRotation = contextPlugin._onlyPercentage && contextResizing._rotateVertical;
-        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%')) || 'auto';
-        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%')) || 'auto';
+        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + '%') || 'auto';
+        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto';
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + ', ' + displayY + ')');
 
         // resizing display
@@ -344,7 +423,7 @@ export default {
         const pluginName = this.context.resizing._resize_plugin;
         const currentContext = this.context[pluginName];
         const contextEl = currentContext._element;
-        const contextPlugin = this.plugins[pluginName];
+        const currentModule = this.plugins[pluginName];
 
         e.preventDefault();
 
@@ -356,8 +435,8 @@ export default {
         switch (command) {
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-                contextPlugin.setPercentSize.call(this, (value * 100), 'auto');
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                currentModule.setPercentSize.call(this, (value * 100), 'auto');
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':
                 const r = contextEl.getAttribute('data-rotate') || '0';
@@ -384,26 +463,26 @@ export default {
                 contextResizing._rotateVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
                 this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
     
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
                 break;
             case 'onalign':
                 this.plugins.resizing.openAlignMenu.call(this);
                 break;
             case 'align':
                 const alignValue = value === 'basic' ? 'none' : value;
-                contextPlugin.setAlign.call(this, alignValue, null, null, null);
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                currentModule.setAlign.call(this, alignValue, null, null, null);
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'caption':
                 const caption = !currentContext._captionChecked;
-                contextPlugin.openModify.call(this, true);
+                currentModule.openModify.call(this, true);
                 currentContext._captionChecked = currentContext.captionCheckEl.checked = caption;
 
                 if (pluginName === 'image') {
-                    contextPlugin.update_image.call(this, false, false);
+                    currentModule.update_image.call(this, false, false);
                 } else if (pluginName === 'video') {
                     this.context.dialog.updateModal = true;
-                    contextPlugin.submitAction.call(this);
+                    currentModule.submitAction.call(this);
                 }
 
                 if (caption) {
@@ -419,27 +498,27 @@ export default {
 
                     this.controllersOff();
                 } else {
-                    contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
-                    contextPlugin.openModify.call(this, true);
+                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    currentModule.openModify.call(this, true);
                 }
 
                 break;
             case 'revert':
-                if (contextPlugin.setOriginSize) {
-                    contextPlugin.setOriginSize.call(this);
+                if (currentModule.setOriginSize) {
+                    currentModule.setOriginSize.call(this);
                 } else {
-                    contextPlugin.resetAlign.call(this);
+                    currentModule.resetAlign.call(this);
                     this.plugins.resizing.resetTransform.call(this, contextEl);
                 }
     
-                contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'update':
-                contextPlugin.openModify.call(this);
+                currentModule.openModify.call(this);
                 this.controllersOff();
                 break;
             case 'delete':
-                contextPlugin.destroy.call(this);
+                currentModule.destroy.call(this);
                 break;
         }
 
@@ -549,7 +628,7 @@ export default {
 
         const pluginName = this.context.resizing._resize_plugin;
         const contextEl = this.context[pluginName]._element;
-        const contextPlugin = this.plugins[pluginName];
+        const currentModule = this.plugins[pluginName];
 
         contextResizing._resizeClientX = e.clientX;
         contextResizing._resizeClientY = e.clientY;
@@ -578,7 +657,7 @@ export default {
                 if (change) this.history.push();
             }
             
-            contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
+            currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
         }.bind(this);
 
         const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
