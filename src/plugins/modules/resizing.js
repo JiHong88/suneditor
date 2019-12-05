@@ -181,6 +181,10 @@ export default {
         return resize_button;
     },
 
+    _module_setInputSize: function () {
+
+    },
+
     call_controller_resize: function (targetElement, plugin) {
         const contextResizing = this.context.resizing;
         const contextPlugin = this.context[plugin];
@@ -212,14 +216,14 @@ export default {
 
         // text
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
-        const percentageRotation = contextPlugin._imageSizeOnlyPercentage && contextResizing._rotateVertical;
-        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + (contextPlugin._imageSizeOnlyPercentage ? '' : '%')) || 'auto';
-        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + (contextPlugin._imageSizeOnlyPercentage ? '' : '%')) || 'auto';
+        const percentageRotation = contextPlugin._onlyPercentage && contextResizing._rotateVertical;
+        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%')) || 'auto';
+        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%')) || 'auto';
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + ', ' + displayY + ')');
 
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
-        const resizeDotShow = contextPlugin._resizing && !contextPlugin._imageSizeOnlyPercentage ? 'flex' : 'none';
+        const resizeDotShow = contextPlugin._resizing && !contextPlugin._onlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
             resizeHandles[i].style.display = resizeDotShow;

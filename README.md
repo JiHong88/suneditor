@@ -442,7 +442,7 @@ imageResizing   : Can resize the image.                             default: tru
 imageWidth      : The default width size of the image frame.        default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
-                  When "imageSizeUnit" is "%" the default value is false.
+                  When "imageSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
                   If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
@@ -466,8 +466,10 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
-videoWidth      : The default width size of the video frame.         default: 560 {Number}
-videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+videoWidth      : The default width size of the video frame.         default: 'auto' {String}
+videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
+videoRotation   : Choose whether to video rotation buttons display.
+                  When "videoSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
 youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {String}
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
