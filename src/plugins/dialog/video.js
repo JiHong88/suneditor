@@ -139,8 +139,8 @@ export default {
         if (this.context.video.focusElement.value.trim().length === 0) return false;
 
         const contextVideo = this.context.video;
-        const w = (/^\d+$/.test(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
-        const h = (/^\d+$/.test(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
+        const w = (this.util.isNumber(contextVideo.videoWidth.value) ? contextVideo.videoWidth.value : this.context.option.videoWidth);
+        const h = (this.util.isNumber(contextVideo.videoHeight.value) ? contextVideo.videoHeight.value : this.context.option.videoHeight);
         let oIframe = null;
         let cover = null;
         let container = null;
@@ -200,6 +200,7 @@ export default {
             this._variable._videosCnt++;
         }
 
+        /** rendering */
         contextVideo._cover = cover;
         contextVideo._container = container;
 
@@ -229,15 +230,7 @@ export default {
         }
 
         // align
-        if (contextVideo._align && 'none' !== contextVideo._align) {
-            cover.style.margin = 'auto';
-        } else {
-            cover.style.margin = '0';
-        }
-        
-        this.util.removeClass(container, this.context.video._floatClassRegExp);
-        this.util.addClass(container, '__se__float-' + contextVideo._align);
-        oIframe.setAttribute('data-align', contextVideo._align);
+        this.plugins.video.setAlign.call(this, null, oIframe, cover, container);
 
         if (!this.context.dialog.updateModal) {
             this.insertComponent(container);
@@ -374,8 +367,8 @@ export default {
 
     setSize: function (w, h, notResetPercentage) {
         const contextVideo = this.context.video;
-        contextVideo._element.style.width = /^\d+$/.test(w) ? w + 'px' : w;
-        contextVideo._element.style.height = /^\d+$/.test(h) ? h + 'px' : h;
+        contextVideo._element.style.width = this.util.isNumber(w) ? w + 'px' : w;
+        contextVideo._element.style.height = this.util.isNumber(h) ? h + 'px' : h;
         if (!notResetPercentage) contextVideo._element.removeAttribute('data-percentage');
     },
 
@@ -428,6 +421,25 @@ export default {
 
         this.util.removeClass(contextVideo._container, this.context.video._floatClassRegExp);
         this.util.addClass(contextVideo._container, '__se__float-' + contextVideo._align);
+    },
+
+    setAlign: function (align, element, cover, container) {
+        const contextVideo = this.context.video;
+        
+        if (!align) align = contextVideo._align;
+        if (!element) element = contextVideo._element;
+        if (!cover) cover = contextVideo._cover;
+        if (!container) container = contextVideo._container;
+
+        if (align && align !== 'none') {
+            cover.style.margin = 'auto';
+        } else {
+            cover.style.margin = '0';
+        }
+        
+        this.util.removeClass(container, contextVideo._floatClassRegExp);
+        this.util.addClass(container, '__se__float-' + align);
+        element.setAttribute('data-align', align);
     },
 
     resetAlign: function () {

@@ -248,7 +248,7 @@ export default {
 
         // percentage active
         const pButtons = contextResizing.percentageButtons;
-        const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? ((container.style.width.match(/\d+/)[0] * 1) / 100) + '' : '' ;
+        const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width) / 100) + '' : '' ;
         for (let i = 0, len = pButtons.length; i < len; i++) {
             if (pButtons[i].getAttribute('data-value') === value) {
                 this.util.addClass(pButtons[i], 'active');
@@ -385,17 +385,7 @@ export default {
                 break;
             case 'align':
                 const alignValue = value === 'basic' ? 'none' : value;
-        
-                if (alignValue && 'none' !== alignValue) {
-                    currentContext._cover.style.margin = 'auto';
-                } else {
-                    currentContext._cover.style.margin = '0';
-                }
-    
-                this.util.removeClass(currentContext._container, currentContext._floatClassRegExp);
-                this.util.addClass(currentContext._container, '__se__float-' + alignValue);
-                contextEl.setAttribute('data-align', alignValue);
-    
+                contextPlugin.setAlign.call(this, alignValue, null, null, null);
                 contextPlugin.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'caption':
@@ -455,6 +445,7 @@ export default {
         const originSize = (element.getAttribute('data-origin') || '').split(',');
         this.context.resizing._rotateVertical = false;
 
+        element.style.maxWidth = '';
         element.style.transform = '';
         element.style.transformOrigin = '';
         element.setAttribute('data-rotate', '');
@@ -471,8 +462,11 @@ export default {
         const deg = element.getAttribute('data-rotate') * 1;
         let transOrigin = '';
 
+        if (isVertical) element.style.maxWidth = 'none';
+        else element.style.maxWidth = '';
+
         if (percentage && !isVertical) {
-            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, 'auto');
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, (!height ? '' : height + 'px'));
         } else {
             const cover = this.util.getParentElement(element, 'FIGURE');
     
@@ -497,7 +491,7 @@ export default {
         element.style.transformOrigin = transOrigin;
 
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing._setCaptionPosition.call(this, element, this.util.getChildElement(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION'));
+        this.plugins.resizing.setCaptionPosition.call(this, element);
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -528,13 +522,14 @@ export default {
         }
 
         if (r % 180 === 0) {
-            element.style.maxWidth = '100%';
+            element.style.maxWidth = '';
         }
         
         element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
     },
 
-    _setCaptionPosition: function (element, figcaption) {
+    setCaptionPosition: function (element) {
+        const figcaption = this.util.getChildElement(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
         if (figcaption) {
             figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
         }
@@ -624,11 +619,11 @@ export default {
         let w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);
         let h = this._w.Math.round(isVertical ? this.context.resizing._resize_w : this.context.resizing._resize_h);
 
-        if (!isVertical && !/^\d+%$/.test(w)) {
+        if (!isVertical && !/%$/.test(w)) {
             const padding = 16;
             const limit = this.context.element.wysiwygFrame.clientWidth - (padding * 2) - 2;
             
-            if (w.toString().match(/\d+/)[0] > limit) {
+            if (this.util.getNumber(w) > limit) {
                 w = limit;
                 h = this.context.resizing._resize_plugin === 'video' ? (h / w) * limit : 'auto';
             }
