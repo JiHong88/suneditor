@@ -627,6 +627,8 @@ const util = {
      * @returns {Number|null}
      */
     getNumber: function (text, maxDec) {
+        if (!text) return null;
+        
         let number = (text + '').match(/-?\d+(\.\d+)?/);
         if (!number || !number[0]) return null;
 

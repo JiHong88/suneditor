@@ -185,10 +185,17 @@ export default {
         const percentageRotation = contextPlugin._onlyPercentage && this.context.resizing._rotateVertical;
 
         contextPlugin.proportion.checked = contextPlugin._proportionChecked = contextPlugin._element.getAttribute('data-proportion') !== 'false';
-        contextPlugin.inputX.value = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.width : (this.util.getNumber(contextPlugin._container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+
+        let x = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.width : (this.util.getNumber(contextPlugin._container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+        if (x === contextPlugin._defaultSizeX) x = '';
+        contextPlugin.inputX.value = x;
         currentModule.setInputSize.call(this, 'x');
         
-        if (!contextPlugin._onlyPercentage) contextPlugin.inputY.value = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+        if (!contextPlugin._onlyPercentage) {
+            let y = percentageRotation ? '' : this.util.getNumber(contextPlugin._cover.style.paddingBottom) > 0 ? contextPlugin._cover.style.paddingBottom : (!/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%'));
+            if (y === contextPlugin._defaultSizeY) y = '';
+            contextPlugin.inputY.value = y;
+        }
         
         contextPlugin.inputX.disabled = percentageRotation ? true : false;
         contextPlugin.inputY.disabled = percentageRotation ? true : false;
@@ -295,10 +302,11 @@ export default {
 
         // text
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
+        const cover = this.util.getParentElement(targetElement, 'FIGURE');
         const percentageRotation = contextPlugin._onlyPercentage && contextResizing._rotateVertical;
         const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + '%') || 'auto';
-        const displayY = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto';
-        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + ', ' + displayY + ')');
+        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.util.getNumber(cover.style.paddingBottom) > 0 ? cover.style.paddingBottom : ((percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto'));
+        this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + displayY + ')');
 
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
@@ -435,7 +443,7 @@ export default {
         switch (command) {
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-                currentModule.setPercentSize.call(this, (value * 100), 'auto');
+                currentModule.setPercentSize.call(this, (value * 100), '');
                 currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':

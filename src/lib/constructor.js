@@ -412,10 +412,11 @@ export default {
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-        options.videoWidth = !options.videoWidth ? 'auto' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth) ? '100%' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
         options.videoSizeOnlyPercentage = options.videoSizeOnlyPercentage ? '%' : '';
         options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
         options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !options.videoSizeOnlyPercentage;
+        options.videoRatio = util.getNumber(options.videoRatio, 4) || 0.5625; // 16:9
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;

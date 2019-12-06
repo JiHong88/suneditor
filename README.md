@@ -466,7 +466,7 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
-videoWidth      : The default width size of the video frame.         default: 'auto' {String}
+videoWidth      : The default width size of the video frame.         default: '100%' {String}
 videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
 videoRotation   : Choose whether to video rotation buttons display.
                   When "videoSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
