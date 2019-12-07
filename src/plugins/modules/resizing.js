@@ -112,9 +112,9 @@ export default {
                     '<span>50%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="percent" data-value="0.25" class="se-tooltip _se_percentage">' +
-                    '<span>25%</span>' +
-                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize25 + '</span></span>' +
+                '<button type="button" data-command="auto" class="se-tooltip">' +
+                    '<i class="se-icon-auto-size"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.autoSize + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip _se_rotation">' +
                     '<i class="se-icon-rotate-left"></i>' +
@@ -441,6 +441,10 @@ export default {
         }
 
         switch (command) {
+            case 'auto':
+                currentModule.setAutoSize.call(this);
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                break;
             case 'percent':
                 this.plugins.resizing.resetTransform.call(this, contextEl);
                 currentModule.setPercentSize.call(this, (value * 100), '');
@@ -471,7 +475,7 @@ export default {
                 contextResizing._rotateVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
                 this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
     
-                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
+                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'onalign':
                 this.plugins.resizing.openAlignMenu.call(this);
@@ -512,13 +516,7 @@ export default {
 
                 break;
             case 'revert':
-                if (currentModule.setOriginSize) {
-                    currentModule.setOriginSize.call(this);
-                } else {
-                    currentModule.resetAlign.call(this);
-                    this.plugins.resizing.resetTransform.call(this, contextEl);
-                }
-    
+                currentModule.setOriginSize.call(this);
                 currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'update':

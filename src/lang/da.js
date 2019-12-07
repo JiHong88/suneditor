@@ -119,6 +119,7 @@
             resize75: 'Forstør 75%',
             resize50: 'Forstør 50%',
             resize25: 'Forstør 25%',
+            autoSize: 'Auto størrelse',
             mirrorHorizontal: 'Spejling, horisontal',
             mirrorVertical: 'Spejling, vertikal',
             rotateLeft: 'Roter til venstre',

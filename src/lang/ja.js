@@ -116,6 +116,7 @@
             resize75: '75％ サイズ',
             resize50: '50％ サイズ',
             resize25: '25％ サイズ',
+            autoSize: '自動サイズ',
             mirrorHorizontal: '左右反転',
             mirrorVertical: '上下反転',
             rotateLeft: '左に回転',

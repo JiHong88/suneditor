@@ -116,6 +116,7 @@
             resize75: 'Redimensionner à 75%',
             resize50: 'Redimensionner à 50%',
             resize25: 'Redimensionner à 25%',
+            autoSize: 'Taille automatique',
             mirrorHorizontal: 'Mirroir, Horizontal',
             mirrorVertical: 'Mirroir, Vertical',
             rotateLeft: 'Rotation à gauche',

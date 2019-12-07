@@ -75,7 +75,7 @@
 .sun-editor .se-icon-reduction::before{content:'\0059';}
 .sun-editor .se-icon-image::before{content:'\005a';}
 .sun-editor .se-icon-link::before{content:'\0061';}
-.sun-editor .se-icon-sun::before{content:'\0062';}
+.sun-editor .se-icon-auto-size::before{content:'\0062';}
 .sun-editor .se-icon-print::before{content:'\0063';}
 .sun-editor .se-icon-modify::before{content:'\0064';}
 .sun-editor .se-icon-revert::before{content:'\0065';}

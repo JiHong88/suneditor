@@ -116,6 +116,7 @@
             resize75: 'Zoom 75%',
             resize50: 'Zoom 50%',
             resize25: 'Zoom 25%',
+            autoSize: 'Automatische Größenanpassung',
             mirrorHorizontal: 'Horizontal spiegeln',
             mirrorVertical: 'Vertikal spiegeln',
             rotateLeft: 'Nach links drehen',
