@@ -192,7 +192,7 @@ export default {
         currentModule.setInputSize.call(this, 'x');
         
         if (!contextPlugin._onlyPercentage) {
-            let y = percentageRotation ? '' : this.util.getNumber(contextPlugin._cover.style.paddingBottom) > 0 ? contextPlugin._cover.style.paddingBottom : (!/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%'));
+            let y = percentageRotation ? '' : this.util.getNumber(contextPlugin._cover.style.paddingBottom) > 0 ? contextPlugin._cover.style.height : (!/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%'));
             if (y === contextPlugin._defaultSizeY) y = '';
             contextPlugin.inputY.value = y;
         }
@@ -305,7 +305,7 @@ export default {
         const cover = this.util.getParentElement(targetElement, 'FIGURE');
         const percentageRotation = contextPlugin._onlyPercentage && contextResizing._rotateVertical;
         const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + '%') || 'auto';
-        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.util.getNumber(cover.style.paddingBottom) > 0 ? cover.style.paddingBottom : ((percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto'));
+        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.util.getNumber(cover.style.paddingBottom) > 0 ? cover.style.height : ((percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto'));
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + displayY + ')');
 
         // resizing display
@@ -549,13 +549,14 @@ export default {
     },
 
     setTransformSize: function (element, width, height) {
-        const percentage = element.getAttribute('data-percentage');
+        let percentage = element.getAttribute('data-percentage');
         const isVertical = this.context.resizing._rotateVertical;
         const deg = element.getAttribute('data-rotate') * 1;
         let transOrigin = '';
 
         if (percentage && !isVertical) {
-            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage, (!height ? '' : height + 'px'));
+            percentage = percentage.split(',');
+            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage[0], percentage[1]);
         } else {
             const cover = this.util.getParentElement(element, 'FIGURE');
     
@@ -568,7 +569,7 @@ export default {
             this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px', true);
     
             cover.style.width = w;
-            cover.style.height = (this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
+            cover.style.height = (!!this.context[this.context.resizing._resize_plugin]._caption ? '' : h);
 
             if (isVertical) {
                 let transW = (offsetW/2) + 'px ' + (offsetW/2) + 'px 0';
@@ -578,12 +579,12 @@ export default {
         }
 
         element.style.transformOrigin = transOrigin;
-
         this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-        this.plugins.resizing.setCaptionPosition.call(this, element);
-
+        
         if (isVertical) element.style.maxWidth = 'none';
         else element.style.maxWidth = '';
+
+        this.plugins.resizing.setCaptionPosition.call(this, element);
     },
 
     _setTransForm: function (element, r, x, y) {
@@ -726,7 +727,7 @@ export default {
             }
         }
 
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, false);
         this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
         
         this.plugins[this.context.resizing._resize_plugin].init.call(this);

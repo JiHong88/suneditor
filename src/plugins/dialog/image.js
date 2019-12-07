@@ -486,8 +486,8 @@ export default {
         }
         if (!img.getAttribute('data-origin')) {
             const container = this.util.getParentElement(img, this.util.isComponent);
-            const w = !/%$/.test(img.style.width) ? img.style.width : (this.util.getNumber(container.style.width) || 100) + '%';
-            const h = !/%$/.test(img.style.height) || !/%$/.test(img.style.width) ? img.style.height : (this.util.getNumber(container.style.height) || 100) + '%';
+            const w = !/%$/.test(img.style.width) ? img.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
+            const h = !/%$/.test(img.style.height) || !/%$/.test(img.style.width) ? img.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%';
             img.setAttribute('data-origin', w + ',' + h);
         }
 
@@ -499,7 +499,8 @@ export default {
         const imagesInfo = this._variable._imagesInfo;
 
         if (images.length === imagesInfo.length) return;
-        
+
+        this.context.resizing._resize_plugin = 'image';
         const imagePlugin = this.plugins.image;
         const currentImages = [];
         const infoIndex = [];
@@ -538,6 +539,8 @@ export default {
             this._imageUpload(null, dataIndex, 'delete', null, 0);
             i--;
         }
+
+        this.context.resizing._resize_plugin = '';
     },
 
     _onload_image: function (oImg, file) {
@@ -664,7 +667,7 @@ export default {
                 if (/%$/.test(contextImage.inputX.value) || /%$/.test(contextImage.inputY.value)) {
                     this.plugins.resizing.resetTransform.call(this, imageEl);
                 } else {
-                    this.plugins.resizing.setTransformSize.call(this, imageEl, this.util.getNumber(contextImage.inputX.value), this.util.getNumber(contextImage.inputY.value));
+                    this.plugins.resizing.setTransformSize.call(this, imageEl, this.util.getNumber(contextImage.inputX.value, 0), this.util.getNumber(contextImage.inputY.value, 0));
                 }
             }
         }
@@ -762,15 +765,18 @@ export default {
         this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
     },
 
-    applySize: function () {
+    applySize: function (w, h) {
         const contextImage = this.context.image;
+
+        if (!w) w = contextImage.inputX.value;
+        if (!h) h = contextImage.inputY.value;
         
-        if ((contextImage._onlyPercentage && !!contextImage.inputX.value) || /%$/.test(contextImage.inputX.value)) {
-            this.plugins.image.setPercentSize.call(this, contextImage.inputX.value, contextImage.inputY.value);
-        } else if ((!contextImage.inputX.value || contextImage.inputX.value === 'auto') && (!contextImage.inputY.value || contextImage.inputY.value === 'auto')) {
+        if ((contextImage._onlyPercentage && !!w) || /%$/.test(w)) {
+            this.plugins.image.setPercentSize.call(this, w, h);
+        } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.image.setAutoSize.call(this);
         } else {
-            this.plugins.image.setSize.call(this, contextImage.inputX.value, contextImage.inputY.value, false);
+            this.plugins.image.setSize.call(this, w, h, false);
         }
     },
 
@@ -799,10 +805,12 @@ export default {
         contextImage._cover.style.height = '';
 
         this.plugins.image.setAlign.call(this, null, null, null, null);
+        contextImage._element.removeAttribute('data-percentage');
     },
     
     setOriginSize: function () {
         const contextImage = this.context.image;
+        contextImage._element.removeAttribute('data-percentage');
 
         this.plugins.resizing.resetTransform.call(this, contextImage._element);
         this.plugins.image.cancelPercentAttr.call(this);
@@ -822,19 +830,19 @@ export default {
 
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
-        const pxHeight = !!h && !/%$/.test(h) && !this.util.isNumber(h) ? this.util.isNumber(h) ? h + contextImage.sizeUnit : h : '';
+        h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextImage.sizeUnit : (h || '');
 
         contextImage._container.style.width = this.util.isNumber(w) ? w + '%' : w;
         contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
         contextImage._cover.style.height = '';
         contextImage._element.style.width = '100%';
-        contextImage._element.style.height = pxHeight;
+        contextImage._element.style.height = h;
         contextImage._element.style.maxWidth = '';
 
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
 
-        contextImage._element.setAttribute('data-percentage', w);
+        contextImage._element.setAttribute('data-percentage', w + ',' + h);
         this.plugins.resizing.setCaptionPosition.call(this, contextImage._element);
     },
 
@@ -871,7 +879,7 @@ export default {
             cover.style.width = container.style.width;
         } else {
             container.style.minWidth = '';
-            cover.style.width = (!element.style.width || element.style.width === 'auto') ? '' : '100%';
+            cover.style.width = this.context.resizing._rotateVertical ? (element.style.height || element.offsetHeight) : ((!element.style.width || element.style.width === 'auto') ? '' : '100%');
         }
 
         if (!this.util.hasClass(container, '__se__float-' + align)) {
