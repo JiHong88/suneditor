@@ -132,7 +132,6 @@
         menu: {
             spaced: 'Buchstaben Abstand',
             bordered: 'Grenzlinie',
-            invert: 'Farbe umkehren',
             neon: 'Neon',
             translucent: 'Durchscheinend',
             shadow: 'Schatten'

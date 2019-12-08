@@ -396,17 +396,12 @@ paragraphStyles : You can apply custom class to format.
                         class: '__se__p-bordered'
                     },
                     {
-                        name: 'Invert color',
-                        class: '__se__p-invert',
-                        _class: 'se-invert' // .sun-editor .se-invert > div {color: #fff; background-color: #333;}
-                    },
-                    {
                         name: 'Neon',
                         class: '__se__p-neon'
                     }
                   ]
                   ex) [
-                      'invert', 'neon', // The default value is called by name only and the name is called in the language file.
+                      'spaced', 'neon', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Custom',
                           class: '__se__customClass'

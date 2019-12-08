@@ -132,7 +132,6 @@
         menu: {
             spaced: 'интервал',
             bordered: 'Граничная Линия',
-            invert: 'Инвертировать цвет',
             neon: 'неон',
             translucent: 'полупрозрачный',
             shadow: 'Тень'

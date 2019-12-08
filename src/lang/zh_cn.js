@@ -131,7 +131,6 @@
         menu: {
             spaced: '间隔开',
             bordered: '边界线',
-            invert: '反转颜色',
             neon: '氖',
             translucent: '半透明',
             shadow: '暗影'

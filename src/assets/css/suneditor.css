@@ -232,7 +232,6 @@
 .sun-editor .se-list-layer .se-list-align .se-btn-align > span {display:inline-block; width:14px; height:32px; margin:-1px 10px 0 0; vertical-align:middle;}
 /* submenu layer - paragraph style, text style */
 .sun-editor .se-list-layer .se-list-format div {padding:4px 2px;}
-.sun-editor .se-list-layer .se-list-format button.se-invert div {color:#fff; background-color:#333;}
 /* submenu layer --- table selector */
 .sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:4; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:2px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}

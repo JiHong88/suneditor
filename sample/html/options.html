@@ -147,7 +147,7 @@
             <br><br>
             <label><input type="checkbox" id="paragraphStyles">&nbsp;&nbsp;paragraphStyles</label><br>
             <span>[</span><br>
-            <span>&nbsp;&nbsp;'invert',</span><br>
+            <span>&nbsp;&nbsp;'spaced',</span><br>
             <span>&nbsp;&nbsp;{name: 'Box', class: '__se__customClass'}</span><br>
             <span>]</span>
             <br><br>
@@ -335,7 +335,7 @@ function sun_create () {
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
-        paragraphStyles: document.getElementById('paragraphStyles').checked ? ['invert', {name: 'Box', class: '__se__customClass'}] : undefined,
+        paragraphStyles: document.getElementById('paragraphStyles').checked ? ['spaced', {name: 'Box', class: '__se__customClass'}] : undefined,
         textStyles: document.getElementById('textStyles').checked ? ['translucent', {name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}] : undefined,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,

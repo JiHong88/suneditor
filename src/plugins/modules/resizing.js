@@ -48,6 +48,7 @@ export default {
         context.resizing.alignButton = resize_button.querySelector('._se_resizing_align_button');
         context.resizing.alignButtonIcon = context.resizing.alignButton.querySelector('i');
 
+        context.resizing.autoSizeButton = resize_button.querySelector('._se_resizing_btn_group ._se_auto_size');
         context.resizing.captionButton = resize_button.querySelector('._se_resizing_caption_button');
 
         /** add event listeners */
@@ -112,7 +113,7 @@ export default {
                     '<span>50%</span>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
                 '</button>' +
-                '<button type="button" data-command="auto" class="se-tooltip">' +
+                '<button type="button" data-command="auto" class="se-tooltip _se_auto_size">' +
                     '<i class="se-icon-auto-size"></i>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.autoSize + '</span></span>' +
                 '</button>' +
@@ -330,15 +331,6 @@ export default {
             else this.util.removeClass(alignList[i], 'on');
         }
 
-        // caption active
-        if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
-            this.util.addClass(contextResizing.captionButton, 'active');
-            contextPlugin._captionChecked = true;
-        } else {
-            this.util.removeClass(contextResizing.captionButton, 'active');
-            contextPlugin._captionChecked = false;
-        }
-
         // percentage active
         const pButtons = contextResizing.percentageButtons;
         const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width) / 100) + '' : '' ;
@@ -348,6 +340,27 @@ export default {
             } else {
                 this.util.removeClass(pButtons[i], 'active');
             }
+        }
+
+        // caption display, active
+        if (!contextPlugin._caption) {
+            contextResizing.captionButton.style.display = 'none';
+        } else {
+            contextResizing.captionButton.style.display = '';
+            if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
+                this.util.addClass(contextResizing.captionButton, 'active');
+                contextPlugin._captionChecked = true;
+            } else {
+                this.util.removeClass(contextResizing.captionButton, 'active');
+                contextPlugin._captionChecked = false;
+            }
+        }
+
+        // auto size display
+        if (plugin === 'video') {
+            contextResizing.autoSizeButton.style.display = 'none';
+        } else {
+            contextResizing.autoSizeButton.style.display = '';
         }
 
         this._resizingName = plugin;

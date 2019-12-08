@@ -132,7 +132,6 @@
         menu: {
             spaced: 'Espacement',
             bordered: 'Ligne de démarcation',
-            invert: 'Inverser la couleur',
             neon: 'Néon',
             translucent: 'Translucide',
             shadow: 'L\'ombre'

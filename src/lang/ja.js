@@ -132,7 +132,6 @@
         menu: {
             spaced: '文字間隔',
             bordered: '境界線',
-            invert: '色反転',
             neon: 'ネオン',
             translucent: '半透明',
             shadow: '影'

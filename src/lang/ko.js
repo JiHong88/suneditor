@@ -132,7 +132,6 @@
         menu: {
             spaced: '글자 간격',
             bordered: '경계선',
-            invert: '색상 반전',
             neon: '네온',
             translucent: '반투명',
             shadow: '그림자'

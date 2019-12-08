@@ -135,7 +135,6 @@
         menu: {
             spaced: 'Brev Afstand',
             bordered: 'Afgrænsningslinje',
-            invert: 'Inverter farve',
             neon: 'Neon',
             translucent: 'Gennemsigtig',
             shadow: 'Skygge'
