@@ -486,9 +486,12 @@ export default {
         }
         if (!img.getAttribute('data-origin')) {
             const container = this.util.getParentElement(img, this.util.isComponent);
-            const w = !/%$/.test(img.style.width) ? img.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
-            const h = !/%$/.test(img.style.height) || !/%$/.test(img.style.width) ? img.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%';
+            const cover = this.util.getParentElement(img, 'FIGURE');
+
+            const w = this.plugins.resizing._module_getSizeX.call(this, this.context.image, img, cover, container);
+            const h = this.plugins.resizing._module_getSizeY.call(this, this.context.image, img, cover, container);
             img.setAttribute('data-origin', w + ',' + h);
+            img.setAttribute('data-size', w + ',' + h);
         }
 
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
@@ -510,7 +513,7 @@ export default {
 
         for (let i = 0, len = images.length, img; i < len; i++) {
             img = images[i];
-            if (!this.util.getParentElement(img, '.se-image-container')) {
+            if (!this.util.getParentElement(img, this.util.isComponent)) {
                 currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
@@ -711,7 +714,7 @@ export default {
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
-        contextImage._container = this.util.getParentElement(element, '.se-image-container');
+        contextImage._container = this.util.getParentElement(element, this.util.isComponent);
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
@@ -722,7 +725,7 @@ export default {
             contextImage._element_l = size.l;
         }
 
-        let userSize = contextImage._element.getAttribute('data-origin');
+        let userSize = contextImage._element.getAttribute('data-size') || contextImage._element.getAttribute('data-origin');
         if (userSize) {
             userSize = userSize.split(',');
             contextImage._origin_w = userSize[0];
@@ -730,7 +733,6 @@ export default {
         } else if (size) {
             contextImage._origin_w = size.w;
             contextImage._origin_h = size.h;
-            contextImage._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },
 
@@ -790,6 +792,9 @@ export default {
 
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
         if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
+
+        // save current size
+        this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
 
     setAutoSize: function () {
@@ -806,6 +811,9 @@ export default {
 
         this.plugins.image.setAlign.call(this, null, null, null, null);
         contextImage._element.removeAttribute('data-percentage');
+
+        // save current size
+        this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
     
     setOriginSize: function () {
@@ -825,6 +833,9 @@ export default {
             } else {
                 this.plugins.image.setSize.call(this, w, h);
             }
+
+            // save current size
+            this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
         }
     },
 
@@ -844,6 +855,9 @@ export default {
 
         contextImage._element.setAttribute('data-percentage', w + ',' + h);
         this.plugins.resizing.setCaptionPosition.call(this, contextImage._element);
+
+        // save current size
+        this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
 
     cancelPercentAttr: function () {
@@ -900,7 +914,7 @@ export default {
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, '.se-image-container') || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, this.util.isComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         
         this.util.removeItem(imageContainer);

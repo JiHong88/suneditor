@@ -182,19 +182,36 @@ export default {
         return resize_button;
     },
 
+    _module_getSizeX: function (contextPlugin, element, cover, container) {
+        if (!element) element = contextPlugin._element;
+        if (!cover) cover = contextPlugin._cover;
+        if (!container) container = contextPlugin._container;
+
+        return !/%$/.test(element.style.width) ? element.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
+    },
+
+    _module_getSizeY: function (contextPlugin, element, cover, container) {
+        if (!element) element = contextPlugin._element;
+        if (!cover) cover = contextPlugin._cover;
+        if (!container) container = contextPlugin._container;
+
+        return this.util.getNumber(cover.style.paddingBottom) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
+    },
+
     _module_setModifyInputSize: function (contextPlugin, currentModule) {
         const percentageRotation = contextPlugin._onlyPercentage && this.context.resizing._rotateVertical;
-
         contextPlugin.proportion.checked = contextPlugin._proportionChecked = contextPlugin._element.getAttribute('data-proportion') !== 'false';
 
-        let x = percentageRotation ? '' : !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.width : (this.util.getNumber(contextPlugin._container.style.width) || 100) + (contextPlugin._onlyPercentage ? '' : '%');
+        let x = percentageRotation ? '' : this.plugins.resizing._module_getSizeX.call(this, contextPlugin);
         if (x === contextPlugin._defaultSizeX) x = '';
+        if (contextPlugin._onlyPercentage) x = this.util.getNumber(x, 2);
         contextPlugin.inputX.value = x;
         currentModule.setInputSize.call(this, 'x');
         
         if (!contextPlugin._onlyPercentage) {
-            let y = percentageRotation ? '' : this.util.getNumber(contextPlugin._cover.style.paddingBottom) > 0 ? contextPlugin._cover.style.height : (!/%$/.test(contextPlugin._element.style.height) || !/%$/.test(contextPlugin._element.style.width) ? contextPlugin._element.style.height : (this.util.getNumber(contextPlugin._container.style.height) || 100) + (contextPlugin._onlyPercentage ? '' : '%'));
+            let y = percentageRotation ? '' : this.plugins.resizing._module_getSizeY.call(this, contextPlugin);
             if (y === contextPlugin._defaultSizeY) y = '';
+            if (contextPlugin._onlyPercentage) y = this.util.getNumber(y, 2);
             contextPlugin.inputY.value = y;
         }
         
@@ -262,14 +279,16 @@ export default {
     },
 
     _module_sizeRevert: function (contextPlugin) {
-        if (!contextPlugin._origin_w) return;
-
         if (contextPlugin._onlyPercentage) {
             contextPlugin.inputX.value = contextPlugin._origin_w > 100 ? 100 : contextPlugin._origin_w;
         } else {
             contextPlugin.inputX.value = contextPlugin._origin_w;
             contextPlugin.inputY.value = contextPlugin._origin_h;
         }
+    },
+
+    _module_saveCurrentSize: function (contextPlugin) {
+        contextPlugin._element.setAttribute('data-size', this.plugins.resizing._module_getSizeX.call(this, contextPlugin) + ',' + this.plugins.resizing._module_getSizeY.call(this, contextPlugin));
     },
 
     call_controller_resize: function (targetElement, plugin) {
@@ -304,9 +323,8 @@ export default {
         // text
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
         const cover = this.util.getParentElement(targetElement, 'FIGURE');
-        const percentageRotation = contextPlugin._onlyPercentage && contextResizing._rotateVertical;
-        const displayX = (percentageRotation ? 'auto' : !/%$/.test(targetElement.style.width) ? targetElement.style.width : (this.util.getNumber(container.style.width) || 100) + '%') || 'auto';
-        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.util.getNumber(cover.style.paddingBottom) > 0 ? cover.style.height : ((percentageRotation ? 'auto' : !/%$/.test(targetElement.style.height) || !/%$/.test(targetElement.style.width) ? targetElement.style.height : (this.util.getNumber(container.style.height) || 100) + '%') || 'auto'));
+        const displayX = this.plugins.resizing._module_getSizeX.call(this, contextPlugin, targetElement, cover, container) || 'auto';
+        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + displayY + ')');
 
         // resizing display
@@ -546,7 +564,7 @@ export default {
     },
 
     resetTransform: function (element) {
-        const originSize = (element.getAttribute('data-origin') || '').split(',');
+        const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
         this.context.resizing._rotateVertical = false;
 
         element.style.maxWidth = '';
@@ -556,7 +574,7 @@ export default {
         element.setAttribute('data-rotateX', '');
         element.setAttribute('data-rotateY', '');
 
-        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, originSize[0] ? originSize[0] : 'auto', originSize[1] ? originSize[1] : '', true);
+        this.plugins[this.context.resizing._resize_plugin].setSize.call(this, size[0] ? size[0] : 'auto', size[1] ? size[1] : '', true);
     },
 
     setTransformSize: function (element, width, height) {

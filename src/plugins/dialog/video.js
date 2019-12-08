@@ -259,9 +259,12 @@ export default {
         if (!frame.getAttribute('data-origin')) {
             const container = this.util.getParentElement(frame, this.util.isComponent);
             const cover = this.util.getParentElement(frame, 'FIGURE');
-            const w = !/%$/.test(frame.style.width) ? frame.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
-            const h = !/%$/.test(frame.style.height) || !/%$/.test(frame.style.width) ? frame.style.height : (this.util.getNumber(cover.style.paddingBottom, 2) || this.util.getNumber(this.context.video._videoRatio, 2)) + '%';
+
+            const w = this.plugins.resizing._module_getSizeX.call(this, this.context.video, frame, cover, container);
+            const h = this.plugins.resizing._module_getSizeY.call(this, this.context.video, frame, cover, container);
+            
             frame.setAttribute('data-origin', w + ',' + h);
+            frame.setAttribute('data-size', w + ',' + h);
         }
     },
 
@@ -307,9 +310,9 @@ export default {
             this.util.removeItem(figcaption);
         }
 
-        const originSize = (oIframe.getAttribute('data-origin') || '').split(',');
-        const w = originSize[0] || this.context.option.videoWidth;
-        const h = originSize[1] || this.context.option.videoHeight;
+        const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
+        const w = size[0] || this.context.option.videoWidth;
+        const h = size[1] || this.context.option.videoHeight;
         this.plugins.video.applySize.call(this, w, h);
 
         existElement.parentNode.insertBefore(container, existElement);
@@ -321,7 +324,7 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, '.se-video-container');
+        contextVideo._container = this.util.getParentElement(element, this.util.isComponent);
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -330,7 +333,7 @@ export default {
         contextVideo._element_t = size.t;
         contextVideo._element_l = size.l;
 
-        let origin = contextVideo._element.getAttribute('data-origin');
+        let origin = contextVideo._element.getAttribute('data-size') || contextVideo._element.getAttribute('data-origin');
         if (origin) {
             origin = origin.split(',');
             contextVideo._origin_w = origin[0];
@@ -338,7 +341,6 @@ export default {
         } else {
             contextVideo._origin_w = size.w;
             contextVideo._origin_h = size.h;
-            contextVideo._element.setAttribute('data-origin', size.w + ',' + size.h);
         }
     },
 
@@ -376,8 +378,8 @@ export default {
 
         for (let i = 0, len = this._variable._videosCnt, video, container; i < len; i++) {
             video = videos[i];
-            container = this.util.getParentElement(video, '.se-video-container');
-            if (!container || container.getElementsByTagName('figcaption').length > 0 || video.style.width) {
+            container = this.util.getParentElement(video, this.util.isComponent);
+            if (!container || container.getElementsByTagName('figcaption').length > 0 || !video.style.width) {
                 videoPlugin._update_videoCover.call(this, video);
             }
         }
@@ -413,6 +415,9 @@ export default {
         contextVideo._element.style.width = w ? w + contextVideo.sizeUnit : '';
         contextVideo._cover.style.paddingBottom = contextVideo._cover.style.height = contextVideo._element.style.height = h ? h + contextVideo.sizeUnit : '';
         if (!notResetPercentage) contextVideo._element.removeAttribute('data-percentage');
+
+        // save current size
+        this.plugins.resizing._module_saveCurrentSize.call(this, contextVideo);
     },
 
     setAutoSize: function () {
@@ -437,6 +442,9 @@ export default {
             } else {
                 this.plugins.video.setSize.call(this, w, h);
             }
+
+            // save current size
+            this.plugins.resizing._module_saveCurrentSize.call(this, contextVideo);
         }
     },
 
@@ -454,8 +462,10 @@ export default {
         contextVideo._element.style.maxWidth = '';
 
         if (contextVideo._align === 'center') this.plugins.video.setAlign.call(this, null, null, null, null);
-
         contextVideo._element.setAttribute('data-percentage', w + ',' + h);
+
+        // save current size
+        this.plugins.resizing._module_saveCurrentSize.call(this, contextVideo);
     },
 
     cancelPercentAttr: function () {
