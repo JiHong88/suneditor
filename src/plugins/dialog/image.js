@@ -63,6 +63,7 @@ export default {
         context.image.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         context.image.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         
+        context.image.proportion = {};
         context.image.inputX = {};
         context.image.inputY = {};
         if (context.option.imageResizing) {
@@ -160,7 +161,7 @@ export default {
             }
 
             html += '' +
-                        '<div class="se-dialog-form-footer">' +
+                        '<div class="se-dialog-form se-dialog-form-footer">' +
                             '<label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
                         '</div>' +
                     '</div>' +

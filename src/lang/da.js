@@ -103,7 +103,8 @@
             center: 'Center',
             width: 'Bredde',
             height: 'Højde',
-            size: 'Størrelse'
+            size: 'Størrelse',
+            ratio: 'Forhold'
         },
         controller: {
             edit: 'Rediger',

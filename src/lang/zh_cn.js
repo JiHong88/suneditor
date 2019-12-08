@@ -100,7 +100,8 @@
             center: '居中',
             width: '宽度',
             height: '高度',
-            size: '尺寸'
+            size: '尺寸',
+            ratio: '比'
         },
         controller: {
             edit: '编辑',

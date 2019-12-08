@@ -647,8 +647,9 @@ export default {
         const plugins = {};
         if (_plugins) {
             const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
-            for (let i = 0, len = pluginsValues.length; i < len; i++) {
-                plugins[pluginsValues[i].name] = pluginsValues[i];
+            for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+                p = pluginsValues[i].default || pluginsValues[i];
+                plugins[p.name] = p;
             }
         }
 

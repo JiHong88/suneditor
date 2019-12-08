@@ -100,7 +100,8 @@
             center: 'Centré',
             width: 'Largeur',
             height: 'Hauteur',
-            size: 'La taille'
+            size: 'La taille',
+            ratio: 'Rapport'
         },
         controller: {
             edit: 'Modifier',

@@ -100,7 +100,8 @@
             center: '中央',
             width: '横',
             height: '縦',
-            size: 'サイズ'
+            size: 'サイズ',
+            ratio: '比率'
         },
         controller: {
             edit: '編集',

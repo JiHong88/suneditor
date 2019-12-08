@@ -100,7 +100,8 @@
             center: 'Zentriert',
             width: 'Breite',
             height: 'Höhe',
-            size: 'Größe'
+            size: 'Größe',
+            ratio: 'Verhältnis'
         },
         controller: {
             edit: 'Bearbeiten',

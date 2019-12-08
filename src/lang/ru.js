@@ -100,7 +100,8 @@
             center: 'По центру',
             width: 'Ширина',
             height: 'Высота',
-            size: 'Размер'
+            size: 'Размер',
+            ratio: 'Соотношение'
         },
         controller: {
             edit: 'Изменить',
