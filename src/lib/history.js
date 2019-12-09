@@ -87,13 +87,22 @@ export default function (core, change) {
 
     return {
         /**
+         * @description History stack
+         */
+        stack: stack,
+
+        /**
          * @description Saving the current status to the history object stack
          */
-        push: function () {
+        push: function (delay) {
             _w.setTimeout(core._resourcesStateChange);
             
-            if (pushDelay) {
+            if (!delay || pushDelay) {
                 _w.clearTimeout(pushDelay);
+                if (!delay) {
+                    pushStack();
+                    return;
+                }
             }
 
             pushDelay = _w.setTimeout(function () {
@@ -122,13 +131,25 @@ export default function (core, change) {
                 setContentsFromStack();
             }
         },
+
+        /**
+         * @description Go to the history stack for that index.
+         * If "index" is -1, go to the last stack
+         * @param {Number} index Stack index
+         */
+        go: function (index) {
+            stackIndex = index < 0 ? (stack.length - 1) : index;
+            setContentsFromStack();
+        },
         
         /**
          * @description Reset the history object
          */
         reset: function () {
+            if (undo) undo.setAttribute('disabled', true);
+            if (redo) redo.setAttribute('disabled', true);
+            stack.splice(0);
             stackIndex = -1;
-            stack = [];
             pushStack();
         }
     };

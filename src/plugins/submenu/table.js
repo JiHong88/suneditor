@@ -1370,6 +1370,6 @@ export default {
         this.focus();
 
         // history stack
-        this.history.push();
+        this.history.push(false);
     }
 };

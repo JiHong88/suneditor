@@ -121,9 +121,9 @@ export default {
             toggleClass(selectedFormsts[i], value);
         }
 
-        // history stack
-        this.history.push();
-
         this.submenuOff();
+
+        // history stack
+        this.history.push(false);
     }
 };

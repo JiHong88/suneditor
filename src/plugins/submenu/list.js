@@ -218,9 +218,6 @@ export default {
             edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
         }
 
-        // history stack
-        this.history.push();
-
         if (selectedFormsts.length > 1) {
             this.setRange(edgeFirst.sc, 0, edgeLast.ec, edgeLast.ec.textContent.length);
         } else {
@@ -228,5 +225,8 @@ export default {
         }
 
         this.submenuOff();
+
+        // history stack
+        this.history.push(false);
     }
 };

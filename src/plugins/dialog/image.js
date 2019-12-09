@@ -702,7 +702,7 @@ export default {
         }
 
         // history stack
-        this.history.push();
+        this.history.push(false);
     },
 
     update_src: function (src, element, file) {
@@ -923,9 +923,6 @@ export default {
         this.plugins.image.init.call(this);
 
         this.controllersOff();
-
-        // history stack
-        this.history.push();
         
         if (dataIndex >= 0) {
             const imagesInfo = this._variable._imagesInfo;
@@ -938,6 +935,9 @@ export default {
                 }
             }
         }
+
+        // history stack
+        this.history.push(false);
     },
 
     init: function () {

@@ -562,7 +562,7 @@ export default {
         }
 
         // history stack
-        this.history.push();
+        this.history.push(false);
     },
 
     resetTransform: function (element) {
@@ -698,7 +698,7 @@ export default {
                 // element resize
                 this.plugins.resizing.cancel_controller_resize.call(this);
                 // history stack
-                if (change) this.history.push();
+                if (change) this.history.push(false);
             }
             
             currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));

@@ -185,8 +185,6 @@ export default {
         this.context.resizing._resize_plugin = 'video';
 
         const contextVideo = this.context.video;
-        const w = (this.util.isNumber(contextVideo.inputX.value) ? contextVideo.inputX.value : this.context.option.videoWidth);
-        const h = (this.util.isNumber(contextVideo.inputY.value) ? contextVideo.inputY.value : this.context.option.videoHeight);
         let oIframe = null;
         let cover = null;
         let container = null;
@@ -268,10 +266,13 @@ export default {
         else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || this.context.resizing._rotateVertical) {
             this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);
         }
+        
+        this.context.resizing._resize_plugin = '';
 
         // history stack
-        this.history.push();
-        this.context.resizing._resize_plugin = '';
+        if (this.context.dialog.updateModal) {
+            this.history.push(false);
+        }
     },
 
     setVideosInfo: function (frame) {
@@ -575,7 +576,7 @@ export default {
         this.controllersOff();
 
         // history stack
-        this.history.push();
+        this.history.push(false);
     },
 
     init: function () {
