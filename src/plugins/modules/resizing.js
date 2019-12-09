@@ -473,8 +473,14 @@ export default {
                 currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'percent':
+                let percentY = this.plugins.resizing._module_getSizeY.call(this, currentContext);
+                if (this.context.resizing._rotateVertical) {
+                    const percentage = contextEl.getAttribute('data-percentage');
+                    if (percentage) percentY = percentage.split(',')[1];
+                }
+
                 this.plugins.resizing.resetTransform.call(this, contextEl);
-                currentModule.setPercentSize.call(this, (value * 100), '');
+                currentModule.setPercentSize.call(this, (value * 100), percentY);
                 currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                 break;
             case 'mirror':
@@ -581,7 +587,11 @@ export default {
 
         if (percentage && !isVertical) {
             percentage = percentage.split(',');
-            this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage[0], percentage[1]);
+            if (percentage[0] === 'auto' && percentage[1] === 'auto') {
+                this.plugins[this.context.resizing._resize_plugin].setAutoSize.call(this);
+            } else {
+                this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage[0], percentage[1]);
+            }
         } else {
             const cover = this.util.getParentElement(element, 'FIGURE');
     

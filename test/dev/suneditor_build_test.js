@@ -72,7 +72,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // imageResizing: false,
     // imageSizeOnlyPercentage: true,
     // videoResizing: false,
-    videoSizeOnlyPercentage: true
+    // videoSizeOnlyPercentage: true
 });
 
 ss.onScroll = function (e) {

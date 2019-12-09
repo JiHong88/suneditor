@@ -811,7 +811,7 @@ export default {
         contextImage._cover.style.height = '';
 
         this.plugins.image.setAlign.call(this, null, null, null, null);
-        contextImage._element.removeAttribute('data-percentage');
+        contextImage._element.setAttribute('data-percentage', 'auto,auto');
 
         // save current size
         this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
@@ -843,13 +843,14 @@ export default {
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
         h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextImage.sizeUnit : (h || '');
+        const heightPercentage = /%$/.test(h);
 
         contextImage._container.style.width = this.util.isNumber(w) ? w + '%' : w;
         contextImage._container.style.height = '';
         contextImage._cover.style.width = '100%';
-        contextImage._cover.style.height = '';
+        contextImage._cover.style.height = !heightPercentage ? '' : h;
         contextImage._element.style.width = '100%';
-        contextImage._element.style.height = h;
+        contextImage._element.style.height = heightPercentage ? '' : h;
         contextImage._element.style.maxWidth = '';
 
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
