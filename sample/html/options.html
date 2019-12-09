@@ -66,6 +66,7 @@
                 <option value="fr">fr</option>
                 <option value="ja">ja</option>
                 <option value="ko">ko</option>
+                <option value="pt_br">pt_br</option>
                 <option value="ru">ru</option>
                 <option value="zh_cn">zh_cn</option>
             </select>
@@ -164,13 +165,9 @@
             <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>
             <br><br>
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
-            <input type="text" id="imageWidth_value" placeholder="Number" style="width: 200px">
+            <input type="text" id="imageWidth_value" placeholder="String.. (auto)" style="width: 200px">
             <br><br>
-            <label> -&nbsp;&nbsp;imageSizeUnit</label>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="radio" id="radio_imageSizeUnit_1" name="radio_imageSizeUnit" value="px" checked>&nbsp;&nbsp;px</label>
-            &nbsp;&nbsp;&nbsp;
-            <label><input type="radio" id="radio_imageSizeUnit_2" name="radio_imageSizeUnit" value="%">&nbsp;&nbsp;%</label>
+            <label><input type="checkbox" id="imageSizeOnlyPercentage">&nbsp;&nbsp;imageSizeOnlyPercentage</label>
             <br><br>
             <label><input type="checkbox" id="imageRotation">&nbsp;&nbsp;imageRotation</label>
             &nbsp;&nbsp;&nbsp;&nbsp;
@@ -191,15 +188,26 @@
             <h4 style="color: #b94a48;">--Video</h4>
             <label><input type="checkbox" id="videoResizing">&nbsp;&nbsp;videoResizing</label>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
-            <input type="text" id="videoWidth_value" placeholder="Number">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="videoHeight">&nbsp;&nbsp;videoHeight</label>
-            <input type="text" id="videoHeight_value" placeholder="Number">
-            <br><br>
             <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
-            <input type="text" id="youtubeQuery_value" placeholder="String">
-
+            <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
+            <br><br>
+            <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
+            <input type="text" id="videoWidth_value" placeholder="String.. (100%)">
+            <br><br>
+            <label><input type="checkbox" id="videoSizeOnlyPercentage">&nbsp;&nbsp;videoSizeOnlyPercentage</label>
+            <br><br>
+            <label><input type="checkbox" id="videoRotation">&nbsp;&nbsp;videoRotation</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_videoRotation_1" name="radio_videoRotation" value="px" checked>&nbsp;&nbsp;true</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_videoRotation_2" name="radio_videoRotation" value="%">&nbsp;&nbsp;false</label>
+            <br><br>
+            <label><input type="checkbox" id="videoRatio">&nbsp;&nbsp;videoRatio</label>
+            <input type="text" id="videoRatio_value" placeholder="Float.. (0.5625)">
+            <br><br>
+            <label><input type="checkbox" id="videoRatioList">&nbsp;&nbsp;videoRatioList</label>
+            <span>[ {name: 'Classic Film 3:2', value: 0.6666}, {name: 'HD', value: 0.5625} ]</span>
+            
             <br>
             <h4 style="color: #b94a48;">--Defining save button</h4>
             <label><input type="checkbox" id="callBackSave">&nbsp;&nbsp;callBackSave</label><br>
@@ -226,7 +234,7 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
         <br>
-        <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div>
+        
         <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
@@ -246,7 +254,10 @@
             </div>
         </div>
 
-        <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;" id="option_display"></div>
+        <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div>
+        <div style="background-color: #f3f3f3;">
+            <textarea id="option_display"></textarea>
+        </div>
     </article>
 
     <footer>
@@ -265,6 +276,19 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+<!-- code mirror options display -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.css">
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/edit/matchbrackets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/edit/closebrackets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/json-lint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/javascript/javascript.js"></script>
+<style>
+.CodeMirror {
+    font-family: monospace;
+    font-size: 13px;
+}
+</style>
 <!-- languages -->
 <script src="../../src/lang/da.js"></script>
 <script src="../../src/lang/de.js"></script>
@@ -272,12 +296,21 @@
 <script src="../../src/lang/fr.js"></script>
 <script src="../../src/lang/ja.js"></script>
 <script src="../../src/lang/ko.js"></script>
+<script src="../../src/lang/pt_br.js"></script>
 <script src="../../src/lang/ru.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
-var optionDisplay = document.getElementById('option_display');
 var langSelect = document.getElementById('language');
 var modeSelect = document.getElementById('mode');
+
+var optionDisplay = CodeMirror.fromTextArea(document.getElementById('option_display'), {
+    mode: 'application/ld+json',
+    lineNumbers: true,
+    lineWrapping: false,
+    autoCloseBrackets: true,
+    matchbrackets: true,
+});
+optionDisplay.setSize('100%', '500px');
 
 function sun_create () {
     if (editorImageSample && editorImageSample.destroy) editorImageSample.destroy();
@@ -324,14 +357,19 @@ function sun_create () {
         imageFileInput: document.getElementById('imageFileInput').checked,
         imageUrlInput: document.getElementById('imageUrlInput').checked,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
-        imageSizeUnit: document.getElementById('radio_imageSizeUnit_1').checked ? 'px' : '%',
+        imageSizeOnlyPercentage: document.getElementById('imageSizeOnlyPercentage').checked,
         imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
-        videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : undefined,
+        videoSizeOnlyPercentage: document.getElementById('videoSizeOnlyPercentage').checked,
+        videoRotation: document.getElementById('videoRotation').checked ? document.getElementById('radio_videoRotation_1').checked : undefined,
+        videoRatio: document.getElementById('videoRatio').checked ? document.getElementById('videoRatio_value').value : undefined,
+        videoRatioList: !document.getElementById('videoRatioList').checked ? undefined : [
+            {name: 'Classic Film 3:2', value: 0.6666}, {name: 'HD', value: 0.5625}
+        ],
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
@@ -359,7 +397,8 @@ function sun_create () {
     editorImageSample.onImageUpload = imageUpload;
 
     // option string
-    JSONstringify(options, langSelect.options[langSelect.selectedIndex].value)
+    var json = JSONstringify(options, langSelect.options[langSelect.selectedIndex].value);
+    optionDisplay.setValue(json.replace(/\%c/g, ''));
 }
 
 sun_create();

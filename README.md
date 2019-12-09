@@ -465,6 +465,18 @@ videoWidth      : The default width size of the video frame.         default: '1
 videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
 videoRotation   : Choose whether to video rotation buttons display.
                   When "videoSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
+videoRatio      : The default aspect ratio of the video.
+                  Up to four decimal places are allowed.             default: 0.5625 (16:9) {Float}
+videoRatioList  : Video ratio selection options.
+                  default: [
+                    {name: '16:9', value: 0.5625},
+                    {name: '4:3', value: 0.75},
+                    {name: '21:9', value: 0.4285}
+                  ],
+                  ex) [
+                    {name: 'Classic Film 3:2', value: 0.6666},
+                    {name: 'HD', value: 0.5625}
+                  ]
 youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {String}
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'

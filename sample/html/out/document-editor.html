@@ -91,11 +91,15 @@
                         <td class="description last">History stack</td>
                     </tr>
                     <tr>
-                        <td class="name"><code>push()</code></td>
+                        <td class="name"><code>push(delay)</code></td>
                         <td class="type">
                             <span class="param-type">Function</span>
                         </td>
-                        <td class="description last">Saving the current status to the history object stack</td>
+                        <td class="description last">
+                            Saving the current status to the history object stack<br>
+                            If "delay" is true, it will be saved after 500 miliseconds<br>
+                            If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
+                        </td>
                     </tr>
                     <tr>
                         <td class="name"><code>undo()</code></td>

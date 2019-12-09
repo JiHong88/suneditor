@@ -154,4 +154,6 @@ function JSONstringify(json, lang) {
 
     arr.unshift(json);
     console.log.apply(console, arr);
+
+    return json;
 }

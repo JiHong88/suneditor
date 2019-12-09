@@ -69,6 +69,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     height: 'auto',
     width: '100%',
+    youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     // imageResizing: false,
     // imageSizeOnlyPercentage: true,
     // videoResizing: false,
