@@ -199,7 +199,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             resizeClientY: 0,
             tabSize: 4,
             codeIndent: 4,
-            minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
+            minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
             _range: null,
             _selectionNode: null,
@@ -2429,7 +2429,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 p = rangeLines[i];
-                margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
+                margin = /\d+/.test(p.style.marginLeft) ? util.getNumber(p.style.marginLeft, 0) : 0;
 
                 if ('indent' === command) {
                     margin += 25;
@@ -3102,7 +3102,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && (selectionParent.style.marginLeft.match(/\d+/) || [0])[0] * 1 > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && (util.getNumber((selectionParent.style.marginLeft) || 0), 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;

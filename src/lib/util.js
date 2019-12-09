@@ -612,6 +612,31 @@ const util = {
     },
 
     /**
+     * @description Checks for numeric (with decimal point).
+     * @param {String|Number} text Text string or number
+     * @returns {Boolean}
+     */
+    isNumber: function (text) {
+        return !!text && /^-?\d+(\.\d+)?$/.test(text + '');
+    },
+
+    /**
+     * @description Get a number.
+     * @param {String|Number} text Text string or number
+     * @param {Number} maxDec Maximum number of decimal places (-1 : Infinity)
+     * @returns {Number|null}
+     */
+    getNumber: function (text, maxDec) {
+        if (!text) return null;
+        
+        let number = (text + '').match(/-?\d+(\.\d+)?/);
+        if (!number || !number[0]) return null;
+
+        number = number[0];
+        return maxDec < 0 ? number * 1 : maxDec === 0 ? this._w.Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
+    },
+
+    /**
      * @description Get all child nodes of the argument value element (Without text node)
      * @param {Element|String} element element to get child node
      * @param {(function|null)} validation Conditional function
@@ -1003,10 +1028,10 @@ const util = {
         cleanHTML = cleanHTML
             .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:colspan|rowspan|target|href|src|class|data-format|data-file-size|data-file-name|data-origin|origin-size|data-percentage)\s*=\s*"[^"]*")/ig);
+                const v = m.match(/((?:contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")/ig);
                 if (v) {
                     for (let i = 0, len = v.length; i < len; i++) {
-                        if (/^class="(?!__se__)/.test(v[i])) continue;
+                        if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
                         t += ' ' + v[i];
                     }
                 }

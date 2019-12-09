@@ -367,8 +367,8 @@ export default {
         options.lang = options.lang || _defaultLang;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon
-        options.toolbarWidth = options.toolbarWidth ? (/^\d+$/.test(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
-        options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? options.stickyToolbar.toString().match(/\d+/)[0] * 1 : -1);
+        options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
+        options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         // options.fullPage = options.fullPage;
         options.iframe = options.fullPage || options.iframe;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
@@ -381,15 +381,15 @@ export default {
         options.resizingBar = options.resizingBar === undefined ? (/inline|balloon/i.test(options.mode) ? false : true) : options.resizingBar;
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-        options.maxCharCount = /^\d+$/.test(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
+        options.maxCharCount = util.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */
-        options.width = options.width ? (/^\d+$/.test(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
-        options.minWidth = (/^\d+$/.test(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-        options.maxWidth = (/^\d+$/.test(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+        options.width = options.width ? (util.isNumber(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.minWidth = (util.isNumber(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+        options.maxWidth = (util.isNumber(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
         /** Height size */
-        options.height = options.height ? (/^\d+$/.test(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
-        options.minHeight = (/^\d+$/.test(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-        options.maxHeight = (/^\d+$/.test(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        options.height = options.height ? (util.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
+        options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
+        options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
@@ -401,19 +401,23 @@ export default {
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-        options.imageWidth = options.imageWidth && /\d+/.test(options.imageWidth) ? options.imageWidth.toString().match(/\d+/)[0] : 'auto';
-        options.imageSizeUnit = options.imageSizeUnit && /%/.test(options.imageSizeUnit) ? '%' : 'px';
-        options._imageSizeOnlyPercentage = options.imageSizeUnit !== 'px'; // "px" or only a percentage
-        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options._imageSizeOnlyPercentage;
+        options.imageWidth = !options.imageWidth ? 'auto' : util.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
+        options.imageSizeOnlyPercentage = options.imageSizeOnlyPercentage ? '%' : '';
+        options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
+        options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !options.imageSizeOnlyPercentage;
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = options.imageUploadUrl || null;
-        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? options.imageUploadSizeLimit.toString().match(/\d+/)[0] * 1 : null;
+        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-        options.videoWidth = options.videoWidth && /\d+/.test(options.videoWidth) ? options.videoWidth.toString().match(/\d+/)[0] : 560;
-        options.videoHeight = options.videoHeight && /\d+/.test(options.videoHeight) ? options.videoHeight.toString().match(/\d+/)[0] : 315;
+        options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth) ? '100%' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoSizeOnlyPercentage = options.videoSizeOnlyPercentage ? '%' : '';
+        options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
+        options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !options.videoSizeOnlyPercentage;
+        options.videoRatio = util.getNumber(options.videoRatio, 4) || 0.5625; // 16:9
+        options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;
@@ -644,8 +648,9 @@ export default {
         const plugins = {};
         if (_plugins) {
             const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
-            for (let i = 0, len = pluginsValues.length; i < len; i++) {
-                plugins[pluginsValues[i].name] = pluginsValues[i];
+            for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+                p = pluginsValues[i].default || pluginsValues[i];
+                plugins[p.name] = p;
             }
         }
 

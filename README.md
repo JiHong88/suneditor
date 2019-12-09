@@ -396,17 +396,12 @@ paragraphStyles : You can apply custom class to format.
                         class: '__se__p-bordered'
                     },
                     {
-                        name: 'Invert color',
-                        class: '__se__p-invert',
-                        _class: 'se-invert' // .sun-editor .se-invert > div {color: #fff; background-color: #333;}
-                    },
-                    {
                         name: 'Neon',
                         class: '__se__p-neon'
                     }
                   ]
                   ex) [
-                      'invert', 'neon', // The default value is called by name only and the name is called in the language file.
+                      'spaced', 'neon', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Custom',
                           class: '__se__customClass'
@@ -439,11 +434,10 @@ textStyles      : You can apply custom style or class to selected text.
 
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
-imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
-                  The percentage button is active even if it is "px".   default: 'px' {String}
+imageWidth      : The default width size of the image frame.        default: 'auto' {String}
+imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
-                  When "imageSizeUnit" is "%" the default value is false.
+                  When "imageSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
                   If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
@@ -467,8 +461,10 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video iframe.                       default: true {Boolean}
-videoWidth      : The default width size of the video frame.         default: 560 {Number}
-videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+videoWidth      : The default width size of the video frame.         default: '100%' {String}
+videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
+videoRotation   : Choose whether to video rotation buttons display.
+                  When "videoSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
 youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {String}
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'

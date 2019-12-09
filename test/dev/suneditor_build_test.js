@@ -16,25 +16,32 @@ import CodeMirror from 'codemirror';
 
 import lineHeight from '../../src/plugins/submenu/lineHeight'
 
+const align = require('../../src/plugins/submenu/align')
+
+suneditor.create('editor', {
+  plugins: [align],
+  buttonList: [['align']]
+})
+
 window.cm = CodeMirror
 
-let s1 = window.s1 = suneditor.create(document.getElementById('editor'), {
-    plugins: [lineHeight],
-    buttonList: [
-        [
-            'lineHeight'
-        ]
-    ],
-    height: 'auto',
-    width: '500px',
-    // mode: 'balloon',
-    stickyToolbar: '0',
-    videoResizing: false,
-    imageWidth: 150,
-    placeholder: 'Start typing something...'
-    // fullPage: true,
+// let s1 = window.s1 = suneditor.create(document.getElementById('editor'), {
+//     plugins: [lineHeight],
+//     buttonList: [
+//         [
+//             'lineHeight'
+//         ]
+//     ],
+//     height: 'auto',
+//     width: '500px',
+//     // mode: 'balloon',
+//     stickyToolbar: '0',
+//     videoResizing: false,
+//     imageWidth: 150,
+//     placeholder: 'Start typing something...'
+//     // fullPage: true,
     
-});
+// });
 
 window.sun_destroy1 = function () {
     s1.destroy();
@@ -60,6 +67,12 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save']
     ],
+    height: 'auto',
+    width: '100%',
+    // imageResizing: false,
+    // imageSizeOnlyPercentage: true,
+    // videoResizing: false,
+    // videoSizeOnlyPercentage: true
 });
 
 ss.onScroll = function (e) {

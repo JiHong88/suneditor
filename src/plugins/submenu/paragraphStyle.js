@@ -47,18 +47,13 @@ export default {
                 class: '__se__p-bordered',
                 _class: ''
             },
-            invert: {
-                name: menuLang.invert,
-                class: '__se__p-invert',
-                _class: 'se-invert'
-            },
             neon: {
                 name: menuLang.neon,
                 class: '__se__p-neon',
                 _class: ''
             }
         };
-        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'invert', 'neon'] : option.paragraphStyles;
+        const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'neon'] : option.paragraphStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
         for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
@@ -115,12 +110,12 @@ export default {
 
         if (!value) return;
 
-        let selectedFormsts = this.getSelectedElementsAndComponents();
+        let selectedFormsts = this.getSelectedElements();
         if (selectedFormsts.length === 0) return;
 
         // change format class
         const toggleClass = this.util.hasClass(target, 'active') ? this.util.removeClass.bind(this.util) : this.util.addClass.bind(this.util);
-        selectedFormsts = this.getSelectedElementsAndComponents();
+        selectedFormsts = this.getSelectedElements();
         
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
             toggleClass(selectedFormsts[i], value);

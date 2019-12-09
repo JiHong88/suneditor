@@ -100,7 +100,8 @@
             center: 'Centré',
             width: 'Largeur',
             height: 'Hauteur',
-            size: 'La taille'
+            size: 'La taille',
+            ratio: 'Rapport'
         },
         controller: {
             edit: 'Modifier',
@@ -116,6 +117,7 @@
             resize75: 'Redimensionner à 75%',
             resize50: 'Redimensionner à 50%',
             resize25: 'Redimensionner à 25%',
+            autoSize: 'Taille automatique',
             mirrorHorizontal: 'Mirroir, Horizontal',
             mirrorVertical: 'Mirroir, Vertical',
             rotateLeft: 'Rotation à gauche',
@@ -131,7 +133,6 @@
         menu: {
             spaced: 'Espacement',
             bordered: 'Ligne de démarcation',
-            invert: 'Inverser la couleur',
             neon: 'Néon',
             translucent: 'Translucide',
             shadow: 'L\'ombre'
