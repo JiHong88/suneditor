@@ -417,6 +417,7 @@ export default {
         options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
         options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !options.videoSizeOnlyPercentage;
         options.videoRatio = util.getNumber(options.videoRatio, 4) || 0.5625; // 16:9
+        options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;

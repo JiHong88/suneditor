@@ -70,7 +70,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     height: 'auto',
     width: '100%',
     // imageResizing: false,
-    imageSizeOnlyPercentage: true,
+    // imageSizeOnlyPercentage: true,
     // videoResizing: false,
     videoSizeOnlyPercentage: true
 });

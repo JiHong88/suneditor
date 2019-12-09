@@ -288,7 +288,10 @@ export default {
     },
 
     _module_saveCurrentSize: function (contextPlugin) {
-        contextPlugin._element.setAttribute('data-size', this.plugins.resizing._module_getSizeX.call(this, contextPlugin) + ',' + this.plugins.resizing._module_getSizeY.call(this, contextPlugin));
+        const x = this.plugins.resizing._module_getSizeX.call(this, contextPlugin);
+        const y = this.plugins.resizing._module_getSizeY.call(this, contextPlugin);
+        contextPlugin._element.setAttribute('data-size', x + ',' + y);
+        if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = y;
     },
 
     call_controller_resize: function (targetElement, plugin) {
@@ -324,7 +327,7 @@ export default {
         const container = this.util.getParentElement(targetElement, this.util.isComponent);
         const cover = this.util.getParentElement(targetElement, 'FIGURE');
         const displayX = this.plugins.resizing._module_getSizeX.call(this, contextPlugin, targetElement, cover, container) || 'auto';
-        const displayY = contextPlugin._onlyPercentage ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');
+        const displayY = contextPlugin._onlyPercentage && plugin === 'image' ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');
         this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + displayY + ')');
 
         // resizing display
@@ -372,13 +375,6 @@ export default {
                 this.util.removeClass(contextResizing.captionButton, 'active');
                 contextPlugin._captionChecked = false;
             }
-        }
-
-        // auto size display
-        if (plugin === 'video') {
-            contextResizing.autoSizeButton.style.display = 'none';
-        } else {
-            contextResizing.autoSizeButton.style.display = '';
         }
 
         this._resizingName = plugin;

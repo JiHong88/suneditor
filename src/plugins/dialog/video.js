@@ -103,34 +103,31 @@ export default {
                     '</div>';
 
             if (option.videoResizing) {
+                const ratioList = option.videoRatioList || [{name: '16:9', value: 0.5625}, {name: '4:3', value: 0.75}, {name: '21:9', value: 0.4285}];
+                const ratio = option.videoRatio;
                 const onlyPercentage = option.videoSizeOnlyPercentage;
                 const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-                html += '<div class="se-dialog-form">';
-                        if (onlyPercentage) {
-                            html += '' +
-                            '<div class="se-dialog-size-text">' +
-                                '<label class="size-w">' + lang.dialogBox.size + '</label>' +
-                            '</div>';
-                        } else {
-                            html += '' +
-                            '<div class="se-dialog-size-text">' +
-                                '<label class="size-w">' + lang.dialogBox.width + '</label>' +
-                                '<label class="se-dialog-size-x">&nbsp;</label>' +
-                                '<label class="size-h">' + lang.dialogBox.height + '</label>' +
-                            '</div>';
-                        }
-                        html += '' +
+                html += '' +
+                    '<div class="se-dialog-form">' +
+                        '<div class="se-dialog-size-text">' +
+                            '<label class="size-w">' + lang.dialogBox.width + '</label>' +
+                            '<label class="se-dialog-size-x">&nbsp;</label>' +
+                            '<label class="size-h">' + lang.dialogBox.height + '</label>' +
+                            '<label class="size-h">(' + lang.dialogBox.ratio + ')</label>' +
+                        '</div>' +
                         '<input class="se-input-control _se_video_size_x" placeholder="100%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + '/>' +
                         '<label class="se-dialog-size-x">' + (onlyPercentage ? '%' : 'x') + '</label>' +
-                        '<input type="text" class="se-input-control _se_video_size_y" placeholder="' + (option.videoRatio * 100) + '%"' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + '/>' +
+                        '<input class="se-input-control _se_video_size_y" placeholder="' + (option.videoRatio * 100) + '%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + '/>' +
                         '<select class="se-input-select se-video-ratio" title="' + lang.dialogBox.ratio + '">' +
-                            '<option value=""> - </option>' +
-                            '<option value="0.5625" selected>16:9</option>' +
-                            '<option value="0.75">4:3</option>' +
-                            '<option value="0.4286">21:9</option>' +
-                        '</select>' +
-                        '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                            '<option value=""> - </option>';
+                            for (let i = 0, len = ratioList.length; i < len; i++) {
+                                html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
+                            }
+                        html += '</select>' +
                         '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                    '</div>' +
+                    '<div class="se-dialog-form se-dialog-form-footer">' +
+                        '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                     '</div>';
             }
 
@@ -167,10 +164,11 @@ export default {
             return;
         }
 
-        this.plugins.resizing._module_setInputSize.call(this, this.context.video, xy);
+        const contextVideo = this.context.video;
+        this.plugins.resizing._module_setInputSize.call(this, contextVideo, xy);
 
         if (xy === 'y') {
-            this.plugins.video.setVideoRatioSelect.call(this, e.target.value || this.context.video._videoRatio);
+            this.plugins.video.setVideoRatioSelect.call(this, e.target.value || contextVideo._videoRatio);
         }
     },
 
@@ -374,8 +372,9 @@ export default {
         if (contextVideo._resizing) {
             this.plugins.resizing._module_setModifyInputSize.call(this, contextVideo, this.plugins.video);
             
-            let y = this.plugins.resizing._module_getSizeY.call(this, contextVideo);
-            this.plugins.video.setVideoRatioSelect.call(this, y);
+            const y = contextVideo._videoRatio = this.plugins.resizing._module_getSizeY.call(this, contextVideo);
+            const ratioSelected = this.plugins.video.setVideoRatioSelect.call(this, y);
+            if (!ratioSelected) contextVideo.inputY.value = contextVideo._onlyPercentage ? this.util.getNumber(y, 2) : y;
         }
 
         if (!notOpen) this.plugins.dialog.open.call(this, 'video', true);
@@ -391,18 +390,23 @@ export default {
     },
     
     setVideoRatioSelect: function (value) {
+        let ratioSelected = false;
         const contextVideo = this.context.video;
         const ratioOptions = contextVideo.videoRatioOption.options;
 
-        if (/%$/.test(value)) value = (this.util.getNumber(value, 2) / 100) + '';
+        if (/%$/.test(value) || contextVideo._onlyPercentage) value = (this.util.getNumber(value, 2) / 100) + '';
         else if (!this.util.isNumber(value) || (value * 1) >= 1) value = '';
 
+        contextVideo.inputY.placeholder = '';
         for (let i = 0, len = ratioOptions.length; i < len; i++) {
-            if (ratioOptions[i].value === value) ratioOptions[i].selected = true;
+            if (ratioOptions[i].value === value) {
+                ratioSelected = ratioOptions[i].selected = true;
+                contextVideo.inputY.placeholder = !value ? '' : (value * 100) + '%';
+            }
             else ratioOptions[i].selected = false;
         }
 
-        contextVideo.inputY.placeholder = !value ? '' : (value * 100) + '%';
+        return ratioSelected;
     },
 
     checkVideosInfo: function () {
@@ -461,7 +465,7 @@ export default {
     },
 
     setAutoSize: function () {
-        this.plugins.video.setPercentSize.call(this, 100, this.context.video._videoRatio);
+        this.plugins.video.setPercentSize.call(this, 100, this.context.video._defaultRatio);
     },
 
     setOriginSize: function () {
