@@ -55,7 +55,7 @@ export default function (core, change) {
 
     function pushStack () {
         const current = core.getContents(true);
-        if (current === stack[stackIndex].contents) return;
+        if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
 
         stackIndex++;
         const range = core.getRange();
@@ -127,8 +127,9 @@ export default function (core, change) {
          * @description Reset the history object
          */
         reset: function () {
-            stackIndex = 0;
-            stack = stack[stackIndex];
+            stackIndex = -1;
+            stack = [];
+            pushStack();
         }
     };
 }

@@ -101,7 +101,8 @@
             center: 'Centro',
             width: 'Largura',
             height: 'Altura',
-            size: 'Tamanho'
+            size: 'Tamanho',
+            ratio: 'Proporções'
         },
         controller: {
             edit: 'Editar',
@@ -132,7 +133,6 @@
         menu: {
             spaced: 'Espaçado',
             bordered: 'Com borda',
-            invert: 'Inverter cores',
             neon: 'Néon',
             translucent: 'Translúcido',
             shadow: 'Sombreado'
