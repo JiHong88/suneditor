@@ -67,6 +67,8 @@ $ bower install suneditor --save
 #### CDN
 ``` html
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor-contents.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
@@ -107,6 +109,8 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
+// import 'suneditor/assets/css/suneditor.css'
+// import 'suneditor/assets/css/suneditor-contents.css'
 import suneditor from 'suneditor'
 
 // How to import plugins
