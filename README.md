@@ -437,11 +437,12 @@ textStyles      : You can apply custom style or class to selected text.
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------
-imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {String}
+imageResizing   : Can resize the image.                               default: true {Boolean}
+imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
+imageWidth      : The default width size of the image frame.          default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
-                  When "imageSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
+                  When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
                   If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
@@ -464,11 +465,14 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 
 // Video----------------------------------------------------------------------------------------------------------
-videoResizing   : Can resize the video iframe.                       default: true {Boolean}
-videoWidth      : The default width size of the video frame.         default: '100%' {String}
+videoResizing   : Can resize the video iframe.                         default: true {Boolean}
+videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
+videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
+videoWidth      : The default width size of the video frame.           default: '100%' {String}
 videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
 videoRotation   : Choose whether to video rotation buttons display.
-                  When "videoSizeOnlyPercentage" is "true" the default value is false.   default: true {Boolean}
+                  When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.
+                  If you want the button to be visible, put it a true.     default: true {Boolean}
 videoRatio      : The default aspect ratio of the video.
                   Up to four decimal places are allowed.             default: 0.5625 (16:9) {Float}
 videoRatioList  : Video ratio selection options.
