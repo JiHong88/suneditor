@@ -80,7 +80,7 @@
             <label><input type="checkbox" id="iframe">&nbsp;&nbsp;iframe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="fullPage">&nbsp;&nbsp;fullPage</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
-            <input type="text" id="iframeCSSFileName_value" placeholder="String ('suneditor')">
+            <input type="text" id="iframeCSSFileName_value" placeholder="String (suneditor)">
             <br><br>
             <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }
 
@@ -97,8 +97,8 @@
 
             <br>
             <h4 style="color: #b94a48;">--Bottom resizing bar</h4>
-            <label><input type="checkbox" id="resizingBar">&nbsp;&nbsp;resizingBar</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="showPathLabel">&nbsp;&nbsp;showPathLabel</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="resizingBar" checked>&nbsp;&nbsp;resizingBar</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="showPathLabel" checked>&nbsp;&nbsp;showPathLabel</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="charCounter">&nbsp;&nbsp;charCounter</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="maxCharCount">&nbsp;&nbsp;maxCharCount</label>
             <input type="text" id="maxCharCount_value" placeholder="Number">
@@ -160,7 +160,7 @@
 
             <br>
             <h4 style="color: #b94a48;">--Image</h4>
-            <label><input type="checkbox" id="imageResizing">&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageResizing" checked>&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageFileInput" checked>&nbsp;&nbsp;imageFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>
             <br><br>
@@ -186,7 +186,7 @@
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
-            <label><input type="checkbox" id="videoResizing">&nbsp;&nbsp;videoResizing</label>
+            <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
             <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
@@ -254,7 +254,8 @@
             </div>
         </div>
 
-        <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div>
+        <!-- <div class="highlight highlight-source-js"><pre><span class="pl-en">console</span>.<span class="pl-smi">log</span>.<span class="pl-c1">apply</span>(<span class="pl-en">console</span>, options);</pre></div> -->
+        <h2 class="sub-title">Applied options</h2>
         <div style="background-color: #f3f3f3;">
             <textarea id="option_display"></textarea>
         </div>
@@ -321,15 +322,15 @@ function sun_create () {
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
-        iframe: document.getElementById('iframe').checked,
-        fullPage: document.getElementById('fullPage').checked,
+        iframe: document.getElementById('iframe').checked ? true : undefined,
+        fullPage: document.getElementById('fullPage').checked? true : undefined,
         iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
-        resizingBar: document.getElementById('resizingBar').checked,
-        showPathLabel: document.getElementById('showPathLabel').checked,
-        charCounter: document.getElementById('charCounter').checked,
+        resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
+        showPathLabel: document.getElementById('showPathLabel').checked ? undefined : false,
+        charCounter: document.getElementById('charCounter').checked ? true : undefined,
         maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : undefined,
         display: document.getElementById('display').checked ? document.getElementById('display_value').value : undefined,
         width: document.getElementById('width').checked ? document.getElementById('width_value').value : undefined,
@@ -353,18 +354,18 @@ function sun_create () {
         colorList: !document.getElementById('colorList').checked ? undefined : [
             ['#ff0000', '#ff5e00', '#ffe400', '#abf200'], ['#00d8ff', '#0055ff', '#6600ff', '#ff00dd']
         ],
-        imageResizing: document.getElementById('imageResizing').checked,
-        imageFileInput: document.getElementById('imageFileInput').checked,
-        imageUrlInput: document.getElementById('imageUrlInput').checked,
+        imageResizing: document.getElementById('imageResizing').checked ? undefined : false,
+        imageFileInput: document.getElementById('imageFileInput').checked ? undefined : false,
+        imageUrlInput: document.getElementById('imageUrlInput').checked ? undefined : false,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
-        imageSizeOnlyPercentage: document.getElementById('imageSizeOnlyPercentage').checked,
+        imageSizeOnlyPercentage: document.getElementById('imageSizeOnlyPercentage').checked ? true : undefined,
         imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
-        videoResizing: document.getElementById('videoResizing').checked,
+        videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
-        videoSizeOnlyPercentage: document.getElementById('videoSizeOnlyPercentage').checked,
+        videoSizeOnlyPercentage: document.getElementById('videoSizeOnlyPercentage').checked ? true : undefined,
         videoRotation: document.getElementById('videoRotation').checked ? document.getElementById('radio_videoRotation_1').checked : undefined,
         videoRatio: document.getElementById('videoRatio').checked ? document.getElementById('videoRatio_value').value : undefined,
         videoRatioList: !document.getElementById('videoRatioList').checked ? undefined : [
