@@ -42,6 +42,7 @@ export default {
             _xmlHttp: null,
             _resizing: context.option.imageResizing,
             _rotation: context.option.imageRotation,
+            _resizeDotHide: !context.option.imageHeightShow,
             _uploadFileLength: 0,
             _onlyPercentage: context.option.imageSizeOnlyPercentage,
             _ratio: false,
@@ -137,8 +138,9 @@ export default {
             if (option.imageResizing) {
                 const onlyPercentage = option.imageSizeOnlyPercentage;
                 const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
+                const heightDisplay = !option.imageHeightShow ? ' style="display: none !important;"' : '';
                 html += '<div class="se-dialog-form">';
-                        if (onlyPercentage) {
+                        if (onlyPercentage || !option.imageHeightShow) {
                             html += '' +
                             '<div class="se-dialog-size-text">' +
                                 '<label class="size-w">' + lang.dialogBox.size + '</label>' +
@@ -153,9 +155,9 @@ export default {
                         }
                         html += '' +
                             '<input class="se-input-control _se_image_size_x" placeholder="auto"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + ' />' +
-                            '<label class="se-dialog-size-x">' + (onlyPercentage ? '%' : 'x') + '</label>' +
-                            '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" disabled' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + '/>' +
-                            '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                            '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
+                            '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" disabled' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
+                            '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                             '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                         '</div>' ;
             }

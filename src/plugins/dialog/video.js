@@ -34,6 +34,7 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _resizing: context.option.videoResizing,
             _rotation: context.option.videoRotation,
+            _resizeDotHide: !context.option.videoHeightShow,
             _onlyPercentage: context.option.videoSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
@@ -107,27 +108,30 @@ export default {
                 const ratio = option.videoRatio;
                 const onlyPercentage = option.videoSizeOnlyPercentage;
                 const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
+                const heightDisplay = !option.videoHeightShow ? ' style="display: none !important;"' : '';
+                const ratioDisplay = !option.videoRatioShow ? ' style="display: none !important;"' : '';
+                const onlyWidthDisplay = !onlyPercentage && !option.videoHeightShow && !option.videoRatioShow ? ' style="display: none !important;"' : '';
                 html += '' +
                     '<div class="se-dialog-form">' +
                         '<div class="se-dialog-size-text">' +
                             '<label class="size-w">' + lang.dialogBox.width + '</label>' +
                             '<label class="se-dialog-size-x">&nbsp;</label>' +
-                            '<label class="size-h">' + lang.dialogBox.height + '</label>' +
-                            '<label class="size-h">(' + lang.dialogBox.ratio + ')</label>' +
+                            '<label class="size-h"' + heightDisplay + '>' + lang.dialogBox.height + '</label>' +
+                            '<label class="size-h"' + ratioDisplay + '>(' + lang.dialogBox.ratio + ')</label>' +
                         '</div>' +
                         '<input class="se-input-control _se_video_size_x" placeholder="100%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + '/>' +
-                        '<label class="se-dialog-size-x">' + (onlyPercentage ? '%' : 'x') + '</label>' +
-                        '<input class="se-input-control _se_video_size_y" placeholder="' + (option.videoRatio * 100) + '%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + '/>' +
-                        '<select class="se-input-select se-video-ratio" title="' + lang.dialogBox.ratio + '">' +
-                            '<option value=""> - </option>';
+                        '<label class="se-dialog-size-x"' + onlyWidthDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
+                        '<input class="se-input-control _se_video_size_y" placeholder="' + (option.videoRatio * 100) + '%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
+                        '<select class="se-input-select se-video-ratio" title="' + lang.dialogBox.ratio + '"' + ratioDisplay + '>';
+                            if (!heightDisplay) html += '<option value=""> - </option>';
                             for (let i = 0, len = ratioList.length; i < len; i++) {
                                 html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
                             }
                         html += '</select>' +
                         '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
                     '</div>' +
-                    '<div class="se-dialog-form se-dialog-form-footer">' +
-                        '<label' + onlyPercentDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                    '<div class="se-dialog-form se-dialog-form-footer"' + onlyPercentDisplay + onlyWidthDisplay + '>' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                     '</div>';
             }
 

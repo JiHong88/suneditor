@@ -321,7 +321,7 @@ export default {
 
         // resizing display
         contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';
-        const resizeDotShow = contextPlugin._resizing && !contextPlugin._onlyPercentage ? 'flex' : 'none';
+        const resizeDotShow = contextPlugin._resizing && !contextPlugin._resizeDotHide && !contextPlugin._onlyPercentage ? 'flex' : 'none';
         const resizeHandles = contextResizing.resizeHandles;
         for (let i = 0, len = resizeHandles.length; i < len; i++) {
             resizeHandles[i].style.display = resizeDotShow;
