@@ -267,17 +267,6 @@ export default {
         }
     },
 
-    _module_isChange: function (contextPlugin) {
-        const x = this.util.isNumber(contextPlugin.inputX.value) ? contextPlugin.inputX.value + contextPlugin.sizeUnit : contextPlugin.inputX.value;
-        const y = this.util.isNumber(contextPlugin.inputY.value) ? contextPlugin.inputY.value + contextPlugin.sizeUnit : contextPlugin.inputY.value;
-
-        if (/%$/.test(contextPlugin._element.style.width)) {
-            return x !== contextPlugin._container.style.width || y !== contextPlugin._container.style.height;
-        } else {
-            return x !== contextPlugin._element.style.width || y !== contextPlugin._element.style.height;
-        }
-    },
-
     _module_sizeRevert: function (contextPlugin) {
         if (contextPlugin._onlyPercentage) {
             contextPlugin.inputX.value = contextPlugin._origin_w > 100 ? 100 : contextPlugin._origin_w;

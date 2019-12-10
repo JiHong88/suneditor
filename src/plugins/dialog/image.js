@@ -599,7 +599,15 @@ export default {
         let cover = contextImage._cover;
         let container = contextImage._container;
         let isNewContainer = false;
-        const changeSize = this.plugins.resizing._module_isChange.call(this, contextImage);
+
+        let changeSize;
+        const x = this.util.isNumber(contextImage.inputX.value) ? contextImage.inputX.value + contextImage.sizeUnit : contextImage.inputX.value;
+        const y = this.util.isNumber(contextImage.inputY.value) ? contextImage.inputY.value + contextImage.sizeUnit : contextImage.inputY.value;
+        if (/%$/.test(contextImage._element.style.width)) {
+            changeSize = x !== contextImage._container.style.width || y !== contextImage._container.style.height;
+        } else {
+            changeSize = x !== contextImage._element.style.width || y !== contextImage._element.style.height;
+        }
 
         if (cover === null) {
             isNewContainer = true;

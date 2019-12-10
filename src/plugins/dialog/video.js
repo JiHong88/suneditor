@@ -153,7 +153,7 @@ export default {
         const contextVideo = this.context.video;
         const value = e.target.options[e.target.selectedIndex].value;
 
-        contextVideo._videoRatio = !value ? 1 : (value * 100) + '%';
+        contextVideo._defaultSizeY = contextVideo._videoRatio = !value ? contextVideo._defaultSizeY : (value * 100) + '%';
         contextVideo.inputY.placeholder = !value ? '' : (value * 100) + '%';
         contextVideo.inputY.value = '';
     },
@@ -245,7 +245,8 @@ export default {
         contextVideo._cover = cover;
         contextVideo._container = container;
 
-        const changeSize = !this.context.dialog.updateModal || this.plugins.resizing._module_isChange.call(this, contextVideo);
+        const inputUpdate = (this.plugins.resizing._module_getSizeX.call(this, contextVideo) !== (contextVideo.inputX.value || contextVideo._defaultSizeX)) || (this.plugins.resizing._module_getSizeY.call(this, contextVideo) !== (contextVideo.inputY.value || contextVideo._videoRatio));
+        const changeSize = !this.context.dialog.updateModal || inputUpdate;
 
         if (contextVideo._resizing) {
             this.context.video._proportionChecked = contextVideo.proportion.checked;
@@ -263,7 +264,7 @@ export default {
         if (!this.context.dialog.updateModal) {
             this.insertComponent(container);
         }
-        else if (/\d+/.test(cover.style.height) || (contextVideo._resizing && changeSize) || this.context.resizing._rotateVertical) {
+        else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);
         }
         
