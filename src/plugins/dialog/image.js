@@ -40,6 +40,7 @@ export default {
             _proportionChecked: true,
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _xmlHttp: null,
+            _captionShow: true,
             _resizing: context.option.imageResizing,
             _rotation: context.option.imageRotation,
             _resizeDotHide: !context.option.imageHeightShow,

@@ -32,6 +32,7 @@ export default {
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
+            _captionShow: false,
             _resizing: context.option.videoResizing,
             _rotation: context.option.videoRotation,
             _resizeDotHide: !context.option.videoHeightShow,
