@@ -353,7 +353,7 @@ export default {
         }
 
         // caption display, active
-        if (!contextPlugin._caption) {
+        if (!contextPlugin._captionShow) {
             contextResizing.captionButton.style.display = 'none';
         } else {
             contextResizing.captionButton.style.display = '';
