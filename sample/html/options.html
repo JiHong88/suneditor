@@ -162,7 +162,8 @@
             <h4 style="color: #b94a48;">--Image</h4>
             <label><input type="checkbox" id="imageResizing" checked>&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageFileInput" checked>&nbsp;&nbsp;imageFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>
+            <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageHeightShow" checked>&nbsp;&nbsp;imageHeightShow</label>
             <br><br>
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
             <input type="text" id="imageWidth_value" placeholder="String.. (auto)" style="width: 200px">
@@ -188,8 +189,9 @@
             <h4 style="color: #b94a48;">--Video</h4>
             <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
-            <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
+            <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoRatioShow" checked>&nbsp;&nbsp;videoRatioShow</label>
             <br><br>
             <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
             <input type="text" id="videoWidth_value" placeholder="String.. (100%)">
@@ -207,6 +209,9 @@
             <br><br>
             <label><input type="checkbox" id="videoRatioList">&nbsp;&nbsp;videoRatioList</label>
             <span>[ {name: 'Classic Film 3:2', value: 0.6666}, {name: 'HD', value: 0.5625} ]</span>
+            <br><br>
+            <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
+            <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
             
             <br>
             <h4 style="color: #b94a48;">--Defining save button</h4>
@@ -355,6 +360,7 @@ function sun_create () {
             ['#ff0000', '#ff5e00', '#ffe400', '#abf200'], ['#00d8ff', '#0055ff', '#6600ff', '#ff00dd']
         ],
         imageResizing: document.getElementById('imageResizing').checked ? undefined : false,
+        imageHeightShow: document.getElementById('imageHeightShow').checked ? undefined : false,
         imageFileInput: document.getElementById('imageFileInput').checked ? undefined : false,
         imageUrlInput: document.getElementById('imageUrlInput').checked ? undefined : false,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
@@ -364,6 +370,8 @@ function sun_create () {
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
+        videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
+        videoRatioShow: document.getElementById('videoRatioShow').checked ? undefined : false,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
         videoSizeOnlyPercentage: document.getElementById('videoSizeOnlyPercentage').checked ? true : undefined,
         videoRotation: document.getElementById('videoRotation').checked ? document.getElementById('radio_videoRotation_1').checked : undefined,
