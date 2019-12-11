@@ -141,6 +141,7 @@ window.sun_getContents = function () {
 window.sun_setContents = function (content) {
     ss.setContents(content);
     ss.core.history.reset();
+    // ss.core.context.tool.save.disabled = true;
 }
 
 window.sun_appendContents = function (content) {

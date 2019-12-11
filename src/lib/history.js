@@ -53,7 +53,7 @@ export default function (core, change) {
         change();
     }
 
-    function pushStack () {
+    function pushStack (changeEvent) {
         const current = core.getContents(true);
         if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
 
@@ -82,7 +82,7 @@ export default function (core, change) {
         core._checkComponents();
         core._charCount(0, false);
         // onChange
-        change();
+        if (changeEvent) change();
     }
 
     return {
@@ -103,7 +103,7 @@ export default function (core, change) {
             if (!delay || pushDelay) {
                 _w.clearTimeout(pushDelay);
                 if (!delay) {
-                    pushStack();
+                    pushStack(true);
                     return;
                 }
             }
@@ -111,7 +111,7 @@ export default function (core, change) {
             pushDelay = _w.setTimeout(function () {
                 _w.clearTimeout(pushDelay);
                 pushDelay = null;
-                pushStack();
+                pushStack(true);
             }, 500);
         },
 
@@ -151,9 +151,11 @@ export default function (core, change) {
         reset: function () {
             if (undo) undo.setAttribute('disabled', true);
             if (redo) redo.setAttribute('disabled', true);
+            if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
+            
             stack.splice(0);
             stackIndex = -1;
-            pushStack();
+            pushStack(false);
         }
     };
 }
