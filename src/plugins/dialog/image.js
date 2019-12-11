@@ -968,6 +968,7 @@ export default {
             contextImage.inputX.disabled = false;
             contextImage.inputY.disabled = false;
             contextImage.proportion.disabled = false;
+            contextImage.proportion.checked = true;
             contextImage._ratio = false;
             contextImage._ratioX = 1;
             contextImage._ratioY = 1;

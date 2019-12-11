@@ -71,12 +71,13 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     // videoHeightShow: false,
-    videoRatioShow: false,
+    // videoRatioShow: false,
     imageHeightShow: false,
+    imageRotation: true,
     // imageResizing: false,
     // imageSizeOnlyPercentage: true,
     // videoResizing: false,
-    videoSizeOnlyPercentage: true
+    // videoSizeOnlyPercentage: true
 });
 
 ss.onScroll = function (e) {
