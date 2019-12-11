@@ -100,7 +100,8 @@
             center: 'По центру',
             width: 'Ширина',
             height: 'Высота',
-            size: 'Размер'
+            size: 'Размер',
+            ratio: 'Соотношение'
         },
         controller: {
             edit: 'Изменить',
@@ -116,6 +117,7 @@
             resize75: 'Размер 75%',
             resize50: 'Размер 50%',
             resize25: 'Размер 25%',
+            autoSize: 'Авто размер',
             mirrorHorizontal: 'Отразить по горизонтали',
             mirrorVertical: 'Отразить по вертикали',
             rotateLeft: 'Повернуть против часовой стрелки',
@@ -131,7 +133,6 @@
         menu: {
             spaced: 'интервал',
             bordered: 'Граничная Линия',
-            invert: 'Инвертировать цвет',
             neon: 'неон',
             translucent: 'полупрозрачный',
             shadow: 'Тень'

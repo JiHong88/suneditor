@@ -100,7 +100,8 @@
             center: '居中',
             width: '宽度',
             height: '高度',
-            size: '尺寸'
+            size: '尺寸',
+            ratio: '比'
         },
         controller: {
             edit: '编辑',
@@ -131,7 +132,6 @@
         menu: {
             spaced: '间隔开',
             bordered: '边界线',
-            invert: '反转颜色',
             neon: '氖',
             translucent: '半透明',
             shadow: '暗影'

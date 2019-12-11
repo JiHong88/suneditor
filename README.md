@@ -18,7 +18,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Can use CodeMirror.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2180)
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2300)
 
 ## Table of contents
 - [Browser Support](#browser-support)
@@ -67,6 +67,8 @@ $ bower install suneditor --save
 #### CDN
 ``` html
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor-contents.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
@@ -107,6 +109,8 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
+// import 'suneditor/assets/css/suneditor.css'
+// import 'suneditor/assets/css/suneditor-contents.css'
 import suneditor from 'suneditor'
 
 // How to import plugins
@@ -396,17 +400,12 @@ paragraphStyles : You can apply custom class to format.
                         class: '__se__p-bordered'
                     },
                     {
-                        name: 'Invert color',
-                        class: '__se__p-invert',
-                        _class: 'se-invert' // .sun-editor .se-invert > div {color: #fff; background-color: #333;}
-                    },
-                    {
                         name: 'Neon',
                         class: '__se__p-neon'
                     }
                   ]
                   ex) [
-                      'invert', 'neon', // The default value is called by name only and the name is called in the language file.
+                      'spaced', 'neon', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Custom',
                           class: '__se__customClass'
@@ -438,12 +437,12 @@ textStyles      : You can apply custom style or class to selected text.
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------
-imageResizing   : Can resize the image.                             default: true {Boolean}
-imageWidth      : The default width size of the image frame.        default: 'auto' {Number|String}
-imageSizeUnit   : The font size unit, Only "px" or "%" is allowed.
-                  The percentage button is active even if it is "px".   default: 'px' {String}
+imageResizing   : Can resize the image.                               default: true {Boolean}
+imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
+imageWidth      : The default width size of the image frame.          default: 'auto' {String}
+imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
-                  When "imageSizeUnit" is "%" the default value is false.
+                  When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
                   If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
@@ -466,9 +465,26 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 
 // Video----------------------------------------------------------------------------------------------------------
-videoResizing   : Can resize the video iframe.                       default: true {Boolean}
-videoWidth      : The default width size of the video frame.         default: 560 {Number}
-videoHeight     : The default heigth size of the video frame.        default: 315 {Number}
+videoResizing   : Can resize the video iframe.                         default: true {Boolean}
+videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
+videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
+videoWidth      : The default width size of the video frame.           default: '100%' {String}
+videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
+videoRotation   : Choose whether to video rotation buttons display.
+                  When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.
+                  If you want the button to be visible, put it a true.     default: true {Boolean}
+videoRatio      : The default aspect ratio of the video.
+                  Up to four decimal places are allowed.             default: 0.5625 (16:9) {Float}
+videoRatioList  : Video ratio selection options.
+                  default: [
+                    {name: '16:9', value: 0.5625},
+                    {name: '4:3', value: 0.75},
+                    {name: '21:9', value: 0.4285}
+                  ],
+                  ex) [
+                    {name: 'Classic Film 3:2', value: 0.6666},
+                    {name: 'HD', value: 0.5625}
+                  ]
 youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {String}
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'

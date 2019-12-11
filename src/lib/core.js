@@ -199,7 +199,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             resizeClientY: 0,
             tabSize: 4,
             codeIndent: 4,
-            minResizingSize: (context.element.wysiwygFrame.style.minHeight || '65').match(/\d+/)[0] * 1,
+            minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
             _range: null,
             _selectionNode: null,
@@ -344,7 +344,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         execCommand: function (command, showDefaultUI, value) {
             this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
             // history stack
-            this.history.push();
+            this.history.push(false);
         },
 
         /**
@@ -610,7 +610,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            this.history.push();
+            this.history.push(false);
 
             return oNode;
         },
@@ -685,9 +685,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
-                // history stack
-                this.history.push();
-                
                 if (oNode.nodeType === 3) {
                     const previous = oNode.previousSibling;
                     const next = oNode.nextSibling;
@@ -709,6 +706,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         endOffset: oNode.textContent.length - nextText.length
                     };
                 }
+
+                // history stack
+                this.history.push(true);
             }
         },
 
@@ -722,7 +722,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 range.deleteContents();
 
                 // history stack
-                this.history.push();
+                this.history.push(false);
                 return;
             }
 
@@ -797,7 +797,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 util.removeItem(item);
 
                 // history stack
-                this.history.push();
+                this.history.push(false);
             }
         },
 
@@ -890,7 +890,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             removeItems(rangeElement, beforeTag);
 
             // history stack
-            this.history.push();
+            this.history.push(false);
 
             const edge = util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
             if (rangeLines.length > 1) {
@@ -1030,9 +1030,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             if (notHistory) return edge;
             
-            // history stack
-            this.history.push();
-
             if (!remove && edge) {
                 if (!selectedFormats) {
                     this.setRange(edge.sc, 0, edge.sc, 0);
@@ -1040,6 +1037,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     this.setRange(edge.sc, so, edge.ec, eo);
                 }
             }
+
+            // history stack
+            this.history.push(false);
             
             event._findButtonEffectTag();
         },
@@ -1350,7 +1350,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.setRange(start.container, start.offset, end.container, end.offset);
 
             // history stack
-            this.history.push();
+            this.history.push(false);
         },
 
         /**
@@ -2429,7 +2429,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             for (let i = 0, len = rangeLines.length; i < len; i++) {
                 p = rangeLines[i];
-                margin = /\d+/.test(p.style.marginLeft) ? p.style.marginLeft.match(/\d+/)[0] * 1 : 0;
+                margin = /\d+/.test(p.style.marginLeft) ? util.getNumber(p.style.marginLeft, 0) : 0;
 
                 if ('indent' === command) {
                     margin += 25;
@@ -2442,7 +2442,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             event._findButtonEffectTag();
             // history stack
-            this.history.push();
+            this.history.push(false);
         },
 
         /**
@@ -2490,11 +2490,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 this._resourcesStateChange();
                 this._checkComponents();
+                this.focus();
 
                 // history stack
-                this.history.push();
-
-                this.focus();
+                this.history.push(false);
             } else {
                 this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
@@ -2766,7 +2765,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (!core._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
                 // history stack
-                core.history.push();
+                core.history.push(false);
             } else {
                 const value = util.convertHTMLForCodeView(convertValue, core._variable.codeIndent);
                 core._setCodeView(value);
@@ -3102,7 +3101,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && (selectionParent.style.marginLeft.match(/\d+/) || [0])[0] * 1 > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && (util.getNumber((selectionParent.style.marginLeft) || 0), 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;
@@ -3815,7 +3814,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // history stack
             if (textKey) {
-                core.history.push();
+                core.history.push(true);
             }
 
             if (userFunction.onKeyUp) userFunction.onKeyUp(e);
@@ -3959,7 +3958,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core.execCommand('insertHTML', false, cleanData);
             } else {
                 // history stack
-                core.history.push();
+                core.history.push(true);
             }
         },
 
@@ -3968,7 +3967,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core._resourcesStateChange();
                 core._charCount(0, false);
                 // history stack
-                core.history.push();
+                core.history.push(false);
             });
         },
 
@@ -4319,7 +4318,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            core.history.push();
+            core.history.push(false);
         },
 
         /**

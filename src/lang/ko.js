@@ -100,7 +100,8 @@
             center: '가운데',
             width: '가로',
             height: '세로',
-            size: '크기'
+            size: '크기',
+            ratio: '비율'
         },
         controller: {
             edit: '편집',
@@ -116,6 +117,7 @@
             resize75: '75% 크기',
             resize50: '50% 크기',
             resize25: '25% 크기',
+            autoSize: '자동 크기',
             mirrorHorizontal: '좌우 반전',
             mirrorVertical: '상하 반전',
             rotateLeft: '왼쪽으로 회전',
@@ -131,7 +133,6 @@
         menu: {
             spaced: '글자 간격',
             bordered: '경계선',
-            invert: '색상 반전',
             neon: '네온',
             translucent: '반투명',
             shadow: '그림자'

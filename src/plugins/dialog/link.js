@@ -136,11 +136,13 @@ export default {
                 contextLink._linkAnchor.href = url;
                 contextLink._linkAnchor.textContent = anchorText;
                 contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
-                // history stack
-                this.history.push();
+
                 // set range
                 this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
             }
+
+            // history stack
+            this.history.push(false);
 
             contextLink.focusElement.value = '';
             contextLink.linkAnchorText.value = '';
@@ -212,12 +214,12 @@ export default {
             this.util.removeItem(this.context.link._linkAnchor);
             this.context.link._linkAnchor = null;
             this.focus();
+
+            // history stack
+            this.history.push(false);
         }
 
         this.controllersOff();
-        
-        // history stack
-        this.history.push();
     },
 
     init: function () {

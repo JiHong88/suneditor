@@ -103,7 +103,8 @@
             center: 'Center',
             width: 'Bredde',
             height: 'Højde',
-            size: 'Størrelse'
+            size: 'Størrelse',
+            ratio: 'Forhold'
         },
         controller: {
             edit: 'Rediger',
@@ -119,6 +120,7 @@
             resize75: 'Forstør 75%',
             resize50: 'Forstør 50%',
             resize25: 'Forstør 25%',
+            autoSize: 'Auto størrelse',
             mirrorHorizontal: 'Spejling, horisontal',
             mirrorVertical: 'Spejling, vertikal',
             rotateLeft: 'Roter til venstre',
@@ -134,7 +136,6 @@
         menu: {
             spaced: 'Brev Afstand',
             bordered: 'Afgrænsningslinje',
-            invert: 'Inverter farve',
             neon: 'Neon',
             translucent: 'Gennemsigtig',
             shadow: 'Skygge'

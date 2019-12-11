@@ -100,7 +100,8 @@
             center: '中央',
             width: '横',
             height: '縦',
-            size: 'サイズ'
+            size: 'サイズ',
+            ratio: '比率'
         },
         controller: {
             edit: '編集',
@@ -116,6 +117,7 @@
             resize75: '75％ サイズ',
             resize50: '50％ サイズ',
             resize25: '25％ サイズ',
+            autoSize: '自動サイズ',
             mirrorHorizontal: '左右反転',
             mirrorVertical: '上下反転',
             rotateLeft: '左に回転',
@@ -131,7 +133,6 @@
         menu: {
             spaced: '文字間隔',
             bordered: '境界線',
-            invert: '色反転',
             neon: 'ネオン',
             translucent: '半透明',
             shadow: '影'
