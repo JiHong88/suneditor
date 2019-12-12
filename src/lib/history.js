@@ -53,7 +53,7 @@ export default function (core, change) {
         change();
     }
 
-    function pushStack (changeEvent) {
+    function pushStack () {
         const current = core.getContents(true);
         if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
 
@@ -82,7 +82,7 @@ export default function (core, change) {
         core._checkComponents();
         core._charCount(0, false);
         // onChange
-        if (changeEvent) change();
+        change();
     }
 
     return {
@@ -103,7 +103,7 @@ export default function (core, change) {
             if (!delay || pushDelay) {
                 _w.clearTimeout(pushDelay);
                 if (!delay) {
-                    pushStack(true);
+                    pushStack();
                     return;
                 }
             }
@@ -111,7 +111,7 @@ export default function (core, change) {
             pushDelay = _w.setTimeout(function () {
                 _w.clearTimeout(pushDelay);
                 pushDelay = null;
-                pushStack(true);
+                pushStack();
             }, 500);
         },
 
@@ -148,14 +148,28 @@ export default function (core, change) {
         /**
          * @description Reset the history object
          */
-        reset: function () {
+        reset: function (ignoreChangeEvent) {
             if (undo) undo.setAttribute('disabled', true);
             if (redo) redo.setAttribute('disabled', true);
             if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
             
             stack.splice(0);
-            stackIndex = -1;
-            pushStack(false);
+            stackIndex = 0;
+
+            // pushStack
+            stack[stackIndex] = {
+                contents: core.getContents(true),
+                s: {
+                    path: [0],
+                    offset: 0
+                },
+                e: {
+                    path: [0],
+                    offset: 0
+                }
+            };
+
+            if (!ignoreChangeEvent) change();
         }
     };
 }

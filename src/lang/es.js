@@ -13,12 +13,12 @@
 			factory(global, true) :
 			function (w) {
 				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document')
+					throw new Error('SUNEDITOR_LANG a window with a document');
 				}
-				return factory(w)
-			}
+				return factory(w);
+			};
 	} else {
-		factory(global)
+		factory(global);
 	}
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
 	const lang = {
@@ -137,15 +137,15 @@
 			translucent: 'Translúcido',
 			shadow: 'Sombreado'
 		}
-	}
+	};
 
 	if (typeof noGlobal === typeof undefined) {
 		if (!window.SUNEDITOR_LANG) {
-			window.SUNEDITOR_LANG = {}
+			window.SUNEDITOR_LANG = {};
 		}
 
-		window.SUNEDITOR_LANG.es = lang
+		window.SUNEDITOR_LANG.es = lang;
 	}
 
-	return lang
-}))
+	return lang;
+}));
