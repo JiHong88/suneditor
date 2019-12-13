@@ -148,12 +148,28 @@ export default function (core, change) {
         /**
          * @description Reset the history object
          */
-        reset: function () {
+        reset: function (ignoreChangeEvent) {
             if (undo) undo.setAttribute('disabled', true);
             if (redo) redo.setAttribute('disabled', true);
+            if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
+            
             stack.splice(0);
-            stackIndex = -1;
-            pushStack();
+            stackIndex = 0;
+
+            // pushStack
+            stack[stackIndex] = {
+                contents: core.getContents(true),
+                s: {
+                    path: [0],
+                    offset: 0
+                },
+                e: {
+                    path: [0],
+                    offset: 0
+                }
+            };
+
+            if (!ignoreChangeEvent) change();
         }
     };
 }
