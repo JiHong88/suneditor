@@ -190,7 +190,7 @@ export default {
         tableHTML += '</tbody>';
         oTable.innerHTML = tableHTML;
 
-        this.insertComponent(oTable);
+        this.insertComponent(oTable, false);
         
         this.focus();
         this.plugins.table.reset_table_picker.call(this);

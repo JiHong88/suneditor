@@ -591,9 +591,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * When used in a tag in "LI", it is inserted into the LI tag.
          * Returns the next line added.
          * @param {Element} element Element to be inserted
+         * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @returns {Element}
          */
-        insertComponent: function (element) {
+        insertComponent: function (element, notHistoryPush) {
             let oNode = null;
             const selectionNode = this.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode);
@@ -617,7 +618,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            this.history.push(false);
+            if (!notHistoryPush) this.history.push(false);
 
             return oNode;
         },
@@ -915,9 +916,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
          * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
          * @param {Boolean} remove Delete without detached.
-         * @param {Boolean} notHistory When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+         * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistory) {
+        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
             const range = this.getRange();
             const so = range.startOffset;
             const eo = range.endOffset;
@@ -1035,7 +1036,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
             } : util.getEdgeChildNodes(firstNode, lastNode);
 
-            if (notHistory) return edge;
+            if (notHistoryPush) return edge;
             
             if (!remove && edge) {
                 if (!selectedFormats) {
@@ -4301,7 +4302,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (util.isComponent(html)) {
-                core.insertComponent(html);
+                core.insertComponent(html, false);
             } else {
                 core.insertNode(html, afterNode);
             }

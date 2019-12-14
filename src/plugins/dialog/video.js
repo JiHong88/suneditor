@@ -267,7 +267,7 @@ export default {
         this.plugins.video.setAlign.call(this, null, oIframe, cover, container);
 
         if (!this.context.dialog.updateModal) {
-            this.insertComponent(container);
+            this.insertComponent(container, false);
         }
         else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, oIframe, null, null);

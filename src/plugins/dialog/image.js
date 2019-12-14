@@ -574,6 +574,8 @@ export default {
     _onload_image: function (oImg, file) {
         if (!file) return;
         this.plugins.image.setImagesInfo.call(this, oImg, file);
+        // history stack
+        this.history.push(true);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
@@ -612,7 +614,7 @@ export default {
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
-        this.insertComponent(container);
+        this.insertComponent(container, true);
         this.context.resizing._resize_plugin = '';
     },
 
