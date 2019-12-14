@@ -416,7 +416,7 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this, false, false);
+                imagePlugin.update_image.call(this, false, false, false);
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
@@ -443,7 +443,7 @@ export default {
         let state = '';
 
         // create
-        if (!dataIndex) {
+        if (!dataIndex || this._imagesInfoInit) {
             state = 'create';
             dataIndex = this._variable._imageIndex;
             this._variable._imageIndex++;
@@ -471,12 +471,19 @@ export default {
                 }
             }
 
+            if (!info) {
+                dataIndex = this._variable._imageIndex;
+                this._variable._imageIndex++;
+                info = {};
+            }
+
             info.src = img.src,
             info.name = img.getAttribute("data-file-name");
             info.size = img.getAttribute("data-file-size") * 1;
         }
 
         // method bind
+        info.element = img;
         info.delete = this.plugins.image.destroy.bind(this, img);
         info.select = function () {
             img.scrollIntoView(true);
@@ -503,12 +510,26 @@ export default {
 
     checkImagesInfo: function () {
         const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
+        const imagePlugin = this.plugins.image;
         const imagesInfo = this._variable._imagesInfo;
 
-        if (images.length === imagesInfo.length) return;
+        if (images.length === imagesInfo.length) {
+            // reset
+            if (this._imagesInfoReset) {
+                for (let i = 0, len = images.length, img; i < len; i++) {
+                    img = images[i];
+                    imagePlugin.setImagesInfo.call(this, img, {
+                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
+                        'size': img.getAttribute('data-file-size') || 0
+                    });
+                }
+            }
+            // pass
+            return;
+        }
 
+        // check images
         this.context.resizing._resize_plugin = 'image';
-        const imagePlugin = this.plugins.image;
         const currentImages = [];
         const infoIndex = [];
         for (let i = 0, len = imagesInfo.length; i < len; i++) {
@@ -521,7 +542,7 @@ export default {
                 currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
-                imagePlugin.update_image.call(this, true, false);
+                imagePlugin.update_image.call(this, true, false, true);
             } else if (!img.getAttribute('data-index') || infoIndex.indexOf(img.getAttribute('data-index') * 1) < 0) {
                 currentImages.push(this._variable._imageIndex);
                 img.removeAttribute('data-index');
@@ -595,22 +616,13 @@ export default {
         this.context.resizing._resize_plugin = '';
     },
 
-    update_image: function (init, openController) {
+    update_image: function (init, openController, notHistoryPush) {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
         let imageEl = contextImage._element;
         let cover = contextImage._cover;
         let container = contextImage._container;
         let isNewContainer = false;
-
-        let changeSize;
-        const x = this.util.isNumber(contextImage.inputX.value) ? contextImage.inputX.value + contextImage.sizeUnit : contextImage.inputX.value;
-        const y = this.util.isNumber(contextImage.inputY.value) ? contextImage.inputY.value + contextImage.sizeUnit : contextImage.inputY.value;
-        if (/%$/.test(contextImage._element.style.width)) {
-            changeSize = x !== contextImage._container.style.width || y !== contextImage._container.style.height;
-        } else {
-            changeSize = x !== contextImage._element.style.width || y !== contextImage._element.style.height;
-        }
 
         if (cover === null) {
             isNewContainer = true;
@@ -627,6 +639,16 @@ export default {
         if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
+        }
+
+        // check size
+        let changeSize;
+        const x = this.util.isNumber(contextImage.inputX.value) ? contextImage.inputX.value + contextImage.sizeUnit : contextImage.inputX.value;
+        const y = this.util.isNumber(contextImage.inputY.value) ? contextImage.inputY.value + contextImage.sizeUnit : contextImage.inputY.value;
+        if (/%$/.test(imageEl.style.width)) {
+            changeSize = x !== container.style.width || y !== container.style.height;
+        } else {
+            changeSize = x !== imageEl.style.width || y !== imageEl.style.height;
         }
 
         // alt
@@ -674,7 +696,12 @@ export default {
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(existElement);
             imageEl = container.querySelector('img');
+
+            contextImage._element = imageEl;
+            contextImage._cover = cover;
+            contextImage._container = container;
         }
+
 
         // transform
         if (!contextImage._onlyPercentage && changeSize) {
@@ -713,7 +740,7 @@ export default {
         }
 
         // history stack
-        this.history.push(false);
+        if (!notHistoryPush) this.history.push(false);
     },
 
     update_src: function (src, element, file) {

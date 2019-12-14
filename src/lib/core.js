@@ -146,6 +146,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _sticky: false,
 
         /**
+         * @description If true, (initialize, reset) all indexes of image information
+         * @private
+         */
+        _imagesInfoInit: true,
+        _imagesInfoReset: false,
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -2920,14 +2927,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._wd = _d;
 
             _w.setTimeout(function () {
+                this._checkComponents();
+                this._imagesInfoInit = false;
+                this._imagesInfoReset = false;
+                
+                this.history.reset(true);
+
                 if (_options.iframe) {
                     this._wd = context.element.wysiwygFrame.contentDocument;
                     context.element.wysiwyg = this._wd.body;
                     if (_options.height === 'auto') {
                         this._iframeAuto = this._wd.body;
                     }
+                    this._iframeAutoHeight();
                 }
-                this._iframeAutoHeight();
             }.bind(this));
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
@@ -2954,9 +2967,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
 
-            /** Excute history function, check components */
+            /** Excute history function */
             this._checkPlaceholder();
-            this._checkComponents();
             this.history = _history(this, event._onChange_historyStack);
         },
 
@@ -3315,7 +3327,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         
                         if (!util.getParentElement(imageComponent, '.se-image-container')) {
                             core.plugins.image.openModify.call(core, true);
-                            core.plugins.image.update_image.call(core, true, true);
+                            core.plugins.image.update_image.call(core, true, true, true);
                         }
                     });
 
@@ -3590,7 +3602,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                         
                                         if (!util.getParentElement(nextEl, '.se-component')) {
                                             core.plugins.image.openModify.call(core, true);
-                                            core.plugins.image.update_image.call(core, true, true);
+                                            core.plugins.image.update_image.call(core, true, true, false);
                                         }
                                     });
                                 } else if (util.hasClass(nextEl, 'se-video-container')) {
@@ -4200,6 +4212,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.lang = lang = _options.lang;
             core.context = context = _Context(context.element.originElement, constructed, _options);
 
+            core._imagesInfoReset = true;
             core._init();
             event._addEvent();
             core._charCount(0, false);

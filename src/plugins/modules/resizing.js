@@ -187,6 +187,8 @@ export default {
         if (!cover) cover = contextPlugin._cover;
         if (!container) container = contextPlugin._container;
 
+        if (!container || !cover || !element) return '';
+
         return !/%$/.test(element.style.width) ? element.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
     },
 
@@ -194,6 +196,8 @@ export default {
         if (!element) element = contextPlugin._element;
         if (!cover) cover = contextPlugin._cover;
         if (!container) container = contextPlugin._container;
+
+        if (!container || !cover || !element) return '';
 
         return this.util.getNumber(cover.style.paddingBottom) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
     },
@@ -513,7 +517,7 @@ export default {
                 currentContext._captionChecked = currentContext.captionCheckEl.checked = caption;
 
                 if (pluginName === 'image') {
-                    currentModule.update_image.call(this, false, false);
+                    currentModule.update_image.call(this, false, false, false);
                 } else if (pluginName === 'video') {
                     this.context.dialog.updateModal = true;
                     currentModule.submitAction.call(this);
