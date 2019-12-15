@@ -398,6 +398,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Remove range object and button effect
+         */
+        removeRange: function () {
+            this.getSelection().removeAllRanges();
+
+            const commandMap = this.commandMap;
+            util.changeTxt(commandMap.FORMAT, lang.toolbar.format);
+            util.changeTxt(commandMap.FONT, lang.toolbar.font);
+            util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
+            util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
+            util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
+            util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
+            util.removeClass(commandMap.LI, 'active');
+            util.removeClass(commandMap.STRONG, 'active');
+            util.removeClass(commandMap.INS, 'active');
+            util.removeClass(commandMap.EM, 'active');
+            util.removeClass(commandMap.DEL, 'active');
+            util.removeClass(commandMap.SUB, 'active');
+            util.removeClass(commandMap.SUP, 'active');
+
+            if (commandMap.OUTDENT) commandMap.OUTDENT.setAttribute('disabled', true);
+            if (commandMap.LI) commandMap.LI.removeAttribute('data-focus');
+            if (commandMap.ALIGN) {
+                commandMap.ALIGN.className = 'se-icon-align-left';
+                commandMap.ALIGN.removeAttribute('data-focus');
+            }
+        },
+
+        /**
          * @description Get current editor's range object
          * @returns {Object}
          */
@@ -3322,6 +3351,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     e.preventDefault();
                     if (!core.plugins.image) return;
 
+                    core.removeRange();
                     core.callPlugin('image', function () {
                         const size = core.plugins.resizing.call_controller_resize.call(core, imageComponent, 'image');
                         core.plugins.image.onModifyMode.call(core, imageComponent, size);
@@ -3337,6 +3367,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     e.preventDefault();
                     if (!core.plugins.video) return;
 
+                    core.removeRange();
                     core.callPlugin('video', function () {
                         const size = core.plugins.resizing.call_controller_resize.call(core, videoComponent, 'video');
                         core.plugins.video.onModifyMode.call(core, videoComponent, size);
@@ -3531,7 +3562,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
+                        const container = context[resizingName]._container;
+                        const focusEl = (container.previousElementSibling || container.nextElementSibling);
                         core.plugins[resizingName].destroy.call(core);
+                        core.setRange(focusEl.lastChild, 1, focusEl.lastChild, 1);
                         break;
                     }
 
@@ -3580,7 +3614,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
+                        const container = context[resizingName]._container;
+                        const focusEl = (container.previousElementSibling || container.nextElementSibling);
                         core.plugins[resizingName].destroy.call(core);
+                        core.setRange(focusEl.lastChild, 1, focusEl.lastChild, 1);
                         break;
                     }
 
