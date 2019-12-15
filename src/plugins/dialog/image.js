@@ -551,8 +551,9 @@ export default {
                     'size': img.getAttribute('data-file-size') || 0
                 });
                 if (!img.style.width) {
+                    const size = (img.getAttribute('data-size') || img.getAttribute('data-origin') || '').split(',');
                     imagePlugin.onModifyMode.call(this, img, null);
-                    imagePlugin.setOriginSize.call(this);
+                    imagePlugin.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || ''));
                 }
             } else {
                 currentImages.push(img.getAttribute('data-index') * 1);
@@ -704,7 +705,6 @@ export default {
             contextImage._container = container;
         }
 
-
         // transform
         if (!contextImage._onlyPercentage && changeSize) {
             if (!init && (/\d+/.test(imageEl.style.height) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
@@ -717,6 +717,7 @@ export default {
         }
 
         // size
+        let isPercent = false;
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
             if (changeSize) {
@@ -725,7 +726,9 @@ export default {
         }
 
         // align
-        this.plugins.image.setAlign.call(this, null, imageEl, null, null);
+        if (!(isPercent && contextImage._align === 'center')) {
+            this.plugins.image.setAlign.call(this, null, imageEl, null, null);
+        }
 
         // set imagesInfo
         if (init) {
@@ -816,11 +819,14 @@ export default {
         
         if ((contextImage._onlyPercentage && !!w) || /%$/.test(w)) {
             this.plugins.image.setPercentSize.call(this, w, h);
+            return true;
         } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.image.setAutoSize.call(this);
         } else {
             this.plugins.image.setSize.call(this, w, h, false);
         }
+
+        return false;
     },
 
     setSize: function (w, h, notResetPercentage) {
