@@ -351,7 +351,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         execCommand: function (command, showDefaultUI, value) {
             this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
             // history stack
-            this.history.push(false);
+            this.history.push(true);
         },
 
         /**
@@ -404,7 +404,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.getSelection().removeAllRanges();
 
             const commandMap = this.commandMap;
-            util.changeTxt(commandMap.FORMAT, lang.toolbar.format);
+            util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
             util.changeTxt(commandMap.FONT, lang.toolbar.font);
             util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
             util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
@@ -3529,6 +3529,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
         },
 
+        _removeComponentWithKey: function (resizingName) {
+            const container = context[resizingName]._container;
+            let focusEl = (container.previousElementSibling || container.nextElementSibling);
+            core.plugins[resizingName].destroy.call(core);
+
+            focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            core.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+        },
+
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
@@ -3562,10 +3571,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const container = context[resizingName]._container;
-                        const focusEl = (container.previousElementSibling || container.nextElementSibling);
-                        core.plugins[resizingName].destroy.call(core);
-                        core.setRange(focusEl.lastChild, 1, focusEl.lastChild, 1);
+                        event._removeComponentWithKey(resizingName);
                         break;
                     }
 
@@ -3614,10 +3620,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const container = context[resizingName]._container;
-                        const focusEl = (container.previousElementSibling || container.nextElementSibling);
-                        core.plugins[resizingName].destroy.call(core);
-                        core.setRange(focusEl.lastChild, 1, focusEl.lastChild, 1);
+                        event._removeComponentWithKey(resizingName);
                         break;
                     }
 
