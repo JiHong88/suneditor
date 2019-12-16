@@ -3046,8 +3046,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
      * @description event function
      */
     const event = {
-        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
+        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(13|1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
@@ -3823,7 +3823,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onKeyUp_wysiwyg: function (e) {
             core._editorRange();
             const keyCode = e.keyCode;
-            const ctrl = e.ctrlKey || e.metaKey;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
