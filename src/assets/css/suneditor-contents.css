@@ -67,7 +67,7 @@
 
 /* pre */
 .sun-editor-editable pre {
-    display: flex;
+    display: block;
     padding: 8px;
     margin: 0 0 10px;
     line-height: 1.45;
@@ -139,8 +139,8 @@
     color: #999;
     margin-block-start: 1em;
     margin-block-end: 1em;
-    margin-inline-start: 40px;
-    margin-inline-end: 40px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     border-style: solid;
     border-width: 0;
     padding-top: 0;
@@ -148,8 +148,6 @@
     padding-left: 20px;
     padding-right: 5px;
     border-left-width: 5px;
-}
-.sun-editor-editable blockquote {
     border-color: #b1b1b1;
 }
 .sun-editor-editable blockquote blockquote {
