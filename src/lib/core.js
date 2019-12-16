@@ -3248,6 +3248,51 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.setAttribute('contenteditable', false);
             this.removeEventListener('blur', event._cancelCaptionEdit);
         },
+        
+        _selectComponent: function (element, componentName) {
+            if (componentName === 'image') {
+                if (!core.plugins.image) return;
+
+                core.removeRange();
+                core.callPlugin('image', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
+                    core.plugins.image.onModifyMode.call(core, element, size);
+                    
+                    if (!util.getParentElement(element, '.se-image-container')) {
+                        core.plugins.image.openModify.call(core, true);
+                        core.plugins.image.update_image.call(core, true, true, true);
+                    }
+                });
+            } else if (componentName === 'video') {
+                if (!core.plugins.video) return;
+
+                core.removeRange();
+                core.callPlugin('video', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
+                    core.plugins.video.onModifyMode.call(core, element, size);
+                });
+            }
+        },
+
+        _removeComponentWithKey: function (resizingName) {
+            const container = context[resizingName]._container;
+            let focusEl = (container.previousElementSibling || container.nextElementSibling);
+            core.plugins[resizingName].destroy.call(core);
+
+            if (util.isComponent(focusEl)) {
+                const imageComponent = focusEl.querySelector('IMG');
+                const videoComponent = focusEl.querySelector('IFRAME');
+
+                if (imageComponent) {
+                    event._selectComponent(imageComponent, 'image');
+                } else if (videoComponent) {
+                    event._selectComponent(videoComponent, 'image');
+                }
+            } else {
+                focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+                core.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+            }
+        },
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
@@ -3349,30 +3394,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (imageComponent) {
                     e.preventDefault();
-                    if (!core.plugins.image) return;
-
-                    core.removeRange();
-                    core.callPlugin('image', function () {
-                        const size = core.plugins.resizing.call_controller_resize.call(core, imageComponent, 'image');
-                        core.plugins.image.onModifyMode.call(core, imageComponent, size);
-                        
-                        if (!util.getParentElement(imageComponent, '.se-image-container')) {
-                            core.plugins.image.openModify.call(core, true);
-                            core.plugins.image.update_image.call(core, true, true, true);
-                        }
-                    });
-
+                    event._selectComponent(imageComponent, 'image');
                     return;
                 } else if (videoComponent) {
                     e.preventDefault();
-                    if (!core.plugins.video) return;
-
-                    core.removeRange();
-                    core.callPlugin('video', function () {
-                        const size = core.plugins.resizing.call_controller_resize.call(core, videoComponent, 'video');
-                        core.plugins.video.onModifyMode.call(core, videoComponent, size);
-                    });
-
+                    event._selectComponent(videoComponent, 'video');
                     return;
                 }
             }
@@ -3527,15 +3553,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 context.element.toolbar.style.display = 'none';
                 core._inlineToolbarAttr.isShow = false;
             }
-        },
-
-        _removeComponentWithKey: function (resizingName) {
-            const container = context[resizingName]._container;
-            let focusEl = (container.previousElementSibling || container.nextElementSibling);
-            core.plugins[resizingName].destroy.call(core);
-
-            focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-            core.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
         },
 
         onKeyDown_wysiwyg: function (e) {
