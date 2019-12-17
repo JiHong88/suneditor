@@ -3143,7 +3143,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && (util.getNumber((selectionParent.style.marginLeft) || 0), 0) > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;

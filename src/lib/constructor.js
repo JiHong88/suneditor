@@ -479,7 +479,7 @@ export default {
             ],
 
             outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
-                '<i class="se-icon-indent-left"></i>'
+                '<i class="se-icon-indent-left"></i>', true
             ],
 
             fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '',
