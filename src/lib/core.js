@@ -372,6 +372,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+         * @param {Element} focusEl Focus element
+         * @private
+         */
+        _focusEdge: function (focusEl) {
+            if (util.isComponent(focusEl)) {
+                const imageComponent = focusEl.querySelector('IMG');
+                const videoComponent = focusEl.querySelector('IFRAME');
+    
+                if (imageComponent) {
+                    this.selectComponent(imageComponent, 'image');
+                } else if (videoComponent) {
+                    this.selectComponent(videoComponent, 'video');
+                }
+            } else {
+                focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+                this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+            }
+        },
+
+        /**
          * @description Set current editor's range object
          * @param {Element} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
@@ -650,6 +671,36 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (!notHistoryPush) this.history.push(false);
 
             return oNode;
+        },
+
+        /**
+         * @description The component(image, video) is selected and the resizing module is called.
+         * @param {Element} element Element tag (img or iframe)
+         * @param {String} componentName Component name (image or video)
+         */
+        selectComponent: function (element, componentName) {
+            if (componentName === 'image') {
+                if (!core.plugins.image) return;
+
+                core.removeRange();
+                core.callPlugin('image', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
+                    core.plugins.image.onModifyMode.call(core, element, size);
+                    
+                    if (!util.getParentElement(element, '.se-image-container')) {
+                        core.plugins.image.openModify.call(core, true);
+                        core.plugins.image.update_image.call(core, true, true, true);
+                    }
+                });
+            } else if (componentName === 'video') {
+                if (!core.plugins.video) return;
+
+                core.removeRange();
+                core.callPlugin('video', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
+                    core.plugins.video.onModifyMode.call(core, element, size);
+                });
+            }
         },
 
         /**
@@ -3248,51 +3299,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.setAttribute('contenteditable', false);
             this.removeEventListener('blur', event._cancelCaptionEdit);
         },
-        
-        _selectComponent: function (element, componentName) {
-            if (componentName === 'image') {
-                if (!core.plugins.image) return;
-
-                core.removeRange();
-                core.callPlugin('image', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
-                    core.plugins.image.onModifyMode.call(core, element, size);
-                    
-                    if (!util.getParentElement(element, '.se-image-container')) {
-                        core.plugins.image.openModify.call(core, true);
-                        core.plugins.image.update_image.call(core, true, true, true);
-                    }
-                });
-            } else if (componentName === 'video') {
-                if (!core.plugins.video) return;
-
-                core.removeRange();
-                core.callPlugin('video', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
-                    core.plugins.video.onModifyMode.call(core, element, size);
-                });
-            }
-        },
-
-        _removeComponentWithKey: function (resizingName) {
-            const container = context[resizingName]._container;
-            let focusEl = (container.previousElementSibling || container.nextElementSibling);
-            core.plugins[resizingName].destroy.call(core);
-
-            if (util.isComponent(focusEl)) {
-                const imageComponent = focusEl.querySelector('IMG');
-                const videoComponent = focusEl.querySelector('IFRAME');
-
-                if (imageComponent) {
-                    event._selectComponent(imageComponent, 'image');
-                } else if (videoComponent) {
-                    event._selectComponent(videoComponent, 'image');
-                }
-            } else {
-                focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-                core.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
-            }
-        },
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
@@ -3394,11 +3400,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (imageComponent) {
                     e.preventDefault();
-                    event._selectComponent(imageComponent, 'image');
+                    core.selectComponent(imageComponent, 'image');
                     return;
                 } else if (videoComponent) {
                     e.preventDefault();
-                    event._selectComponent(videoComponent, 'video');
+                    core.selectComponent(videoComponent, 'video');
                     return;
                 }
             }
@@ -3588,7 +3594,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        event._removeComponentWithKey(resizingName);
+                        core.plugins[resizingName].destroy.call(core);
                         break;
                     }
 
@@ -3637,7 +3643,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (resizingName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        event._removeComponentWithKey(resizingName);
+                        core.plugins[resizingName].destroy.call(core);
                         break;
                     }
 
@@ -3654,9 +3660,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 e.stopPropagation();
                                 if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
-                                    event._selectComponent(nextEl, 'image');
+                                    core.selectComponent(nextEl, 'image');
                                 } else if (util.hasClass(nextEl, 'se-video-container')) {
-                                    event._selectComponent(nextEl.querySelector('iframe'), 'video');
+                                    core.selectComponent(nextEl.querySelector('iframe'), 'video');
                                 }
                             }
 

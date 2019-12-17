@@ -964,12 +964,17 @@ export default {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, this.util.isComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
+        let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
 
         this.controllersOff();
+
+        // focus
+        this._focusEdge(focusEl);
         
+        // event
         if (dataIndex >= 0) {
             const imagesInfo = this._variable._imagesInfo;
 

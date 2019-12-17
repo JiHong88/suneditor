@@ -266,11 +266,11 @@
     background-clip: padding-box;
 }
 /** table - select class */
-.sun-editor-editable[contenteditable="true"] table td.se-table-selected-cell, .sun-editor-editable[contenteditable="true"] table th.se-table-selected-cell {
+.sun-editor-editable table td.se-table-selected-cell, .sun-editor-editable table th.se-table-selected-cell {
     border: 1px double #4592ff;
     background-color: #f1f7ff;
 }
-.sun-editor-editable.se-disabled {
+.sun-editor-editable.se-disabled * {
     user-select: none;
     -o-user-select: none;
     -moz-user-select: none;

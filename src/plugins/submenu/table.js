@@ -192,7 +192,8 @@ export default {
 
         this.insertComponent(oTable, false);
         
-        this.focus();
+        const firstTd = oTable.querySelector('td div');
+        this.setRange(firstTd, 0, firstTd, 0);
         this.plugins.table.reset_table_picker.call(this);
     },
 
@@ -202,13 +203,13 @@ export default {
         if (!returnElement) {
             let cellsHTML = '';
             while (cnt > 0) {
-                cellsHTML += '<' +nodeName + '><br></' + nodeName + '>';
+                cellsHTML += '<' +nodeName + '><div><br></div></' + nodeName + '>';
                 cnt--;
             }
             return cellsHTML;
         } else {
             const cell = this.util.createElement(nodeName);
-            cell.innerHTML = '<br>';
+            cell.innerHTML = '<div><br></div>';
             return cell;
         }
     },
@@ -1140,7 +1141,7 @@ export default {
 
         if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || 
             tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
-                return;
+            return;
         }
 
         tablePlugin._selectedCell = target;

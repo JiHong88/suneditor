@@ -580,9 +580,14 @@ export default {
 
     destroy: function () {
         this._variable._videosCnt--;
-        this.util.removeItem(this.context.video._container);
+        const container = this.context.video._container;
+        let focusEl = (container.previousElementSibling || container.nextElementSibling);
+        this.util.removeItem(container);
         this.plugins.video.init.call(this);
         this.controllersOff();
+
+        // focus
+        this._focusEdge(focusEl);
 
         // history stack
         this.history.push(false);
