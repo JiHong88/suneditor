@@ -1116,15 +1116,13 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
         tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
+        this._focusEdge(tablePlugin._selectedCell);
 
         if (!tablePlugin._shift) {
             tablePlugin._fixedCell = null;
             tablePlugin._selectedCell = null;
             tablePlugin._fixedCellName = null;
         }
-
-        this._editorRange();
-        this.focus();
     },
 
     _onCellMultiSelect: function (e) {

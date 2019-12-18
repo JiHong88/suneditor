@@ -364,10 +364,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (caption) {
                 caption.focus();
             } else {
-                context.element.wysiwyg.focus();
+                try {
+                    const range = this.getRange();
+                    this.setRange(range.startContainer, range.startOffset);
+                } catch (e) {
+                    context.element.wysiwyg.focus();
+                    this._editorRange();
+                }
             }
 
-            this._editorRange();
             event._findButtonEffectTag();
         },
 
