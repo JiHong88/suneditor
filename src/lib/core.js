@@ -360,17 +360,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-            if (caption) {
-                caption.focus();
-            } else {
-                try {
-                    const range = this.getRange();
-                    this.setRange(range.startContainer, range.startOffset);
-                } catch (e) {
+            try {
+                const range = this.getRange();
+                this.setRange(range.startContainer, range.startOffset);
+            } catch (e) {
+                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+                if (caption) {
+                    caption.focus();
+                } else {
                     context.element.wysiwyg.focus();
-                    this._editorRange();
                 }
+
+                this._editorRange();
             }
 
             event._findButtonEffectTag();
@@ -3415,7 +3416,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
+            if (figcaption && (!figcaption.getAttribute('contenteditable') || figcaption.getAttribute('contenteditable') === 'false')) {
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();

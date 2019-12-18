@@ -327,6 +327,7 @@
     z-index: 0;
 }
 .sun-editor-editable[contenteditable="true"] figure figcaption {
+    display: block;
     z-index: 2;
 }
 
