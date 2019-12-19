@@ -756,8 +756,6 @@ export default {
         }
 
         this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, false);
-        this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
-        
         this.plugins[this.context.resizing._resize_plugin].init.call(this);
     }
 };

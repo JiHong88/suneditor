@@ -941,7 +941,7 @@ export default {
             cover.style.width = container.style.width;
         } else {
             container.style.minWidth = '';
-            cover.style.width = this.context.resizing._rotateVertical ? (element.style.height || element.offsetHeight) : ((!element.style.width || element.style.width === 'auto') ? '' : '100%');
+            cover.style.width = this.context.resizing._rotateVertical ? (element.style.height || element.offsetHeight) : ((!element.style.width || element.style.width === 'auto') ? '' : element.style.width || '100%');
         }
 
         if (!this.util.hasClass(container, '__se__float-' + align)) {
