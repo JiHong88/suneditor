@@ -293,12 +293,6 @@
 }
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: 1px dashed #e1e1e1;
-    user-select: none;
-    -o-user-select: none;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
 }
 
 /** image, video .. */
