@@ -416,7 +416,7 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this, false, false);
+                imagePlugin.update_image.call(this, false, false, false);
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
@@ -443,7 +443,7 @@ export default {
         let state = '';
 
         // create
-        if (!dataIndex) {
+        if (!dataIndex || this._imagesInfoInit) {
             state = 'create';
             dataIndex = this._variable._imageIndex;
             this._variable._imageIndex++;
@@ -471,12 +471,19 @@ export default {
                 }
             }
 
+            if (!info) {
+                dataIndex = this._variable._imageIndex;
+                this._variable._imageIndex++;
+                info = {};
+            }
+
             info.src = img.src,
             info.name = img.getAttribute("data-file-name");
             info.size = img.getAttribute("data-file-size") * 1;
         }
 
         // method bind
+        info.element = img;
         info.delete = this.plugins.image.destroy.bind(this, img);
         info.select = function () {
             img.scrollIntoView(true);
@@ -503,12 +510,26 @@ export default {
 
     checkImagesInfo: function () {
         const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
+        const imagePlugin = this.plugins.image;
         const imagesInfo = this._variable._imagesInfo;
 
-        if (images.length === imagesInfo.length) return;
+        if (images.length === imagesInfo.length) {
+            // reset
+            if (this._imagesInfoReset) {
+                for (let i = 0, len = images.length, img; i < len; i++) {
+                    img = images[i];
+                    imagePlugin.setImagesInfo.call(this, img, {
+                        'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
+                        'size': img.getAttribute('data-file-size') || 0
+                    });
+                }
+            }
+            // pass
+            return;
+        }
 
+        // check images
         this.context.resizing._resize_plugin = 'image';
-        const imagePlugin = this.plugins.image;
         const currentImages = [];
         const infoIndex = [];
         for (let i = 0, len = imagesInfo.length; i < len; i++) {
@@ -521,7 +542,7 @@ export default {
                 currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
-                imagePlugin.update_image.call(this, true, false);
+                imagePlugin.update_image.call(this, true, false, true);
             } else if (!img.getAttribute('data-index') || infoIndex.indexOf(img.getAttribute('data-index') * 1) < 0) {
                 currentImages.push(this._variable._imageIndex);
                 img.removeAttribute('data-index');
@@ -530,8 +551,9 @@ export default {
                     'size': img.getAttribute('data-file-size') || 0
                 });
                 if (!img.style.width) {
+                    const size = (img.getAttribute('data-size') || img.getAttribute('data-origin') || '').split(',');
                     imagePlugin.onModifyMode.call(this, img, null);
-                    imagePlugin.setOriginSize.call(this);
+                    imagePlugin.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || ''));
                 }
             } else {
                 currentImages.push(img.getAttribute('data-index') * 1);
@@ -553,6 +575,8 @@ export default {
     _onload_image: function (oImg, file) {
         if (!file) return;
         this.plugins.image.setImagesInfo.call(this, oImg, file);
+        // history stack
+        this.history.push(true);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
@@ -591,26 +615,17 @@ export default {
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
-        this.insertComponent(container);
+        this.insertComponent(container, true);
         this.context.resizing._resize_plugin = '';
     },
 
-    update_image: function (init, openController) {
+    update_image: function (init, openController, notHistoryPush) {
         const contextImage = this.context.image;
         const linkValue = contextImage._linkValue;
         let imageEl = contextImage._element;
         let cover = contextImage._cover;
         let container = contextImage._container;
         let isNewContainer = false;
-
-        let changeSize;
-        const x = this.util.isNumber(contextImage.inputX.value) ? contextImage.inputX.value + contextImage.sizeUnit : contextImage.inputX.value;
-        const y = this.util.isNumber(contextImage.inputY.value) ? contextImage.inputY.value + contextImage.sizeUnit : contextImage.inputY.value;
-        if (/%$/.test(contextImage._element.style.width)) {
-            changeSize = x !== contextImage._container.style.width || y !== contextImage._container.style.height;
-        } else {
-            changeSize = x !== contextImage._element.style.width || y !== contextImage._element.style.height;
-        }
 
         if (cover === null) {
             isNewContainer = true;
@@ -627,6 +642,16 @@ export default {
         if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
+        }
+
+        // check size
+        let changeSize;
+        const x = this.util.isNumber(contextImage.inputX.value) ? contextImage.inputX.value + contextImage.sizeUnit : contextImage.inputX.value;
+        const y = this.util.isNumber(contextImage.inputY.value) ? contextImage.inputY.value + contextImage.sizeUnit : contextImage.inputY.value;
+        if (/%$/.test(imageEl.style.width)) {
+            changeSize = x !== container.style.width || y !== container.style.height;
+        } else {
+            changeSize = x !== imageEl.style.width || y !== imageEl.style.height;
         }
 
         // alt
@@ -674,6 +699,10 @@ export default {
             existElement.parentNode.insertBefore(container, existElement);
             this.util.removeItem(existElement);
             imageEl = container.querySelector('img');
+
+            contextImage._element = imageEl;
+            contextImage._cover = cover;
+            contextImage._container = container;
         }
 
         // transform
@@ -688,6 +717,7 @@ export default {
         }
 
         // size
+        let isPercent = false;
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
             if (changeSize) {
@@ -696,7 +726,9 @@ export default {
         }
 
         // align
-        this.plugins.image.setAlign.call(this, null, imageEl, null, null);
+        if (!(isPercent && contextImage._align === 'center')) {
+            this.plugins.image.setAlign.call(this, null, imageEl, null, null);
+        }
 
         // set imagesInfo
         if (init) {
@@ -713,7 +745,7 @@ export default {
         }
 
         // history stack
-        this.history.push(false);
+        if (!notHistoryPush) this.history.push(false);
     },
 
     update_src: function (src, element, file) {
@@ -787,11 +819,14 @@ export default {
         
         if ((contextImage._onlyPercentage && !!w) || /%$/.test(w)) {
             this.plugins.image.setPercentSize.call(this, w, h);
+            return true;
         } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.image.setAutoSize.call(this);
         } else {
             this.plugins.image.setSize.call(this, w, h, false);
         }
+
+        return false;
     },
 
     setSize: function (w, h, notResetPercentage) {
@@ -906,7 +941,7 @@ export default {
             cover.style.width = container.style.width;
         } else {
             container.style.minWidth = '';
-            cover.style.width = this.context.resizing._rotateVertical ? (element.style.height || element.offsetHeight) : ((!element.style.width || element.style.width === 'auto') ? '' : '100%');
+            cover.style.width = this.context.resizing._rotateVertical ? (element.style.height || element.offsetHeight) : ((!element.style.width || element.style.width === 'auto') ? '' : element.style.width || '100%');
         }
 
         if (!this.util.hasClass(container, '__se__float-' + align)) {
@@ -929,12 +964,17 @@ export default {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, this.util.isComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
+        let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
 
         this.controllersOff();
+
+        // focus
+        this.focusEdge(focusEl);
         
+        // event
         if (dataIndex >= 0) {
             const imagesInfo = this._variable._imagesInfo;
 

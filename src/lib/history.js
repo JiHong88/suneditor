@@ -15,17 +15,7 @@ export default function (core, change) {
     const redo = core.context.tool.redo;
     let pushDelay = null;
     let stackIndex = 0;
-    let stack = [{
-        contents: core.getContents(true),
-        s: {
-            path: [0, 0],
-            offset: 0
-        },
-        e: {
-            path: [0, 0],
-            offset: 0
-        }
-    }];
+    let stack = [];
 
     function setContentsFromStack () {
         const item = stack[stackIndex];
@@ -160,11 +150,11 @@ export default function (core, change) {
             stack[stackIndex] = {
                 contents: core.getContents(true),
                 s: {
-                    path: [0],
+                    path: [0, 0],
                     offset: 0
                 },
                 e: {
-                    path: [0],
+                    path: [0, 0],
                     offset: 0
                 }
             };

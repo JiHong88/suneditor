@@ -72,8 +72,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     // videoHeightShow: false,
     // videoRatioShow: false,
-    imageHeightShow: false,
-    imageRotation: true,
+    // imageHeightShow: false,
+    // imageRotation: true,
     // imageResizing: false,
     // imageSizeOnlyPercentage: true,
     // videoResizing: false,
@@ -254,10 +254,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
 const newOption = {
     mode: 'balloon',
     iframe: false,
-    plugins: [
-        plugins.hiliteColor,
-        plugins.fontColor
-    ],
+    plugins: plugins,
     minHeight: '300',
     textSizeUnit: 'pt',
     buttonList: [
@@ -280,6 +277,7 @@ const newOption = {
     placeholder: 'Placeholder...'
 }
 const newOption2 = {
+    plugins: plugins,
     mode: 'classic',
     maxHeight: '400px',
     height: 150,
@@ -288,6 +286,7 @@ const newOption2 = {
     iframe: true,
 }
 const newOption3 = {
+    plugins: plugins,
     mode: 'inline',
     iframe: false,
 }

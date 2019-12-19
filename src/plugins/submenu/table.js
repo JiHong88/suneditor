@@ -190,9 +190,10 @@ export default {
         tableHTML += '</tbody>';
         oTable.innerHTML = tableHTML;
 
-        this.insertComponent(oTable);
+        this.insertComponent(oTable, false);
         
-        this.focus();
+        const firstTd = oTable.querySelector('td div');
+        this.setRange(firstTd, 0, firstTd, 0);
         this.plugins.table.reset_table_picker.call(this);
     },
 
@@ -202,13 +203,13 @@ export default {
         if (!returnElement) {
             let cellsHTML = '';
             while (cnt > 0) {
-                cellsHTML += '<' +nodeName + '><br></' + nodeName + '>';
+                cellsHTML += '<' +nodeName + '><div><br></div></' + nodeName + '>';
                 cnt--;
             }
             return cellsHTML;
         } else {
             const cell = this.util.createElement(nodeName);
-            cell.innerHTML = '<br>';
+            cell.innerHTML = '<div><br></div>';
             return cell;
         }
     },
@@ -944,6 +945,7 @@ export default {
             }
         }
 
+        this.focusEdge(currentCell);
         this.plugins.table.setPositionControllerDiv.call(this, currentCell, true);
     },
 
@@ -1020,6 +1022,7 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, mergeCell);
 
         util.addClass(mergeCell, 'se-table-selected-cell');
+        this.focusEdge(mergeCell);
     },
 
     toggleHeader: function () {
@@ -1115,15 +1118,13 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
         tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
+        this.focusEdge(tablePlugin._selectedCell || tablePlugin._fixedCell);
 
         if (!tablePlugin._shift) {
             tablePlugin._fixedCell = null;
             tablePlugin._selectedCell = null;
             tablePlugin._fixedCellName = null;
         }
-
-        this._editorRange();
-        this.focus();
     },
 
     _onCellMultiSelect: function (e) {
@@ -1140,7 +1141,7 @@ export default {
 
         if (!target || target === tablePlugin._selectedCell || tablePlugin._fixedCellName !== target.nodeName || 
             tablePlugin._selectedTable !== this.util.getParentElement(target, 'TABLE')) {
-                return;
+            return;
         }
 
         tablePlugin._selectedCell = target;

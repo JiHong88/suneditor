@@ -67,7 +67,7 @@
 
 /* pre */
 .sun-editor-editable pre {
-    display: flex;
+    display: block;
     padding: 8px;
     margin: 0 0 10px;
     line-height: 1.45;
@@ -139,8 +139,8 @@
     color: #999;
     margin-block-start: 1em;
     margin-block-end: 1em;
-    margin-inline-start: 40px;
-    margin-inline-end: 40px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     border-style: solid;
     border-width: 0;
     padding-top: 0;
@@ -148,8 +148,6 @@
     padding-left: 20px;
     padding-right: 5px;
     border-left-width: 5px;
-}
-.sun-editor-editable blockquote {
     border-color: #b1b1b1;
 }
 .sun-editor-editable blockquote blockquote {
@@ -267,6 +265,19 @@
     padding:0.4em;
     background-clip: padding-box;
 }
+/** table - select class */
+.sun-editor-editable table td.se-table-selected-cell, .sun-editor-editable table th.se-table-selected-cell {
+    border: 1px double #4592ff;
+    background-color: #f1f7ff;
+}
+.sun-editor-editable.se-disabled * {
+    user-select: none;
+    -o-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
 
 /** component (image, iframe video) */
 .sun-editor-editable .se-component {
@@ -282,12 +293,6 @@
 }
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: 1px dashed #e1e1e1;
-    user-select: none;
-    -o-user-select: none;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
 }
 
 /** image, video .. */
@@ -298,6 +303,26 @@
     width: auto;
     height: auto;
     max-width: 100%;
+}
+/*  image, video - select index  */
+.sun-editor-editable[contenteditable="true"] figure::after {
+    position: absolute;
+    content: '';
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: default;
+    display: block;
+    background: rgba(0,0,0,0);
+}
+.sun-editor-editable[contenteditable="true"] figure a, .sun-editor-editable[contenteditable="true"] figure img, .sun-editor-editable[contenteditable="true"] figure iframe {
+    z-index: 0;
+}
+.sun-editor-editable[contenteditable="true"] figure figcaption {
+    display: block;
+    z-index: 2;
 }
 
 /** image, video iframe figure cover */
@@ -346,6 +371,22 @@
     max-width: 100%;
 }
 
+/** --- show blocks mode */
+.sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
+.sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
+.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6 {
+    border:1px dashed #3f9dff !important;
+    padding:10px 8px 8px 8px !important;
+}
+.se-show-block p {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;}
+.se-show-block div {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;}
+.se-show-block h1 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAfSURBVAjXY/j/v4EBhr+9B+LzEPrDeygfhI8j1CBhAEhmJGY4Rf6uAAAAAElFTkSuQmCC') no-repeat;}
+.se-show-block h2 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j/v4EBhr+dB+LtQPy9geEDEH97D8T3gbgdoQYJAwA51iPuD2haEAAAAABJRU5ErkJggg==') no-repeat;}
+.se-show-block h3 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j/v4EBhr+dB+LtQPy9geHDeQgN5p9HqEHCADeWI+69VG2MAAAAAElFTkSuQmCC') no-repeat;}
+.se-show-block h4 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAPAQMAAADTSA1RAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j//wADDH97DsTXIfjDdiDdDMTfIRhZHRQDAKJOJ6L+K3y7AAAAAElFTkSuQmCC') no-repeat;}
+.se-show-block h5 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAlSURBVAjXY/j/v4EBhr+1A/F+IO5vYPiwHUh/B2IQfR6hBgkDABlWIy5uM+9GAAAAAElFTkSuQmCC') no-repeat;}
+.se-show-block h6 {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPAQMAAAA4f7ZSAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAiSURBVAjXY/j/v4EBhr+dB+LtQLy/geFDP5S9HSKOrA6KAR9GIza1ptJnAAAAAElFTkSuQmCC') no-repeat;}
+
 /** -- Paragraph styles custom -- */
 /* Bordered */
 .sun-editor-editable .__se__p-bordered, .sun-editor .__se__p-bordered {
@@ -392,7 +433,6 @@
         box-shadow: none;
     }    
 }
-
 
 /* -- Text styles custom -- */
 /* Shadow */

@@ -146,6 +146,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _sticky: false,
 
         /**
+         * @description If true, (initialize, reset) all indexes of image information
+         * @private
+         */
+        _imagesInfoInit: true,
+        _imagesInfoReset: false,
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -344,7 +351,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         execCommand: function (command, showDefaultUI, value) {
             this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
             // history stack
-            this.history.push(false);
+            this.history.push(true);
         },
 
         /**
@@ -353,15 +360,41 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-            if (caption) {
-                caption.focus();
-            } else {
-                context.element.wysiwyg.focus();
+            try {
+                const range = this.getRange();
+                this.setRange(range.startContainer, range.startOffset);
+            } catch (e) {
+                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+                if (caption) {
+                    caption.focus();
+                } else {
+                    context.element.wysiwyg.focus();
+                }
+
+                this._editorRange();
             }
 
-            this._editorRange();
             event._findButtonEffectTag();
+        },
+
+        /**
+         * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+         * @param {Element} focusEl Focus element
+         */
+        focusEdge: function (focusEl) {
+            if (util.isComponent(focusEl)) {
+                const imageComponent = focusEl.querySelector('IMG');
+                const videoComponent = focusEl.querySelector('IFRAME');
+    
+                if (imageComponent) {
+                    this.selectComponent(imageComponent, 'image');
+                } else if (videoComponent) {
+                    this.selectComponent(videoComponent, 'video');
+                }
+            } else {
+                focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+                this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+            }
         },
 
         /**
@@ -388,6 +421,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             selection.addRange(range);
             this._editorRange();
+        },
+
+        /**
+         * @description Remove range object and button effect
+         */
+        removeRange: function () {
+            this.getSelection().removeAllRanges();
+
+            const commandMap = this.commandMap;
+            util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
+            util.changeTxt(commandMap.FONT, lang.toolbar.font);
+            util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
+            util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
+            util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
+            util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
+            util.removeClass(commandMap.LI, 'active');
+            util.removeClass(commandMap.STRONG, 'active');
+            util.removeClass(commandMap.INS, 'active');
+            util.removeClass(commandMap.EM, 'active');
+            util.removeClass(commandMap.DEL, 'active');
+            util.removeClass(commandMap.SUB, 'active');
+            util.removeClass(commandMap.SUP, 'active');
+
+            if (commandMap.OUTDENT) commandMap.OUTDENT.setAttribute('disabled', true);
+            if (commandMap.LI) commandMap.LI.removeAttribute('data-focus');
+            if (commandMap.ALIGN) {
+                commandMap.ALIGN.className = 'se-icon-align-left';
+                commandMap.ALIGN.removeAttribute('data-focus');
+            }
         },
 
         /**
@@ -584,9 +646,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * When used in a tag in "LI", it is inserted into the LI tag.
          * Returns the next line added.
          * @param {Element} element Element to be inserted
+         * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @returns {Element}
          */
-        insertComponent: function (element) {
+        insertComponent: function (element, notHistoryPush) {
             let oNode = null;
             const selectionNode = this.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode);
@@ -610,9 +673,39 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            this.history.push(false);
+            if (!notHistoryPush) this.history.push(false);
 
             return oNode;
+        },
+
+        /**
+         * @description The component(image, video) is selected and the resizing module is called.
+         * @param {Element} element Element tag (img or iframe)
+         * @param {String} componentName Component name (image or video)
+         */
+        selectComponent: function (element, componentName) {
+            if (componentName === 'image') {
+                if (!core.plugins.image) return;
+
+                core.removeRange();
+                core.callPlugin('image', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
+                    core.plugins.image.onModifyMode.call(core, element, size);
+                    
+                    if (!util.getParentElement(element, '.se-image-container')) {
+                        core.plugins.image.openModify.call(core, true);
+                        core.plugins.image.update_image.call(core, true, true, true);
+                    }
+                });
+            } else if (componentName === 'video') {
+                if (!core.plugins.video) return;
+
+                core.removeRange();
+                core.callPlugin('video', function () {
+                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
+                    core.plugins.video.onModifyMode.call(core, element, size);
+                });
+            }
         },
 
         /**
@@ -908,9 +1001,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
          * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
          * @param {Boolean} remove Delete without detached.
-         * @param {Boolean} notHistory When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+         * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistory) {
+        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
             const range = this.getRange();
             const so = range.startOffset;
             const eo = range.endOffset;
@@ -1028,7 +1121,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
             } : util.getEdgeChildNodes(firstNode, lastNode);
 
-            if (notHistory) return edge;
+            if (notHistoryPush) return edge;
             
             if (!remove && edge) {
                 if (!selectedFormats) {
@@ -2920,14 +3013,20 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._wd = _d;
 
             _w.setTimeout(function () {
+                this._checkComponents();
+                this._imagesInfoInit = false;
+                this._imagesInfoReset = false;
+                
+                this.history.reset(true);
+
                 if (_options.iframe) {
                     this._wd = context.element.wysiwygFrame.contentDocument;
                     context.element.wysiwyg = this._wd.body;
                     if (_options.height === 'auto') {
                         this._iframeAuto = this._wd.body;
                     }
+                    this._iframeAutoHeight();
                 }
-                this._iframeAutoHeight();
             }.bind(this));
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
@@ -2954,9 +3053,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
 
-            /** Excute history function, check components */
+            /** Excute history function */
             this._checkPlaceholder();
-            this._checkComponents();
             this.history = _history(this, event._onChange_historyStack);
         },
 
@@ -3004,8 +3102,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
      * @description event function
      */
     const event = {
-        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|33|34|35|36|37|38|39|40|46|98|100|102|104)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
+        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
+        _historyIgnoreKeycode: new _w.RegExp('^(13|1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
@@ -3101,7 +3199,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
 
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && (util.getNumber((selectionParent.style.marginLeft) || 0), 0) > 0 && commandMap.OUTDENT) {
+                    if (findOutdent && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                         findOutdent = false;
@@ -3307,34 +3405,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (imageComponent) {
                     e.preventDefault();
-                    if (!core.plugins.image) return;
-
-                    core.callPlugin('image', function () {
-                        const size = core.plugins.resizing.call_controller_resize.call(core, imageComponent, 'image');
-                        core.plugins.image.onModifyMode.call(core, imageComponent, size);
-                        
-                        if (!util.getParentElement(imageComponent, '.se-image-container')) {
-                            core.plugins.image.openModify.call(core, true);
-                            core.plugins.image.update_image.call(core, true, true);
-                        }
-                    });
-
+                    core.selectComponent(imageComponent, 'image');
                     return;
                 } else if (videoComponent) {
                     e.preventDefault();
-                    if (!core.plugins.video) return;
-
-                    core.callPlugin('video', function () {
-                        const size = core.plugins.resizing.call_controller_resize.call(core, videoComponent, 'video');
-                        core.plugins.video.onModifyMode.call(core, videoComponent, size);
-                    });
-
+                    core.selectComponent(videoComponent, 'video');
                     return;
                 }
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (figcaption && figcaption.getAttribute('contenteditable') !== 'ture') {
+            if (figcaption && (!figcaption.getAttribute('contenteditable') || figcaption.getAttribute('contenteditable') === 'false')) {
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
@@ -3556,8 +3637,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }	
                         }	
 
-                        if (util.isComponent(commonCon.previousSibling)) {
-                            const previousEl = commonCon.previousSibling;
+                        if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
+                            const previousEl = formatEl.previousSibling;
                             util.removeItem(previousEl);
                         }
                     }
@@ -3584,22 +3665,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 e.stopPropagation();
                                 if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
-                                    core.callPlugin('image', function () {
-                                        const size = core.plugins.resizing.call_controller_resize.call(core, nextEl, 'image');
-                                        core.plugins.image.onModifyMode.call(core, nextEl, size);
-                                        
-                                        if (!util.getParentElement(nextEl, '.se-component')) {
-                                            core.plugins.image.openModify.call(core, true);
-                                            core.plugins.image.update_image.call(core, true, true);
-                                        }
-                                    });
+                                    core.selectComponent(nextEl, 'image');
                                 } else if (util.hasClass(nextEl, 'se-video-container')) {
-                                    e.stopPropagation();
-                                    core.callPlugin('video', function () {
-                                        const iframe = nextEl.querySelector('iframe');
-                                        const size = core.plugins.resizing.call_controller_resize.call(core, iframe, 'video');
-                                        core.plugins.video.onModifyMode.call(core, iframe, size);
-                                    });
+                                    core.selectComponent(nextEl.querySelector('iframe'), 'video');
                                 }
                             }
 
@@ -3753,7 +3821,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onKeyUp_wysiwyg: function (e) {
             core._editorRange();
             const keyCode = e.keyCode;
-            const ctrl = e.ctrlKey || e.metaKey;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
@@ -4200,6 +4268,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.lang = lang = _options.lang;
             core.context = context = _Context(context.element.originElement, constructed, _options);
 
+            core._imagesInfoReset = true;
             core._init();
             event._addEvent();
             core._charCount(0, false);
@@ -4288,7 +4357,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (util.isComponent(html)) {
-                core.insertComponent(html);
+                core.insertComponent(html, false);
             } else {
                 core.insertNode(html, afterNode);
             }
