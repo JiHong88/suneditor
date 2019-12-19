@@ -945,6 +945,7 @@ export default {
             }
         }
 
+        this.focusEdge(currentCell);
         this.plugins.table.setPositionControllerDiv.call(this, currentCell, true);
     },
 
@@ -1021,6 +1022,7 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, mergeCell);
 
         util.addClass(mergeCell, 'se-table-selected-cell');
+        this.focusEdge(mergeCell);
     },
 
     toggleHeader: function () {
@@ -1116,7 +1118,7 @@ export default {
         tablePlugin.call_controller_tableEdit.call(this, tablePlugin._selectedCell || tablePlugin._fixedCell);
 
         tablePlugin._selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
-        this._focusEdge(tablePlugin._selectedCell);
+        this.focusEdge(tablePlugin._selectedCell);
 
         if (!tablePlugin._shift) {
             tablePlugin._fixedCell = null;

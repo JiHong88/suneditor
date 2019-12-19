@@ -972,7 +972,7 @@ export default {
         this.controllersOff();
 
         // focus
-        this._focusEdge(focusEl);
+        this.focusEdge(focusEl);
         
         // event
         if (dataIndex >= 0) {

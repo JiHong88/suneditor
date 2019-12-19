@@ -587,7 +587,7 @@ export default {
         this.controllersOff();
 
         // focus
-        this._focusEdge(focusEl);
+        this.focusEdge(focusEl);
 
         // history stack
         this.history.push(false);

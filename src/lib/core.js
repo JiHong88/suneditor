@@ -380,9 +380,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         /**
          * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
          * @param {Element} focusEl Focus element
-         * @private
          */
-        _focusEdge: function (focusEl) {
+        focusEdge: function (focusEl) {
             if (util.isComponent(focusEl)) {
                 const imageComponent = focusEl.querySelector('IMG');
                 const videoComponent = focusEl.querySelector('IFRAME');
