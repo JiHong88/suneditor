@@ -456,7 +456,8 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
         style: 'margin: 10px; background-color: #f5f5f5;',
         command: 'replace'
     }],
-    placeholder: 'Start typing something.4..'
+    placeholder: 'Start typing something.4..',
+    maxCharCount: 280,
 });
 window.sun_destroy3 = function () {
     s3.destroy();
@@ -493,6 +494,7 @@ window.sun_create4 = function() {
         imageWidth: 300,
         mode: 'classic',
         // toolbarWidth: 800,
+        maxCharCount: 280,
         height: 'auto',
         placeholder: 'Start typing something..5.'
         // callBackSave: (contents) => {
