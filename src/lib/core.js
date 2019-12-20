@@ -3102,8 +3102,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
      * @description event function
      */
     const event = {
-        _directionKeyKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
-        _historyIgnoreKeycode: new _w.RegExp('^(13|1[6-7]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
+        _directionKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
+        _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
+        _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
         _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
@@ -3572,7 +3573,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
-            if (!event._directionKeyKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
+            if (!event._directionKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
 
             if (core._isBalloon) {
                 event._hideToolbar();
@@ -3588,7 +3589,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             /** default key action */
             const selectionNode = core.getSelectionNode();
             const range = core.getRange();
-            const selectRange = range.startContainer !== range.endContainer;
+            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const resizingName = core._resizingName;
             let formatEl = util.getFormatElement(selectionNode) || selectionNode;
             let rangeEl = util.getRangeFormatElement(selectionNode);
@@ -3806,7 +3807,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
+            const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
             if (!core._charCount(1, textKey)) {
                 if (textKey) {
                     e.preventDefault();
@@ -3856,15 +3857,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 selectionNode = core.getSelectionNode();
             }
 
-            if (event._directionKeyKeyCode.test(keyCode)) {
+            if (event._directionKeyCode.test(keyCode)) {
                 event._findButtonEffectTag();
             }
 
             core._checkComponents();
 
-            const textKey = !ctrl && !alt && !event._historyIgnoreKeycode.test(keyCode);
-
-            if (textKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+            const historyIgnoreKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
+            if (historyIgnoreKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 const range = core.getRange();
                 const s = range.startOffset, e = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
@@ -3872,6 +3872,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core.setRange(selectionNode, s - frontZeroWidthCnt, selectionNode, e - frontZeroWidthCnt);
             }
 
+            const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
             if (!core._charCount(1, textKey)) {
                 if (e.key.length === 1) {
                     e.preventDefault();
