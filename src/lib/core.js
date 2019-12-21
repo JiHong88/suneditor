@@ -3863,8 +3863,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core._checkComponents();
 
-            const historyIgnoreKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
-            if (historyIgnoreKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+            const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
+            if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 const range = core.getRange();
                 const s = range.startOffset, e = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
@@ -3882,7 +3882,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // history stack
-            if (textKey) {
+            if (historyKey) {
                 core.history.push(true);
             }
 
