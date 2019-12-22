@@ -315,6 +315,8 @@ export default {
 
         reader.onload = function (update, updateElement, file) {
             try {
+                this.context.image.inputX.value = width;
+                this.context.image.inputY.value = height;
                 if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
                 else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
 
@@ -947,8 +949,9 @@ export default {
         if (!this.util.hasClass(container, '__se__float-' + align)) {
             this.util.removeClass(container, contextImage._floatClassRegExp);
             this.util.addClass(container, '__se__float-' + align);
-            element.setAttribute('data-align', align);
         }
+        
+        element.setAttribute('data-align', align);
     },
 
     resetAlign: function () {

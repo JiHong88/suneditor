@@ -565,8 +565,9 @@ export default {
         if (!this.util.hasClass(container, '__se__float-' + align)) {
             this.util.removeClass(container, contextVideo._floatClassRegExp);
             this.util.addClass(container, '__se__float-' + align);
-            element.setAttribute('data-align', align);
         }
+        
+        element.setAttribute('data-align', align);
     },
 
     resetAlign: function () {
