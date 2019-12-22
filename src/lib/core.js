@@ -1495,7 +1495,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0, len = children.length, child, next; i < len; i++) {
                     child = children[i];
                     next = children[i + 1];
-                    if (!child || /^A$/i.test(child.nodeName)) break;
+                    if (!child || inst.util.isMaintainNoodeChange(child)) break;
                     if (len === 1 && current.nodeName === child.nodeName) {
                         inst.util.copyTagAttributes(child, current);
                         current.parentNode.insertBefore(child, current);

@@ -1001,12 +1001,21 @@ const util = {
     },
 
     /**
-     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup)
+     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|a)
      * @param {Element} element Element to check
      * @returns {Boolean}
      */
     isIgnoreNodeChange: function (element) {
         return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
+    },
+
+    /**
+     * @description Tag to maintain current node type when changing node (a)
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     */
+    isMaintainNoodeChange: function (element) {
+        return /^A$/i.test(element.nodeName);
     },
 
     /**
