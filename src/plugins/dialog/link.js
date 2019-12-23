@@ -206,7 +206,9 @@ export default {
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {
-            this.setRange(this.context.link._linkAnchor, 0, this.context.link._linkAnchor, 1);
+            const sc = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+            const ec = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            this.setRange(sc, 0, ec, ec.textContent.length);
             this.nodeChange(null, null, ['A'], false);
         }
         else {

@@ -1336,7 +1336,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // all path
                 if (vNode.nodeType === 3 || util.isBreak(vNode)) return vNode;
                 // all remove
-                if (isRemoveFormat) return null;
+                if (isRemoveFormat || (!isRemoveNode && util.isMaintainNoodeChange(vNode))) return null;
 
                 // remove node check
                 const tagRemove = (!removeNodeRegExp && isRemoveNode) || (removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName));
@@ -1495,8 +1495,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0, len = children.length, child, next; i < len; i++) {
                     child = children[i];
                     next = children[i + 1];
-                    if (!child || inst.util.isMaintainNoodeChange(child)) break;
-                    if (len === 1 && current.nodeName === child.nodeName) {
+                    if (!child) break;
+                    if (len === 1 && current.nodeName === child.nodeName && !inst.util.isMaintainNoodeChange(child)) {
                         inst.util.copyTagAttributes(child, current);
                         current.parentNode.insertBefore(child, current);
                         inst.util.removeItem(current);
@@ -1628,7 +1628,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let endOffset = endOff;
             let startPass = false;
             let endPass = false;
-            let pCurrent, newNode, appendNode, cssText;
+            let pCurrent, newNode, appendNode, cssText, maintainNode;
 
             function checkCss (vNode) {
                 const regExp = new _w.RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
@@ -1652,6 +1652,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // startContainer
                     if (!startPass && child === startContainer) {
+                        maintainNode = !isRemoveNode ? util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
                         const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, 
                                 isSameNode ? 
@@ -1659,8 +1660,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 startContainer.data.length - startOffset)
                             );
 
+                        if (!!maintainNode) maintainNode = maintainNode.cloneNode(false);
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
+                            const prevMaintainNode = !isRemoveNode ? util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                            if (!!prevMaintainNode) {
+                                maintainNode = prevMaintainNode;
+                            }
                         }
 
                         newNode = child;
@@ -1684,7 +1690,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         newInnerNode.appendChild(childNode);
-                        pNode.appendChild(newInnerNode);
+
+                        if (!!maintainNode) {
+                            maintainNode.appendChild(newInnerNode);
+                            if (prevNode.data.length === 0) pNode.appendChild(maintainNode);
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(newInnerNode);
+                        } else {
+                            pNode.appendChild(newInnerNode);
+                        }
 
                         startContainer = textNode;
                         startOffset = 0;
@@ -1696,9 +1710,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!endPass && child === endContainer) {
+                        maintainNode = !isRemoveNode ? util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
+                        if (!!maintainNode) maintainNode = maintainNode.cloneNode(false);
                         if (afterNode.data.length > 0) {
                             newNode = child;
                             cssText = '';
@@ -1720,6 +1736,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                             pNode.appendChild(cloneNode);
                             newNode.textContent = afterNode.data;
+
+                            const afterMaintainNode = !isRemoveNode ? util.getParentElement(cloneNode, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                            if (!!afterMaintainNode) {
+                                maintainNode = afterMaintainNode;
+                            }
                         }
 
                         newNode = child;
@@ -1742,7 +1763,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        newInnerNode.appendChild(childNode);
+                        if (!!maintainNode) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            newInnerNode.appendChild(childNode);
+                            maintainNode.insertBefore(newInnerNode, maintainNode.firstChild);
+                            pNode.appendChild(maintainNode);
+                        } else {
+                            newInnerNode.appendChild(childNode);
+                        }
 
                         endContainer = textNode;
                         endOffset = textNode.data.length;
@@ -1801,6 +1829,22 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         } else {
                             newInnerNode.appendChild(childNode);
                             ancestor = newNode;
+                        }
+
+                        if (!isRemoveNode && child.nodeType === 3) {
+                            const otherMaintain = util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util));
+                            if (!!otherMaintain) {
+                                if (!maintainNode) {
+                                    maintainNode = otherMaintain.cloneNode(false);
+                                    maintainNode.appendChild(ancestor);
+                                    pNode.appendChild(maintainNode);
+                                } else {
+                                    const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return current.parentNode === pNode;});
+                                    maintainNode.appendChild(ancestorMaintainNode);
+                                    newInnerNode = ancestorMaintainNode.cloneNode(false);
+                                    pNode.appendChild(newInnerNode);
+                                }
+                            }
                         }
                     }
 
