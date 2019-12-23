@@ -1557,6 +1557,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return offsets;
         },
 
+        _util_getMaintainNode: function (isRemoveNode, element) {
+            return !isRemoveNode ? this.getParentElement(element, function (current) {return this.isMaintainNoodeChange(current);}.bind(this)) : null;
+        },
+
         /**
          * @description wraps text nodes of line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
@@ -1617,6 +1621,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // add tag
             _removeCheck.v = false;
+            const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveNode);
             const el = element;
             const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
@@ -1652,7 +1657,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // startContainer
                     if (!startPass && child === startContainer) {
-                        maintainNode = !isRemoveNode ? util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                        maintainNode = _getMaintainNode(child);
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
                         const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, 
                                 isSameNode ? 
@@ -1663,7 +1668,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (!!maintainNode) maintainNode = maintainNode.cloneNode(false);
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
-                            const prevMaintainNode = !isRemoveNode ? util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                            const prevMaintainNode = _getMaintainNode(ancestor);
                             if (!!prevMaintainNode) {
                                 maintainNode = prevMaintainNode;
                             }
@@ -1710,7 +1715,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!endPass && child === endContainer) {
-                        maintainNode = !isRemoveNode ? util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                        maintainNode = _getMaintainNode(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
@@ -1737,7 +1742,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             pNode.appendChild(cloneNode);
                             newNode.textContent = afterNode.data;
 
-                            const afterMaintainNode = !isRemoveNode ? util.getParentElement(cloneNode, function (current) {return this.isMaintainNoodeChange(current);}.bind(util)) : null;
+                            const afterMaintainNode = _getMaintainNode(cloneNode);
                             if (!!afterMaintainNode) {
                                 maintainNode = afterMaintainNode;
                             }
@@ -1832,14 +1837,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (!isRemoveNode && child.nodeType === 3) {
-                            const otherMaintain = util.getParentElement(child, function (current) {return this.isMaintainNoodeChange(current);}.bind(util));
+                            const otherMaintain = _getMaintainNode(child);
                             if (!!otherMaintain) {
                                 if (!maintainNode) {
                                     maintainNode = otherMaintain.cloneNode(false);
                                     maintainNode.appendChild(ancestor);
                                     pNode.appendChild(maintainNode);
                                 } else {
-                                    const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return current.parentNode === pNode;});
+                                    const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                     maintainNode.appendChild(ancestorMaintainNode);
                                     newInnerNode = ancestorMaintainNode.cloneNode(false);
                                     pNode.appendChild(newInnerNode);
