@@ -1336,7 +1336,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // all path
                 if (vNode.nodeType === 3 || util.isBreak(vNode)) return vNode;
                 // all remove
-                if (isRemoveFormat || (!isRemoveNode && util.isMaintainNoodeChange(vNode))) return null;
+                if (isRemoveFormat) return null;
 
                 // remove node check
                 const tagRemove = (!removeNodeRegExp && isRemoveNode) || (removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName));
@@ -1496,7 +1496,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     child = children[i];
                     next = children[i + 1];
                     if (!child) break;
-                    if (len === 1 && current.nodeName === child.nodeName && !inst.util.isMaintainNoodeChange(child)) {
+                    if (len === 1 && current.nodeName === child.nodeName) {
                         inst.util.copyTagAttributes(child, current);
                         current.parentNode.insertBefore(child, current);
                         inst.util.removeItem(current);
@@ -1561,6 +1561,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return !isRemoveNode ? this.getParentElement(element, function (current) {return this.isMaintainNoodeChange(current);}.bind(this)) : null;
         },
 
+        _util_isMaintainNode: function (isRemoveNode, element) {
+            return !isRemoveNode && element.nodeType !== 3 && this.isMaintainNoodeChange(element);
+        },
+
         /**
          * @description wraps text nodes of line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
@@ -1622,11 +1626,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // add tag
             _removeCheck.v = false;
             const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveNode);
+            const _isMaintainNode = this._util_isMaintainNode.bind(this.util, isRemoveNode);
             const el = element;
             const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
+            const originSc = startCon;
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
@@ -1657,6 +1663,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // startContainer
                     if (!startPass && child === startContainer) {
+                        let line = pNode;
                         maintainNode = _getMaintainNode(child);
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
                         const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, 
@@ -1665,7 +1672,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 startContainer.data.length - startOffset)
                             );
 
-                        if (!!maintainNode) maintainNode = maintainNode.cloneNode(false);
+                        if (maintainNode) maintainNode = maintainNode.cloneNode(false);
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
                             const prevMaintainNode = _getMaintainNode(ancestor);
@@ -1674,11 +1681,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                         }
 
+                        if (maintainNode) line = maintainNode;
+
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
-                        while (newNode !== pNode && newNode !== el && newNode !== null) {
-                            vNode = validation(newNode);
+                        while (newNode !== line && newNode !== el && newNode !== null) {
+                            vNode =  _isMaintainNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1695,14 +1704,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         newInnerNode.appendChild(childNode);
+                        line.appendChild(newInnerNode);
 
-                        if (!!maintainNode) {
-                            maintainNode.appendChild(newInnerNode);
-                            if (prevNode.data.length === 0) pNode.appendChild(maintainNode);
+                        if (maintainNode && !_getMaintainNode(endContainer)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
-                        } else {
-                            pNode.appendChild(newInnerNode);
+                            maintainNode = null;
                         }
 
                         startContainer = textNode;
@@ -1715,16 +1722,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!endPass && child === endContainer) {
-                        maintainNode = _getMaintainNode(child);
+                        let line = pNode;
+                        const isSameMaintainNode = originSc === _getMaintainNode(child);
+                        maintainNode = isSameMaintainNode ? maintainNode : _getMaintainNode(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
-                        if (!!maintainNode) maintainNode = maintainNode.cloneNode(false);
+                        if (maintainNode && !isSameMaintainNode) maintainNode = maintainNode.cloneNode(false);
+
                         if (afterNode.data.length > 0) {
                             newNode = child;
                             cssText = '';
                             pCurrent = [];
-                            while (newNode !== pNode && newNode !== el && newNode !== null) {
+                            while (newNode !== line && newNode !== el && newNode !== null) {
                                 if (newNode.nodeType === 1 && checkCss(newNode)) {
                                     pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1739,20 +1749,22 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 appendNode = newNode;
                             }
 
-                            pNode.appendChild(cloneNode);
+                            line.appendChild(cloneNode);
                             newNode.textContent = afterNode.data;
 
-                            const afterMaintainNode = _getMaintainNode(cloneNode);
-                            if (!!afterMaintainNode) {
-                                maintainNode = afterMaintainNode;
+                            if (maintainNode && !isSameMaintainNode) {
+                                const afterMaintainNode = _getMaintainNode(cloneNode);
+                                if (afterMaintainNode) {
+                                    maintainNode = afterMaintainNode;
+                                }
                             }
                         }
 
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
-                        while (newNode !== pNode && newNode !== el && newNode !== null) {
-                            vNode = validation(newNode);
+                        while (newNode !== line && newNode !== el && newNode !== null) {
+                            vNode = _isMaintainNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1768,11 +1780,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (!!maintainNode) {
+                        if (maintainNode) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             newInnerNode.appendChild(childNode);
                             maintainNode.insertBefore(newInnerNode, maintainNode.firstChild);
-                            pNode.appendChild(maintainNode);
+                            line.appendChild(maintainNode);
+                            maintainNode = null;
                         } else {
                             newInnerNode.appendChild(childNode);
                         }
@@ -1836,19 +1849,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             ancestor = newNode;
                         }
 
-                        if (!isRemoveNode && child.nodeType === 3) {
+                        if (maintainNode && !isRemoveNode && child.nodeType === 3) {
                             const otherMaintain = _getMaintainNode(child);
                             if (!!otherMaintain) {
-                                if (!maintainNode) {
-                                    maintainNode = otherMaintain.cloneNode(false);
-                                    maintainNode.appendChild(ancestor);
-                                    pNode.appendChild(maintainNode);
-                                } else {
-                                    const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
-                                    maintainNode.appendChild(ancestorMaintainNode);
-                                    newInnerNode = ancestorMaintainNode.cloneNode(false);
-                                    pNode.appendChild(newInnerNode);
-                                }
+                                const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                                maintainNode.appendChild(ancestorMaintainNode);
+                                newInnerNode = ancestorMaintainNode.cloneNode(false);
+                                pNode.appendChild(newInnerNode);
                             }
                         }
                     }
