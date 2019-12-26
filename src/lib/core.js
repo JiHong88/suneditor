@@ -1734,13 +1734,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newNode = child;
                             cssText = '';
                             pCurrent = [];
+                            const maintains = [];
                             while (newNode !== line && newNode !== el && newNode !== null) {
                                 if (newNode.nodeType === 1 && checkCss(newNode)) {
-                                    pCurrent.push(newNode.cloneNode(false));
+                                    if (_isMaintainNode(newNode)) maintains.push(newNode.cloneNode(false));
+                                    else pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
                                 newNode = newNode.parentNode;
                             }
+                            pCurrent = pCurrent.concat(maintains);
 
                             cloneNode = appendNode = newNode = pCurrent.pop() || afterNode;
                             while (pCurrent.length > 0) {

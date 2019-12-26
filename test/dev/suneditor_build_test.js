@@ -20,7 +20,8 @@ const align = require('../../src/plugins/submenu/align')
 
 suneditor.create('editor', {
   plugins: [align, plugins.link],
-  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']]
+  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
+  width: '100%'
 })
 
 window.cm = CodeMirror
