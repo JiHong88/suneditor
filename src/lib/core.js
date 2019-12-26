@@ -1448,12 +1448,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Strip remove node
-         * @param {Element} element The format node
          * @param {Element} removeNode The remove node
          * @private
          */
-        _stripRemoveNode: function (element, removeNode) {
+        _stripRemoveNode: function (removeNode) {
             if (!removeNode || removeNode.nodeType === 3) return;
+            const element = removeNode.parentNode;
             const children = removeNode.childNodes;
 
             while (children[0]) {
@@ -1557,12 +1557,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return offsets;
         },
 
-        _util_getMaintainNode: function (isRemoveNode, element) {
-            return !isRemoveNode ? this.getParentElement(element, function (current) {return this.isMaintainNoodeChange(current);}.bind(this)) : null;
+        _util_getMaintainNode: function (isRemove, element) {
+            return !isRemove ? this.getParentElement(element, function (current) {return this.isMaintainNoodeChange(current);}.bind(this)) : null;
         },
 
-        _util_isMaintainNode: function (isRemoveNode, element) {
-            return !isRemoveNode && element.nodeType !== 3 && this.isMaintainNoodeChange(element);
+        _util_isMaintainNode: function (isRemove, element) {
+            return !isRemove && element.nodeType !== 3 && this.isMaintainNoodeChange(element);
         },
 
         /**
@@ -1625,8 +1625,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // add tag
             _removeCheck.v = false;
-            const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveNode);
-            const _isMaintainNode = this._util_isMaintainNode.bind(this.util, isRemoveNode);
+            const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveFormat);
+            const _isMaintainNode = this._util_isMaintainNode.bind(this.util, isRemoveFormat);
             const el = element;
             const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
@@ -1710,6 +1710,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             maintainNode = null;
+                            nNodeArray.push(newInnerNode);
                         }
 
                         startContainer = textNode;
@@ -1789,6 +1790,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             maintainNode.insertBefore(newInnerNode, maintainNode.firstChild);
                             line.appendChild(maintainNode);
                             maintainNode = null;
+                            nNodeArray.push(newInnerNode);
                         } else {
                             newInnerNode.appendChild(childNode);
                         }
@@ -1901,7 +1903,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 removeNode = removeNode.parentNode;
                             }
                         }
-                        this._stripRemoveNode(pNode, removeNode);
+                        this._stripRemoveNode(removeNode);
                     }
                 }
                 
@@ -2128,7 +2130,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             } else if (isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
-                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                    this._stripRemoveNode(nNodeArray[i]);
                 }
             }
 
@@ -2259,7 +2261,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             } else if (isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
-                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                    this._stripRemoveNode(nNodeArray[i]);
                 }
             }
 
@@ -2448,7 +2450,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             } else if (isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
-                    this._stripRemoveNode(pNode, nNodeArray[i]);
+                    this._stripRemoveNode(nNodeArray[i]);
                 }
             }
 
