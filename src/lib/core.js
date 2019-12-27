@@ -1516,30 +1516,34 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         break;
                     }
                     
-                    if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next)) {
-                        const childLength = child.childNodes.length;
+                    if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next) && child.href === next.href) {
+                        const childs = child.childNodes;
+                        let childLength = 0;
+                        for (let n = 0, nLen = childs.length; n < nLen; n++) {
+                            if (childs[n].textContent.length > 0) childLength++;
+                        }
                         const l = child.lastChild;
                         const r = next.firstChild;
                         const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
 
                         // update nodePath
-                        if (nodePath_a && nodePath_a[depth] >= i + 1) {
-                            nodePath_a[depth] -= 1;
+                        if (nodePath_a && nodePath_a[depth] > i) {
                             if (nodePath_a[depth + 1] >= 0) {
                                 nodePath_a[depth + 1] += childLength;
                                 if (textOffset) {
                                     offsets.a += child.textContent.length;
                                 }
                             }
+                            nodePath_a[depth] -= 1;
                         }
-                        if (nodePath_b && nodePath_b[depth] >= i + 1) {
-                            nodePath_b[depth] -= 1;
-                            if (nodePath_b[depth + 1] >= 0) {
+                        if (nodePath_b && nodePath_b[depth] > i) {
+                            if (nodePath_b[depth + 1] >= 0 && nodePath_b[depth] === i + 1) {
                                 nodePath_b[depth + 1] += childLength;
                                 if (textOffset) {
                                     offsets.b += child.textContent.length;
                                 }
                             }
+                            nodePath_b[depth] -= 1;
                         }
     
                         if (child.nodeType === 3) child.textContent += next.textContent;
@@ -1675,19 +1679,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (maintainNode) maintainNode = maintainNode.cloneNode(false);
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
-                            const prevMaintainNode = _getMaintainNode(ancestor);
-                            if (!!prevMaintainNode) {
-                                maintainNode = prevMaintainNode;
-                            }
                         }
 
+                        const prevMaintainNode = _getMaintainNode(ancestor);
+                        if (!!prevMaintainNode) maintainNode = prevMaintainNode;
                         if (maintainNode) line = maintainNode;
 
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== line && newNode !== el && newNode !== null) {
-                            vNode =  _isMaintainNode(newNode) ? null : validation(newNode);
+                            vNode = _isMaintainNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1755,12 +1757,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                             line.appendChild(cloneNode);
                             newNode.textContent = afterNode.data;
+                        }
 
-                            if (maintainNode && !isSameMaintainNode) {
-                                const afterMaintainNode = _getMaintainNode(cloneNode);
-                                if (afterMaintainNode) {
-                                    maintainNode = afterMaintainNode;
-                                }
+                        if (maintainNode && !isSameMaintainNode) {
+                            const afterMaintainNode = _getMaintainNode(cloneNode);
+                            if (afterMaintainNode) {
+                                maintainNode = afterMaintainNode;
                             }
                         }
 
@@ -1898,11 +1900,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (isRemoveNode) {
                     for (let i = 0; i < nNodeArray.length; i++) {
                         let removeNode = nNodeArray[i];
-                        if (collapsed) {
-                            while(removeNode !== nNode) {
-                                removeNode = removeNode.parentNode;
-                            }
-                        }
+                        // if (collapsed) {
+                        //     while(removeNode !== nNode) {
+                        //         removeNode = removeNode.parentNode;
+                        //     }
+                        // }
                         this._stripRemoveNode(removeNode);
                     }
                 }
