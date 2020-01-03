@@ -1632,7 +1632,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveFormat);
             const _isMaintainNode = this._util_isMaintainNode.bind(this.util, isRemoveFormat);
             const el = element;
-            const nNode = newInnerNode;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
@@ -1676,7 +1675,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 startContainer.data.length - startOffset)
                             );
 
-                        if (maintainNode) maintainNode = maintainNode.cloneNode(false);
+                        if (maintainNode) {
+                            const a = _getMaintainNode(ancestor);
+                            if (a && isRemoveNode) {
+                                let m = a;
+                                let p = null;
+                                while (m.parentNode !== line) {
+                                    p = m.parentNode.cloneNode(false);
+                                    while(m.childNodes[0]) {
+                                        p.appendChild(m.childNodes[0])
+                                    }
+                                    m.appendChild(p);
+                                    m = m.parentNode;
+                                }
+                                m.parentNode.appendChild(a);
+                            }
+                            maintainNode = maintainNode.cloneNode(false);
+                        }
+                        
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
                         }
@@ -1899,13 +1915,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             } else {
                 if (isRemoveNode) {
                     for (let i = 0; i < nNodeArray.length; i++) {
-                        let removeNode = nNodeArray[i];
-                        // if (collapsed) {
-                        //     while(removeNode !== nNode) {
-                        //         removeNode = removeNode.parentNode;
-                        //     }
-                        // }
-                        this._stripRemoveNode(removeNode);
+                        this._stripRemoveNode(nNodeArray[i]);
                     }
                 }
                 
