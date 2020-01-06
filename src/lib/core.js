@@ -510,10 +510,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _createDefaultRange: function () {
+            context.element.wysiwyg.focus();
             const range = this._wd.createRange();
             if (!context.element.wysiwyg.firstChild) this.execCommand('formatBlock', false, 'P');
+
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);
+            
             return range;
         },
 
