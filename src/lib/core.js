@@ -1683,7 +1683,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 while (m.parentNode !== line) {
                                     p = m.parentNode.cloneNode(false);
                                     while(m.childNodes[0]) {
-                                        p.appendChild(m.childNodes[0])
+                                        p.appendChild(m.childNodes[0]);
                                     }
                                     m.appendChild(p);
                                     m = m.parentNode;
@@ -1727,7 +1727,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (maintainNode && !_getMaintainNode(endContainer)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
-                            maintainNode = null;
+                            // maintainNode = null;
                             nNodeArray.push(newInnerNode);
                         }
 
@@ -1844,14 +1844,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
+                        const maintains = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
-                                if (vNode) pCurrent.push(vNode);
+                                if (vNode) {
+                                    if (_isMaintainNode(vNode)) maintains.push(vNode);
+                                    else pCurrent.push(vNode);
+                                }
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
                             newNode = newNode.parentNode;
                         }
+                        pCurrent = pCurrent.concat(maintains);
 
                         const childNode = pCurrent.pop() || child;
                         appendNode = newNode = childNode;
@@ -1872,9 +1877,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             ancestor = newNode;
                         }
 
-                        if (maintainNode && !isRemoveNode && child.nodeType === 3) {
-                            const otherMaintain = _getMaintainNode(child);
-                            if (!!otherMaintain) {
+                        if (maintainNode && child.nodeType === 3) {
+                            if (_getMaintainNode(child)) {
                                 const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                 maintainNode.appendChild(ancestorMaintainNode);
                                 newInnerNode = ancestorMaintainNode.cloneNode(false);
