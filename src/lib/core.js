@@ -3650,6 +3650,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
         },
 
+        _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
@@ -3657,16 +3658,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const alt = e.altKey;
 
             if (!event._directionKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
-
             if (core._isBalloon) {
                 event._hideToolbar();
             }
 
             /** Shortcuts */
             if (ctrl && event._shortcutCommand(keyCode, shift)) {
+                event._onShortcutKey = true;
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
+            } else if (event._onShortcutKey) {
+                event._onShortcutKey = false;
             }
 
             /** default key action */
@@ -3903,6 +3906,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         onKeyUp_wysiwyg: function (e) {
+            if (event._onShortcutKey) return;
             core._editorRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
