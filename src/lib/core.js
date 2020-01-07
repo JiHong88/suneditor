@@ -1809,8 +1809,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newInnerNode.appendChild(childNode);
                             maintainNode.insertBefore(newInnerNode, maintainNode.firstChild);
                             line.appendChild(maintainNode);
-                            maintainNode = null;
                             nNodeArray.push(newInnerNode);
+                            maintainNode = null;
                         } else {
                             newInnerNode.appendChild(childNode);
                         }
@@ -1889,6 +1889,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 newInnerNode = ancestorMaintainNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
                                 pNode.appendChild(newInnerNode);
+                            } else {
+                                maintainNode = null;
                             }
                         }
                     }
