@@ -1680,7 +1680,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                         if (maintainNode) {
                             const a = _getMaintainNode(ancestor);
-                            if (a && isRemoveNode) {
+                            if (a && a.parentNode !== line) {
                                 let m = a;
                                 let p = null;
                                 while (m.parentNode !== line) {
@@ -1730,7 +1730,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (maintainNode && !_getMaintainNode(endContainer)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
-                            // maintainNode = null;
                             nNodeArray.push(newInnerNode);
                         }
 
@@ -1852,8 +1851,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
                                 if (vNode) {
-                                    if (_isMaintainNode(vNode)) maintains.push(vNode);
-                                    else pCurrent.push(vNode);
+                                    if (_isMaintainNode(vNode)) {
+                                        if (!maintainNode) maintains.push(vNode);
+                                    } else {
+                                        pCurrent.push(vNode);
+                                    }
                                 }
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
@@ -1885,6 +1887,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                 maintainNode.appendChild(ancestorMaintainNode);
                                 newInnerNode = ancestorMaintainNode.cloneNode(false);
+                                nNodeArray.push(newInnerNode);
                                 pNode.appendChild(newInnerNode);
                             }
                         }
@@ -3946,10 +3949,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
             if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 const range = core.getRange();
-                const s = range.startOffset, e = range.endOffset;
+                const so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
-                core.setRange(selectionNode, s - frontZeroWidthCnt, selectionNode, e - frontZeroWidthCnt);
+                core.setRange(selectionNode, so - frontZeroWidthCnt, selectionNode, eo - frontZeroWidthCnt);
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
