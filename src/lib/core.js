@@ -1882,7 +1882,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
                         
-                        if (childNode === child) {
+                        if (_isMaintainNode(newInnerNode.parentNode) && !_isMaintainNode(childNode)) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(newInnerNode);
+                            nNodeArray.push(newInnerNode);
+                        }
+
+                        if (!maintainNode && _isMaintainNode(childNode)) {
+                            const newInner = newInnerNode.cloneNode(false);
+                            const aChildren = childNode.childNodes;
+                            for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
+                                newInner.appendChild(aChildren[a]);
+                            }
+                            childNode.appendChild(newInner);
+                            pNode.appendChild(childNode);
+                            newInnerNode = newInner;
+                            ancestor = newNode;
+                            nNodeArray.push(newInnerNode);
+                        } else if (childNode === child) {
                             if (!endPass) ancestor = newInnerNode;
                             else ancestor = pNode;
                         } else if (endPass) {
