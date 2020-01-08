@@ -1483,16 +1483,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
          * If "offset" has been changed, it will return as much "offset" as it has been modified.
          * "a", "b" You can send a maximum of two nodepaths.
-         * @param {Object} nodePath_a NodePath object (util.getNodePath)
-         * @param {Object|null} nodePath_b NodePath object (util.getNodePath)
+         * @param {Object} nodePath_s Start NodePath object (util.getNodePath)
+         * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
          * @returns {Object} {a: 0, b: 0}
          * @private
          */
-        _mergeSameTags: function (element, nodePath_a, nodePath_b) {
+        _mergeSameTags: function (element, nodePath_s, nodePath_e) {
             const inst = this;
             const offsets = {a: 0, b: 0};
 
-            (function recursionFunc(current, depth) {
+            (function recursionFunc(current, depth, depthIndex, includedPath_s, includedPath_e) {
                 const children = current.childNodes;
                 
                 for (let i = 0, len = children.length, child, next; i < len; i++) {
@@ -1505,61 +1505,72 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         inst.util.removeItem(current);
 
                         // update nodePath
-                        if (nodePath_a && nodePath_a[depth] === i) {
-                            nodePath_a.splice(depth, 1);
-                            nodePath_a[depth] = i;
+                        if (nodePath_s && nodePath_s[depth] === i) {
+                            nodePath_s.splice(depth, 1);
+                            nodePath_s[depth] = i;
                         }
-                        if (nodePath_b && nodePath_b[depth] === i) {
-                            nodePath_b.splice(depth, 1);
-                            nodePath_b[depth] = i;
+
+                        if (nodePath_e && nodePath_e[depth] === i) {
+                            nodePath_e.splice(depth, 1);
+                            nodePath_e[depth] = i;
                         }
                     }
                     if (!next) {
-                        if (child.nodeType === 1) recursionFunc(child, depth + 1);
+                        if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
                         break;
                     }
-                    
+
                     if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next) && child.href === next.href) {
                         const childs = child.childNodes;
                         let childLength = 0;
                         for (let n = 0, nLen = childs.length; n < nLen; n++) {
                             if (childs[n].textContent.length > 0) childLength++;
                         }
+                        if (childLength > 0 && child.lastChild && next.firstChild && child.lastChild.nodeType === 3 && next.firstChild.nodeType === 3) childLength--;
+
                         const l = child.lastChild;
                         const r = next.firstChild;
                         const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
 
-                        // update nodePath
-                        if (nodePath_a && nodePath_a[depth] > i) {
-                            if (nodePath_a[depth + 1] >= 0) {
-                                nodePath_a[depth + 1] += childLength;
-                                if (textOffset) {
-                                    offsets.a += child.textContent.length;
+                        // start
+                        if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
+                            if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
+                                includedPath_s = false;
+                            } else {
+                                nodePath_s[depth] -= 1;
+                                if (nodePath_s[depth + 1] >= 0) {
+                                    nodePath_s[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        offsets.a += child.textContent.length;
+                                    }
                                 }
                             }
-                            nodePath_a[depth] -= 1;
                         }
-                        if (nodePath_b && nodePath_b[depth] > i) {
-                            if (nodePath_b[depth + 1] >= 0 && nodePath_b[depth] === i + 1) {
-                                nodePath_b[depth + 1] += childLength;
-                                if (textOffset) {
-                                    offsets.b += child.textContent.length;
+                        // end
+                        if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
+                            if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
+                                includedPath_e = false;
+                            } else {
+                                nodePath_e[depth] -= 1;
+                                if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
+                                    nodePath_e[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        offsets.b += child.textContent.length;
+                                    }
                                 }
                             }
-                            nodePath_b[depth] -= 1;
                         }
-    
+
                         if (child.nodeType === 3) child.textContent += next.textContent;
                         else child.innerHTML += next.innerHTML;
                         
                         inst.util.removeItem(next);
                         i--;
-                    }
-                    else if (child.nodeType === 1) {
-                        recursionFunc(child, depth + 1);
+                    } else if (child.nodeType === 1) {
+                        recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
                     }
                 }
-            })(element, 0);
+            })(element, 0, 0, true, true);
 
             return offsets;
         },
