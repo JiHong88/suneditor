@@ -1575,12 +1575,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return offsets;
         },
 
-        _util_getMaintainNode: function (isRemove, element) {
-            return !isRemove ? this.getParentElement(element, function (current) {return this.isMaintainNoodeChange(current);}.bind(this)) : null;
+        _util_getAnchor: function (isRemove, element) {
+            return !isRemove ? this.getParentElement(element, function (current) {return this.isAnchor(current);}.bind(this)) : null;
         },
 
-        _util_isMaintainNode: function (isRemove, element) {
-            return !isRemove && element.nodeType !== 3 && this.isMaintainNoodeChange(element);
+        _util_isAnchor: function (isRemove, element) {
+            return !isRemove && element.nodeType !== 3 && this.isAnchor(element);
         },
 
         /**
@@ -1643,8 +1643,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // add tag
             _removeCheck.v = false;
-            const _getMaintainNode = this._util_getMaintainNode.bind(this.util, isRemoveFormat);
-            const _isMaintainNode = this._util_isMaintainNode.bind(this.util, isRemoveFormat);
+            const _getAnchor = this._util_getAnchor.bind(this.util, isRemoveFormat);
+            const _isAnchor = this._util_isAnchor.bind(this.util, isRemoveFormat);
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
@@ -1656,7 +1656,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let endOffset = endOff;
             let startPass = false;
             let endPass = false;
-            let pCurrent, newNode, appendNode, cssText, maintainNode;
+            let pCurrent, newNode, appendNode, cssText, anchorNode;
 
             function checkCss (vNode) {
                 const regExp = new _w.RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
@@ -1681,7 +1681,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // startContainer
                     if (!startPass && child === startContainer) {
                         let line = pNode;
-                        maintainNode = _getMaintainNode(child);
+                        anchorNode = _getAnchor(child);
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
                         const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, 
                                 isSameNode ? 
@@ -1689,8 +1689,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 startContainer.data.length - startOffset)
                             );
 
-                        if (maintainNode) {
-                            const a = _getMaintainNode(ancestor);
+                        if (anchorNode) {
+                            const a = _getAnchor(ancestor);
                             if (a && a.parentNode !== line) {
                                 let m = a;
                                 let p = null;
@@ -1704,22 +1704,22 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 }
                                 m.parentNode.appendChild(a);
                             }
-                            maintainNode = maintainNode.cloneNode(false);
+                            anchorNode = anchorNode.cloneNode(false);
                         }
                         
                         if (prevNode.data.length > 0) {
                             ancestor.appendChild(prevNode);
                         }
 
-                        const prevMaintainNode = _getMaintainNode(ancestor);
-                        if (!!prevMaintainNode) maintainNode = prevMaintainNode;
-                        if (maintainNode) line = maintainNode;
+                        const prevAnchorNode = _getAnchor(ancestor);
+                        if (!!prevAnchorNode) anchorNode = prevAnchorNode;
+                        if (anchorNode) line = anchorNode;
 
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== line && newNode !== el && newNode !== null) {
-                            vNode = _isMaintainNode(newNode) ? null : validation(newNode);
+                            vNode = _isAnchor(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1738,7 +1738,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newInnerNode.appendChild(childNode);
                         line.appendChild(newInnerNode);
 
-                        if (maintainNode && !_getMaintainNode(endContainer)) {
+                        if (anchorNode && !_getAnchor(endContainer)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
@@ -1755,27 +1755,27 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // endContainer
                     if (!endPass && child === endContainer) {
                         let line = pNode;
-                        const isSameMaintainNode = originSc === _getMaintainNode(child);
-                        maintainNode = isSameMaintainNode ? maintainNode : _getMaintainNode(child);
+                        const isSameAnchorNode = originSc === _getAnchor(child);
+                        anchorNode = isSameAnchorNode ? anchorNode : _getAnchor(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
-                        if (maintainNode && !isSameMaintainNode) maintainNode = maintainNode.cloneNode(false);
+                        if (anchorNode && !isSameAnchorNode) anchorNode = anchorNode.cloneNode(false);
 
                         if (afterNode.data.length > 0) {
                             newNode = child;
                             cssText = '';
                             pCurrent = [];
-                            const maintains = [];
+                            const anchors = [];
                             while (newNode !== line && newNode !== el && newNode !== null) {
                                 if (newNode.nodeType === 1 && checkCss(newNode)) {
-                                    if (_isMaintainNode(newNode)) maintains.push(newNode.cloneNode(false));
+                                    if (_isAnchor(newNode)) anchors.push(newNode.cloneNode(false));
                                     else pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
                                 newNode = newNode.parentNode;
                             }
-                            pCurrent = pCurrent.concat(maintains);
+                            pCurrent = pCurrent.concat(anchors);
 
                             cloneNode = appendNode = newNode = pCurrent.pop() || afterNode;
                             while (pCurrent.length > 0) {
@@ -1788,10 +1788,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newNode.textContent = afterNode.data;
                         }
 
-                        if (maintainNode && !isSameMaintainNode) {
-                            const afterMaintainNode = _getMaintainNode(cloneNode);
-                            if (afterMaintainNode) {
-                                maintainNode = afterMaintainNode;
+                        if (anchorNode && !isSameAnchorNode) {
+                            const afterAnchorNode = _getAnchor(cloneNode);
+                            if (afterAnchorNode) {
+                                anchorNode = afterAnchorNode;
                             }
                         }
 
@@ -1799,7 +1799,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== line && newNode !== el && newNode !== null) {
-                            vNode = _isMaintainNode(newNode) ? null : validation(newNode);
+                            vNode = _isAnchor(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1815,13 +1815,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (maintainNode) {
+                        if (anchorNode) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             newInnerNode.appendChild(childNode);
-                            maintainNode.insertBefore(newInnerNode, maintainNode.firstChild);
-                            line.appendChild(maintainNode);
+                            anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
+                            line.appendChild(anchorNode);
                             nNodeArray.push(newInnerNode);
-                            maintainNode = null;
+                            anchorNode = null;
                         } else {
                             newInnerNode.appendChild(childNode);
                         }
@@ -1857,13 +1857,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
-                        const maintains = [];
+                        const anchors = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
                                 if (vNode) {
-                                    if (_isMaintainNode(vNode)) {
-                                        if (!maintainNode) maintains.push(vNode);
+                                    if (_isAnchor(vNode)) {
+                                        if (!anchorNode) anchors.push(vNode);
                                     } else {
                                         pCurrent.push(vNode);
                                     }
@@ -1872,7 +1872,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                             newNode = newNode.parentNode;
                         }
-                        pCurrent = pCurrent.concat(maintains);
+                        pCurrent = pCurrent.concat(anchors);
 
                         const childNode = pCurrent.pop() || child;
                         appendNode = newNode = childNode;
@@ -1882,13 +1882,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
                         
-                        if (_isMaintainNode(newInnerNode.parentNode) && !_isMaintainNode(childNode)) {
+                        if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
                         }
 
-                        if (!maintainNode && _isMaintainNode(childNode)) {
+                        if (!endPass && !anchorNode && _isAnchor(childNode)) {
                             const newInner = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
@@ -1910,15 +1910,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             ancestor = newNode;
                         }
 
-                        if (maintainNode && child.nodeType === 3) {
-                            if (_getMaintainNode(child)) {
-                                const ancestorMaintainNode = util.getParentElement(ancestor, function (current) {return this.isMaintainNoodeChange(current.parentNode) || current.parentNode === pNode;}.bind(util));
-                                maintainNode.appendChild(ancestorMaintainNode);
-                                newInnerNode = ancestorMaintainNode.cloneNode(false);
+                        if (anchorNode && child.nodeType === 3) {
+                            if (_getAnchor(child)) {
+                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this.isAnchor(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                                anchorNode.appendChild(ancestorAnchorNode);
+                                newInnerNode = ancestorAnchorNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
                                 pNode.appendChild(newInnerNode);
                             } else {
-                                maintainNode = null;
+                                anchorNode = null;
                             }
                         }
                     }

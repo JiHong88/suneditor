@@ -611,6 +611,16 @@ const util = {
         return node && /^BR$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
+
+    /**
+     * @description Check the node is a anchor node (A)
+     * @param {Element|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isAnchor: function (node) {
+        return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
     /**
      * @description Checks for numeric (with decimal point).
      * @param {String|Number} text Text string or number
@@ -1007,15 +1017,6 @@ const util = {
      */
     isIgnoreNodeChange: function (element) {
         return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
-    },
-
-    /**
-     * @description Tag to maintain current node type when changing node (a)
-     * @param {Element} element Element to check
-     * @returns {Boolean}
-     */
-    isMaintainNoodeChange: function (element) {
-        return /^A$/i.test(element.nodeName);
     },
 
     /**
