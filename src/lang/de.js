@@ -68,7 +68,7 @@
             tag_blockquote: 'Zitat',
             tag_pre: 'Quellcode',
             template: 'Skabelon',
-            lineHeight: 'Linienhöhe',
+            lineHeight: 'Zeilenhöhe',
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil'
         },
