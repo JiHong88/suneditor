@@ -1417,29 +1417,41 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // node Changes
             newNode = appendNode.cloneNode(false);
-            // startCon
+
+            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr, isAnchor) {
+                for (let n = 0, len = arr.length; n < len; n++) {
+                    if (isAnchor(arr[n])) return true;
+                }
+                return false;
+            })(removeNodeArray, util.isAnchor));
+
+            const _getAnchor = this._util_getAnchor.bind(util, isRemoveAnchor);
+            const _isAnchor = this._util_isAnchor.bind(util, isRemoveAnchor);
+
+            // one line
             if (oneLine) {
-                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck);
+                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getAnchor, _isAnchor);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
-            } else {
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck);
             }
-
-            // mid
-            for (let i = 1; i < endLength; i++) {
-                newNode = appendNode.cloneNode(false);
-                this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
-            }
-
-            // endCon
-            if (endLength > 0 && !oneLine) {
-                newNode = appendNode.cloneNode(false);
-                end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck);
-            } else if (!oneLine) {
-                end = start;
+            // multi line 
+            else {
+                // start
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor);
+                // mid
+                for (let i = 1; i < endLength; i++) {
+                    newNode = appendNode.cloneNode(false);
+                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
+                }
+                // end
+                if (endLength > 0) {
+                    newNode = appendNode.cloneNode(false);
+                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor);
+                } else {
+                    end = start;
+                }
             }
 
             // set range
@@ -1598,7 +1610,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck) {
+        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getAnchor, _isAnchor) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -1643,8 +1655,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // add tag
             _removeCheck.v = false;
-            const _getAnchor = this._util_getAnchor.bind(this.util, isRemoveFormat);
-            const _isAnchor = this._util_isAnchor.bind(this.util, isRemoveFormat);
             const el = element;
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
@@ -2020,7 +2030,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -2336,7 +2346,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck) {
+        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor) {
             // not add tag
             let parentCon = endCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -3983,10 +3993,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
             if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 const range = core.getRange();
-                const so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
+                const so = range.startOffset - frontZeroWidthCnt, eo = range.endOffset - frontZeroWidthCnt;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
-                core.setRange(selectionNode, so - frontZeroWidthCnt, selectionNode, eo - frontZeroWidthCnt);
+                core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
