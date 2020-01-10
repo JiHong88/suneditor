@@ -1659,7 +1659,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const nNodeArray = [newInnerNode];
             const pNode = element.cloneNode(false);
             const isSameNode = startCon === endCon;
-            const originSc = startCon;
             let startContainer = startCon;
             let startOffset = startOff;
             let endContainer = endCon;
@@ -1765,12 +1764,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // endContainer
                     if (!endPass && child === endContainer) {
                         let line = pNode;
-                        const isSameAnchorNode = originSc === _getAnchor(child);
-                        anchorNode = isSameAnchorNode ? anchorNode : _getAnchor(child);
+                        anchorNode = _getAnchor(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
-                        if (anchorNode && !isSameAnchorNode) anchorNode = anchorNode.cloneNode(false);
+                        if (anchorNode) anchorNode = anchorNode.cloneNode(false);
 
                         if (afterNode.data.length > 0) {
                             newNode = child;
@@ -1798,7 +1796,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newNode.textContent = afterNode.data;
                         }
 
-                        if (anchorNode && !isSameAnchorNode) {
+                        if (anchorNode && cloneNode) {
                             const afterAnchorNode = _getAnchor(cloneNode);
                             if (afterAnchorNode) {
                                 anchorNode = afterAnchorNode;
@@ -2213,14 +2211,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
-
                         line.appendChild(newInnerNode);
-
-                        // if (anchorNode) {
-                        //     newInnerNode = newInnerNode.cloneNode(false);
-                        //     pNode.appendChild(newInnerNode);
-                        //     nNodeArray.push(newInnerNode);
-                        // }
 
                         container = textNode;
                         offset = 0;
