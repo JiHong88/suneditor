@@ -1550,7 +1550,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 includedPath_s = false;
                             } else {
                                 nodePath_s[depth] -= 1;
-                                if (nodePath_s[depth + 1] >= 0) {
+                                if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
                                     nodePath_s[depth + 1] += childLength;
                                     if (textOffset) {
                                         offsets.a += child.textContent.length;
