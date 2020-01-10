@@ -1467,10 +1467,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _stripRemoveNode: function (removeNode) {
-            if (!removeNode || removeNode.nodeType === 3) return;
             const element = removeNode.parentNode;
+            if (!removeNode || removeNode.nodeType === 3 || !element) return;
+            
             const children = removeNode.childNodes;
-
             while (children[0]) {
                 element.insertBefore(children[0], removeNode);
             }
@@ -1763,7 +1763,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!endPass && child === endContainer) {
-                        let line = pNode;
                         anchorNode = _getAnchor(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
@@ -1775,7 +1774,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             cssText = '';
                             pCurrent = [];
                             const anchors = [];
-                            while (newNode !== line && newNode !== el && newNode !== null) {
+                            while (newNode !== pNode && newNode !== el && newNode !== null) {
                                 if (newNode.nodeType === 1 && checkCss(newNode)) {
                                     if (_isAnchor(newNode)) anchors.push(newNode.cloneNode(false));
                                     else pCurrent.push(newNode.cloneNode(false));
@@ -1792,7 +1791,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 appendNode = newNode;
                             }
 
-                            line.appendChild(cloneNode);
+                            pNode.appendChild(cloneNode);
                             newNode.textContent = afterNode.data;
                         }
 
@@ -1806,7 +1805,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = child;
                         pCurrent = [];
                         cssText = '';
-                        while (newNode !== line && newNode !== el && newNode !== null) {
+                        while (newNode !== pNode && newNode !== el && newNode !== null) {
                             vNode = _isAnchor(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
@@ -1827,7 +1826,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             newInnerNode.appendChild(childNode);
                             anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
-                            line.appendChild(anchorNode);
+                            pNode.appendChild(anchorNode);
                             nNodeArray.push(newInnerNode);
                             anchorNode = null;
                         } else {
@@ -1897,14 +1896,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (!endPass && !anchorNode && _isAnchor(childNode)) {
-                            const newInner = newInnerNode.cloneNode(false);
+                            newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
-                                newInner.appendChild(aChildren[a]);
+                                newInnerNode.appendChild(aChildren[a]);
                             }
-                            childNode.appendChild(newInner);
+                            childNode.appendChild(newInnerNode);
                             pNode.appendChild(childNode);
-                            newInnerNode = newInner;
                             ancestor = newNode;
                             nNodeArray.push(newInnerNode);
                         } else if (childNode === child) {
@@ -2122,15 +2120,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
                         
                         if (!anchorNode && _isAnchor(childNode)) {
-                            const newInner = newInnerNode.cloneNode(false);
+                            newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
-                                newInner.appendChild(aChildren[a]);
+                                newInnerNode.appendChild(aChildren[a]);
                             }
-                            childNode.appendChild(newInner);
+                            childNode.appendChild(newInnerNode);
                             pNode.appendChild(childNode);
-                            newInnerNode = newInner;
-                            ancestor = !_isAnchor(newNode) ? newNode : newInner;
+                            ancestor = !_isAnchor(newNode) ? newNode : newInnerNode;
                             nNodeArray.push(newInnerNode);
                         } else if (isTopNode) {
                             newInnerNode.appendChild(childNode);
@@ -2443,7 +2440,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let container = endCon;
             let offset = endOff;
             let passNode = false;
-            let pCurrent, newNode, appendNode;
+            let pCurrent, newNode, appendNode, anchorNode;
 
             (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
@@ -2469,33 +2466,72 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                         newNode = child;
                         pCurrent = [];
+                        const anchors = [];
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
-                                pCurrent.push(vNode);
+                                if (_isAnchor(vNode)) {
+                                    if (!anchorNode) anchors.push(vNode);
+                                } else {
+                                    pCurrent.push(vNode);
+                                }
                             }
                             newNode = newNode.parentNode;
                         }
+                        pCurrent = pCurrent.concat(anchors);
 
-                        if (pCurrent.length > 0) {
-                            const childNode = pCurrent.pop();
-                            appendNode = newNode = childNode;
-                            while (pCurrent.length > 0) {
-                                newNode = pCurrent.pop();
-                                appendNode.appendChild(newNode);
-                                appendNode = newNode;
+                        const isTopNode = pCurrent.length > 0;
+                        const childNode = pCurrent.pop() || child;
+                        appendNode = newNode = childNode;
+                        while (pCurrent.length > 0) {
+                            newNode = pCurrent.pop();
+                            appendNode.appendChild(newNode);
+                            appendNode = newNode;
+                        }
+
+                        if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(newInnerNode);
+                            nNodeArray.push(newInnerNode);
+                        }
+
+                        if (!anchorNode && _isAnchor(childNode)) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            const aChildren = childNode.childNodes;
+                            for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
+                                newInnerNode.appendChild(aChildren[a]);
                             }
+                            childNode.appendChild(newInnerNode);
+                            pNode.appendChild(childNode);
+                            ancestor = newNode;
+                            nNodeArray.push(newInnerNode);
+                        } else if (isTopNode) {
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             ancestor = newNode;
                         } else {
                             ancestor = newInnerNode;
                         }
+
+                        if (anchorNode && child.nodeType === 3) {
+                            if (_getAnchor(child)) {
+                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this.isAnchor(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                                anchorNode.appendChild(ancestorAnchorNode);
+                                newInnerNode = ancestorAnchorNode.cloneNode(false);
+                                nNodeArray.push(newInnerNode);
+                                pNode.appendChild(newInnerNode);
+                            } else {
+                                anchorNode = null;
+                            }
+                        }
                     }
 
                     // endContainer
                     if (!passNode && child === container) {
+                        anchorNode = _getAnchor(child);
                         const afterNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
+
+                        if (anchorNode) anchorNode = anchorNode.cloneNode(false);
 
                         if (afterNode.data.length > 0) {
                             ancestor.insertBefore(afterNode, ancestor.firstChild);
@@ -2504,7 +2540,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = ancestor;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
-                            vNode = validation(newNode);
+                            vNode = _isAnchor(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
                                 pCurrent.push(vNode);
                             }
@@ -2519,7 +2555,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (childNode !== ancestor) {
+                        if (anchorNode) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
+                            anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
+                            pNode.insertBefore(anchorNode, pNode.firstChild);
+                            nNodeArray.push(newInnerNode);
+                            anchorNode = null;
+                        } else if (childNode !== ancestor) {
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             ancestor = newNode;
                         } else {
