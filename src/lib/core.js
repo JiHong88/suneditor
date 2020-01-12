@@ -2491,7 +2491,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                         if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
-                            pNode.appendChild(newInnerNode);
+                            pNode.insertBefore(newInnerNode, pNode.firstChild);
                             nNodeArray.push(newInnerNode);
                         }
 
@@ -2502,9 +2502,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 newInnerNode.appendChild(aChildren[a]);
                             }
                             childNode.appendChild(newInnerNode);
-                            pNode.appendChild(childNode);
-                            ancestor = newNode;
+                            pNode.insertBefore(childNode, pNode.firstChild);
                             nNodeArray.push(newInnerNode);
+                            if (newInnerNode.children.length > 0) ancestor = newNode;
+                            else ancestor = newInnerNode;
                         } else if (isTopNode) {
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             ancestor = newNode;
@@ -2518,7 +2519,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 anchorNode.appendChild(ancestorAnchorNode);
                                 newInnerNode = ancestorAnchorNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
-                                pNode.appendChild(newInnerNode);
+                                pNode.insertBefore(newInnerNode, pNode.firstChild);
                             } else {
                                 anchorNode = null;
                             }
@@ -2535,6 +2536,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                         if (afterNode.data.length > 0) {
                             ancestor.insertBefore(afterNode, ancestor.firstChild);
+                        }
+
+                        if (anchorNode) {
+                            const a = _getAnchor(ancestor);
+                            if (a && a.parentNode !== pNode) {
+                                let m = a;
+                                let p = null;
+                                while (m.parentNode !== pNode) {
+                                    p = m.parentNode.cloneNode(false);
+                                    while(m.childNodes[0]) {
+                                        p.appendChild(m.childNodes[0]);
+                                    }
+                                    m.appendChild(p);
+                                    m = m.parentNode;
+                                }
+                                m.parentNode.insertBefore(a, m.parentNode.firstChild);
+                            }
+                            anchorNode = anchorNode.cloneNode(false);
                         }
 
                         newNode = ancestor;
@@ -2555,14 +2574,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (anchorNode) {
-                            newInnerNode = newInnerNode.cloneNode(false);
-                            newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
-                            anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
-                            pNode.insertBefore(anchorNode, pNode.firstChild);
-                            nNodeArray.push(newInnerNode);
-                            anchorNode = null;
-                        } else if (childNode !== ancestor) {
+                        if (childNode !== ancestor) {
                             newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
                             ancestor = newNode;
                         } else {
@@ -2570,8 +2582,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (util.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
+                        
+                        if (anchorNode) {
+                            anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
+                            pNode.insertBefore(anchorNode, pNode.firstChild);
+                            anchorNode = null;
+                        } else {
+                            pNode.insertBefore(newInnerNode, pNode.firstChild);
+                        }
 
-                        pNode.insertBefore(newInnerNode, pNode.firstChild);
                         container = textNode;
                         offset = textNode.data.length;
                         passNode = true;
