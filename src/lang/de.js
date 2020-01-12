@@ -122,17 +122,17 @@
             mirrorVertical: 'Vertikal spiegeln',
             rotateLeft: 'Nach links drehen',
             rotateRight: 'Nach rechts drehen',
-            maxSize: 'Maximale größe',
-            minSize: 'Mindest größe',
+            maxSize: 'Maximale Größe',
+            minSize: 'Mindestgröße',
             tableHeader: 'Tabellenüberschrift',
             mergeCells: 'Zellen verbinden',
-            splitCells: 'Zellen Teilung',
-            HorizontalSplit: 'Horizontale Teilung',
-            VerticalSplit: 'Vertikale Teilung'
+            splitCells: 'Zellen teilen',
+            HorizontalSplit: 'Horizontal teilen',
+            VerticalSplit: 'Vertikal teilen'
         },
         menu: {
-            spaced: 'Buchstaben Abstand',
-            bordered: 'Grenzlinie',
+            spaced: 'Buchstabenabstand',
+            bordered: 'Umrandet',
             neon: 'Neon',
             translucent: 'Durchscheinend',
             shadow: 'Schatten'

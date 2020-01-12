@@ -2852,6 +2852,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
                 }
                 
+                this._variable._range = null;
                 context.element.code.focus();
             }
 
