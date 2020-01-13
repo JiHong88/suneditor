@@ -3372,7 +3372,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
-        _frontZeroWidthReg: new _w.RegExp('^' + util.zeroWidthSpace + '+', ''),
+        _frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
             66: 'B',
@@ -4137,10 +4137,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
             if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 const range = core.getRange();
-                const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
-                const so = range.startOffset - frontZeroWidthCnt, eo = range.endOffset - frontZeroWidthCnt;
+                let so = range.startOffset, eo = range.endOffset;
+                const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
+                so = range.startOffset - frontZeroWidthCnt;
+                eo = range.endOffset - frontZeroWidthCnt;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
-                core.setRange(selectionNode, so < 0 ? 0 : so - 1, selectionNode, eo < 0 ? 0 : eo - 1);
+                core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
