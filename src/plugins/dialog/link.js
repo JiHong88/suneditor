@@ -231,11 +231,13 @@ export default {
     },
 
     init: function () {
-        const contextLink = this.context.link;
-        contextLink.linkBtn.style.display = 'none';
-        contextLink._linkAnchor = null;
-        contextLink.focusElement.value = '';
-        contextLink.linkAnchorText.value = '';
-        contextLink.linkNewWindowCheck.checked = false;
+        if (!/link/i.test(this.context.dialog.kind)) {
+            const contextLink = this.context.link;
+            contextLink.linkBtn.style.display = 'none';
+            contextLink._linkAnchor = null;
+            contextLink.focusElement.value = '';
+            contextLink.linkAnchorText.value = '';
+            contextLink.linkNewWindowCheck.checked = false;
+        }
     }
 };
