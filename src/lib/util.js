@@ -229,7 +229,7 @@ const util = {
                     if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                returnHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, '');
+                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, ' ');
             }
         }
 
@@ -609,6 +609,16 @@ const util = {
      */
     isBreak: function (node) {
         return node && /^BR$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+
+    /**
+     * @description Check the node is a anchor node (A)
+     * @param {Element|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isAnchor: function (node) {
+        return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
@@ -1010,15 +1020,6 @@ const util = {
     },
 
     /**
-     * @description Tag to maintain current node type when changing node (a)
-     * @param {Element} element Element to check
-     * @returns {Boolean}
-     */
-    isMaintainNoodeChange: function (element) {
-        return /^A$/i.test(element.nodeName);
-    },
-
-    /**
      * @description Gets the clean HTML code for editor
      * @param {String} html HTML string
      * @returns {String}
@@ -1035,7 +1036,7 @@ const util = {
         }
 
         cleanHTML = cleanHTML
-            .replace(/<([a-zA-Z]+\:[a-zA-Z]+|script|style).*>(\n|.)*<\/([a-zA-Z]+\:[a-zA-Z]+|script|style)>/g, '')
+            .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
             .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                 const v = m.match(/((?:contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")/ig);
                 if (v) {
