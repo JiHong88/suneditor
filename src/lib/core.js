@@ -1538,11 +1538,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         for (let n = 0, nLen = childs.length; n < nLen; n++) {
                             if (childs[n].textContent.length > 0) childLength++;
                         }
-                        if (childLength > 0 && child.lastChild && next.firstChild && child.lastChild.nodeType === 3 && next.firstChild.nodeType === 3) childLength--;
-
+                        
                         const l = child.lastChild;
                         const r = next.firstChild;
                         const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
+                        let addOffset = l.textContent.length;
+                        let tempL = l.previousSibling;
+                        while(tempL && tempL.nodeType === 3) {
+                            addOffset += tempL.textContent.length;
+                            tempL = tempL.previousSibling;
+                        }
+
+                        if (childLength > 0 && l && r && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
 
                         // start
                         if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
@@ -1553,8 +1560,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
                                     nodePath_s[depth + 1] += childLength;
                                     if (textOffset) {
-                                        if (child.lastChild && child.lastChild.nodeType === 3 && next.firstChild && next.firstChild.nodeType === 3) {
-                                            offsets.a += child.lastChild.textContent.length;
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.a += addOffset;
                                         }
                                     }
                                 }
@@ -1569,8 +1576,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
                                     nodePath_e[depth + 1] += childLength;
                                     if (textOffset) {
-                                        if (child.lastChild && child.lastChild.nodeType === 3 && next.firstChild && next.firstChild.nodeType === 3) {
-                                            offsets.b += child.lastChild.textContent.length;
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.b += addOffset;
                                         }
                                     }
                                 }
@@ -4133,7 +4140,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 const frontZeroWidthCnt = (selectionNode.textContent.match(event._frontZeroWidthReg) || '').length;
                 const so = range.startOffset - frontZeroWidthCnt, eo = range.endOffset - frontZeroWidthCnt;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
-                core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
+                core.setRange(selectionNode, so < 0 ? 0 : so - 1, selectionNode, eo < 0 ? 0 : eo - 1);
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
