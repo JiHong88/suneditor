@@ -229,7 +229,7 @@ const util = {
                     if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                returnHTML += baseHtml.replace(/(?!>)\s+?(?=<)/g, ' ');
+                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, ' ');
             }
         }
 

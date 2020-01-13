@@ -139,7 +139,7 @@ window.sun_insertHTML = function (html) {
 }
 
 window.sun_getContents = function () {
-    alert(ss.getContents());
+    // alert(ss.getContents());
     console.log(ss.getContents());
 }
 

@@ -4105,6 +4105,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 event._applyTagEffects();
 
                 core._checkComponents();
+                core.history.push(false);
                 return;
             }
 
