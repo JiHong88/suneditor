@@ -165,6 +165,7 @@ export default {
         }
         
         if (this.context.link._linkAnchor) {
+            this.context.dialog.updateModal = true;
             this.context.link.focusElement.value = this.context.link._linkAnchor.href;
             this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
             this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
