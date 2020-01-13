@@ -672,11 +672,6 @@ input[type="button"].btn-block {
   min-height: 50px;
   border: 1px solid transparent;
 }
-@media (min-width: 919px) {
-  .navbar-header {
-    float: left;
-  }
-}
 .navbar-collapse {
   padding-right: 15px;
   padding-left: 15px;
@@ -690,6 +685,9 @@ input[type="button"].btn-block {
   overflow-y: auto;
 }
 @media (min-width: 919px) {
+  .navbar-header {
+    float: left;
+  }
   .navbar-collapse {
     width: auto;
     border-top: 0;
@@ -783,7 +781,7 @@ input[type="button"].btn-block {
 }
 @media (min-width: 919px) {
   .navbar-nav {
-    float: left;
+    float: right;
     margin: 0;
   }
   .navbar-nav > li {
