@@ -59,6 +59,9 @@
     color: #004cff;
     text-decoration: none;
 }
+.sun-editor-editable span[style~="color:"] a {
+    color: inherit;
+}
 .sun-editor-editable a:hover, .sun-editor-editable a:focus {
     cursor: pointer;
     color: #0093ff;

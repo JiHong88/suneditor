@@ -19,8 +19,8 @@ import lineHeight from '../../src/plugins/submenu/lineHeight'
 const align = require('../../src/plugins/submenu/align')
 
 let s1 = suneditor.create('editor', {
-  plugins: [align, plugins.link],
-  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
+  plugins: plugins,
+  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'codeView', 'preview']],
   width: '100%'
 })
 

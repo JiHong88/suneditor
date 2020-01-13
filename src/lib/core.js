@@ -374,7 +374,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._editorRange();
             }
 
-            event._findButtonEffectTag();
+            event._applyTagEffects();
         },
 
         /**
@@ -1137,7 +1137,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // history stack
             this.history.push(false);
             
-            event._findButtonEffectTag();
+            event._applyTagEffects();
         },
 
         /**
@@ -1588,11 +1588,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _util_getAnchor: function (isRemove, element) {
-            return !isRemove ? this.getParentElement(element, function (current) {return this.isAnchor(current);}.bind(this)) : null;
+            return element && !isRemove ? this.getParentElement(element, function (current) {return this.isAnchor(current);}.bind(this)) : null;
         },
 
         _util_isAnchor: function (isRemove, element) {
-            return !isRemove && element.nodeType !== 3 && this.isAnchor(element);
+            return element && !isRemove && element.nodeType !== 3 && this.isAnchor(element);
         },
 
         /**
@@ -1704,7 +1704,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 let m = a;
                                 let p = null;
                                 while (m.parentNode !== line) {
-                                    p = m.parentNode.cloneNode(false);
+                                    ancestor = p = m.parentNode.cloneNode(false);
                                     while(m.childNodes[0]) {
                                         p.appendChild(m.childNodes[0]);
                                     }
@@ -1767,7 +1767,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
-                        if (anchorNode) anchorNode = anchorNode.cloneNode(false);
+                        if (anchorNode) {
+                            anchorNode = anchorNode.cloneNode(false);
+                        } else if (_isAnchor(newInnerNode.parentNode) && !anchorNode) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(newInnerNode);
+                            nNodeArray.push(newInnerNode);
+                        }
 
                         if (afterNode.data.length > 0) {
                             newNode = child;
@@ -1894,7 +1900,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
                         }
-
+                        
                         if (!endPass && !anchorNode && _isAnchor(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
@@ -1903,8 +1909,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                             childNode.appendChild(newInnerNode);
                             pNode.appendChild(childNode);
-                            ancestor = newNode;
                             nNodeArray.push(newInnerNode);
+                            if (newInnerNode.children.length > 0) ancestor = newNode;
+                            else ancestor = newInnerNode;
                         } else if (childNode === child) {
                             if (!endPass) ancestor = newInnerNode;
                             else ancestor = pNode;
@@ -2162,7 +2169,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 let m = a;
                                 let p = null;
                                 while (m.parentNode !== line) {
-                                    p = m.parentNode.cloneNode(false);
+                                    ancestor = p = m.parentNode.cloneNode(false);
                                     while(m.childNodes[0]) {
                                         p.appendChild(m.childNodes[0]);
                                     }
@@ -2532,19 +2539,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const afterNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
 
-                        if (anchorNode) anchorNode = anchorNode.cloneNode(false);
-
-                        if (afterNode.data.length > 0) {
-                            ancestor.insertBefore(afterNode, ancestor.firstChild);
-                        }
-
                         if (anchorNode) {
+                            anchorNode = anchorNode.cloneNode(false);
                             const a = _getAnchor(ancestor);
                             if (a && a.parentNode !== pNode) {
                                 let m = a;
                                 let p = null;
                                 while (m.parentNode !== pNode) {
-                                    p = m.parentNode.cloneNode(false);
+                                    ancestor = p = m.parentNode.cloneNode(false);
                                     while(m.childNodes[0]) {
                                         p.appendChild(m.childNodes[0]);
                                     }
@@ -2554,6 +2556,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 m.parentNode.insertBefore(a, m.parentNode.firstChild);
                             }
                             anchorNode = anchorNode.cloneNode(false);
+                        } else if (_isAnchor(newInnerNode.parentNode) && !anchorNode) {
+                            newInnerNode = newInnerNode.cloneNode(false);
+                            pNode.appendChild(newInnerNode);
+                            nNodeArray.push(newInnerNode);
+                        }
+
+                        if (afterNode.data.length > 0) {
+                            ancestor.insertBefore(afterNode, ancestor.firstChild);
                         }
 
                         newNode = ancestor;
@@ -2777,7 +2787,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
             }
 
-            event._findButtonEffectTag();
+            event._applyTagEffects();
             // history stack
             this.history.push(false);
         },
@@ -3410,7 +3420,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return true;
         },
 
-        _findButtonEffectTag: function () {
+        _applyTagEffects: function () {
             const commandMap = core.commandMap;
             const classOnCheck = this._onButtonsCheck;
             const commandMapNodes = [];
@@ -3696,7 +3706,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core.focus();
             }
 
-            event._findButtonEffectTag();
+            event._applyTagEffects();
 
             if (core._isBalloon) {
                 const range = core.getRange();
@@ -4092,7 +4102,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 selectionNode.appendChild(oFormatTag);
                 core.setRange(oFormatTag, 0, oFormatTag, 0);
-                event._findButtonEffectTag();
+                event._applyTagEffects();
 
                 core._checkComponents();
                 return;
@@ -4107,7 +4117,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             if (event._directionKeyCode.test(keyCode)) {
-                event._findButtonEffectTag();
+                event._applyTagEffects();
             }
 
             core._checkComponents();

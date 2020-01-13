@@ -163,6 +163,12 @@ export default {
         if (!update) {
             this.context.link.linkAnchorText.value = this.getSelection().toString();
         }
+        
+        if (this.context.link._linkAnchor) {
+            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
+            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
+            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
+        }
     },
 
     call_controller_linkButton: function (selectionATag) {
@@ -188,7 +194,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn);
+        this.controllersOn(linkBtn, this.plugins.link.init.bind(this));
     },
 
     onClick_linkBtn: function (e) {
