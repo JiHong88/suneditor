@@ -1455,6 +1455,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             // set range
+            this.controllersOff();
             this.setRange(start.container, start.offset, end.container, end.offset);
 
             // history stack
