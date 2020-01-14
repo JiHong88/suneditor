@@ -409,8 +409,9 @@ function sun_create () {
     editorImageSample.onImageUpload = imageUpload;
 
     // option string
-    var json = JSONstringify(options, langSelect.options[langSelect.selectedIndex].value);
-    optionDisplay.setValue(json.replace(/\%c/g, ''));
+    var languageCode = langSelect.options[langSelect.selectedIndex].value;
+    var json = JSONstringify(options, languageCode);
+    optionDisplay.setValue(json.replace(/\%c/g, '').replace(/"SUNEDITOR_LANG\..+"/, 'SUNEDITOR_LANG.' + languageCode));
 }
 
 sun_create();

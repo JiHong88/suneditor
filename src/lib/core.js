@@ -4753,8 +4753,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (core._isInline) {
                     event._showToolbarInline();
                 } else {
-                    context.element.toolbar.style.display = 'none';
-                    context.element._stickyDummy.style.display = 'none';
+                    context.element.toolbar.style.display = '';
+                    context.element._stickyDummy.style.display = '';
                 }
             },
 
@@ -4765,8 +4765,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (core._isInline) {
                     event._hideToolbar();
                 } else {
-                    context.element.toolbar.style.display = '';
-                    context.element._stickyDummy.style.display = '';
+                    context.element.toolbar.style.display = 'none';
+                    context.element._stickyDummy.style.display = 'none';
                 }
             },
         }
