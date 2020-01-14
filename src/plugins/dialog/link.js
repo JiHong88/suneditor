@@ -130,7 +130,15 @@ export default {
                 oA.textContent = anchorText;
                 oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
 
-                this.insertNode(oA);
+                const selectedFormats = this.getSelectedElements();
+                if (selectedFormats.length > 1) {
+                    const oFormat = this.util.createElement(selectedFormats[0].nodeName);
+                    oFormat.appendChild(oA);
+                    this.insertNode(oFormat);
+                } else {
+                    this.insertNode(oA);
+                }
+
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
                 contextLink._linkAnchor.href = url;
