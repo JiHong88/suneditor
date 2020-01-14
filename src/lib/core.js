@@ -1599,10 +1599,24 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             return offsets;
         },
 
+        /**
+         * @description Return the parent anchor tag. (bind and use a util object)
+         * @param {Boolean} isRemove Delete anchor tag
+         * @param {Element} element Element
+         * @returns {Element}
+         * @private
+         */
         _util_getAnchor: function (isRemove, element) {
             return element && !isRemove ? this.getParentElement(element, function (current) {return this.isAnchor(current);}.bind(this)) : null;
         },
 
+        /**
+         * @description Checks if the element is an anchor tag. (bind and use a util object)
+         * @param {Boolean} isRemove Delete anchor tag
+         * @param {Element} element Element
+         * @returns {Element}
+         * @private
+         */
         _util_isAnchor: function (isRemove, element) {
             return element && !isRemove && element.nodeType !== 3 && this.isAnchor(element);
         },
