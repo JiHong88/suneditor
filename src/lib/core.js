@@ -4680,7 +4680,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Enabled the suneditor
+         * @description Enable the suneditor
          */
         enabled: function () {
             context.tool.cover.style.display = 'none';
@@ -4726,6 +4726,49 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             /** remove user object */
             _w.Object.keys(this).forEach(function(key) {delete this[key];}.bind(this));
+        },
+
+        /**
+         * @description Toolbar methods
+         */
+        toolbar: {
+            /**
+             * @description Disable the toolbar
+             */
+            disabled: function () {
+                context.tool.cover.style.display = 'block';
+            },
+
+            /**
+             * @description Enable the toolbar
+             */
+            enabled: function () {
+                context.tool.cover.style.display = 'none';
+            },
+
+            /**
+             * @description Show the toolbar
+             */
+            show: function () {
+                if (core._isInline) {
+                    event._showToolbarInline();
+                } else {
+                    context.element.toolbar.style.display = 'none';
+                    context.element._stickyDummy.style.display = 'none';
+                }
+            },
+
+            /**
+             * @description Hide the toolbar
+             */
+            hide: function () {
+                if (core._isInline) {
+                    event._hideToolbar();
+                } else {
+                    context.element.toolbar.style.display = '';
+                    context.element._stickyDummy.style.display = '';
+                }
+            },
         }
     };
 
