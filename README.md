@@ -605,6 +605,19 @@ editor.show();
 // Destroy the suneditor
 editor.destroy();
 
+// Toolbar methods
+// Disable the suneditor
+editor.toolbar.disabled();
+
+// Enabled the suneditor
+editor.toolbar.enabled();
+
+// Hide the suneditor
+editor.toolbar.hide();
+
+// Show the suneditor
+editor.toolbar.show();
+
 // Event functions
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.

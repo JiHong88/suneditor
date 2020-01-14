@@ -11,7 +11,10 @@ export default {
     name: 'dialog',
     add: function (core) {
         const context = core.context;
-        context.dialog = {};
+        context.dialog = {
+            kind: '',
+            updateModal: false
+        };
 
         /** dialog */
         let dialog_div = core.util.createElement('DIV');
@@ -92,12 +95,14 @@ export default {
             this.plugins.dialog._bindClose = null;
         }
 
+        const kind = this.context.dialog.kind;
         this.modalForm.style.display = 'none';
         this.context.dialog.back.style.display = 'none';
         this.context.dialog.modalArea.style.display = 'none';
-        this.modalForm = null;
+        this.context.dialog.kind = '';
         this.context.dialog.updateModal = false;
-        this.plugins[this.context.dialog.kind].init.call(this);
+        this.plugins[kind].init.call(this);
+        this.modalForm = null;
         this.focus();
     }
 };

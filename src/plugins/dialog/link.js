@@ -130,7 +130,15 @@ export default {
                 oA.textContent = anchorText;
                 oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
 
-                this.insertNode(oA);
+                const selectedFormats = this.getSelectedElements();
+                if (selectedFormats.length > 1) {
+                    const oFormat = this.util.createElement(selectedFormats[0].nodeName);
+                    oFormat.appendChild(oA);
+                    this.insertNode(oFormat);
+                } else {
+                    this.insertNode(oA);
+                }
+
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
                 contextLink._linkAnchor.href = url;
@@ -163,6 +171,13 @@ export default {
         if (!update) {
             this.context.link.linkAnchorText.value = this.getSelection().toString();
         }
+        
+        if (this.context.link._linkAnchor) {
+            this.context.dialog.updateModal = true;
+            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
+            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
+            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
+        }
     },
 
     call_controller_linkButton: function (selectionATag) {
@@ -188,7 +203,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn);
+        this.controllersOn(linkBtn, this.plugins.link.init.bind(this));
     },
 
     onClick_linkBtn: function (e) {
@@ -206,7 +221,9 @@ export default {
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {
-            this.setRange(this.context.link._linkAnchor, 0, this.context.link._linkAnchor, 1);
+            const sc = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+            const ec = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            this.setRange(sc, 0, ec, ec.textContent.length);
             this.nodeChange(null, null, ['A'], false);
         }
         else {
@@ -223,11 +240,13 @@ export default {
     },
 
     init: function () {
-        const contextLink = this.context.link;
-        contextLink.linkBtn.style.display = 'none';
-        contextLink._linkAnchor = null;
-        contextLink.focusElement.value = '';
-        contextLink.linkAnchorText.value = '';
-        contextLink.linkNewWindowCheck.checked = false;
+        if (!/link/i.test(this.context.dialog.kind)) {
+            const contextLink = this.context.link;
+            contextLink.linkBtn.style.display = 'none';
+            contextLink._linkAnchor = null;
+            contextLink.focusElement.value = '';
+            contextLink.linkAnchorText.value = '';
+            contextLink.linkNewWindowCheck.checked = false;
+        }
     }
 };

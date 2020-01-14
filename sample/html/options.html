@@ -32,7 +32,7 @@
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
+            <ul class="nav navbar-nav">
                 <li><a href="getting-started.html" title="Getting started">Getting started</a></li>
                 <li><a href="examples.html" title="Examples">Examples</a></li>
                 <li><a href="options.html" style="color:#fff;" title="Options">Options</a></li>
@@ -409,8 +409,9 @@ function sun_create () {
     editorImageSample.onImageUpload = imageUpload;
 
     // option string
-    var json = JSONstringify(options, langSelect.options[langSelect.selectedIndex].value);
-    optionDisplay.setValue(json.replace(/\%c/g, ''));
+    var languageCode = langSelect.options[langSelect.selectedIndex].value;
+    var json = JSONstringify(options, languageCode);
+    optionDisplay.setValue(json.replace(/\%c/g, '').replace(/"SUNEDITOR_LANG\..+"/, 'SUNEDITOR_LANG.' + languageCode));
 }
 
 sun_create();
