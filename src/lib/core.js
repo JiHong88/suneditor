@@ -362,7 +362,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             try {
                 const range = this.getRange();
-                this.setRange(range.startContainer, range.startOffset);
+                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
             } catch (e) {
                 const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
                 if (caption) {
