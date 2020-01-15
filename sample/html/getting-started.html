@@ -573,7 +573,7 @@ buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> 
 <span class="pl-c"><span class="pl-c">//</span> Show the suneditor</span>
 <span class="pl-smi">editor</span>.<span class="pl-c1">toolbar</span>.<span class="pl-en">show</span>();
 
-<span class="pl-c"><span class="pl-c">//</span> Event functions</span>
+<span class="pl-c"><span class="pl-c">//</span> Event functions -------------------------------------------------------------------------------------</span>
 <span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
 <span class="pl-c"><span class="pl-c">//</span> It is not called in exceptional cases and is called after the default event function has finished.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e) }
@@ -587,6 +587,13 @@ buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> 
 <span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
+
+<span class="pl-c"><span class="pl-c">//</span> onload event</span>
+<span class="pl-c"><span class="pl-c">//</span> When reloaded with the "setOptions" method, the value of the "reload" argument is true.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">core</span>, <span class="pl-smi">reload</span>) { 
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-core<span class="pl-pds">'</span></span>, core)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-reload<span class="pl-pds">'</span></span>, reload)
+}
 
 <span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
 <span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
@@ -626,9 +633,6 @@ buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> 
     <span class="pl-en">alert</span>(errorMessage)
 }
 
-<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
-<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
-<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * toolbar: Toolbar Element</span>
 <span class="pl-c"> * context: The editor's context object (editor.getContext())</span>

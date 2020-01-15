@@ -34,7 +34,7 @@ export default {
         notice_button.addEventListener('click', this.onClick_cancel.bind(core));
         
         /** append html */
-        context.element.editorArea.insertBefore(notice_div, context.element.wysiwygFrame);
+        context.element.relative.insertBefore(notice_div, context.element.editorArea);
         
         /** empty memory */
         notice_div = null;

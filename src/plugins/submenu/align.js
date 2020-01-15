@@ -73,16 +73,21 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let command = null;
+        let value = null;
 
-        while (!command && !/UL/i.test(target.tagName)) {
-            command = target.getAttribute('data-command');
+        while (!value && !/UL/i.test(target.tagName)) {
+            value = target.getAttribute('data-value');
             target = target.parentNode;
         }
 
-        if (!command) return;
+        if (!value) return;
 
-        this.execCommand(command, false, null);
+        const selectedFormsts = this.getSelectedElements();
+        for (let i = 0, len = selectedFormsts.length; i < len; i++) {
+            selectedFormsts[i].style.textAlign = value;
+        }
+
         this.submenuOff();
+        this.focus();
     }
 };

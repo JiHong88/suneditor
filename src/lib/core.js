@@ -362,7 +362,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             try {
                 const range = this.getRange();
-                this.setRange(range.startContainer, range.startOffset);
+                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
             } catch (e) {
                 const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
                 if (caption) {
@@ -3289,7 +3289,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Initializ core variable
          * @private
          */
-        _init: function () {
+        _init: function (reload) {
             this._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
 
@@ -3308,6 +3308,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
                     this._iframeAutoHeight();
                 }
+
+                if (typeof userFunction.onload === 'function') return userFunction.onload(core, reload);
             }.bind(this));
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
@@ -4483,6 +4485,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Event functions
          * @param {Object} event Event Object
          */
+        onload: null,
         onScroll: null,
         onClick: null,
         onKeyDown: null,
@@ -4558,7 +4561,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.context = context = _Context(context.element.originElement, constructed, _options);
 
             core._imagesInfoReset = true;
-            core._init();
+            core._init(true);
             event._addEvent();
             core._charCount(0, false);
 
@@ -4787,7 +4790,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
     };
 
     /** initialize core and add event listeners */
-    core._init();
+    core._init(false);
     event._addEvent();
     core._charCount(0, false);
 
