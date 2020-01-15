@@ -618,7 +618,7 @@ editor.toolbar.hide();
 // Show the suneditor
 editor.toolbar.show();
 
-// Event functions
+// Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
 editor.onScroll = function (e) { console.log('onScroll', e) }
@@ -675,9 +675,6 @@ editor.onImageUploadError = function (errorMessage, result) {
     alert(errorMessage)
 }
 
-// Paste event.
-// Called before the editor's default event action.
-// If it returns false, it stops without executing the rest of the action.
 /**
  * toolbar: Toolbar Element
  * context: The editor's context object (editor.getContext())
