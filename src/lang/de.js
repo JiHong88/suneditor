@@ -67,7 +67,7 @@
             tag_h: 'Header',
             tag_blockquote: 'Zitat',
             tag_pre: 'Quellcode',
-            template: 'Skabelon',
+            template: 'Vorlage',
             lineHeight: 'Zeilenhöhe',
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil'
