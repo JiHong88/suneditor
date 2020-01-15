@@ -633,6 +633,10 @@ editor.onDrop = function (e) { console.log('onDrop', e) }
 
 editor.onChange = function (contents) { console.log('onChange', contents) }
 
+// onload event
+// When reloaded with the "setOptions" method, the value of the "reload" argument is true.
+editor.onload = function (core, reload) { console.log('onload', core) }
+
 // Paste event.
 // Called before the editor's default event action.
 // If it returns false, it stops without executing the rest of the action.

@@ -3289,7 +3289,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Initializ core variable
          * @private
          */
-        _init: function (isUpdate) {
+        _init: function (reload) {
             this._ww = context.option.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
 
@@ -3309,7 +3309,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     this._iframeAutoHeight();
                 }
 
-                if (typeof userFunction.onload === 'function') return userFunction.onload(core, isUpdate);
+                if (typeof userFunction.onload === 'function') return userFunction.onload(core, reload);
             }.bind(this));
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
@@ -4485,7 +4485,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Event functions
          * @param {Object} event Event Object
          */
-        onload: null,
         onScroll: null,
         onClick: null,
         onKeyDown: null,
@@ -4494,6 +4493,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onChange: null,
         onPaste: null,
         showInline: null,
+        onload: null,
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
