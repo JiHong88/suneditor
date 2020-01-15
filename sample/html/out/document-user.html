@@ -283,6 +283,54 @@
             </div>
             <dl class="details"></dl>
 
+            
+        <h4 class="name" id="toolbar"><span class="type-signature"></span>{toolbar}<span
+                class="type-signature"></span></h4>
+        <div class="description">
+            An object with toolbar-related methods
+        </div>
+        <h5 class="subsection-title">Properties:</h5>
+        <table class="props">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="name"><code>disabled()</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">Disable the toolbar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>enabled()</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">Enable the toolbar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>show()</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">Show the toolbar</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>hide()</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">Hide the toolbar</td>
+                </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
 
 
             <h3 class="subsection-title">Events</h3>
@@ -290,6 +338,39 @@
                 It can be redefined by receiving event object as parameter.
                 It is not called in exceptional cases and is called after the default event function has finished.
             </div>
+
+            <h4 class="name" id="onload"><span class="type-signature"></span>onload<span
+                    class="signature">(core, reload)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Scroll event
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                <tr>
+                    <td class="name"><code>reload</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">When reloaded with the "<a href="#setOptions">setOptions</a>" method, the value of the this argument is true.</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
 
             <h4 class="name" id="onScroll"><span class="type-signature"></span>onScroll<span
                     class="signature">(event)</span><span class="type-signature"></span></h4>
@@ -641,10 +722,12 @@
         <li><a href="document-user.html#show">show</a></li>
         <li><a href="document-user.html#hide">hide</a></li>
         <li><a href="document-user.html#destroy">destroy</a></li>
+        <li><a href="document-user.html#toolbar">{toolbar}</a></li>
     </ul>
 
     <h3>Useable events</h3>
     <ul>
+        <li><a href="document-user.html#onload">onload</a></li>
         <li><a href="document-user.html#onScroll">onScroll</a></li>
         <li><a href="document-user.html#onClick">onClick</a></li>
         <li><a href="document-user.html#onKeyDown">onKeyDown</a></li>

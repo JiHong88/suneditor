@@ -4485,6 +4485,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Event functions
          * @param {Object} event Event Object
          */
+        onload: null,
         onScroll: null,
         onClick: null,
         onKeyDown: null,
@@ -4493,7 +4494,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onChange: null,
         onPaste: null,
         showInline: null,
-        onload: null,
 
         /**
          * @description Called when the image is uploaded or the uploaded image is deleted
