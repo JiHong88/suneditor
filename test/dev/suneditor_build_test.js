@@ -87,6 +87,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // videoSizeOnlyPercentage: true
 });
 
+ss.onload = function (core) {
+    console.log('onload', core);
+};
 ss.onScroll = function (e) {
     console.log('onScroll', e);
 };
@@ -379,6 +382,10 @@ window.setImageList = function () {
 
     imageSize.innerText = size.toFixed(1) + 'KB';
     imageTable.innerHTML = list;
+}
+
+s2.onload = function (core, isUpdate) {
+    console.log('2222onload222', isUpdate)
 }
 
 s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
