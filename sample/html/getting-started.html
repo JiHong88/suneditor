@@ -590,7 +590,10 @@ buttonList      <span class="pl-k">:</span> <span class="pl-smi">Defines</span> 
 
 <span class="pl-c"><span class="pl-c">//</span> onload event</span>
 <span class="pl-c"><span class="pl-c">//</span> When reloaded with the "setOptions" method, the value of the "reload" argument is true.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">core</span>, <span class="pl-smi">reload</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload<span class="pl-pds">'</span></span>, core) }
+<span class="pl-smi">editor</span>.<span class="pl-en">onload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">core</span>, <span class="pl-smi">reload</span>) { 
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-core<span class="pl-pds">'</span></span>, core)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-reload<span class="pl-pds">'</span></span>, reload)
+}
 
 <span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
 <span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
