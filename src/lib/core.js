@@ -1035,7 +1035,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util.isIgnoreNodeChange(c) && !util.isListCell(format)) {
+                    if (util.isIgnoreNodeChange(c) && !util.isBreak(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
