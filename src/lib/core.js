@@ -3468,8 +3468,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     /* Format block */
                     if (findFormat && commandMap.FORMAT) {
                         commandMapNodes.push('FORMAT');
-                        util.changeTxt(commandMap.FORMAT, nodeName);
-                        commandMap.FORMAT.setAttribute('data-focus', nodeName);
+                        core.callPlugin('formatBlock', function () {
+                            core.plugins.formatBlock.active.call(core, selectionParent);
+                        });
                         findFormat = false;
                     }
 

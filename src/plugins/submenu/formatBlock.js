@@ -41,7 +41,7 @@ export default {
         const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs; i < len; i++) {
+        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
             format = formatList[i];
             
             if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
@@ -49,16 +49,18 @@ export default {
                 command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
                 name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+                className = '';
                 attrs = '';
             } else {
                 tagName = format.tag.toLowerCase();
                 command = format.command;
                 name = format.name || tagName;
-                attrs = format.class ? ' class="' + format.class + '"' : '';
+                className = format.class;
+                attrs = className ? ' class="' + className + '"' : '';
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '">' +
                     '<' + tagName + attrs + '>' + name + '</' + tagName + '>' +
                 '</button></li>';
         }
@@ -69,17 +71,38 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        const formatContext = this.context.formatBlock;
+        const formatList = formatContext._formatList;
+        const nodeName = element.nodeName.toLowerCase();
+        const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
+        let formatTitle = this.lang.formats;
+
+        for (let i = 0, len = formatList.length, f; i < len; i++) {
+            f = formatList[i];
+            if (nodeName === f.getAttribute('data-value') && className === f.getAttribute('data-class')) {
+                formatTitle = f.title;
+                break;
+            }
+        }
+
+        this.util.changeTxt(this.commandMap.FORMAT, formatTitle);
+        this.commandMap.FORMAT.setAttribute('data-value', nodeName);
+        this.commandMap.FORMAT.setAttribute('data-class', className);
+    },
+
     on: function () {
         const formatContext = this.context.formatBlock;
         const formatList = formatContext._formatList;
-        const currentFormat = (this.commandMap.FORMAT.getAttribute('data-focus') || 'P').toLowerCase();
+        const currentFormat = (this.commandMap.FORMAT.getAttribute('data-value') || '') + (this.commandMap.FORMAT.getAttribute('data-class') || '');
 
         if (currentFormat !== formatContext.currentFormat) {
-            for (let i = 0, len = formatList.length; i < len; i++) {
-                if (currentFormat === formatList[i].getAttribute('data-value')) {
-                    this.util.addClass(formatList[i], 'active');
+            for (let i = 0, len = formatList.length, f; i < len; i++) {
+                f = formatList[i];
+                if (currentFormat === f.getAttribute('data-value') + f.getAttribute('data-class')) {
+                    this.util.addClass(f, 'active');
                 } else {
-                    this.util.removeClass(formatList[i], 'active');
+                    this.util.removeClass(f, 'active');
                 }
             }
 
@@ -92,11 +115,12 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let command = null, value = null, tag = null;
+        let command = null, value = null, tag = null, className = '';
         
         while (!command && !/UL/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');
+            className = target.getAttribute('data-class');
             if (command) {
                 tag = target.firstChild;
                 break;
@@ -176,7 +200,7 @@ export default {
             for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
                 node = selectedFormsts[i];
                 
-                if (node.nodeName.toLowerCase() !== value.toLowerCase() && !this.util.isComponent(node)) {
+                if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.util.isComponent(node)) {
                     newFormat = tag.cloneNode(false);
                     this.util.copyFormatAttributes(newFormat, node);
                     newFormat.innerHTML = node.innerHTML;
