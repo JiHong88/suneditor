@@ -20,8 +20,22 @@ const align = require('../../src/plugins/submenu/align')
 
 let s1 = suneditor.create('editor', {
   plugins: plugins,
-  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'codeView', 'preview']],
-  width: '100%'
+  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
+  width: '100%',
+  formats: [
+        { 
+            tag: 'p', // Tag name
+            name: 'NORMAL', // default: tag name 
+            command: 'replace', // default: "replace" 
+            class: '__se__format__NORMAL', // Class names must always begin with "__se__format__" 
+        }, 
+        { 
+            tag: 'div', // Tag name
+            name: 'CODE', // default: tag name 
+            command: 'replace', // default: "replace" 
+            class: '__se__format__CODE', // Class names must always begin with "__se__format__" 
+        } 
+    ]
 })
 
 window.cm = CodeMirror

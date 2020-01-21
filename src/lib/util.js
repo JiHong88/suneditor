@@ -401,7 +401,7 @@ const util = {
      */
     copyFormatAttributes: function (originEl, copyEl) {
         copyEl = copyEl.cloneNode(false);
-        copyEl.className = copyEl.className.replace(/(\s|^)__se__format__(\s|$)/g, '');
+        copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
         this.copyTagAttributes(originEl, copyEl);
     },
 
