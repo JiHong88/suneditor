@@ -315,8 +315,9 @@ export default {
     },
 
     _update_videoCover: function (oIframe) {
-        const contextVideo = this.context.video;
+        if (!oIframe) return;
 
+        const contextVideo = this.context.video;
         oIframe.frameBorder = '0';
         oIframe.allowFullscreen = true;
         oIframe.onload = oIframe.addEventListener('load', this.plugins.video._onload_video.bind(this, oIframe));

@@ -756,6 +756,8 @@ export default {
     },
 
     onModifyMode: function (element, size) {
+        if (!element) return;
+        
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
