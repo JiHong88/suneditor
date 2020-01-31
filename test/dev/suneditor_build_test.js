@@ -164,7 +164,7 @@ window.sun_getContents = function () {
 }
 
 window.sun_setContents = function (content) {
-    ss.setContents(content);
+    ss.setContents('<p><img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" style="width: 900px;"><br></p>');
     ss.core.history.reset(true);
     // ss.core.context.tool.save.disabled = true;
 }

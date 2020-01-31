@@ -3136,6 +3136,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          */
         setContents: function (html) {
             const convertValue = util.convertContentsForEditor(html);
+            this._resetComponents();
+
             if (!core._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
                 // history stack
@@ -3262,6 +3264,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this));
                 else this.plugins.video.checkVideosInfo.call(this);
             }
+        },
+
+        /**
+         * @description Initialize the information of the components.
+         * @private
+         */
+        _resetComponents: function () {
+            this._variable._imagesInfo = [],
+            this._variable._imageIndex = 0,
+            this._variable._videosCnt = 0
         },
 
         /**
