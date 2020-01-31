@@ -2810,7 +2810,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     margin -= 25;
                 }
     
-                p.style.marginLeft = (margin < 0 ? 0 : margin) + 'px';
+                util.setStyle(p, 'marginLeft', (margin <= 0 ? '' : margin + 'px'));
             }
 
             event._applyTagEffects();

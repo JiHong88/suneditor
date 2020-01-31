@@ -881,6 +881,20 @@ const util = {
     },
 
     /**
+     * @description Set style, if all styles are deleted, the style properties are deleted.
+     * @param {Element} element Element to set style
+     * @param {String} styleName Style attribute name (marginLeft, textAlign...)
+     * @param {String|Number} value Style value
+     */
+    setStyle: function (element, styleName, value) {
+        element.style[styleName] = value;
+
+        if (!value && !element.style.cssText) {
+            element.removeAttribute('style');
+        }
+    },
+
+    /**
      * @description Determine whether any of the matched elements are assigned the given class
      * @param {Element} element Elements to search class name
      * @param {String} className Class name to search for
@@ -916,6 +930,8 @@ const util = {
 
         const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         element.className = element.className.replace(check, ' ').trim();
+
+        if (!element.className.trim()) element.removeAttribute('class');
     },
 
     /**
@@ -933,6 +949,8 @@ const util = {
         else {
             element.className += ' ' + className;
         }
+
+        if (!element.className.trim()) element.removeAttribute('class');
     },
 
     /**

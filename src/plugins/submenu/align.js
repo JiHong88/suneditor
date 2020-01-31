@@ -84,7 +84,7 @@ export default {
 
         const selectedFormsts = this.getSelectedElements();
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            selectedFormsts[i].style.textAlign = value;
+            this.util.setStyle(selectedFormsts[i], 'textAlign', (value === 'left' ? '' : value));
         }
 
         this.submenuOff();
