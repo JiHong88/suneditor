@@ -91,6 +91,6 @@ export default {
         this.focus();
         
         // history stack
-        core.history.push(false);
+        this.history.push(false);
     }
 };

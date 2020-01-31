@@ -3271,9 +3271,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _resetComponents: function () {
-            this._variable._imagesInfo = [],
-            this._variable._imageIndex = 0,
-            this._variable._videosCnt = 0
+            this._variable._imagesInfo = [];
+            this._variable._imageIndex = 0;
+            this._variable._videosCnt = 0;
         },
 
         /**
