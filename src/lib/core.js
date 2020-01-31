@@ -3663,18 +3663,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @warning Events are registered only when there is a table plugin.
          */
         onMouseDown_wysiwyg: function (e) {
-            if (core._isBalloon) {
-                event._hideToolbar();
+            const tableCell = util.getParentElement(e.target, util.isCell);
+            if (tableCell) {
+                const tablePlugin = core.plugins.table;
+                if (tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
+                    core.callPlugin('table', function () {
+                        tablePlugin.onTableCellMultiSelect.call(core, tableCell, false);
+                    });
+                }
             }
 
-            const tableCell = util.getParentElement(e.target, util.isCell);
-            if (!tableCell) return;
-
-            const tablePlugin = core.plugins.table;
-            if (tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
-                core.callPlugin('table', function () {
-                    tablePlugin.onTableCellMultiSelect.call(core, tableCell, false);
-                });
+            if (core._isBalloon) {
+                event._hideToolbar();
             }
         },
 

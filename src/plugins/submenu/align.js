@@ -89,5 +89,8 @@ export default {
 
         this.submenuOff();
         this.focus();
+        
+        // history stack
+        core.history.push(false);
     }
 };

@@ -20,7 +20,8 @@ const align = require('../../src/plugins/submenu/align')
 
 let s1 = suneditor.create('editor', {
   plugins: plugins,
-  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
+  mode: 'balloon',
+  buttonList: [['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
   width: '100%',
   formats: [
         { 
