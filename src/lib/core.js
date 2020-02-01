@@ -3903,7 +3903,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         break;
                     }
 
-                    if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
+                    if (util.isWysiwygDiv(selectionNode.parentNode) && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && selectionNode.childNodes.length === 0) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
