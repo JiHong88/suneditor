@@ -46,7 +46,7 @@ export default {
             
             if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
                 tagName = format.toLowerCase();
-                command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
+                command = tagName === 'blockquote' ? 'range' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
                 name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
                 className = '';

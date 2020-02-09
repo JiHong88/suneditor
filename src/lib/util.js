@@ -250,7 +250,7 @@ const util = {
     convertHTMLForCodeView: function (html, indentSize) {
         let returnHTML = '';
         const reg = this._w.RegExp;
-        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
+        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
         const isFormatElement = this.isFormatElement.bind(this);
         const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
         const util = this;
@@ -301,23 +301,23 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, LI, TH, TD)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI, TH, TD)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|TH|TD)$/i.test(element.nodeName) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace__.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
      * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || element.getAttribute('data-format') === 'range')) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range__.+(\\s|$)'))) return true;
         return false;
     },
 
@@ -903,7 +903,7 @@ const util = {
     hasClass: function (element, className) {
         if (!element) return;
 
-        return element.classList.contains(className.trim());
+        return (new this._w.RegExp(className)).test(element.className);
     },
 
     /**
@@ -1077,7 +1077,7 @@ const util = {
      * @private
      */
     _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark|canvas|label|select|option|input'.split('|');
         let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {

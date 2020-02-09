@@ -741,10 +741,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         afterNode = commonCon.splitText(endOff);
                     }
                     else {
-                        if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
-                            parentNode.removeChild(parentNode.lastChild);
+                        if (!util.isBreak(parentNode)) {
+                            if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
+                                parentNode.removeChild(parentNode.lastChild);
+                            }
+                            afterNode = null;
+                        } else {
+                            afterNode = parentNode;
+                            parentNode = parentNode.parentNode;
                         }
-                        afterNode = null;
                     }
                 }
                 /** Select range nodes */
@@ -4046,6 +4051,45 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     
                     break;
                 case 13: /** enter key */
+                    if (!shift && /^PRE$/i.test(formatEl.nodeName)) {
+                        e.preventDefault();
+                        const selectionFormat = selectionNode === formatEl;
+
+                        if ((selectionFormat && range.collapsed && selectionNode.children.length === range.endOffset) || (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(selectionNode.previousSibling) && !selectionNode.nextSibling)) {
+                            if (!selectionFormat) util.removeItem(selectionNode);
+                            const newEl = core.appendFormatTag(formatEl, formatEl.nextElementSibling ? formatEl.nextElementSibling.nodeName : 'P');
+                            util.copyFormatAttributes(newEl, formatEl);
+                            core.setRange(newEl, 1, newEl, 1);
+                            break;
+                        }
+                        
+                        if (selectionFormat) {
+                            core.execCommand('insertHTML', false, '<BR><BR>');
+
+                            const wSelection = _w.getSelection();
+                            let con = wSelection.focusNode;
+                            let offset = 1;
+                            if (/^PRE$/i.test(wSelection.focusNode.nodeName)) {
+                                con = con.childNodes[wSelection.focusOffset > 1 ? wSelection.focusOffset - 1 : wSelection.focusOffset];
+                            } else {
+                                con = con.previousSibling;
+                            }
+                            core.setRange(con, offset, con, offset);
+                        } else {
+                            const br = util.createElement('BR');
+                            core.insertNode(br);
+                            if (!util.isBreak(br.previousSibling) && (!br.nextSibling || util.onlyZeroWidthSpace(br.nextSibling))) {
+                                br.parentNode.insertBefore(br.cloneNode(false), br);
+                                core.setRange(br, 1, br, 1);
+                            } else {
+                                core.setRange(br.nextSibling, 0, br.nextSibling, 0);
+                            }
+                        }
+
+                        event._onShortcutKey = true;
+                        break;
+                    }
+
                     if (selectRange) break;
 
                     const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
