@@ -1008,7 +1008,7 @@ const util = {
         const inst = this;
         
         (function recursionFunc(current) {
-            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !inst._notTextNode(current) && 
                     (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
@@ -1026,15 +1026,6 @@ const util = {
         })(element);
 
         if (element.childNodes.length === 0) element.innerHTML = '<br>';
-    },
-
-    /**
-     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|a)
-     * @param {Element} element Element to check
-     * @returns {Boolean}
-     */
-    isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
     },
 
     /**
@@ -1069,6 +1060,36 @@ const util = {
             .replace(this._deleteExclusionTags, '');
 
         return this._tagConvertor(cleanHTML || html);
+    },
+
+    /**
+     * @description Nodes that need to be added without modification when changing text nodes
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _isIgnoreNodeChange: function (element) {
+        return element.nodeType !== 3 && !(/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName));
+    },
+
+    /**
+     * @description Nodes that must remain undetached when changing text nodes
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _isMaintainedNode: function (element) {
+        return element.nodeType !== 3 && /^(a|label)$/i.test(element.nodeName);
+    },
+
+    /**
+     * @description Nodes without text
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _notTextNode: function (element) {
+        return element.nodeType !== 3 && /^(br|input|canvas|img|iframe|audio|video)$/i.test(element.nodeName);
     },
 
     /**
