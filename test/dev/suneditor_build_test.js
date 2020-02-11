@@ -35,7 +35,8 @@ let s1 = suneditor.create('editor', {
             name: 'CODE', // default: tag name 
             command: 'replace', // default: "replace" 
             class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
-        } 
+        },
+        'pre'
     ]
 })
 

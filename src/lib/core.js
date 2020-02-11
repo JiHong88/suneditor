@@ -4054,10 +4054,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!shift && /^PRE$/i.test(formatEl.nodeName)) {
                         e.preventDefault();
                         const selectionFormat = selectionNode === formatEl;
+                        const wSelection = core.getSelection();
+                        const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
 
-                        if ((selectionFormat && range.collapsed && selectionNode.childNodes.length - 2 === range.endOffset && util.isBreak(selectionNode.childNodes[range.endOffset]) && util.isBreak(selectionNode.childNodes[range.endOffset - 1]) && util.isBreak(selectionNode.childNodes[range.endOffset - 2])) ||
-                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(selectionNode.previousElementSibling) && util.isBreak(selectionNode.previousElementSibling.previousElementSibling) && (!selectionNode.nextSibling || (!util.isBreak(selectionNode.nextSibling) && util.onlyZeroWidthSpace(selectionNode.nextSibling.textContent))))) {
-                            if (selectionFormat) util.removeItem(selectionNode.childNodes[range.endOffset - 1]);
+                        if ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || (!children[offset + 2] && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (!prev.previousElementSibling || util.isBreak(prev.previousElementSibling)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
+                            if (selectionFormat) util.removeItem(children[offset - 1]);
                             else util.removeItem(selectionNode);
                             const newEl = core.appendFormatTag(formatEl, formatEl.nextElementSibling ? formatEl.nextElementSibling.nodeName : 'P');
                             util.copyFormatAttributes(newEl, formatEl);
@@ -4068,23 +4070,25 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (selectionFormat) {
                             core.execCommand('insertHTML', false, '<BR><BR>');
 
-                            const wSelection = _w.getSelection();
                             let con = wSelection.focusNode;
-                            let offset = 1;
-                            if (/^PRE$/i.test(wSelection.focusNode.nodeName)) {
-                                con = con.childNodes[util.isBreak(con.childNodes[wSelection.focusOffset - 1]) ? wSelection.focusOffset - 1 : wSelection.focusOffset];
+                            const wOffset = wSelection.focusOffset;
+                            if (formatEl === con) {
+                                con = con.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
                             } else {
                                 con = con.previousSibling;
                             }
-                            core.setRange(con, offset, con, offset);
+
+                            core.setRange(con, 1, con, 1);
                         } else {
                             const br = util.createElement('BR');
                             core.insertNode(br);
-                            if (!util.isBreak(br.previousSibling) && (!br.nextSibling || util.onlyZeroWidthSpace(br.nextSibling))) {
+                            
+                            const brPrev = br.previousSibling, brNext = br.nextSibling;
+                            if (!util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
                                 br.parentNode.insertBefore(br.cloneNode(false), br);
                                 core.setRange(br, 1, br, 1);
                             } else {
-                                core.setRange(br.nextSibling, 0, br.nextSibling, 0);
+                                core.setRange(brNext, 0, brNext, 0);
                             }
                         }
 
