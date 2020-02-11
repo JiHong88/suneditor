@@ -306,7 +306,7 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace__.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
@@ -317,7 +317,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range__.+(\\s|$)'))) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'))) return true;
         return false;
     },
 

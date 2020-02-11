@@ -4055,8 +4055,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         e.preventDefault();
                         const selectionFormat = selectionNode === formatEl;
 
-                        if ((selectionFormat && range.collapsed && selectionNode.children.length === range.endOffset) || (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(selectionNode.previousSibling) && !selectionNode.nextSibling)) {
-                            if (!selectionFormat) util.removeItem(selectionNode);
+                        if ((selectionFormat && range.collapsed && selectionNode.childNodes.length - 2 === range.endOffset && util.isBreak(selectionNode.childNodes[range.endOffset]) && util.isBreak(selectionNode.childNodes[range.endOffset - 1]) && util.isBreak(selectionNode.childNodes[range.endOffset - 2])) ||
+                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(selectionNode.previousElementSibling) && util.isBreak(selectionNode.previousElementSibling.previousElementSibling) && (!selectionNode.nextSibling || (!util.isBreak(selectionNode.nextSibling) && util.onlyZeroWidthSpace(selectionNode.nextSibling.textContent))))) {
+                            if (selectionFormat) util.removeItem(selectionNode.childNodes[range.endOffset - 1]);
+                            else util.removeItem(selectionNode);
                             const newEl = core.appendFormatTag(formatEl, formatEl.nextElementSibling ? formatEl.nextElementSibling.nodeName : 'P');
                             util.copyFormatAttributes(newEl, formatEl);
                             core.setRange(newEl, 1, newEl, 1);
@@ -4070,7 +4072,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             let con = wSelection.focusNode;
                             let offset = 1;
                             if (/^PRE$/i.test(wSelection.focusNode.nodeName)) {
-                                con = con.childNodes[wSelection.focusOffset > 1 ? wSelection.focusOffset - 1 : wSelection.focusOffset];
+                                con = con.childNodes[util.isBreak(con.childNodes[wSelection.focusOffset - 1]) ? wSelection.focusOffset - 1 : wSelection.focusOffset];
                             } else {
                                 con = con.previousSibling;
                             }

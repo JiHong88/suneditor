@@ -23,20 +23,20 @@ let s1 = suneditor.create('editor', {
 //   mode: 'balloon',
   buttonList: [['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
   width: '100%',
-//   formats: [
-//         { 
-//             tag: 'p', // Tag name
-//             name: 'NORMAL', // default: tag name 
-//             command: 'replace', // default: "replace" 
-//             class: '__se__format__replace__NORMAL', // Class names must always begin with "__se__format__" 
-//         }, 
-//         { 
-//             tag: 'div', // Tag name
-//             name: 'CODE', // default: tag name 
-//             command: 'replace', // default: "replace" 
-//             class: '__se__format__CODE', // Class names must always begin with "__se__format__" 
-//         } 
-//     ]
+  formats: [
+        { 
+            tag: 'div', // Tag name
+            name: 'NORMAL', // default: tag name 
+            command: 'replace', // default: "replace" 
+            class: '__se__format__replace_NORMAL', // Class names must always begin with "__se__format__" 
+        }, 
+        { 
+            tag: 'div', // Tag name
+            name: 'CODE', // default: tag name 
+            command: 'replace', // default: "replace" 
+            class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
+        } 
+    ]
 })
 
 window.cm = CodeMirror

@@ -360,7 +360,7 @@ formats         : Change default formatBlock array.                 default: [..
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
                     command: 'replace' || 'range', // default: "replace"
-                    class: '__se__format__replace__xxx' || '__se__format__range__xxx', // Class names must always begin with "__se__format__(replace or range)__"
+                    class: '__se__format__replace_xxx' || '__se__format__range_xxx', // Class names must always begin with "__se__format__(replace or range)_"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
