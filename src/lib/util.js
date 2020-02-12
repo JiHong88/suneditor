@@ -301,23 +301,34 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI, TH, TD)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
+     * * Range format element is wrap the format element  (P, DIV, H1-6, PRE, LI)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
         if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'))) return true;
+        return false;
+    },
+
+    /**
+     * @description It is judged whether it is the free format element. (PRE)
+     * Free format elements's line break is "BR" tag.
+     * @param {Element} element 
+     * @returns {Boolean}
+     */
+    isFreeFormatElement: function (element) {
+        if (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
@@ -331,7 +342,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], PRE, LI), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element}
@@ -354,7 +365,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, TH, TD), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
@@ -371,6 +382,28 @@ const util = {
             element = element.parentNode;
         }
 
+        return null;
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a free format node (PRE), it returns that node.
+     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation Additional validation function.
+     * @returns {Element}
+     */
+    getFreeFormatElement: function (element, validation) {
+        if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
+
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isFreeFormatElement(element) && validation(element)) return element;
+
+            element = element.parentNode;
+        }
+        
         return null;
     },
 

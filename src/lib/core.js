@@ -738,7 +738,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 /** No Select range node */
                 if (range.collapsed) {
                     if (commonCon.nodeType === 3) {
-                        afterNode = commonCon.splitText(endOff);
+                        if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
+                        else afterNode = commonCon.nextSibling;
                     }
                     else {
                         if (!util.isBreak(parentNode)) {
@@ -4051,18 +4052,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     
                     break;
                 case 13: /** enter key */
-                    if (!shift && /^PRE$/i.test(formatEl.nodeName)) {
+                    const freeFormatEl = util.getFreeFormatElement(selectionNode);
+                    if (!shift && freeFormatEl) {
                         e.preventDefault();
-                        const selectionFormat = selectionNode === formatEl;
+                        const selectionFormat = selectionNode === freeFormatEl;
                         const wSelection = core.getSelection();
                         const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
 
-                        if ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || (!children[offset + 2] && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
-                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (!prev.previousElementSibling || util.isBreak(prev.previousElementSibling)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
+                        if ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
                             if (selectionFormat) util.removeItem(children[offset - 1]);
                             else util.removeItem(selectionNode);
-                            const newEl = core.appendFormatTag(formatEl, formatEl.nextElementSibling ? formatEl.nextElementSibling.nodeName : 'P');
-                            util.copyFormatAttributes(newEl, formatEl);
+                            const newEl = core.appendFormatTag(freeFormatEl, freeFormatEl.nextElementSibling ? freeFormatEl.nextElementSibling.nodeName : 'P');
+                            util.copyFormatAttributes(newEl, freeFormatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
                         }
@@ -4070,21 +4072,22 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (selectionFormat) {
                             core.execCommand('insertHTML', false, '<BR><BR>');
 
-                            let con = wSelection.focusNode;
+                            let focusNode = wSelection.focusNode;
                             const wOffset = wSelection.focusOffset;
-                            if (formatEl === con) {
-                                con = con.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
+                            if (freeFormatEl === focusNode) {
+                                focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
                             } else {
-                                con = con.previousSibling;
+                                focusNode = focusNode.previousSibling;
                             }
 
-                            core.setRange(con, 1, con, 1);
+                            core.setRange(focusNode, 1, focusNode, 1);
                         } else {
+                            const focusNext = wSelection.focusNode.nextSibling;
                             const br = util.createElement('BR');
                             core.insertNode(br);
                             
                             const brPrev = br.previousSibling, brNext = br.nextSibling;
-                            if (!util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
+                            if (!util.isBreak(focusNext) && !util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
                                 br.parentNode.insertBefore(br.cloneNode(false), br);
                                 core.setRange(br, 1, br, 1);
                             } else {
