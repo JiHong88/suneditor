@@ -46,7 +46,7 @@ export default {
             
             if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
                 tagName = format.toLowerCase();
-                command = tagName === 'blockquote' ? 'range' : 'replace';
+                command = tagName === 'blockquote' ? 'range' : tagName === 'pre' ? 'free' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
                 name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
                 className = '';
@@ -130,10 +130,48 @@ export default {
 
         if (!command) return;
 
-        // blockquote, pre
+        // blockquote
         if (command === 'range') {
             const rangeElement = tag.cloneNode(false);
             this.applyRangeFormatElement(rangeElement);
+        }
+        // pre
+        else if (command === 'free') {
+            const selectedFormsts = this.getSelectedElementsAndComponents();
+            const getParentFunc = function (current) {
+                return !this.isFormatElement(current);
+            }.bind(this.util);
+            const getBeforeFunc = function (current) {
+                return !this.isFormatElement(current.parentNode);
+            }.bind(this.util);
+
+            let parentNode = this.util.getParentElement(selectedFormsts[0].parentNode, getParentFunc);
+            let freeElement = tag.cloneNode(false);
+            const focusElement = freeElement;
+
+            for (let i = 0, len = selectedFormsts.length, f, before, html, isComp; i < len; i++) {
+                f = selectedFormsts[i];
+                if (!this.util.getParentElement(f, '.se-wrapper-inner')) continue;
+
+                before = this.util.getParentElement(f, getBeforeFunc);
+                isComp = this.util.isComponent(f);
+                html = (isComp ? '' : f.innerHTML).replace(/\n/g, '') + '<BR>';
+
+                if (parentNode !== f.parentNode || isComp) {
+                    parentNode = before.parentNode;
+                    parentNode.insertBefore(freeElement, before);
+                    freeElement = tag.cloneNode(false);
+                }
+
+                freeElement.innerHTML += html;
+                if (len - 1 === i) before.parentNode.insertBefore(freeElement, before);
+
+                if (!isComp) this.util.removeItem(before);
+            }
+
+            // history stack
+            this.history.push(false);
+            this.setRange(focusElement, 0, focusElement, 0);
         }
         // others
         else {
