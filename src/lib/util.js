@@ -302,11 +302,12 @@ const util = {
 
     /**
      * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI)
+     * Format element also contain "free format Element"
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
@@ -324,6 +325,7 @@ const util = {
     /**
      * @description It is judged whether it is the free format element. (PRE)
      * Free format elements's line break is "BR" tag.
+     * Free format elements is included in the format element.
      * @param {Element} element 
      * @returns {Boolean}
      */

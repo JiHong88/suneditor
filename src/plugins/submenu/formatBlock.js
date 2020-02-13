@@ -87,8 +87,11 @@ export default {
         }
 
         this.util.changeTxt(this.commandMap.FORMAT, formatTitle);
+        this.util.changeTxt(this.commandMap.FORMAT_TOOLTIP, formatTitle);
         this.commandMap.FORMAT.setAttribute('data-value', nodeName);
         this.commandMap.FORMAT.setAttribute('data-class', className);
+
+        return formatTitle !== this.lang.formats;
     },
 
     on: function () {
@@ -135,51 +138,13 @@ export default {
             const rangeElement = tag.cloneNode(false);
             this.applyRangeFormatElement(rangeElement);
         }
-        // pre
-        else if (command === 'free') {
-            const selectedFormsts = this.getSelectedElementsAndComponents();
-            const getParentFunc = function (current) {
-                return !this.isFormatElement(current);
-            }.bind(this.util);
-            const getBeforeFunc = function (current) {
-                return !this.isFormatElement(current.parentNode);
-            }.bind(this.util);
-
-            let parentNode = this.util.getParentElement(selectedFormsts[0].parentNode, getParentFunc);
-            let freeElement = tag.cloneNode(false);
-            const focusElement = freeElement;
-
-            for (let i = 0, len = selectedFormsts.length, f, before, html, isComp; i < len; i++) {
-                f = selectedFormsts[i];
-                if (!this.util.getParentElement(f, '.se-wrapper-inner')) continue;
-
-                before = this.util.getParentElement(f, getBeforeFunc);
-                isComp = this.util.isComponent(f);
-                html = (isComp ? '' : f.innerHTML).replace(/\n/g, '') + '<BR>';
-
-                if (parentNode !== f.parentNode || isComp) {
-                    parentNode = before.parentNode;
-                    parentNode.insertBefore(freeElement, before);
-                    freeElement = tag.cloneNode(false);
-                }
-
-                freeElement.innerHTML += html;
-                if (len - 1 === i) before.parentNode.insertBefore(freeElement, before);
-
-                if (!isComp) this.util.removeItem(before);
-            }
-
-            // history stack
-            this.history.push(false);
-            this.setRange(focusElement, 0, focusElement, 0);
-        }
-        // others
+        // free, others
         else {
             const range = this.getRange();
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
 
-            let selectedFormsts = this.getSelectedElementsAndComponents();
+            const selectedFormsts = this.getSelectedElementsAndComponents();
             if (selectedFormsts.length === 0) return;
 
             let first = selectedFormsts[0];
@@ -187,7 +152,7 @@ export default {
             const firstPath = this.util.getNodePath(range.startContainer, first, null);
             const lastPath = this.util.getNodePath(range.endContainer, last, null);
             
-            // remove list
+            // remove selected list
             let rangeArr = {};
             let listFirst = false;
             let listLast = false;
@@ -225,35 +190,73 @@ export default {
 
                 if (lastIndex && this.util.isList(r)) {
                     const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
-                    if (listLast || len === 1) {
-                        last = edge.ec;
-                        if (listFirst) first = edge.sc || last;
-                    }
+                    if (listLast || len === 1) last = edge.ec;
+                    if (listFirst) first = edge.sc || last;
                 }
             }
 
             // change format tag
             this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            selectedFormsts = this.getSelectedElementsAndComponents();
-            for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
-                node = selectedFormsts[i];
-                
-                if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.util.isComponent(node)) {
-                    newFormat = tag.cloneNode(false);
-                    this.util.copyFormatAttributes(newFormat, node);
-                    newFormat.innerHTML = node.innerHTML;
+            const modifiedFormsts = this.getSelectedElementsAndComponents();
 
-                    node.parentNode.insertBefore(newFormat, node);
-                    this.util.removeItem(node);
+            // free format
+            if (command === 'free') {
+                const getParentFunc = function (current) {
+                    return !this.isFormatElement(current);
+                }.bind(this.util);
+                const getBeforeFunc = function (current) {
+                    return !this.isFormatElement(current.parentNode);
+                }.bind(this.util);
+    
+                let parentNode = this.util.getParentElement(modifiedFormsts[0].parentNode, getParentFunc);
+                let freeElement = tag.cloneNode(false);
+                const focusElement = freeElement;
+    
+                for (let i = 0, len = modifiedFormsts.length, f, before, html, isComp, first = true; i < len; i++) {
+                    f = modifiedFormsts[i];
+                    if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
+    
+                    isComp = this.util.isComponent(f);
+                    html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
+                    before = this.util.getParentElement(f, getBeforeFunc);
+    
+                    if (parentNode !== f.parentNode || isComp) {
+                        parentNode.insertBefore(freeElement, before);
+                        parentNode = before.parentNode;
+                        freeElement = tag.cloneNode(false);
+                    }
+    
+                    freeElement.innerHTML += (first || !html || /<br>$/i.test(html)) ? html : '<BR>' + html;
+                    first = false;
+
+                    if (len - 1 === i) before.parentNode.insertBefore(freeElement, before);
+                    if (!isComp) this.util.removeItem(before);
                 }
-
-                if (i === 0) first = newFormat || node;
-                if (i === len - 1) last = newFormat || node;
-                newFormat = null;
+    
+                this.setRange(focusElement, 0, focusElement, 0);
+            }
+            // others format
+            else {
+                for (let i = 0, len = modifiedFormsts.length, node, newFormat; i < len; i++) {
+                    node = modifiedFormsts[i];
+                    
+                    if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.util.isComponent(node)) {
+                        newFormat = tag.cloneNode(false);
+                        this.util.copyFormatAttributes(newFormat, node);
+                        newFormat.innerHTML = node.innerHTML;
+    
+                        node.parentNode.insertBefore(newFormat, node);
+                        this.util.removeItem(node);
+                    }
+    
+                    if (i === 0) first = newFormat || node;
+                    if (i === len - 1) last = newFormat || node;
+                    newFormat = null;
+                }
+    
+                this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
             }
 
-            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            
             // history stack
             this.history.push(false);
         }

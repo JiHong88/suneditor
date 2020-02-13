@@ -3336,6 +3336,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             this.commandMap = {
                 FORMAT: context.tool.format,
+                FORMAT_TOOLTIP: context.tool.formatTooltip,
                 FONT: context.tool.font,
                 FONT_TOOLTIP: context.tool.fontTooltip,
                 SIZE: context.tool.fontSize,
@@ -3485,9 +3486,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (util.isFormatElement(selectionParent)) {
                     /* Format block */
                     if (findFormat && commandMap.FORMAT) {
-                        commandMapNodes.push('FORMAT');
                         core.callPlugin('formatBlock', function () {
-                            core.plugins.formatBlock.active.call(core, selectionParent);
+                            if (core.plugins.formatBlock.active.call(core, selectionParent)) commandMapNodes.push('FORMAT');
                         });
                         findFormat = false;
                     }
@@ -3571,7 +3571,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 
-                if (commandMap.FONT && /^FONT$/i.test(key)) {
+                if (commandMap.FORMAT && /^FORMAT$/i.test(key)) {
+                    util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
+                    util.changeTxt(commandMap.FORMAT_TOOLTIP, lang.toolbar.formats);
+                }
+                else if (commandMap.FONT && /^FONT$/i.test(key)) {
                     util.changeTxt(commandMap.FONT, lang.toolbar.font);
                     util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
                 }

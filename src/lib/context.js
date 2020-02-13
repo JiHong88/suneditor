@@ -46,6 +46,7 @@ const _Context = function (element, cons, options) {
             font: cons._toolBar.querySelector('._se_command_font_family .txt'),
             fontTooltip: cons._toolBar.querySelector('._se_command_font_family .se-tooltip-text'),
             format: cons._toolBar.querySelector('._se_command_format'),
+            formatTooltip: cons._toolBar.querySelector('._se_command_format .se-tooltip-text'),
             fontSize: cons._toolBar.querySelector('._se_command_font_size'),
             align: cons._toolBar.querySelector('._se_command_align'),
             list: cons._toolBar.querySelector('._se_command_list'),
