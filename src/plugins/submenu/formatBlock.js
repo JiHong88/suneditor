@@ -201,36 +201,53 @@ export default {
 
             // free format
             if (command === 'free') {
-                const getParentFunc = function (current) {
-                    return !this.isFormatElement(current);
-                }.bind(this.util);
-                const getBeforeFunc = function (current) {
-                    return !this.isFormatElement(current.parentNode);
-                }.bind(this.util);
-    
-                let parentNode = this.util.getParentElement(modifiedFormsts[0].parentNode, getParentFunc);
+                let parentNode = modifiedFormsts[0].parentNode;
                 let freeElement = tag.cloneNode(false);
                 const focusElement = freeElement;
     
-                for (let i = 0, len = modifiedFormsts.length, f, before, html, isComp, first = true; i < len; i++) {
+                for (let i = modifiedFormsts.length - 1, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
                     f = modifiedFormsts[i];
                     if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
     
                     isComp = this.util.isComponent(f);
                     html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
-                    before = this.util.getParentElement(f, getBeforeFunc);
+                    before = this.util.getParentElement(f, function (current) {
+                        return current.parentNode === parentNode;
+                    });
     
                     if (parentNode !== f.parentNode || isComp) {
-                        parentNode.insertBefore(freeElement, before);
-                        parentNode = before.parentNode;
+                        if (this.util.isFormatElement(parentNode)) {
+                            parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
+                            parentNode = parentNode.parentNode;
+                        } else {
+                            parentNode.insertBefore(freeElement, before ? before.nextSibling : null);
+                            parentNode = f.parentNode;
+                        }
+
+                        next = freeElement.nextSibling;
+                        if (next && freeElement.nodeName === next.nodeName && this.util.isSameAttributes(freeElement, next)) {
+                            freeElement.innerHTML += '<BR>' + next.innerHTML;
+                            this.util.removeItem(next);
+                        }
+
                         freeElement = tag.cloneNode(false);
+                        first = true;
                     }
     
-                    freeElement.innerHTML += (first || !html || /<br>$/i.test(html)) ? html : '<BR>' + html;
-                    first = false;
+                    inner = freeElement.innerHTML;
+                    freeElement.innerHTML = ((first || !html || !inner || /<br>$/i.test(html)) ? html : html + '<BR>') + inner;
 
-                    if (len - 1 === i) before.parentNode.insertBefore(freeElement, before);
-                    if (!isComp) this.util.removeItem(before);
+                    if (i === 0) {
+                        parentNode.insertBefore(freeElement, f);
+                        next = f.nextSibling;
+                        if (next && freeElement.nodeName === next.nodeName && this.util.isSameAttributes(freeElement, next)) {
+                            freeElement.innerHTML += '<BR>' + next.innerHTML;
+                            this.util.removeItem(next);
+                        }
+                    }
+
+                    if (!isComp) this.util.removeItem(f);
+                    if (!!html) first = false;
                 }
     
                 this.setRange(focusElement, 0, focusElement, 0);
