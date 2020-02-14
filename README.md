@@ -623,23 +623,25 @@ editor.toolbar.show();
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
-editor.onScroll = function (e) { console.log('onScroll', e) }
+editor.onScroll = function (e, core) { console.log('onScroll', e) }
 
-editor.onClick = function (e) { console.log('onClick', e) }
+editor.onClick = function (e, core) { console.log('onClick', e) }
 
-editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 
-editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
-editor.onDrop = function (e) { console.log('onDrop', e) }
+editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
-editor.onChange = function (contents) { console.log('onChange', contents) }
+editor.onChange = function (contents, core) { console.log('onChange', contents) }
+
+editor.onBlur = function (e, core) { console.log('onBlur', e) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
 editor.onload = function (core, reload) {
     console.log('onload-core', core)
-    console.log('onload-reload', reload)    
+    console.log('onload-reload', reload)
 }
 
 // Paste event.
@@ -649,7 +651,7 @@ editor.onload = function (core, reload) {
  * cleanData : HTML string modified for editor format
  * maxCharCount : maxChartCount option (true if max character is exceeded)
 */
-editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
+editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
 /**
@@ -665,7 +667,7 @@ editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', 
  * }
  * remainingFilesCount: Count of remaining image files
 */
-editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
     console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
@@ -676,7 +678,7 @@ editor.onImageUpload = function (targetImgElement, index, state, imageInfo, rema
  * errorMessage: Error message to show
  * result: Result object 
 */
-editor.onImageUploadError = function (errorMessage, result) {
+editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
 }
 
@@ -684,7 +686,7 @@ editor.onImageUploadError = function (errorMessage, result) {
  * toolbar: Toolbar Element
  * context: The editor's context object (editor.getContext())
 */
-editor.showInline = function (toolbar, context) {
+editor.showInline = function (toolbar, context, core) {
     console.log('toolbar', toolbar);
     console.log('context', context);
 }

@@ -157,7 +157,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount);
+            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, core);
         },
 
         /**
@@ -165,7 +165,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _imageUploadError: function (errorMessage, result) {
-            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result);
+            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result, core);
             return true;
         },
 
@@ -3766,7 +3766,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 else event._showToolbarBalloon(range);
             }
 
-            if (userFunction.onClick) userFunction.onClick(e);
+            if (userFunction.onClick) userFunction.onClick(e, core);
         },
 
         _showToolbarBalloon: function (rangeObj) {
@@ -3860,7 +3860,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
             core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             
-            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context);
+            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context, core);
 
             event.onScroll_window();
             core._inlineToolbarAttr.isShow = true;
@@ -4173,7 +4173,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            if (userFunction.onKeyDown) userFunction.onKeyDown(e);
+            if (userFunction.onKeyDown) userFunction.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -4247,13 +4247,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core.history.push(true);
             }
 
-            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
+            if (userFunction.onKeyUp) userFunction.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             if (core._isBalloon) event._hideToolbar();
-            if (userFunction.onScroll) userFunction.onScroll(e);
+            if (userFunction.onScroll) userFunction.onScroll(e, core);
+        },
+
+        onBlur_wysiwyg: function (e) {
+            if (core._isInline || core._isBalloon) event._hideToolbar();
+            if (userFunction.onBlur) userFunction.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -4370,7 +4375,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
             const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
 
-            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount)) {
+            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -4432,7 +4437,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            if (userFunction.onDrop) userFunction.onDrop(e);
+            if (userFunction.onDrop) userFunction.onDrop(e, core);
         },
 
         _setDropLocationSelection: function (e) {
@@ -4445,7 +4450,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         _onChange_historyStack: function () {
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (userFunction.onChange) userFunction.onChange(core.getContents(true));
+            if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
         },
 
         _addEvent: function () {
@@ -4463,6 +4468,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+            eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** Events are registered only a balloon mode or when there is a table plugin. */
             if (core._isBalloon || core.plugins.table) {
@@ -4494,11 +4500,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (core._isInline) {
                 eventWysiwyg.addEventListener('focus', event._showToolbarInline, false);
             }
-
-            /** inline, balloon editor */
-            if (core._isInline || core._isBalloon) {
-                eventWysiwyg.addEventListener('blur', event._hideToolbar, false);
-            }
             
             /** window event */
             _w.removeEventListener('resize', event.onResize_window);
@@ -4529,7 +4530,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
             eventWysiwyg.removeEventListener('focus', event._showToolbarInline);
-            eventWysiwyg.removeEventListener('blur', event._hideToolbar);
+            eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
             context.element.code.removeEventListener('keydown', event._codeViewAutoHeight);
             context.element.code.removeEventListener('keyup', event._codeViewAutoHeight);
@@ -4564,6 +4565,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onDrop: null,
         onChange: null,
         onPaste: null,
+        onBlur: null,
         showInline: null,
 
         /**

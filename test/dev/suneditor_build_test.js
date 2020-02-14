@@ -112,6 +112,9 @@ ss.onScroll = function (e) {
 ss.onClick = function (e) {
     console.log('onClick', e);
 };
+ss.onBlur = function (e, core) {
+    console.log('onBlur', e);
+};
 ss.onKeyDown = function (e) {
     console.log('onKeyDown', e);
 };
