@@ -3686,6 +3686,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @warning Events are registered only when there is a table plugin.
          */
         onMouseDown_wysiwyg: function (e) {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
+            
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
                 const tablePlugin = core.plugins.table;
