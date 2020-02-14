@@ -431,6 +431,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             const commandMap = this.commandMap;
             util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
+            util.changeTxt(commandMap.FORMAT_TOOLTIP, lang.toolbar.formats);
             util.changeTxt(commandMap.FONT, lang.toolbar.font);
             util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
             util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);

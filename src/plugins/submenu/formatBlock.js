@@ -201,11 +201,12 @@ export default {
 
             // free format
             if (command === 'free') {
-                let parentNode = modifiedFormsts[0].parentNode;
+                const len = modifiedFormsts.length - 1;
+                let parentNode = modifiedFormsts[len].parentNode;
                 let freeElement = tag.cloneNode(false);
                 const focusElement = freeElement;
     
-                for (let i = modifiedFormsts.length - 1, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
+                for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
                     f = modifiedFormsts[i];
                     if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
     
@@ -243,6 +244,12 @@ export default {
                         if (next && freeElement.nodeName === next.nodeName && this.util.isSameAttributes(freeElement, next)) {
                             freeElement.innerHTML += '<BR>' + next.innerHTML;
                             this.util.removeItem(next);
+                        }
+
+                        const prev = freeElement.previousSibling;
+                        if (prev && freeElement.nodeName === prev.nodeName && this.util.isSameAttributes(freeElement, prev)) {
+                            prev.innerHTML += '<BR>' + freeElement.innerHTML;
+                            this.util.removeItem(freeElement);
                         }
                     }
 
