@@ -263,7 +263,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertContentsForEditor"><span class="type-signature"></span>convertContentsForEditor<span class="signature">(contents)</span><span
+            <h4 class="name" id="convertContentsForEditor"><span class="type-signature"></span>convertContentsForEditor<span class="signature">(contents, whitelist)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Converts contents into a format that can be placed in an editor.
@@ -284,6 +284,16 @@
                         <span class="param-type">String</span>
                     </td>
                     <td class="description last">Contents</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>whitelist</code></td>
+                    <td class="type">
+                        <span class="param-type">String|RegExp</span>
+                    </td>
+                    <td class="description last">
+                        Regular expression of allowed tags.<br>
+                        RegExp object is create by <a href="#createTagsWhitelist">util.createTagsWhitelist</a> method. (<a href="./document-editor.html#editorTagsWhitelistRegExp">core.editorTagsWhitelistRegExp</a>, <a href="./document-editor.html#pasteTagsWhitelistRegExp">core.pasteTagsWhitelistRegExp</a>)
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -1712,7 +1722,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html)</span><span
+        <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html, whitelist)</span><span
                 class="type-signature"> &rarr; {String}</span></h4>
         <div class="description">
             Gets the clean HTML code for editor
@@ -1733,6 +1743,44 @@
                     <span class="param-type">String</span>
                 </td>
                 <td class="description last">HTML string</td>
+            </tr>
+            <tr>
+                <td class="name"><code>whitelist</code></td>
+                <td class="type">
+                    <span class="param-type">String|RegExp</span>
+                </td>
+                <td class="description last">
+                    Regular expression of allowed tags.<br>
+                    RegExp object is create by <a href="#createTagsWhitelist">util.createTagsWhitelist</a> method. (<a href="./document-editor.html#editorTagsWhitelistRegExp">core.editorTagsWhitelistRegExp</a>, <a href="./document-editor.html#pasteTagsWhitelistRegExp">core.pasteTagsWhitelistRegExp</a>)
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="createTagsWhitelist"><span class="type-signature"></span>createTagsWhitelist<span class="signature">(list)</span><span
+                class="type-signature"> &rarr; {RegExp}</span></h4>
+        <div class="description">
+            Create whitelist RegExp object.<br>
+            Return RegExp format: new RegExp("<span style="color:#d73a49">&lt;\\/?(</span><span style="color: #23853a;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0a3667">?!\\b<span style="color: #23853a;">list[i]</span>\\b</span><span style="color: #23853a;">)</span><span style="color:#d73a49">)[^>^&gt;])+></span>", "<span style="color:#d73a49">g</span>")
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>list</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">Tags list ("br|p|div|pre...")</td>
             </tr>
             </tbody>
         </table>
@@ -1805,6 +1853,7 @@
         <li><a href="document-util.html#removeItemAllParents">removeItemAllParents</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
         <li><a href="document-util.html#cleanHTML">cleanHTML</a></li>
+        <li><a href="document-util.html#createTagsWhitelist">createTagsWhitelist</a></li>
     </ul>
 </nav>
 

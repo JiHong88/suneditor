@@ -23,6 +23,7 @@ let s1 = suneditor.create('editor', {
 //   mode: 'balloon',
   buttonList: [['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
   width: '100%',
+  pasteTagsWhitelist: 'p|h[1-6]',
   formats: [
         { 
             tag: 'div', // Tag name
@@ -92,6 +93,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
+    fullPage: true,
+    addTagsWhitelist: 'mark|canvas|label|select|option|input'
     // mode: 'inline'
     // videoHeightShow: false,
     // videoRatioShow: false,
@@ -168,7 +171,7 @@ window.sun_getContents = function () {
 }
 
 window.sun_setContents = function (content) {
-    ss.setContents('<p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"></p>');
+    ss.setContents('<img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300">');
     ss.core.history.reset(true);
     // ss.core.context.tool.save.disabled = true;
 }
@@ -306,7 +309,7 @@ const newOption = {
     placeholder: 'Placeholder...'
 }
 const newOption2 = {
-    plugins: plugins,
+    plugins: [plugins.align],
     mode: 'classic',
     maxHeight: '400px',
     height: 150,

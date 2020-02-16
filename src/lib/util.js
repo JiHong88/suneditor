@@ -212,9 +212,11 @@ const util = {
     /**
      * @description Converts contents into a format that can be placed in an editor
      * @param {String} contents contents
+     * @param {String|RegExp} whitelist Regular expression of allowed tags.
+     * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
      * @returns {String}
      */
-    convertContentsForEditor: function (contents) {
+    convertContentsForEditor: function (contents, whitelist) {
         let returnHTML = '';
         let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
@@ -238,7 +240,7 @@ const util = {
             returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
         }
 
-        return this._tagConvertor(returnHTML.replace(this._deleteExclusionTags, ''));
+        return this._tagConvertor(!whitelist ? returnHTML : returnHTML.replace(typeof whitelist === 'string' ? this.createTagsWhitelist(whitelist) : whitelist, ''));
     },
 
     /**
@@ -1066,9 +1068,11 @@ const util = {
     /**
      * @description Gets the clean HTML code for editor
      * @param {String} html HTML string
+     * @param {String|RegExp} whitelist Regular expression of allowed tags.
+     * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
      * @returns {String}
      */
-    cleanHTML: function (html) {
+    cleanHTML: function (html, whitelist) {
         const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).childNodes;
         let cleanHTML = '';
@@ -1091,10 +1095,9 @@ const util = {
                 }
                 return t;
             })
-            .replace(/<\/?(span[^>^<]*)>/g, '')
-            .replace(this._deleteExclusionTags, '');
+            .replace(/<\/?(span[^>^<]*)>/g, '');
 
-        return this._tagConvertor(cleanHTML || html);
+        return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? this.createTagsWhitelist(whitelist) : whitelist, ''));
     },
 
     /**
@@ -1128,12 +1131,14 @@ const util = {
     },
 
     /**
-     * @description Delete Exclusion tags regexp object
-     * @returns {Object}
+     * @description Create whitelist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * @param {String} list Tags list ("br|p|div|pre...")
+     * @returns {RegExp}
      * @private
      */
-    _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark|canvas|label|select|option|input'.split('|');
+    createTagsWhitelist: function (list) {
+        const exclusionTags = list.split('|');
         let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
@@ -1143,7 +1148,7 @@ const util = {
         regStr += '[^>^<])+>';
 
         return new RegExp(regStr, 'g');
-    })()
+    }
 };
 
 export default util;

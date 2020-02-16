@@ -55,6 +55,7 @@ const _Context = function (element, cons, options) {
             save: cons._toolBar.querySelector('._se_command_save'),
             outdent: cons._toolBar.querySelector('._se_command_outdent')
         },
+        options: options,
         option: options
     };
 };

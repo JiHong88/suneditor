@@ -110,6 +110,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         history: null,
 
         /**
+         * @description Editor tags whitelist (RegExp object)
+         * util.createTagsWhitelist(options._editorTagsWhitelist)
+         */
+        editorTagsWhitelistRegExp: null,
+
+        /**
+         * @description Tag whitelist when pasting (RegExp object)
+         * util.createTagsWhitelist(options.pasteTagsWhitelist)
+         */
+        pasteTagsWhitelistRegExp: null,
+
+        /**
          * @description binded controllersOff method
          * @private
          */
@@ -2920,7 +2932,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML);
+                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML, this.editorTagsWhitelistRegExp);
 
                 const attrs = parseDocument.body.attributes;
                 for (let i = 0, len = attrs.length; i < len; i++) {
@@ -2928,7 +2940,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
                 }
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html, this.editorTagsWhitelistRegExp) : '<p><br></p>';
             }
         },
 
@@ -3142,7 +3154,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} html HTML string
          */
         setContents: function (html) {
-            const convertValue = util.convertContentsForEditor(html);
+            const convertValue = util.convertContentsForEditor(html, this.editorTagsWhitelistRegExp);
             this._resetComponents();
 
             if (!core._variable.isCodeView) {
@@ -3330,6 +3342,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (typeof userFunction.onload === 'function') return userFunction.onload(core, reload);
             }.bind(this));
+
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(context.option._editorTagsWhitelist);
+            this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(context.option.pasteTagsWhitelist);
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             this._isInline = /inline/i.test(context.option.mode);
@@ -4375,7 +4390,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (!clipboardData) return true;
 
             const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
-            const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
+            const cleanData = util.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
             if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
@@ -4432,7 +4447,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 return false;
             // html paste
             } else {
-                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'));
+                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
                 if (cleanData) {
                     event._setDropLocationSelection(e);
                     core.execCommand('insertHTML', false, cleanData);
@@ -4745,10 +4760,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
-            const convertValue = util.convertContentsForEditor(contents);
+            const convertValue = util.convertContentsForEditor(contents, this.editorTagsWhitelistRegExp);
             
             if (!core._variable.isCodeView) {
-                context.element.wysiwyg.innerHTML += convertValue;
+                const temp = util.createElement('DIV');
+                temp.innerHTML = convertValue;
+
+                const wysiwyg = context.element.wysiwyg;
+                const children = temp.children;
+                for (let i = 0, len = children.length; i < len; i++) {
+                    wysiwyg.appendChild(children[i]);
+                }
             } else {
                 core._setCodeView(core._getCodeView() + '\n' + util.convertHTMLForCodeView(convertValue, core._variable.codeIndent));
             }

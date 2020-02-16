@@ -31,7 +31,7 @@ export default {
      * @description Create the suneditor
      * @param {String|Element} idOrElement textarea Id or textarea element
      * @param {Json} options user options
-     * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+     * @returns {Object}
      */
     create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};

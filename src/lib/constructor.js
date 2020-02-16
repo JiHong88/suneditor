@@ -49,7 +49,7 @@ export default {
         editor_div.className = 'se-wrapper';
 
         /** --- init elements and create bottom bar --- */
-        const initHTML = util.convertContentsForEditor(element.value);
+        const initHTML = util.convertContentsForEditor(element.value, options._editorTagsWhitelist);
         const initElements = this._initElements(options, top_div, tool_bar.element, arrow, initHTML);
 
         const bottomBar = initElements.bottomBar;
@@ -365,6 +365,9 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
+        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
+        options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
+        options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
