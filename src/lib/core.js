@@ -4611,7 +4611,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.plugins = options.plugins || core.plugins;
             const mergeOptions = [context.option, options].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
-                    init[key] = option[key];
+                    if (key === 'plugins' && option[key] && init[key]) {
+                        let i = init[key], o = option[key];
+                        i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });
+                        o = o.length ? o : Object.keys(o).map(function(name) { return o[name]; });
+                        init[key] = (o.filter(function(val) { return i.indexOf(val) === -1; })).concat(i);
+                    } else {
+                        init[key] = option[key];
+                    }
                 });
                 return init;
             }, {});
