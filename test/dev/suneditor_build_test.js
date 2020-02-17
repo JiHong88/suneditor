@@ -21,7 +21,7 @@ const align = require('../../src/plugins/submenu/align')
 let s1 = suneditor.create('editor', {
   plugins: plugins,
 //   mode: 'balloon',
-  buttonList: [['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
+  buttonList: [['blockquote'],['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
   width: '100%',
   pasteTagsWhitelist: 'p|h[1-6]',
   formats: [
@@ -37,7 +37,8 @@ let s1 = suneditor.create('editor', {
             command: 'replace', // default: "replace" 
             class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
         },
-        'pre'
+        'pre',
+        'blockquote'
     ]
 })
 
@@ -62,7 +63,7 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.destroy();
+    s1.core.focus();
 }
 
 window.sun_create1 = function () {
@@ -108,6 +109,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 
 ss.onload = function (core) {
     console.log('onload', core);
+    core.focus();
 };
 ss.onScroll = function (e) {
     console.log('onScroll', e);

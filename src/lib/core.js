@@ -3350,7 +3350,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._isInline = /inline/i.test(context.option.mode);
             this._isBalloon = /balloon/i.test(context.option.mode);
 
+            Object.keys(plugins).forEach(function (key) {
+                if (plugins[key].command === 'command') {
+                    core.callPlugin(key, null);
+                }
+            });
+
             this.commandMap = {
+                BLOCKQUOTE: this.plugins.blockquote,
                 FORMAT: context.tool.format,
                 FORMAT_TOOLTIP: context.tool.formatTooltip,
                 FONT: context.tool.font,
@@ -3489,7 +3496,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
+            let findBlockquote = true, findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -3497,6 +3504,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (selectionParent.nodeType !== 1 || util.isBreak(selectionParent)) continue;
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
+
+                /** Range format */
+                /* Blockquote */
+                if (findBlockquote && /blockquote/i.test(selectionParent.nodeName) && commandMap.BLOCKQUOTE) {
+                    commandMap.BLOCKQUOTE.active.call(core, true);
+                    commandMapNodes.push('BLOCKQUOTE');
+                    findBlockquote = false;
+                }
 
                 /** Format */
                 if (util.isFormatElement(selectionParent)) {
@@ -3587,7 +3602,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 
-                if (commandMap.FORMAT && /^FORMAT$/i.test(key)) {
+                if (commandMap.BLOCKQUOTE && /^BLOCKQUOTE$/i.test(key)) {
+                    commandMap.BLOCKQUOTE.active.call(core, false);
+                }
+                else if (commandMap.FORMAT && /^FORMAT$/i.test(key)) {
                     util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
                     util.changeTxt(commandMap.FORMAT_TOOLTIP, lang.toolbar.formats);
                 }
@@ -3685,6 +3703,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         core.plugins.dialog.open.call(core, command, false);
                     });
                     return;
+                }
+                else if (/command/.test(display)) {
+                    core.callPlugin(command, function () {
+                        core.plugins[command].action.call(core);
+                    });
                 }
 
                 core.submenuOff();
@@ -4466,6 +4489,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _onChange_historyStack: function () {
+            event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
         },

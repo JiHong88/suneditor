@@ -448,7 +448,7 @@ export default {
      */
     _defaultButtons: function (lang) {
         return {
-            /** command */
+            /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
                 '<i class="se-icon-bold"></i>'
             ],
@@ -515,6 +515,11 @@ export default {
 
             save: ['_se_command_save', lang.toolbar.save, 'save', '',
                 '<i class="se-icon-save"></i>', true
+            ],
+
+            /** plugins - command */
+            blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
+                '<i class="se-icon-audio"></i>'
             ],
 
             /** plugins - submenu */
