@@ -53,7 +53,7 @@
             hr_dashed: 'Dashed',
             table: 'Table',
             link: 'Link',
-            math: 'math',
+            math: 'Math',
             image: 'Image',
             video: 'Video',
             fullScreen: 'Full screen',
