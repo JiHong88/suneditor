@@ -12,6 +12,8 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.font = {
+            targetText: targetElement.querySelector('.txt'),
+            targetTooltip: targetElement.parentNode.querySelector('.se-tooltip-text'),
             _fontList: null,
             currentFont: ''
         };
@@ -65,10 +67,28 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        const target = this.context.font.targetText;
+        const tooltip = this.context.font.targetTooltip;
+
+        if (!element) {
+            const font = this.lang.toolbar.font;
+            this.util.changeTxt(target, font);
+            this.util.changeTxt(tooltip, font);
+        } else if (element.style.fontFamily.length > 0) {
+            const selectFont = element.style.fontFamily.replace(/["']/g,'');
+            this.util.changeTxt(target, selectFont);
+            this.util.changeTxt(tooltip, selectFont);
+            return true;
+        }
+
+        return false;
+    },
+
     on: function () {
         const fontContext = this.context.font;
         const fontList = fontContext._fontList;
-        const currentFont = this.commandMap.FONT.textContent;
+        const currentFont = fontContext.targetText.textContent;
 
         if (currentFont !== fontContext.currentFont) {
             for (let i = 0, len = fontList.length; i < len; i++) {

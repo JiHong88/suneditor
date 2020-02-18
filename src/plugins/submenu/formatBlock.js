@@ -12,6 +12,8 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.formatBlock = {
+            targetText: targetElement.querySelector('.txt'),
+            targetTooltip: targetElement.parentNode.querySelector('.se-tooltip-text'),
             _formatList: null,
             currentFormat: ''
         };
@@ -72,32 +74,43 @@ export default {
     },
 
     active: function (element) {
-        const formatContext = this.context.formatBlock;
-        const formatList = formatContext._formatList;
-        const nodeName = element.nodeName.toLowerCase();
-        const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
-        let formatTitle = this.lang.formats;
+        let formatTitle = this.lang.toolbar.formats;
+        const target = this.context.formatBlock.targetText;
+        const tooltip = this.context.formatBlock.targetTooltip;
 
-        for (let i = 0, len = formatList.length, f; i < len; i++) {
-            f = formatList[i];
-            if (nodeName === f.getAttribute('data-value') && className === f.getAttribute('data-class')) {
-                formatTitle = f.title;
-                break;
+        if (!element) {
+            this.util.changeTxt(target, formatTitle);
+            this.util.changeTxt(tooltip, formatTitle);
+        } else if (this.util.isFormatElement(element)) {
+            const formatContext = this.context.formatBlock;
+            const formatList = formatContext._formatList;
+            const nodeName = element.nodeName.toLowerCase();
+            const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
+
+            for (let i = 0, len = formatList.length, f; i < len; i++) {
+                f = formatList[i];
+                if (nodeName === f.getAttribute('data-value') && className === f.getAttribute('data-class')) {
+                    formatTitle = f.title;
+                    break;
+                }
             }
+
+            this.util.changeTxt(target, formatTitle);
+            this.util.changeTxt(tooltip, formatTitle);
+            target.setAttribute('data-value', nodeName);
+            target.setAttribute('data-class', className);
+
+            return true;
         }
 
-        this.util.changeTxt(this.commandMap.FORMAT, formatTitle);
-        this.util.changeTxt(this.commandMap.FORMAT_TOOLTIP, formatTitle);
-        this.commandMap.FORMAT.setAttribute('data-value', nodeName);
-        this.commandMap.FORMAT.setAttribute('data-class', className);
-
-        return formatTitle !== this.lang.formats;
+        return false;
     },
 
     on: function () {
         const formatContext = this.context.formatBlock;
         const formatList = formatContext._formatList;
-        const currentFormat = (this.commandMap.FORMAT.getAttribute('data-value') || '') + (this.commandMap.FORMAT.getAttribute('data-class') || '');
+        const target = formatContext.targetText;
+        const currentFormat = (target.getAttribute('data-value') || '') + (target.getAttribute('data-class') || '');
 
         if (currentFormat !== formatContext.currentFormat) {
             for (let i = 0, len = formatList.length, f; i < len; i++) {

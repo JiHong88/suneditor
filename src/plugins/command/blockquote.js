@@ -13,9 +13,20 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.blockquote = {
-            commandButton: targetElement,
+            targetButton: targetElement,
             tag: core.util.createElement('BLOCKQUOTE')
         };
+    },
+
+    active: function (element) {
+        if (!element) {
+            this.util.removeClass(this.context.blockquote.targetButton, 'active');
+        } else if (/blockquote/i.test(element.nodeName)) {
+            this.util.addClass(this.context.blockquote.targetButton, 'active');
+            return true;
+        }
+        
+        return false;
     },
 
     action: function () {
@@ -25,16 +36,6 @@ export default {
             this.detachRangeFormatElement(currentBlockquote, this.getSelectedElements(), null, false, false);
         } else {
             this.applyRangeFormatElement(this.context.blockquote.tag.cloneNode(false));
-        }
-    },
-
-    active: function (element) {
-        if (!!element && /blockquote/i.test(element.nodeName)) {
-            this.util.addClass(this.context.blockquote.commandButton, 'active');
-            return true;
-        } else {
-            this.util.removeClass(this.context.blockquote.commandButton, 'active');
-            return false;
         }
     }
 };

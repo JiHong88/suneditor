@@ -182,13 +182,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Plugins array with active method
+         */
+        commandPlugins: null,
+
+        /**
          * @description Elements that need to change text or className for each selection change
-         * @property {Element} FORMAT format button > span.txt
-         * @property {Element} FONT font family button > span.txt
-         * @property {Element} FONT_TOOLTIP font family tooltip element
-         * @property {Element} SIZE font size button > span.txt
-         * @property {Element} ALIGN align button > div.icon
-         * @property {Element} LI list button
+         * After creating the editor, "commandPlugins" are added.
          * @property {Element} STRONG bold button
          * @property {Element} INS underline button
          * @property {Element} EM italic button
@@ -442,14 +442,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.getSelection().removeAllRanges();
 
             const commandMap = this.commandMap;
-            util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
-            util.changeTxt(commandMap.FORMAT_TOOLTIP, lang.toolbar.formats);
-            util.changeTxt(commandMap.FONT, lang.toolbar.font);
-            util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
-            util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
-            util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-            util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-            util.removeClass(commandMap.LI, 'active');
             util.removeClass(commandMap.STRONG, 'active');
             util.removeClass(commandMap.INS, 'active');
             util.removeClass(commandMap.EM, 'active');
@@ -458,11 +450,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             util.removeClass(commandMap.SUP, 'active');
 
             if (commandMap.OUTDENT) commandMap.OUTDENT.setAttribute('disabled', true);
-            if (commandMap.LI) commandMap.LI.removeAttribute('data-focus');
-            if (commandMap.ALIGN) {
-                commandMap.ALIGN.className = 'se-icon-align-left';
-                commandMap.ALIGN.removeAttribute('data-focus');
-            }
         },
 
         /**
@@ -3350,22 +3337,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._isInline = /inline/i.test(context.option.mode);
             this._isBalloon = /balloon/i.test(context.option.mode);
 
-            Object.keys(plugins).forEach(function (key) {
-                if (plugins[key].command === 'command') {
-                    core.callPlugin(key, null);
-                }
-            });
-
             this.commandMap = {
-                BLOCKQUOTE: this.plugins.blockquote,
-                FORMAT: context.tool.format,
-                FORMAT_TOOLTIP: context.tool.formatTooltip,
-                FONT: context.tool.font,
-                FONT_TOOLTIP: context.tool.fontTooltip,
-                SIZE: context.tool.fontSize,
-                ALIGN: context.tool.align,
                 LI: context.tool.list,
                 LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
+                SIZE: context.tool.fontSize,
+                ALIGN: context.tool.align,
+
                 STRONG: context.tool.bold,
                 INS: context.tool.underline,
                 EM: context.tool.italic,
@@ -3374,6 +3351,21 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 SUP: context.tool.superscript,
                 OUTDENT: context.tool.outdent
             };
+
+            // Command plugins registration
+            const commandPlugins = [];
+            Object.keys(plugins).forEach(function (key) {
+                const c = plugins[key];
+                const button = pluginCallButtons[key];
+                if (button) {
+                    core.callPlugin(key, button);
+                    if (c.active) {
+                        core.commandMap[c.name] = button;
+                        commandPlugins.push(c.name);
+                    }
+                }
+            });
+            this.commandPlugins = commandPlugins;
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
@@ -3496,6 +3488,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const commandMapNodes = [];
             const currentNodes = [];
 
+            const commandPlugins = core.commandPlugins;
+            const cLen = commandPlugins.length;
+
             let findBlockquote = true, findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
             let nodeName = '';
 
@@ -3505,24 +3500,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 
-                /** Range format */
-                /* Blockquote */
-                if (findBlockquote && /blockquote/i.test(selectionParent.nodeName) && commandMap.BLOCKQUOTE) {
-                    commandMap.BLOCKQUOTE.active.call(core, true);
-                    commandMapNodes.push('BLOCKQUOTE');
-                    findBlockquote = false;
+                /* Command plugins */
+                for (let c = 0, name; c < cLen; c++) {
+                    name = commandPlugins[c];
+                    if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, selectionParent)) {
+                        commandMapNodes.push(name);
+                    }
                 }
 
-                /** Format */
                 if (util.isFormatElement(selectionParent)) {
-                    /* Format block */
-                    if (findFormat && commandMap.FORMAT) {
-                        core.callPlugin('formatBlock', function () {
-                            if (core.plugins.formatBlock.active.call(core, selectionParent)) commandMapNodes.push('FORMAT');
-                        });
-                        findFormat = false;
-                    }
-
                     /* Align */
                     const textAlign = selectionParent.style.textAlign;
                     if (findAlign && textAlign && commandMap.ALIGN) {
@@ -3602,16 +3588,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 
-                if (commandMap.BLOCKQUOTE && /^BLOCKQUOTE$/i.test(key)) {
-                    commandMap.BLOCKQUOTE.active.call(core, false);
-                }
-                else if (commandMap.FORMAT && /^FORMAT$/i.test(key)) {
-                    util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
-                    util.changeTxt(commandMap.FORMAT_TOOLTIP, lang.toolbar.formats);
-                }
-                else if (commandMap.FONT && /^FONT$/i.test(key)) {
-                    util.changeTxt(commandMap.FONT, lang.toolbar.font);
-                    util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
+                if (commandPlugins.indexOf(key) > -1) {
+                    plugins[key].active.call(core, null);
                 }
                 else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
                     util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);

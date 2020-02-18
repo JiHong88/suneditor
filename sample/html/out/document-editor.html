@@ -757,10 +757,19 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="commandPlugins"><span class="type-signature"></span>commandPlugins<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Plugins array with active method.
+            </div>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="commandMap"><span class="type-signature"></span>commandMap<span
                     class="type-signature"></span></h4>
             <div class="description">
-                Elements that need to change text or className for each selection change
+                Elements that need to change text or className for each selection change.<br>
+                After creating the editor, <a href="#commandPlugins">commandPlugins</a> are added.
             </div>
             <h5 class="subsection-title">Properties:</h5>
             <table class="props">
@@ -772,48 +781,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td class="name"><code>FORMAT</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">format button > span.txt</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>FONT</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">font family button > span.txt</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>FONT_TOOLTIP</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">font family tooltip element</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>SIZE</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">font size button > span.txt</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>ALIGN</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">align button > div.icon</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>LI</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">list button</td>
-                </tr>
                 <tr>
                     <td class="name"><code>STRONG</code></td>
                     <td class="type">
@@ -1908,6 +1875,7 @@
         <li><a href="document-editor.html#controllerArray">controllerArray</a></li>
         <li><a href="document-editor.html#controllerFunction">controllerFunction</a></li>
         <li><a href="document-editor.html#codeViewDisabledButtons">codeViewDisabledButtons</a></li>
+        <li><a href="document-editor.html#commandPlugins">commandPlugins</a></li>
         <li><a href="document-editor.html#commandMap">commandMap</a></li>
         <li><a href="document-editor.html#_variable">_variable</a></li>
         <li><b>Methods</b></li>
