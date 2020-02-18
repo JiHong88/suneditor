@@ -3466,7 +3466,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
+            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true, findMath = true;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -3544,6 +3544,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     }
                     findA = false;
                 } else if (findA && context.link && core.controllerArray[0] === context.link.linkBtn) {
+                    core.controllersOff();
+                }
+
+                /** Math */
+                if (findMath && core.plugins.math && selectionParent.getAttribute('data-exp')) {
+                    if (!context.math || core.controllerArray[0] !== context.math.mathBtn) {
+                        core.callPlugin('math', function () {
+                            core.plugins.math.call_controller_mathButton.call(core, selectionParent);
+                        });
+                    }
+                    findMath = false;
+                } else if (findMath && context.math && core.controllerArray[0] === context.math.mathBtn) {
                     core.controllersOff();
                 }
 

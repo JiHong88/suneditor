@@ -53,6 +53,7 @@
             hr_dashed: 'Dashed',
             table: 'Table',
             link: 'Link',
+            math: 'math',
             image: 'Image',
             video: 'Video',
             fullScreen: 'Full screen',
@@ -78,6 +79,12 @@
                 url: 'URL to link',
                 text: 'Text to display',
                 newWindowCheck: 'Open in new window'
+            },
+            mathBox: {
+                title: 'Math',
+                inputLabel: 'Mathematical Notation',
+                fontSizeLabel: 'Font Size',
+                previewLabel: 'Preview'
             },
             imageBox: {
                 title: 'Insert image',

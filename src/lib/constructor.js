@@ -576,6 +576,9 @@ export default {
 
             video: ['', lang.toolbar.video, 'video', 'dialog',
                 '<i class="se-icon-video"></i>'
+            ],
+            math: ['', lang.toolbar.math, 'math', 'dialog',
+                '<strong style="font-size: 1.3rem;">√</strong>'
             ]
         };
     },
