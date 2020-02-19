@@ -78,38 +78,38 @@ export default {
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = `
-        <form class='editor_math'>
-            <div class='se-dialog-header'>
-                <button type='button' data-command='close' class='close' aria-label='Close' title='${lang.dialogBox.close}'>
-                    <i aria-hidden='true' data-command='close' class='se-icon-cancel'></i>
-                </button>
-                <span class='se-modal-title'>${lang.dialogBox.mathBox.title}</span>
-            </div>
-            <div class='se-dialog-body'>
-                <div class='se-dialog-form'>
-                    <label>${lang.dialogBox.mathBox.inputLabel} (<a href='https://katex.org/docs/supported.html' target='_blank'>KaTeX</a>):</label>
-                    <textarea style='height: 4rem;border: 1px solid #ccc !important;' class='se-input-form _se_math_exp' type='text'></textarea>
-                </div>
-                <div class='se-dialog-form'>
-                    <label>${lang.dialogBox.mathBox.fontSizeLabel}:</label>
-                    <select style='width:6em;margin-left: 1em;' class='_se_math_size'>
-                        <option value='1em'>1</option>
-                        <option value='1.5em'>1.5</option>
-                        <option value='2em'>2</option>
-                        <option value='2.5em'>2.5</option>
-                    </select>
-                </div>
-                <div class='se-dialog-form'>
-                    <label>${lang.dialogBox.mathBox.previewLabel}:</label>
-                    <p style='font-size:13px;' class='_se_math_preview'></p>
-                </div>
-            </div>
-            <div class='se-dialog-footer'>
-                <button type='submit' class='se-btn-primary' title='${lang.dialogBox.submitButton}'><span>${lang.dialogBox.submitButton}</span></button>
-            </div>
-        </form>
-        `;
+        dialog.innerHTML = '' +
+        '<form class="editor_math">' +
+            '<div class="se-dialog-header">' +
+                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                '</button>' +
+                '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +
+            '</div>' +
+            '<div class="se-dialog-body">' +
+                '<div class="se-dialog-form">' +
+                    '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>):</label>' +
+                    '<textarea style="height: 4rem;border: 1px solid #ccc !important;" class="se-input-form _se_math_exp" type="text"></textarea>' +
+                '</div>' +
+                '<div class="se-dialog-form">' +
+                    '<label>' + lang.dialogBox.mathBox.fontSizeLabel + ':</label>' +
+                    '<select style="width:6em;margin-left: 1em;" class="_se_math_size">' +
+                        '<option value="1em">1</option>' +
+                        '<option value="1.5em">1.5</option>' +
+                        '<option value="2em">2</option>' +
+                        '<option value="2.5em">2.5</option>' +
+                    '</select>' +
+                '</div>' +
+                '<div class="se-dialog-form">' +
+                    '<label>' + lang.dialogBox.mathBox.previewLabel + ':</label>' +
+                    '<p style="font-size:13px;" class="_se_math_preview"></p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="se-dialog-footer">' +
+                '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+            '</div>' +
+        '</form>' +
+        '';
 
         return dialog;
     },
@@ -120,21 +120,21 @@ export default {
         const math_btn = this.util.createElement('DIV');
 
         math_btn.className = 'se-controller se-controller-link';
-        math_btn.innerHTML = `
-        <div class='se-arrow se-arrow-up'></div>
-        <div class='link-content'>
-            <div class='se-btn-group'>
-                <button type='button' data-command='update' tabindex='-1' class='se-tooltip'>
-                    <i class='se-icon-edit'></i>
-                    <span class='se-tooltip-inner'><span class='se-tooltip-text'>${lang.controller.edit}</span></span>
-                </button>
-                <button type='button' data-command='delete' tabindex='-1' class='se-tooltip'>
-                    <i class='se-icon-delete'></i>
-                    <span class='se-tooltip-inner'><span class='se-tooltip-text'>${lang.controller.remove}</span></span>
-                </button>
-            </div>
-        </div>
-        `;
+        math_btn.innerHTML = '' +
+        '<div class="se-arrow se-arrow-up"></div>' +
+        '<div class="link-content">' +
+            '<div class="se-btn-group">' +
+                '<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
+                    '<i class="se-icon-edit"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
+                '</button>' +
+                '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
+                    '<i class="se-icon-delete"></i>' +
+                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
+                '</button>' +
+            '</div>' +
+        '</div>' +
+        '';
 
         return math_btn;
     },
@@ -150,9 +150,7 @@ export default {
 
             const contextMath = this.context.math;
             const mathExp = contextMath.focusElement.value;
-            const katexEl = new this._w.DOMParser()
-                .parseFromString(contextMath.previewElement.innerHTML, 'text/html')
-                .querySelector('.katex');
+            const katexEl = contextMath.previewElement.querySelector('.katex');
             katexEl.setAttribute('data-exp', mathExp);
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
@@ -171,7 +169,7 @@ export default {
                 const empty = this.util.createTextNode(this.util.zeroWidthSpace);
                 katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
             } else {
-                const findParent = (child, className) => {
+                const findParent = function (child, className) {
                     if (child.classList.contains(className)) return child;
 
                     const parent = child.parentNode;
