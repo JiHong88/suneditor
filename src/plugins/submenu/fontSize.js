@@ -12,6 +12,7 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.fontSize = {
+            targetText: targetElement.querySelector('.txt'),
             _sizeList: null,
             currentSize: ''
         };
@@ -55,10 +56,21 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        if (!element) {
+            this.util.changeTxt(this.context.fontSize.targetText, this.lang.toolbar.fontSize);
+        } else if (element.style.fontSize.length > 0) {
+            this.util.changeTxt(this.context.fontSize.targetText, element.style.fontSize);
+            return true;
+        }
+
+        return false;
+    },
+
     on: function () {
         const fontSizeContext = this.context.fontSize;
         const sizeList = fontSizeContext._sizeList;
-        const currentSize = this.commandMap.SIZE.textContent;
+        const currentSize = fontSizeContext.targetText.textContent;
 
         if (currentSize !== fontSizeContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {

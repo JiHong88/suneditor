@@ -284,6 +284,14 @@ plugins: [
     video
 ]               : Plugins array.     default: null {Array}
 
+// Tags whitelist--------------------------------------å---------------------------------------------------------
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
+                        ex) 'mark|canvas|label|select|option|input'
+// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
+pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
+                        ex) 'p|h[1-6]'
+
 // Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
@@ -355,12 +363,14 @@ fontSizeUnit    : The font size unit.                               default: 'px
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+                    // "blockquote": range format, "pre": free format, "Other tags": replace format
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
-                    command: 'replace' || 'range', // default: "replace"
-                    class: '__se__format__xxx' || null, // Class names must always begin with "__se__format__"
+                    command: 'replace' || 'range' || 'free', // default: "replace"
+                    class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx'
+                    // Class names must always begin with "__se__format__(replace, range, free)_"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
@@ -621,23 +631,25 @@ editor.toolbar.show();
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
-editor.onScroll = function (e) { console.log('onScroll', e) }
+editor.onScroll = function (e, core) { console.log('onScroll', e) }
 
-editor.onClick = function (e) { console.log('onClick', e) }
+editor.onClick = function (e, core) { console.log('onClick', e) }
 
-editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 
-editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
-editor.onDrop = function (e) { console.log('onDrop', e) }
+editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
-editor.onChange = function (contents) { console.log('onChange', contents) }
+editor.onChange = function (contents, core) { console.log('onChange', contents) }
+
+editor.onBlur = function (e, core) { console.log('onBlur', e) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
 editor.onload = function (core, reload) {
     console.log('onload-core', core)
-    console.log('onload-reload', reload)    
+    console.log('onload-reload', reload)
 }
 
 // Paste event.
@@ -647,7 +659,7 @@ editor.onload = function (core, reload) {
  * cleanData : HTML string modified for editor format
  * maxCharCount : maxChartCount option (true if max character is exceeded)
 */
-editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
+editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
 
 // Called when the image is uploaded or the uploaded image is deleted.
 /**
@@ -663,7 +675,7 @@ editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', 
  * }
  * remainingFilesCount: Count of remaining image files
 */
-editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
     console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
@@ -674,7 +686,7 @@ editor.onImageUpload = function (targetImgElement, index, state, imageInfo, rema
  * errorMessage: Error message to show
  * result: Result object 
 */
-editor.onImageUploadError = function (errorMessage, result) {
+editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
 }
 
@@ -682,7 +694,7 @@ editor.onImageUploadError = function (errorMessage, result) {
  * toolbar: Toolbar Element
  * context: The editor's context object (editor.getContext())
 */
-editor.showInline = function (toolbar, context) {
+editor.showInline = function (toolbar, context, core) {
     console.log('toolbar', toolbar);
     console.log('context', context);
 }

@@ -290,6 +290,12 @@ export default {
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
+        if (!this.getSelection().isCollapsed) {
+            this.controllersOff();
+            this.util.removeClass(tdElement, 'se-table-selected-cell');
+            return;
+        }
+
         const contextTable = this.context.table;
         const tablePlugin = this.plugins.table;
         const tableController = contextTable.tableController;

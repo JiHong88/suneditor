@@ -49,7 +49,7 @@ export default {
         editor_div.className = 'se-wrapper';
 
         /** --- init elements and create bottom bar --- */
-        const initHTML = util.convertContentsForEditor(element.value);
+        const initHTML = util.convertContentsForEditor(element.value, options._editorTagsWhitelist);
         const initElements = this._initElements(options, top_div, tool_bar.element, arrow, initHTML);
 
         const bottomBar = initElements.bottomBar;
@@ -365,6 +365,9 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
+        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
+        options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
+        options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
@@ -445,7 +448,7 @@ export default {
      */
     _defaultButtons: function (lang) {
         return {
-            /** command */
+            /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
                 '<i class="se-icon-bold"></i>'
             ],
@@ -514,17 +517,22 @@ export default {
                 '<i class="se-icon-save"></i>', true
             ],
 
+            /** plugins - command */
+            blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
+                '<i class="se-icon-audio"></i>'
+            ],
+
             /** plugins - submenu */
-            font: ['se-btn-select se-btn-tool-font _se_command_font_family', lang.toolbar.font, 'font', 'submenu',
+            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'submenu',
                 '<span class="txt">' + lang.toolbar.font + '</span><i class="se-icon-arrow-down"></i>'
             ],
             
             formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt _se_command_format">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
+                '<span class="txt">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt _se_command_font_size">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
+                '<span class="txt">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
@@ -536,10 +544,10 @@ export default {
             ],
 
             align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu',
-                '<i class="se-icon-align-left _se_command_align"></i>'
+                '<i class="se-icon-align-left"></i>'
             ],
 
-            list: ['_se_command_list', lang.toolbar.list, 'list', 'submenu',
+            list: ['', lang.toolbar.list, 'list', 'submenu',
                 '<i class="se-icon-list-number"></i>'
             ],
 

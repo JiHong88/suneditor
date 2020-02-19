@@ -167,6 +167,19 @@ export default {
         return false;
     },
 
+    active: function (element) {
+        if (!element && this.controllerArray[0] === this.context.link.linkBtn) {
+            this.controllersOff();
+        } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
+            if (this.controllerArray[0] !== this.context.link.linkBtn) {
+                this.plugins.link.call_controller_linkButton.call(this, element);
+                return true;
+            }
+        }
+
+        return false;
+    },
+
     on: function (update) {
         if (!update) {
             this.context.link.linkAnchorText.value = this.getSelection().toString();

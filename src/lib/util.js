@@ -212,9 +212,11 @@ const util = {
     /**
      * @description Converts contents into a format that can be placed in an editor
      * @param {String} contents contents
+     * @param {String|RegExp} whitelist Regular expression of allowed tags.
+     * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
      * @returns {String}
      */
-    convertContentsForEditor: function (contents) {
+    convertContentsForEditor: function (contents, whitelist) {
         let returnHTML = '';
         let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
@@ -238,7 +240,7 @@ const util = {
             returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
         }
 
-        return this._tagConvertor(returnHTML.replace(this._deleteExclusionTags, ''));
+        return this._tagConvertor(!whitelist ? returnHTML : returnHTML.replace(typeof whitelist === 'string' ? this.createTagsWhitelist(whitelist) : whitelist, ''));
     },
 
     /**
@@ -250,7 +252,7 @@ const util = {
     convertHTMLForCodeView: function (html, indentSize) {
         let returnHTML = '';
         const reg = this._w.RegExp;
-        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
+        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
         const isFormatElement = this.isFormatElement.bind(this);
         const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
         const util = this;
@@ -301,23 +303,36 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, LI, TH, TD)
+     * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI)
+     * Format element also contain "free format Element"
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|TH|TD)$/i.test(element.nodeName) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * * Range format element is wrap the format element  (P, DIV, H1-6, PRE, LI)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || element.getAttribute('data-format') === 'range')) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'))) return true;
+        return false;
+    },
+
+    /**
+     * @description It is judged whether it is the free format element. (PRE)
+     * Free format elements's line break is "BR" tag.
+     * Free format elements is included in the format element.
+     * @param {Element} element 
+     * @returns {Boolean}
+     */
+    isFreeFormatElement: function (element) {
+        if (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
@@ -331,7 +346,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], PRE, LI), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element}
@@ -354,7 +369,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, TH, TD), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
@@ -371,6 +386,28 @@ const util = {
             element = element.parentNode;
         }
 
+        return null;
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a free format node (PRE), it returns that node.
+     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation Additional validation function.
+     * @returns {Element}
+     */
+    getFreeFormatElement: function (element, validation) {
+        if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
+
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isFreeFormatElement(element) && validation(element)) return element;
+
+            element = element.parentNode;
+        }
+        
         return null;
     },
 
@@ -903,7 +940,7 @@ const util = {
     hasClass: function (element, className) {
         if (!element) return;
 
-        return element.classList.contains(className.trim());
+        return (new this._w.RegExp(className)).test(element.className);
     },
 
     /**
@@ -1008,7 +1045,7 @@ const util = {
         const inst = this;
         
         (function recursionFunc(current) {
-            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !inst._notTextNode(current) && 
                     (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
@@ -1029,20 +1066,13 @@ const util = {
     },
 
     /**
-     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|a)
-     * @param {Element} element Element to check
-     * @returns {Boolean}
-     */
-    isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
-    },
-
-    /**
      * @description Gets the clean HTML code for editor
      * @param {String} html HTML string
+     * @param {String|RegExp} whitelist Regular expression of allowed tags.
+     * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
      * @returns {String}
      */
-    cleanHTML: function (html) {
+    cleanHTML: function (html, whitelist) {
         const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
         const domTree = this._d.createRange().createContextualFragment(html).childNodes;
         let cleanHTML = '';
@@ -1065,19 +1095,50 @@ const util = {
                 }
                 return t;
             })
-            .replace(/<\/?(span[^>^<]*)>/g, '')
-            .replace(this._deleteExclusionTags, '');
+            .replace(/<\/?(span[^>^<]*)>/g, '');
 
-        return this._tagConvertor(cleanHTML || html);
+        return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? this.createTagsWhitelist(whitelist) : whitelist, ''));
     },
 
     /**
-     * @description Delete Exclusion tags regexp object
-     * @returns {Object}
+     * @description Nodes that need to be added without modification when changing text nodes
+     * @param {Element} element Element to check
+     * @returns {Boolean}
      * @private
      */
-    _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+    _isIgnoreNodeChange: function (element) {
+        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName);
+    },
+
+    /**
+     * @description Nodes that must remain undetached when changing text nodes
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _isMaintainedNode: function (element) {
+        return element.nodeType !== 3 && /^(a|label)$/i.test(element.nodeName);
+    },
+
+    /**
+     * @description Nodes without text
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _notTextNode: function (element) {
+        return element.nodeType !== 3 && /^(br|input|canvas|img|iframe|audio|video)$/i.test(element.nodeName);
+    },
+
+    /**
+     * @description Create whitelist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * @param {String} list Tags list ("br|p|div|pre...")
+     * @returns {RegExp}
+     * @private
+     */
+    createTagsWhitelist: function (list) {
+        const exclusionTags = list.split('|');
         let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
@@ -1087,7 +1148,7 @@ const util = {
         regStr += '[^>^<])+>';
 
         return new RegExp(regStr, 'g');
-    })()
+    }
 };
 
 export default util;

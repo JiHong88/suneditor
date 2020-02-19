@@ -110,6 +110,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         history: null,
 
         /**
+         * @description Editor tags whitelist (RegExp object)
+         * util.createTagsWhitelist(options._editorTagsWhitelist)
+         */
+        editorTagsWhitelistRegExp: null,
+
+        /**
+         * @description Tag whitelist when pasting (RegExp object)
+         * util.createTagsWhitelist(options.pasteTagsWhitelist)
+         */
+        pasteTagsWhitelistRegExp: null,
+
+        /**
          * @description binded controllersOff method
          * @private
          */
@@ -157,7 +169,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount);
+            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, core);
         },
 
         /**
@@ -165,18 +177,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _imageUploadError: function (errorMessage, result) {
-            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result);
+            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result, core);
             return true;
         },
 
         /**
+         * @description Plugins array with "active" method.
+         * "activePlugins" runs the "add" method when creating the editor.
+         */
+        activePlugins: null,
+
+        /**
          * @description Elements that need to change text or className for each selection change
-         * @property {Element} FORMAT format button > span.txt
-         * @property {Element} FONT font family button > span.txt
-         * @property {Element} FONT_TOOLTIP font family tooltip element
-         * @property {Element} SIZE font size button > span.txt
-         * @property {Element} ALIGN align button > div.icon
-         * @property {Element} LI list button
+         * After creating the editor, "activePlugins" are added.
          * @property {Element} STRONG bold button
          * @property {Element} INS underline button
          * @property {Element} EM italic button
@@ -360,19 +373,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            try {
-                const range = this.getRange();
-                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-            } catch (e) {
-                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-                if (caption) {
-                    caption.focus();
-                } else {
-                    context.element.wysiwyg.focus();
-                }
-
-                this._editorRange();
+            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+            if (caption) {
+                caption.focus();
+            } else {
+                context.element.wysiwyg.focus();
             }
+
+            this._editorRange();
 
             event._applyTagEffects();
         },
@@ -430,13 +438,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this.getSelection().removeAllRanges();
 
             const commandMap = this.commandMap;
-            util.changeTxt(commandMap.FORMAT, lang.toolbar.formats);
-            util.changeTxt(commandMap.FONT, lang.toolbar.font);
-            util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
-            util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
-            util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-            util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-            util.removeClass(commandMap.LI, 'active');
             util.removeClass(commandMap.STRONG, 'active');
             util.removeClass(commandMap.INS, 'active');
             util.removeClass(commandMap.EM, 'active');
@@ -445,11 +446,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             util.removeClass(commandMap.SUP, 'active');
 
             if (commandMap.OUTDENT) commandMap.OUTDENT.setAttribute('disabled', true);
-            if (commandMap.LI) commandMap.LI.removeAttribute('data-focus');
-            if (commandMap.ALIGN) {
-                commandMap.ALIGN.className = 'se-icon-align-left';
-                commandMap.ALIGN.removeAttribute('data-focus');
-            }
         },
 
         /**
@@ -738,13 +734,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 /** No Select range node */
                 if (range.collapsed) {
                     if (commonCon.nodeType === 3) {
-                        afterNode = commonCon.splitText(endOff);
+                        if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
+                        else afterNode = commonCon.nextSibling;
                     }
                     else {
-                        if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
-                            parentNode.removeChild(parentNode.lastChild);
+                        if (!util.isBreak(parentNode)) {
+                            if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
+                                parentNode.removeChild(parentNode.lastChild);
+                            }
+                            afterNode = null;
+                        } else {
+                            afterNode = parentNode;
+                            parentNode = parentNode.parentNode;
                         }
-                        afterNode = null;
                     }
                 }
                 /** Select range nodes */
@@ -1035,7 +1037,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util.isIgnoreNodeChange(c) && !util.isBreak(c) && !util.isListCell(format)) {
+                    if (util._isIgnoreNodeChange(c) && !util.isBreak(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
@@ -1418,19 +1420,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // node Changes
             newNode = appendNode.cloneNode(false);
 
-            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr, isAnchor) {
+            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr, _isMaintainedNode) {
                 for (let n = 0, len = arr.length; n < len; n++) {
-                    if (isAnchor(arr[n])) return true;
+                    if (_isMaintainedNode(arr[n])) return true;
                 }
                 return false;
-            })(removeNodeArray, util.isAnchor));
+            })(removeNodeArray, util._isMaintainedNode));
 
-            const _getAnchor = this._util_getAnchor.bind(util, isRemoveAnchor);
-            const _isAnchor = this._util_isAnchor.bind(util, isRemoveAnchor);
+            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor);
+            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor);
 
             // one line
             if (oneLine) {
-                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getAnchor, _isAnchor);
+                const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
@@ -1439,7 +1441,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             // multi line 
             else {
                 // start
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 // mid
                 for (let i = 1; i < endLength; i++) {
                     newNode = appendNode.cloneNode(false);
@@ -1448,7 +1450,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // end
                 if (endLength > 0) {
                     newNode = appendNode.cloneNode(false);
-                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor);
+                    end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 } else {
                     end = start;
                 }
@@ -1600,25 +1602,25 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Return the parent anchor tag. (bind and use a util object)
-         * @param {Boolean} isRemove Delete anchor tag
+         * @description Return the parent maintained tag. (bind and use a util object)
+         * @param {Boolean} isRemove Delete maintained tag
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_getAnchor: function (isRemove, element) {
-            return element && !isRemove ? this.getParentElement(element, function (current) {return this.isAnchor(current);}.bind(this)) : null;
+        _util_getMaintainedNode: function (isRemove, element) {
+            return element && !isRemove ? this.getParentElement(element, function (current) {return this._isMaintainedNode(current);}.bind(this)) : null;
         },
 
         /**
-         * @description Checks if the element is an anchor tag. (bind and use a util object)
-         * @param {Boolean} isRemove Delete anchor tag
+         * @description Check if element is a tag that should be persisted. (bind and use a util object)
+         * @param {Boolean} isRemove Delete maintained tag
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_isAnchor: function (isRemove, element) {
-            return element && !isRemove && element.nodeType !== 3 && this.isAnchor(element);
+        _util_isMaintainedNode: function (isRemove, element) {
+            return element && !isRemove && element.nodeType !== 3 && this._isMaintainedNode(element);
         },
 
         /**
@@ -1636,7 +1638,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
-        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getAnchor, _isAnchor) {
+        _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -1716,7 +1718,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // startContainer
                     if (!startPass && child === startContainer) {
                         let line = pNode;
-                        anchorNode = _getAnchor(child);
+                        anchorNode = _getMaintainedNode(child);
                         const prevNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
                         const textNode = util.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, 
                                 isSameNode ? 
@@ -1725,7 +1727,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             );
 
                         if (anchorNode) {
-                            const a = _getAnchor(ancestor);
+                            const a = _getMaintainedNode(ancestor);
                             if (a && a.parentNode !== line) {
                                 let m = a;
                                 let p = null;
@@ -1746,7 +1748,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             ancestor.appendChild(prevNode);
                         }
 
-                        const prevAnchorNode = _getAnchor(ancestor);
+                        const prevAnchorNode = _getMaintainedNode(ancestor);
                         if (!!prevAnchorNode) anchorNode = prevAnchorNode;
                         if (anchorNode) line = anchorNode;
 
@@ -1754,7 +1756,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== line && newNode !== el && newNode !== null) {
-                            vNode = _isAnchor(newNode) ? null : validation(newNode);
+                            vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1773,7 +1775,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newInnerNode.appendChild(childNode);
                         line.appendChild(newInnerNode);
 
-                        if (anchorNode && !_getAnchor(endContainer)) {
+                        if (anchorNode && !_getMaintainedNode(endContainer)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
@@ -1789,13 +1791,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!endPass && child === endContainer) {
-                        anchorNode = _getAnchor(child);
+                        anchorNode = _getMaintainedNode(child);
                         const afterNode = util.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, (endContainer.length - endOffset)));
                         const textNode = util.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
 
                         if (anchorNode) {
                             anchorNode = anchorNode.cloneNode(false);
-                        } else if (_isAnchor(newInnerNode.parentNode) && !anchorNode) {
+                        } else if (_isMaintainedNode(newInnerNode.parentNode) && !anchorNode) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
@@ -1808,7 +1810,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             const anchors = [];
                             while (newNode !== pNode && newNode !== el && newNode !== null) {
                                 if (newNode.nodeType === 1 && checkCss(newNode)) {
-                                    if (_isAnchor(newNode)) anchors.push(newNode.cloneNode(false));
+                                    if (_isMaintainedNode(newNode)) anchors.push(newNode.cloneNode(false));
                                     else pCurrent.push(newNode.cloneNode(false));
                                     cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                                 }
@@ -1828,7 +1830,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (anchorNode && cloneNode) {
-                            const afterAnchorNode = _getAnchor(cloneNode);
+                            const afterAnchorNode = _getMaintainedNode(cloneNode);
                             if (afterAnchorNode) {
                                 anchorNode = afterAnchorNode;
                             }
@@ -1838,7 +1840,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         pCurrent = [];
                         cssText = '';
                         while (newNode !== pNode && newNode !== el && newNode !== null) {
-                            vNode = _isAnchor(newNode) ? null : validation(newNode);
+                            vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
                                 pCurrent.push(vNode);
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
@@ -1881,7 +1883,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (!collapsed && util.isIgnoreNodeChange(child)) {
+                            if (!collapsed && util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -1901,7 +1903,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
                                 if (vNode) {
-                                    if (_isAnchor(vNode)) {
+                                    if (_isMaintainedNode(vNode)) {
                                         if (!anchorNode) anchors.push(vNode);
                                     } else {
                                         pCurrent.push(vNode);
@@ -1921,13 +1923,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
                         
-                        if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
+                        if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
                         }
                         
-                        if (!endPass && !anchorNode && _isAnchor(childNode)) {
+                        if (!endPass && !anchorNode && _isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
@@ -1950,8 +1952,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (anchorNode && child.nodeType === 3) {
-                            if (_getAnchor(child)) {
-                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this.isAnchor(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                            if (_getMaintainedNode(child)) {
+                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this._isMaintainedNode(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                 anchorNode.appendChild(ancestorAnchorNode);
                                 newInnerNode = ancestorAnchorNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
@@ -2059,7 +2061,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -2109,7 +2111,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isIgnoreNodeChange(child)) {
+                            if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
@@ -2127,7 +2129,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (newNode.nodeType === 1 && vNode) {
-                                if (_isAnchor(vNode)) {
+                                if (_isMaintainedNode(vNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
@@ -2146,13 +2148,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
+                        if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
                         }
                         
-                        if (!anchorNode && _isAnchor(childNode)) {
+                        if (!anchorNode && _isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
@@ -2160,7 +2162,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             }
                             childNode.appendChild(newInnerNode);
                             pNode.appendChild(childNode);
-                            ancestor = !_isAnchor(newNode) ? newNode : newInnerNode;
+                            ancestor = !_isMaintainedNode(newNode) ? newNode : newInnerNode;
                             nNodeArray.push(newInnerNode);
                         } else if (isTopNode) {
                             newInnerNode.appendChild(childNode);
@@ -2170,8 +2172,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (anchorNode && child.nodeType === 3) {
-                            if (_getAnchor(child)) {
-                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this.isAnchor(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                            if (_getMaintainedNode(child)) {
+                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this._isMaintainedNode(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                 anchorNode.appendChild(ancestorAnchorNode);
                                 newInnerNode = ancestorAnchorNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
@@ -2185,12 +2187,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // startContainer
                     if (!passNode && child === container) {
                         let line = pNode;
-                        anchorNode = _getAnchor(child);
+                        anchorNode = _getMaintainedNode(child);
                         const prevNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
 
                         if (anchorNode) {
-                            const a = _getAnchor(ancestor);
+                            const a = _getMaintainedNode(ancestor);
                             if (a && a.parentNode !== line) {
                                 let m = a;
                                 let p = null;
@@ -2211,7 +2213,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             ancestor.appendChild(prevNode);
                         }
 
-                        const prevAnchorNode = _getAnchor(ancestor);
+                        const prevAnchorNode = _getMaintainedNode(ancestor);
                         if (!!prevAnchorNode) anchorNode = prevAnchorNode;
                         if (anchorNode) line = anchorNode;
 
@@ -2376,7 +2378,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!child) continue;
                     let coverNode = ancestor;
 
-                    if (util.isIgnoreNodeChange(child)) {
+                    if (util._isIgnoreNodeChange(child)) {
                         pNode.appendChild(newInnerNode);
                         newInnerNode = newInnerNode.cloneNode(false);
                         pNode.appendChild(child);
@@ -2435,7 +2437,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {{container: *, offset: *}}
          * @private
          */
-        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getAnchor, _isAnchor) {
+        _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
             // not add tag
             let parentCon = endCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -2485,7 +2487,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
-                            if (util.isIgnoreNodeChange(child)) {
+                            if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
                                 pNode.insertBefore(child, ancestor);
                                 pNode.insertBefore(newInnerNode, child);
@@ -2503,7 +2505,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
-                                if (_isAnchor(vNode)) {
+                                if (_isMaintainedNode(vNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
@@ -2522,13 +2524,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             appendNode = newNode;
                         }
 
-                        if (_isAnchor(newInnerNode.parentNode) && !_isAnchor(childNode)) {
+                        if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.insertBefore(newInnerNode, pNode.firstChild);
                             nNodeArray.push(newInnerNode);
                         }
 
-                        if (!anchorNode && _isAnchor(childNode)) {
+                        if (!anchorNode && _isMaintainedNode(childNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             const aChildren = childNode.childNodes;
                             for (let a = 0, aLen = aChildren.length; a < aLen; a++) {
@@ -2547,8 +2549,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         }
 
                         if (anchorNode && child.nodeType === 3) {
-                            if (_getAnchor(child)) {
-                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this.isAnchor(current.parentNode) || current.parentNode === pNode;}.bind(util));
+                            if (_getMaintainedNode(child)) {
+                                const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {return this._isMaintainedNode(current.parentNode) || current.parentNode === pNode;}.bind(util));
                                 anchorNode.appendChild(ancestorAnchorNode);
                                 newInnerNode = ancestorAnchorNode.cloneNode(false);
                                 nNodeArray.push(newInnerNode);
@@ -2561,13 +2563,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     // endContainer
                     if (!passNode && child === container) {
-                        anchorNode = _getAnchor(child);
+                        anchorNode = _getMaintainedNode(child);
                         const afterNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, (container.length - offset)));
                         const textNode = util.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
 
                         if (anchorNode) {
                             anchorNode = anchorNode.cloneNode(false);
-                            const a = _getAnchor(ancestor);
+                            const a = _getMaintainedNode(ancestor);
                             if (a && a.parentNode !== pNode) {
                                 let m = a;
                                 let p = null;
@@ -2582,7 +2584,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                                 m.parentNode.insertBefore(a, m.parentNode.firstChild);
                             }
                             anchorNode = anchorNode.cloneNode(false);
-                        } else if (_isAnchor(newInnerNode.parentNode) && !anchorNode) {
+                        } else if (_isMaintainedNode(newInnerNode.parentNode) && !anchorNode) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
@@ -2595,7 +2597,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         newNode = ancestor;
                         pCurrent = [];
                         while (newNode !== pNode && newNode !== null) {
-                            vNode = _isAnchor(newNode) ? null : validation(newNode);
+                            vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
                                 pCurrent.push(vNode);
                             }
@@ -2913,7 +2915,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
 
                 this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML);
+                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML, this.editorTagsWhitelistRegExp);
 
                 const attrs = parseDocument.body.attributes;
                 for (let i = 0, len = attrs.length; i < len; i++) {
@@ -2921,7 +2923,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
                 }
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html) : '<p><br></p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html, this.editorTagsWhitelistRegExp) : '<p><br></p>';
             }
         },
 
@@ -3135,7 +3137,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} html HTML string
          */
         setContents: function (html) {
-            const convertValue = util.convertContentsForEditor(html);
+            const convertValue = util.convertContentsForEditor(html, this.editorTagsWhitelistRegExp);
             this._resetComponents();
 
             if (!core._variable.isCodeView) {
@@ -3324,18 +3326,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (typeof userFunction.onload === 'function') return userFunction.onload(core, reload);
             }.bind(this));
 
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(context.option._editorTagsWhitelist);
+            this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(context.option.pasteTagsWhitelist);
+
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             this._isInline = /inline/i.test(context.option.mode);
             this._isBalloon = /balloon/i.test(context.option.mode);
 
             this.commandMap = {
-                FORMAT: context.tool.format,
-                FONT: context.tool.font,
-                FONT_TOOLTIP: context.tool.fontTooltip,
                 SIZE: context.tool.fontSize,
-                ALIGN: context.tool.align,
-                LI: context.tool.list,
-                LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
+
                 STRONG: context.tool.bold,
                 INS: context.tool.underline,
                 EM: context.tool.italic,
@@ -3344,6 +3344,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 SUP: context.tool.superscript,
                 OUTDENT: context.tool.outdent
             };
+
+            // Command plugins registration
+            const activePlugins = this.activePlugins = [];
+            Object.keys(plugins).forEach(function (key) {
+                const c = plugins[key];
+                const button = pluginCallButtons[key];
+                if (c.active && button) {
+                    core.callPlugin(key, button);
+                    core.commandMap[c.name] = button;
+                    activePlugins.push(c.name);
+                }
+            });
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
@@ -3400,7 +3412,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _directionKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
         _frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
@@ -3466,7 +3478,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            let findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true, findMath = true;
+            const activePlugins = core.activePlugins;
+            const cLen = activePlugins.length;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -3475,100 +3488,26 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 
-                /** Format */
+                /* Active plugins */
+                for (let c = 0, name; c < cLen; c++) {
+                    name = activePlugins[c];
+                    if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, selectionParent)) {
+                        commandMapNodes.push(name);
+                    }
+                }
+
                 if (util.isFormatElement(selectionParent)) {
-                    /* Format block */
-                    if (findFormat && commandMap.FORMAT) {
-                        commandMapNodes.push('FORMAT');
-                        core.callPlugin('formatBlock', function () {
-                            core.plugins.formatBlock.active.call(core, selectionParent);
-                        });
-                        findFormat = false;
-                    }
-
-                    /* Align */
-                    const textAlign = selectionParent.style.textAlign;
-                    if (findAlign && textAlign && commandMap.ALIGN) {
-                        commandMapNodes.push('ALIGN');
-                        commandMap.ALIGN.className = 'se-icon-align-' + textAlign;
-                        commandMap.ALIGN.setAttribute('data-focus', textAlign);
-                        findAlign = false;
-                    }
-
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') < 0 && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
-                        findOutdent = false;
                     }
-
                     continue;
                 }
 
-                /* List */
-                if (findList && util.isList(nodeName) && commandMap.LI) {
-                    commandMapNodes.push('LI');
-                    commandMap.LI.setAttribute('data-focus', nodeName);
-                    if (/UL/i.test(nodeName)) {
-                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-number');
-                        util.addClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                    } else {
-                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                        util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-                    }
-                    findList = false;
-                }
-
-                /** Font */
-                if (findFont && selectionParent.style.fontFamily.length > 0 && commandMap.FONT) {
-                    commandMapNodes.push('FONT');
-                    const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
-                    util.changeTxt(commandMap.FONT, selectFont);
-                    util.changeTxt(commandMap.FONT_TOOLTIP, selectFont);
-                    findFont = false;
-                }
-
-                /** Size */
-                if (findSize && selectionParent.style.fontSize.length > 0 && commandMap.SIZE) {
-                    commandMapNodes.push('SIZE');
-                    util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
-                    findSize = false;
-                }
-
-                /** A */
-                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null && core.plugins.link) {
-                    if (!context.link || core.controllerArray[0] !== context.link.linkBtn) {
-                        core.callPlugin('link', function () {
-                            core.plugins.link.call_controller_linkButton.call(core, selectionParent);
-                        });
-                    }
-                    findA = false;
-                } else if (findA && context.link && core.controllerArray[0] === context.link.linkBtn) {
-                    core.controllersOff();
-                }
-
-                /** Math */
-                if (findMath && core.plugins.math && selectionParent.getAttribute('data-exp')) {
-                    if (!context.math || core.controllerArray[0] !== context.math.mathBtn) {
-                        core.callPlugin('math', function () {
-                            core.plugins.math.call_controller_mathButton.call(core, selectionParent);
-                        });
-                    }
-                    findMath = false;
-                } else if (findMath && context.math && core.controllerArray[0] === context.math.mathBtn) {
-                    core.controllersOff();
-                }
-
-                /** strong, ins, em, del, sub, sup */
+                /** default active buttons [strong, ins, em, del, sub, sup] */
                 if (classOnCheck.test(nodeName)) {
                     commandMapNodes.push(nodeName);
-                }
-            }
-
-            /** toggle class on */
-            for (let i = 0; i < commandMapNodes.length; i++) {
-                nodeName = commandMapNodes[i];
-                if (classOnCheck.test(nodeName)) {
                     util.addClass(commandMap[nodeName], 'active');
                 }
             }
@@ -3577,25 +3516,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 
-                if (commandMap.FONT && /^FONT$/i.test(key)) {
-                    util.changeTxt(commandMap.FONT, lang.toolbar.font);
-                    util.changeTxt(commandMap.FONT_TOOLTIP, lang.toolbar.font);
-                }
-                else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
-                    util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
-                }
-                else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
-                    commandMap.ALIGN.className = 'se-icon-align-left';
-                    commandMap.ALIGN.removeAttribute('data-focus');
+                if (activePlugins.indexOf(key) > -1) {
+                    plugins[key].active.call(core, null);
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
-                }
-                else if (commandMap.LI && util.isListCell(key)) {
-                    commandMap.LI.removeAttribute('data-focus');
-                    util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                    util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-                    util.removeClass(commandMap.LI, 'active');
                 }
                 else {
                     util.removeClass(commandMap[key], 'active');
@@ -3672,6 +3597,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     });
                     return;
                 }
+                else if (/command/.test(display)) {
+                    core.callPlugin(command, function () {
+                        core.plugins[command].action.call(core);
+                    });
+                }
 
                 core.submenuOff();
                 return;
@@ -3687,6 +3617,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @warning Events are registered only when there is a table plugin.
          */
         onMouseDown_wysiwyg: function (e) {
+            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
+            
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
                 const tablePlugin = core.plugins.table;
@@ -3767,7 +3699,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 else event._showToolbarBalloon(range);
             }
 
-            if (userFunction.onClick) userFunction.onClick(e);
+            if (userFunction.onClick) userFunction.onClick(e, core);
         },
 
         _showToolbarBalloon: function (rangeObj) {
@@ -3861,7 +3793,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core._inlineToolbarAttr.width = toolbar.style.width = context.option.toolbarWidth;
             core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             
-            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context);
+            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context, core);
 
             event.onScroll_window();
             core._inlineToolbarAttr.isShow = true;
@@ -3915,7 +3847,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         break;
                     }
 
-                    if (util.isWysiwygDiv(selectionNode.parentNode) && !selectionNode.previousSibling && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode)) {
+                    if (util.isWysiwygDiv(selectionNode.parentNode) && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && selectionNode.childNodes.length === 0) {
                         e.preventDefault();
                         e.stopPropagation();
                         selectionNode.innerHTML = '<br>';
@@ -4058,6 +3990,53 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     
                     break;
                 case 13: /** enter key */
+                    const freeFormatEl = util.getFreeFormatElement(selectionNode);
+                    if (!shift && freeFormatEl) {
+                        e.preventDefault();
+                        const selectionFormat = selectionNode === freeFormatEl;
+                        const wSelection = core.getSelection();
+                        const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
+
+                        if ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                         (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
+                            if (selectionFormat) util.removeItem(children[offset - 1]);
+                            else util.removeItem(selectionNode);
+                            const newEl = core.appendFormatTag(freeFormatEl, freeFormatEl.nextElementSibling ? freeFormatEl.nextElementSibling.nodeName : 'P');
+                            util.copyFormatAttributes(newEl, freeFormatEl);
+                            core.setRange(newEl, 1, newEl, 1);
+                            break;
+                        }
+                        
+                        if (selectionFormat) {
+                            core.execCommand('insertHTML', false, '<BR><BR>');
+
+                            let focusNode = wSelection.focusNode;
+                            const wOffset = wSelection.focusOffset;
+                            if (freeFormatEl === focusNode) {
+                                focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
+                            } else {
+                                focusNode = focusNode.previousSibling;
+                            }
+
+                            core.setRange(focusNode, 1, focusNode, 1);
+                        } else {
+                            const focusNext = wSelection.focusNode.nextSibling;
+                            const br = util.createElement('BR');
+                            core.insertNode(br);
+                            
+                            const brPrev = br.previousSibling, brNext = br.nextSibling;
+                            if (!util.isBreak(focusNext) && !util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
+                                br.parentNode.insertBefore(br.cloneNode(false), br);
+                                core.setRange(br, 1, br, 1);
+                            } else {
+                                core.setRange(brNext, 0, brNext, 0);
+                            }
+                        }
+
+                        event._onShortcutKey = true;
+                        break;
+                    }
+
                     if (selectRange) break;
 
                     const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
@@ -4127,7 +4106,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            if (userFunction.onKeyDown) userFunction.onKeyDown(e);
+            if (userFunction.onKeyDown) userFunction.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -4201,13 +4180,18 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 core.history.push(true);
             }
 
-            if (userFunction.onKeyUp) userFunction.onKeyUp(e);
+            if (userFunction.onKeyUp) userFunction.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             if (core._isBalloon) event._hideToolbar();
-            if (userFunction.onScroll) userFunction.onScroll(e);
+            if (userFunction.onScroll) userFunction.onScroll(e, core);
+        },
+
+        onBlur_wysiwyg: function (e) {
+            if (core._isInline || core._isBalloon) event._hideToolbar();
+            if (userFunction.onBlur) userFunction.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -4322,9 +4306,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (!clipboardData) return true;
 
             const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
-            const cleanData = util.cleanHTML(clipboardData.getData('text/html'));
+            const cleanData = util.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
-            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount)) {
+            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -4379,14 +4363,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 return false;
             // html paste
             } else {
-                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'));
+                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
                 if (cleanData) {
                     event._setDropLocationSelection(e);
                     core.execCommand('insertHTML', false, cleanData);
                 }
             }
 
-            if (userFunction.onDrop) userFunction.onDrop(e);
+            if (userFunction.onDrop) userFunction.onDrop(e, core);
         },
 
         _setDropLocationSelection: function (e) {
@@ -4398,8 +4382,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _onChange_historyStack: function () {
+            event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (userFunction.onChange) userFunction.onChange(core.getContents(true));
+            if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
         },
 
         _addEvent: function () {
@@ -4417,6 +4402,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+            eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** Events are registered only a balloon mode or when there is a table plugin. */
             if (core._isBalloon || core.plugins.table) {
@@ -4448,11 +4434,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             if (core._isInline) {
                 eventWysiwyg.addEventListener('focus', event._showToolbarInline, false);
             }
-
-            /** inline, balloon editor */
-            if (core._isInline || core._isBalloon) {
-                eventWysiwyg.addEventListener('blur', event._hideToolbar, false);
-            }
             
             /** window event */
             _w.removeEventListener('resize', event.onResize_window);
@@ -4483,7 +4464,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
             eventWysiwyg.removeEventListener('focus', event._showToolbarInline);
-            eventWysiwyg.removeEventListener('blur', event._hideToolbar);
+            eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
             context.element.code.removeEventListener('keydown', event._codeViewAutoHeight);
             context.element.code.removeEventListener('keyup', event._codeViewAutoHeight);
@@ -4518,6 +4499,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onDrop: null,
         onChange: null,
         onPaste: null,
+        onBlur: null,
         showInline: null,
 
         /**
@@ -4546,7 +4528,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             core.plugins = options.plugins || core.plugins;
             const mergeOptions = [context.option, options].reduce(function (init, option) {
                 Object.keys(option).forEach(function (key) {
-                    init[key] = option[key];
+                    if (key === 'plugins' && option[key] && init[key]) {
+                        let i = init[key], o = option[key];
+                        i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });
+                        o = o.length ? o : Object.keys(o).map(function(name) { return o[name]; });
+                        init[key] = (o.filter(function(val) { return i.indexOf(val) === -1; })).concat(i);
+                    } else {
+                        init[key] = option[key];
+                    }
                 });
                 return init;
             }, {});
@@ -4695,10 +4684,17 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
-            const convertValue = util.convertContentsForEditor(contents);
+            const convertValue = util.convertContentsForEditor(contents, this.editorTagsWhitelistRegExp);
             
             if (!core._variable.isCodeView) {
-                context.element.wysiwyg.innerHTML += convertValue;
+                const temp = util.createElement('DIV');
+                temp.innerHTML = convertValue;
+
+                const wysiwyg = context.element.wysiwyg;
+                const children = temp.children;
+                for (let i = 0, len = children.length; i < len; i++) {
+                    wysiwyg.appendChild(children[i]);
+                }
             } else {
                 core._setCodeView(core._getCodeView() + '\n' + util.convertHTMLForCodeView(convertValue, core._variable.codeIndent));
             }
