@@ -12,6 +12,8 @@ export default {
     add: function (core, targetElement) {
         const context = core.context;
         context.list = {
+            targetButton: targetElement,
+            targetIcon: targetElement.querySelector('i'),
             _list: null,
             currentList: ''
         };
@@ -54,10 +56,38 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        const button = this.context.list.targetButton;
+        const icon = this.context.list.targetIcon;
+        const util = this.util;
+
+        if (!element) {
+            button.removeAttribute('data-focus');
+            util.removeClass(icon, 'se-icon-list-bullets');
+            util.addClass(icon, 'se-icon-list-number');
+            util.removeClass(button, 'active');
+        } else if (util.isList(element)) {
+            const nodeName = element.nodeName;
+            button.setAttribute('data-focus', nodeName);
+            util.addClass(button, 'active');
+            if (/UL/i.test(nodeName)) {
+                util.removeClass(icon, 'se-icon-list-number');
+                util.addClass(icon, 'se-icon-list-bullets');
+            } else {
+                util.removeClass(icon, 'se-icon-list-bullets');
+                util.addClass(icon, 'se-icon-list-number');
+            }
+            
+            return true;
+        }
+
+        return false;
+    },
+
     on: function () {
         const listContext = this.context.list;
         const list = listContext._list;
-        const currentList = this.commandMap.LI.getAttribute('data-focus') || '';
+        const currentList = listContext.targetButton.getAttribute('data-focus') || '';
 
         if (currentList !== listContext.currentList) {
             for (let i = 0, len = list.length; i < len; i++) {

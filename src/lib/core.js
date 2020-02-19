@@ -182,13 +182,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
-         * @description Plugins array with active method
+         * @description Plugins array with "active" method.
+         * "activePlugins" runs the "add" method when creating the editor.
          */
-        commandPlugins: null,
+        activePlugins: null,
 
         /**
          * @description Elements that need to change text or className for each selection change
-         * After creating the editor, "commandPlugins" are added.
+         * After creating the editor, "activePlugins" are added.
          * @property {Element} STRONG bold button
          * @property {Element} INS underline button
          * @property {Element} EM italic button
@@ -372,19 +373,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            try {
-                const range = this.getRange();
-                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-            } catch (e) {
-                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-                if (caption) {
-                    caption.focus();
-                } else {
-                    context.element.wysiwyg.focus();
-                }
-
-                this._editorRange();
+            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+            if (caption) {
+                caption.focus();
+            } else {
+                context.element.wysiwyg.focus();
             }
+
+            this._editorRange();
 
             event._applyTagEffects();
         },
@@ -3338,10 +3334,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._isBalloon = /balloon/i.test(context.option.mode);
 
             this.commandMap = {
-                LI: context.tool.list,
-                LI_ICON: context.tool.list && context.tool.list.querySelector('i'),
                 SIZE: context.tool.fontSize,
-                ALIGN: context.tool.align,
 
                 STRONG: context.tool.bold,
                 INS: context.tool.underline,
@@ -3353,19 +3346,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             };
 
             // Command plugins registration
-            const commandPlugins = [];
+            const activePlugins = this.activePlugins = [];
             Object.keys(plugins).forEach(function (key) {
                 const c = plugins[key];
                 const button = pluginCallButtons[key];
-                if (button) {
+                if (c.active && button) {
                     core.callPlugin(key, button);
-                    if (c.active) {
-                        core.commandMap[c.name] = button;
-                        commandPlugins.push(c.name);
-                    }
+                    core.commandMap[c.name] = button;
+                    activePlugins.push(c.name);
                 }
             });
-            this.commandPlugins = commandPlugins;
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
@@ -3422,7 +3412,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _directionKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP|LI)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
         _frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
@@ -3488,10 +3478,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const commandMapNodes = [];
             const currentNodes = [];
 
-            const commandPlugins = core.commandPlugins;
-            const cLen = commandPlugins.length;
-
-            let findBlockquote = true, findFormat = true, findAlign = true, findList = true, findFont = true, findSize = true, findOutdent = true, findA = true;
+            const activePlugins = core.activePlugins;
+            const cLen = activePlugins.length;
             let nodeName = '';
 
             for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
@@ -3500,86 +3488,26 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 nodeName = selectionParent.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 
-                /* Command plugins */
+                /* Active plugins */
                 for (let c = 0, name; c < cLen; c++) {
-                    name = commandPlugins[c];
+                    name = activePlugins[c];
                     if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, selectionParent)) {
                         commandMapNodes.push(name);
                     }
                 }
 
                 if (util.isFormatElement(selectionParent)) {
-                    /* Align */
-                    const textAlign = selectionParent.style.textAlign;
-                    if (findAlign && textAlign && commandMap.ALIGN) {
-                        commandMapNodes.push('ALIGN');
-                        commandMap.ALIGN.className = 'se-icon-align-' + textAlign;
-                        commandMap.ALIGN.setAttribute('data-focus', textAlign);
-                        findAlign = false;
-                    }
-
                     /* Outdent */
-                    if (findOutdent && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') < 0 && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
-                        findOutdent = false;
                     }
-
                     continue;
                 }
 
-                /* List */
-                if (findList && util.isList(nodeName) && commandMap.LI) {
-                    commandMapNodes.push('LI');
-                    commandMap.LI.setAttribute('data-focus', nodeName);
-                    if (/UL/i.test(nodeName)) {
-                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-number');
-                        util.addClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                    } else {
-                        util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                        util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-                    }
-                    findList = false;
-                }
-
-                /** Font */
-                if (findFont && selectionParent.style.fontFamily.length > 0 && commandMap.FONT) {
-                    commandMapNodes.push('FONT');
-                    const selectFont = (selectionParent.style.fontFamily || selectionParent.face || lang.toolbar.font).replace(/["']/g,'');
-                    util.changeTxt(commandMap.FONT, selectFont);
-                    util.changeTxt(commandMap.FONT_TOOLTIP, selectFont);
-                    findFont = false;
-                }
-
-                /** Size */
-                if (findSize && selectionParent.style.fontSize.length > 0 && commandMap.SIZE) {
-                    commandMapNodes.push('SIZE');
-                    util.changeTxt(commandMap.SIZE, selectionParent.style.fontSize);
-                    findSize = false;
-                }
-
-                /** A */
-                if (findA && /^A$/.test(nodeName) && selectionParent.getAttribute('data-image-link') === null && core.plugins.link) {
-                    if (!context.link || core.controllerArray[0] !== context.link.linkBtn) {
-                        core.callPlugin('link', function () {
-                            core.plugins.link.call_controller_linkButton.call(core, selectionParent);
-                        });
-                    }
-                    findA = false;
-                } else if (findA && context.link && core.controllerArray[0] === context.link.linkBtn) {
-                    core.controllersOff();
-                }
-
-                /** strong, ins, em, del, sub, sup */
+                /** default active buttons [strong, ins, em, del, sub, sup] */
                 if (classOnCheck.test(nodeName)) {
                     commandMapNodes.push(nodeName);
-                }
-            }
-
-            /** toggle class on */
-            for (let i = 0; i < commandMapNodes.length; i++) {
-                nodeName = commandMapNodes[i];
-                if (classOnCheck.test(nodeName)) {
                     util.addClass(commandMap[nodeName], 'active');
                 }
             }
@@ -3588,24 +3516,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1) continue;
                 
-                if (commandPlugins.indexOf(key) > -1) {
+                if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
-                }
-                else if (commandMap.SIZE && /^SIZE$/i.test(key)) {
-                    util.changeTxt(commandMap.SIZE, lang.toolbar.fontSize);
-                }
-                else if (commandMap.ALIGN && /^ALIGN$/i.test(key)) {
-                    commandMap.ALIGN.className = 'se-icon-align-left';
-                    commandMap.ALIGN.removeAttribute('data-focus');
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
-                }
-                else if (commandMap.LI && util.isListCell(key)) {
-                    commandMap.LI.removeAttribute('data-focus');
-                    util.removeClass(commandMap.LI_ICON, 'se-icon-list-bullets');
-                    util.addClass(commandMap.LI_ICON, 'se-icon-list-number');
-                    util.removeClass(commandMap.LI, 'active');
                 }
                 else {
                     util.removeClass(commandMap[key], 'active');

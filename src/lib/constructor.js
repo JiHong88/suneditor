@@ -532,7 +532,7 @@ export default {
             ],
 
             fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt _se_command_font_size">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
+                '<span class="txt">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
@@ -544,10 +544,10 @@ export default {
             ],
 
             align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu',
-                '<i class="se-icon-align-left _se_command_align"></i>'
+                '<i class="se-icon-align-left"></i>'
             ],
 
-            list: ['_se_command_list', lang.toolbar.list, 'list', 'submenu',
+            list: ['', lang.toolbar.list, 'list', 'submenu',
                 '<i class="se-icon-list-number"></i>'
             ],
 

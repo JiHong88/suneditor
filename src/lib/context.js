@@ -46,10 +46,7 @@ const _Context = function (element, cons, options) {
             undo: cons._toolBar.querySelector('._se_command_undo'),
             redo: cons._toolBar.querySelector('._se_command_redo'),
             save: cons._toolBar.querySelector('._se_command_save'),
-            outdent: cons._toolBar.querySelector('._se_command_outdent'),
-            fontSize: cons._toolBar.querySelector('._se_command_font_size'), //delete
-            align: cons._toolBar.querySelector('._se_command_align'),
-            list: cons._toolBar.querySelector('._se_command_list')
+            outdent: cons._toolBar.querySelector('._se_command_outdent')
         },
         options: options,
         option: options
