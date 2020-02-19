@@ -88,7 +88,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'align', 'horizontalRule', 'list', 'table',
         'link', 'image', 'video',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save']
+        'preview', 'print', 'save', 'math']
     ],
     height: 'auto',
     width: '100%',

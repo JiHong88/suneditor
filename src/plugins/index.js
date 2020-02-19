@@ -22,6 +22,7 @@ import textStyle from './submenu/textStyle';
 import link from './dialog/link';
 import image from './dialog/image';
 import video from './dialog/video';
+import math from './dialog/math';
 
 export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video };
 export default { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video };
