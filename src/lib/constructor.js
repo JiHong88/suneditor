@@ -167,8 +167,7 @@ export default {
         arrow.className = 'se-arrow';
 
         if (isNewToolbar) {
-            relative.insertBefore(tool_bar.element, el.toolbar);
-            relative.removeChild(el.toolbar);
+            relative.replaceChild(tool_bar.element, el.toolbar);
             el.toolbar = tool_bar.element;
             el._arrow = arrow;
         }

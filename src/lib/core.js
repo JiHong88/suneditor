@@ -1516,8 +1516,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!child) break;
                     if (len === 1 && current.nodeName === child.nodeName) {
                         inst.util.copyTagAttributes(child, current);
-                        current.parentNode.insertBefore(child, current);
-                        inst.util.removeItem(current);
+                        current.parentNode.replaceChild(child, current);
 
                         // update nodePath
                         if (nodePath_s && nodePath_s[depth] === i) {
@@ -1988,8 +1987,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
                     let textNode = util.createTextNode(collapsed ? util.zeroWidthSpace : removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
+                    pNode.replaceChild(textNode, removeNode);
 
                     if (i === 0) startContainer = endContainer = textNode;
                 }
@@ -2277,8 +2275,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
                     let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
+                    pNode.replaceChild(textNode, removeNode);
                     if (i === 0) container = textNode;
                 }
             } else if (isRemoveNode) {
@@ -2409,8 +2406,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
                     let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
+                    pNode.replaceChild(textNode, removeNode);
                 }
             } else if (isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
@@ -2661,8 +2657,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
                     let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.insertBefore(textNode, removeNode);
-                    pNode.removeChild(removeNode);
+                    pNode.replaceChild(textNode, removeNode);
 
                     if (i === nNodeArray.length - 1) {
                         container = textNode;

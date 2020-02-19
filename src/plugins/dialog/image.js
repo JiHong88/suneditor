@@ -698,8 +698,7 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            existElement.parentNode.insertBefore(container, existElement);
-            this.util.removeItem(existElement);
+            existElement.parentNode.replaceChild(container, existElement);
             imageEl = container.querySelector('img');
 
             contextImage._element = imageEl;

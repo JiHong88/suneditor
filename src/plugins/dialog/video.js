@@ -331,7 +331,7 @@ export default {
         const cover = contextVideo._cover = this.plugins.resizing.set_cover.call(this, oIframe);
         const container = contextVideo._container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
 
-        const figcaption = existElement.getElementsByTagName('FIGCAPTION')[0];
+        const figcaption = existElement.querySelector('figcaption');
         let caption = null;
         if (!!figcaption) {
             caption = this.util.createElement('DIV');
@@ -342,9 +342,8 @@ export default {
         const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
         this.plugins.video.applySize.call(this, (size[0] || this.context.option.videoWidth), (size[1] || ''));
 
-        existElement.parentNode.insertBefore(container, existElement);
-        if (!!caption) existElement.parentNode.insertBefore(caption, existElement);
-        this.util.removeItem(existElement);
+        existElement.parentNode.replaceChild(container, existElement);
+        if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
     },
 
     onModifyMode: function (element, size) {

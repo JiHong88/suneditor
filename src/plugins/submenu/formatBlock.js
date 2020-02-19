@@ -282,8 +282,7 @@ export default {
                         this.util.copyFormatAttributes(newFormat, node);
                         newFormat.innerHTML = node.innerHTML;
     
-                        node.parentNode.insertBefore(newFormat, node);
-                        this.util.removeItem(node);
+                        node.parentNode.replaceChild(newFormat, node);
                     }
     
                     if (i === 0) first = newFormat || node;
