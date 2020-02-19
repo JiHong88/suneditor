@@ -13,6 +13,7 @@ import notice from '../modules/notice';
 
 export default {
     name: 'image',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog, resizing, notice]);
         

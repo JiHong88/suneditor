@@ -14,7 +14,10 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
-import lineHeight from '../../src/plugins/submenu/lineHeight'
+
+import 'katex/dist/katex.min.css';
+import Katex from 'katex';
+
 
 const align = require('../../src/plugins/submenu/align')
 
@@ -90,6 +93,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'math']
     ],
+    katex: Katex,
     height: 'auto',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',

@@ -9,6 +9,7 @@
 
 export default {
     name: 'fontSize',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.fontSize = {

@@ -9,6 +9,7 @@
 
 export default {
     name: 'formatBlock',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.formatBlock = {

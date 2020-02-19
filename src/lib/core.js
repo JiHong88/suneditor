@@ -100,6 +100,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         controllerArray: [],
 
         /**
+         * @description The name of the plugin that called the currently active controller
+         */
+        currentControllerName: '',
+
+        /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
         codeViewDisabledButtons: null,
@@ -319,9 +324,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 this._resizingName = tempName;
             }
 
-            for (let i = 0; i < arguments.length; i++) {
-                if (arguments[i].style) arguments[i].style.display = 'block';
-                this.controllerArray[i] = arguments[i];
+            for (let i = 0, arg; i < arguments.length; i++) {
+                arg = arguments[i];
+
+                if (typeof arg === 'string') {
+                    this.currentControllerName = arg;
+                    continue;
+                }
+
+                if (arg.style) arg.style.display = 'block';
+                this.controllerArray[i] = arg;
             }
 
             this._notHideToolbar = true;
@@ -338,6 +350,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             this._notHideToolbar = false;
             this._resizingName = '';
+            this.currentControllerName = '';
             if (!this._bindControllersOff) return;
 
             this.removeDocEvent('mousedown', this._bindControllersOff);
@@ -3578,7 +3591,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             
             core.focus();
             
-            /** Dialog, Submenu */
+            /** call plugins */
             if (display) {
                 if (/submenu/.test(display) && (target.nextElementSibling === null || target !== core.submenuActiveButton)) {
                     core.callPlugin(command, function () {
@@ -3588,7 +3601,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
                 else if (/dialog/.test(display)) {
                     core.callPlugin(command, function () {
-                        core.plugins.dialog.open.call(core, command, false);
+                        core.plugins.dialog.open.call(core, command, command === core.currentControllerName);
                     });
                     return;
                 }

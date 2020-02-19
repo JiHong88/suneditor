@@ -371,7 +371,7 @@ export default {
         }
 
         this._resizingName = plugin;
-        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton);
+        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, plugin);
 
         // button group
         const overLeft = this.context.element.wysiwygFrame.offsetWidth - l - contextResizing.resizeButton.offsetWidth;

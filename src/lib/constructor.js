@@ -10,7 +10,6 @@
 import _defaultLang from '../lang/en';
 import util from './util';
 
-
 export default {
     /**
      * @description document create - call _createToolBar()
@@ -37,6 +36,7 @@ export default {
     
         // toolbar
         const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options.lang);
+        if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
 
@@ -114,7 +114,7 @@ export default {
      * @param {Element} textarea textarea element
      * @private
      */
-    _checkCodeMirror: function(options, textarea) {
+    _checkCodeMirror: function (options, textarea) {
         if (options.codeMirror) {
             const cmOptions = [{
                 mode: 'htmlmixed',
@@ -145,6 +145,26 @@ export default {
     },
 
     /**
+     * @description Check for a katex object.
+     * @param {Object} katex katex object
+     * @private
+     */
+    _checkKatexMath: function (katex) {
+        if (!katex) throw Error('[SUNEDITOR.create.fail] To use the math button you need to add a "katex" object to the options.');
+
+        const katexOptions = [{
+            throwOnError: false,
+        }, (katex.options || {})].reduce(function (init, option) {
+            Object.keys(option).forEach(function (key) {
+                init[key] = option[key];
+            });
+            return init;
+        }, {});
+
+        katex.options = katexOptions;
+    },
+
+    /**
      * @description Add or reset options
      * @param {Object} mergeOptions New options property
      * @param {Object} context Context object of core
@@ -163,6 +183,7 @@ export default {
         const isNewPlugins = !!mergeOptions.plugins;
 
         const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions.lang);
+        if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
         const arrow = document.createElement('DIV');
         arrow.className = 'se-arrow';
 
@@ -364,6 +385,7 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
+        /** Tags whitelist */
         options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
@@ -430,6 +452,8 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        /** Math (katex) */
+        options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
         /** Buttons */
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
@@ -614,7 +638,7 @@ export default {
      * @param {string} buttonClass className in button
      * @param {string} title Title in button
      * @param {string} dataCommand The data-command property of the button
-     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu')
+     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu', 'command')
      * @param {string} innerHTML Html in button
      * @param {string} _disabled Button disabled
      * @returns {Element}

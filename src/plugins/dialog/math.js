@@ -2,28 +2,9 @@
 
 import dialog from '../modules/dialog';
 
-const katexJsSrc = 'https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js';
-const katexCssSrc = 'https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css';
-
-const script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = katexJsSrc;
-
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = katexCssSrc;
-
-document.head.appendChild(link);
-document.head.appendChild(script);
-
-const htmlMathString = function (exp) {
-    return window.katex.renderToString(exp, {
-        throwOnError: false,
-    });
-}
-
 export default {
     name: 'math',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog]);
 
@@ -32,26 +13,23 @@ export default {
             focusElement: null,
             previewElement: null,
             fontSizeElement: null,
-            _mathExp: null
+            _mathExp: null,
+            _renderer: null
         };
 
         /** math dialog */
         let math_dialog = this.setDialog.call(core);
         context.math.modal = math_dialog;
-        context.math.focusElement = math_dialog.querySelector('._se_math_exp');
-        context.math.previewElement = math_dialog.querySelector('._se_math_preview');
-        context.math.fontSizeElement = math_dialog.querySelector('._se_math_size');
+        context.math.focusElement = math_dialog.querySelector('.se-math-exp');
+        context.math.previewElement = math_dialog.querySelector('.se-math-preview');
+        context.math.fontSizeElement = math_dialog.querySelector('.se-math-size');
+        context.math._renderer = function (exp) {
+            return this.src.renderToString(exp, this.options);
+        }.bind(core.context.option.katex);
 
-        const renderMathExp = function () {
-            context.math.previewElement.innerHTML = htmlMathString(this.value);
-        };
-
-        context.math.focusElement.onkeyup = renderMathExp;
-        context.math.focusElement.onchange = renderMathExp;
-
-        context.math.fontSizeElement.onchange = function () {
-            context.math.previewElement.style.fontSize = this.value;
-        };
+        context.math.focusElement.addEventListener('keyup', this._renderMathExp.bind(context.math), false);
+        context.math.focusElement.addEventListener('change', this._renderMathExp.bind(context.math), false);
+        context.math.fontSizeElement.addEventListener('change', function (e) { this.fontSize = e.target.value; }.bind(context.math.previewElement.style), false);
 
         /** math button */
         let math_button = this.setController_MathButton.call(core);
@@ -89,20 +67,20 @@ export default {
             '<div class="se-dialog-body">' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>):</label>' +
-                    '<textarea style="height: 4rem;border: 1px solid #ccc !important;" class="se-input-form _se_math_exp" type="text"></textarea>' +
+                    '<textarea class="se-input-form se-math-exp" type="text"></textarea>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.fontSizeLabel + ':</label>' +
-                    '<select style="width:6em;margin-left: 1em;" class="_se_math_size">' +
-                        '<option value="1em">1</option>' +
-                        '<option value="1.5em">1.5</option>' +
-                        '<option value="2em">2</option>' +
-                        '<option value="2.5em">2.5</option>' +
+                    '<select class="se-input-select se-math-size">' +
+                        '<option value="1em">1em</option>' +
+                        '<option value="1.5em">1.5em</option>' +
+                        '<option value="2em">2em</option>' +
+                        '<option value="2.5em">2.5em</option>' +
                     '</select>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.previewLabel + ':</label>' +
-                    '<p style="font-size:13px;" class="_se_math_preview"></p>' +
+                    '<p class="se-math-preview"></p>' +
                 '</div>' +
             '</div>' +
             '<div class="se-dialog-footer">' +
@@ -137,6 +115,10 @@ export default {
         '';
 
         return math_btn;
+    },
+
+    _renderMathExp: function (e) {
+        this.previewElement.innerHTML = this._renderer(e.target.value);
     },
 
     submit: function (e) {
@@ -184,6 +166,7 @@ export default {
                 };
                 const containerEl = findParent(contextMath._mathExp, 'katex');
                 containerEl.parentNode.replaceChild(katexEl, containerEl);
+                this.setRange(katexEl.childNodes[0], 0, katexEl.childNodes[0], 1);
             }
 
             // history stack
@@ -206,25 +189,40 @@ export default {
         return false;
     },
 
+    active: function (element) {
+        if (!element) {
+            if (this.controllerArray[0] === this.context.math.mathBtn) this.controllersOff();
+        } else if (element.getAttribute('data-exp')) {
+            if (this.controllerArray[0] !== this.context.math.mathBtn) {
+                this.plugins.math.call_controller_mathButton.call(this, element);
+                return true;
+            }
+        }
+
+        return false;
+    },
+
     on: function (update) {
-        if (this.context.math._mathExp && update) {
-            const exp = this.context.math._mathExp.getAttribute('data-exp');
-            const fontSize = this.context.math._mathExp.getAttribute('data-font-size') || '1em';
+        const contextMath = this.context.math;
+
+        if (contextMath._mathExp && update) {
+            const exp = contextMath._mathExp.getAttribute('data-exp');
+            const fontSize = contextMath._mathExp.getAttribute('data-font-size') || '1em';
 
             this.context.dialog.updateModal = true;
-            this.context.math.focusElement.value = exp;
-            this.context.math.fontSizeElement.value = fontSize;
-            this.context.math.previewElement.innerHTML = htmlMathString(exp);
-            this.context.math.previewElement.style.fontSize = fontSize;
+            contextMath.focusElement.value = exp;
+            contextMath.fontSizeElement.value = fontSize;
+            contextMath.previewElement.innerHTML = contextMath._renderer(exp);
+            contextMath.previewElement.style.fontSize = fontSize;
         }
     },
 
-    call_controller_mathButton: function (selectionATag) {
-        this.editMath = this.context.math._mathExp = selectionATag;
+    call_controller_mathButton: function (mathTag) {
+        this.context.math._mathExp = mathTag;
         const mathBtn = this.context.math.mathBtn;
 
-        const offset = this.util.getOffset(selectionATag, this.context.element.wysiwygFrame);
-        mathBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
+        const offset = this.util.getOffset(mathTag, this.context.element.wysiwygFrame);
+        mathBtn.style.top = (offset.top + mathTag.offsetHeight + 10) + 'px';
         mathBtn.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
 
         mathBtn.style.display = 'block';
@@ -237,7 +235,7 @@ export default {
             mathBtn.firstElementChild.style.left = '20px';
         }
 
-        this.controllersOn(mathBtn, this.plugins.math.init.bind(this));
+        this.controllersOn(mathBtn, this.plugins.math.init.bind(this), 'math');
     },
 
     onClick_mathBtn: function (e) {
@@ -251,8 +249,6 @@ export default {
         if (/update/.test(command)) {
             this.context.math.focusElement.value = this.context.math._mathExp.getAttribute('data-exp');
             this.plugins.dialog.open.call(this, 'math', true);
-        } else if (/unlink/.test(command)) {
-            // do nothing
         } else {
             /** delete */
             this.util.removeItem(this.context.math._mathExp);

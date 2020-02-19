@@ -9,6 +9,7 @@
 
 export default {
     name: 'align',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.align = {

@@ -11,6 +11,7 @@ import dialog from '../modules/dialog';
 
 export default {
     name: 'link',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog]);
 
@@ -168,8 +169,8 @@ export default {
     },
 
     active: function (element) {
-        if (!element && this.controllerArray[0] === this.context.link.linkBtn) {
-            this.controllersOff();
+        if (!element) {
+            if (this.controllerArray[0] === this.context.link.linkBtn) this.controllersOff();
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
             if (this.controllerArray[0] !== this.context.link.linkBtn) {
                 this.plugins.link.call_controller_linkButton.call(this, element);
@@ -216,7 +217,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn, this.plugins.link.init.bind(this));
+        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), 'link');
     },
 
     onClick_linkBtn: function (e) {

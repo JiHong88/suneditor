@@ -12,6 +12,7 @@ import resizing from '../modules/resizing';
 
 export default {
     name: 'video',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog, resizing]);
 

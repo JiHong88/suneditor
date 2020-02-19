@@ -9,6 +9,7 @@
 
 export default {
     name: 'horizontalRule',
+    display: 'submenu',
     add: function (core, targetElement) {
         /** set submenu */
         let listDiv = this.setSubmenu.call(core);

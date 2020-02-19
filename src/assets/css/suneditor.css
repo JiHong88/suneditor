@@ -319,6 +319,11 @@
 .sun-editor .se-dialog-tabs button:hover {background-color:#fff;}
 .sun-editor .se-dialog-tabs button.active {background-color:#fff;border-bottom:0;}
 
+/* dialog - modal - math */
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {height:4rem; border:1px solid #ccc !important;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
+
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
 .sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:4; border:1px solid rgba(0, 0, 0, .25); border-radius:2px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}

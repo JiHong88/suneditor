@@ -11,6 +11,7 @@ import colorPicker from '../modules/colorPicker';
 
 export default {
     name: 'fontColor',
+    display: 'submenu',
     add: function (core, targetElement) {
         core.addModule([colorPicker]);
 

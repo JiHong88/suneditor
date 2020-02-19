@@ -9,6 +9,7 @@
 
 export default {
     name: 'paragraphStyle',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.paragraphStyle = {
