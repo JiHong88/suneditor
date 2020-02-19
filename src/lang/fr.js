@@ -53,6 +53,7 @@
             hr_dashed: 'Tirets',
             table: 'Table',
             link: 'Lien',
+            math: 'Math',
             image: 'Image',
             video: 'Video',
             fullScreen: 'Plein écran',
@@ -78,6 +79,12 @@
                 url: 'Adresse URL du lien',
                 text: 'Texte à afficher',
                 newWindowCheck: 'Ouvrir dans une nouvelle fenêtre'
+            },
+            mathBox: {
+                title: 'Math',
+                inputLabel: 'Notation mathématique',
+                fontSizeLabel: 'Taille',
+                previewLabel: 'Previsualiser'
             },
             imageBox: {
                 title: 'Insérer une image',

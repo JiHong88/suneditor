@@ -66,20 +66,20 @@ export default {
             '</div>' +
             '<div class="se-dialog-body">' +
                 '<div class="se-dialog-form">' +
-                    '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>):</label>' +
+                    '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>)</label>' +
                     '<textarea class="se-input-form se-math-exp" type="text"></textarea>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
-                    '<label>' + lang.dialogBox.mathBox.fontSizeLabel + ':</label>' +
+                    '<label>' + lang.dialogBox.mathBox.fontSizeLabel + '</label>' +
                     '<select class="se-input-select se-math-size">' +
-                        '<option value="1em">1em</option>' +
-                        '<option value="1.5em">1.5em</option>' +
-                        '<option value="2em">2em</option>' +
-                        '<option value="2.5em">2.5em</option>' +
+                        '<option value="1em">1</option>' +
+                        '<option value="1.5em">1.5</option>' +
+                        '<option value="2em">2</option>' +
+                        '<option value="2.5em">2.5</option>' +
                     '</select>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
-                    '<label>' + lang.dialogBox.mathBox.previewLabel + ':</label>' +
+                    '<label>' + lang.dialogBox.mathBox.previewLabel + '</label>' +
                     '<p class="se-math-preview"></p>' +
                 '</div>' +
             '</div>' +
@@ -133,6 +133,8 @@ export default {
             const contextMath = this.context.math;
             const mathExp = contextMath.focusElement.value;
             const katexEl = contextMath.previewElement.querySelector('.katex');
+
+            if (!katexEl) return;
             katexEl.setAttribute('data-exp', mathExp);
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
@@ -150,6 +152,7 @@ export default {
 
                 const empty = this.util.createTextNode(this.util.zeroWidthSpace);
                 katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
+                this.setRange(katexEl, 0, katexEl, 1);
             } else {
                 const findParent = function (child, className) {
                     if (child.classList.contains(className)) return child;
@@ -166,7 +169,7 @@ export default {
                 };
                 const containerEl = findParent(contextMath._mathExp, 'katex');
                 containerEl.parentNode.replaceChild(katexEl, containerEl);
-                this.setRange(katexEl.childNodes[0], 0, katexEl.childNodes[0], 1);
+                this.setRange(katexEl, 0, katexEl, 1);
             }
 
             // history stack

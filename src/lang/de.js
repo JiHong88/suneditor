@@ -53,6 +53,7 @@
             hr_dashed: 'Gestrichelt',
             table: 'Tabelle',
             link: 'Link',
+            math: 'Mathematik',
             image: 'Bild',
             video: 'Video',
             fullScreen: 'Vollbild',
@@ -78,6 +79,12 @@
                 url: 'Link-URL',
                 text: 'Link-Text',
                 newWindowCheck: 'In neuem Fenster anzeigen'
+            },
+            mathBox: {
+                title: 'Mathematik',
+                inputLabel: 'Mathematische Notation',
+                fontSizeLabel: 'Schriftgröße',
+                previewLabel: 'Vorschau'
             },
             imageBox: {
                 title: 'Bild einfügen',

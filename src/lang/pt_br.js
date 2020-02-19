@@ -54,6 +54,7 @@
             hr_dashed: 'tracejada',
             table: 'Tabela',
             link: 'Link',
+            math: 'Matemática',
             image: 'Imagem',
             video: 'Vídeo',
             fullScreen: 'Tela cheia',
@@ -79,6 +80,12 @@
                 url: 'URL para link',
                 text: 'Texto à mostrar',
                 newWindowCheck: 'Abrir em nova guia'
+            },
+            mathBox: {
+                title: 'Matemática',
+                inputLabel: 'Notação matemática',
+                fontSizeLabel: 'Tamanho',
+                previewLabel: 'Prever'
             },
             imageBox: {
                 title: 'Inserir imagens',

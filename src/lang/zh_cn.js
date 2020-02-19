@@ -53,6 +53,7 @@
             hr_dashed: '虚线',
             table: '表格',
             link: '超链接',
+            math: '数学',
             image: '图片',
             video: '视频',
             fullScreen: '全屏',
@@ -78,6 +79,12 @@
                 url: '网址',
                 text: '字体',
                 newWindowCheck: '在新标签页中打开'
+            },
+            mathBox: {
+                title: '数学',
+                inputLabel: '数学符号',
+                fontSizeLabel: '字号',
+                previewLabel: '预览'
             },
             imageBox: {
                 title: '插入图片',
