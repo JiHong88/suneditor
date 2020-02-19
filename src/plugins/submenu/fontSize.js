@@ -60,7 +60,7 @@ export default {
     active: function (element) {
         if (!element) {
             this.util.changeTxt(this.context.fontSize.targetText, this.lang.toolbar.fontSize);
-        } else if (element.style.fontSize.length > 0) {
+        } else if (element.style && element.style.fontSize.length > 0) {
             this.util.changeTxt(this.context.fontSize.targetText, element.style.fontSize);
             return true;
         }

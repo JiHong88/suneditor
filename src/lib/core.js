@@ -1188,7 +1188,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let endOff = range.endOffset;
             let tempCon, tempOffset, tempChild;
 
-            if (isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) {
+            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || util._isIgnoreNodeChange(range.commonAncestorContainer)) {
                 return;
             }
 
@@ -1283,6 +1283,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 if (!onlyBreak) {
                     while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
                         tempChild = tempCon.childNodes;
+                        if (tempChild.length === 0) break;
                         tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
                         tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
                     }
@@ -1527,6 +1528,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     child = children[i];
                     next = children[i + 1];
                     if (!child) break;
+                    if(inst.util._isIgnoreNodeChange(child)) continue;
                     if (len === 1 && current.nodeName === child.nodeName) {
                         inst.util.copyTagAttributes(child, current);
                         current.parentNode.replaceChild(child, current);

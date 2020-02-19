@@ -76,7 +76,7 @@ export default {
             const font = this.lang.toolbar.font;
             this.util.changeTxt(target, font);
             this.util.changeTxt(tooltip, font);
-        } else if (element.style.fontFamily.length > 0) {
+        } else if (element.style && element.style.fontFamily.length > 0) {
             const selectFont = element.style.fontFamily.replace(/["']/g,'');
             this.util.changeTxt(target, selectFont);
             this.util.changeTxt(tooltip, selectFont);

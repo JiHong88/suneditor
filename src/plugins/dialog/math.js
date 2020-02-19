@@ -38,7 +38,7 @@ export default {
         math_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);
         math_button.addEventListener('click', this.onClick_mathBtn.bind(core));
 
         /** append html */
@@ -86,8 +86,7 @@ export default {
             '<div class="se-dialog-footer">' +
                 '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '</div>' +
-        '</form>' +
-        '';
+        '</form>';
 
         return dialog;
     },
@@ -134,7 +133,8 @@ export default {
             const mathExp = contextMath.focusElement.value;
             const katexEl = contextMath.previewElement.querySelector('.katex');
 
-            if (!katexEl) return;
+            if (!katexEl) return false;
+            katexEl.setAttribute('data-ignore-node', true);
             katexEl.setAttribute('data-exp', mathExp);
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
@@ -179,14 +179,20 @@ export default {
             contextMath.fontSizeElement.value = '1em';
             contextMath.previewElement.style.fontSize = '1em';
             contextMath.previewElement.innerHTML = '';
+
+            return true;
         }.bind(this);
 
         try {
-            submitAction();
-        } finally {
+            if (submitAction()) {
+                this.plugins.dialog.close.call(this);
+                this.focus();
+            }
+        } catch (e) {
             this.plugins.dialog.close.call(this);
-            this.closeLoading();
             this.focus();
+        } finally {
+            this.closeLoading();
         }
 
         return false;
@@ -197,6 +203,7 @@ export default {
             if (this.controllerArray[0] === this.context.math.mathBtn) this.controllersOff();
         } else if (element.getAttribute('data-exp')) {
             if (this.controllerArray[0] !== this.context.math.mathBtn) {
+                this.setRange(element, 0, element, 1);
                 this.plugins.math.call_controller_mathButton.call(this, element);
                 return true;
             }
