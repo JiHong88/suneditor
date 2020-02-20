@@ -57,6 +57,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         util: util,
 
         /**
+         * @description Notice object
+         */
+        notice: notice,
+
+        /**
          * @description Whether the plugin is initialized
          */
         initPlugins: {},
@@ -193,6 +198,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _imageUploadError: function (errorMessage, result) {
             if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result, core);
             return true;
+        },
+
+        /**
+         * @description An user callback function of the image upload
+         * @private
+         */
+        _imageUploadHandler: function (response, info, core) {
+            if (typeof userFunction.imageUploadHandler === 'function') {
+                userFunction.imageUploadHandler(response, info, core);
+                return true;
+            } else {
+                return false;
+            }
         },
 
         /**
@@ -4522,9 +4540,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         showInline: null,
 
         /**
-         * @description Called before the image is uploaded
-         * If false is returned, no image upload is performed.
-         * @param {Array} files Files array
+         * @description It replaces the default callback function of the image upload
+         * @param {Object} response Response object
          * @param {Object} info Input information
          * - linkValue: Link url value
          * - linkNewWindow: Open in new window Check Value
@@ -4533,6 +4550,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * - align: Align Check Value
          * - isUpdate: Update image if true, create image if false
          * - currentImage: If isUpdate is true, the currently selected image.
+         * @param {Object} core Core object
+         */
+        imageUploadHandler: null,
+
+        /**
+         * @description Called before the image is uploaded
+         * If false is returned, no image upload is performed.
+         * @param {Array} files Files array
+         * @param {Object} info Input information
          * @param {Object} core Core object
          * @returns {Boolean}
          */

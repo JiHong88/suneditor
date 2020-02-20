@@ -292,7 +292,7 @@ export default {
                 }
 
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, info.isUpdate, info.currentImage);
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                 if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
@@ -344,22 +344,24 @@ export default {
         reader.readAsDataURL(file);
     },
 
-    callBack_imgUpload: function (linkValue, linkNewWindow, width, height, align, update, updateElement) {
+    callBack_imgUpload: function (info) {
         if (this.context.image._xmlHttp.readyState === 4) {
             if (this.context.image._xmlHttp.status === 200) {
-                const response = JSON.parse(this.context.image._xmlHttp.responseText);
+                
+                if (!this._imageUploadHandler(this.context.image._xmlHttp, info, this)) {
+                    const response = JSON.parse(this.context.image._xmlHttp.responseText);
 
-                if (response.errorMessage) {
-                    this.closeLoading();
-                    if (this._imageUploadError(response.errorMessage, response.result)) {
-                        notice.open.call(this, response.errorMessage);
-                    }
-                } else {
-                    const fileList = response.result;
-                    for (let i = 0, len = fileList.length, file; i < len; i++) {
-                        file = {name: fileList[i].name, size: fileList[i].size};
-                        if (update) this.plugins.image.update_src.call(this, fileList[i].url, updateElement, file);
-                        else this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, height, align, file);
+                    if (response.errorMessage) {
+                        if (this._imageUploadError(response.errorMessage, response.result)) {
+                            notice.open.call(this, response.errorMessage);
+                        }
+                    } else {
+                        const fileList = response.result;
+                        for (let i = 0, len = fileList.length, file; i < len; i++) {
+                            file = {name: fileList[i].name, size: fileList[i].size};
+                            if (info.isUpdate) this.plugins.image.update_src.call(this, fileList[i].url, info.currentImage, file);
+                            else this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+                        }
                     }
                 }
 

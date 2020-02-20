@@ -138,6 +138,10 @@ ss.onChange = function (contents) {
     console.log('change')
 }
 
+ss.imageUploadHandler = function (response, core) {
+    console.log('rrrr', response)
+}
+
 ss.onImageUploadBefore = function (files, info, core) {
     console.log('files--', files);
     console.log('info--', info);

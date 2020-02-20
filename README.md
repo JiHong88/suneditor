@@ -30,6 +30,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
+- [Use KaTeX (math plugin)](#use-katex-math-plugin)
 - [Options](#options)
 - [Functions](#functions)
 - [Plugins list](#plugins-list)
@@ -143,14 +144,14 @@ suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
-        ['paragraphStyle'],
+        ['blockquote', 'paragraphStyle'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
         '/', // Line break
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
-        ['table', 'link', 'image', 'video'],
+        ['table', 'link', 'image', 'video', /** 'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template']
@@ -171,16 +172,14 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, lineHeight, 
-    table, template, formatBlock, paragraphStyle, textStyle, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, 
+        horizontalRule, image, template} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo', 'removeFormat'],
-        [font, fontSize, formatBlock],
-        [paragraphStyle, textStyle, fontColor, hiliteColor],
-        [align, horizontalRule, list, lineHeight],
-        [table, link, image, video, template]
+        [align, font, fontSize, fontColor, hiliteColor],
+        [horizontalRule, image, template]
     ],
 })
 ```
@@ -202,13 +201,13 @@ const initEditor = suneditor.init({
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
-        'paragraphStyle',
+        'blockquote', 'paragraphStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video',
+        'table', 'link', 'image', 'video', /** 'math' */, // You must add the 'katex' library at options to use the 'math' plugin.
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ]
@@ -231,8 +230,9 @@ initEditor.create('sample_2', {
 
 ## Use CodeMirror
 ```html
+<!-- https://github.com/codemirror/CodeMirror -->
 <!-- codeMirror (^5.0.0) -->
-<!-- Use version 5.0.0 or later. -->
+<!-- Use version 5.x.x -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
@@ -248,7 +248,7 @@ import 'codemirror/mode/htmlmixed/htmlmixed'
 import 'codemirror/lib/codemirror.css'
 
 suneditor.create('sample', {
-    codeMirror: CodeMirror,
+    codeMirror: CodeMirror // window.CodeMirror,
     // Set options
     // codeMirror: {
     //     src: CodeMirror,
@@ -261,9 +261,38 @@ suneditor.create('sample', {
 });
 ```
 
+## Use KaTeX (math plugin)
+```html
+<!-- https://github.com/KaTeX/KaTeX -->
+<!-- KaTeX (^0.11.1) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+```
+```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+// Import katex
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+
+suneditor.create('sample', {
+    katex: katex // window.katex,
+    // Set options
+    // katex: {
+    //     src: katex,
+    //     options: {...}
+    // }
+    buttonList: [
+        ['math']
+    ]
+});
+```
+
 ## Options
 ```java
 plugins: [
+    // command
+    blockquote,
     // Submenu
     align,
     font,
@@ -281,7 +310,8 @@ plugins: [
     // Dialog
     image,
     link,
-    video
+    video,
+    math // You must add the 'katex' library at options to use the 'math' plugin.
 ]               : Plugins array.     default: null {Array}
 
 // Tags whitelist--------------------------------------å---------------------------------------------------------
@@ -308,7 +338,7 @@ iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     or put the URL value.                                        default: 'suneditor' {Array|String}
                     ex) 'main' or ['suneditor', 'http://suneditor.com/sample/css/sample.css']
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
-                  Use version 5.0.0 or later.
+                  Use version 5.x.x // https://github.com/codemirror/CodeMirror
                   ex) codeMirror: CodeMirror // Default option
                       codeMirror: { // Custom option
                         src: CodeMirror,
@@ -318,6 +348,17 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                             * htmlMode: true,
                             * lineNumbers: true
                             * lineWrapping: true
+                            */
+                        }
+                      }
+katex           : Required library for math plugins.               default: null {Object}
+                  Use version 0.x.x // https://github.com/KaTeX/KaTeX
+                  ex) katex: katex // Default option
+                      katex: { // Custom option
+                        src: katex,
+                        options: {
+                            /** default options **
+                            * throwOnError: false,
                             */
                         }
                       }
@@ -663,11 +704,10 @@ editor.onload = function (core, reload) {
 */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
 
-// Called before the image is uploaded
-// If false is returned, no image upload is performed.
+// It replaces the default callback function of the image upload
 /**
- * files: Files array
- * info: {
+ * response: Response object
+ * info (Input information): {
  * - linkValue: Link url value
  * - linkNewWindow: Open in new window Check Value
  * - inputWidth: Value of width input
@@ -676,6 +716,51 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
  * - isUpdate: Update image if true, create image if false
  * - currentImage: If isUpdate is true, the currently selected image.
  * }
+ * core: Core object
+ */
+editor.imageUploadHandler = function (response, info, core) {
+    // Example of upload method
+    const res = JSON.parse(response.responseText);
+    
+    // Error
+    if (res.errorMessage) {
+        if (typeof editor.onImageUploadError === 'function') {
+            if (core.onImageUploadError(res.errorMessage, res.result)) {
+                core.notice.open.call(core, res.errorMessage);
+            }
+        } else {
+            core.notice.open.call(core, res.errorMessage);
+        }
+        /** 
+         * You can do the same thing using the core private function.
+         * The core._imageUploadError function returns false when "editor.onImageUploadError" function is not defined.
+        */
+        // if (core._imageUploadError(res.errorMessage, res.result)) {
+        //     core.notice.open.call(core, res.errorMessage);
+        // }
+    }
+    // Success
+    else {
+        const fileList = res.result;
+        const imagePlugin = core.plugins.image;
+
+        for (let i = 0, len = fileList.length, file; i < len; i++) {
+            // The file object must have name and size attributes.
+            file = {name: fileList[i].name, size: fileList[i].size};
+            // For existing image updates, the "info" attributes are predefined in the element.
+            // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
+            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.currentImage, file);
+            // The image is created and a format element(p, div..) is added below it.
+            else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+        }
+    }
+}
+
+// Called before the image is uploaded
+// If false is returned, no image upload is performed.
+/**
+ * files: Files array
+ * info: Input information
  * core: Core object
  * return {Boolean}
  */
@@ -740,14 +825,21 @@ editor.showInline = function (toolbar, context, core) {
     </thead>
     <tbody>
         <tr>
+            <td align="left">blockquote</td>
+            <td align="left"><strong>command</strong></td>
+        </tr>
+        <tr>
             <td align="left">image</td>
-            <td align="left" rowspan="3"><strong>dialog</strong></td>
+            <td align="left" rowspan="4"><strong>dialog</strong></td>
         </tr>
         <tr>
             <td align="left">link</td>
         </tr>
         <tr>
             <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">math</td>
         </tr>
         <tr>
             <td align="left">align</td>
