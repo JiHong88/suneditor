@@ -63,8 +63,8 @@ export default {
             if (textAlign) {
                 target.className = 'se-icon-align-' + textAlign;
                 target.setAttribute('data-focus', textAlign);
-                return true;
             }
+            return true;
         }
 
         return false;

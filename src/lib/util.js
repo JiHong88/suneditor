@@ -1040,13 +1040,15 @@ const util = {
     /**
      * @description Delete a empty child node of argument element
      * @param {Element} element Element node
+     * @param {Node|null} notRemoveNode Do not remove node
      */
-    removeEmptyNode: function (element) {
+    removeEmptyNode: function (element, notRemoveNode) {
         const inst = this;
         
         (function recursionFunc(current) {
-            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !inst._notTextNode(current) && 
-                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
+            if (current === notRemoveNode) return 0;
+            if (current !== element && current.getAttribute('contenteditable') !== 'false' && inst.onlyZeroWidthSpace(current.textContent) && 
+                !inst._notTextNode(current) && (!current.firstChild || !inst.isBreak(current.firstChild)) && !inst.isComponent(current)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
@@ -1107,7 +1109,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (!!element.getAttribute('data-ignore-node') || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName));
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName));
     },
 
     /**
@@ -1127,7 +1129,7 @@ const util = {
      * @private
      */
     _notTextNode: function (element) {
-        return element.nodeType !== 3 && /^(br|input|canvas|img|iframe|audio|video)$/i.test(element.nodeName);
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || /^(br|input|canvas|img|iframe|audio|video)$/i.test(element.nodeName));
     },
 
     /**

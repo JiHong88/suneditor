@@ -386,14 +386,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-            if (caption) {
-                caption.focus();
-            } else {
-                context.element.wysiwyg.focus();
-            }
+            try {
+                const range = this.getRange();
+                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+            } catch (e) {
+                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+                if (caption) {
+                    caption.focus();
+                } else {
+                    context.element.wysiwyg.focus();
+                }
 
-            this._editorRange();
+                this._editorRange();
+            }
 
             event._applyTagEffects();
         },
@@ -1188,7 +1193,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let endOff = range.endOffset;
             let tempCon, tempOffset, tempChild;
 
-            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || util._isIgnoreNodeChange(range.commonAncestorContainer)) {
+            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && startCon.getAttribute('contenteditable') === 'false')) {
                 return;
             }
 
@@ -1457,7 +1462,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 // start
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 // mid
-                for (let i = 1; i < endLength; i++) {
+                for (let i = endLength - 1; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
                     this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
                 }
@@ -1493,19 +1498,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             element.removeChild(removeNode);
-        },
-
-        /**
-         * @description Delete a empty child node of argument element
-         * @param {Element} formatNode The format node
-         * @param {Element} notRemoveNode Do not remove node
-         * @private
-         */
-        _removeEmptyNode: function (formatNode, notRemoveNode) {
-            const preventDelete = util.onlyZeroWidthSpace(notRemoveNode.textContent);
-            if (preventDelete) notRemoveNode.textContent = ' ';
-            util.removeEmptyNode(formatNode);
-            if (preventDelete) notRemoveNode.textContent = util.zeroWidthSpace;
         },
 
         /**
@@ -1555,46 +1547,48 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         for (let n = 0, nLen = childs.length; n < nLen; n++) {
                             if (childs[n].textContent.length > 0) childLength++;
                         }
-                        
+
                         const l = child.lastChild;
                         const r = next.firstChild;
-                        const textOffset = l && r && l.nodeType === 3 && r.nodeType === 3;
-                        let addOffset = l.textContent.length;
-                        let tempL = l.previousSibling;
-                        while(tempL && tempL.nodeType === 3) {
-                            addOffset += tempL.textContent.length;
-                            tempL = tempL.previousSibling;
-                        }
-
-                        if (childLength > 0 && l && r && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
-
-                        // start
-                        if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
-                            if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
-                                includedPath_s = false;
-                            } else {
-                                nodePath_s[depth] -= 1;
-                                if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
-                                    nodePath_s[depth + 1] += childLength;
-                                    if (textOffset) {
-                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                            offsets.a += addOffset;
+                        if (l && r) {
+                            const textOffset = l.nodeType === 3 && r.nodeType === 3;
+                            let addOffset = l.textContent.length;
+                            let tempL = l.previousSibling;
+                            while(tempL && tempL.nodeType === 3) {
+                                addOffset += tempL.textContent.length;
+                                tempL = tempL.previousSibling;
+                            }
+    
+                            if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
+    
+                            // start
+                            if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
+                                if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
+                                    includedPath_s = false;
+                                } else {
+                                    nodePath_s[depth] -= 1;
+                                    if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
+                                        nodePath_s[depth + 1] += childLength;
+                                        if (textOffset) {
+                                            if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                                offsets.a += addOffset;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        // end
-                        if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
-                            if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
-                                includedPath_e = false;
-                            } else {
-                                nodePath_e[depth] -= 1;
-                                if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
-                                    nodePath_e[depth + 1] += childLength;
-                                    if (textOffset) {
-                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                            offsets.b += addOffset;
+                            // end
+                            if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
+                                if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
+                                    includedPath_e = false;
+                                } else {
+                                    nodePath_e[depth] -= 1;
+                                    if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
+                                        nodePath_e[depth + 1] += childLength;
+                                        if (textOffset) {
+                                            if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                                offsets.b += addOffset;
+                                            }
                                         }
                                     }
                                 }
@@ -1758,7 +1752,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             anchorNode = anchorNode.cloneNode(false);
                         }
                         
-                        if (prevNode.data.length > 0) {
+                        if (!util.onlyZeroWidthSpace(prevNode)) {
                             ancestor.appendChild(prevNode);
                         }
 
@@ -1817,7 +1811,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             nNodeArray.push(newInnerNode);
                         }
 
-                        if (afterNode.data.length > 0) {
+                        if (!util.onlyZeroWidthSpace(afterNode)) {
                             newNode = child;
                             cssText = '';
                             pCurrent = [];
@@ -1897,12 +1891,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     // other
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
-                            if (!collapsed && util._isIgnoreNodeChange(child)) {
-                                newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child);
-                                pNode.appendChild(newInnerNode);
-                                nNodeArray.push(newInnerNode);
-                                i--;
+                            if (util._isIgnoreNodeChange(child)) {
+                                pNode.appendChild(child.cloneNode(true));
+                                if (!collapsed) {
+                                    newInnerNode = newInnerNode.cloneNode(false);
+                                    pNode.appendChild(newInnerNode);
+                                    nNodeArray.push(newInnerNode);
+                                }
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2018,7 +2013,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            this._removeEmptyNode(pNode, newInnerNode);
+            util.removeEmptyNode(pNode, newInnerNode);
 
             if (collapsed) {
                 startOffset = startContainer.textContent.length;
@@ -2126,10 +2121,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child);
+                                pNode.appendChild(child.cloneNode(true));
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
-                                i--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2222,7 +2216,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             anchorNode = anchorNode.cloneNode(false);
                         }
 
-                        if (prevNode.data.length > 0) {
+                        if (!util.onlyZeroWidthSpace(prevNode)) {
                             ancestor.appendChild(prevNode);
                         }
 
@@ -2307,7 +2301,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                this._removeEmptyNode(pNode, newInnerNode);
+                util.removeEmptyNode(pNode, newInnerNode);
 
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
@@ -2353,7 +2347,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 let children = tempNode.childNodes;
                 let i = 0, len = children.length;
-
                 for (let child; i < len; i++) {
                     child = children[i];
                     if (child.nodeType === 3) break;
@@ -2390,25 +2383,26 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (!child) continue;
                     let coverNode = ancestor;
 
-                    if (util._isIgnoreNodeChange(child)) {
-                        pNode.appendChild(newInnerNode);
-                        newInnerNode = newInnerNode.cloneNode(false);
-                        pNode.appendChild(child);
+                    if (!util.isBreak(child) && util._isIgnoreNodeChange(child)) {
+                        if (newInnerNode.childNodes.length > 0) {
+                            pNode.appendChild(newInnerNode);
+                            newInnerNode = newInnerNode.cloneNode(false);
+                        }
+                        pNode.appendChild(child.cloneNode(true));
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
-                        i--;
                         continue;
                     } else {
                         vNode = validation(child);
                         if (vNode) {
                             noneChange = false;
                             ancestor.appendChild(vNode);
-                            if (child.nodeType === 1 && !util.isBreak(child)) coverNode = vNode;
+                            if (child.nodeType === 1) coverNode = vNode;
                         }
                     }
 
-                    recursionFunc(child, coverNode);
+                    if (!util.isBreak(child)) recursionFunc(child, coverNode);
                 }
             })(element.cloneNode(true), newInnerNode);
 
@@ -2429,7 +2423,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
-            this._removeEmptyNode(pNode, newInnerNode);
+            util.removeEmptyNode(pNode, newInnerNode);
             this._mergeSameTags(pNode, null, null);
 
             // node change
@@ -2499,11 +2493,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
+                                const cloneChild = child.cloneNode(true);
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.insertBefore(child, ancestor);
-                                pNode.insertBefore(newInnerNode, child);
+                                pNode.insertBefore(cloneChild, ancestor);
+                                pNode.insertBefore(newInnerNode, cloneChild);
                                 nNodeArray.push(newInnerNode);
-                                i--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2601,7 +2595,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             nNodeArray.push(newInnerNode);
                         }
 
-                        if (afterNode.data.length > 0) {
+                        if (!util.onlyZeroWidthSpace(afterNode)) {
                             ancestor.insertBefore(afterNode, ancestor.firstChild);
                         }
 
@@ -2693,7 +2687,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     element.appendChild(container);
                 }
             } else {
-                this._removeEmptyNode(pNode, newInnerNode);
+                util.removeEmptyNode(pNode, newInnerNode);
 
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
@@ -3492,23 +3486,28 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const cLen = activePlugins.length;
             let nodeName = '';
 
-            for (let selectionParent = core.getSelectionNode(); !util.isWysiwygDiv(selectionParent); selectionParent = selectionParent.parentNode) {
-                if (!selectionParent) break;
-                if (selectionParent.nodeType !== 1 || util.isBreak(selectionParent)) continue;
-                nodeName = selectionParent.nodeName.toUpperCase();
+            let selectionNode = core.getSelectionNode();
+            while (selectionNode.firstChild) {
+                selectionNode = selectionNode.firstChild;
+            }
+
+            for (let element = selectionNode; !util.isWysiwygDiv(element); element = element.parentNode) {
+                if (!element) break;
+                if (element.nodeType !== 1 || util.isBreak(element)) continue;
+                nodeName = element.nodeName.toUpperCase();
                 currentNodes.push(nodeName);
 
                 /* Active plugins */
                 for (let c = 0, name; c < cLen; c++) {
                     name = activePlugins[c];
-                    if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, selectionParent)) {
+                    if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, element)) {
                         commandMapNodes.push(name);
                     }
                 }
 
-                if (util.isFormatElement(selectionParent)) {
+                if (util.isFormatElement(element)) {
                     /* Outdent */
-                    if (commandMapNodes.indexOf('OUTDENT') < 0 && selectionParent.style.marginLeft && util.getNumber(selectionParent.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') < 0 && element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                     }

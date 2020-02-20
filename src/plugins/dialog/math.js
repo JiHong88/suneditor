@@ -134,7 +134,7 @@ export default {
             const katexEl = contextMath.previewElement.querySelector('.katex');
 
             if (!katexEl) return false;
-            katexEl.setAttribute('data-ignore-node', true);
+            katexEl.setAttribute('contenteditable', false);
             katexEl.setAttribute('data-exp', mathExp);
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
@@ -172,9 +172,6 @@ export default {
                 this.setRange(katexEl, 0, katexEl, 1);
             }
 
-            // history stack
-            this.history.push(false);
-
             contextMath.focusElement.value = '';
             contextMath.fontSizeElement.value = '1em';
             contextMath.previewElement.style.fontSize = '1em';
@@ -186,11 +183,11 @@ export default {
         try {
             if (submitAction()) {
                 this.plugins.dialog.close.call(this);
-                this.focus();
+                // history stack
+                this.history.push(false);
             }
         } catch (e) {
             this.plugins.dialog.close.call(this);
-            this.focus();
         } finally {
             this.closeLoading();
         }
@@ -205,8 +202,8 @@ export default {
             if (this.controllerArray[0] !== this.context.math.mathBtn) {
                 this.setRange(element, 0, element, 1);
                 this.plugins.math.call_controller_mathButton.call(this, element);
-                return true;
             }
+            return true;
         }
 
         return false;

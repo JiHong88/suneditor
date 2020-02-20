@@ -174,8 +174,8 @@ export default {
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
             if (this.controllerArray[0] !== this.context.link.linkBtn) {
                 this.plugins.link.call_controller_linkButton.call(this, element);
-                return true;
             }
+            return true;
         }
 
         return false;
