@@ -14,8 +14,8 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
 > - Pasting from Microsoft Word and Excel.
 > - Custom table selection, merge and split.
-> - Media embeds, image uploads.
-> - Can use CodeMirror.
+> - Media embed, images upload.
+> - Can use CodeMirror, KaTeX.
 > - And.. many other features :)
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2301)
