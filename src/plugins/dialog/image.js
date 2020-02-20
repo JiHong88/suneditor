@@ -272,6 +272,18 @@ export default {
             const imageUploadHeader = this.context.option.imageUploadHeader;
             const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
+            const info = {
+                linkValue: this.context.image._linkValue,
+                linkNewWindow: this.context.image.imgLinkNewWindowCheck.checked,
+                inputWidth: this.context.image.inputX.value,
+                inputHeight: this.context.image.inputY.value,
+                align: this.context.image._align,
+                isUpdate: this.context.dialog.updateModal,
+                currentImage: this.context.image._element
+            };
+
+            if (!this._imageUploadBefore(files, info)) return;
+
             if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
                 const formData = new FormData();
 
@@ -280,7 +292,7 @@ export default {
                 }
 
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.inputX.value, this.context.image.inputY.value, this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, info.isUpdate, info.currentImage);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
                 if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
@@ -291,7 +303,7 @@ export default {
             }
             else {
                 for (let i = 0; i < filesLen; i++) {
-                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.inputX.value, this.context.image.inputY.value, this.context.image._align, i, filesLen - 1);
+                    this.plugins.image.setup_reader.call(this, files[i], info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, i, filesLen - 1);
                 }
             }
         }
@@ -301,8 +313,9 @@ export default {
         try {
             this.plugins.image.submitAction.call(this, this.context.image.imgInputFile.files);
         } catch (e) {
-            this.closeLoading();
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
+        } finally {
+            this.closeLoading();
         }
     },
 

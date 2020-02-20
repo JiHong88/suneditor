@@ -631,6 +631,7 @@ editor.toolbar.show();
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
+// e: event object, core: Core object
 editor.onScroll = function (e, core) { console.log('onScroll', e) }
 
 editor.onClick = function (e, core) { console.log('onClick', e) }
@@ -658,8 +659,31 @@ editor.onload = function (core, reload) {
 /**
  * cleanData : HTML string modified for editor format
  * maxCharCount : maxChartCount option (true if max character is exceeded)
+ * core: Core object
 */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Called before the image is uploaded
+// If false is returned, no image upload is performed.
+/**
+ * files: Files array
+ * info: {
+ * - linkValue: Link url value
+ * - linkNewWindow: Open in new window Check Value
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update image if true, create image if false
+ * - currentImage: If isUpdate is true, the currently selected image.
+ * }
+ * core: Core object
+ * return {Boolean}
+ */
+editor.onImageUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
 
 // Called when the image is uploaded or the uploaded image is deleted.
 /**
@@ -667,13 +691,14 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
  * index: Uploaded index (key value)
  * state: Upload status ('create', 'update', 'delete')
  * imageInfo: {
- * * index: data index
- * * name: file name
- * * size: file size
- * * select: select function
- * * delete: delete function
+ * - index: data index
+ * - name: file name
+ * - size: file size
+ * - select: select function
+ * - delete: delete function
  * }
  * remainingFilesCount: Count of remaining image files
+ * core: Core object
 */
 editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
     console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
@@ -685,9 +710,12 @@ editor.onImageUpload = function (targetImgElement, index, state, imageInfo, rema
 /**
  * errorMessage: Error message to show
  * result: Result object 
+ * core: Core object
+ * return {Boolean}
 */
 editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
+    return Boolean
 }
 
 /**

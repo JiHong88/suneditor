@@ -170,6 +170,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         _imagesInfoReset: false,
 
         /**
+         * @description An user event function before image uploaded
+         * @private
+         */
+        _imageUploadBefore: function (files, info) {
+            if (typeof userFunction.onImageUploadBefore === 'function') return userFunction.onImageUploadBefore(files, info, core);
+            return true;
+        },
+
+        /**
          * @description An user event function when image uploaded success or remove image
          * @private
          */
@@ -4498,7 +4507,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
         /**
          * @description Event functions
-         * @param {Object} event Event Object
+         * @param {Object} e Event Object
+         * @param {Object} core Core object
          */
         onload: null,
         onScroll: null,
@@ -4512,11 +4522,34 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         showInline: null,
 
         /**
+         * @description Called before the image is uploaded
+         * If false is returned, no image upload is performed.
+         * @param {Array} files Files array
+         * @param {Object} info Input information
+         * - linkValue: Link url value
+         * - linkNewWindow: Open in new window Check Value
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update image if true, create image if false
+         * - currentImage: If isUpdate is true, the currently selected image.
+         * @param {Object} core Core object
+         * @returns {Boolean}
+         */
+        onImageUploadBefore: null,
+
+        /**
          * @description Called when the image is uploaded or the uploaded image is deleted
          * @param {Element} targetImgElement Current img element
          * @param {Number} index Uploaded index
-         * @param {Boolean} isDelete Whether or not it was called after the delete operation
+         * @param {String} state Upload status ('create', 'update', 'delete')
          * @param {Object} imageInfo Image info object
+         * - index: data index
+         * - name: file name
+         * - size: file size
+         * - select: select function
+         * - delete: delete function
+         * @param {Object} core Core object
          */
         onImageUpload: null,
 
@@ -4524,6 +4557,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Called when the image is upload failed
          * @param {String} errorMessage Error message
          * @param {Object} result Result info Object
+         * @param {Object} core Core object
+         * @returns {Boolean}
          */
         onImageUploadError: null,
 
