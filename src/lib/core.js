@@ -35,6 +35,33 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
     const core = {
         _d: _d,
         _w: _w,
+
+        /**
+         * @description Document object of the iframe if created as an iframe || _d
+         * @private
+         */
+        _wd: null,
+
+        /**
+         * @description Window object of the iframe if created as an iframe || _w
+         * @private
+         */
+        _ww: null,
+
+        /**
+         * @description Util object
+         */
+        util: util,
+
+        /**
+         * @description Notice object
+         */
+        notice: notice,
+
+        /**
+         * @description History object for undo, redo
+         */
+        history: null,
         
         /**
          * @description Elements and user options parameters of the suneditor
@@ -50,16 +77,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Loaded plugins
          */
         plugins: plugins || {},
-
-        /**
-         * @description Util object
-         */
-        util: util,
-
-        /**
-         * @description Notice object
-         */
-        notice: notice,
 
         /**
          * @description Whether the plugin is initialized
@@ -115,11 +132,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         codeViewDisabledButtons: null,
 
         /**
-         * @description History object for undo, redo
-         */
-        history: null,
-
-        /**
          * @description Editor tags whitelist (RegExp object)
          * util.createTagsWhitelist(options._editorTagsWhitelist)
          */
@@ -136,6 +148,12 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @private
          */
         _bindControllersOff: null,
+
+        /**
+         * @description The selection node (core.getSelectionNode()) to which the effect was last applied
+         * @private
+         */
+        _lastEffectNode: null,
 
         /**
          * @description Is inline mode?
@@ -378,6 +396,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             this._notHideToolbar = false;
             this._resizingName = '';
             this.currentControllerName = '';
+            this._lastEffectNode = null;
             if (!this._bindControllersOff) return;
 
             this.removeDocEvent('mousedown', this._bindControllersOff);
@@ -3517,6 +3536,10 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _applyTagEffects: function () {
+            let selectionNode = core.getSelectionNode();
+            if (selectionNode === core._lastEffectNode) return;
+            core._lastEffectNode = selectionNode;
+
             const commandMap = core.commandMap;
             const classOnCheck = this._onButtonsCheck;
             const commandMapNodes = [];
@@ -3526,7 +3549,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const cLen = activePlugins.length;
             let nodeName = '';
 
-            let selectionNode = core.getSelectionNode();
             while (selectionNode.firstChild) {
                 selectionNode = selectionNode.firstChild;
             }
@@ -4431,6 +4453,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _onChange_historyStack: function () {
+            event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
         },
