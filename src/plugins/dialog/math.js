@@ -59,7 +59,7 @@ export default {
         dialog.innerHTML = '' +
         '<form class="editor_math">' +
             '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                     '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +

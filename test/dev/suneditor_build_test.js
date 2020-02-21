@@ -80,18 +80,20 @@ window.sun_create1 = function () {
 
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    lang: lang.ko,
+    // lang: lang.ko,
     plugins: plugins,
     buttonList: [
-        ['undo', 'redo','removeFormat',
-        'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'textStyle',
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'blockquote', 'paragraphStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor',
+        'fontColor', 'hiliteColor', 'textStyle',
+        'removeFormat',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'table',
-        'link', 'image', 'video',
+        'align', 'horizontalRule', 'list', 'lineHeight',
+        'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'math']
+        'preview', 'print', 'save', 'template']
     ],
     katex: Katex,
     height: 'auto',
@@ -99,7 +101,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     fullPage: true,
-    addTagsWhitelist: 'mark|canvas|label|select|option|input'
+    addTagsWhitelist: 'mark|canvas|label|select|option|input',
+    imageUploadUrl: 'http://localhost:3000/files/upload',
     // mode: 'inline'
     // videoHeightShow: false,
     // videoRatioShow: false,
@@ -138,9 +141,9 @@ ss.onChange = function (contents) {
     console.log('change')
 }
 
-ss.imageUploadHandler = function (response, core) {
-    console.log('rrrr', response)
-}
+// ss.imageUploadHandler = function (response, core) {
+//     console.log('rrrr', response)
+// }
 
 ss.onImageUploadBefore = function (files, info, core) {
     console.log('files--', files);

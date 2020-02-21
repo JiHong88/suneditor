@@ -122,9 +122,9 @@ export default {
                 lineNumbers: true,
                 lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
-                Object.keys(option).forEach(function (key) {
+                for (let key in option) {
                     init[key] = option[key];
-                });
+                }
                 return init;
             }, {});
 
@@ -155,9 +155,9 @@ export default {
         const katexOptions = [{
             throwOnError: false,
         }, (katex.options || {})].reduce(function (init, option) {
-            Object.keys(option).forEach(function (key) {
+            for (let key in option) {
                 init[key] = option[key];
-            });
+            }
             return init;
         }, {});
 
@@ -542,7 +542,7 @@ export default {
 
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
-                '<i class="se-icon-audio"></i>'
+                '<i class="se-icon-emoji"></i>'
             ],
 
             /** plugins - submenu */

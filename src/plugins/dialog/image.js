@@ -103,7 +103,7 @@ export default {
 
         let html = '' +
             '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                     '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
@@ -294,7 +294,7 @@ export default {
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
                 this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
-                if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
+                if(imageUploadHeader !== null && typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
                         this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
                     }
@@ -370,7 +370,7 @@ export default {
             // error
             else {
                 this.closeLoading();
-                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseURL: ' + this.context.image._xmlHttp.responseURL);
+                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseText: ' + this.context.image._xmlHttp.responseText);
             }
         }
     },

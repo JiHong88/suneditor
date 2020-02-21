@@ -408,23 +408,35 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         /**
+         * @description Use focus method of document
+         * @private
+         */
+        _nativeFocus: function () {
+            const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
+            if (caption) {
+                caption.focus();
+            } else {
+                context.element.wysiwyg.focus();
+            }
+
+            this._editorRange();
+        },
+
+        /**
          * @description Focus to wysiwyg area
          */
         focus: function () {
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
-            try {
-                const range = this.getRange();
-                this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-            } catch (e) {
-                const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
-                if (caption) {
-                    caption.focus();
-                } else {
-                    context.element.wysiwyg.focus();
+            if (context.option.iframe) {
+                this._nativeFocus();
+            } else {
+                try {
+                    const range = this.getRange();
+                    this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                } catch (e) {
+                    this._nativeFocus();
                 }
-
-                this._editorRange();
             }
 
             event._applyTagEffects();
@@ -1082,7 +1094,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 while (children[0]) {
                     c = children[0];
-                    if (util._isIgnoreNodeChange(c) && !util.isBreak(c) && !util.isListCell(format)) {
+                    if (util._notTextNode(c) && !util.isBreak(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
                             parent.insertBefore(format, sibling);
@@ -3378,15 +3390,16 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             // Command plugins registration
             const activePlugins = this.activePlugins = [];
-            Object.keys(plugins).forEach(function (key) {
-                const c = plugins[key];
-                const button = pluginCallButtons[key];
+            let c, button;
+            for (let key in plugins) {
+                c = plugins[key];
+                button = pluginCallButtons[key];
                 if (c.active && button) {
                     core.callPlugin(key, button);
                     core.commandMap[c.name] = button;
                     activePlugins.push(c.name);
                 }
-            });
+            }
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
@@ -4418,7 +4431,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         },
 
         _onChange_historyStack: function () {
-            event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
         },
@@ -4597,7 +4609,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             core.plugins = options.plugins || core.plugins;
             const mergeOptions = [context.option, options].reduce(function (init, option) {
-                Object.keys(option).forEach(function (key) {
+                for (let key in option) {
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
                         i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });
@@ -4606,7 +4618,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     } else {
                         init[key] = option[key];
                     }
-                });
+                }
                 return init;
             }, {});
 

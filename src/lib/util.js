@@ -1015,9 +1015,10 @@ const util = {
         let cc = null;
         if (!validation) {
             validation = function (current) {
+                if (this.isComponent(current)) return false;
                 const text = current.textContent.trim();
                 return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-            };
+            }.bind(this);
         }
 
         (function recursionFunc (element) {
@@ -1044,11 +1045,13 @@ const util = {
      */
     removeEmptyNode: function (element, notRemoveNode) {
         const inst = this;
+        const validation = !notRemoveNode ? false : function (el) {
+            return el === notRemoveNode;
+        };
         
         (function recursionFunc(current) {
-            if (current === notRemoveNode) return 0;
-            if (current !== element && current.getAttribute('contenteditable') !== 'false' && inst.onlyZeroWidthSpace(current.textContent) && 
-                !inst._notTextNode(current) && (!current.firstChild || !inst.isBreak(current.firstChild)) && !inst.isComponent(current)) {
+            if (inst._notTextNode(current) || current === notRemoveNode || (validation && inst.getChildElement(current, validation)) || current.getAttribute('contenteditable') === 'false') return 0;
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
@@ -1129,7 +1132,7 @@ const util = {
      * @private
      */
     _notTextNode: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || /^(br|input|canvas|img|iframe|audio|video)$/i.test(element.nodeName));
+        return element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(element.nodeName));
     },
 
     /**

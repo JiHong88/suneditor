@@ -43,17 +43,20 @@ export default {
 
         let colorArr = [];
         let list = '<div class="se-list-inner">';
-            for (let i = 0, len = colorList.length; i < len; i++) {
-                if (typeof colorList[i] === 'string') {
-                    colorArr.push(colorList[i]);
+            for (let i = 0, len = colorList.length, color; i < len; i++) {
+                color = colorList[i];
+                if (!color) continue;
+                
+                if (typeof color === 'string') {
+                    colorArr.push(color);
                     if (i < len - 1) continue;
                 }
                 if (colorArr.length > 0) {
                     list += '<div class="se-selector-color">' + makeColor(colorArr) + '</div>';
                     colorArr = [];
                 }
-                if (typeof colorList[i] === 'object') {
-                    list += '<div class="se-selector-color">' + makeColor(colorList[i]) + '</div>';
+                if (typeof color === 'object') {
+                    list += '<div class="se-selector-color">' + makeColor(color) + '</div>';
                 }
             }
             list += '' +

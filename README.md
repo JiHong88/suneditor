@@ -501,8 +501,12 @@ imageUrlInput   : Choose whether to create a image url input tag in the image up
 imageUploadHeader : Http Header when uploading images.              default: null {Object}
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
+                  request format: {
+                            "file-0": {},
+                            "file-1": {}
+                        }
                   When not used, it enters base64 data
-                  return {
+                  response format: {
                             "errorMessage": "insert error message",
                             "result": [
                                 {
@@ -567,13 +571,13 @@ buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
-                    // ['paragraphStyle'],
+                    // ['blockquote', 'paragraphStyle'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                     // ['fontColor', 'hiliteColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
-                    // ['table', 'link', 'image', 'video'],
+                    // ['table', 'link', 'image', 'video', 'math'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],

@@ -152,7 +152,7 @@ export default {
             const rangeElement = tag.cloneNode(false);
             this.applyRangeFormatElement(rangeElement);
         }
-        // free, others
+        // free, replace
         else {
             const range = this.getRange();
             const startOffset = range.startOffset;
@@ -273,7 +273,7 @@ export default {
     
                 this.setRange(focusElement, 0, focusElement, 0);
             }
-            // others format
+            // replace format
             else {
                 for (let i = 0, len = modifiedFormsts.length, node, newFormat; i < len; i++) {
                     node = modifiedFormsts[i];
