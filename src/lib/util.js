@@ -696,7 +696,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
@@ -721,7 +721,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
@@ -1045,12 +1045,15 @@ const util = {
      */
     removeEmptyNode: function (element, notRemoveNode) {
         const inst = this;
-        const validation = !notRemoveNode ? false : function (el) {
-            return el === notRemoveNode;
-        };
+
+        if (notRemoveNode) {
+            notRemoveNode = inst.getParentElement(notRemoveNode, function (current) {
+                return element === current.parentElement;
+            });
+        }
         
         (function recursionFunc(current) {
-            if (inst._notTextNode(current) || current === notRemoveNode || (validation && inst.getChildElement(current, validation)) || current.getAttribute('contenteditable') === 'false') return 0;
+            if (inst._notTextNode(current) || current === notRemoveNode || current.getAttribute('contenteditable') === 'false') return 0;
             if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
