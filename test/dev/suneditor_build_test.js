@@ -23,7 +23,7 @@ const align = require('../../src/plugins/submenu/align')
 
 let s1 = suneditor.create('editor', {
   plugins: plugins,
-//   mode: 'balloon',
+  mode: 'balloon', 
   buttonList: [['blockquote', 'font'],['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
   width: '100%',
   pasteTagsWhitelist: 'p|h[1-6]',

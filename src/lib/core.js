@@ -3764,13 +3764,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             event._applyTagEffects();
 
-            if (core._isBalloon) {
-                const range = core.getRange();
-                if (range.collapsed) event._hideToolbar();
-                else event._showToolbarBalloon(range);
-            }
-
+            if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon); 
             if (userFunction.onClick) userFunction.onClick(e, core);
+        },
+
+        _toggleToolbarBalloon: function () {
+            core._editorRange();
+            const range = core.getRange();
+            if (range.collapsed) event._hideToolbar();
+            else event._showToolbarBalloon(range);
         },
 
         _showToolbarBalloon: function (rangeObj) {
