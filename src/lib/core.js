@@ -459,6 +459,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             event._applyTagEffects();
+            if (core._isBalloon) event._toggleToolbarBalloon();
         },
 
         /**
@@ -3793,8 +3794,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
 
-            const scrollLeft = _w.scrollX || _d.documentElement.scrollLeft;
-            const scrollTop = _w.scrollY || _d.documentElement.scrollTop;
+            let scrollLeft = 0;
+            let scrollTop = 0;
+            let el = context.element.topArea.parentElement;
+            while (!!el) {
+                scrollLeft += el.scrollLeft;
+                scrollTop += el.scrollTop;
+                el = el.parentElement;
+            }
+
             const editorWidth = context.element.topArea.offsetWidth;
             const stickyTop = event._getStickyOffsetTop();
             let editorLeft = 0;
@@ -4185,12 +4193,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
         onKeyUp_wysiwyg: function (e) {
             if (event._onShortcutKey) return;
             core._editorRange();
+            const range = core.getRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
-            if (core._isBalloon && !core.getRange().collapsed) {
+            if (core._isBalloon && !range.collapsed) {
                 event._showToolbarBalloon();
                 return;
             }
@@ -4230,7 +4239,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
             if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
-                const range = core.getRange();
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;

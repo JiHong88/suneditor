@@ -21,6 +21,18 @@ import Katex from 'katex';
 
 const align = require('../../src/plugins/submenu/align')
 
+
+suneditor.create("sample1", {
+    plugins: plugins,
+    mode: "balloon",
+    buttonList: [
+        ["undo", "redo"],
+        ["font", "fontSize", "formatBlock"],
+        ["paragraphStyle", "table"]
+    ]
+});
+
+
 let s1 = suneditor.create('editor', {
   plugins: plugins,
   mode: 'balloon', 
@@ -82,6 +94,7 @@ window.sun_create1 = function () {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
+    mode: 'balloon',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -190,7 +203,7 @@ window.sun_getContents = function () {
 }
 
 window.sun_setContents = function (content) {
-    ss.setContents('<img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300">');
+    ss.setContents('<p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
     ss.core.history.reset(true);
     // ss.core.context.tool.save.disabled = true;
 }
