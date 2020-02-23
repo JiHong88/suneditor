@@ -103,20 +103,7 @@ export default {
         }
     },
 
-    pickup: function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        let target = e.target;
-        let command = '';
-
-        while (!command && !/^UL$/i.test(target.tagName)) {
-            command = target.getAttribute('data-command');
-            target = target.parentNode;
-        }
-
-        if (!command) return;
-
+    editList: function (command) {
         const selectedFormsts = this.getSelectedElementsAndComponents();
         if (!selectedFormsts || selectedFormsts.length === 0) return;
 
@@ -139,7 +126,7 @@ export default {
             }
         }
 
-        if (isRemove && (!topEl || command !== topEl.tagName) && (!bottomEl || command !== bottomEl.tagName)) {
+        if (isRemove && (!topEl || command !== topEl.tagName.toUpperCase()) && (!bottomEl || command !== bottomEl.tagName.toUpperCase())) {
             const currentFormat = this.util.getRangeFormatElement(this.getSelectionNode());
             const cancel = currentFormat && currentFormat.tagName === command;
             let rangeArr, tempList;
@@ -259,5 +246,62 @@ export default {
 
         // history stack
         this.history.push(false);
+    },
+
+    editInsideList: function (remove) {
+        const selectedCells = this.getSelectedElements().filter(function (el) { return this.isListCell(el); }.bind(this.util));
+        const cellsLen = selectedCells.length;
+        if ((!remove && !selectedCells[0].previousElementSibling) || cellsLen === 0) return;
+
+        let originList = selectedCells[0].parentNode;
+        let sc, so, ec, eo;
+        
+        if (remove) {
+            this.plugins.list.editList.call(this, originList.nodeName.toUpperCase());
+        } else {
+            sc = selectedCells[0], eo = 1;
+            let innerList = this.util.createElement(originList.nodeName);
+            let next = sc.nextElementSibling;
+
+            for (let i = 0, len = cellsLen, c; i < len; i++) {
+                c = selectedCells[i];
+                if (c.parentNode !== originList) {
+                    originList.insertBefore(innerList, next);
+                    originList = c.parentNode;
+                    innerList = this.util.createElement(originList.nodeName);
+                }
+                
+                next = c.nextElementSibling;
+                innerList.appendChild(c);
+                if (i === len - 1) {
+                    originList.insertBefore(innerList, next);
+                }
+            }
+
+            if (cellsLen > 1) {
+                so = 0, ec = selectedCells[cellsLen - 1];
+            } else {
+                so = 1, ec = sc;
+            }
+        }
+        
+        this.setRange(sc, so, ec, eo);
+    },
+
+    pickup: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let target = e.target;
+        let command = '';
+
+        while (!command && !/^UL$/i.test(target.tagName)) {
+            command = target.getAttribute('data-command');
+            target = target.parentNode;
+        }
+
+        if (!command) return;
+
+        this.plugins.list.editList.call(this, command);
     }
 };

@@ -25,6 +25,7 @@ const align = require('../../src/plugins/submenu/align')
 suneditor.create("sample1", {
     plugins: plugins,
     mode: "balloon",
+    // iframe: true,
     buttonList: [
         ["undo", "redo"],
         ["font", "fontSize", "formatBlock"],
@@ -34,12 +35,25 @@ suneditor.create("sample1", {
 
 
 let s1 = suneditor.create('editor', {
-  plugins: plugins,
-  mode: 'balloon', 
-  buttonList: [['blockquote', 'font'],['table', 'align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'formatBlock', 'codeView', 'preview']],
-  width: '100%',
-  pasteTagsWhitelist: 'p|h[1-6]',
-  formats: [
+    plugins: plugins,
+    // mode: 'balloon', 
+    katex: Katex,
+    buttonList: [
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'blockquote', 'paragraphStyle',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'fontColor', 'hiliteColor', 'textStyle',
+        'removeFormat',
+        'outdent', 'indent',
+        'align', 'horizontalRule', 'list', 'lineHeight',
+        'table', 'link', 'image', 'video', 'math',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print', 'save', 'template']
+    ],
+    width: '100%',
+    pasteTagsWhitelist: 'p|h[1-6]',
+    formats: [
         { 
             tag: 'div', // Tag name
             name: 'NORMAL', // default: tag name 

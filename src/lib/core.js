@@ -678,7 +678,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
-            return (offset === 0) || (offset === container.nodeValue.length);
+            return (offset === 0) || (!container.nodeValue && offset === 1) || (offset === container.nodeValue.length);
         },
 
         /**
@@ -1158,7 +1158,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     if (!newList && util.isListCell(insNode)) {
                         const inner = insNode;
-                        insNode = util.isCell(rangeElement.parentNode) ? util.createElement('DIV') : util.createElement('P');
+                        insNode = util.createElement(util.isList(rangeElement.parentNode) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
                         insNode.innerHTML = inner.innerHTML;
                         util.copyFormatAttributes(insNode, inner);
                     } else {
@@ -3796,7 +3796,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             let scrollLeft = 0;
             let scrollTop = 0;
-            let el = context.element.topArea.parentElement;
+            let el = context.element.topArea;
             while (!!el) {
                 scrollLeft += el.scrollLeft;
                 scrollTop += el.scrollTop;
@@ -4006,6 +4006,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
                     core.controllersOff();
+                    
+                    if (util.isListCell(formatEl) && (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset)) && core.plugins.list) {
+                        core.callPlugin('list', function () {
+                            core.plugins.list.editInsideList.call(core, shift);
+                        });
+                        break;
+                    }
 
                     let currentNode = selectionNode;
                     while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
@@ -4125,7 +4132,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
-                            const newEl = core.appendFormatTag(rangeEl, util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
+                            const newEl = core.appendFormatTag(rangeEl, util.isList(rangeEl.parentNode) ? 'LI' : util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
                             util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl);
                             core.setRange(newEl, 1, newEl, 1);
@@ -4225,7 +4232,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
             const formatEl = util.getFormatElement(selectionNode);
             const rangeEl = util.getRangeFormatElement(selectionNode);
-            if (!formatEl || formatEl === rangeEl) {
+            if ((!formatEl && range.collapsed) || formatEl === rangeEl) {
                 core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 core.focus();
                 selectionNode = core.getSelectionNode();
