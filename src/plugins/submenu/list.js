@@ -251,7 +251,7 @@ export default {
     editInsideList: function (remove) {
         const selectedCells = this.getSelectedElements().filter(function (el) { return this.isListCell(el); }.bind(this.util));
         const cellsLen = selectedCells.length;
-        if (cellsLen === 0 || (!remove && (!selectedCells[0].previousElementSibling || !selectedCells[cellsLen - 1].nextElementSibling))) return;
+        if (cellsLen === 0 || (!remove && (!this.util.isListCell(selectedCells[0].previousElementSibling) && !this.util.isListCell(selectedCells[cellsLen - 1].nextElementSibling)))) return;
 
         let originList = selectedCells[0].parentNode;
         let lastCell = selectedCells[cellsLen - 1];
