@@ -4006,13 +4006,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     core.controllersOff();
                     
-                    if (util.isListCell(formatEl) && (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset)) && core.plugins.list) {
-                        core.callPlugin('list', function () {
-                            core.plugins.list.editInsideList.call(core, shift);
-                        });
-                        break;
-                    }
-
                     let currentNode = selectionNode;
                     while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
@@ -4033,47 +4026,98 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         break;
                     }
 
-                    const lines = core.getSelectedElements();
+                    const selectedFormats = core.getSelectedElements();
+                    const lines = [], cells = [];
+                    const fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
+                    let r = {sc: null, so: null, ec: null, eo: null};
+                    for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
+                        f = selectedFormats[i];
+                        if (util.isListCell(f)) cells.push(f);
+                        else lines.push(f);
+                    }
+                    
+                    // Nested list
+                    if (cells.length > 0 && (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset)) && core.plugins.list) {
+                        core.callPlugin('list', function () {
+                            const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
+                            if (fc) {
+                                r.sc = listRange.sc;
+                                r.so = listRange.so;
+                            }
+                            if (lc) {
+                                r.ec = listRange.ec;
+                                r.eo = listRange.eo;
+                            }
+                        });
+                    }
 
-                    if (!shift) {
-                        const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
-                        if (lines.length === 1) {
-                            const r = core.insertNode(tabText);
-                            core.setRange(tabText, r.endOffset, tabText, r.endOffset);
+                    // Lines tab(4)
+                    if (lines.length > 0) {
+                        if (!shift) {
+                            const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
+                            if (lines.length === 1) {
+                                const textRange = core.insertNode(tabText);
+                                if (!fc) {
+                                    r.sc = tabText;
+                                    r.so = textRange.endOffset;
+                                }
+                                if (!lc) {
+                                    r.ec = tabText;
+                                    r.eo = textRange.endOffset;
+                                }
+                            } else {
+                                const len = lines.length - 1;
+                                for (let i = 0, child; i <= len; i++) {
+                                    child = lines[i].firstChild;
+                                    if (!child) continue;
+    
+                                    if (util.isBreak(child)) {
+                                        lines[i].insertBefore(tabText.cloneNode(false), child);
+                                    } else {
+                                        child.textContent = tabText.textContent + child.textContent;
+                                    }
+                                }
+    
+                                const firstChild = util.getChildElement(lines[0], 'text', false);
+                                const endChild = util.getChildElement(lines[len], 'text', true);
+                                if (!fc && firstChild) {
+                                    r.sc = firstChild;
+                                    r.so = 0;
+                                }
+                                if (!lc && endChild) {
+                                    r.ec = endChild;
+                                    r.eo = endChild.textContent.length;
+                                }
+                            }
                         } else {
                             const len = lines.length - 1;
                             for (let i = 0, child; i <= len; i++) {
                                 child = lines[i].firstChild;
                                 if (!child) continue;
-
-                                if (util.isBreak(child)) {
-                                    lines[i].insertBefore(tabText.cloneNode(false), child);
-                                } else {
-                                    child.textContent = tabText.textContent + child.textContent;
+    
+                                if (/^\s{1,4}$/.test(child.textContent)) {
+                                    util.removeItem(child);
+                                } else if (/^\s{1,4}/.test(child.textContent)) {
+                                    child.textContent = child.textContent.replace(/^\s{1,4}/, '');
                                 }
                             }
-
+    
                             const firstChild = util.getChildElement(lines[0], 'text', false);
                             const endChild = util.getChildElement(lines[len], 'text', true);
-                            if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
-                        }
-                    } else {
-                        const len = lines.length - 1;
-                        for (let i = 0, child; i <= len; i++) {
-                            child = lines[i].firstChild;
-                            if (!child) continue;
-
-                            if (/^\s{1,4}$/.test(child.textContent)) {
-                                util.removeItem(child);
-                            } else if (/^\s{1,4}/.test(child.textContent)) {
-                                child.textContent = child.textContent.replace(/^\s{1,4}/, '');
+                            if (!fc && firstChild) {
+                                r.sc = firstChild;
+                                r.so = 0;
+                            }
+                            if (!lc && endChild) {
+                                r.ec = endChild;
+                                r.eo = endChild.textContent.length;
                             }
                         }
-
-                        const firstChild = util.getChildElement(lines[0], 'text', false);
-                        const endChild = util.getChildElement(lines[len], 'text', true);
-                        if (firstChild && endChild) core.setRange(firstChild, 0, endChild, endChild.textContent.length);
                     }
+
+                    core.setRange(r.sc, r.so, r.ec, r.eo);
+                    // history stack
+                    core.history.push(false);
                     
                     break;
                 case 13: /** enter key */

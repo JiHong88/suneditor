@@ -827,7 +827,7 @@ const util = {
                 query = '^' + query.split(':')[1] + '$';
             } else {
                 attr = 'nodeName';
-                query = '^' + query + '$';
+                query = '^' + (query === 'text' ? '#' + query : query) + '$';
             }
 
             const regExp = new this._w.RegExp(query, 'i');

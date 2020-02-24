@@ -127,7 +127,7 @@ export default {
         }
 
         if (isRemove && (!topEl || (firstSel.tagName !== topEl.tagName || command !== topEl.tagName.toUpperCase())) && (!bottomEl || (lastSel.tagName !== bottomEl.tagName || command !== bottomEl.tagName.toUpperCase()))) {
-            const currentFormat = this.util.getRangeFormatElement(this.getSelectionNode());
+            const currentFormat = this.util.getRangeFormatElement(firstSel);
             const cancel = currentFormat && currentFormat.tagName === command;
             let rangeArr, tempList;
             const passComponent = function (current) {
@@ -235,26 +235,32 @@ export default {
 
             edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
         }
-
-        if (selectedFormsts.length > 1) {
-            this.setRange(edgeFirst.sc, 0, edgeLast.ec, edgeLast.ec.textContent.length);
-        } else {
-            this.setRange(edgeFirst.ec, edgeFirst.ec.textContent.length, edgeLast.ec, edgeLast.ec.textContent.length);
-        }
-
+        
         this.submenuOff();
 
-        // history stack
-        this.history.push(false);
+        return {
+            sc: selectedFormsts.length > 1 ? edgeFirst.sc : edgeFirst.ec,
+            so: selectedFormsts.length > 1 ? 0 : edgeFirst.ec.textContent.length,
+            ec: edgeLast.ec,
+            eo: edgeLast.ec.textContent.length
+        };
     },
 
-    editInsideList: function (remove) {
-        const selectedCells = this.getSelectedElements().filter(function (el) { return this.isListCell(el); }.bind(this.util));
+    editInsideList: function (remove, selectedCells) {
+        selectedCells = !selectedCells ? this.getSelectedElements().filter(function (el) { return this.isListCell(el); }.bind(this.util)) : selectedCells;
         const cellsLen = selectedCells.length;
-        if (cellsLen === 0 || (!remove && (!this.util.isListCell(selectedCells[0].previousElementSibling) && !this.util.isListCell(selectedCells[cellsLen - 1].nextElementSibling)))) return;
+        if (cellsLen === 0 || (!remove && (!this.util.isListCell(selectedCells[0].previousElementSibling) && !this.util.isListCell(selectedCells[cellsLen - 1].nextElementSibling)))) {
+            return {
+                sc: selectedCells[0],
+                so: 0,
+                ec: selectedCells[cellsLen - 1],
+                eo: 1
+            };
+        }
 
         let originList = selectedCells[0].parentNode;
         let lastCell = selectedCells[cellsLen - 1];
+        let range = null;
 
         if (remove) {
             if (originList !== lastCell.parentNode && lastCell.nextElementSibling) {
@@ -264,13 +270,12 @@ export default {
                     lastCell = lastCell.nextElementSibling;
                 }
             }
-
-            this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
+            range = this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
         } else {
-            const sc = selectedCells[0], so = cellsLen > 1 ? 0 : 1, ec = lastCell, eo = 1;
+            range = { sc: selectedCells[0], so: cellsLen > 1 ? 0 : 1, ec: lastCell, eo: 1 };
             let innerList = this.util.createElement(originList.nodeName);
-            let prev = sc.previousElementSibling;
-            let next = sc.nextElementSibling;
+            let prev = range.sc.previousElementSibling;
+            let next = range.sc.nextElementSibling;
 
             for (let i = 0, len = cellsLen, c; i < len; i++) {
                 c = selectedCells[i];
@@ -286,11 +291,9 @@ export default {
             }
             
             innerList = this.plugins.list._insiedList(originList, innerList, prev, next);
-            this.setRange(sc, so, ec, eo);
-
-            // history stack
-            this.history.push(false);
         }
+
+        return range;
     },
 
     _insiedList: function (originList, innerList, prev, next) {
@@ -336,6 +339,10 @@ export default {
 
         if (!command) return;
 
-        this.plugins.list.editList.call(this, command, null, null);
+        const range = this.plugins.list.editList.call(this, command, null, null);
+        this.setRange(range.sc, range.so, range.ec, range.eo);
+
+        // history stack
+        this.history.push(false);
     }
 };
