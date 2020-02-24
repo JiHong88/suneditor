@@ -52,7 +52,8 @@ let s1 = suneditor.create('editor', {
         'preview', 'print', 'save', 'template']
     ],
     width: '100%',
-    pasteTagsWhitelist: 'p|h[1-6]',
+    height: 'auto',
+    // pasteTagsWhitelist: 'p|h[1-6]',
     formats: [
         { 
             tag: 'div', // Tag name
@@ -100,7 +101,8 @@ window.sun_create1 = function () {
     s1 = suneditor.create('editor', {
         plugins: [align, plugins.link],
         buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
-        width: '100%'
+        width: '100%',
+        height: 'auto'
       })
 }
 

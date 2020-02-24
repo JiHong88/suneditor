@@ -1147,8 +1147,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                 if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
                     if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
-                    insNode = insNode.cloneNode(true);
                     rangeEl.appendChild(insNode);
+                    i--, len--;
                 }
                 else {
                     if (rangeEl && rangeEl.children.length > 0) {

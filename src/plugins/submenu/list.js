@@ -103,8 +103,8 @@ export default {
         }
     },
 
-    editList: function (command) {
-        const selectedFormsts = this.getSelectedElementsAndComponents();
+    editList: function (command, selectedCells) {
+        const selectedFormsts = !selectedCells ? this.getSelectedElementsAndComponents() : selectedCells;
         if (!selectedFormsts || selectedFormsts.length === 0) return;
 
         let isRemove = true;
@@ -126,7 +126,7 @@ export default {
             }
         }
 
-        if (isRemove && (!topEl || command !== topEl.tagName.toUpperCase()) && (!bottomEl || command !== bottomEl.tagName.toUpperCase())) {
+        if (isRemove && (!topEl || (firstSel.tagName !== topEl.tagName || command !== topEl.tagName.toUpperCase())) && (!bottomEl || (lastSel.tagName !== bottomEl.tagName || command !== bottomEl.tagName.toUpperCase()))) {
             const currentFormat = this.util.getRangeFormatElement(this.getSelectionNode());
             const cancel = currentFormat && currentFormat.tagName === command;
             let rangeArr, tempList;
@@ -251,41 +251,66 @@ export default {
     editInsideList: function (remove) {
         const selectedCells = this.getSelectedElements().filter(function (el) { return this.isListCell(el); }.bind(this.util));
         const cellsLen = selectedCells.length;
-        if ((!remove && !selectedCells[0].previousElementSibling) || cellsLen === 0) return;
+        if (cellsLen === 0 || (!remove && (!selectedCells[0].previousElementSibling || !selectedCells[cellsLen - 1].nextElementSibling))) return;
 
         let originList = selectedCells[0].parentNode;
-        let sc, so, ec, eo;
         
         if (remove) {
-            this.plugins.list.editList.call(this, originList.nodeName.toUpperCase());
+            this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
         } else {
-            sc = selectedCells[0], eo = 1;
+            const sc = selectedCells[0], so = cellsLen > 1 ? 0 : 1, ec = selectedCells[cellsLen - 1], eo = 1;
             let innerList = this.util.createElement(originList.nodeName);
+            let prev = sc.previousElementSibling;
             let next = sc.nextElementSibling;
 
             for (let i = 0, len = cellsLen, c; i < len; i++) {
                 c = selectedCells[i];
                 if (c.parentNode !== originList) {
-                    originList.insertBefore(innerList, next);
+                    this.plugins.list._insiedList(originList, innerList, prev, next);
                     originList = c.parentNode;
                     innerList = this.util.createElement(originList.nodeName);
                 }
                 
+                prev = c.previousElementSibling;
                 next = c.nextElementSibling;
                 innerList.appendChild(c);
-                if (i === len - 1) {
-                    originList.insertBefore(innerList, next);
-                }
+            }
+            
+            innerList = this.plugins.list._insiedList(originList, innerList, prev, next);
+            this.setRange(sc, so, ec, eo);
+
+            // history stack
+            this.history.push(false);
+        }
+    },
+
+    _insiedList: function (originList, innerList, prev, next) {
+        let insertPrev = false;
+
+        if (prev && innerList.tagName === prev.tagName) {
+            const children = innerList.children;
+            while (children[0]) {
+                prev.appendChild(children[0]);
             }
 
-            if (cellsLen > 1) {
-                so = 0, ec = selectedCells[cellsLen - 1];
-            } else {
-                so = 1, ec = sc;
-            }
+            innerList = prev;
+            insertPrev = true;
         }
-        
-        this.setRange(sc, so, ec, eo);
+
+        if (next && innerList.tagName === next.tagName) {
+            const children = next.children;
+            while (children[0]) {
+                innerList.appendChild(children[0]);
+            }
+
+            const temp = next.nextElementSibling;
+            next.parentNode.removeChild(next);
+            next = temp;
+        }
+
+        if (!insertPrev) originList.insertBefore(innerList, next);
+
+        return innerList;
     },
 
     pickup: function (e) {
@@ -302,6 +327,6 @@ export default {
 
         if (!command) return;
 
-        this.plugins.list.editList.call(this, command);
+        this.plugins.list.editList.call(this, command, null);
     }
 };
