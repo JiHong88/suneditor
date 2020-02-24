@@ -254,11 +254,20 @@ export default {
         if (cellsLen === 0 || (!remove && (!selectedCells[0].previousElementSibling || !selectedCells[cellsLen - 1].nextElementSibling))) return;
 
         let originList = selectedCells[0].parentNode;
-        
+        let lastCell = selectedCells[cellsLen - 1];
+
         if (remove) {
+            if (originList !== lastCell.parentNode && lastCell.nextElementSibling) {
+                lastCell = lastCell.nextElementSibling;
+                while (lastCell) {
+                    selectedCells.push(lastCell);
+                    lastCell = lastCell.nextElementSibling;
+                }
+            }
+
             this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
         } else {
-            const sc = selectedCells[0], so = cellsLen > 1 ? 0 : 1, ec = selectedCells[cellsLen - 1], eo = 1;
+            const sc = selectedCells[0], so = cellsLen > 1 ? 0 : 1, ec = lastCell, eo = 1;
             let innerList = this.util.createElement(originList.nodeName);
             let prev = sc.previousElementSibling;
             let next = sc.nextElementSibling;
@@ -327,6 +336,6 @@ export default {
 
         if (!command) return;
 
-        this.plugins.list.editList.call(this, command, null);
+        this.plugins.list.editList.call(this, command, null, null);
     }
 };

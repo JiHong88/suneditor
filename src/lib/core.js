@@ -1185,7 +1185,6 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             firstNode = lastNode = insNode;
                         }
                     }
-                    
                 }
             }
 
