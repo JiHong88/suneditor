@@ -272,7 +272,7 @@ export default {
             }
             range = this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
         } else {
-            range = { sc: selectedCells[0], so: cellsLen > 1 ? 0 : 1, ec: lastCell, eo: 1 };
+            range = { sc: selectedCells[0], so: cellsLen > 1 || !this.getRange().collapsed ? 0 : 1, ec: lastCell, eo: 1 };
             let innerList = this.util.createElement(originList.nodeName);
             let prev = range.sc.previousElementSibling;
             let next = range.sc.nextElementSibling;

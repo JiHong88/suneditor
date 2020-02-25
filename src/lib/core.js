@@ -1007,7 +1007,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             const removeItems = function (parent, origin, before) {
                 let cc = null;
                 if (parent !== origin && !util.isTable(origin)) {
-                   cc = util.removeItemAllParents(origin);
+                   cc = util.removeItemAllParents(origin, null);
                 }
 
                 return cc ? cc.ec : before;
@@ -1024,7 +1024,15 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
 
-                    if (i === len - 1 || !util.getParentElement(rangeLines[i + 1], function (current) { return current === originParent; })) {
+                    if (i === len - 1 || rangeLines[i + 1].parentNode !== originParent) {
+                        let list = originParent.parentNode, p;
+                        while (util.isList(list)) {
+                            p = util.createElement(list.nodeName);
+                            p.appendChild(listParent);
+                            listParent = p;
+                            list = list.parentNode;
+                        }
+
                         const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
 
                         if (parentDepth >= depth) {
@@ -1061,6 +1069,8 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             }
 
+            this._mergeSameTags(rangeElement, null, null, false);
+            util.removeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
             pElement.insertBefore(rangeElement, beforeTag);
             removeItems(rangeElement, beforeTag);
 
@@ -1562,12 +1572,13 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
          * If "offset" has been changed, it will return as much "offset" as it has been modified.
          * "a", "b" You can send a maximum of two nodepaths.
-         * @param {Object} nodePath_s Start NodePath object (util.getNodePath)
+         * @param {Object|null} nodePath_s Start NodePath object (util.getNodePath)
          * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
+         * @param {Boolean} onlyText If true, the node with util._isIgnoreNodeChange() is true is ignored.
          * @returns {Object} {a: 0, b: 0}
          * @private
          */
-        _mergeSameTags: function (element, nodePath_s, nodePath_e) {
+        _mergeSameTags: function (element, nodePath_s, nodePath_e, onlyText) {
             const inst = this;
             const offsets = {a: 0, b: 0};
 
@@ -1578,7 +1589,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     child = children[i];
                     next = children[i + 1];
                     if (!child) break;
-                    if(inst.util._isIgnoreNodeChange(child)) continue;
+                    if((onlyText && inst.util._isIgnoreNodeChange(child)) || (!onlyText && inst.util.isFormatElement(child) && !inst.util.isFreeFormatElement(child))) continue;
                     if (len === 1 && current.nodeName === child.nodeName) {
                         inst.util.copyTagAttributes(child, current);
                         current.parentNode.replaceChild(child, current);
@@ -2100,7 +2111,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             endOffset = (collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s);
 
             // tag merge
-            const newOffsets = this._mergeSameTags(pNode, startPath, endPath);
+            const newOffsets = this._mergeSameTags(pNode, startPath, endPath, true);
 
             element.innerHTML = pNode.innerHTML;
 
@@ -2372,7 +2383,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = this._mergeSameTags(pNode, path, null);
+                const newOffsets = this._mergeSameTags(pNode, path, null, true);
 
                 element.innerHTML = pNode.innerHTML;
 
@@ -2482,7 +2493,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
             }
 
             util.removeEmptyNode(pNode, newInnerNode);
-            this._mergeSameTags(pNode, null, null);
+            this._mergeSameTags(pNode, null, null, true);
 
             // node change
             element.innerHTML = pNode.innerHTML;
@@ -2761,7 +2772,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = this._mergeSameTags(pNode, path, null);
+                const newOffsets = this._mergeSameTags(pNode, path, null, true);
 
                 element.innerHTML = pNode.innerHTML;
 
@@ -2973,6 +2984,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 for (let i = 0, len = headChildren.length; i < len; i++) {
                     if (/script/i.test(headChildren[i].tagName)) {
                         parseDocument.head.removeChild(headChildren[i]);
+                        i--, len--;
                     }
                 }
 
@@ -2984,6 +2996,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                     if (attrs[i].name === 'contenteditable') continue;
                     this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
                 }
+                if (!util.hasClass(this._wd.body, 'sun-editor-editable')) util.addClass(this._wd.body, 'sun-editor-editable');
             } else {
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html, this.editorTagsWhitelistRegExp) : '<p><br></p>';
             }
@@ -3562,14 +3575,14 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 /* Active plugins */
                 for (let c = 0, name; c < cLen; c++) {
                     name = activePlugins[c];
-                    if (commandMapNodes.indexOf(name) < 0 && plugins[name].active.call(core, element)) {
+                    if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
                         commandMapNodes.push(name);
                     }
                 }
 
                 if (util.isFormatElement(element)) {
                     /* Outdent */
-                    if (commandMapNodes.indexOf('OUTDENT') < 0 && element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') === -1 && element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
                         commandMapNodes.push('OUTDENT');
                         commandMap.OUTDENT.removeAttribute('disabled');
                     }
@@ -3758,11 +3771,11 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 } else {
                     core.execCommand('formatBlock', false, util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 }
-
+                e.preventDefault();
                 core.focus();
+            } else {                
+                event._applyTagEffects();
             }
-
-            event._applyTagEffects();
 
             if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon); 
             if (userFunction.onClick) userFunction.onClick(e, core);
@@ -4177,7 +4190,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                             e.preventDefault();
                             const newEl = core.appendFormatTag(rangeEl, util.isList(rangeEl.parentNode) ? 'LI' : util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
                             util.copyFormatAttributes(newEl, formatEl);
-                            util.removeItemAllParents(formatEl);
+                            util.removeItemAllParents(formatEl, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
                         }

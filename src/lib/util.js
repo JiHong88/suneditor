@@ -609,7 +609,7 @@ const util = {
      * @returns {Boolean}
      */
     isList: function (node) {
-        return node && /^(OL|UL)$/i.test(typeof node === 'string' ? node : node.nodeName);
+        return node && /^(OL|UL|DL)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
@@ -1036,6 +1036,35 @@ const util = {
         }(item));
 
         return cc;
+    },
+
+    /**
+     * @description Remove nested tags without other child nodes.
+     * @param {Element} element Element object
+     * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+     */
+    removeNestedTags: function (element, validation) {
+        if (typeof validation === 'string') {
+            validation = function (current) { return this.test(current.tagName); }.bind(new this._w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+        } else if (typeof validation !== 'function') {
+            validation = function () { return true; };
+        }
+        
+        (function recursionFunc(current) {
+            let children = current.children;
+            if (element !== current && children.length === 1 && children[0].nodeName === current.nodeName && validation(current)) {
+                const temp = children[0];
+                children = temp.children;
+                while (children[0]) {
+                    current.appendChild(children[0]);
+                }
+                current.removeChild(temp);
+            }
+
+            for (let i = 0, len = current.children.length; i < len; i++) {
+                recursionFunc(current.children[i]);
+            }
+        })(element);
     },
 
     /**

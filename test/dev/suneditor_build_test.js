@@ -53,6 +53,7 @@ let s1 = suneditor.create('editor', {
     ],
     width: '100%',
     height: 'auto',
+    // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
     formats: [
         { 
@@ -110,7 +111,7 @@ window.sun_create1 = function () {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
-    mode: 'balloon',
+    // mode: 'balloon',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -125,12 +126,12 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'preview', 'print', 'save', 'template']
     ],
     katex: Katex,
-    height: 'auto',
+    height: '400',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     fullPage: true,
-    addTagsWhitelist: 'mark|canvas|label|select|option|input',
+    addTagsWhitelist: 'mark|canvas|label|select|option|input|style|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
     // mode: 'inline'
     // videoHeightShow: false,
@@ -219,7 +220,7 @@ window.sun_getContents = function () {
 }
 
 window.sun_setContents = function (content) {
-    ss.setContents('<p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
+    ss.setContents('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
     ss.core.history.reset(true);
     // ss.core.context.tool.save.disabled = true;
 }
