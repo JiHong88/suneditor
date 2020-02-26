@@ -160,6 +160,11 @@ export default function (core, change) {
             };
 
             if (!ignoreChangeEvent) change();
+        },
+
+        _destroy: function () {
+            if (pushDelay) _w.clearTimeout(pushDelay);
+            stack = null;
         }
     };
 }

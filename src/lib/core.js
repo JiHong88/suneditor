@@ -4928,6 +4928,9 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * @description Destroy the suneditor
          */
         destroy: function () {
+            /** remove history */
+            core.history._destroy();
+
             /** remove event listeners */
             event._removeEvent();
             

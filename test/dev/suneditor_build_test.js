@@ -216,7 +216,18 @@ window.sun_insertHTML = function (html) {
 
 window.sun_getContents = function () {
     // alert(ss.getContents());
-    console.log(ss.getContents());
+
+    // console.log(ss.getContents());
+
+    // ss.core.commandHandler(null, 'selectAll')
+    // let t = '';
+    // const lines = ss.core.getSelectedElements();
+    // for (let i = 0, len = lines.length; i < len; i++) {
+    //     t += lines[i].textContent + '\n';
+    // }
+    // console.log(t);
+
+    console.log(ss.core.context.element.wysiwyg.textContent)
 }
 
 window.sun_setContents = function (content) {
