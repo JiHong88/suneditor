@@ -988,10 +988,10 @@
 
 
             <h4 class="name" id="appendFormatTag"><span class="type-signature"></span>appendFormatTag<span
-                    class="signature">(element, formatNodeName)</span><span class="type-signature"> &rarr; {Element}</span></h4>
+                    class="signature">(element, formatNode)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
                 Append format element to sibling node of argument element.<br>
-                If the "formatNodeName" argument value is present, the tag of that argument value is inserted,<br>
+                If the "formatNode" argument value is present, the tag of that argument value is inserted,<br>
                 If not, the currently selected format tag is inserted.<br>
                 Returns the inserted element.
             </div>
@@ -1013,11 +1013,11 @@
                     <td class="description last">Insert as siblings of that element</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>formatNodeName</code></td>
+                    <td class="name"><code>formatNode</code></td>
                     <td class="type">
-                        <span class="param-type">String | null</span>
+                        <span class="param-type">String|Element|null</span>
                     </td>
-                    <td class="description last">Node name to be inserted</td>
+                    <td class="description last">Node name or node obejct to be inserted</td>
                 </tr>
                 </tbody>
             </table>

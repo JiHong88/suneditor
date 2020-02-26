@@ -700,15 +700,19 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
          * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
          * If not, the currently selected format tag is inserted.
          * @param {Element} element Insert as siblings of that element
-         * @param {String|null} formatNodeName Node name to be inserted
+         * @param {String|Element|null} formatNode Node name or node obejct to be inserted
          * @returns {Element}
          */
-        appendFormatTag: function (element, formatNodeName) {
+        appendFormatTag: function (element, formatNode) {
             const formatEl = element;
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
-            const oFormatName = formatNodeName ? formatNodeName : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = '<br>';
+
+            if ((formatNode && typeof formatNode !== 'string') || (!formatNode && util.isFormatElement(currentFormatEl))) {
+                util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
+            }
 
             if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
             else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
@@ -745,7 +749,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                 }
             } else {
                 this.insertNode(element, formatEl);
-                oNode = this.appendFormatTag(element);
+                oNode = this.appendFormatTag(element, null);
             }
 
             // history stack
@@ -1038,7 +1042,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                         if (parentDepth >= depth) {
                             parentDepth = depth;
                             pElement = edge.cc;
-                            beforeTag = removeItems(pElement, originParent, edge.ec);
+                            beforeTag = removeItems(pElement, originParent, depth > 1 ? edge.sc : edge.ec);
                             if (beforeTag) pElement = beforeTag.parentNode;
                         } else if (pElement === edge.cc) {
                             beforeTag = edge.ec;
@@ -4145,7 +4149,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
                          (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
                             if (selectionFormat) util.removeItem(children[offset - 1]);
                             else util.removeItem(selectionNode);
-                            const newEl = core.appendFormatTag(freeFormatEl, freeFormatEl.nextElementSibling ? freeFormatEl.nextElementSibling.nodeName : 'P');
+                            const newEl = core.appendFormatTag(freeFormatEl, freeFormatEl.nextElementSibling ? freeFormatEl.nextElementSibling : 'P');
                             util.copyFormatAttributes(newEl, freeFormatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
@@ -4198,7 +4202,7 @@ export default function (context, pluginCallButtons, plugins, lang, _options) {
 
                     if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
-                        formatEl = core.appendFormatTag(formatEl);
+                        formatEl = core.appendFormatTag(formatEl, null);
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
 

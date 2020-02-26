@@ -162,6 +162,10 @@ export default function (core, change) {
             if (!ignoreChangeEvent) change();
         },
 
+        /**
+         * @description Remove all stacks and remove the timeout function.
+         * @private
+         */
         _destroy: function () {
             if (pushDelay) _w.clearTimeout(pushDelay);
             stack = null;
