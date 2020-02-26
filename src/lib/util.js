@@ -491,7 +491,7 @@ const util = {
      */
     getPositionIndex: function (node) {
         let idx = 0;
-        while (!!(node = node.previousSibling)) {
+        while ((node = node.previousSibling)) {
             idx += 1;
         }
         return idx;
@@ -736,10 +736,13 @@ const util = {
     /**
      * @description Returns the number of parents nodes.
      * "0" when the parent node is the WYSIWYG area.
+     * "-1" when the element argument is the WYSIWYG area.
      * @param {Element} element The element to check
      * @returns {Number}
      */
     getElementDepth: function (element) {
+        if (this.isWysiwygDiv(element)) return -1;
+
         let depth = 0;
         element = element.parentNode;
 
@@ -1008,14 +1011,15 @@ const util = {
      * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
      * @param {Element} item Element to be remove
      * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
+     * @param {Element|null} stopParent Stop when the parent node reaches stopParent
      * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
      */
-    removeItemAllParents: function (item, validation) {
+    removeItemAllParents: function (item, validation, stopParent) {
         if (!item) return null;
         let cc = null;
         if (!validation) {
             validation = function (current) {
-                if (this.isComponent(current)) return false;
+                if (current === stopParent || this.isComponent(current)) return false;
                 const text = current.textContent.trim();
                 return text.length === 0 || /^(\n|\u200B)+$/.test(text);
             }.bind(this);
@@ -1043,7 +1047,7 @@ const util = {
      * @param {Element} element Element object
      * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
      */
-    removeNestedTags: function (element, validation) {
+    mergeNestedTags: function (element, validation) {
         if (typeof validation === 'string') {
             validation = function (current) { return this.test(current.tagName); }.bind(new this._w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
         } else if (typeof validation !== 'function') {
@@ -1052,7 +1056,7 @@ const util = {
         
         (function recursionFunc(current) {
             let children = current.children;
-            if (element !== current && children.length === 1 && children[0].nodeName === current.nodeName && validation(current)) {
+            if (children.length === 1 && children[0].nodeName === current.nodeName && validation(current)) {
                 const temp = children[0];
                 children = temp.children;
                 while (children[0]) {

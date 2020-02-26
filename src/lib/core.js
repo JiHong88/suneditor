@@ -594,7 +594,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
-         * @description Returns a "formatElement"(P, DIV, H[1-6], LI) array from the currently selected range.
+         * @description Returns a "formatElement"(util.isFormatElement) array from the currently selected range.
          * @param {Function|null} validation The validation function. (Replaces the default validation function-util.isFormatElement(current))
          * @returns {Array}
          */
@@ -981,6 +981,43 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
+         * @description Split all nested tags based on "beforeTag"
+         * Returns the last element of the splited tag.
+         * @param {Element} beforeTag Criteria element
+         * @returns {Element}
+         */
+        splitNestedElement: function (beforeTag) {
+            const bp = beforeTag.parentNode;
+            const children = bp.childNodes;
+            const index = util.getPositionIndex(beforeTag);
+            let newRange = bp.cloneNode(false);
+            while (children[index]) {
+                newRange.appendChild(children[index]);
+            }
+
+            let depthParent = bp;
+            let newRangeTemp = null;
+            while (util.getElementDepth(depthParent) > 0) {
+                newRangeTemp = depthParent.cloneNode(false);
+                newRangeTemp.appendChild(newRange);
+                newRange = newRangeTemp;
+                depthParent = depthParent.parentNode;
+            }
+
+            const pElement = depthParent.parentNode;
+            depthParent = depthParent.nextElementSibling;
+            this._mergeSameTags(newRange, null, null, false);
+            util.mergeNestedTags(newRange, function (current) { return this.isList(current); }.bind(util));
+            
+            if (newRange.childNodes.length > 0) pElement.insertBefore(newRange, depthParent);
+            else newRange = depthParent;
+
+            if (bp.childNodes.length === 0) util.removeItem(bp);
+
+            return newRange;
+        },
+
+        /**
          * @description Appended all selected format Element to the argument element and insert
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
@@ -1011,7 +1048,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const removeItems = function (parent, origin, before) {
                 let cc = null;
                 if (parent !== origin && !util.isTable(origin)) {
-                   cc = util.removeItemAllParents(origin, null);
+                    if (origin && util.getElementDepth(parent) === util.getElementDepth(origin)) return before;
+                    cc = util.removeItemAllParents(origin, null, parent);
                 }
 
                 return cc ? cc.ec : before;
@@ -1042,15 +1080,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (parentDepth >= depth) {
                             parentDepth = depth;
                             pElement = edge.cc;
-                            beforeTag = removeItems(pElement, originParent, depth > 1 ? edge.sc : edge.ec);
+                            beforeTag = removeItems(pElement, originParent, edge.ec);
                             if (beforeTag) pElement = beforeTag.parentNode;
                         } else if (pElement === edge.cc) {
                             beforeTag = edge.ec;
                         }
 
                         if (pElement !== edge.cc) {
-                            before = removeItems(pElement, edge.cc);
+                            before = removeItems(pElement, edge.cc, before);
                             if (before !== undefined) beforeTag = before;
+                            else beforeTag = edge.cc;
                         }
 
                         rangeElement.appendChild(listParent);
@@ -1074,12 +1113,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             this._mergeSameTags(rangeElement, null, null, false);
-            util.removeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
-            pElement.insertBefore(rangeElement, beforeTag);
-            removeItems(rangeElement, beforeTag);
+            util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
-            // history stack
-            this.history.push(false);
+            // Nested list
+            if (beforeTag && util.getElementDepth(beforeTag) > 0 && util.isList(beforeTag.parentNode)) {
+                const splitRange = this.splitNestedElement(beforeTag);
+                splitRange.parentNode.insertBefore(rangeElement, splitRange);
+            }
+            // basic
+            else {
+                pElement.insertBefore(rangeElement, beforeTag);
+                removeItems(rangeElement, beforeTag);
+            }
 
             const edge = util.getEdgeChildNodes(rangeElement.firstElementChild, rangeElement.lastElementChild);
             if (rangeLines.length > 1) {
@@ -1087,6 +1132,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             } else {
                 this.setRange(edge.ec, edge.ec.textContent.length, edge.ec, edge.ec.textContent.length);
             }
+
+            // history stack
+            this.history.push(false);
         },
 
         /**
@@ -1203,17 +1251,21 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             const rangeParent = rangeElement.parentNode;
-            const rangeRight = rangeElement.nextSibling;
+            let rangeRight = rangeElement.nextSibling;
             if (rangeEl && rangeEl.children.length > 0) {
                 rangeParent.insertBefore(rangeEl, rangeRight);
             }
+            
+            if (newRangeElement) firstNode = newRangeElement.previousSibling;
+            else firstNode = rangeElement.previousSibling;
+            rangeRight = rangeElement.nextSibling;
 
             util.removeItem(rangeElement);
 
             const edge = remove ? {
                 cc: rangeParent,
                 sc: firstNode,
-                ec: firstNode && firstNode.parentNode ? firstNode.nextSibling : rangeEl && rangeEl.children.length > 0 ? rangeEl : rangeRight ? rangeRight : null
+                ec: rangeRight,
             } : util.getEdgeChildNodes(firstNode, lastNode);
 
             if (notHistoryPush) return edge;
@@ -1594,9 +1646,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     next = children[i + 1];
                     if (!child) break;
                     if((onlyText && inst.util._isIgnoreNodeChange(child)) || (!onlyText && inst.util.isFormatElement(child) && !inst.util.isFreeFormatElement(child))) continue;
-                    if (len === 1 && current.nodeName === child.nodeName) {
+                    if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
                         inst.util.copyTagAttributes(child, current);
-                        current.parentNode.replaceChild(child, current);
+                        current.parentNode.insertBefore(child, current);
+                        inst.util.removeItem(current);
 
                         // update nodePath
                         if (nodePath_s && nodePath_s[depth] === i) {

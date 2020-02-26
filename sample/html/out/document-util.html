@@ -1189,7 +1189,8 @@
         </h4>
         <div class="description">
             Returns the number of parents nodes.<br>
-            "0" when the parent node is the WYSIWYG area.
+            "0" when the parent node is the WYSIWYG area.<br>
+            "-1" when the element argument is the WYSIWYG area.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1660,7 +1661,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="removeItemAllParents"><span class="type-signature"></span>removeItemAllParents<span class="signature">(item, validation)</span><span
+        <h4 class="name" id="removeItemAllParents"><span class="type-signature"></span>removeItemAllParents<span class="signature">(item, validation, stopParent)</span><span
             class="type-signature"> &rarr; {Object|null}</span></h4>
         <div class="description">
             Delete all parent nodes that match the condition.<br>
@@ -1690,15 +1691,22 @@
                 </td>
                 <td class="description last">Validation function. default(Deleted if it only have breakLine and blanks)</td>
             </tr>
+            <tr>
+                <td class="name"><code>stopParent</code></td>
+                <td class="type">
+                    <span class="param-type">Element|null</span>
+                </td>
+                <td class="description last">Stop when the parent node reaches stopParent</td>
+            </tr>
             </tbody>
         </table>
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="removeNestedTags"><span class="type-signature"></span>removeNestedTags<span class="signature">(element, validation)</span><span
+        <h4 class="name" id="mergeNestedTags"><span class="type-signature"></span>mergeNestedTags<span class="signature">(element, validation)</span><span
             class="type-signature"></span></h4>
         <div class="description">
-            Remove nested tags without other child nodes.
+            Merge nested tags without other child nodes.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1892,7 +1900,7 @@
         <li><a href="document-util.html#toggleClass">toggleClass</a></li>
         <li><a href="document-util.html#removeItem">removeItem</a></li>
         <li><a href="document-util.html#removeItemAllParents">removeItemAllParents</a></li>
-        <li><a href="document-util.html#removeNestedTags">removeNestedTags</a></li>
+        <li><a href="document-util.html#mergeNestedTags">mergeNestedTags</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
         <li><a href="document-util.html#cleanHTML">cleanHTML</a></li>
         <li><a href="document-util.html#createTagsWhitelist">createTagsWhitelist</a></li>

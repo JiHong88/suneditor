@@ -904,7 +904,7 @@
             <h4 class="name" id="getSelectedElements"><span class="type-signature"></span>getSelectedElements<span
                 class="signature">(validation)</span><span class="type-signature"> &rarr; {Array}</span></h4>
             <div class="description">
-                Returns a "formatElement"(P, DIV, H[1-6], LI) array from the currently selected range.
+                Returns a "formatElement"(<a href="./document-util.html#isFormatElement">util.isFormatElement</a>) array from the currently selected range.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -921,7 +921,7 @@
                     <td class="type">
                         <span class="param-type">Function|null</span>
                     </td>
-                    <td class="description last">The validation function. (Replaces the default validation function-util.isFormatElement(current))</td>
+                    <td class="description last">The validation function. (Replaces the default validation function-<a href="./document-util.html#isFormatElement">util.isFormatElement</a>)</td>
                 </tr>
                 </tbody>
             </table>
@@ -1054,7 +1054,7 @@
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)</td>
+                    <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (<a href="./document-util.html#getEdgeChildNodes">util.getEdgeChildNodes</a>)</td>
                 </tr>
                 </tbody>
             </table>
@@ -1139,6 +1139,34 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="splitNestedElement"><span class="type-signature"></span>splitNestedElement<span class="signature">(beforeTag)</span><span
+                    class="type-signature"> &rarr; {Element}</span></h4>
+            <div class="description">
+                Split all nested tags based on "beforeTag"<br>
+                Returns the last element of the splited tag.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>beforeTag</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Criteria element</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="applyRangeFormatElement"><span class="type-signature"></span>applyRangeFormatElement<span class="signature">(rangeElement)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -1170,7 +1198,7 @@
                     class="type-signature"></span></h4>
             <div class="description">
                 The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)<br>
-                When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling}.
+                When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: previousSibling, ec: nextSibling}.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1195,7 +1223,7 @@
                         <span class="param-type">Array|null</span>
                     </td>
                     <td class="description last">Array of format elements (P, DIV, LI...) to remove.<br>
-                        If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}</td>
+                        If null, Applies to all elements and return {cc: parentNode, sc: previousSibling, ec: nextSibling}</td>
                 </tr>
                 <tr>
                     <td class="name"><code>newRangeElement</code></td>
@@ -1216,7 +1244,7 @@
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)</td>
+                    <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (<a href="./document-util.html#getEdgeChildNodes">util.getEdgeChildNodes</a>)</td>
                 </tr>
                 </tbody>
             </table>
@@ -1605,6 +1633,7 @@
         <li><a href="document-editor.html#selectComponent">selectComponent</a></li>
         <li><a href="document-editor.html#insertNode">insertNode</a></li>
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
+        <li><a href="document-editor.html#splitNestedElement">splitNestedElement</a></li>
         <li><a href="document-editor.html#applyRangeFormatElement">applyRangeFormatElement</a></li>
         <li><a href="document-editor.html#detachRangeFormatElement">detachRangeFormatElement</a></li>
         <li><a href="document-editor.html#nodeChange">nodeChange</a></li>

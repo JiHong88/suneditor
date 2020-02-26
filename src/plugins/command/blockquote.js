@@ -33,7 +33,7 @@ export default {
         const currentBlockquote = this.util.getParentElement(this.getSelectionNode(), 'blockquote');
 
         if (currentBlockquote) {
-            this.detachRangeFormatElement(currentBlockquote, this.getSelectedElements(), null, false, false);
+            this.detachRangeFormatElement(currentBlockquote, null, null, false, false);
         } else {
             this.applyRangeFormatElement(this.context.blockquote.tag.cloneNode(false));
         }

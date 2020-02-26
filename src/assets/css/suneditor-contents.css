@@ -107,6 +107,19 @@
     text-align: -webkit-match-parent;
     margin-bottom: 5px;
 }
+/* nested ol, ul */
+.sun-editor-editable ol ol, .sun-editor-editable ul ol {
+    list-style-type: lower-alpha;
+}
+.sun-editor-editable ol ol ol, .sun-editor-editable ul ol ol, .sun-editor-editable ul ul ol {
+    list-style-type: upper-roman;
+}
+.sun-editor-editable ul ul, .sun-editor-editable ol ul {
+    list-style-type: circle;
+}
+.sun-editor-editable ul ul ul, .sun-editor-editable ol ul ul, .sun-editor-editable ol ol ul {
+    list-style-type: square;
+}
 
 /* sub, sup */
 .sun-editor-editable sub, .sun-editor-editable sup {
