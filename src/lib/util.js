@@ -303,7 +303,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, PRE, LI)
+     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
      * Format element also contain "free format Element"
      * @param {Element} element The element to check
      * @returns {Boolean}
@@ -315,7 +315,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, PRE, LI)
+     * * Range format element is wrap the format element  (util.isFormatElement)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
@@ -346,7 +346,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], PRE, LI), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element}
@@ -369,7 +369,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, TH, TD), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
@@ -390,7 +390,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a free format node (PRE), it returns that node.
+     * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element}
@@ -609,7 +609,7 @@ const util = {
      * @returns {Boolean}
      */
     isList: function (node) {
-        return node && /^(OL|UL|DL)$/i.test(typeof node === 'string' ? node : node.nodeName);
+        return node && /^(OL|UL)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**

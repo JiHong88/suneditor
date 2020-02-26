@@ -982,7 +982,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         /**
          * @description Appended all selected format Element to the argument element and insert
-         * @param {Element} rangeElement Element of wrap the arguments (PRE, BLOCKQUOTE...)
+         * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
             const rangeLines = this.getSelectedElementsAndComponents();

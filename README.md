@@ -315,7 +315,7 @@ plugins: [
 ]               : Plugins array.     default: null {Array}
 
 // Tags whitelist--------------------------------------å---------------------------------------------------------
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
                         ex) 'mark|canvas|label|select|option|input'
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist

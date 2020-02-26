@@ -364,7 +364,7 @@
             <h4 class="name" id="isFormatElement"><span class="type-signature"></span>isFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the format element. (P, DIV, H1-6, PRE, LI)<br>
+                It is judged whether it is the format element. (P, DIV, H[1-6], PRE, LI)<br>
                 Format element also contain "free format Element"
             </div>
             <h5>Parameters:</h5>
@@ -393,7 +393,7 @@
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
                 It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)<br>
-                Range format element is wrap the format element  (P, DIV, H1-6, PRE, LI)
+                Range format element is wrap the format element  (<a href="#isFormatElement">util.isFormatElement</a>)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -476,7 +476,7 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
+                If a parent node that contains an argument node finds a format node (<a href="#isFormatElement">util.isFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -510,7 +510,7 @@
             <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
-                If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
+                If a parent node that contains an argument node finds a format node (<a href="#isRangeFormatElement">util.isRangeFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -544,7 +544,7 @@
             <h4 class="name" id="getFreeFormatElement"><span class="type-signature"></span>getFreeFormatElement<span
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
-                If a parent node that contains an argument node finds a free format node (PRE), it returns that node.
+                If a parent node that contains an argument node finds a free format node (<a href="#isFreeFormatElement">util.isFreeFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
