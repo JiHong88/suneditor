@@ -732,8 +732,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         insertComponent: function (element, notHistoryPush) {
             let oNode = null;
             const selectionNode = this.getSelectionNode();
-            const formatEl = util.getFormatElement(selectionNode);
-
+            let formatEl = util.getFormatElement(selectionNode);
+            
             if (util.isListCell(formatEl)) {
                 if (/^HR$/i.test(element.nodeName)) {
                     const newLi = util.createElement('LI');
@@ -748,8 +748,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
                 }
             } else {
+                // split element
+                const r = this.removeNode();
+                if (this.getRange().collapsed && r.container.nodeType === 3) {
+                    oNode = this.splitElement(r.container, r.offset);
+                    formatEl = oNode.previousSibling;
+                }
+
                 this.insertNode(element, formatEl);
-                oNode = this.appendFormatTag(element, null);
+                if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
             }
 
             // history stack
@@ -892,129 +899,170 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
-         * @description Delete the currently selected node
+         * @description Delete the currently selected nodes and reset selection range
+         * Returns {container: "the last element after deletion", offset: "offset"}
+         * @returns {Object}
          */
         removeNode: function () {
             const range = this.getRange();
+            let container, offset;
 
+            // native function
             if (range.deleteContents) {
                 range.deleteContents();
+                container = range.endContainer || range.startContainer;
 
-                // history stack
-                this.history.push(false);
-                return;
-            }
-
-            const startCon = range.startContainer;
-            const startOff = range.startOffset;
-            const endCon = range.endContainer;
-            const endOff = range.endOffset;
-            const commonCon = range.commonAncestorContainer;
-
-            let beforeNode = null;
-            let afterNode = null;
-
-            const childNodes = util.getListChildNodes(commonCon);
-            let startIndex = util.getArrayIndex(childNodes, startCon);
-            let endIndex = util.getArrayIndex(childNodes, endCon);
-
-            for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
-                if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
-                    startIndex = i;
-                    startNode = startNode.parentNode;
+                if (container.nodeType === 3) {
+                    offset = container.textContent.length;
+                } else {
+                    container = util.getEdgeChildNodes((range.endContainer ? range.endContainer.childNodes[range.endOffset] : range.startContainer.childNodes[range.startOffset]), null).ec;
+                    offset = 0;
                 }
             }
-
-            for (let i = endIndex - 1, endNode = endCon; i > startIndex; i--) {
-                if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
-                    childNodes.splice(i, 1);
-                    endNode = endNode.parentNode;
-                    --endIndex;
+            // hard coding
+            else {
+                let startCon = range.startContainer;
+                let endCon = range.endContainer;
+                const startOff = range.startOffset;
+                const endOff = range.endOffset;
+                const commonCon = range.commonAncestorContainer;
+    
+                let beforeNode = null;
+                let afterNode = null;
+    
+                const childNodes = util.getListChildNodes(commonCon);
+                let startIndex = util.getArrayIndex(childNodes, startCon);
+                let endIndex = util.getArrayIndex(childNodes, endCon);
+    
+                if (childNodes.length > 0) {
+                    for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
+                        if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
+                            startIndex = i;
+                            startNode = startNode.parentNode;
+                        }
+                    }
+        
+                    for (let i = endIndex - 1, endNode = endCon; i > startIndex; i--) {
+                        if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
+                            childNodes.splice(i, 1);
+                            endNode = endNode.parentNode;
+                            --endIndex;
+                        }
+                    }
+                } else {
+                    childNodes.push(commonCon);
+                    startIndex = endIndex = 0;
+                    startCon = endCon = null;
                 }
-            }
-
-            for (let i = startIndex; i <= endIndex; i++) {
-                const item = childNodes[i];
-
-                if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
+    
+                for (let i = startIndex; i <= endIndex; i++) {
+                    const item = childNodes[i];
+    
+                    if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
+                        util.removeItem(item);
+                        continue;
+                    }
+    
+                    if (item === startCon) {
+                        if (startCon.nodeType === 1) {
+                            beforeNode = util.createTextNode(startCon.textContent);
+                        } else {
+                            beforeNode = util.createTextNode(startCon.substringData(0, startOff));
+                        }
+    
+                        if (beforeNode.length > 0) {
+                            startCon.data = beforeNode.data;
+                        } else {
+                            util.removeItem(startCon);
+                        }
+    
+                        continue;
+                    }
+    
+                    if (item === endCon) {
+                        if (endCon.nodeType === 1) {
+                            afterNode = util.createTextNode(endCon.textContent);
+                        } else {
+                            afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                        }
+    
+                        if (afterNode.length > 0) {
+                            endCon.data = afterNode.data;
+                        } else {
+                            util.removeItem(endCon);
+                        }
+    
+                        continue;
+                    }
+    
                     util.removeItem(item);
-                    continue;
                 }
 
-                if (item === startCon) {
-                    if (startCon.nodeType === 1) {
-                        beforeNode = util.createTextNode(startCon.textContent);
-                    } else {
-                        beforeNode = util.createTextNode(startCon.substringData(0, startOff));
-                    }
-
-                    if (beforeNode.length > 0) {
-                        startCon.data = beforeNode.data;
-                    } else {
-                        util.removeItem(startCon);
-                    }
-
-                    continue;
-                }
-
-                if (item === endCon) {
-                    if (endCon.nodeType === 1) {
-                        afterNode = util.createTextNode(endCon.textContent);
-                    } else {
-                        afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                    }
-
-                    if (afterNode.length > 0) {
-                        endCon.data = afterNode.data;
-                    } else {
-                        util.removeItem(endCon);
-                    }
-
-                    continue;
-                }
-
-                util.removeItem(item);
-
-                // history stack
-                this.history.push(false);
+                container = endCon || startCon || range.endContainer || range.startContainer;
+                offset = 0;
             }
+
+            // set range
+            this.setRange(container, offset, container, offset);
+
+            // history stack
+            this.history.push(true);
+
+            return {
+                container: container,
+                offset: offset
+            };
         },
 
         /**
-         * @description Split all nested tags based on "beforeTag"
+         * @description Split all tags based on "beforeNode"
          * Returns the last element of the splited tag.
-         * @param {Element} beforeTag Criteria element
+         * @param {Node} beforeNode Element or text node on which to base
+         * @param {Number|null} offset Text offset of "beforeNode" (Only valid when "beforeNode" is a text node)
          * @returns {Element}
          */
-        splitNestedElement: function (beforeTag) {
-            const bp = beforeTag.parentNode;
-            const children = bp.childNodes;
-            const index = util.getPositionIndex(beforeTag);
-            let newRange = bp.cloneNode(false);
-            while (children[index]) {
-                newRange.appendChild(children[index]);
+        splitElement: function (beforeNode, offset) {
+            const bp = beforeNode.parentNode;
+            let index = 0, newEl, children, temp;
+            let next = true;
+
+            if (offset > 0 && beforeNode.nodeType === 3) {
+                index = util.getPositionIndex(beforeNode);
+                beforeNode.splitText(offset);
+                const after = util.getNodeFromPath([index + 1], bp);
+                if (util.onlyZeroWidthSpace(after)) after.data = util.zeroWidthSpace;
+            } else {
+                if (!beforeNode.previousSibling) next = false;
+                else beforeNode = beforeNode.previousSibling;
             }
 
-            let depthParent = bp;
-            let newRangeTemp = null;
-            while (util.getElementDepth(depthParent) > 0) {
-                newRangeTemp = depthParent.cloneNode(false);
-                newRangeTemp.appendChild(newRange);
-                newRange = newRangeTemp;
-                depthParent = depthParent.parentNode;
+            let depthEl = beforeNode;
+            while (util.getElementDepth(depthEl) > 0) {
+                index = util.getPositionIndex(depthEl) + 1;
+                depthEl = depthEl.parentNode;
+
+                temp = newEl;
+                newEl = depthEl.cloneNode(false);
+                children = depthEl.childNodes;
+
+                if (temp) newEl.appendChild(temp);
+                while (children[index]) {
+                    newEl.appendChild(children[index]);
+                }
             }
 
-            const pElement = depthParent.parentNode;
-            depthParent = depthParent.nextElementSibling;
-            this._mergeSameTags(newRange, null, null, false);
-            util.mergeNestedTags(newRange, function (current) { return this.isList(current); }.bind(util));
+            const pElement = depthEl.parentNode;
+            if (next) depthEl = depthEl.nextElementSibling;
+
+            this._mergeSameTags(newEl, null, null, false);
+            util.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(util));
             
-            if (newRange.childNodes.length > 0) pElement.insertBefore(newRange, depthParent);
-            else newRange = depthParent;
+            if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
+            else newEl = depthEl;
 
             if (bp.childNodes.length === 0) util.removeItem(bp);
 
-            return newRange;
+            return newEl;
         },
 
         /**
@@ -1117,7 +1165,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             // Nested list
             if (beforeTag && util.getElementDepth(beforeTag) > 0 && util.isList(beforeTag.parentNode)) {
-                const splitRange = this.splitNestedElement(beforeTag);
+                const splitRange = this.splitElement(beforeTag);
                 splitRange.parentNode.insertBefore(rangeElement, splitRange);
             }
             // basic
@@ -4202,7 +4250,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                          (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent))))) {
                             if (selectionFormat) util.removeItem(children[offset - 1]);
                             else util.removeItem(selectionNode);
-                            const newEl = core.appendFormatTag(freeFormatEl, freeFormatEl.nextElementSibling ? freeFormatEl.nextElementSibling : 'P');
+                            const newEl = core.appendFormatTag(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
                             util.copyFormatAttributes(newEl, freeFormatEl);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
@@ -4245,7 +4293,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
-                            const newEl = core.appendFormatTag(rangeEl, util.isList(rangeEl.parentNode) ? 'LI' : util.isCell(rangeEl.parentNode) ? 'DIV' : util.isListCell(formatEl) ? 'P' : null);
+                            const newEl = core.appendFormatTag(rangeEl, util.isList(rangeEl.parentNode) ? 'LI' : util.isCell(rangeEl.parentNode) ? 'DIV' : null);
                             util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl, null);
                             core.setRange(newEl, 1, newEl, 1);
