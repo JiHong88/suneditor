@@ -730,10 +730,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush) {
+            const r = this.removeNode();
             let oNode = null;
-            const selectionNode = this.getSelectionNode();
+            let selectionNode = this.getSelectionNode();
             let formatEl = util.getFormatElement(selectionNode);
-            
+
             if (util.isListCell(formatEl)) {
                 if (/^HR$/i.test(element.nodeName)) {
                     const newLi = util.createElement('LI');
@@ -748,13 +749,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
                 }
             } else {
-                // split element
-                const r = this.removeNode();
                 if (this.getRange().collapsed && r.container.nodeType === 3) {
                     oNode = this.splitElement(r.container, r.offset);
                     formatEl = oNode.previousSibling;
                 }
-
                 this.insertNode(element, formatEl);
                 if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
             }
@@ -863,10 +861,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
             else {
                 parentNode = afterNode.parentNode;
-                afterNode = afterNode.nextElementSibling;
+                afterNode = afterNode.nextSibling;
             }
 
             try {
+                if (util.isFormatElement(oNode) || util.isComponent(oNode) || util.isRangeFormatElement(oNode)) {
+                    afterNode = this.splitElement(afterNode, 0);
+                    parentNode = afterNode.parentNode;
+                }
                 parentNode.insertBefore(oNode, afterNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
@@ -893,6 +895,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     };
                 }
 
+                this.setRange(oNode, 1, oNode, 1);
+
                 // history stack
                 this.history.push(true);
             }
@@ -905,106 +909,117 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         removeNode: function () {
             const range = this.getRange();
-            let container, offset;
+            let container, offset = 0;
 
             // native function
-            if (range.deleteContents) {
-                range.deleteContents();
-                container = range.endContainer || range.startContainer;
+            // if (range.deleteContents) {
+            //     range.deleteContents();
+            //     container = range.endContainer || range.startContainer;
 
-                if (container.nodeType === 3) {
-                    offset = container.textContent.length;
-                } else {
-                    container = util.getEdgeChildNodes((range.endContainer ? range.endContainer.childNodes[range.endOffset] : range.startContainer.childNodes[range.startOffset]), null).ec;
-                    offset = 0;
+            //     if (container.nodeType === 3) {
+            //         offset = range.startOffset;
+            //     } else {
+            //         container = util.getEdgeChildNodes((range.endContainer ? range.endContainer.childNodes[range.endOffset] : range.startContainer.childNodes[range.startOffset]), null).sc;
+            //     }
+
+            //     // set range
+            //     this.setRange(container, offset, container, offset);
+            //     // history stack
+            //     this.history.push(true);
+
+            //     return {
+            //         container: container,
+            //         offset: offset
+            //     };
+            // }
+
+            let startCon = range.startContainer;
+            let endCon = range.endContainer;
+            const startOff = range.startOffset;
+            const endOff = range.endOffset;
+            const commonCon = range.commonAncestorContainer;
+
+            let beforeNode = null;
+            let afterNode = null;
+
+            const childNodes = util.getListChildNodes(commonCon);
+            let startIndex = util.getArrayIndex(childNodes, startCon);
+            let endIndex = util.getArrayIndex(childNodes, endCon);
+
+            if (childNodes.length > 0) {
+                for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
+                    if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
+                        startIndex = i;
+                        startNode = startNode.parentNode;
+                    }
                 }
+    
+                for (let i = endIndex - 1, endNode = endCon; i > startIndex; i--) {
+                    if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
+                        childNodes.splice(i, 1);
+                        endNode = endNode.parentNode;
+                        --endIndex;
+                    }
+                }
+            } else {
+                childNodes.push(commonCon);
+                startIndex = endIndex = 0;
+                startCon = endCon = commonCon;
             }
-            // hard coding
-            else {
-                let startCon = range.startContainer;
-                let endCon = range.endContainer;
-                const startOff = range.startOffset;
-                const endOff = range.endOffset;
-                const commonCon = range.commonAncestorContainer;
-    
-                let beforeNode = null;
-                let afterNode = null;
-    
-                const childNodes = util.getListChildNodes(commonCon);
-                let startIndex = util.getArrayIndex(childNodes, startCon);
-                let endIndex = util.getArrayIndex(childNodes, endCon);
-    
-                if (childNodes.length > 0) {
-                    for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
-                        if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
-                            startIndex = i;
-                            startNode = startNode.parentNode;
-                        }
-                    }
-        
-                    for (let i = endIndex - 1, endNode = endCon; i > startIndex; i--) {
-                        if (childNodes[i] === endNode.parentNode && childNodes[i].nodeType === 1) {
-                            childNodes.splice(i, 1);
-                            endNode = endNode.parentNode;
-                            --endIndex;
-                        }
-                    }
-                } else {
-                    childNodes.push(commonCon);
-                    startIndex = endIndex = 0;
-                    startCon = endCon = null;
+
+            for (let i = startIndex; i <= endIndex; i++) {
+                const item = childNodes[i];
+
+                if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
+                    util.removeItem(item);
+                    continue;
                 }
-    
-                for (let i = startIndex; i <= endIndex; i++) {
-                    const item = childNodes[i];
-    
-                    if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                        util.removeItem(item);
-                        continue;
-                    }
-    
-                    if (item === startCon) {
-                        if (startCon.nodeType === 1) {
-                            beforeNode = util.createTextNode(startCon.textContent);
+
+                if (item === startCon) {
+                    if (startCon.nodeType === 1) {
+                        beforeNode = util.createTextNode(startCon.textContent);
+                    } else {
+                        if (item === endCon) {
+                            beforeNode = util.createTextNode(startCon.substringData(0, startOff) + endCon.substringData(endOff, (endCon.length - endOff)));
+                            offset = startOff;
                         } else {
                             beforeNode = util.createTextNode(startCon.substringData(0, startOff));
                         }
-    
-                        if (beforeNode.length > 0) {
-                            startCon.data = beforeNode.data;
-                        } else {
-                            util.removeItem(startCon);
-                        }
-    
-                        continue;
                     }
-    
-                    if (item === endCon) {
-                        if (endCon.nodeType === 1) {
-                            afterNode = util.createTextNode(endCon.textContent);
-                        } else {
-                            afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
-                        }
-    
-                        if (afterNode.length > 0) {
-                            endCon.data = afterNode.data;
-                        } else {
-                            util.removeItem(endCon);
-                        }
-    
-                        continue;
+
+                    if (beforeNode.length > 0) {
+                        startCon.data = beforeNode.data;
+                    } else {
+                        util.removeItem(startCon);
                     }
-    
-                    util.removeItem(item);
+
+                    if (item === endCon) break;
+                    continue;
                 }
 
-                container = endCon || startCon || range.endContainer || range.startContainer;
-                offset = 0;
+                if (item === endCon) {
+                    if (endCon.nodeType === 1) {
+                        afterNode = util.createTextNode(endCon.textContent);
+                    } else {
+                        afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
+                    }
+
+                    if (afterNode.length > 0) {
+                        endCon.data = afterNode.data;
+                    } else {
+                        util.removeItem(endCon);
+                    }
+
+                    continue;
+                }
+
+                util.removeItem(item);
             }
+
+            container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
 
             // set range
             this.setRange(container, offset, container, offset);
-
             // history stack
             this.history.push(true);
 
@@ -1026,12 +1041,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let index = 0, newEl, children, temp;
             let next = true;
 
-            if (offset > 0 && beforeNode.nodeType === 3) {
+            if (beforeNode.nodeType === 3) {
                 index = util.getPositionIndex(beforeNode);
-                beforeNode.splitText(offset);
-                const after = util.getNodeFromPath([index + 1], bp);
-                if (util.onlyZeroWidthSpace(after)) after.data = util.zeroWidthSpace;
-            } else {
+                if (offset >= 0) {
+                    beforeNode.splitText(offset);
+                    const after = util.getNodeFromPath([index + 1], bp);
+                    if (util.onlyZeroWidthSpace(after)) after.data = util.zeroWidthSpace;
+                }
+            } else if (beforeNode.nodeType === 1) {
                 if (!beforeNode.previousSibling) next = false;
                 else beforeNode = beforeNode.previousSibling;
             }
@@ -1053,6 +1070,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             const pElement = depthEl.parentNode;
             if (next) depthEl = depthEl.nextElementSibling;
+            if (!newEl) return depthEl;
 
             this._mergeSameTags(newEl, null, null, false);
             util.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(util));
