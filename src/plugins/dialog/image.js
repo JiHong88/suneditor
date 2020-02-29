@@ -56,7 +56,7 @@ export default {
         let image_dialog = this.setDialog.call(core);
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
-        context.image.imgInputFile = context.image.focusElement = image_dialog.querySelector('._se_image_file');
+        context.image.imgInputFile = context.image.focusElement = (image_dialog.querySelector('._se_image_file') || image_dialog.querySelector('._se_image_url'));
         context.image.altText = image_dialog.querySelector('._se_image_alt');
         context.image.imgLink = image_dialog.querySelector('._se_image_link');
         context.image.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
@@ -224,9 +224,9 @@ export default {
         this.util.addClass(targetElement, 'active');
 
         // focus
-        if (tabName === 'image') {
-            this.context.image.imgInputFile.focus();
-        } else if (tabName === 'url') {
+        if (tabName === 'image' && this.context.image.focusElement) {
+            this.context.image.focusElement.focus();
+        } else if (tabName === 'url' && this.context.image.imgLink) {
             this.context.image.imgLink.focus();
         }
 
