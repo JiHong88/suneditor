@@ -1043,6 +1043,176 @@ const util = {
     },
 
     /**
+     * @description Split all tags based on "beforeNode"
+     * Returns the last element of the splited tag.
+     * @param {Node} beforeNode Element or text node on which to base
+     * @param {Number|null} offset Text offset of "beforeNode" (Only valid when "beforeNode" is a text node)
+     * @param {Number} depth The nesting depth of the element being split. (default: 0)
+     * @returns {Element}
+     */
+    splitElement: function (beforeNode, offset, depth) {
+        const bp = beforeNode.parentNode;
+        let index = 0, newEl, children, temp;
+        let next = true;
+        if (!depth || depth < 0) depth = 0;
+
+        if (beforeNode.nodeType === 3) {
+            index = this.getPositionIndex(beforeNode);
+            if (offset >= 0) {
+                beforeNode.splitText(offset);
+                const after = this.getNodeFromPath([index + 1], bp);
+                if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
+            }
+        } else if (beforeNode.nodeType === 1) {
+            if (!beforeNode.previousSibling) {
+                if (this.getElementDepth(beforeNode) === depth) next = false;
+            } else {
+                beforeNode = beforeNode.previousSibling;
+            }
+        }
+
+        let depthEl = beforeNode;
+        while (this.getElementDepth(depthEl) > depth) {
+            index = this.getPositionIndex(depthEl) + 1;
+            depthEl = depthEl.parentNode;
+
+            temp = newEl;
+            newEl = depthEl.cloneNode(false);
+            children = depthEl.childNodes;
+
+            if (temp) newEl.appendChild(temp);
+            while (children[index]) {
+                newEl.appendChild(children[index]);
+            }
+        }
+
+        const pElement = depthEl.parentNode;
+        if (next) depthEl = depthEl.nextElementSibling;
+        if (!newEl) return depthEl;
+
+        this.mergeSameTags(newEl, null, null, false);
+        this.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(this));
+        
+        if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
+        else newEl = depthEl;
+
+        if (bp.childNodes.length === 0) this.removeItem(bp);
+
+        return newEl;
+    },
+
+    /**
+     * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
+     * If "offset" has been changed, it will return as much "offset" as it has been modified.
+     * "a", "b" You can send a maximum of two nodepaths.
+     * @param {Element} element Element object.
+     * @param {Object|null} nodePath_s Start NodePath object (util.getNodePath)
+     * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
+     * @param {Boolean} onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
+     * @returns {Object} {a: 0, b: 0}
+     */
+    mergeSameTags: function (element, nodePath_s, nodePath_e, onlyText) {
+        const inst = this;
+        const offsets = {a: 0, b: 0};
+
+        (function recursionFunc(current, depth, depthIndex, includedPath_s, includedPath_e) {
+            const children = current.childNodes;
+            
+            for (let i = 0, len = children.length, child, next; i < len; i++) {
+                child = children[i];
+                next = children[i + 1];
+                if (!child) break;
+                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && inst.isFormatElement(child) && !inst.isFreeFormatElement(child))) continue;
+                if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
+                    inst.copyTagAttributes(child, current);
+                    current.parentNode.insertBefore(child, current);
+                    inst.removeItem(current);
+
+                    // update nodePath
+                    if (nodePath_s && nodePath_s[depth] === i) {
+                        nodePath_s.splice(depth, 1);
+                        nodePath_s[depth] = i;
+                    }
+
+                    if (nodePath_e && nodePath_e[depth] === i) {
+                        nodePath_e.splice(depth, 1);
+                        nodePath_e[depth] = i;
+                    }
+                }
+                if (!next) {
+                    if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                    break;
+                }
+
+                if (child.nodeName === next.nodeName && inst.isSameAttributes(child, next) && child.href === next.href) {
+                    const childs = child.childNodes;
+                    let childLength = 0;
+                    for (let n = 0, nLen = childs.length; n < nLen; n++) {
+                        if (childs[n].textContent.length > 0) childLength++;
+                    }
+
+                    const l = child.lastChild;
+                    const r = next.firstChild;
+                    if (l && r) {
+                        const textOffset = l.nodeType === 3 && r.nodeType === 3;
+                        let addOffset = l.textContent.length;
+                        let tempL = l.previousSibling;
+                        while(tempL && tempL.nodeType === 3) {
+                            addOffset += tempL.textContent.length;
+                            tempL = tempL.previousSibling;
+                        }
+
+                        if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
+
+                        // start
+                        if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
+                            if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
+                                includedPath_s = false;
+                            } else {
+                                nodePath_s[depth] -= 1;
+                                if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
+                                    nodePath_s[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.a += addOffset;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // end
+                        if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
+                            if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
+                                includedPath_e = false;
+                            } else {
+                                nodePath_e[depth] -= 1;
+                                if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
+                                    nodePath_e[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.b += addOffset;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (child.nodeType === 3) child.textContent += next.textContent;
+                    else child.innerHTML += next.innerHTML;
+                    
+                    inst.removeItem(next);
+                    i--;
+                } else if (child.nodeType === 1) {
+                    recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                }
+            }
+        })(element, 0, 0, true, true);
+
+        return offsets;
+    },
+
+    /**
      * @description Remove nested tags without other child nodes.
      * @param {Element} element Element object
      * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.

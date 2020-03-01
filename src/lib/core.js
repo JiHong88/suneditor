@@ -656,9 +656,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         /**
          * @description Get format elements and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
          * If some of the component are included in the selection, get the entire that component.
+         * @param {Boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
          * @returns {Array}
          */
-        getSelectedElementsAndComponents: function () {
+        getSelectedElementsAndComponents: function (removeDuplicate) {
             const commonCon = this.getRange().commonAncestorContainer;
             const myComponent = util.getParentElement(commonCon, util.isComponent);
             const selectedLines = util.isTable(commonCon) ? 
@@ -667,6 +668,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     const component = this.getParentElement(current, this.isComponent);
                     return (this.isFormatElement(current) && (!component || component === myComponent)) || (this.isComponent(current) && !this.getFormatElement(current));
                 }.bind(util));
+            
+            if (removeDuplicate) {
+                for (let i = 0, len = selectedLines.length; i < len; i++) {
+                    for (let j = i - 1; j >= 0; j--) {
+                        if (selectedLines[j].contains(selectedLines[i])) {
+                            selectedLines.splice(i, 1);
+                            i--; len--;
+                            break;
+                        }
+                    }
+                }
+            }
 
             return selectedLines;
         },
@@ -704,7 +717,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @returns {Element}
          */
         appendFormatTag: function (element, formatNode) {
-            const formatEl = element;
             const currentFormatEl = util.getFormatElement(this.getSelectionNode());
             const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : util.isFormatElement(currentFormatEl) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
@@ -714,8 +726,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
             }
 
-            if (util.isCell(formatEl)) formatEl.insertBefore(oFormat, element.nextElementSibling);
-            else formatEl.parentNode.insertBefore(oFormat, formatEl.nextElementSibling);
+            if (util.isCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
+            else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
 
             return oFormat;
         },
@@ -750,7 +762,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             } else {
                 if (this.getRange().collapsed && r.container.nodeType === 3) {
-                    oNode = this.splitElement(r.container, r.offset);
+                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
+                    oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     formatEl = oNode.previousSibling;
                 }
                 this.insertNode(element, formatEl);
@@ -865,9 +878,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             try {
-                if (util.isFormatElement(oNode) || util.isComponent(oNode) || util.isRangeFormatElement(oNode)) {
-                    afterNode = this.splitElement(afterNode, 0);
-                    parentNode = afterNode.parentNode;
+                if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
+                    if (util.isList(afterNode)) {
+                        parentNode = afterNode;
+                        afterNode = null;
+                    } else {
+                        const depthFormat = util.getParentElement(afterNode, function (current) { return this.isRangeFormatElement(current); }.bind(util));
+                        afterNode = util.splitElement(afterNode, 0, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                        parentNode = afterNode.parentNode;
+                    }
                 }
                 parentNode.insertBefore(oNode, afterNode);
             } catch (e) {
@@ -946,7 +965,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let startIndex = util.getArrayIndex(childNodes, startCon);
             let endIndex = util.getArrayIndex(childNodes, endCon);
 
-            if (childNodes.length > 0) {
+            if (childNodes.length > 0 && startIndex > -1 && endIndex > -1) {
                 for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
                     if (childNodes[i] === startNode.parentNode && childNodes[i].firstChild === startNode && startOff === 0) {
                         startIndex = i;
@@ -962,9 +981,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
                 }
             } else {
-                childNodes.push(commonCon);
+                if (childNodes.length === 0) {
+                    childNodes.push(commonCon);
+                    startCon = endCon = commonCon;
+                } else {
+                    startCon = endCon = childNodes[0];
+                }
+
                 startIndex = endIndex = 0;
-                startCon = endCon = commonCon;
             }
 
             for (let i = startIndex; i <= endIndex; i++) {
@@ -1030,65 +1054,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
-         * @description Split all tags based on "beforeNode"
-         * Returns the last element of the splited tag.
-         * @param {Node} beforeNode Element or text node on which to base
-         * @param {Number|null} offset Text offset of "beforeNode" (Only valid when "beforeNode" is a text node)
-         * @returns {Element}
-         */
-        splitElement: function (beforeNode, offset) {
-            const bp = beforeNode.parentNode;
-            let index = 0, newEl, children, temp;
-            let next = true;
-
-            if (beforeNode.nodeType === 3) {
-                index = util.getPositionIndex(beforeNode);
-                if (offset >= 0) {
-                    beforeNode.splitText(offset);
-                    const after = util.getNodeFromPath([index + 1], bp);
-                    if (util.onlyZeroWidthSpace(after)) after.data = util.zeroWidthSpace;
-                }
-            } else if (beforeNode.nodeType === 1) {
-                if (!beforeNode.previousSibling) next = false;
-                else beforeNode = beforeNode.previousSibling;
-            }
-
-            let depthEl = beforeNode;
-            while (util.getElementDepth(depthEl) > 0) {
-                index = util.getPositionIndex(depthEl) + 1;
-                depthEl = depthEl.parentNode;
-
-                temp = newEl;
-                newEl = depthEl.cloneNode(false);
-                children = depthEl.childNodes;
-
-                if (temp) newEl.appendChild(temp);
-                while (children[index]) {
-                    newEl.appendChild(children[index]);
-                }
-            }
-
-            const pElement = depthEl.parentNode;
-            if (next) depthEl = depthEl.nextElementSibling;
-            if (!newEl) return depthEl;
-
-            this._mergeSameTags(newEl, null, null, false);
-            util.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(util));
-            
-            if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
-            else newEl = depthEl;
-
-            if (bp.childNodes.length === 0) util.removeItem(bp);
-
-            return newEl;
-        },
-
-        /**
          * @description Appended all selected format Element to the argument element and insert
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            const rangeLines = this.getSelectedElementsAndComponents();
+            const rangeLines = this.getSelectedElementsAndComponents(true);
             if (!rangeLines || rangeLines.length === 0) return;
 
             let last  = rangeLines[rangeLines.length - 1];
@@ -1178,12 +1148,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
-            this._mergeSameTags(rangeElement, null, null, false);
+            util.mergeSameTags(rangeElement, null, null, false);
             util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
             // Nested list
-            if (beforeTag && util.getElementDepth(beforeTag) > 0 && util.isList(beforeTag.parentNode)) {
-                const splitRange = this.splitElement(beforeTag);
+            if (beforeTag && util.getElementDepth(beforeTag) > 0 && (util.isList(beforeTag.parentNode) || util.isList(beforeTag.parentNode.parentNode))) {
+                const depthFormat = util.getParentElement(beforeTag, function (current) { return this.isRangeFormatElement(current) && !this.isList(current); }.bind(util));
+                const splitRange = util.splitElement(beforeTag, null, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                 splitRange.parentNode.insertBefore(rangeElement, splitRange);
             }
             // basic
@@ -1256,7 +1227,17 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
 
                 if (format.childNodes.length > 0) {
-                    parent.insertBefore(format, sibling);
+                    if (util.isListCell(parent) && util.isListCell(format) && util.isList(sibling)) {
+                        first = sibling;
+                        while(sibling) {
+                            format.appendChild(sibling);
+                            sibling = sibling.nextSibling;
+                        }
+                        parent.parentNode.insertBefore(format, parent.nextElementSibling);
+                    } else {
+                        parent.insertBefore(format, sibling);
+                    }
+
                     if (!first) first = format;
                 }
 
@@ -1286,7 +1267,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     if (!newList && util.isListCell(insNode)) {
                         const inner = insNode;
-                        insNode = util.createElement(util.isList(rangeElement.parentNode) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                        insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
                         insNode.innerHTML = inner.innerHTML;
                         util.copyFormatAttributes(insNode, inner);
                     } else {
@@ -1332,7 +1313,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 cc: rangeParent,
                 sc: firstNode,
                 ec: rangeRight,
-            } : util.getEdgeChildNodes(firstNode, lastNode);
+            } : util.getEdgeChildNodes(firstNode, (!lastNode.parentNode ? firstNode : lastNode));
 
             if (notHistoryPush) return edge;
             
@@ -1652,7 +1633,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 // start
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 // mid
-                for (let i = endLength - 1; i > 0; i--) {
+                for (let i = 1; i < endLength; i++) {
                     newNode = appendNode.cloneNode(false);
                     this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
                 }
@@ -1688,117 +1669,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             element.removeChild(removeNode);
-        },
-
-        /**
-         * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
-         * If "offset" has been changed, it will return as much "offset" as it has been modified.
-         * "a", "b" You can send a maximum of two nodepaths.
-         * @param {Object|null} nodePath_s Start NodePath object (util.getNodePath)
-         * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
-         * @param {Boolean} onlyText If true, the node with util._isIgnoreNodeChange() is true is ignored.
-         * @returns {Object} {a: 0, b: 0}
-         * @private
-         */
-        _mergeSameTags: function (element, nodePath_s, nodePath_e, onlyText) {
-            const inst = this;
-            const offsets = {a: 0, b: 0};
-
-            (function recursionFunc(current, depth, depthIndex, includedPath_s, includedPath_e) {
-                const children = current.childNodes;
-                
-                for (let i = 0, len = children.length, child, next; i < len; i++) {
-                    child = children[i];
-                    next = children[i + 1];
-                    if (!child) break;
-                    if((onlyText && inst.util._isIgnoreNodeChange(child)) || (!onlyText && inst.util.isFormatElement(child) && !inst.util.isFreeFormatElement(child))) continue;
-                    if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
-                        inst.util.copyTagAttributes(child, current);
-                        current.parentNode.insertBefore(child, current);
-                        inst.util.removeItem(current);
-
-                        // update nodePath
-                        if (nodePath_s && nodePath_s[depth] === i) {
-                            nodePath_s.splice(depth, 1);
-                            nodePath_s[depth] = i;
-                        }
-
-                        if (nodePath_e && nodePath_e[depth] === i) {
-                            nodePath_e.splice(depth, 1);
-                            nodePath_e[depth] = i;
-                        }
-                    }
-                    if (!next) {
-                        if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
-                        break;
-                    }
-
-                    if (child.nodeName === next.nodeName && inst.util.isSameAttributes(child, next) && child.href === next.href) {
-                        const childs = child.childNodes;
-                        let childLength = 0;
-                        for (let n = 0, nLen = childs.length; n < nLen; n++) {
-                            if (childs[n].textContent.length > 0) childLength++;
-                        }
-
-                        const l = child.lastChild;
-                        const r = next.firstChild;
-                        if (l && r) {
-                            const textOffset = l.nodeType === 3 && r.nodeType === 3;
-                            let addOffset = l.textContent.length;
-                            let tempL = l.previousSibling;
-                            while(tempL && tempL.nodeType === 3) {
-                                addOffset += tempL.textContent.length;
-                                tempL = tempL.previousSibling;
-                            }
-    
-                            if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
-    
-                            // start
-                            if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
-                                if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
-                                    includedPath_s = false;
-                                } else {
-                                    nodePath_s[depth] -= 1;
-                                    if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
-                                        nodePath_s[depth + 1] += childLength;
-                                        if (textOffset) {
-                                            if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                                offsets.a += addOffset;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            // end
-                            if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
-                                if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
-                                    includedPath_e = false;
-                                } else {
-                                    nodePath_e[depth] -= 1;
-                                    if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
-                                        nodePath_e[depth + 1] += childLength;
-                                        if (textOffset) {
-                                            if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                                offsets.b += addOffset;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (child.nodeType === 3) child.textContent += next.textContent;
-                        else child.innerHTML += next.innerHTML;
-                        
-                        inst.util.removeItem(next);
-                        i--;
-                    } else if (child.nodeType === 1) {
-                        recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
-                    }
-                }
-            })(element, 0, 0, true, true);
-
-            return offsets;
         },
 
         /**
@@ -2084,7 +1954,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
                             if (util._isIgnoreNodeChange(child)) {
-                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(child);
+                                i--; len--;
                                 if (!collapsed) {
                                     newInnerNode = newInnerNode.cloneNode(false);
                                     pNode.appendChild(newInnerNode);
@@ -2234,12 +2105,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             endOffset = (collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s);
 
             // tag merge
-            const newOffsets = this._mergeSameTags(pNode, startPath, endPath, true);
+            const newOffsets = util.mergeSameTags(pNode, startPath, endPath, true);
 
-            element.innerHTML = pNode.innerHTML;
+            element.parentNode.replaceChild(pNode, element);
 
-            startContainer = util.getNodeFromPath(startPath, element);
-            endContainer = util.getNodeFromPath(endPath, element);
+            startContainer = util.getNodeFromPath(startPath, pNode);
+            endContainer = util.getNodeFromPath(endPath, pNode);
 
             return {
                 startContainer: startContainer,
@@ -2313,9 +2184,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                pNode.appendChild(child);
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
+                                i--; len--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2506,11 +2378,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = this._mergeSameTags(pNode, path, null, true);
+                const newOffsets = util.mergeSameTags(pNode, path, null, true);
 
-                element.innerHTML = pNode.innerHTML;
+                element.parentNode.replaceChild(pNode, element);
 
-                container = util.getNodeFromPath(path, element);
+                container = util.getNodeFromPath(path, pNode);
                 offset += newOffsets.a;
             }
 
@@ -2580,10 +2452,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             pNode.appendChild(newInnerNode);
                             newInnerNode = newInnerNode.cloneNode(false);
                         }
-                        pNode.appendChild(child.cloneNode(true));
+                        pNode.appendChild(child);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
+                        i--; len--;
                         continue;
                     } else {
                         vNode = validation(child);
@@ -2596,7 +2469,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     if (!util.isBreak(child)) recursionFunc(child, coverNode);
                 }
-            })(element.cloneNode(true), newInnerNode);
+            })(element, newInnerNode);
 
             // not remove tag
             if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
@@ -2616,10 +2489,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             util.removeEmptyNode(pNode, newInnerNode);
-            this._mergeSameTags(pNode, null, null, true);
+            util.mergeSameTags(pNode, null, null, true);
 
             // node change
-            element.innerHTML = pNode.innerHTML;
+            element.parentNode.replaceChild(pNode, element);
         },
 
         /**
@@ -2685,11 +2558,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (passNode && !util.isBreak(child)) {
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
-                                const cloneChild = child.cloneNode(true);
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.insertBefore(cloneChild, ancestor);
-                                pNode.insertBefore(newInnerNode, cloneChild);
+                                pNode.insertBefore(child, ancestor);
+                                pNode.insertBefore(newInnerNode, child);
                                 nNodeArray.push(newInnerNode);
+                                i++;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2895,11 +2768,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = this._mergeSameTags(pNode, path, null, true);
+                const newOffsets = util.mergeSameTags(pNode, path, null, true);
 
-                element.innerHTML = pNode.innerHTML;
+                element.parentNode.replaceChild(pNode, element);
 
-                container = util.getNodeFromPath(path, element);
+                container = util.getNodeFromPath(path, pNode);
                 offset += newOffsets.a;
             }
 
@@ -4142,6 +4015,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     core.controllersOff();
                     
+                    // table
                     let currentNode = selectionNode;
                     while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
                         currentNode = currentNode.parentNode;
@@ -4168,8 +4042,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     let r = {sc: null, so: null, ec: null, eo: null};
                     for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
                         f = selectedFormats[i];
-                        if (util.isListCell(f)) cells.push(f);
-                        else lines.push(f);
+                        if (util.isListCell(f)) {
+                            if (!f.previousElementSibling && !shift) continue;
+                            cells.push(f);
+                        } else {
+                            lines.push(f);
+                        }
                     }
                     
                     // Nested list
@@ -4305,21 +4183,29 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
 
                     if (selectRange) break;
-
-                    const figcaption = util.getParentElement(rangeEl, 'FIGCAPTION');
+                    
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
-                            const newEl = core.appendFormatTag(rangeEl, util.isList(rangeEl.parentNode) ? 'LI' : util.isCell(rangeEl.parentNode) ? 'DIV' : null);
-                            util.copyFormatAttributes(newEl, formatEl);
+                            let newEl = null;
+
+                            if (util.isListCell(rangeEl.parentNode)) {
+                                rangeEl = rangeEl.parentNode;
+                                newEl = core.appendFormatTag(rangeEl, 'LI');
+                            } else {
+                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling : 'P';
+                                newEl = core.appendFormatTag(rangeEl, newFormat);
+                                util.copyFormatAttributes(newEl, formatEl);
+                            }
+
                             util.removeItemAllParents(formatEl, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
                         }
                     }
 
-                    if (rangeEl && figcaption && util.getParentElement(rangeEl, util.isList)) {
+                    if (rangeEl && util.getParentElement(rangeEl, 'FIGCAPTION') && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl, null);
                         core.setRange(formatEl, 0, formatEl, 0);

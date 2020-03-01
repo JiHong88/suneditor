@@ -158,27 +158,28 @@ export default {
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
 
-            const selectedFormsts = this.getSelectedElementsAndComponents();
+            const util = this.util;
+            const selectedFormsts = this.getSelectedElementsAndComponents(false);
             if (selectedFormsts.length === 0) return;
 
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
-            const firstPath = this.util.getNodePath(range.startContainer, first, null);
-            const lastPath = this.util.getNodePath(range.endContainer, last, null);
+            const firstPath = util.getNodePath(range.startContainer, first, null);
+            const lastPath = util.getNodePath(range.endContainer, last, null);
             
             // remove selected list
             let rangeArr = {};
             let listFirst = false;
             let listLast = false;
-            const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
+            const passComponent = function (current) { return !this.isComponent(current); }.bind(util);
 
             for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
                 lastIndex = i === len - 1;
-                o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
-                isList = this.util.isList(o);
+                o = util.getRangeFormatElement(selectedFormsts[i], passComponent);
+                isList = util.isList(o);
                 if (!r && isList) {
                     r = o;
-                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
+                    rangeArr = {r: r, f: [util.getParentElement(selectedFormsts[i], 'LI')]};
                     if (i === 0) listFirst = true;
                 } else if (r && isList) {
                     if (r !== o) {
@@ -191,18 +192,18 @@ export default {
 
                         if (isList) {
                             r = o;
-                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
+                            rangeArr = {r: r, f: [util.getParentElement(selectedFormsts[i], 'LI')]};
                             if (lastIndex) listLast = true;
                         } else {
                             r = null;
                         }
                     } else {
-                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
+                        rangeArr.f.push(util.getParentElement(selectedFormsts[i], 'LI'));
                         if (lastIndex) listLast = true;
                     }
                 }
 
-                if (lastIndex && this.util.isList(r)) {
+                if (lastIndex && util.isList(r)) {
                     const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
                     if (listLast || len === 1) last = edge.ec;
                     if (listFirst) first = edge.sc || last;
@@ -210,8 +211,8 @@ export default {
             }
 
             // change format tag
-            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            const modifiedFormsts = this.getSelectedElementsAndComponents();
+            this.setRange(util.getNodeFromPath(firstPath, first), startOffset, util.getNodeFromPath(lastPath, last), endOffset);
+            const modifiedFormsts = this.getSelectedElementsAndComponents(false);
 
             // free format
             if (command === 'free') {
@@ -224,14 +225,14 @@ export default {
                     f = modifiedFormsts[i];
                     if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
     
-                    isComp = this.util.isComponent(f);
+                    isComp = util.isComponent(f);
                     html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
-                    before = this.util.getParentElement(f, function (current) {
+                    before = util.getParentElement(f, function (current) {
                         return current.parentNode === parentNode;
                     });
     
                     if (parentNode !== f.parentNode || isComp) {
-                        if (this.util.isFormatElement(parentNode)) {
+                        if (util.isFormatElement(parentNode)) {
                             parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
                             parentNode = parentNode.parentNode;
                         } else {
@@ -240,9 +241,9 @@ export default {
                         }
 
                         next = freeElement.nextSibling;
-                        if (next && freeElement.nodeName === next.nodeName && this.util.isSameAttributes(freeElement, next)) {
+                        if (next && freeElement.nodeName === next.nodeName && util.isSameAttributes(freeElement, next)) {
                             freeElement.innerHTML += '<BR>' + next.innerHTML;
-                            this.util.removeItem(next);
+                            util.removeItem(next);
                         }
 
                         freeElement = tag.cloneNode(false);
@@ -255,19 +256,19 @@ export default {
                     if (i === 0) {
                         parentNode.insertBefore(freeElement, f);
                         next = f.nextSibling;
-                        if (next && freeElement.nodeName === next.nodeName && this.util.isSameAttributes(freeElement, next)) {
+                        if (next && freeElement.nodeName === next.nodeName && util.isSameAttributes(freeElement, next)) {
                             freeElement.innerHTML += '<BR>' + next.innerHTML;
-                            this.util.removeItem(next);
+                            util.removeItem(next);
                         }
 
                         const prev = freeElement.previousSibling;
-                        if (prev && freeElement.nodeName === prev.nodeName && this.util.isSameAttributes(freeElement, prev)) {
+                        if (prev && freeElement.nodeName === prev.nodeName && util.isSameAttributes(freeElement, prev)) {
                             prev.innerHTML += '<BR>' + freeElement.innerHTML;
-                            this.util.removeItem(freeElement);
+                            util.removeItem(freeElement);
                         }
                     }
 
-                    if (!isComp) this.util.removeItem(f);
+                    if (!isComp) util.removeItem(f);
                     if (!!html) first = false;
                 }
     
@@ -278,9 +279,9 @@ export default {
                 for (let i = 0, len = modifiedFormsts.length, node, newFormat; i < len; i++) {
                     node = modifiedFormsts[i];
                     
-                    if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.util.isComponent(node)) {
+                    if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !util.isComponent(node)) {
                         newFormat = tag.cloneNode(false);
-                        this.util.copyFormatAttributes(newFormat, node);
+                        util.copyFormatAttributes(newFormat, node);
                         newFormat.innerHTML = node.innerHTML;
     
                         node.parentNode.replaceChild(newFormat, node);
@@ -291,7 +292,7 @@ export default {
                     newFormat = null;
                 }
     
-                this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
+                this.setRange(util.getNodeFromPath(firstPath, first), startOffset, util.getNodeFromPath(lastPath, last), endOffset);
             }
 
             // history stack

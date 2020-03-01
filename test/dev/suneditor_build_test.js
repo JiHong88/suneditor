@@ -24,10 +24,11 @@ const align = require('../../src/plugins/submenu/align')
 
 suneditor.create("sample1", {
     plugins: plugins,
-    mode: "balloon",
+    // mode: "balloon",
     // iframe: true,
+    imageFileInput: false,
     buttonList: [
-        ["undo", "redo"],
+        ["undo", "image", "video"],
         ["font", "fontSize", "formatBlock"],
         ["paragraphStyle", "table"]
     ]
@@ -52,7 +53,7 @@ let s1 = suneditor.create('editor', {
         'preview', 'print', 'save', 'template']
     ],
     width: '100%',
-    height: 'auto',
+    height: '500',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
     formats: [

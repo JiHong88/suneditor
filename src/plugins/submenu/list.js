@@ -104,7 +104,7 @@ export default {
     },
 
     editList: function (command, selectedCells) {
-        const selectedFormsts = !selectedCells ? this.getSelectedElementsAndComponents() : selectedCells;
+        const selectedFormsts = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
         if (!selectedFormsts || selectedFormsts.length === 0) return;
 
         let isRemove = true;
@@ -280,7 +280,7 @@ export default {
             for (let i = 0, len = cellsLen, c; i < len; i++) {
                 c = selectedCells[i];
                 if (c.parentNode !== originList) {
-                    this.plugins.list._insiedList(originList, innerList, prev, next);
+                    this.plugins.list._insiedList.call(this, originList, innerList, prev, next);
                     originList = c.parentNode;
                     innerList = this.util.createElement(originList.nodeName);
                 }
@@ -290,7 +290,7 @@ export default {
                 innerList.appendChild(c);
             }
             
-            innerList = this.plugins.list._insiedList(originList, innerList, prev, next);
+            innerList = this.plugins.list._insiedList.call(this, originList, innerList, prev, next);
         }
 
         return range;
@@ -320,7 +320,16 @@ export default {
             next = temp;
         }
 
-        if (!insertPrev) originList.insertBefore(innerList, next);
+        if (!insertPrev) {
+            if (this.util.isListCell(prev)) {
+                originList = prev;
+                next = null;
+            }
+
+            originList.insertBefore(innerList, next);
+            this.util.mergeSameTags(originList, null, null, false);
+            this.util.mergeNestedTags(originList);
+        }
 
         return innerList;
     },
