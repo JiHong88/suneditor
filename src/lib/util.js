@@ -452,6 +452,31 @@ const util = {
     },
 
     /**
+     * @description Get the item from the array that matches the condition.
+     * @param {Array} array Array to get item
+     * @param {Function|null} validation Conditional function
+     * @param {Boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
+     * If false, returns only one item that meet the criteria otherwise return null.
+     * @returns {Array|Object}
+     */
+    getArrayItem: function (array, validation, multi) {
+        if (!array || array.length === 0) return null;
+
+        validation = validation || function () { return true; };
+        const arr = [];
+        
+        for (let i = 0, len = array.length, a; i < len; i++) {
+            a = array[i];
+            if (validation(a)) {
+                if (!multi) return a;
+                else arr.push(a);
+            }
+        }
+
+        return !multi ? null : arr;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {Array} array element array
      * @param {Element} element The element to find index
@@ -720,7 +745,7 @@ const util = {
     /**
      * @description Get all child nodes of the argument value element (Include text nodes)
      * @param {Element} element element to get child node
-     * @param {(function|null)} validation Conditional function
+     * @param {function|null} validation Conditional function
      * @returns {Array}
      */
     getListChildNodes: function (element, validation) {
@@ -1052,35 +1077,107 @@ const util = {
     },
 
     /**
-     * @description Split all tags based on "beforeNode"
+     * @description Detach Nested list all nested lists under the "baseNode".
+     * Returns a list with nested removed.
+     * @param {Element} baseNode Element on which to base.
+     * @returns {Element}
+     */
+    detachNestedList: function (baseNode) {
+        const rNode = this.__deleteNestedList(baseNode);
+        let rangeElement, cNodes;
+
+        if (rNode) {
+            rangeElement = rNode.cloneNode(false);
+            cNodes = rNode.childNodes;
+            const index = this.getPositionIndex(baseNode);
+            while (cNodes[index]) {
+                rangeElement.appendChild(cNodes[index]);
+            }
+        } else {
+            rangeElement = baseNode;
+        }
+        
+        const rChildren = this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
+        for (let i = 0, len = rChildren.length, n; i < len; i++) {
+            n = this.__deleteNestedList(rChildren[i]);
+            if (n && n.childNodes.length === 0) {
+                this.removeItem(n);
+                i--; len--;
+            }
+        }
+        
+        if (rNode) {
+            rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
+            if (cNodes && cNodes.length === 0) this.removeItem(rNode);
+        }
+
+        return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
+    },
+
+    /**
+     * @description Sub function of util.detachNestedList method.
+     * @private
+     */
+    __deleteNestedList: function (baseNode) {
+        let sibling = baseNode.parentNode;
+        let parent = sibling.parentNode;
+        let liSibling, liParent, child, index, c;
+        
+        while (this.isListCell(parent)) {
+            index = this.getPositionIndex(baseNode);
+            liSibling = parent.nextElementSibling;
+            liParent = parent.parentNode;
+            child = sibling;
+            while(child) {
+                sibling = sibling.nextSibling;
+                if (this.isList(child)) {
+                    c = child.childNodes;
+                    while (c[index]) {
+                        liParent.insertBefore(c[index], liSibling);
+                    }
+                    if (c.length === 0) this.removeItem(child);
+                } else {
+                    liParent.appendChild(child);
+                }
+                child = sibling;
+            }
+            sibling = liParent;
+            parent = liParent.parentNode;
+        }
+
+        return liParent;
+    },
+
+    /**
+     * @description Split all tags based on "baseNode"
      * Returns the last element of the splited tag.
-     * @param {Node} beforeNode Element or text node on which to base
-     * @param {Number|null} offset Text offset of "beforeNode" (Only valid when "beforeNode" is a text node)
+     * @param {Node} baseNode Element or text node on which to base
+     * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
      * @param {Number} depth The nesting depth of the element being split. (default: 0)
      * @returns {Element}
      */
-    splitElement: function (beforeNode, offset, depth) {
-        const bp = beforeNode.parentNode;
+    splitElement: function (baseNode, offset, depth) {
+        const bp = baseNode.parentNode;
         let index = 0, newEl, children, temp;
         let next = true;
         if (!depth || depth < 0) depth = 0;
 
-        if (beforeNode.nodeType === 3) {
-            index = this.getPositionIndex(beforeNode);
+        if (baseNode.nodeType === 3) {
+            index = this.getPositionIndex(baseNode);
             if (offset >= 0) {
-                beforeNode.splitText(offset);
+                baseNode.splitText(offset);
                 const after = this.getNodeFromPath([index + 1], bp);
                 if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
             }
-        } else if (beforeNode.nodeType === 1) {
-            if (!beforeNode.previousSibling) {
-                if (this.getElementDepth(beforeNode) === depth) next = false;
+        } else if (baseNode.nodeType === 1) {
+            if (!baseNode.previousSibling) {
+                if (this.getElementDepth(baseNode) === depth) next = false;
             } else {
-                beforeNode = beforeNode.previousSibling;
+                baseNode = baseNode.previousSibling;
             }
         }
 
-        let depthEl = beforeNode;
+        let depthEl = baseNode;
         while (this.getElementDepth(depthEl) > depth) {
             index = this.getPositionIndex(depthEl) + 1;
             depthEl = depthEl.parentNode;
@@ -1096,7 +1193,7 @@ const util = {
         }
 
         const pElement = depthEl.parentNode;
-        if (next) depthEl = depthEl.nextElementSibling;
+        if (next) depthEl = depthEl.nextSibling;
         if (!newEl) return depthEl;
 
         this.mergeSameTags(newEl, null, null, false);

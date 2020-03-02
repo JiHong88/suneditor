@@ -9,6 +9,7 @@ import { ko } from '../../src/lang';
 import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
+import Resolutions from './Resolutions';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
@@ -23,14 +24,22 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: plugins,
+    plugins: [Resolutions],
     // mode: "balloon",
     // iframe: true,
+    width: '100%',
     imageFileInput: false,
     buttonList: [
-        ["undo", "image", "video"],
-        ["font", "fontSize", "formatBlock"],
-        ["paragraphStyle", "table"]
+        [
+            {
+                name: 'Resolutions', 
+                dataCommand: 'Resolutions',
+                buttonClass:'', 
+                title:'Resolutions', 
+                dataDisplay:'submenu',
+                innerHTML:'<i class="se-icon-add"></i>'
+            }
+        ]
     ]
 });
 

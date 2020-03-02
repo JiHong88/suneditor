@@ -183,7 +183,8 @@ export default {
                     if (i === 0) listFirst = true;
                 } else if (r && isList) {
                     if (r !== o) {
-                        const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true, true);
+                        const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true);
+                        o = selectedFormsts[i].parentNode;
                         if (listFirst) {
                             first = edge.sc;
                             listFirst = false;
@@ -191,7 +192,7 @@ export default {
                         if (lastIndex) last = edge.ec;
 
                         if (isList) {
-                            r = o = null;
+                            r = o;
                             rangeArr = {r: r, f: [util.getParentElement(selectedFormsts[i], 'LI')]};
                             if (lastIndex) listLast = true;
                         } else {
@@ -204,7 +205,7 @@ export default {
                 }
 
                 if (lastIndex && util.isList(r)) {
-                    const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true, true);
+                    const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true);
                     if (listLast || len === 1) last = edge.ec;
                     if (listFirst) first = edge.sc || last;
                 }

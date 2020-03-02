@@ -670,6 +670,50 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="getArrayItem"><span class="type-signature"></span>getArrayItem<span
+                    class="signature">(array, validation, multi)</span><span class="type-signature"> &rarr; {Array|Object}</span></h4>
+            <div class="description">
+                Get the item from the array that matches the condition.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Array to get item</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Conditional function</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>multi</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">
+                        If true, returns all items that meet the criteria otherwise, returns an empty array.<br>
+                        If false, returns only one item that meet the criteria otherwise return null.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="getArrayIndex"><span class="type-signature"></span>getArrayIndex<span
                     class="signature">(array, element)</span><span class="type-signature"> &rarr; {Number}</span></h4>
             <div class="description">
@@ -1730,10 +1774,38 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="splitElement"><span class="type-signature"></span>splitElement<span class="signature">(beforeNode, offset, depth)</span><span
+        <h4 class="name" id="detachNestedList"><span class="type-signature"></span>detachNestedList<span class="signature">(baseNode)</span><span
             class="type-signature"> &rarr; {Element}</span></h4>
         <div class="description">
-            Split all tags based on "beforeNode"<br>
+            Detach Nested list all nested lists under the "baseNode".<br>
+            Returns a list with nested removed.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>baseNode</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element on which to base.</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="splitElement"><span class="type-signature"></span>splitElement<span class="signature">(baseNode, offset, depth)</span><span
+            class="type-signature"> &rarr; {Element}</span></h4>
+        <div class="description">
+            Split all tags based on "baseNode"<br>
             Returns the last element of the splited tag.
         </div>
         <h5>Parameters:</h5>
@@ -1747,7 +1819,7 @@
             </thead>
             <tbody>
             <tr>
-                <td class="name"><code>beforeNode</code></td>
+                <td class="name"><code>baseNode</code></td>
                 <td class="type">
                     <span class="param-type">Node</span>
                 </td>
@@ -1758,7 +1830,7 @@
                 <td class="type">
                     <span class="param-type">Number|null</span>
                 </td>
-                <td class="description last">Text offset of "beforeNode" (Only valid when "beforeNode" is a text node)</td>
+                <td class="description last">Text offset of "baseNode" (Only valid when "baseNode" is a text node)</td>
             </tr>
             <tr>
                 <td class="name"><code>depth</code></td>
@@ -1989,6 +2061,7 @@
         <li><a href="document-util.html#getFreeFormatElement">getFreeFormatElement</a></li>
         <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
+        <li><a href="document-util.html#getArrayItem">getArrayItem</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
@@ -2020,6 +2093,7 @@
         <li><a href="document-util.html#toggleClass">toggleClass</a></li>
         <li><a href="document-util.html#removeItem">removeItem</a></li>
         <li><a href="document-util.html#removeItemAllParents">removeItemAllParents</a></li>
+        <li><a href="document-util.html#detachNestedList">detachNestedList</a></li>
         <li><a href="document-util.html#splitElement">splitElement</a></li>
         <li><a href="document-util.html#mergeSameTags">mergeSameTags</a></li>
         <li><a href="document-util.html#mergeNestedTags">mergeNestedTags</a></li>

@@ -61,9 +61,7 @@ export default {
         this.history.push(true);
 
         const initialEditorContent = this.getContents();
-    
         const title = initialEditorContent.search('Resolutions') === -1 ? '<h4><u>Resolutions</u></h4>' : '';
-
 
         if(this.context.custom.textElement.value.length > 0) {
             // const parser = new this._w.DOMParser();

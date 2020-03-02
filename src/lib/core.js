@@ -756,7 +756,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
                     this.setRange(textNode, 1, textNode, 1);
                 } else {
-                    this.insertNode(element, selectionNode === formatEl ? null : selectionNode);
+                    this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling);
+                    if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
                     oNode = util.createElement('LI');
                     formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
                 }
@@ -883,9 +884,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         parentNode = afterNode;
                         afterNode = null;
                     } else {
-                        const depthFormat = util.getParentElement(afterNode, function (current) { return this.isRangeFormatElement(current); }.bind(util));
-                        afterNode = util.splitElement(afterNode, 0, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                        parentNode = afterNode.parentNode;
+                        const r = this.removeNode();
+                        parentNode = r.container.parentNode;
+                        afterNode = r.container.nextSibling;
                     }
                 }
                 parentNode.insertBefore(oNode, afterNode);
@@ -1058,7 +1059,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            const rangeLines = this.getSelectedElementsAndComponents(true);
+            const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
             let last  = rangeLines[rangeLines.length - 1];
@@ -1111,7 +1112,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             list = list.parentNode;
                         }
 
-                        const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
+                        const edge = this.detachRangeFormatElement(originParent, lineArr, null, false, true);
 
                         if (parentDepth >= depth) {
                             parentDepth = depth;
@@ -1184,7 +1185,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Boolean} remove Delete without detached.
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush, removeNestedList) {
+        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
             const range = this.getRange();
             const so = range.startOffset;
             const eo = range.endOffset;
@@ -1198,36 +1199,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const newList = util.isList(newRangeElement);
             let insertedNew = false;
             let reset = false;
-
-            function _deleteNestedList (originNode) {
-                let sibling = originNode.parentNode;
-                let parent = sibling.parentNode;
-                let liSibling, liParent, child, index, c;
-                
-                while (util.isListCell(parent)) {
-                    index = util.getPositionIndex(originNode);
-                    liSibling = parent.nextElementSibling;
-                    liParent = parent.parentNode;
-                    child = sibling;
-                    while(child) {
-                        sibling = sibling.nextSibling;
-                        if (util.isList(child)) {
-                            c = child.childNodes;
-                            while (c[index]) {
-                                liParent.insertBefore(c[index], liSibling);
-                            }
-                            if (c.length === 0) util.removeItem(child);
-                        } else {
-                            liParent.appendChild(child);
-                        }
-                        child = sibling;
-                    }
-                    sibling = liParent;
-                    parent = liParent.parentNode;
-                }
-
-                return liParent;
-            }
 
             function appendNode (parent, insNode, sibling, originNode) {
                 if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
@@ -1259,7 +1230,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 if (format.childNodes.length > 0) {
                     if (util.isListCell(parent) && util.isListCell(format) && util.isList(sibling)) {
-                        if (!removeNestedList) {
+                        if (newList) {
                             first = sibling;
                             while(sibling) {
                                 format.appendChild(sibling);
@@ -1268,26 +1239,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             parent.parentNode.insertBefore(format, parent.nextElementSibling);
                         } else {
                             reset = true;
-                            
-                            const rNode = _deleteNestedList(originNode);
-                            rangeElement = rNode.cloneNode(false);
-                            const c = rNode.childNodes;
-                            const index = util.getPositionIndex(originNode);
-                            while (c[index]) {
-                                rangeElement.appendChild(c[index]);
-                            }
-                            
-                            const rChildren = util.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(util));
-                            for (let i = 0, len = rChildren.length, n; i < len; i++) {
-                                n = _deleteNestedList(rChildren[i]);
-                                if (n && n.childNodes.length === 0) {
-                                    util.removeItem(n);
-                                    i--; len--;
-                                }
-                            }
-                            
-                            rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
-                            if (c.length === 0) util.removeItem(rNode);
+                            rangeElement = util.detachNestedList(originNode);
                         }
                     } else {
                         parent.insertBefore(format, sibling);
@@ -1320,15 +1272,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        const inner = insNode;
-                        insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
-                        insNode.innerHTML = inner.innerHTML;
-                        util.copyFormatAttributes(insNode, inner);
+                        if (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false)) {
+                            reset = true;
+                            rangeElement = util.detachNestedList(insNode);
+                        } else {
+                            const inner = insNode;
+                            insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                            insNode.innerHTML = inner.innerHTML;
+                            util.copyFormatAttributes(insNode, inner);
+                        }
                     } else {
                         insNode = insNode.cloneNode(true);
                     }
 
-                    if (!remove) {
+                    if (!remove && !reset) {
                         if (newRangeElement) {
                             if (!insertedNew) {
                                 parent.insertBefore(newRangeElement, rangeElement);
@@ -1337,17 +1294,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             insNode = appendNode(newRangeElement, insNode, null, children[i]);
                         } else {
                             insNode = appendNode(parent, insNode, rangeElement, children[i]);
-                        }
-
-                        if (reset) {
-                            reset = false;
-                            children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
-                            rangeEl = rangeElement.cloneNode(false);
-                            parent = rangeElement.parentNode;
-                            firstNode = lastNode = null;
-                            i = -1;
-                            len = children.length;
-                            continue;
                         }
 
                         if (selectedFormats) {
@@ -1359,6 +1305,17 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             firstNode = lastNode = insNode;
                         }
                     }
+
+                    if (reset) {
+                        reset = false;
+                        children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
+                        rangeEl = rangeElement.cloneNode(false);
+                        parent = rangeElement.parentNode;
+                        firstNode = lastNode = null;
+                        i = -1;
+                        len = children.length;
+                        continue;
+                    }
                 }
             }
 
@@ -1369,7 +1326,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
             
             if (newRangeElement) firstNode = newRangeElement.previousSibling;
-            else firstNode = rangeElement.previousSibling;
+            else if (!firstNode) firstNode = rangeElement.previousSibling;
             rangeRight = rangeElement.nextSibling;
 
             util.removeItem(rangeElement);
