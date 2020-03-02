@@ -337,12 +337,21 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".se-component"
+     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
         return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
+    },
+
+    /**
+     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
+     * @param {Element} element The element to check
+     * @returns {Boolean}
+     */
+    isMediaComponent: function (element) {
+        return element && /se-component/.test(element.className);
     },
 
     /**

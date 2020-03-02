@@ -286,7 +286,7 @@ export default {
 
     setVideosInfo: function (frame) {
         if (!frame.getAttribute('data-origin')) {
-            const container = this.util.getParentElement(frame, this.util.isComponent);
+            const container = this.util.getParentElement(frame, this.util.isMediaComponent);
             const cover = this.util.getParentElement(frame, 'FIGURE');
 
             const w = this.plugins.resizing._module_getSizeX.call(this, this.context.video, frame, cover, container);
@@ -323,7 +323,7 @@ export default {
         oIframe.allowFullscreen = true;
         oIframe.onload = oIframe.addEventListener('load', this.plugins.video._onload_video.bind(this, oIframe));
         
-        const existElement = this.util.getParentElement(oIframe, this.util.isComponent) || 
+        const existElement = this.util.getParentElement(oIframe, this.util.isMediaComponent) || 
             this.util.getParentElement(oIframe, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
@@ -351,7 +351,7 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, this.util.isComponent);
+        contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -427,7 +427,7 @@ export default {
 
         for (let i = 0, len = this._variable._videosCnt, video, container; i < len; i++) {
             video = videos[i];
-            container = this.util.getParentElement(video, this.util.isComponent);
+            container = this.util.getParentElement(video, this.util.isMediaComponent);
             if (!container || container.getElementsByTagName('figcaption').length > 0 || !video.style.width) {
                 videoPlugin._update_videoCover.call(this, video);
             }

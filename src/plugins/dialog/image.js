@@ -514,7 +514,7 @@ export default {
             img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
         }
         if (!img.getAttribute('data-origin')) {
-            const container = this.util.getParentElement(img, this.util.isComponent);
+            const container = this.util.getParentElement(img, this.util.isMediaComponent);
             const cover = this.util.getParentElement(img, 'FIGURE');
 
             const w = this.plugins.resizing._module_getSizeX.call(this, this.context.image, img, cover, container);
@@ -553,10 +553,10 @@ export default {
         for (let i = 0, len = imagesInfo.length; i < len; i++) {
             infoIndex[i] = imagesInfo[i].index;
         }
-
+        
         for (let i = 0, len = images.length, img; i < len; i++) {
             img = images[i];
-            if (!this.util.getParentElement(img, this.util.isComponent)) {
+            if (!this.util.getParentElement(img, this.util.isMediaComponent)) {
                 currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
@@ -777,7 +777,7 @@ export default {
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
-        contextImage._container = this.util.getParentElement(element, this.util.isComponent);
+        contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
@@ -982,7 +982,7 @@ export default {
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, this.util.isComponent) || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
