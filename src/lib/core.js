@@ -1184,21 +1184,52 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Boolean} remove Delete without detached.
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
-        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
+        detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush, removeNestedList) {
             const range = this.getRange();
             const so = range.startOffset;
             const eo = range.endOffset;
 
-            const children = rangeElement.childNodes;
-            const parent = rangeElement.parentNode;
+            let children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
+            let parent = rangeElement.parentNode;
             let firstNode = null;
             let lastNode = null;
             let rangeEl = rangeElement.cloneNode(false);
             
             const newList = util.isList(newRangeElement);
             let insertedNew = false;
+            let reset = false;
 
-            function appendNode (parent, insNode, sibling) {
+            function _deleteNestedList (originNode) {
+                let sibling = originNode.parentNode;
+                let parent = sibling.parentNode;
+                let liSibling, liParent, child, index, c;
+                
+                while (util.isListCell(parent)) {
+                    index = util.getPositionIndex(originNode);
+                    liSibling = parent.nextElementSibling;
+                    liParent = parent.parentNode;
+                    child = sibling;
+                    while(child) {
+                        sibling = sibling.nextSibling;
+                        if (util.isList(child)) {
+                            c = child.childNodes;
+                            while (c[index]) {
+                                liParent.insertBefore(c[index], liSibling);
+                            }
+                            if (c.length === 0) util.removeItem(child);
+                        } else {
+                            liParent.appendChild(child);
+                        }
+                        child = sibling;
+                    }
+                    sibling = liParent;
+                    parent = liParent.parentNode;
+                }
+
+                return liParent;
+            }
+
+            function appendNode (parent, insNode, sibling, originNode) {
                 if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
 
                 if (insNode.nodeType === 3) {
@@ -1206,13 +1237,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     return insNode;
                 }
                 
-                const children = insNode.childNodes;
+                const insChildren = insNode.childNodes;
                 let format = insNode.cloneNode(false);
                 let first = null;
                 let c = null;
 
-                while (children[0]) {
-                    c = children[0];
+                while (insChildren[0]) {
+                    c = insChildren[0];
                     if (util._notTextNode(c) && !util.isBreak(c) && !util.isListCell(format)) {
                         if (format.childNodes.length > 0) {
                             if (!first) first = format;
@@ -1228,12 +1259,36 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 if (format.childNodes.length > 0) {
                     if (util.isListCell(parent) && util.isListCell(format) && util.isList(sibling)) {
-                        first = sibling;
-                        while(sibling) {
-                            format.appendChild(sibling);
-                            sibling = sibling.nextSibling;
+                        if (!removeNestedList) {
+                            first = sibling;
+                            while(sibling) {
+                                format.appendChild(sibling);
+                                sibling = sibling.nextSibling;
+                            }
+                            parent.parentNode.insertBefore(format, parent.nextElementSibling);
+                        } else {
+                            reset = true;
+                            
+                            const rNode = _deleteNestedList(originNode);
+                            rangeElement = rNode.cloneNode(false);
+                            const c = rNode.childNodes;
+                            const index = util.getPositionIndex(originNode);
+                            while (c[index]) {
+                                rangeElement.appendChild(c[index]);
+                            }
+                            
+                            const rChildren = util.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(util));
+                            for (let i = 0, len = rChildren.length, n; i < len; i++) {
+                                n = _deleteNestedList(rChildren[i]);
+                                if (n && n.childNodes.length === 0) {
+                                    util.removeItem(n);
+                                    i--; len--;
+                                }
+                            }
+                            
+                            rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
+                            if (c.length === 0) util.removeItem(rNode);
                         }
-                        parent.parentNode.insertBefore(format, parent.nextElementSibling);
                     } else {
                         parent.insertBefore(format, sibling);
                     }
@@ -1257,7 +1312,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
                     if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
                     rangeEl.appendChild(insNode);
-                    i--, len--;
                 }
                 else {
                     if (rangeEl && rangeEl.children.length > 0) {
@@ -1280,11 +1334,22 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 parent.insertBefore(newRangeElement, rangeElement);
                                 insertedNew = true;
                             }
-                            insNode = appendNode(newRangeElement, insNode, null);
+                            insNode = appendNode(newRangeElement, insNode, null, children[i]);
                         } else {
-                            insNode = appendNode(parent, insNode, rangeElement);
+                            insNode = appendNode(parent, insNode, rangeElement, children[i]);
                         }
-                        
+
+                        if (reset) {
+                            reset = false;
+                            children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
+                            rangeEl = rangeElement.cloneNode(false);
+                            parent = rangeElement.parentNode;
+                            firstNode = lastNode = null;
+                            i = -1;
+                            len = children.length;
+                            continue;
+                        }
+
                         if (selectedFormats) {
                             lastNode = insNode;
                             if (!firstNode) {
@@ -4037,14 +4102,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
 
                     const selectedFormats = core.getSelectedElements();
-                    const lines = [], cells = [];
-                    const fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
+                    const cells = [];
+                    let lines = [];
+                    let fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
                     let r = {sc: null, so: null, ec: null, eo: null};
                     for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
                         f = selectedFormats[i];
                         if (util.isListCell(f)) {
-                            if (!f.previousElementSibling && !shift) continue;
-                            cells.push(f);
+                            if (!f.previousElementSibling && !shift) {
+                                lines.push(f);
+                            } else {
+                                cells.push(f);
+                            }
                         } else {
                             lines.push(f);
                         }
@@ -4063,6 +4132,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 r.eo = listRange.eo;
                             }
                         });
+                    } else {
+                        lines = lines.concat(cells);
+                        fc = lc = null;
                     }
 
                     // Lines tab(4)
