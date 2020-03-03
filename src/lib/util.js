@@ -1077,12 +1077,13 @@ const util = {
     },
 
     /**
-     * @description Detach Nested list all nested lists under the "baseNode".
+     * @description Detach Nested all nested lists under the "baseNode".
      * Returns a list with nested removed.
      * @param {Element} baseNode Element on which to base.
+     * @param {Boolean} all If true, it also detach all nested lists of a returned list.
      * @returns {Element}
      */
-    detachNestedList: function (baseNode) {
+    detachNestedList: function (baseNode, all) {
         const rNode = this.__deleteNestedList(baseNode);
         let rangeElement, cNodes;
 
@@ -1097,13 +1098,12 @@ const util = {
             rangeElement = baseNode;
         }
         
-        const rChildren = this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
-        for (let i = 0, len = rChildren.length, n; i < len; i++) {
-            n = this.__deleteNestedList(rChildren[i]);
-            if (n && n.childNodes.length === 0) {
-                this.removeItem(n);
-                i--; len--;
-            }
+        const rChildren = !all ? 
+            this.getListChildren(baseNode, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this)) :
+            this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
+
+        for (let i = 0, len = rChildren.length; i < len; i++) {
+            this.__deleteNestedList(rChildren[i]);
         }
         
         if (rNode) {
@@ -1119,7 +1119,8 @@ const util = {
      * @private
      */
     __deleteNestedList: function (baseNode) {
-        let sibling = baseNode.parentNode;
+        const baseParent = baseNode.parentNode;
+        let sibling = baseParent;
         let parent = sibling.parentNode;
         let liSibling, liParent, child, index, c;
         
@@ -1144,6 +1145,8 @@ const util = {
             sibling = liParent;
             parent = liParent.parentNode;
         }
+
+        if (baseParent.children.length === 0) this.removeItem(baseParent);
 
         return liParent;
     },
@@ -1228,7 +1231,7 @@ const util = {
                 child = children[i];
                 next = children[i + 1];
                 if (!child) break;
-                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && inst.isFormatElement(child) && !inst.isFreeFormatElement(child))) continue;
+                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) continue;
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
                     inst.copyTagAttributes(child, current);
                     current.parentNode.insertBefore(child, current);

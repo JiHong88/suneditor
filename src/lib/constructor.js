@@ -542,7 +542,7 @@ export default {
 
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
-                '<i class="se-icon-emoji"></i>'
+                '<i class="se-icon-add"></i>'
             ],
 
             /** plugins - submenu */

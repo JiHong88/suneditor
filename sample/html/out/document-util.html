@@ -1774,10 +1774,10 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="detachNestedList"><span class="type-signature"></span>detachNestedList<span class="signature">(baseNode)</span><span
+        <h4 class="name" id="detachNestedList"><span class="type-signature"></span>detachNestedList<span class="signature">(baseNode, all)</span><span
             class="type-signature"> &rarr; {Element}</span></h4>
         <div class="description">
-            Detach Nested list all nested lists under the "baseNode".<br>
+            Detach Nested all nested lists under the "baseNode".<br>
             Returns a list with nested removed.
         </div>
         <h5>Parameters:</h5>
@@ -1796,6 +1796,13 @@
                     <span class="param-type">Element</span>
                 </td>
                 <td class="description last">Element on which to base.</td>
+            </tr>
+            <tr>
+                <td class="name"><code>all</code></td>
+                <td class="type">
+                    <span class="param-type">Boolean</span>
+                </td>
+                <td class="description last">If true, it also detach all nested lists of a returned list.</td>
             </tr>
             </tbody>
         </table>

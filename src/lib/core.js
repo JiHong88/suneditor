@@ -896,15 +896,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 if (oNode.nodeType === 3) {
                     const previous = oNode.previousSibling;
                     const next = oNode.nextSibling;
-                    const previousText = (!previous || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
-                    const nextText = (!next || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+                    const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                    const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
     
-                    if (previous) {
+                    if (previous && previousText.length > 0) {
                         oNode.textContent = previousText + oNode.textContent;
                         util.removeItem(previous);
                     }
     
-                    if (next) {
+                    if (next && next.length > 0) {
                         oNode.textContent += nextText;
                         util.removeItem(next);
                     }
@@ -1112,7 +1112,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             list = list.parentNode;
                         }
 
-                        const edge = this.detachRangeFormatElement(originParent, lineArr, null, false, true);
+                        const edge = this.detachRangeFormatElement(originParent, lineArr, null, true, true);
 
                         if (parentDepth >= depth) {
                             parentDepth = depth;
@@ -1238,8 +1238,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                             parent.parentNode.insertBefore(format, parent.nextElementSibling);
                         } else {
-                            reset = true;
-                            rangeElement = util.detachNestedList(originNode);
+                            const detachRange = util.detachNestedList(originNode, false);
+                            if (rangeElement !== detachRange) {
+                                rangeElement = detachRange;
+                                reset = true;
+                            }
                         }
                     } else {
                         parent.insertBefore(format, sibling);
@@ -1273,8 +1276,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     if (!newList && util.isListCell(insNode)) {
                         if (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false)) {
-                            reset = true;
-                            rangeElement = util.detachNestedList(insNode);
+                            const detachRange = util.detachNestedList(insNode, false);
+                            if (rangeElement !== detachRange) {
+                                rangeElement = detachRange;
+                                reset = true;
+                            }
                         } else {
                             const inner = insNode;
                             insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
@@ -1331,11 +1337,17 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             util.removeItem(rangeElement);
 
-            const edge = remove ? {
-                cc: rangeParent,
-                sc: firstNode,
-                ec: rangeRight,
-            } : util.getEdgeChildNodes(firstNode, (!lastNode.parentNode ? firstNode : lastNode));
+            let edge = null;
+            if (remove) {
+                edge = {
+                    cc: rangeParent,
+                    sc: firstNode,
+                    ec: rangeRight,
+                };
+            } else {
+                edge = util.getEdgeChildNodes(firstNode, (!lastNode.parentNode ? firstNode : lastNode));
+                edge.cc = (edge.sc || edge.ec).parentNode;
+            }
 
             if (notHistoryPush) return edge;
             
