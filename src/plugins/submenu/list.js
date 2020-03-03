@@ -103,23 +103,23 @@ export default {
         }
     },
 
-    editList: function (command, selectedCells) {
-        const selectedFormsts = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
-        if (!selectedFormsts || selectedFormsts.length === 0) return;
+    editList: function (command, selectedCells, detach) {
+        const selectedFormats = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
+        if (!selectedFormats || selectedFormats.length === 0) return;
 
         let isRemove = true;
         let edgeFirst = null;
         let edgeLast = null;
         
         // merge
-        const firstSel = selectedFormsts[0];
-        const lastSel = selectedFormsts[selectedFormsts.length - 1];
+        const firstSel = selectedFormats[0];
+        const lastSel = selectedFormats[selectedFormats.length - 1];
         let topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
         let bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
-        for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            if (!this.util.isList(this.util.getRangeFormatElement(selectedFormsts[i], function (current) {
-                return this.getRangeFormatElement(current) && current !== selectedFormsts[i];
+        for (let i = 0, len = selectedFormats.length; i < len; i++) {
+            if (!this.util.isList(this.util.getRangeFormatElement(selectedFormats[i], function (current) {
+                return this.getRangeFormatElement(current) && current !== selectedFormats[i];
             }.bind(this.util)))) {
                 isRemove = false;
                 break;
@@ -127,37 +127,50 @@ export default {
         }
 
         if (isRemove && (!topEl || (firstSel.tagName !== topEl.tagName || command !== topEl.tagName.toUpperCase())) && (!bottomEl || (lastSel.tagName !== bottomEl.tagName || command !== bottomEl.tagName.toUpperCase()))) {
-            const currentFormat = this.util.getRangeFormatElement(firstSel);
-            const cancel = currentFormat && currentFormat.tagName === command;
-            let rangeArr, tempList;
-            const passComponent = function (current) {
-                return !this.isComponent(current);
-            }.bind(this.util);
-
-            if (!cancel) tempList = this.util.createElement(command);
-
-            for (let i = 0, len = selectedFormsts.length, r, o; i < len; i++) {
-                o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
-                if (!o || !this.util.isList(o)) continue;
-
-                if (!r) {
-                    r = o;
-                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
-                } else {
-                    if (r !== o) {
-                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
-                        if (!edgeFirst) edgeFirst = edge;
-                        if (!cancel) tempList = this.util.createElement(command);
-                        r = o;
-                        rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
-                    } else {
-                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
+            if (detach) {
+                for (let i = 0, len = selectedFormats.length; i < len; i++) {
+                    for (let j = i - 1; j >= 0; j--) {
+                        if (selectedFormats[j].contains(selectedFormats[i])) {
+                            selectedFormats.splice(i, 1);
+                            i--; len--;
+                            break;
+                        }
                     }
                 }
-
-                if (i === len - 1) {
-                    edgeLast = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, tempList, false, true);
-                    if (!edgeFirst) edgeFirst = edgeLast;
+            } else {
+                const currentFormat = this.util.getRangeFormatElement(firstSel);
+                const cancel = currentFormat && currentFormat.tagName === command;
+                let rangeArr, tempList;
+                const passComponent = function (current) {
+                    return !this.isComponent(current);
+                }.bind(this.util);
+                
+                if (!cancel) tempList = this.util.createElement(command);
+    
+                for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
+                    o = this.util.getRangeFormatElement(selectedFormats[i], passComponent);
+                    if (!o || !this.util.isList(o)) continue;
+    
+                    if (!r) {
+                        r = o;
+                        rangeArr = {r: r, f: [this.util.getParentElement(selectedFormats[i], 'LI')]};
+                    } else {
+                        if (r !== o) {
+                            const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                            o = selectedFormats[i].parentNode;
+                            if (!edgeFirst) edgeFirst = edge;
+                            if (!cancel) tempList = this.util.createElement(command);
+                            r = o;
+                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormats[i], 'LI')]};
+                        } else {
+                            rangeArr.f.push(this.util.getParentElement(selectedFormats[i], 'LI'));
+                        }
+                    }
+    
+                    if (i === len - 1) {
+                        edgeLast = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                        if (!edgeFirst) edgeFirst = edgeLast;
+                    }
                 }
             }
         } else {
@@ -179,13 +192,13 @@ export default {
                 return !this.isComponent(current) && !this.isList(current);
             }.bind(this.util);
             
-            for (let i = 0, len = selectedFormsts.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
-                fTag = selectedFormsts[i];
+            for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
+                fTag = selectedFormats[i];
                 if (fTag.childNodes.length === 0 && !this.util._isIgnoreNodeChange(fTag)) {
                     this.util.removeItem(fTag);
                     continue;
                 }
-                next = selectedFormsts[i + 1];
+                next = selectedFormats[i + 1];
                 originParent = fTag.parentNode;
                 nextParent = next ? next.parentNode : null;
                 isCell = this.util.isListCell(fTag);
@@ -239,8 +252,8 @@ export default {
         this.submenuOff();
 
         return {
-            sc: selectedFormsts.length > 1 ? edgeFirst.sc : edgeFirst.ec,
-            so: selectedFormsts.length > 1 ? 0 : edgeFirst.ec.textContent.length,
+            sc: selectedFormats.length > 1 ? edgeFirst.sc : edgeFirst.ec,
+            so: selectedFormats.length > 1 ? 0 : edgeFirst.ec.textContent.length,
             ec: edgeLast.ec,
             eo: edgeLast.ec.textContent.length
         };
@@ -263,14 +276,14 @@ export default {
         let range = null;
 
         if (remove) {
-            if (originList !== lastCell.parentNode && lastCell.nextElementSibling) {
+            if (originList !== lastCell.parentNode && this.util.isList(lastCell.parentNode.parentNode) && lastCell.nextElementSibling) {
                 lastCell = lastCell.nextElementSibling;
                 while (lastCell) {
                     selectedCells.push(lastCell);
                     lastCell = lastCell.nextElementSibling;
                 }
             }
-            range = this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells);
+            range = this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells, true);
         } else {
             range = { sc: selectedCells[0], so: cellsLen > 1 || !this.getRange().collapsed ? 0 : 1, ec: lastCell, eo: 1 };
             let innerList = this.util.createElement(originList.nodeName);
@@ -348,7 +361,7 @@ export default {
 
         if (!command) return;
 
-        const range = this.plugins.list.editList.call(this, command, null, null);
+        const range = this.plugins.list.editList.call(this, command, null, false);
         this.setRange(range.sc, range.so, range.ec, range.eo);
 
         // history stack
