@@ -29,8 +29,11 @@ export default {
 
     setSubmenu: function () {
         const templateList = this.context.option.templates;
-        const listDiv = this.util.createElement('DIV');
+        if (!templateList || templateList.length === 0) {
+            throw Error('[SUNEDITOR.plugins.template.fail] To use the "template" plugin, please define the "templates" option.');
+        }
 
+        const listDiv = this.util.createElement('DIV');
         listDiv.className = 'se-list-layer';
 
         let list = '<div class="se-submenu se-list-inner">' +

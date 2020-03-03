@@ -1099,8 +1099,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 if (util.isList(originParent)) {
                     if (listParent === null) listParent = util.createElement(originParent.nodeName);
-
-                    listParent.innerHTML += line.outerHTML;
                     lineArr.push(line);
 
                     if (i === len - 1 || rangeLines[i + 1].parentNode !== originParent) {
@@ -1127,6 +1125,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             before = removeItems(pElement, edge.cc, before);
                             if (before !== undefined) beforeTag = before;
                             else beforeTag = edge.cc;
+                        }
+
+                        for (let c = 0, cLen = edge.removeArray.length; c < cLen; c++) {
+                            listParent.innerHTML += edge.removeArray[c].outerHTML;
                         }
 
                         rangeElement.appendChild(listParent);
@@ -1177,13 +1179,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         /**
          * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
-         * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling}.
+         * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
          * @param {Element} rangeElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
          * @param {Array|null} selectedFormats Array of format elements (P, DIV, LI...) to remove.
          * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
          * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
          * @param {Boolean} remove If true, deleted without detached.
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+         * @returns {Object}
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
             const range = this.getRange();
@@ -1196,6 +1199,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let lastNode = null;
             let rangeEl = rangeElement.cloneNode(false);
             
+            const removeArray = [];
             const newList = util.isList(newRangeElement);
             let insertedNew = false;
             let reset = false;
@@ -1255,6 +1259,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 return first;
             }
 
+            // detach loop
             for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
                 if (remove && i === 0) {
@@ -1285,7 +1290,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                         } else {
                             const inner = insNode;
-                            insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                            insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
                             const innerChildren = inner.childNodes;
                             while (innerChildren[0]) {
                                 insNode.appendChild(innerChildren[0]);
@@ -1296,28 +1301,30 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         insNode = insNode.cloneNode(true);
                     }
 
-                    if (!remove && !reset) {
-                        if (newRangeElement) {
-                            if (!insertedNew) {
-                                parent.insertBefore(newRangeElement, rangeElement);
-                                insertedNew = true;
+                    if (!reset) {
+                        if (!remove) {
+                            if (newRangeElement) {
+                                if (!insertedNew) {
+                                    parent.insertBefore(newRangeElement, rangeElement);
+                                    insertedNew = true;
+                                }
+                                insNode = appendNode(newRangeElement, insNode, null, children[i]);
+                            } else {
+                                insNode = appendNode(parent, insNode, rangeElement, children[i]);
                             }
-                            insNode = appendNode(newRangeElement, insNode, null, children[i]);
+    
+                            if (selectedFormats) {
+                                lastNode = insNode;
+                                if (!firstNode) {
+                                    firstNode = insNode;
+                                }
+                            } else if (!firstNode) {
+                                firstNode = lastNode = insNode;
+                            }
                         } else {
-                            insNode = appendNode(parent, insNode, rangeElement, children[i]);
+                            removeArray.push(insNode);
                         }
-
-                        if (selectedFormats) {
-                            lastNode = insNode;
-                            if (!firstNode) {
-                                firstNode = insNode;
-                            }
-                        } else if (!firstNode) {
-                            firstNode = lastNode = insNode;
-                        }
-                    }
-
-                    if (reset) {
+                    } else {
                         reset = false;
                         children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
                         rangeEl = rangeElement.cloneNode(false);
@@ -1347,6 +1354,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     cc: rangeParent,
                     sc: firstNode,
                     ec: rangeRight,
+                    removeArray: removeArray
                 };
             } else {
                 edge = util.getEdgeChildNodes(firstNode, (!lastNode.parentNode ? firstNode : lastNode));
@@ -4111,28 +4119,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
                     core.controllersOff();
-                    
-                    // table
-                    let currentNode = selectionNode;
-                    while (!util.isCell(currentNode) && !util.isWysiwygDiv(currentNode)) {
-                        currentNode = currentNode.parentNode;
-                    }
-
-                    if (currentNode && util.isCell(currentNode)) {
-                        const table = util.getParentElement(currentNode, 'table');
-                        const cells = util.getListChildren(table, util.isCell);
-                        let idx = shift ? util.prevIdx(cells, currentNode) : util.nextIdx(cells, currentNode);
-
-                        if (idx === cells.length && !shift) idx = 0;
-                        if (idx === -1 && shift) idx = cells.length - 1;
-
-                        const moveCell = cells[idx];
-                        if (!moveCell) return false;
-
-                        core.setRange(moveCell, 0, moveCell, 0);
-                        break;
-                    }
-
+                    const isEdge = (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset));            
                     const selectedFormats = core.getSelectedElements();
                     const cells = [];
                     let lines = [];
@@ -4152,7 +4139,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
                     
                     // Nested list
-                    if (cells.length > 0 && (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset)) && core.plugins.list) {
+                    if (cells.length > 0 && isEdge && core.plugins.list) {
                         core.callPlugin('list', function () {
                             const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
                             if (fc) {
@@ -4165,6 +4152,23 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                         });
                     } else {
+                        // table
+                        const tableCell = util.getParentElement(selectionNode, util.isCell);
+                        if (tableCell && isEdge) {
+                            const table = util.getParentElement(tableCell, 'table');
+                            const cells = util.getListChildren(table, util.isCell);
+                            let idx = shift ? util.prevIdx(cells, tableCell) : util.nextIdx(cells, tableCell);
+
+                            if (idx === cells.length && !shift) idx = 0;
+                            if (idx === -1 && shift) idx = cells.length - 1;
+
+                            const moveCell = cells[idx];
+                            if (!moveCell) return false;
+
+                            core.setRange(moveCell, 0, moveCell, 0);
+                            break;
+                        }
+
                         lines = lines.concat(cells);
                         fc = lc = null;
                     }
