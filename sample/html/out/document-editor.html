@@ -1229,7 +1229,7 @@
                     <td class="type">
                         <span class="param-type">Boolean</span>
                     </td>
-                    <td class="description last">Delete without detached.</td>
+                    <td class="description last">If true, deleted without detached.</td>
                 </tr>
                 <tr>
                     <td class="name"><code>notHistoryPush</code></td>
@@ -1237,6 +1237,41 @@
                         <span class="param-type">Boolean</span>
                     </td>
                     <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (<a href="./document-util.html#getEdgeChildNodes">util.getEdgeChildNodes</a>)</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="detachList"><span class="type-signature"></span>detachList<span class="signature">(selectedFormats, remove)</span><span
+                    class="type-signature">{Object}</span>{sc: &lt;LI&gt;, ec: &lt;LI&gt;}</h4>
+            <div class="description">
+                "selectedFormats" array are detached from the list element.<br>
+                The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>selectedFormats</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Array of format elements (LI, P...) to remove.</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>remove</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">If true, deleted without detached.</td>
                 </tr>
                 </tbody>
             </table>
@@ -1627,6 +1662,7 @@
         <li><a href="document-editor.html#removeNode">removeNode</a></li>
         <li><a href="document-editor.html#applyRangeFormatElement">applyRangeFormatElement</a></li>
         <li><a href="document-editor.html#detachRangeFormatElement">detachRangeFormatElement</a></li>
+        <li><a href="document-editor.html#detachList">detachList</a></li>
         <li><a href="document-editor.html#nodeChange">nodeChange</a></li>
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>

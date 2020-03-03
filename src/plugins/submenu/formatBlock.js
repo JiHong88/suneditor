@@ -168,48 +168,9 @@ export default {
             const lastPath = util.getNodePath(range.endContainer, last, null);
             
             // remove selected list
-            let rangeArr = {};
-            let listFirst = false;
-            let listLast = false;
-            const passComponent = function (current) { return !this.isComponent(current); }.bind(util);
-
-            for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
-                lastIndex = i === len - 1;
-                o = util.getRangeFormatElement(selectedFormsts[i], passComponent);
-                isList = util.isList(o);
-                if (!r && isList) {
-                    r = o;
-                    rangeArr = {r: r, f: [util.getParentElement(selectedFormsts[i], 'LI')]};
-                    if (i === 0) listFirst = true;
-                } else if (r && isList) {
-                    if (r !== o) {
-                        const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true);
-                        o = selectedFormsts[i].parentNode;
-                        if (listFirst) {
-                            first = edge.sc;
-                            listFirst = false;
-                        }
-                        if (lastIndex) last = edge.ec;
-
-                        if (isList) {
-                            r = o;
-                            rangeArr = {r: r, f: [util.getParentElement(selectedFormsts[i], 'LI')]};
-                            if (lastIndex) listLast = true;
-                        } else {
-                            r = null;
-                        }
-                    } else {
-                        rangeArr.f.push(util.getParentElement(selectedFormsts[i], 'LI'));
-                        if (lastIndex) listLast = true;
-                    }
-                }
-
-                if (lastIndex && util.isList(r)) {
-                    const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, false, true);
-                    if (listLast || len === 1) last = edge.ec;
-                    if (listFirst) first = edge.sc || last;
-                }
-            }
+            const rlist = this.detachList(selectedFormsts, false);
+            if (rlist.sc) first = rlist.sc;
+            if (rlist.ec) last = rlist.ec;
 
             // change format tag
             this.setRange(util.getNodeFromPath(firstPath, first), startOffset, util.getNodeFromPath(lastPath, last), endOffset);

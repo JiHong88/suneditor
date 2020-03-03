@@ -1182,7 +1182,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Array|null} selectedFormats Array of format elements (P, DIV, LI...) to remove.
          * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
          * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
-         * @param {Boolean} remove Delete without detached.
+         * @param {Boolean} remove If true, deleted without detached.
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
@@ -1238,7 +1238,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                             parent.parentNode.insertBefore(format, parent.nextElementSibling);
                         } else {
-                            const detachRange = util.detachNestedList(originNode, false);
+                            const detachRange = util.detachNestedList(originNode, true);
                             if (rangeElement !== detachRange) {
                                 rangeElement = detachRange;
                                 reset = true;
@@ -1276,7 +1276,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     if (!newList && util.isListCell(insNode)) {
                         if (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false)) {
-                            const detachRange = util.detachNestedList(insNode, false);
+                            const detachRange = util.detachNestedList(insNode, true);
                             if (rangeElement !== detachRange) {
                                 rangeElement = detachRange;
                                 reset = true;
@@ -1363,6 +1363,65 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.history.push(false);
             
             event._applyTagEffects();
+        },
+
+        /**
+         * @description "selectedFormats" array are detached from the list element.
+         * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
+         * @param {Array} selectedFormats Array of format elements (LI, P...) to remove.
+         * @param {Boolean} remove If true, deleted without detached.
+         * @returns {Object} {sc: <LI>, ec: <LI>}.
+         */
+        detachList: function (selectedFormats, remove) {
+            let rangeArr = {};
+            let listFirst = false;
+            let listLast = false;
+            let first = null;
+            let last = null;
+            const passComponent = function (current) { return !this.isComponent(current); }.bind(util);
+
+            for (let i = 0, len = selectedFormats.length, r, o, lastIndex, isList; i < len; i++) {
+                lastIndex = i === len - 1;
+                o = util.getRangeFormatElement(selectedFormats[i], passComponent);
+                isList = util.isList(o);
+                if (!r && isList) {
+                    r = o;
+                    rangeArr = {r: r, f: [util.getParentElement(selectedFormats[i], 'LI')]};
+                    if (i === 0) listFirst = true;
+                } else if (r && isList) {
+                    if (r !== o) {
+                        const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, remove, true);
+                        o = selectedFormats[i].parentNode;
+                        if (listFirst) {
+                            first = edge.sc;
+                            listFirst = false;
+                        }
+                        if (lastIndex) last = edge.ec;
+
+                        if (isList) {
+                            r = o;
+                            rangeArr = {r: r, f: [util.getParentElement(selectedFormats[i], 'LI')]};
+                            if (lastIndex) listLast = true;
+                        } else {
+                            r = null;
+                        }
+                    } else {
+                        rangeArr.f.push(util.getParentElement(selectedFormats[i], 'LI'));
+                        if (lastIndex) listLast = true;
+                    }
+                }
+
+                if (lastIndex && util.isList(r)) {
+                    const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, remove, true);
+                    if (listLast || len === 1) last = edge.ec;
+                    if (listFirst) first = edge.sc || last;
+                }
+            }
+
+            return {
+                sc: first,
+                ec: last
+            };
         },
 
         /**
