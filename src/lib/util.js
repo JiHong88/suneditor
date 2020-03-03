@@ -1098,9 +1098,13 @@ const util = {
             rangeElement = baseNode;
         }
         
-        const rChildren = !all ? 
-            this.getListChildren(baseNode, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this)) :
-            this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
+        let rChildren;
+        if (!all) {
+            const depth = this.getElementDepth(baseNode) + 2;
+            rChildren = this.getListChildren(baseNode, function (current) { return this.isListCell(current) && !current.previousElementSibling && this.getElementDepth(current) === depth; }.bind(this));
+        } else {
+            rChildren = this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
+        }
 
         for (let i = 0, len = rChildren.length; i < len; i++) {
             this.__deleteNestedList(rChildren[i]);
@@ -1427,7 +1431,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName));
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**
@@ -1437,7 +1441,7 @@ const util = {
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element.nodeType !== 3 && /^(a|label)$/i.test(element.nodeName);
+        return element.nodeType !== 3 && /^(a|label)$/i.test(typeof element === 'string' ? element : element.nodeName);
     },
 
     /**
@@ -1447,7 +1451,7 @@ const util = {
      * @private
      */
     _notTextNode: function (element) {
-        return element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(element.nodeName));
+        return element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**

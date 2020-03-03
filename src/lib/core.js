@@ -1238,8 +1238,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                             parent.parentNode.insertBefore(format, parent.nextElementSibling);
                         } else {
-                            const detachRange = util.detachNestedList(originNode, true);
-                            if (rangeElement !== detachRange) {
+                            const originNext = originNode.nextElementSibling;
+                            const detachRange = util.detachNestedList(originNode, false);
+                            if ((rangeElement !== detachRange) || (originNext !== originNode.nextElementSibling)) {
                                 rangeElement = detachRange;
                                 reset = true;
                             }
@@ -1276,15 +1277,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                     if (!newList && util.isListCell(insNode)) {
                         if (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false)) {
-                            const detachRange = util.detachNestedList(insNode, true);
-                            if (rangeElement !== detachRange) {
+                            const insNext = insNode.nextElementSibling;
+                            const detachRange = util.detachNestedList(insNode, false);
+                            if ((rangeElement !== detachRange) || insNext !== insNode.nextElementSibling) {
                                 rangeElement = detachRange;
                                 reset = true;
                             }
                         } else {
                             const inner = insNode;
                             insNode = util.createElement((util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
-                            insNode.innerHTML = inner.innerHTML;
+                            const innerChildren = inner.childNodes;
+                            while (innerChildren[0]) {
+                                insNode.appendChild(innerChildren[0]);
+                            }
                             util.copyFormatAttributes(insNode, inner);
                         }
                     } else {
@@ -1317,7 +1322,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
                         rangeEl = rangeElement.cloneNode(false);
                         parent = rangeElement.parentNode;
-                        firstNode = lastNode = null;
                         i = -1;
                         len = children.length;
                         continue;
