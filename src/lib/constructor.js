@@ -500,7 +500,7 @@ export default {
                 '<i class="se-icon-erase"></i>'
             ],
 
-            indent: ['', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
+            indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
                 '<i class="se-icon-indent-right"></i>'
             ],
 

@@ -247,6 +247,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @property {Element} SUB subscript button
          * @property {Element} SUP superscript button
          * @property {Element} OUTDENT outdent button
+         * @property {Element} INDENT indent button
          */
         commandMap: null,
 
@@ -523,6 +524,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             util.removeClass(commandMap.SUP, 'active');
 
             if (commandMap.OUTDENT) commandMap.OUTDENT.setAttribute('disabled', true);
+            if (commandMap.INDENT) commandMap.INDENT.removeAttribute('disabled');
         },
 
         /**
@@ -594,11 +596,103 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
+         * @description Reset range object to text node selected status.
+         * @private
+         */
+        _resetRangeToTextNode: function () {
+            const range = this.getRange();
+            let startCon = range.startContainer;
+            let startOff = range.startOffset;
+            let endCon = range.endContainer;
+            let endOff = range.endOffset;
+            let tempCon, tempOffset, tempChild;
+
+            // startContainer
+            tempCon = util.isWysiwygDiv(startCon) ? context.element.wysiwyg.firstChild : startCon;
+            tempOffset = startOff;
+
+            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+                const onlyBreak = util.isBreak(tempCon);
+                if (!onlyBreak) {
+                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+                        tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
+                        tempOffset = 0;
+                    }
+    
+                    let format = util.getFormatElement(tempCon);
+                    if (format === util.getRangeFormatElement(format)) {
+                        format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
+                        tempCon.parentNode.insertBefore(format, tempCon);
+                        format.appendChild(tempCon);
+                    }
+                }
+
+                if (util.isBreak(tempCon)) {
+                    const emptyText = util.createTextNode(util.zeroWidthSpace);
+                    tempCon.parentNode.insertBefore(emptyText, tempCon);
+                    tempCon = emptyText;
+                    if (onlyBreak) {
+                        if (startCon === endCon) {
+                            endCon = tempCon;
+                            endOff = 1;
+                        }
+                        util.removeItem(startCon);
+                    }
+                }
+            }
+
+            // set startContainer
+            startCon = tempCon;
+            startOff = tempOffset;
+
+            // endContainer
+            tempCon = util.isWysiwygDiv(endCon) ? context.element.wysiwyg.lastChild : endCon;
+            tempOffset = endOff;
+
+            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+                const onlyBreak = util.isBreak(tempCon);
+                if (!onlyBreak) {
+                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+                        tempChild = tempCon.childNodes;
+                        if (tempChild.length === 0) break;
+                        tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
+                        tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
+                    }
+    
+                    let format = util.getFormatElement(tempCon);
+                    if (format === util.getRangeFormatElement(format)) {
+                        format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
+                        tempCon.parentNode.insertBefore(format, tempCon);
+                        format.appendChild(tempCon);
+                    }
+                }
+
+                if (util.isBreak(tempCon)) {
+                    const emptyText = util.createTextNode(util.zeroWidthSpace);
+                    tempCon.parentNode.insertBefore(emptyText, tempCon);
+                    tempCon = emptyText;
+                    tempOffset = 1;
+                    if (onlyBreak) {
+                        util.removeItem(endCon);
+                    }
+                }
+            }
+
+            // set endContainer
+            endCon = tempCon;
+            endOff = tempOffset;
+
+            // set Range
+            this.setRange(startCon, startOff, endCon, endOff);
+        },
+
+        /**
          * @description Returns a "formatElement"(util.isFormatElement) array from the currently selected range.
          * @param {Function|null} validation The validation function. (Replaces the default validation function-util.isFormatElement(current))
          * @returns {Array}
          */
         getSelectedElements: function (validation) {
+            this._resetRangeToTextNode();
             let range = this.getRange();
 
             if (util.isWysiwygDiv(range.startContainer)) {
@@ -883,10 +977,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (util.isList(afterNode)) {
                         parentNode = afterNode;
                         afterNode = null;
-                    } else {
+                    } else if (!afterNode) {
                         const r = this.removeNode();
-                        parentNode = r.container.parentNode;
-                        afterNode = r.container.nextSibling;
+                        const container = r.container.nodeType === 3 ? (util.getFormatElement(r.container) || r.container.parentNode) : r.container;
+                        parentNode = container.parentNode;
+                        afterNode = container.nextSibling;
                     }
                 }
                 parentNode.insertBefore(oNode, afterNode);
@@ -1203,6 +1298,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const newList = util.isList(newRangeElement);
             let insertedNew = false;
             let reset = false;
+            let moveComplete = false;
 
             function appendNode (parent, insNode, sibling, originNode) {
                 if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
@@ -1212,7 +1308,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     return insNode;
                 }
                 
-                const insChildren = insNode.childNodes;
+                const insChildren = (moveComplete ? insNode : originNode).childNodes;
                 let format = insNode.cloneNode(false);
                 let first = null;
                 let c = null;
@@ -1262,6 +1358,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             // detach loop
             for (let i = 0, len = children.length, insNode; i < len; i++) {
                 insNode = children[i];
+                moveComplete = false;
                 if (remove && i === 0) {
                     if (!selectedFormats || selectedFormats.length === len || selectedFormats[0] === insNode) {
                         firstNode = rangeElement.previousSibling;
@@ -1296,9 +1393,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 insNode.appendChild(innerChildren[0]);
                             }
                             util.copyFormatAttributes(insNode, inner);
+                            moveComplete = true;
                         }
                     } else {
-                        insNode = insNode.cloneNode(true);
+                        insNode = insNode.cloneNode(false);
                     }
 
                     if (!reset) {
@@ -1325,7 +1423,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             removeArray.push(insNode);
                         }
                     } else {
-                        reset = false;
+                        reset = moveComplete = false;
                         children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
                         rangeEl = rangeElement.cloneNode(false);
                         parent = rangeElement.parentNode;
@@ -1357,8 +1455,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     removeArray: removeArray
                 };
             } else {
-                edge = util.getEdgeChildNodes(firstNode, (!lastNode.parentNode ? firstNode : lastNode));
-                edge.cc = (edge.sc || edge.ec).parentNode;
+                const childEdge = util.getEdgeChildNodes(firstNode, ((!lastNode || !lastNode.parentNode) ? firstNode : lastNode));
+                edge = {
+                    cc: (childEdge.sc || childEdge.ec).parentNode,
+                    sc: childEdge.sc,
+                    ec: childEdge.ec
+                };
             }
 
             if (notHistoryPush) return edge;
@@ -1467,7 +1569,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let startOff = range.startOffset;
             let endCon = range.endContainer;
             let endOff = range.endOffset;
-            let tempCon, tempOffset, tempChild;
 
             if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && startCon.getAttribute('contenteditable') === 'false')) {
                 return;
@@ -1515,85 +1616,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (checkCnt >= checkAttrs.length) return;
                 }
             }
-
-            /* find text node */
-            // startContainer
-            tempCon = util.isWysiwygDiv(startCon) ? context.element.wysiwyg.firstChild : startCon;
-            tempOffset = startOff;
-
-            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-                const onlyBreak = util.isBreak(tempCon);
-                if (!onlyBreak) {
-                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                        tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
-                        tempOffset = 0;
-                    }
-    
-                    let format = util.getFormatElement(tempCon);
-                    if (format === util.getRangeFormatElement(format)) {
-                        format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
-                        tempCon.parentNode.insertBefore(format, tempCon);
-                        format.appendChild(tempCon);
-                    }
-                }
-
-                if (util.isBreak(tempCon)) {
-                    const emptyText = util.createTextNode(util.zeroWidthSpace);
-                    tempCon.parentNode.insertBefore(emptyText, tempCon);
-                    tempCon = emptyText;
-                    if (onlyBreak) {
-                        if (startCon === endCon) {
-                            endCon = tempCon;
-                            endOff = 1;
-                        }
-                        util.removeItem(startCon);
-                    }
-                }
-            }
-
-            // set startContainer
-            startCon = tempCon;
-            startOff = tempOffset;
-
-            // endContainer
-            tempCon = util.isWysiwygDiv(endCon) ? context.element.wysiwyg.lastChild : endCon;
-            tempOffset = endOff;
-
-            if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-                const onlyBreak = util.isBreak(tempCon);
-                if (!onlyBreak) {
-                    while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
-                        tempChild = tempCon.childNodes;
-                        if (tempChild.length === 0) break;
-                        tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : (tempCon.previousElementSibling || tempCon.previousSibling || startCon);
-                        tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
-                    }
-    
-                    let format = util.getFormatElement(tempCon);
-                    if (format === util.getRangeFormatElement(format)) {
-                        format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
-                        tempCon.parentNode.insertBefore(format, tempCon);
-                        format.appendChild(tempCon);
-                    }
-                }
-
-                if (util.isBreak(tempCon)) {
-                    const emptyText = util.createTextNode(util.zeroWidthSpace);
-                    tempCon.parentNode.insertBefore(emptyText, tempCon);
-                    tempCon = emptyText;
-                    tempOffset = 1;
-                    if (onlyBreak) {
-                        util.removeItem(endCon);
-                    }
-                }
-            }
-
-            // set endContainer
-            endCon = tempCon;
-            endOff = tempOffset;
-
-            // set Range
-            this.setRange(startCon, startOff, endCon, endOff);
 
             let start = {}, end = {};
             let newNode, styleRegExp = '', classRegExp = '', removeNodeRegExp = '';
@@ -2974,21 +2996,35 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         indent: function (command) {
             const rangeLines = this.getSelectedElements();
-            let p, margin;
+            const cells = [];
+            const shift = 'indent' !== command;
 
-            for (let i = 0, len = rangeLines.length; i < len; i++) {
-                p = rangeLines[i];
-                margin = /\d+/.test(p.style.marginLeft) ? util.getNumber(p.style.marginLeft, 0) : 0;
+            for (let i = 0, len = rangeLines.length, f, margin; i < len; i++) {
+                f = rangeLines[i];
 
-                if ('indent' === command) {
-                    margin += 25;
+                if (!util.isListCell(f)) {
+                    margin = /\d+/.test(f.style.marginLeft) ? util.getNumber(f.style.marginLeft, 0) : 0;
+                    if (shift) {
+                        margin -= 25;
+                    } else {
+                        margin += 25;
+                    }
+                    util.setStyle(f, 'marginLeft', (margin <= 0 ? '' : margin + 'px'));
                 } else {
-                    margin -= 25;
+                    if (shift || f.previousElementSibling) {
+                        cells.push(f);
+                    }
                 }
-    
-                util.setStyle(p, 'marginLeft', (margin <= 0 ? '' : margin + 'px'));
             }
 
+            // list cells
+            if (cells.length > 0) {
+                this.callPlugin('list', function () {
+                    const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
+                });
+            }
+
+            this._lastEffectNode = null;
             event._applyTagEffects();
             // history stack
             this.history.push(false);
@@ -3510,15 +3546,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this._isBalloon = /balloon/i.test(options.mode);
 
             this.commandMap = {
-                SIZE: context.tool.fontSize,
-
                 STRONG: context.tool.bold,
                 INS: context.tool.underline,
                 EM: context.tool.italic,
                 DEL: context.tool.strike,
                 SUB: context.tool.subscript,
                 SUP: context.tool.superscript,
-                OUTDENT: context.tool.outdent
+                OUTDENT: context.tool.outdent,
+                INDENT: context.tool.indent
             };
 
             // Command plugins registration
@@ -3683,10 +3718,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 if (util.isFormatElement(element)) {
                     /* Outdent */
-                    if (commandMapNodes.indexOf('OUTDENT') === -1 && element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0 && commandMap.OUTDENT) {
-                        commandMapNodes.push('OUTDENT');
-                        commandMap.OUTDENT.removeAttribute('disabled');
+                    if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
+                        if (util.isListCell(element) || (element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0)) {
+                            commandMapNodes.push('OUTDENT');
+                            commandMap.OUTDENT.removeAttribute('disabled');
+                        }
                     }
+
+                    /* Indent */
+                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && util.isListCell(element) && !element.previousElementSibling) {
+                        commandMapNodes.push('INDENT');
+                        commandMap.INDENT.setAttribute('disabled', true);
+                    }
+
                     continue;
                 }
 
@@ -3706,6 +3750,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
+                }
+                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                    commandMap.INDENT.removeAttribute('disabled');
                 }
                 else {
                     util.removeClass(commandMap[key], 'active');

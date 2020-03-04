@@ -106,21 +106,29 @@ export default {
     editList: function (command, selectedCells, detach) {
         const selectedFormats = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
         if (!selectedFormats || selectedFormats.length === 0) return;
+        
+        const util = this.util;
+        selectedFormats.sort(function (a, b) {
+            if (!this.isListCell(a) || !this.isListCell(b)) return 0;
+            a = this.getElementDepth(a);
+            b = this.getElementDepth(b);
+            return a > b ? 1 : a < b ? -1 : 0;
+        }.bind(util));
 
         let isRemove = true;
         let edgeFirst = null;
         let edgeLast = null;
         
         // merge
-        const firstSel = selectedFormats[0];
-        const lastSel = selectedFormats[selectedFormats.length - 1];
-        let topEl = (this.util.isListCell(firstSel) || this.util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
-        let bottomEl = (this.util.isListCell(lastSel) || this.util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
+        let firstSel = selectedFormats[0];
+        let lastSel = selectedFormats[selectedFormats.length - 1];
+        let topEl = (util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
+        let bottomEl = (util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
         for (let i = 0, len = selectedFormats.length; i < len; i++) {
-            if (!this.util.isList(this.util.getRangeFormatElement(selectedFormats[i], function (current) {
+            if (!util.isList(util.getRangeFormatElement(selectedFormats[i], function (current) {
                 return this.getRangeFormatElement(current) && current !== selectedFormats[i];
-            }.bind(this.util)))) {
+            }.bind(util)))) {
                 isRemove = false;
                 break;
             }
@@ -137,52 +145,62 @@ export default {
                         }
                     }
                 }
-            } else {
-                const currentFormat = this.util.getRangeFormatElement(firstSel);
-                const cancel = currentFormat && currentFormat.tagName === command;
-                let rangeArr, tempList;
-                const passComponent = function (current) {
-                    return !this.isComponent(current);
-                }.bind(this.util);
-                
-                if (!cancel) tempList = this.util.createElement(command);
-    
-                for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
-                    o = this.util.getRangeFormatElement(selectedFormats[i], passComponent);
-                    if (!o || !this.util.isList(o)) continue;
-    
-                    if (!r) {
-                        r = o;
-                        rangeArr = {r: r, f: [this.util.getParentElement(selectedFormats[i], 'LI')]};
-                    } else {
-                        if (r !== o) {
-                            const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
-                            o = selectedFormats[i].parentNode;
-                            if (!edgeFirst) edgeFirst = edge;
-                            if (!cancel) tempList = this.util.createElement(command);
-                            r = o;
-                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormats[i], 'LI')]};
+            }
+
+            const currentFormat = util.getRangeFormatElement(firstSel);
+            const cancel = currentFormat && currentFormat.tagName === command;
+            let rangeArr, tempList, edge;
+            const passComponent = function (current) {
+                return !this.isComponent(current);
+            }.bind(util);
+            
+            if (!cancel) tempList = util.createElement(command);
+
+            for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
+                o = util.getRangeFormatElement(selectedFormats[i], passComponent);
+                if (!o || !util.isList(o)) continue;
+
+                if (!r) {
+                    r = o;
+                    rangeArr = {r: r, f: [util.getParentElement(selectedFormats[i], 'LI')]};
+                } else {
+                    if (r !== o) {
+                        if (detach && util.isListCell(o.parentNode)) {
+                            edge = this.plugins.list._detachNested.call(this, rangeArr.f);
                         } else {
-                            rangeArr.f.push(this.util.getParentElement(selectedFormats[i], 'LI'));
+                            edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
                         }
+                        
+                        o = selectedFormats[i].parentNode;
+                        if (!edgeFirst) edgeFirst = edge;
+                        if (!cancel) tempList = util.createElement(command);
+                        
+                        r = o;
+                        rangeArr = {r: r, f: [util.getParentElement(selectedFormats[i], 'LI')]};
+                    } else {
+                        rangeArr.f.push(util.getParentElement(selectedFormats[i], 'LI'));
                     }
-    
-                    if (i === len - 1) {
+                }
+                
+                if (i === len - 1) {
+                    if (detach && util.isListCell(o.parentNode)) {
+                        edgeLast = this.plugins.list._detachNested.call(this, rangeArr.f);
+                    } else {
                         edgeLast = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
-                        if (!edgeFirst) edgeFirst = edgeLast;
                     }
+                    if (!edgeFirst) edgeFirst = edgeLast;
                 }
             }
         } else {
             const topElParent = topEl ? topEl.parentNode : topEl;
             const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
-            topEl = topElParent && !this.util.isWysiwygDiv(topElParent) && topElParent.nodeName === command ? topElParent : topEl;
-            bottomEl = bottomElParent && !this.util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === command ? bottomElParent : bottomEl;
+            topEl = topElParent && !util.isWysiwygDiv(topElParent) && topElParent.nodeName === command ? topElParent : topEl;
+            bottomEl = bottomElParent && !util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === command ? bottomElParent : bottomEl;
 
             const mergeTop = topEl && topEl.tagName === command;
             const mergeBottom = bottomEl && bottomEl.tagName === command;
             
-            let list = mergeTop ? topEl : this.util.createElement(command);
+            let list = mergeTop ? topEl : util.createElement(command);
             let firstList = null;
             let lastList = null;
             let topNumber = null;
@@ -190,49 +208,53 @@ export default {
 
             const passComponent = function (current) {
                 return !this.isComponent(current) && !this.isList(current);
-            }.bind(this.util);
+            }.bind(util);
             
             for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
                 fTag = selectedFormats[i];
-                if (fTag.childNodes.length === 0 && !this.util._isIgnoreNodeChange(fTag)) {
-                    this.util.removeItem(fTag);
+                if (fTag.childNodes.length === 0 && !util._isIgnoreNodeChange(fTag)) {
+                    util.removeItem(fTag);
                     continue;
                 }
                 next = selectedFormats[i + 1];
                 originParent = fTag.parentNode;
                 nextParent = next ? next.parentNode : null;
-                isCell = this.util.isListCell(fTag);
-                rangeTag = this.util.isRangeFormatElement(originParent) ? originParent : null;
-                parentTag = isCell && !this.util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
-                siblingTag = isCell && !this.util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
+                isCell = util.isListCell(fTag);
+                rangeTag = util.isRangeFormatElement(originParent) ? originParent : null;
+                parentTag = isCell && !util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
+                siblingTag = isCell && !util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
 
-                newCell = this.util.createElement('LI');
-                this.util.copyFormatAttributes(newCell, fTag);
-                if (this.util.isComponent(fTag)) {
+                newCell = util.createElement('LI');
+                util.copyFormatAttributes(newCell, fTag);
+                if (util.isComponent(fTag)) {
                     const isHR = /^HR$/i.test(fTag.nodeName);
                     if (!isHR) newCell.innerHTML = '<br>';
                     newCell.innerHTML += fTag.outerHTML;
                     if (isHR) newCell.innerHTML += '<br>';
                 } else {
-                    newCell.innerHTML = fTag.innerHTML;
+                    const fChildren = fTag.childNodes;
+                    while (fChildren[0]) {
+                        newCell.appendChild(fChildren[0]);
+                    }
+                    // newCell.innerHTML = fTag.innerHTML;
                 }
                 list.appendChild(newCell);
 
                 if (!next) lastList = list;
-                if (!next || parentTag !== nextParent || this.util.isRangeFormatElement(siblingTag)) {
+                if (!next || parentTag !== nextParent || util.isRangeFormatElement(siblingTag)) {
                     if (!firstList) firstList = list;
-                    if ((!mergeTop || !next || parentTag !== nextParent) && !(next && this.util.isList(nextParent) && nextParent === originParent)) {
+                    if ((!mergeTop || !next || parentTag !== nextParent) && !(next && util.isList(nextParent) && nextParent === originParent)) {
                         if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
                     }
                 }
 
-                this.util.removeItem(fTag);
+                util.removeItem(fTag);
                 if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
-                if (next && this.util.getRangeFormatElement(nextParent, passComponent) !== this.util.getRangeFormatElement(originParent, passComponent)) {
-                    list = this.util.createElement(command);
+                if (next && util.getRangeFormatElement(nextParent, passComponent) !== util.getRangeFormatElement(originParent, passComponent)) {
+                    list = util.createElement(command);
                 }
 
-                if (rangeTag && rangeTag.children.length === 0) this.util.removeItem(rangeTag);
+                if (rangeTag && rangeTag.children.length === 0) util.removeItem(rangeTag);
             }
 
             if (topNumber) {
@@ -243,19 +265,50 @@ export default {
                 bottomNumber = list.children.length - 1;
                 list.innerHTML += bottomEl.innerHTML;
                 lastList = list.children[bottomNumber];
-                this.util.removeItem(bottomEl);
+                util.removeItem(bottomEl);
             }
 
-            edgeFirst = edgeLast = this.util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
+            edgeFirst = edgeLast = util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
         }
         
-        this.submenuOff();
-
         return {
             sc: selectedFormats.length > 1 ? edgeFirst.sc : edgeFirst.ec,
             so: selectedFormats.length > 1 ? 0 : edgeFirst.ec.textContent.length,
             ec: edgeLast.ec,
             eo: edgeLast.ec.textContent.length
+        };
+    },
+
+    _detachNested: function (cells) {
+        const first = cells[0];
+        const last = cells[cells.length - 1];
+        const next = last.nextElementSibling;
+        const originList = first.parentNode;
+        const sibling = originList.parentNode.nextElementSibling;
+        const parentNode = originList.parentNode.parentNode;
+
+        for (let c = 0, cLen = cells.length; c < cLen; c++) {
+            parentNode.insertBefore(cells[c], sibling);
+        }
+
+        if (originList.children.length > 0) {
+            const newList = originList.cloneNode(false);
+            const children = originList.children;
+            const index = this.util.getPositionIndex(next);
+            while (children[index]) {
+                newList.appendChild(children[index]);
+            }
+            last.appendChild(newList);
+        }
+
+        if (originList.children.length === 0) this.util.removeItem(originList);
+
+        const edge = this.util.getEdgeChildNodes(first, last);
+
+        return {
+            cc: first.parentNode,
+            sc: edge.sc,
+            ec: edge.ec
         };
     },
 
@@ -363,6 +416,8 @@ export default {
 
         const range = this.plugins.list.editList.call(this, command, null, false);
         this.setRange(range.sc, range.so, range.ec, range.eo);
+
+        this.submenuOff();
 
         // history stack
         this.history.push(false);

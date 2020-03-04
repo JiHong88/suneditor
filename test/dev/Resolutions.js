@@ -64,11 +64,14 @@ export default {
         const title = initialEditorContent.search('Resolutions') === -1 ? '<h4><u>Resolutions</u></h4>' : '';
 
         if(this.context.custom.textElement.value.length > 0) {
-            // const parser = new this._w.DOMParser();
-            // parser.parseFromString(title, 'text/html')
             // Get Input value
-            const value = title.concat('<p>', this.context.custom.textElement.value, '</p>');
+            let value = title;
+            const lines = this.context.custom.textElement.value.split('\n');
+            for (let i = 0, len = lines.length; i < len; i++) {
+                value += '<p>' + lines[i] + '</p>';
+            }
 
+            // rendering
             const template = this.util.createElement('DIV');
             template.innerHTML = value;
             
@@ -81,8 +84,8 @@ export default {
                 after = child;
             }
 
-            // set range
-            // this.setRange(value, value.length, value, value.length);
+            // set range (It is not necessary this code in the next version)
+            // this.setRange(after, 1, after, 1);
             
             // clear content
             this.context.custom.textElement.value = null;

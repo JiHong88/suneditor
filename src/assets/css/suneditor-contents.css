@@ -107,7 +107,10 @@
     text-align: -webkit-match-parent;
     margin-bottom: 5px;
 }
-/* nested ol, ul */
+/* nested list ol, ul */
+.sun-editor-editable ol ol, .sun-editor-editable ol ul, .sun-editor-editable ul ol, .sun-editor-editable ul ul {
+    margin: 0;
+}
 .sun-editor-editable ol ol, .sun-editor-editable ul ol {
     list-style-type: lower-alpha;
 }
