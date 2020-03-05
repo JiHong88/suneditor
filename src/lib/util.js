@@ -21,8 +21,8 @@ const util = {
      * @private
      */
     _tagConvertor: function (text) {
-        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(b|strong|var|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        const ec = {'b': 'strong', 'i': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
+        return text.replace(/(<\/?)(b|strong|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -231,7 +231,7 @@ const util = {
                     if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, ' ');
+                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, '');
             }
         }
 
@@ -1387,6 +1387,23 @@ const util = {
         })(element);
 
         if (element.childNodes.length === 0) element.innerHTML = '<br>';
+    },
+
+    /**
+     * @description Sort a element array by depth of element.
+     * @param {Array} array Array object
+     * @param {Boolean} des true: descending order / false: ascending order
+     */
+    sortByDepth: function (array, des) {
+        const t = !des ? -1 : 1;
+        const f = t * -1;
+
+        array.sort(function (a, b) {
+            if (!this.isListCell(a) || !this.isListCell(b)) return 0;
+            a = this.getElementDepth(a);
+            b = this.getElementDepth(b);
+            return a > b ? t : a < b ? f : 0;
+        }.bind(this));
     },
 
     /**

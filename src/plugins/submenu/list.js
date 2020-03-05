@@ -108,12 +108,7 @@ export default {
         if (!selectedFormats || selectedFormats.length === 0) return;
         
         const util = this.util;
-        selectedFormats.sort(function (a, b) {
-            if (!this.isListCell(a) || !this.isListCell(b)) return 0;
-            a = this.getElementDepth(a);
-            b = this.getElementDepth(b);
-            return a > b ? 1 : a < b ? -1 : 0;
-        }.bind(util));
+        util.sortByDepth(selectedFormats, true);
 
         let isRemove = true;
         let edgeFirst = null;
@@ -272,8 +267,8 @@ export default {
         }
         
         return {
-            sc: selectedFormats.length > 1 ? edgeFirst.sc : edgeFirst.ec,
-            so: selectedFormats.length > 1 ? 0 : edgeFirst.ec.textContent.length,
+            sc: edgeFirst.sc,
+            so: 0,
             ec: edgeLast.ec,
             eo: edgeLast.ec.textContent.length
         };
@@ -291,9 +286,9 @@ export default {
             parentNode.insertBefore(cells[c], sibling);
         }
 
-        if (originList.children.length > 0) {
+        if (next && originList.children.length > 0) {
             const newList = originList.cloneNode(false);
-            const children = originList.children;
+            const children = originList.childNodes;
             const index = this.util.getPositionIndex(next);
             while (children[index]) {
                 newList.appendChild(children[index]);

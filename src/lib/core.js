@@ -1187,16 +1187,31 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 return cc ? cc.ec : before;
             };
             
-            for (let i = 0, len = rangeLines.length, line, originParent, depth, before; i < len; i++) {
+            for (let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested; i < len; i++) {
                 line = rangeLines[i];
                 originParent = line.parentNode;
                 depth = util.getElementDepth(line);
 
                 if (util.isList(originParent)) {
-                    if (listParent === null) listParent = util.createElement(originParent.nodeName);
-                    lineArr.push(line);
+                    if (listParent === null) {
+                        if (nextList) {
+                            listParent = nextList;
+                            nested = true;
+                            nextList = null;
+                        } else {
+                            listParent = originParent.cloneNode(false);
+                        }
+                    }
 
-                    if (i === len - 1 || rangeLines[i + 1].parentNode !== originParent) {
+                    lineArr.push(line);
+                    nextLine = rangeLines[i + 1];
+
+                    if (i === len - 1 || (nextLine && rangeLines[i + 1].parentNode !== originParent)) {
+                        // nested list
+                        if (nextLine && line.contains(rangeLines[i + 1].parentNode)) {
+                            nextList = nextLine.parentNode.cloneNode(false);
+                        }
+
                         let list = originParent.parentNode, p;
                         while (util.isList(list)) {
                             p = util.createElement(list.nodeName);
@@ -1223,11 +1238,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
 
                         for (let c = 0, cLen = edge.removeArray.length; c < cLen; c++) {
-                            listParent.innerHTML += edge.removeArray[c].outerHTML;
+                            listParent.appendChild(edge.removeArray[c]);
                         }
 
-                        rangeElement.appendChild(listParent);
+                        if (!nested) rangeElement.appendChild(listParent);
+                        if (nextList) edge.removeArray[edge.removeArray.length - 1].appendChild(nextList);
                         listParent = null;
+                        nested = false;
                     }
                 }
                 else {
@@ -1421,6 +1438,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                         } else {
                             removeArray.push(insNode);
+                            util.removeItem(children[i]);
                         }
                     } else {
                         reset = moveComplete = false;
@@ -3621,7 +3639,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
      * @description event function
      */
     const event = {
-        _directionKeyCode: new _w.RegExp('^(8|13|32|46|3[3-9]|40|46)$'),
+        _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
         _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
@@ -4105,6 +4123,31 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     const commonCon = range.commonAncestorContainer;
                     if (range.startOffset === 0 && range.endOffset === 0) {
                         if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                            if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.previousSibling && range.collapsed && range.startOffset === 0))) {
+                                if (util.getArrayItem(formatEl.children, util.isList, false)) {
+                                    const prev = formatEl.previousElementSibling || rangeEl.parentNode;
+                                    if (util.isListCell(prev)) {
+                                        e.preventDefault();
+
+                                        const con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
+                                        const offset = con.nodeType === 3 ? con.textContent.length : 1;
+                                        const children = formatEl.childNodes;
+                                        let after = con;
+                                        let child = children[0];
+                                        while ((child = children[0])) {
+                                            prev.insertBefore(child, after.nextSibling);
+                                            after = child;
+                                        }
+    
+                                        util.removeItem(formatEl);
+                                        if (rangeEl.children.length === 0) util.removeItem(rangeEl);
+    
+                                        core.setRange(con, offset, con, offset);
+                                    }
+                                }
+                                break;
+                            }
+
                             let detach = true;
                             let comm = commonCon;
                             while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
@@ -4119,8 +4162,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 e.preventDefault();
                                 core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
                                 break;
-                            }	
-                        }	
+                            }
+                        }
 
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
                             const previousEl = formatEl.previousSibling;
@@ -4464,8 +4507,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             core._checkComponents();
 
-            const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
-            if (historyKey && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+            
+            const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
+            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent)) {
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;
@@ -4474,7 +4518,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
             if (!core._charCount(1, textKey)) {
                 if (e.key.length === 1) {
                     e.preventDefault();
@@ -4484,6 +4527,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             // history stack
+            const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
             if (historyKey) {
                 core.history.push(true);
             }
