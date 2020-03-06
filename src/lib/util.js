@@ -231,7 +231,7 @@ const util = {
                     if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, '');
+                returnHTML += baseHtml.replace(/(?<=(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)>)\s+(?=<)/g, '');
             }
         }
 
