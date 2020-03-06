@@ -54,6 +54,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         util: util,
 
         /**
+         * @description Functions object
+         */
+        functions: null,
+
+        /**
          * @description Notice object
          */
         notice: notice,
@@ -723,10 +728,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const onlyTable = function (current) {
                 return util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
             };
-            const startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
-            const endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
-            const sameRange = startRangeEl === endRangeEl;
+
+            let startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
+            let endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
+            if (startRangeEl && util.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
+            if (endRangeEl && util.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
             
+            const sameRange = startRangeEl === endRangeEl;
             for (let i = 0, len = lineNodes.length, line; i < len; i++) {
                 line = lineNodes[i];
 
@@ -979,7 +987,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         afterNode = null;
                     } else if (!afterNode) {
                         const r = this.removeNode();
-                        const container = r.container.nodeType === 3 ? (util.getFormatElement(r.container) || r.container.parentNode) : r.container;
+                        const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container)) ? r.container : (util.getFormatElement(r.container) || r.container.parentNode)) : r.container;
                         parentNode = container.parentNode;
                         afterNode = container.nextSibling;
                     }
@@ -4202,7 +4210,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
-                    if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.nextSibling && range.collapsed && range.endOffset === selectionNode.textContent.length))) {
+                    if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.nextSibling && range.collapsed && range.endOffset === selectionNode.textContent.length))) {
                         const next = formatEl.nextElementSibling;
                         if (next && util.getArrayItem(next.children, util.isList, false)) {
                             e.preventDefault();
@@ -5219,6 +5227,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     core._init(false);
     event._addEvent();
     core._charCount(0, false);
+
+    // functionss
+    core.functions = userFunction;
 
     return userFunction;
 }
