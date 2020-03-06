@@ -4198,11 +4198,28 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                     core.selectComponent(nextEl.querySelector('iframe'), 'video');
                                 }
                             }
-
                             break;
                         }
                     }
-                    
+
+                    if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.nextSibling && range.collapsed && range.endOffset === selectionNode.textContent.length))) {
+                        const next = formatEl.nextElementSibling;
+                        if (next && util.getArrayItem(next.children, util.isList, false)) {
+                            e.preventDefault();
+
+                            const con = next.firstChild;
+                            const children = next.childNodes;
+                            let child = children[0];
+                            while ((child = children[0])) {
+                                formatEl.appendChild(child);
+                            }
+
+                            util.removeItem(next);
+                            core.setRange(con, 0, con, 0);
+                        }
+                        break;
+                    }
+
                     break;
                 case 9: /** tab key */
                     e.preventDefault();
@@ -4506,7 +4523,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             core._checkComponents();
-
             
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
             if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent)) {
