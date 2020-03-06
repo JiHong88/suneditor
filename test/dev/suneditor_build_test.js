@@ -143,7 +143,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|style|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
-    // mode: 'inline'
+    mode: 'inline'
     // videoHeightShow: false,
     // videoRatioShow: false,
     // imageHeightShow: false,
@@ -163,6 +163,9 @@ ss.onScroll = function (e) {
 };
 ss.onClick = function (e) {
     console.log('onClick', e);
+};
+ss.onFocus = function (e, core) {
+    console.log('onFocus', e);
 };
 ss.onBlur = function (e, core) {
     console.log('onBlur', e);

@@ -4565,6 +4565,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (userFunction.onScroll) userFunction.onScroll(e, core);
         },
 
+        onFocus_wysiwyg: function (e) {
+            if (core._isInline) event._showToolbarInline();
+            if (userFunction.onFocus) userFunction.onFocus(e, core);
+        },
+
         onBlur_wysiwyg: function (e) {
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (userFunction.onBlur) userFunction.onBlur(e, core);
@@ -4778,6 +4783,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
+            eventWysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** Events are registered only a balloon mode or when there is a table plugin. */
@@ -4804,11 +4810,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 } else {
                     util.addClass(context.element.resizingBar, 'se-resizing-none');
                 }
-            }
-
-            /** inline editor */
-            if (core._isInline) {
-                eventWysiwyg.addEventListener('focus', event._showToolbarInline, false);
             }
             
             /** window event */
@@ -4839,7 +4840,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
-            eventWysiwyg.removeEventListener('focus', event._showToolbarInline);
+            eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
             eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
             context.element.code.removeEventListener('keydown', event._codeViewAutoHeight);
@@ -4876,6 +4877,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onDrop: null,
         onChange: null,
         onPaste: null,
+        onFocus: null,
         onBlur: null,
         showInline: null,
 
