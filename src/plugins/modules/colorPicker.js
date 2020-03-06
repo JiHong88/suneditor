@@ -61,7 +61,7 @@ export default {
             }
             list += '' +
             '<form class="se-submenu-form-group">' +
-                '<input type="text" maxlength="7" class="_se_color_picker_input" />' +
+                '<input type="text" maxlength="7" class="_se_color_picker_input se-color-input"/>' +
                 '<button type="submit" class="se-btn-primary se-tooltip _se_color_picker_submit">' +
                     '<i class="se-icon-checked"></i>' +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.submitButton + '</span></span>' +
