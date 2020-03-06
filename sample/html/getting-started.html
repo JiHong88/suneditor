@@ -11,9 +11,27 @@
    <link rel="stylesheet" href="../css/bootstrap.css" media="all">
    <link rel="stylesheet" href="../css/sample.css" media="all">
    <style>
-       .readmd > div {
-           margin: 35px;
-       }
+    .readmd a > div {
+        padding: 35px;
+    }
+
+    .readmd a > div img {
+        width: 35px;
+    }
+
+    .readmd a:hover {
+        font-size: 2.5rem;
+    }
+
+    .readmd a:hover img {
+        width: 5rem;
+    }
+
+    .readmd .inner {
+        position: absolute;
+        display: inline-flex;
+        margin: 8px
+    }
    </style>
 </head>
 <body>
@@ -47,16 +65,12 @@
 
 <div class="content">
     <article class="readmd">
-        <a id="readme" href="#readme"><h4 class="sub-title">README</h4></a>
-
-        <div><pre><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_js.svg" style="width: 35px;"><div style="position: absolute; display: inline-flex; margin: 10px"><a href="https://github.com/JiHong88/SunEditor/blob/master/README.md"><span style="color: #f7df1f;">SunEditor</span></a></div></pre></div>
-        <div><pre><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_react.svg" style="width: 35px;"><div style="position: absolute; display: inline-flex; margin: 10px"><a href="https://github.com/mkhstar/suneditor-react/blob/master/README.md"><span style="color: #61dafb;">suneditor-react</span></a></div></pre></div>
-        <div><pre><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_vue.svg" style="width: 35px;"><div style="position: absolute; display: inline-flex; margin: 10px"><a href="https://github.com/JiHong88/suneditor-vue/blob/master/README.md"><span style="color: #40b883;">suneditor-vue</span></a></div></pre></div>    
+        <a href="https://github.com/JiHong88/SunEditor/blob/master/README.md"><div><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_js.svg"><div class="inner"><span style="color: #f7df1f;">SunEditor</span></div></div></a>
+        <a href="https://github.com/mkhstar/suneditor-react/blob/master/README.md"><div><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_react.svg"><div class="inner"><span style="color: #61dafb;">SunEditor-React</span></div></div></a>
+        <a href="https://github.com/JiHong88/suneditor-vue/blob/master/README.md"><div><img src="https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/icon_vue.svg"><div class="inner"><span style="color: #40b883;">SunEditor-Vue</span></div></div></a>
     </article>
 
     <footer>
-        <p>SunEditor distributed under the MIT license.</p>
-        <p><a href="https://github.com/JiHong88/SunEditor" target="_blank" style="color:#f4b124;">Go to GitHub SunEditor</a></p>
     </footer>
 </div>
 
