@@ -689,6 +689,8 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
 editor.onChange = function (contents, core) { console.log('onChange', contents) }
 
+editor.onFocus = function (e, core) { console.log('onFocus', e) }
+
 editor.onBlur = function (e, core) { console.log('onBlur', e) }
 
 // onload event
@@ -707,6 +709,53 @@ editor.onload = function (core, reload) {
  * core: Core object
 */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Called before the image is uploaded
+// If false is returned, no image upload is performed.
+/**
+ * files: Files array
+ * info: Input information
+ * core: Core object
+ * return {Boolean}
+ */
+editor.onImageUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
+
+// Called when the image is uploaded or the uploaded image is deleted.
+/**
+ * targetImgElement: Current img element
+ * index: Uploaded index (key value)
+ * state: Upload status ('create', 'update', 'delete')
+ * imageInfo: {
+ * - index: data index
+ * - name: file name
+ * - size: file size
+ * - select: select function
+ * - delete: delete function
+ * }
+ * remainingFilesCount: Count of remaining image files
+ * core: Core object
+*/
+editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
+    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
+}
+
+// Called when the image is upload failed.
+// If you return false, the default notices are not called.
+/**
+ * errorMessage: Error message to show
+ * result: Result object 
+ * core: Core object
+ * return {Boolean}
+*/
+editor.onImageUploadError = function (errorMessage, result, core) {
+    alert(errorMessage)
+    return Boolean
+}
 
 // It replaces the default callback function of the image upload
 /**
@@ -758,53 +807,6 @@ editor.imageUploadHandler = function (response, info, core) {
             else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
         }
     }
-}
-
-// Called before the image is uploaded
-// If false is returned, no image upload is performed.
-/**
- * files: Files array
- * info: Input information
- * core: Core object
- * return {Boolean}
- */
-editor.onImageUploadBefore: function (files, info, core) {
-    console.log('files', files);
-    console.log('info', info);
-    return Boolean
-}
-
-// Called when the image is uploaded or the uploaded image is deleted.
-/**
- * targetImgElement: Current img element
- * index: Uploaded index (key value)
- * state: Upload status ('create', 'update', 'delete')
- * imageInfo: {
- * - index: data index
- * - name: file name
- * - size: file size
- * - select: select function
- * - delete: delete function
- * }
- * remainingFilesCount: Count of remaining image files
- * core: Core object
-*/
-editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
-    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
-}
-
-// Called when the image is upload failed.
-// If you return false, the default notices are not called.
-/**
- * errorMessage: Error message to show
- * result: Result object 
- * core: Core object
- * return {Boolean}
-*/
-editor.onImageUploadError = function (errorMessage, result, core) {
-    alert(errorMessage)
-    return Boolean
 }
 
 /**

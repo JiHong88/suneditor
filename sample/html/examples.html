@@ -157,9 +157,9 @@
         <p></p>
         <textarea id="imageManagement" style="display: none;">
             <p>cat</p>
-            <div class="se-component se-image-container __se__float-none" contenteditable="false" style=""><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,199" data-origin="300,199" data-file-name="s-cat.jpg" data-file-size="40500" style="width: 300px; transform: rotate(0deg); height: 198px;" data-size="300px,198px" data-index="0"></figure></div>
+            <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/s-cat.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,199" data-origin="300,199" data-file-name="s-cat.jpg" data-file-size="40500" style="width: 300px; transform: rotate(0deg); height: 198px;" data-size="300px,198px" data-index="0"></figure></div>
             <p>cat1</p>
-            <div class="se-component se-image-container __se__float-none" contenteditable="false" style=""><figure style="margin: 0px; width: 300px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-file-name="s-cat1.jpg" data-file-size="52000" style="width: 300px; height: 174px; transform: rotate(0deg);" data-size="300px,174px" data-index="2"><figcaption style="margin-top: 0px;"><div>Insert description</div></figcaption></figure></div>
+            <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px; width: 300px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-file-name="s-cat1.jpg" data-file-size="52000" style="width: 300px; height: 174px; transform: rotate(0deg);" data-size="300px,174px" data-index="2"><figcaption style="margin-top: 0px;"><div>Insert description</div></figcaption></figure></div>
             <p><br></p>
         </textarea>
         <div class="image-list">
@@ -490,6 +490,8 @@
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
 
+<span class="pl-smi">editor</span>.<span class="pl-en">onFocus</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onFocus<span class="pl-pds">'</span></span>, e) }
+
 <span class="pl-smi">editor</span>.<span class="pl-en">onBlur</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onBlur<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-c"><span class="pl-c">//</span> onload event</span>
@@ -536,6 +538,13 @@
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">alert</span>(errorMessage)
 }
+
+<span class="pl-c"><span class="pl-c">//</span> Called before the image is uploaded.</span>
+<span class="pl-c"><span class="pl-c">//</span> If false is returned, no image upload is performed.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadBefore</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
+
+<span class="pl-c"><span class="pl-c">//</span> It replaces the default callback function of the image upload.</span>
+<span class="pl-smi">editor</span>.<span class="pl-en">imageUploadHandler</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
 
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * toolbar: Toolbar Element</span>
@@ -798,6 +807,9 @@
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
         suneditor.onChange = function (contents) { console.log('onChange', contents) }
+        suneditor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e, cleanData, maxCharCount) }
+        suneditor.onFocus = function (contents) { console.log('onFocus', contents) }
+        suneditor.onBlur = function (contents) { console.log('onBlur', contents) }
         suneditor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) { 
             console.log('targetImgElement:' + targetImgElement + ', index:' + index + ', state("create","update","delete"):' + state + ', imageInfo:' + imageInfo + ', remainingFilesCount:' + remainingFilesCount)
         }
