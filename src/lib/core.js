@@ -99,6 +99,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         submenu: null,
 
         /**
+         * @description Boolean value of whether the editor has focus
+         */
+        hasFocus: false,
+
+        /**
          * @description current resizing component name
          * @private
          */
@@ -173,10 +178,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _isInline: null,
 
         /**
-         * @description Is balloon mode?
+         * @description Is balloon|balloon-always mode?
          * @private
          */
         _isBalloon: null,
+
+        /**
+         * @description Is balloon-always mode?
+         * @private
+         */
+        _isBalloonAlways: null,
 
         /**
          * @description Required value when using inline mode to sticky toolbar
@@ -3146,7 +3157,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 
                 if (!this._variable.isFullScreen) {
                     this._notHideToolbar = false;
-                    if (/balloon/i.test(options.mode)) {
+                    if (/balloon|balloon-always/i.test(options.mode)) {
                         context.element._arrow.style.display = '';
                         this._isInline = false;
                         this._isBalloon = true;
@@ -3660,7 +3671,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             this._isInline = /inline/i.test(options.mode);
-            this._isBalloon = /balloon/i.test(options.mode);
+            this._isBalloon = /balloon|balloon-always/i.test(options.mode);
+            this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
             this.commandMap = {
                 STRONG: context.tool.bold,
@@ -3931,7 +3943,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (!command && !display) return;
             if (target.disabled) return;
             
-            core.focus();
+            if (!core.hasFocus) core.focus();
             
             /** call plugins */
             if (display) {
@@ -3982,6 +3994,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (core._isBalloon) {
                 event._hideToolbar();
             }
+
+            if (userFunction.onMouseDown) userFunction.onMouseDown(e, core);
         },
 
         onClick_wysiwyg: function (e) {
@@ -4024,6 +4038,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             core._editorRange();
+            _w.setTimeout(core._editorRange.bind(core));
 
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode);
@@ -4043,14 +4058,27 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 event._applyTagEffects();
             }
 
-            if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon); 
+            if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
             if (userFunction.onClick) userFunction.onClick(e, core);
+        },
+
+        _balloonDelay: null,
+        _showToolbarBalloonDelay: function () {
+            if (event._balloonDelay) {
+                _w.clearTimeout(event._balloonDelay);
+            }
+
+            event._balloonDelay = _w.setTimeout(function () {
+                _w.clearTimeout(this._balloonDelay);
+                this._balloonDelay = null;
+                this._showToolbarBalloon();
+            }.bind(event), 300);
         },
 
         _toggleToolbarBalloon: function () {
             core._editorRange();
             const range = core.getRange();
-            if (range.collapsed) event._hideToolbar();
+            if (core.currentControllerName === 'table' || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
             else event._showToolbarBalloon(range);
         },
 
@@ -4062,7 +4090,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const selection = core.getSelection();
 
             let isDirTop;
-            if (selection.focusNode === selection.anchorNode) {
+            if (util.getParentElement(core.getSelectionNode(), util.isAnchor)) {
+                isDirTop = true;
+            } else if (selection.focusNode === selection.anchorNode) {
                 isDirTop = selection.focusOffset < selection.anchorOffset;
             } else {
                 const childNodes = util.getListChildNodes(range.commonAncestorContainer);
@@ -4097,6 +4127,21 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
 
+            if (!rects) {
+                const node = core.getSelectionNode();
+                const nodeOffset = util.getOffset(node, context.element.wysiwygFrame);
+                rects = {
+                    left: nodeOffset.left,
+                    top: nodeOffset.top,
+                    right: nodeOffset.left,
+                    bottom: nodeOffset.top + node.offsetHeight,
+                    noText: true
+                };
+                scrollLeft = 0;
+                scrollTop = 0;
+                isDirTop = true;
+            }
+
             const iframeRects = /iframe/i.test(context.element.wysiwygFrame.nodeName) ? context.element.wysiwygFrame.getClientRects()[0] : null;
             if (iframeRects) {
                 rects = {
@@ -4118,12 +4163,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
             const padding = 1;
             const toolbarWidth = toolbar.offsetWidth;
-            const toolbarHeight = toolbar.offsetHeight;
+            const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbar.offsetHeight;
 
             const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
             const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
-            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
+            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
             toolbar.style.left = _w.Math.floor(l) + 'px';
@@ -4238,32 +4283,34 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 // history stack
                                 core.history.push(true);
                             } else {
-                                const prev = formatEl.previousElementSibling || rangeEl.parentNode;
+                                let prev = formatEl.previousElementSibling || rangeEl.parentNode;
                                 if (util.isListCell(prev)) {
-                                    if (util.isListCell(prev)) {
-                                        e.preventDefault();
-    
-                                        let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
-                                        if (!con) {
-                                            con = util.createTextNode(util.zeroWidthSpace);
-                                            rangeEl.parentNode.insertBefore(con, rangeEl.parentNode.firstChild);
-                                        }
-                                        const offset = con.nodeType === 3 ? con.textContent.length : 1;
-                                        const children = formatEl.childNodes;
-                                        let after = con;
-                                        let child = children[0];
-                                        while ((child = children[0])) {
-                                            prev.insertBefore(child, after.nextSibling);
-                                            after = child;
-                                        }
-    
-                                        util.removeItem(formatEl);
-                                        if (rangeEl.children.length === 0) util.removeItem(rangeEl);
-    
-                                        core.setRange(con, offset, con, offset);
-                                        // history stack
-                                        core.history.push(true);
+                                    e.preventDefault();
+                                    const prevLast = prev.lastElementChild;
+                                    if (util.isList(prevLast)) {
+                                        prev = prevLast.lastElementChild;
                                     }
+
+                                    let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
+                                    if (!con) {
+                                        con = util.createTextNode(util.zeroWidthSpace);
+                                        rangeEl.parentNode.insertBefore(con, rangeEl.parentNode.firstChild);
+                                    }
+                                    const offset = con.nodeType === 3 ? con.textContent.length : 1;
+                                    const children = formatEl.childNodes;
+                                    let after = con;
+                                    let child = children[0];
+                                    while ((child = children[0])) {
+                                        prev.insertBefore(child, after.nextSibling);
+                                        after = child;
+                                    }
+
+                                    util.removeItem(formatEl);
+                                    if (rangeEl.children.length === 0) util.removeItem(rangeEl);
+
+                                    core.setRange(con, offset, con, offset);
+                                    // history stack
+                                    core.history.push(true);
                                 }
                             }
                             
@@ -4336,7 +4383,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (range.startContainer !== range.endContainer) core.removeNode();
                         
                         let next = util.getArrayItem(formatEl.children, util.isList, false);
-                        next = next || formatEl.nextElementSibling;
+                        next = next || formatEl.nextElementSibling || rangeEl.parentNode.nextElementSibling;
                         if (next && (util.isList(next) || util.getArrayItem(next.children, util.isList, false))) {
                             e.preventDefault();
 
@@ -4633,8 +4680,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
-            if (core._isBalloon && !range.collapsed) {
-                event._showToolbarBalloon();
+            if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
+                if (core._isBalloonAlways) event._showToolbarBalloonDelay();
+                else event._showToolbarBalloon();
                 return;
             }
 
@@ -4705,11 +4753,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         onFocus_wysiwyg: function (e) {
+            core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
             if (userFunction.onFocus) userFunction.onFocus(e, core);
         },
 
         onBlur_wysiwyg: function (e) {
+            core.hasFocus = false;
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (userFunction.onBlur) userFunction.onBlur(e, core);
         },
@@ -4914,6 +4964,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
             /** editor area */
+            eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
             eventWysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
@@ -4924,11 +4975,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
             eventWysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
-
-            /** Events are registered only a balloon mode or when there is a table plugin. */
-            if (core._isBalloon || core.plugins.table) {
-                eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
-            }
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
@@ -5010,6 +5056,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         onload: null,
         onScroll: null,
+        onMouseDown: null,
         onClick: null,
         onKeyDown: null,
         onKeyUp: null,

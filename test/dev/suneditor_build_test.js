@@ -46,7 +46,7 @@ suneditor.create("sample1", {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    // mode: 'balloon', 
+    mode: 'balloon-always', 
     katex: Katex,
     // addAttributesWhitelist: 'style',
     buttonList: [
@@ -122,7 +122,7 @@ window.sun_create1 = function () {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
-    // mode: 'balloon',
+    mode: 'balloon',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',

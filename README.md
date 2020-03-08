@@ -325,7 +325,7 @@ addAttributesWhitelist: Add attributes whitelist of tags that should be kept und
                         ex) 'style|name'
 // Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
-mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
+mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode. default: 'auto' {Number|String}
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
@@ -679,6 +679,8 @@ editor.toolbar.show();
 // It is not called in exceptional cases and is called after the default event function has finished.
 // e: event object, core: Core object
 editor.onScroll = function (e, core) { console.log('onScroll', e) }
+
+editor.onMouseDown = function (e, core) { console.log('onMouseDown', e) }
 
 editor.onClick = function (e, core) { console.log('onClick', e) }
 

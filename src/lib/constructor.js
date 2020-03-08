@@ -391,7 +391,7 @@ export default {
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         options.addAttributesWhitelist = typeof options.addAttributesWhitelist === 'string' ? options.addAttributesWhitelist : '';
         /** Layout */
-        options.mode = options.mode || 'classic'; // classic, inline, balloon
+        options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         // options.fullPage = options.fullPage;

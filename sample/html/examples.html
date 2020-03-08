@@ -482,6 +482,8 @@
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e) }
 
+<span class="pl-smi">editor</span>.<span class="pl-en">onMouseDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onMouseDown<span class="pl-pds">'</span></span>, e) }
+
 <span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
@@ -802,6 +804,7 @@
 
         suneditor.onload = function (core, reload) { console.log('onload-core', core); console.log('onload-reload', reload)}
         suneditor.onScroll = function (e) { console.log('onScroll', e); }
+        suneditor.onMouseDown = function (e) { console.log('onMouseDown', e) }
         suneditor.onClick = function (e) { console.log('onClick', e) }
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
