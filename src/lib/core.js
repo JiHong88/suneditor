@@ -1458,13 +1458,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
                 }
 
-                lineIndex = selectedFormats.indexOf(insNode);
+                if (selectedFormats) lineIndex = selectedFormats.indexOf(insNode);
                 if (selectedFormats && lineIndex === -1) {
                     if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
                     rangeEl.appendChild(insNode);
                 }
                 else {
-                    next = selectedFormats[lineIndex + 1];
+                    if (selectedFormats) next = selectedFormats[lineIndex + 1];
                     if (rangeEl && rangeEl.children.length > 0) {
                         parent.insertBefore(rangeEl, rangeElement);
                         rangeEl = null;
@@ -3902,7 +3902,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
-            core._editorRange();
 
             if (util.getParentElement(target, '.se-submenu')) {
                 e.stopPropagation();
@@ -3944,6 +3943,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (target.disabled) return;
             
             if (!core.hasFocus) core.focus();
+            core._editorRange();
             
             /** call plugins */
             if (display) {
