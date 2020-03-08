@@ -3848,6 +3848,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
+            core._editorRange();
 
             if (util.getParentElement(target, '.se-submenu')) {
                 e.stopPropagation();
