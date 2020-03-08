@@ -731,8 +731,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             let startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
             let endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
-            if (startRangeEl && util.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
-            if (endRangeEl && util.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
+            if (util.isTable(startRangeEl) && util.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
+            if (util.isTable(endRangeEl) && util.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
             
             const sameRange = startRangeEl === endRangeEl;
             for (let i = 0, len = lineNodes.length, line; i < len; i++) {
@@ -1095,11 +1095,28 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 startIndex = endIndex = 0;
             }
 
+            function remove (item) {
+                const format = util.getFormatElement(item);
+                util.removeItem(item);
+
+                if(util.isListCell(format)) {
+                    const list = util.getArrayItem(format.children, util.isList, false);
+                    if (list) {
+                        const child = list.firstElementChild;
+                        const children = child.childNodes;
+                        while (children[0]) {
+                            format.insertBefore(children[0], list);
+                        }
+                        util.removeItemAllParents(child);
+                    }
+                }
+            }
+
             for (let i = startIndex; i <= endIndex; i++) {
                 const item = childNodes[i];
 
                 if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                    util.removeItem(item);
+                    remove(item);
                     continue;
                 }
 
@@ -1118,7 +1135,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (beforeNode.length > 0) {
                         startCon.data = beforeNode.data;
                     } else {
-                        util.removeItem(startCon);
+                        remove(startCon);
                     }
 
                     if (item === endCon) break;
@@ -1135,13 +1152,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (afterNode.length > 0) {
                         endCon.data = afterNode.data;
                     } else {
-                        util.removeItem(endCon);
+                        remove(endCon);
                     }
 
                     continue;
                 }
 
-                util.removeItem(item);
+                remove(item);
             }
 
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
@@ -1165,6 +1182,36 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
+            linesLoop:
+            for (let i = 0, len = rangeLines.length, line, nested, fEl, lEl, f, l; i < len; i++) {
+                line = rangeLines[i];
+                if (!util.isListCell(line)) continue;
+
+                nested = line.lastElementChild;
+                if (nested && util.isListCell(line.nextElementSibling) && rangeLines.indexOf(line.nextElementSibling) > -1) {
+                    lEl = nested.lastElementChild;
+                    if (rangeLines.indexOf(lEl) > -1) {
+                        let list = null;
+                        while ((list = lEl.lastElementChild)) {
+                            if (util.isList(list)) {
+                                if (rangeLines.indexOf(list.lastElementChild) > -1) {
+                                    lEl = list.lastElementChild;
+                                } else {
+                                    continue linesLoop;
+                                }
+                            }
+                        }
+
+                        fEl = nested.firstElementChild;
+                        f = rangeLines.indexOf(fEl);
+                        l = rangeLines.indexOf(lEl);
+                        rangeLines.splice(f, (l - f) + 1);
+                        len = rangeLines.length;
+                        continue;
+                    }
+                }
+            }
+
             let last  = rangeLines[rangeLines.length - 1];
             let standTag, beforeTag, pElement;
 
@@ -1181,7 +1228,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 beforeTag = standTag.nextSibling;
                 pElement = standTag.parentNode;
             }
-
+            
             let parentDepth = util.getElementDepth(standTag);
             let listParent = null;
             const lineArr = [];
@@ -1198,6 +1245,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             for (let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested; i < len; i++) {
                 line = rangeLines[i];
                 originParent = line.parentNode;
+                if (!originParent || rangeElement.contains(originParent)) continue;
+
                 depth = util.getElementDepth(line);
 
                 if (util.isList(originParent)) {
@@ -1214,9 +1263,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     lineArr.push(line);
                     nextLine = rangeLines[i + 1];
 
-                    if (i === len - 1 || (nextLine && rangeLines[i + 1].parentNode !== originParent)) {
+                    if (i === len - 1 || (nextLine && nextLine.parentNode !== originParent)) {
                         // nested list
-                        if (nextLine && line.contains(rangeLines[i + 1].parentNode)) {
+                        if (nextLine && line.contains(nextLine.parentNode)) {
                             nextList = nextLine.parentNode.cloneNode(false);
                         }
 
@@ -1381,7 +1430,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             // detach loop
-            for (let i = 0, len = children.length, insNode; i < len; i++) {
+            for (let i = 0, len = children.length, insNode, lineIndex, next; i < len; i++) {
                 insNode = children[i];
                 moveComplete = false;
                 if (remove && i === 0) {
@@ -1392,18 +1441,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
                 }
 
-                if (selectedFormats && selectedFormats.indexOf(insNode) === -1) {
+                lineIndex = selectedFormats.indexOf(insNode);
+                if (selectedFormats && lineIndex === -1) {
                     if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
                     rangeEl.appendChild(insNode);
                 }
                 else {
+                    next = selectedFormats[lineIndex + 1];
                     if (rangeEl && rangeEl.children.length > 0) {
                         parent.insertBefore(rangeEl, rangeElement);
                         rangeEl = null;
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        if (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false)) {
+                        if (util.getElementDepth(insNode) !== util.getElementDepth(next) && (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false))) {
                             const insNext = insNode.nextElementSibling;
                             const detachRange = util.detachNestedList(insNode, false);
                             if ((rangeElement !== detachRange) || insNext !== insNode.nextElementSibling) {
@@ -3028,7 +3079,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             for (let i = 0, len = rangeLines.length, f, margin; i < len; i++) {
                 f = rangeLines[i];
 
-                if (!util.isListCell(f)) {
+                if (!util.isListCell(f) || !core.plugins.list) {
                     margin = /\d+/.test(f.style.marginLeft) ? util.getNumber(f.style.marginLeft, 0) : 0;
                     if (shift) {
                         margin -= 25;
@@ -3045,9 +3096,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             // list cells
             if (cells.length > 0) {
-                this.callPlugin('list', function () {
-                    const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
-                });
+                core.plugins.list.editInsideList.call(core, shift, cells);
             }
 
             this._lastEffectNode = null;
@@ -4102,42 +4151,60 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const resizingName = core._resizingName;
             let formatEl = util.getFormatElement(selectionNode) || selectionNode;
-            let rangeEl = util.getRangeFormatElement(selectionNode);
+            let rangeEl = util.getRangeFormatElement(formatEl);
 
             switch (keyCode) {
                 case 8: /** backspace key */
-                    if (selectRange) break;
-                    if (resizingName) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        core.plugins[resizingName].destroy.call(core);
-                        break;
-                    }
-
-                    if (util.isWysiwygDiv(selectionNode.parentNode) && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && selectionNode.childNodes.length === 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        selectionNode.innerHTML = '<br>';
-                        if (!selectionNode.nextElementSibling) {
-                            const attrs = selectionNode.attributes;
-                            while (attrs[0]) {
-                                selectionNode.removeAttribute(attrs[0].name);
-                            }
-                            core.execCommand('formatBlock', false, 'P');
+                    if (!selectRange) {
+                        if (resizingName) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            core.plugins[resizingName].destroy.call(core);
+                            break;
                         }
-                        return false;
+    
+                        if (util.isWysiwygDiv(selectionNode.parentNode) && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && selectionNode.childNodes.length === 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            selectionNode.innerHTML = '<br>';
+                            if (!selectionNode.nextElementSibling) {
+                                const attrs = selectionNode.attributes;
+                                while (attrs[0]) {
+                                    selectionNode.removeAttribute(attrs[0].name);
+                                }
+                                core.execCommand('formatBlock', false, 'P');
+                            }
+                            return false;
+                        }
                     }
 
                     const commonCon = range.commonAncestorContainer;
-                    if (range.startOffset === 0 && range.endOffset === 0) {
-                        if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-                            if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.previousSibling && range.collapsed && range.startOffset === 0))) {
-                                if (util.getArrayItem(formatEl.children, util.isList, false)) {
-                                    const prev = formatEl.previousElementSibling || rangeEl.parentNode;
+                    formatEl = util.getFormatElement(range.startContainer);
+                    rangeEl = util.getRangeFormatElement(formatEl);
+                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                        if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || util.isList(selectionNode.previousSibling)))) &&
+                         (util.getFormatElement(range.startContainer) !== util.getFormatElement(range.endContainer) ? rangeEl.contains(range.startContainer) : (range.startOffset === 0  && range.collapsed))) {
+                            if (range.startContainer !== range.endContainer) {
+                                e.preventDefault();
+
+                                core.removeNode();
+                                if (range.startContainer.nodeType === 3) {
+                                    core.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
+                                }
+
+                                // history stack
+                                core.history.push(true);
+                            } else {
+                                const prev = formatEl.previousElementSibling || rangeEl.parentNode;
+                                if (util.isListCell(prev)) {
                                     if (util.isListCell(prev)) {
                                         e.preventDefault();
-
-                                        const con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
+    
+                                        let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
+                                        if (!con) {
+                                            con = util.createTextNode(util.zeroWidthSpace);
+                                            rangeEl.parentNode.insertBefore(con, rangeEl.parentNode.firstChild);
+                                        }
                                         const offset = con.nodeType === 3 ? con.textContent.length : 1;
                                         const children = formatEl.childNodes;
                                         let after = con;
@@ -4151,11 +4218,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                         if (rangeEl.children.length === 0) util.removeItem(rangeEl);
     
                                         core.setRange(con, offset, con, offset);
+                                        // history stack
+                                        core.history.push(true);
                                     }
                                 }
-                                break;
                             }
+                            
+                            break;
+                        }
 
+                        if (!selectRange && range.startOffset === 0) {
                             let detach = true;
                             let comm = commonCon;
                             while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
@@ -4165,14 +4237,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 }
                                 comm = comm.parentNode;
                             }
-
+    
                             if (detach && rangeEl.parentNode) {
                                 e.preventDefault();
                                 core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                                // history stack
+                                core.history.push(true);
                                 break;
                             }
                         }
+                    }
 
+                    if (!selectRange && range.startOffset === 0) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
                             const previousEl = formatEl.previousSibling;
                             util.removeItem(previousEl);
@@ -4210,20 +4286,37 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
-                    if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && !selectionNode.nextSibling && range.collapsed && range.endOffset === selectionNode.textContent.length))) {
-                        const next = formatEl.nextElementSibling;
-                        if (next && util.getArrayItem(next.children, util.isList, false)) {
+                    formatEl = util.getFormatElement(range.startContainer);
+                    rangeEl = util.getRangeFormatElement(formatEl);
+                    if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.nextSibling || util.isList(selectionNode.nextSibling)) &&
+                     (util.getFormatElement(range.startContainer) !== util.getFormatElement(range.endContainer) ? rangeEl.contains(range.endContainer) : (range.endOffset === selectionNode.textContent.length && range.collapsed))))) {
+                        if (range.startContainer !== range.endContainer) core.removeNode();
+                        
+                        let next = util.getArrayItem(formatEl.children, util.isList, false);
+                        next = next || formatEl.nextElementSibling;
+                        if (next && (util.isList(next) || util.getArrayItem(next.children, util.isList, false))) {
                             e.preventDefault();
 
-                            const con = next.firstChild;
-                            const children = next.childNodes;
-                            let child = children[0];
-                            while ((child = children[0])) {
-                                formatEl.appendChild(child);
+                            let con, children;
+                            if (util.isList(next)) {
+                                const child = next.firstElementChild;
+                                children = child.childNodes;
+                                con = children[0];
+                                while (children[0]) {
+                                    formatEl.insertBefore(children[0], next);
+                                }
+                                util.removeItem(child);
+                            } else {
+                                con = next.firstChild;
+                                children = next.childNodes;
+                                while (children[0]) {
+                                    formatEl.appendChild(children[0]);
+                                }
+                                util.removeItem(next);
                             }
-
-                            util.removeItem(next);
                             core.setRange(con, 0, con, 0);
+                            // history stack
+                            core.history.push(true);
                         }
                         break;
                     }
@@ -4244,7 +4337,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         f = selectedFormats[i];
                         if (util.isListCell(f)) {
                             if (!f.previousElementSibling && !shift) {
-                                lines.push(f);
+                                continue;
                             } else {
                                 cells.push(f);
                             }
@@ -4255,17 +4348,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     
                     // Nested list
                     if (cells.length > 0 && isEdge && core.plugins.list) {
-                        core.callPlugin('list', function () {
-                            const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
-                            if (fc) {
-                                r.sc = listRange.sc;
-                                r.so = listRange.so;
-                            }
-                            if (lc) {
-                                r.ec = listRange.ec;
-                                r.eo = listRange.eo;
-                            }
-                        });
+                        const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
+                        if (fc) {
+                            r.sc = listRange.sc;
+                            r.so = listRange.so;
+                        }
+                        if (lc) {
+                            r.ec = listRange.ec;
+                            r.eo = listRange.eo;
+                        }
                     } else {
                         // table
                         const tableCell = util.getParentElement(selectionNode, util.isCell);
@@ -4409,19 +4500,24 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
-                        if (!range.commonAncestorContainer.nextElementSibling && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
+                        if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
                             e.preventDefault();
                             let newEl = null;
 
                             if (util.isListCell(rangeEl.parentNode)) {
-                                rangeEl = rangeEl.parentNode;
-                                newEl = core.appendFormatTag(rangeEl, 'LI');
+                                rangeEl = formatEl.parentNode.parentNode.parentNode;
+                                const splitRange = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
+                                newEl = util.createElement('LI');
+                                rangeEl.insertBefore(newEl, splitRange);
                             } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling : 'P';
-                                newEl = core.appendFormatTag(rangeEl, newFormat);
-                                util.copyFormatAttributes(newEl, formatEl);
+                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : 'P';
+                                newEl = util.createElement(newFormat);
+                                const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
+                                edge.cc.insertBefore(newEl, edge.ec);
                             }
-
+                            
+                            newEl.innerHTML = '<br>';
+                            util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;

@@ -231,7 +231,7 @@ const util = {
                     if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                 }
             } else {
-                returnHTML += baseHtml.replace(/(?<=(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)>)\s+(?=<)/g, '');
+                returnHTML += baseHtml.replace(/<(?!span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/g, function (m) { return m.trim(); });
             }
         }
 
@@ -775,7 +775,7 @@ const util = {
      * @returns {Number}
      */
     getElementDepth: function (element) {
-        if (this.isWysiwygDiv(element)) return -1;
+        if (!element || this.isWysiwygDiv(element)) return -1;
 
         let depth = 0;
         element = element.parentNode;
@@ -1193,7 +1193,16 @@ const util = {
             newEl = depthEl.cloneNode(false);
             children = depthEl.childNodes;
 
-            if (temp) newEl.appendChild(temp);
+            if (temp) {
+                if (this.isListCell(newEl) && this.isList(temp) && temp.firstElementChild) {
+                    newEl.innerHTML = temp.firstElementChild.innerHTML;
+                    util.removeItem(temp.firstElementChild);
+                    if (temp.children.length > 0) newEl.appendChild(temp);
+                } else {
+                }
+                newEl.appendChild(temp);
+            }
+
             while (children[index]) {
                 newEl.appendChild(children[index]);
             }
