@@ -1416,41 +1416,6 @@ const util = {
     },
 
     /**
-     * @description Gets the clean HTML code for editor
-     * @param {String} html HTML string
-     * @param {String|RegExp} whitelist Regular expression of allowed tags.
-     * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
-     * @returns {String}
-     */
-    cleanHTML: function (html, whitelist) {
-        const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
-        const domTree = this._d.createRange().createContextualFragment(html).childNodes;
-        let cleanHTML = '';
-
-        for (let i = 0, len = domTree.length; i < len; i++) {
-            if (!tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].nodeType === 1 ? domTree[i].outerHTML : domTree[i].nodeType === 3 ? domTree[i].textContent : '';
-            }
-        }
-
-        cleanHTML = cleanHTML
-            .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-            .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")/ig);
-                if (v) {
-                    for (let i = 0, len = v.length; i < len; i++) {
-                        if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
-                        t += ' ' + v[i];
-                    }
-                }
-                return t;
-            })
-            .replace(/<\/?(span[^>^<]*)>/g, '');
-
-        return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? this.createTagsWhitelist(whitelist) : whitelist, ''));
-    },
-
-    /**
      * @description Nodes that need to be added without modification when changing text nodes
      * @param {Element} element Element to check
      * @returns {Boolean}

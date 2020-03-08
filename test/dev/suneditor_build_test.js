@@ -48,6 +48,7 @@ let s1 = suneditor.create('editor', {
     plugins: plugins,
     // mode: 'balloon', 
     katex: Katex,
+    // addAttributesWhitelist: 'style',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -143,7 +144,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|style|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
-    mode: 'inline'
+    // mode: 'inline',
     // videoHeightShow: false,
     // videoRatioShow: false,
     // imageHeightShow: false,

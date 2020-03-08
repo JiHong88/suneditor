@@ -385,10 +385,11 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
-        /** Tags whitelist */
+        /** Whitelist */
         options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
+        options.addAttributesWhitelist = typeof options.addAttributesWhitelist === 'string' ? options.addAttributesWhitelist : '';
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';

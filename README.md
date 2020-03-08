@@ -314,14 +314,15 @@ plugins: [
     math // You must add the 'katex' library at options to use the 'math' plugin.
 ]               : Plugins array.     default: null {Array}
 
-// Tags whitelist--------------------------------------å---------------------------------------------------------
+// Whitelist--------------------------------------å---------------------------------------------------------
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
                         ex) 'mark|canvas|label|select|option|input'
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
 pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
                         ex) 'p|h[1-6]'
-
+addAttributesWhitelist: Add attributes whitelist of tags that should be kept undeleted from the editor.
+                        ex) 'style|name'
 // Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}

@@ -50,12 +50,15 @@
 <div class="content">
     <article class="markdown-body entry-content">
         <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;">
-            <h4 style="color: #b94a48;">--Tags whitelist</h4>
+            <h4 style="color: #b94a48;">--Whitelist</h4>
             <label><input type="checkbox" id="addTagsWhitelist">&nbsp;&nbsp;addTagsWhitelist&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="addTagsWhitelist_value" placeholder="String (mark|canvas|label|select|option|input)" style="width:320px">
             <br><br>
             <label><input type="checkbox" id="pasteTagsWhitelist">&nbsp;&nbsp;pasteTagsWhitelist</label>
             <input type="text" id="pasteTagsWhitelist_value" placeholder="String (p|h[1-4])" style="width:320px">
+            <br><br>
+            <label><input type="checkbox" id="addAttributesWhitelist">&nbsp;&nbsp;addAttributesWhitelist</label>
+            <input type="text" id="addAttributesWhitelist_value" placeholder="String (style|name)" style="width:320px">
             <br>
             
             <h4 style="color: #b94a48;">--Layout</h4>
@@ -335,8 +338,9 @@ function sun_create () {
     imageTable.innerHTML = '';
 
     var options = {
-        toolbarWidth: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
-        toolbarWidth: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
+        addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
+        pasteTagsWhitelist: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
+        addAttributesWhitelist: document.getElementById('addAttributesWhitelist').checked ? document.getElementById('addAttributesWhitelist_value').value : undefined,
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,

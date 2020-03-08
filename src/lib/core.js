@@ -149,6 +149,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         pasteTagsWhitelistRegExp: null,
 
         /**
+         * @description Attributes whitelist used by the cleanHTML method
+         * @private
+         */
+        _attributesWhitelistRegExp: null,
+
+        /**
          * @description binded controllersOff method
          * @private
          */
@@ -3464,6 +3470,41 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
+         * @description Gets the clean HTML code for editor
+         * @param {String} html HTML string
+         * @param {String|RegExp} whitelist Regular expression of allowed tags.
+         * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
+         * @returns {String}
+         */
+        cleanHTML: function (html, whitelist) {
+            const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
+            const domTree = this._d.createRange().createContextualFragment(html).childNodes;
+            let cleanHTML = '';
+
+            for (let i = 0, len = domTree.length; i < len; i++) {
+                if (!tagsAllowed.test(domTree[i].nodeName)) {
+                    cleanHTML += domTree[i].nodeType === 1 ? domTree[i].outerHTML : domTree[i].nodeType === 3 ? domTree[i].textContent : '';
+                }
+            }
+
+            cleanHTML = cleanHTML
+                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
+                .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
+                    const v = m.match(this);
+                    if (v) {
+                        for (let i = 0, len = v.length; i < len; i++) {
+                            if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
+                            t += ' ' + v[i];
+                        }
+                    }
+                    return t;
+                }.bind(this._attributesWhitelistRegExp))
+                .replace(/<\/?(span[^>^<]*)>/g, '');
+
+            return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
+        },
+
+        /**
          * @description Add an event to document.
          * When created as an Iframe, the same event is added to the document in the Iframe.
          * @param {String} type Event type
@@ -3615,6 +3656,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist);
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
+            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + (options.addAttributesWhitelist.length > 0 ? options.addAttributesWhitelist + '|' : '') + 'contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             this._isInline = /inline/i.test(options.mode);
@@ -4784,7 +4826,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (!clipboardData) return true;
 
             const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
-            const cleanData = util.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
+            const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
             if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
@@ -4841,7 +4883,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 return false;
             // html paste
             } else {
-                const cleanData = util.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
+                const cleanData = core.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
                 if (cleanData) {
                     event._setDropLocationSelection(e);
                     core.execCommand('insertHTML', false, cleanData);
