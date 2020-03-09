@@ -126,9 +126,6 @@
 .sun-editor .se-icon-line-height::before{content:'\0027';}
 .sun-editor .se-icon-text-style::before{content:'\0028';}
 
-/** relative */
-.sun-editor .se-list-inner li * {position:relative;}
-
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
 /* arrow up */

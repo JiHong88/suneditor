@@ -154,6 +154,10 @@ export default {
 
         return dialog;
     },
+
+    open: function () {
+        this.plugins.dialog.open.call(this, 'video', 'video' === this.currentControllerName);
+    },
     
     setVideoRatio: function (e) {
         const contextVideo = this.context.video;

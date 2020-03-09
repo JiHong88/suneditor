@@ -111,6 +111,10 @@ export default {
         return link_btn;
     },
 
+    open: function () {
+        this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
+    },
+
     submit: function (e) {
         this.showLoading();
 

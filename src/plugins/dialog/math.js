@@ -116,6 +116,10 @@ export default {
         return math_btn;
     },
 
+    open: function () {
+        this.plugins.dialog.open.call(this, 'math', 'math' === this.currentControllerName);
+    },
+
     _renderMathExp: function (e) {
         this.previewElement.innerHTML = this._renderer(e.target.value);
     },

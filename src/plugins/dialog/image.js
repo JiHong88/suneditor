@@ -194,6 +194,10 @@ export default {
         return dialog;
     },
 
+    open: function () {
+        this.plugins.dialog.open.call(this, 'image', 'image' === this.currentControllerName);
+    },
+
     openTab: function (e) {
         const modal = this.context.image.modal;
         const targetElement = (e === 'init' ? modal.querySelector('._se_tab_link') : e.target);

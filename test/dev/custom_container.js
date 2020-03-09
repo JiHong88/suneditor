@@ -36,7 +36,7 @@ export default {
                 '<ul>' +
                     '<li>' +
                         '<div class="se-submenu-form-group">' +
-                            '<div>' +
+                            '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="blockquote" style="margin: 0 !important;">' +
                                     '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>' +
                                     '<span class="se-tooltip-inner">' +
@@ -44,7 +44,7 @@ export default {
                                     '</span>' +
                                 '</button>' +
                             '</div>' +
-                            '<div>' +
+                            '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="link">' +
                                     '<i class="se-icon-link"></i>' +
                                     '<span class="se-tooltip-inner">' +
@@ -52,7 +52,7 @@ export default {
                                     '</span>' +
                                 '</button>' +
                             '</div>' +
-                            '<div>' +
+                            '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="table">' +
                                     '<i class="se-icon-grid"></i>' +
                                     '<span class="se-tooltip-inner">' +
@@ -60,7 +60,7 @@ export default {
                                     '</span>' +
                                 '</button>' +
                             '</div>' +
-                            '<div>' +
+                            '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="textStyle">' +
                                     '<i class="se-icon-text-style"></i>' +
                                     '<span class="se-tooltip-inner">' +
@@ -102,7 +102,7 @@ export default {
         }
         else if (plugin.display === 'dialog') {
             this.callPlugin(command, function () {
-                plugin.dialog.open.call(this, command, command === this.currentControllerName);
+                this.plugins[command].open.call(this);
             }.bind(this), target);
         }
         else if (plugin.display === 'command') {

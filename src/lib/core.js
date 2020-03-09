@@ -3961,7 +3961,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
                 else if (/dialog/.test(display)) {
                     core.callPlugin(command, function () {
-                        core.plugins.dialog.open.call(core, command, command === core.currentControllerName);
+                        core.plugins[command].open.call(core);
                     });
                     return;
                 }
