@@ -4681,9 +4681,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let selectionNode = core.getSelectionNode();
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
-                if (core._isBalloonAlways) event._showToolbarBalloonDelay();
-                else event._showToolbarBalloon();
-                return;
+                if (core._isBalloonAlways) {
+                    event._showToolbarBalloonDelay();
+                } else {
+                    event._showToolbarBalloon();
+                    return;
+                }
             }
 
             /** when format tag deleted */

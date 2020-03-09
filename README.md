@@ -35,11 +35,6 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 - [Functions](#functions)
 - [Plugins list](#plugins-list)
 - [Examples](#examples)
-    - [Defining menu items](#defining-menu-items)
-    - [Char count, Button groups](#char-count-button-groups)
-    - [Iframe, fullPage and use CodeMirror](#iframe-fullpage-and-use-codemirror)
-    - [Image management](#image-management)
-    - [User Functions](#user-functions)
 - [Options template](#options-template)
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
@@ -894,15 +889,7 @@ editor.showInline = function (toolbar, context, core) {
 </table>
 
 ## Examples
-<a id="defining-menu-items"></a> [Defining menu items](http://suneditor.com/sample/html/examples.html#setting)
-
-<a id="char-count-button-groups"></a> [Char count, Button groups](http://suneditor.com/sample/html/examples.html#groups)
-
-<a id="iframe-fullpage-and-use-codemirror"></a> [Iframe, fullPage and use CodeMirror](http://suneditor.com/sample/html/examples.html#CodeMirror)
-
-<a id="image-management"></a> [Image management](http://suneditor.com/sample/html/examples.html#image)
-
-<a id="user-functions"></a> [User Functions](http://suneditor.com/sample/html/examples.html#functions)
+[Examples](http://suneditor.com/sample/html/examples.html)
 
 ## Options template
 [Options template](http://suneditor.com/sample/html/options.html)

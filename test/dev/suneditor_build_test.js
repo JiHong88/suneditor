@@ -122,7 +122,7 @@ window.sun_create1 = function () {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
-    mode: 'balloon',
+    mode: 'balloon-always',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
