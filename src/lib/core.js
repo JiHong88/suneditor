@@ -312,13 +312,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * If the plugin is added call callBack function.
          * @param {String} pluginName The name of the plugin to call
          * @param {function} callBackFunction Function to be executed immediately after module call
+         * @param {Element|null} _target Plugin target button (This is not necessary if you have a button list when creating the editor)
          */
-        callPlugin: function (pluginName, callBackFunction) {
+        callPlugin: function (pluginName, callBackFunction, _target) {
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
-                this.plugins[pluginName].add(this, pluginCallButtons[pluginName]);
+                this.plugins[pluginName].add(this, _target || pluginCallButtons[pluginName]);
                 this.initPlugins[pluginName] = true;
+            }
+
+            if (this.plugins[pluginName].active) {
+                this.commandMap[pluginName] = _target || pluginCallButtons[pluginName];
+                this.activePlugins.push(pluginName);
             }
                 
             if (typeof callBackFunction === 'function') callBackFunction();
@@ -3688,15 +3694,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             };
 
             // Command plugins registration
-            const activePlugins = this.activePlugins = [];
+            this.activePlugins = [];
             let c, button;
             for (let key in plugins) {
                 c = plugins[key];
                 button = pluginCallButtons[key];
                 if (c.active && button) {
-                    core.callPlugin(key, button);
-                    core.commandMap[c.name] = button;
-                    activePlugins.push(c.name);
+                    core.callPlugin(key, null, button);
                 }
             }
 

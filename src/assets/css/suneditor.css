@@ -126,6 +126,9 @@
 .sun-editor .se-icon-line-height::before{content:'\0027';}
 .sun-editor .se-icon-text-style::before{content:'\0028';}
 
+/** relative */
+.sun-editor .se-list-inner li * {position:relative;}
+
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
 /* arrow up */
@@ -258,7 +261,7 @@
 .sun-editor .se-submenu-form-group {display:flex; width:100%; height:auto; padding:4px;}
 .sun-editor .se-submenu-form-group input {flex:auto; display:inline-block; width:auto; height:33px; color:#555; font-size:12px; margin:1px 0 1px 0; padding:0; border-radius:0.25rem; border:1px solid #ccc;}
 .sun-editor .se-submenu-form-group input:focus {border-color:#80bdff; outline:0; -webkit-box-shadow:0 0 0 0.2rem #c7deff; box-shadow:0 0 0 0.2rem #c7deff;}
-.sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; padding:0; margin:0 0 0 4px !important;}
+.sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; margin:0 0 0 4px !important;}
 .sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}
 /** submenu layer - color input */
 .sun-editor .se-submenu-form-group .se-color-input {width:72px; text-transform:uppercase; border:none; border-bottom:2px solid #b1b1b1; outline:none;}

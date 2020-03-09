@@ -1,0 +1,116 @@
+export default {
+    // @Required
+    // plugin name
+    name: 'custom_container',
+
+    // @Required
+    // data display
+    display: 'submenu',
+
+    // @Required
+    // add function - It is called only once when the plugin is first run.
+    // This function generates HTML to append and register the event.
+    // arguments - (core : core object, targetElement : clicked button element)
+    add: function (core, targetElement) {
+
+        // Registering a namespace for caching as a plugin name in the context object
+        const context = core.context;
+        context.customContainer = {};
+
+        // Generate submenu HTML
+        // Always bind "core" when calling a plugin function
+        let listDiv = this.setSubmenu.call(core);
+
+        listDiv.querySelector('ul').addEventListener('click', this.onClick.bind(core));
+
+        /** append html */
+        targetElement.parentNode.appendChild(listDiv);
+    },
+
+    setSubmenu: function () {
+        const listDiv = this.util.createElement('DIV');
+
+        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.innerHTML = '' +
+            '<div class="se-list-inner">' +
+                '<ul>' +
+                    '<li>' +
+                        '<div class="se-submenu-form-group">' +
+                            '<div>' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="blockquote" style="margin: 0 !important;">' +
+                                    '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>' +
+                                    '<span class="se-tooltip-inner">' +
+                                        '<span class="se-tooltip-text">Quote</span>' +
+                                    '</span>' +
+                                '</button>' +
+                            '</div>' +
+                            '<div>' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="link">' +
+                                    '<i class="se-icon-link"></i>' +
+                                    '<span class="se-tooltip-inner">' +
+                                        '<span class="se-tooltip-text">Link</span>' +
+                                    '</span>' +
+                                '</button>' +
+                            '</div>' +
+                            '<div>' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="table">' +
+                                    '<i class="se-icon-grid"></i>' +
+                                    '<span class="se-tooltip-inner">' +
+                                        '<span class="se-tooltip-text">Table</span>' +
+                                    '</span>' +
+                                '</button>' +
+                            '</div>' +
+                            '<div>' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="textStyle">' +
+                                    '<i class="se-icon-text-style"></i>' +
+                                    '<span class="se-tooltip-inner">' +
+                                        '<span class="se-tooltip-text">Text style</span>' +
+                                    '</span>' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</li>' +
+                '</ul>' +
+            '</div>';
+
+        return listDiv;
+    },
+
+    onClick: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let target = e.target;
+        let command = '';
+
+        while (!command && !/^UL$/i.test(target.tagName)) {
+            command = target.getAttribute('data-command');
+            if (command) break;
+            target = target.parentNode;
+        }
+
+        if (!command) return;
+
+        const plugin = this.plugins[command];
+
+        if (plugin.display === 'submenu' && (this.nextElementSibling === null || target !== this.submenuActiveButton)) {
+            this.callPlugin(command, function () {
+                this.submenuOn(target);
+            }.bind(this), target);
+
+            return;
+        }
+        else if (plugin.display === 'dialog') {
+            this.callPlugin(command, function () {
+                plugin.dialog.open.call(this, command, command === this.currentControllerName);
+            }.bind(this), target);
+        }
+        else if (plugin.display === 'command') {
+            this.callPlugin(command, function () {
+                plugin.action.call(this);
+            }.bind(this), target);
+        }
+
+        this.submenuOff();
+    }
+};

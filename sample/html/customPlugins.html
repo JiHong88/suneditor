@@ -85,7 +85,7 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">// <span class="pl-k">@Overriding</span></span>
-    <span class="pl-c">// Plug-ins with active methods load immediately when the editor loads.</span>
+    <span class="pl-c">// Plugins with active methods load immediately when the editor loads.</span>
     <span class="pl-c">// Called each time the selection is moved.</span>
     <span class="pl-en">active</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">element</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-k">if</span> <span class="pl-kos">(</span>!<span class="pl-s1">element</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
@@ -98,6 +98,8 @@
         <span class="pl-k">return</span> <span class="pl-c1">false</span><span class="pl-kos">;</span>
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
+    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// The behavior of the "command plugin" must be defined in the "action" method.</span>
     <span class="pl-en">action</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-k">const</span> <span class="pl-s1">rangeTag</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">getRangeFormatElement</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">getSelectionNode</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
@@ -201,7 +203,7 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">// <span class="pl-k">@Overriding</span></span>
-    <span class="pl-c">// Plug-ins with active methods load immediately when the editor loads.</span>
+    <span class="pl-c">// Plugins with active methods load immediately when the editor loads.</span>
     <span class="pl-c">// Called each time the selection is moved.</span>
     <span class="pl-en">active</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">element</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-c">// If no tag matches, the "element" argument is called with a null value.</span>
@@ -321,7 +323,7 @@
         },
 
         // @Overriding
-        // Plug-ins with active methods load immediately when the editor loads.
+        // Plugins with active methods load immediately when the editor loads.
         // Called each time the selection is moved.
         active: function (element) {
             if (!element) {
@@ -334,6 +336,8 @@
             return false;
         },
 
+        // @Required
+        // The behavior of the "command plugin" must be defined in the "action" method.
         action: function () {
             const rangeTag = this.util.getRangeFormatElement(this.getSelectionNode());
 
@@ -417,7 +421,7 @@
         },
 
         // @Overriding
-        // Plug-ins with active methods load immediately when the editor loads.
+        // Plugins with active methods load immediately when the editor loads.
         // Called each time the selection is moved.
         active: function (element) {
             // If no tag matches, the "element" argument is called with a null value.

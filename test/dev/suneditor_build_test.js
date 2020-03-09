@@ -10,6 +10,7 @@ import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 import Resolutions from './Resolutions';
+import custom_container from './custom_container';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
@@ -24,7 +25,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [Resolutions],
+    plugins: [custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -32,10 +33,10 @@ suneditor.create("sample1", {
     buttonList: [
         [
             {
-                name: 'Resolutions', 
-                dataCommand: 'Resolutions',
-                buttonClass:'', 
-                title:'Resolutions', 
+                name: 'custom_container', 
+                dataCommand: 'custom_container',
+                buttonClass:'se-menu-container', 
+                title:'custom_container', 
                 dataDisplay:'submenu',
                 innerHTML:'<i class="se-icon-add"></i>'
             }

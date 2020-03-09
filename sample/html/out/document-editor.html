@@ -629,7 +629,7 @@
 
             <h3 class="subsection-title">Methods</h3>
 
-            <h4 class="name" id="callPlugin"><span class="type-signature"></span>callPlugin<span class="signature">(pluginName, callBackFunction)</span><span
+            <h4 class="name" id="callPlugin"><span class="type-signature"></span>callPlugin<span class="signature">(pluginName, callBackFunction, _target)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 If the plugin is not added, add the plugin and call the 'add' function.<br>
@@ -655,9 +655,16 @@
                 <tr>
                     <td class="name"><code>callBackFunction</code></td>
                     <td class="type">
-                        <span class="param-type">function</span>
+                        <span class="param-type">Function</span>
                     </td>
                     <td class="description last">Function to be executed immediately after module call</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>_target</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|null</span>
+                    </td>
+                    <td class="description last">Plugin target button (This is not necessary if you have a button list when creating the editor)</td>
                 </tr>
                 </tbody>
             </table>
