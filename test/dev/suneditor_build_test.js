@@ -122,7 +122,7 @@ window.sun_create1 = function () {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
-    mode: 'balloon-always',
+    // mode: 'balloon-always',
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -142,7 +142,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     fullPage: true,
-    addTagsWhitelist: 'mark|canvas|label|select|option|input|style|nav|button',
+    addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
     // mode: 'inline',
     // videoHeightShow: false,

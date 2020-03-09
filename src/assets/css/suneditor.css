@@ -45,9 +45,16 @@
     text-rendering:auto;
     font-size: 15px;
 }
-.sun-editor .se-toolbar [class*='se-icon-']::before {
+
+.sun-editor button > svg {
+    width: 25px;
+    height: 25px;
+    margin: 5px;
+}
+.sun-editor .se-toolbar button > i::before {
     line-height: 2.1;
 }
+
 .sun-editor .se-icon-align-justify::before{content:'\0041';}
 .sun-editor .se-icon-align-left::before{content:'\0042';}
 .sun-editor .se-icon-align-right::before{content:'\0043';}

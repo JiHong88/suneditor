@@ -1337,6 +1337,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
+            core._lastEffectNode = null;
             util.mergeSameTags(rangeElement, null, null, false);
             util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
@@ -1557,6 +1558,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 };
             }
 
+            core._lastEffectNode = null;
             if (notHistoryPush) return edge;
             
             if (!remove && edge) {
@@ -4072,7 +4074,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 _w.clearTimeout(this._balloonDelay);
                 this._balloonDelay = null;
                 this._showToolbarBalloon();
-            }.bind(event), 300);
+            }.bind(event), 350);
         },
 
         _toggleToolbarBalloon: function () {
