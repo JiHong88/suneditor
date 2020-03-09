@@ -4090,9 +4090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const selection = core.getSelection();
 
             let isDirTop;
-            if (util.getParentElement(core.getSelectionNode(), util.isAnchor)) {
-                isDirTop = true;
-            } else if (selection.focusNode === selection.anchorNode) {
+            if (selection.focusNode === selection.anchorNode) {
                 isDirTop = selection.focusOffset < selection.anchorOffset;
             } else {
                 const childNodes = util.getListChildNodes(range.commonAncestorContainer);
@@ -4101,6 +4099,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
+            if (!rects) return;
 
             let scrollLeft = 0;
             let scrollTop = 0;
@@ -4126,22 +4125,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
-
-            if (!rects) {
-                const node = core.getSelectionNode();
-                const nodeOffset = util.getOffset(node, context.element.wysiwygFrame);
-                rects = {
-                    left: nodeOffset.left,
-                    top: nodeOffset.top,
-                    right: nodeOffset.left,
-                    bottom: nodeOffset.top + node.offsetHeight,
-                    noText: true
-                };
-                scrollLeft = 0;
-                scrollTop = 0;
-                isDirTop = true;
-            }
-
             const iframeRects = /iframe/i.test(context.element.wysiwygFrame.nodeName) ? context.element.wysiwygFrame.getClientRects()[0] : null;
             if (iframeRects) {
                 rects = {
@@ -4163,12 +4146,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
             const padding = 1;
             const toolbarWidth = toolbar.offsetWidth;
-            const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbar.offsetHeight;
+            const toolbarHeight = toolbar.offsetHeight;
 
             const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
             const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
-            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
+            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
             toolbar.style.left = _w.Math.floor(l) + 'px';
