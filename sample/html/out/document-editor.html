@@ -188,24 +188,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="editorTagsWhitelistRegExp"><span class="type-signature"></span>editorTagsWhitelistRegExp<span
-                    class="type-signature"></span></h4>
-            <div class="description">
-                Editor tags whitelist (RegExp object)<br>
-                <a href="./document-util.html#createTagsWhitelist">util.createTagsWhitelist</a>(<span style="color:#d73a49;">options._editorTagsWhitelist</span>)<br>
-            </div>
-            <dl class="details"></dl>
-
-
-            <h4 class="name" id="pasteTagsWhitelistRegExp"><span class="type-signature"></span>pasteTagsWhitelistRegExp<span
-                    class="type-signature"></span></h4>
-            <div class="description">
-                Tag whitelist when pasting (RegExp object)<br>
-                <a href="./document-util.html#createTagsWhitelist">util.createTagsWhitelist</a>(<span style="color:#d73a49;">options.pasteTagsWhitelist</span>)
-            </div>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="context"><span class="type-signature"></span>context {JsonObject}<span
                     class="type-signature"></span></h4>
             <h5 class="subsection-title">Properties:</h5>
@@ -422,10 +404,10 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="hasFocus"><span class="type-signature"></span>hasFocus<span
+            <h4 class="name" id="container"><span class="type-signature"></span>container<span
                     class="type-signature"></span></h4>
             <div class="description">
-                Boolean value of whether the editor has focus
+                container element
             </div>
             <dl class="details"></dl>
 
@@ -434,6 +416,14 @@
                     class="type-signature"></span></h4>
             <div class="description">
                 active button element in submenu
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="containerActiveButton"><span class="type-signature"></span>containerActiveButton<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                active button element in container
             </div>
             <dl class="details"></dl>
 
@@ -468,6 +458,32 @@
                     class="type-signature"></span></h4>
             <div class="description">
                 An array of buttons whose class name is not "code-view-enabled"
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="editorTagsWhitelistRegExp"><span class="type-signature"></span>editorTagsWhitelistRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Editor tags whitelist (RegExp object)<br>
+                <a href="./document-util.html#createTagsWhitelist">util.createTagsWhitelist</a>(<span style="color:#d73a49;">options._editorTagsWhitelist</span>)<br>
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="pasteTagsWhitelistRegExp"><span class="type-signature"></span>pasteTagsWhitelistRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Tag whitelist when pasting (RegExp object)<br>
+                <a href="./document-util.html#createTagsWhitelist">util.createTagsWhitelist</a>(<span style="color:#d73a49;">options.pasteTagsWhitelist</span>)
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="hasFocus"><span class="type-signature"></span>hasFocus<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Boolean value of whether the editor has focus
             </div>
             <dl class="details"></dl>
 
@@ -729,6 +745,41 @@
                     class="signature">()</span><span class="type-signature"></span></h4>
             <div class="description">
                 Disable submenu
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="containerOn"><span class="type-signature"></span>containerOn<span class="signature">(element)</span><span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Enabled container
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Container's button element to call</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="containerOff"><span class="type-signature"></span>containerOff<span
+                    class="signature">()</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Disable container
             </div>
             <dl class="details"></dl>
 
@@ -1365,6 +1416,47 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="actionCall"><span class="type-signature"></span>actionCall<span
+                    class="signature">(command, display, target)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Run plugin calls and basic commands.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>command</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Command string</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>display</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Display type string ('command', 'submenu', 'dialog', 'container')</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>target</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">The element of command button</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="commandHandler"><span class="type-signature"></span>commandHandler<span
                     class="signature">(target, command)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1683,16 +1775,18 @@
         <li><a href="document-editor.html#pluginCallButtons">pluginCallButtons</a></li>
         <li><a href="document-editor.html#initPlugins">initPlugins</a></li>
         <li><a href="document-editor.html#lang">lang</a></li>
-        <li><a href="document-editor.html#editorTagsWhitelistRegExp">editorTagsWhitelistRegExp</a></li>
-        <li><a href="document-editor.html#pasteTagsWhitelistRegExp">pasteTagsWhitelistRegExp</a></li>
         <li><a href="document-editor.html#context">context</a></li>
         <li><a href="document-editor.html#submenu">submenu</a></li>
-        <li><a href="document-editor.html#hasFocus">hasFocus</a></li>
+        <li><a href="document-editor.html#container">container</a></li>
         <li><a href="document-editor.html#submenuActiveButton">submenuActiveButton</a></li>
+        <li><a href="document-editor.html#containerActiveButton">containerActiveButton</a></li>
         <li><a href="document-editor.html#controllerArray">controllerArray</a></li>
         <li><a href="document-editor.html#currentControllerName">currentControllerName</a></li>
         <li><a href="document-editor.html#controllerFunction">controllerFunction</a></li>
         <li><a href="document-editor.html#codeViewDisabledButtons">codeViewDisabledButtons</a></li>
+        <li><a href="document-editor.html#editorTagsWhitelistRegExp">editorTagsWhitelistRegExp</a></li>
+        <li><a href="document-editor.html#pasteTagsWhitelistRegExp">pasteTagsWhitelistRegExp</a></li>
+        <li><a href="document-editor.html#hasFocus">hasFocus</a></li>
         <li><a href="document-editor.html#activePlugins">activePlugins</a></li>
         <li><a href="document-editor.html#commandMap">commandMap</a></li>
         <li><a href="document-editor.html#_variable">_variable</a></li>
@@ -1701,6 +1795,8 @@
         <li><a href="document-editor.html#addModule">addModule</a></li>
         <li><a href="document-editor.html#submenuOn">submenuOn</a></li>
         <li><a href="document-editor.html#submenuOff">submenuOff</a></li>
+        <li><a href="document-editor.html#containerOn">containerOn</a></li>
+        <li><a href="document-editor.html#containerOff">containerOff</a></li>
         <li><a href="document-editor.html#controllersOn">controllersOn</a></li>
         <li><a href="document-editor.html#controllersOff">controllersOff</a></li>
         <li><a href="document-editor.html#execCommand">execCommand</a></li>
@@ -1725,6 +1821,7 @@
         <li><a href="document-editor.html#detachRangeFormatElement">detachRangeFormatElement</a></li>
         <li><a href="document-editor.html#detachList">detachList</a></li>
         <li><a href="document-editor.html#nodeChange">nodeChange</a></li>
+        <li><a href="document-editor.html#actionCall">actionCall</a></li>
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>
         <li><a href="document-editor.html#indent">indent</a></li>

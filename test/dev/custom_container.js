@@ -5,7 +5,7 @@ export default {
 
     // @Required
     // data display
-    display: 'submenu',
+    display: 'container',
 
     // @Required
     // add function - It is called only once when the plugin is first run.
@@ -21,7 +21,7 @@ export default {
         // Always bind "core" when calling a plugin function
         let listDiv = this.setSubmenu.call(core);
 
-        listDiv.querySelector('ul').addEventListener('click', this.onClick.bind(core));
+        listDiv.querySelector('.__se_container').addEventListener('click', this.onClick.bind(core));
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -35,9 +35,17 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul>' +
                     '<li>' +
-                        '<div class="se-submenu-form-group">' +
+                        '<div class="se-submenu-form-group __se_container">' +
                             '<div style="position:relative;">' +
-                                '<button type="button" class="se-btn se-tooltip" data-command="blockquote" style="margin: 0 !important;">' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;">' +
+                                    '<i class="se-icon-bold"></i>' +
+                                    '<span class="se-tooltip-inner">' +
+                                        '<span class="se-tooltip-text">Quote</span>' +
+                                    '</span>' +
+                                '</button>' +
+                            '</div>' +
+                            '<div style="position:relative;">' +
+                                '<button type="button" class="se-btn se-tooltip" data-command="blockquote">' +
                                     '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>' +
                                     '<span class="se-tooltip-inner">' +
                                         '<span class="se-tooltip-text">Quote</span>' +
@@ -92,25 +100,6 @@ export default {
         if (!command) return;
 
         const plugin = this.plugins[command];
-
-        if (plugin.display === 'submenu' && (this.nextElementSibling === null || target !== this.submenuActiveButton)) {
-            this.callPlugin(command, function () {
-                this.submenuOn(target);
-            }.bind(this), target);
-
-            return;
-        }
-        else if (plugin.display === 'dialog') {
-            this.callPlugin(command, function () {
-                this.plugins[command].open.call(this);
-            }.bind(this), target);
-        }
-        else if (plugin.display === 'command') {
-            this.callPlugin(command, function () {
-                plugin.action.call(this);
-            }.bind(this), target);
-        }
-
-        this.submenuOff();
+        this.actionCall(command, (plugin ? plugin.display : ''), target);
     }
 };

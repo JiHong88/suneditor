@@ -35,9 +35,9 @@ suneditor.create("sample1", {
             {
                 name: 'custom_container', 
                 dataCommand: 'custom_container',
-                buttonClass:'se-menu-container', 
+                buttonClass:'', 
                 title:'custom_container', 
-                dataDisplay:'submenu',
+                dataDisplay:'container',
                 innerHTML:'<i class="se-icon-add"></i>'
             }
         ]

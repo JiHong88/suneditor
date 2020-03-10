@@ -99,9 +99,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         submenu: null,
 
         /**
-         * @description Boolean value of whether the editor has focus
+         * @description container element
          */
-        hasFocus: false,
+        container: null,
 
         /**
          * @description current resizing component name
@@ -122,9 +122,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _bindedSubmenuOff: null,
 
         /**
+         * @description binded containerOff method
+         * @private
+         */
+        _bindedContainerOff: null,
+
+        /**
          * @description active button element in submenu
          */
         submenuActiveButton: null,
+
+        /**
+         * @description active button element in container
+         */
+        containerActiveButton: null,
 
         /**
          * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
@@ -152,6 +163,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * util.createTagsWhitelist(options.pasteTagsWhitelist)
          */
         pasteTagsWhitelistRegExp: null,
+
+        /**
+         * @description Boolean value of whether the editor has focus
+         */
+        hasFocus: false,
 
         /**
          * @description Attributes whitelist used by the cleanHTML method
@@ -274,6 +290,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         commandMap: null,
 
         /**
+         * @description Map of default command
+         * @private
+         */
+        _defaultCommand: {
+            bold: 'STRONG',
+            underline: 'INS',
+            italic: 'EM',
+            strike: 'DEL',
+            subscript: 'SUB',
+            superscript: 'SUP'
+        },
+
+        /**
          * @description Variables used internally in editor operation
          * @property {Boolean} isCodeView State of code view
          * @property {Boolean} isFullScreen State of full screen
@@ -381,6 +410,49 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.submenu = null;
                 util.removeClass(this.submenuActiveButton, 'on');
                 this.submenuActiveButton = null;
+                this._notHideToolbar = false;
+            }
+            
+            this.focus();
+        },
+
+        /**
+         * @description Enabled container
+         * @param {Element} element Container's button element to call
+         */
+        containerOn: function (element) {
+            if (this._bindedContainerOff) this._bindedContainerOff();
+
+            const containerName = this._containerName = element.getAttribute('data-command');
+
+            this.container = element.nextElementSibling;
+            this.container.style.display = 'block';
+            util.addClass(element, 'on');
+            this.containerActiveButton = element;
+
+            const overLeft = this.context.element.toolbar.offsetWidth - (element.parentElement.offsetLeft + this.container.offsetWidth);
+            if (overLeft < 0) this.container.style.left = overLeft + 'px';
+            else this.container.style.left = '1px';
+
+            this._bindedContainerOff = this.containerOff.bind(this);
+            this.addDocEvent('mousedown', this._bindedContainerOff, false);
+
+            if (this.plugins[containerName].on) this.plugins[containerName].on.call(this);
+        },
+
+        /**
+         * @description Disable container
+         */
+        containerOff: function () {
+            this.removeDocEvent('mousedown', this._bindedContainerOff);
+            this._bindedContainerOff = null;
+
+            if (this.container) {
+                this._containerName = '';
+                this.container.style.display = 'none';
+                this.container = null;
+                util.removeClass(this.containerActiveButton, 'on');
+                this.containerActiveButton = null;
                 this._notHideToolbar = false;
             }
             
@@ -2995,6 +3067,40 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
+         * @description Run plugin calls and basic commands.
+         * @param {String} command Command string
+         * @param {String} display Display type string ('command', 'submenu', 'dialog', 'container')
+         * @param {Element} target The element of command button
+         */
+        actionCall: function (command, display, target) {
+            // call plugins
+            if (display) {
+                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== this.submenuActiveButton)) {
+                    this.callPlugin(command, this.submenuOn.bind(this, target), target);
+                    return;
+                } else if (/dialog/.test(display)) {
+                    this.callPlugin(command, this.plugins[command].open.bind(this), target);
+                    return;
+                } else if (/command/.test(display)) {
+                    this.callPlugin(command, this.plugins[command].action.bind(this), target);
+                } else if (/container/.test(display) && (target.nextElementSibling === null || target !== this.containerActiveButton)) {
+                    this.callPlugin(command, this.containerOn.bind(this, target), target);
+                    return;
+                }                
+            } // default command
+            else if (command) {
+                this.commandHandler(target, command);
+            }
+
+            if (/submenu/.test(display)) {
+                this.submenuOff();
+            } else {
+                this.submenuOff();
+                this.containerOff();
+            }
+        },
+
+        /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
          * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
          * @param {Element} target The element of command button
@@ -3053,12 +3159,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
+                    command = this._defaultCommand[command.toLowerCase()] || command;
+                    if (!this.commandMap[command]) this.commandMap[command] = target;
+
                     const btn = util.hasClass(this.commandMap[command], 'active') ? null : util.createElement(command);
                     let removeNode = command;
 
-                    if (command === 'SUB' && util.hasClass(this.commandMap.SUP, 'active')) {
+                    if (/^SUB$/i.test(command) && util.hasClass(this.commandMap.SUP, 'active')) {
                         removeNode = 'SUP';
-                    } else if (command === 'SUP' && util.hasClass(this.commandMap.SUB, 'active')) {
+                    } else if (/^SUP$/i.test(command) && util.hasClass(this.commandMap.SUB, 'active')) {
                         removeNode = 'SUB';
                     }
 
@@ -3906,7 +4015,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     className = target.className;
                 }
     
-                if (command === core._submenuName) {
+                if (command === core._submenuName || command === core._containerName) {
                     e.stopPropagation();
                 }
             }
@@ -3933,35 +4042,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             
             if (!core.hasFocus) core.focus();
             core._editorRange();
-            
-            /** call plugins */
-            if (display) {
-                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== core.submenuActiveButton)) {
-                    core.callPlugin(command, function () {
-                        core.submenuOn(target);
-                    });
-                    return;
-                }
-                else if (/dialog/.test(display)) {
-                    core.callPlugin(command, function () {
-                        core.plugins[command].open.call(core);
-                    });
-                    return;
-                }
-                else if (/command/.test(display)) {
-                    core.callPlugin(command, function () {
-                        core.plugins[command].action.call(core);
-                    });
-                }
-
-                core.submenuOff();
-                return;
-            }
-
-            /** default command */
-            if (command) {
-                core.commandHandler(target, command);
-            }
+            core.actionCall(command, display, target);
         },
 
         /**
