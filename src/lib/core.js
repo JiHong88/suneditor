@@ -1726,7 +1726,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
-            const range = this.getRange();
+            let range = this.getRange();
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 
@@ -1739,6 +1739,32 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && startCon.getAttribute('contenteditable') === 'false')) {
                 return;
+            }
+
+            if (range.collapsed) {
+                if (startCon.nodeType === 1 && !util.isBreak(startCon)) {
+                    let afterNode = null;
+                    const focusNode = startCon.childNodes[startOff];
+
+                    if (focusNode !== null && util.isBreak(focusNode)) {
+                        if (!focusNode.nextSibling) {
+                            startCon.removeChild(focusNode);
+                            afterNode = null;
+                        } else {
+                            afterNode = focusNode.nextSibling;
+                        }
+                    }
+
+                    const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                    startCon.insertBefore(zeroWidth, afterNode);
+                    this.setRange(zeroWidth, 1, zeroWidth, 1);
+
+                    range = this.getRange();
+                    startCon = range.startContainer;
+                    startOff = range.startOffset;
+                    endCon = range.endContainer;
+                    endOff = range.endOffset;
+                }
             }
 
             if (isRemoveNode) {
