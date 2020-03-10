@@ -12,6 +12,7 @@ import resizing from '../modules/resizing';
 
 export default {
     name: 'video',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog, resizing]);
 
@@ -93,7 +94,7 @@ export default {
         let html = '' +
             '<form class="editor_video">' +
                 '<div class="se-dialog-header">' +
-                    '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
@@ -152,6 +153,10 @@ export default {
         dialog.innerHTML = html;
 
         return dialog;
+    },
+
+    open: function () {
+        this.plugins.dialog.open.call(this, 'video', 'video' === this.currentControllerName);
     },
     
     setVideoRatio: function (e) {
@@ -285,7 +290,7 @@ export default {
 
     setVideosInfo: function (frame) {
         if (!frame.getAttribute('data-origin')) {
-            const container = this.util.getParentElement(frame, this.util.isComponent);
+            const container = this.util.getParentElement(frame, this.util.isMediaComponent);
             const cover = this.util.getParentElement(frame, 'FIGURE');
 
             const w = this.plugins.resizing._module_getSizeX.call(this, this.context.video, frame, cover, container);
@@ -322,7 +327,7 @@ export default {
         oIframe.allowFullscreen = true;
         oIframe.onload = oIframe.addEventListener('load', this.plugins.video._onload_video.bind(this, oIframe));
         
-        const existElement = this.util.getParentElement(oIframe, this.util.isComponent) || 
+        const existElement = this.util.getParentElement(oIframe, this.util.isMediaComponent) || 
             this.util.getParentElement(oIframe, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
@@ -331,7 +336,7 @@ export default {
         const cover = contextVideo._cover = this.plugins.resizing.set_cover.call(this, oIframe);
         const container = contextVideo._container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
 
-        const figcaption = existElement.getElementsByTagName('FIGCAPTION')[0];
+        const figcaption = existElement.querySelector('figcaption');
         let caption = null;
         if (!!figcaption) {
             caption = this.util.createElement('DIV');
@@ -342,16 +347,15 @@ export default {
         const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
         this.plugins.video.applySize.call(this, (size[0] || this.context.option.videoWidth), (size[1] || ''));
 
-        existElement.parentNode.insertBefore(container, existElement);
-        if (!!caption) existElement.parentNode.insertBefore(caption, existElement);
-        this.util.removeItem(existElement);
+        existElement.parentNode.replaceChild(container, existElement);
+        if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
     },
 
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, this.util.isComponent);
+        contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
 
         contextVideo._align = element.getAttribute('data-align') || 'none';
 
@@ -427,7 +431,7 @@ export default {
 
         for (let i = 0, len = this._variable._videosCnt, video, container; i < len; i++) {
             video = videos[i];
-            container = this.util.getParentElement(video, this.util.isComponent);
+            container = this.util.getParentElement(video, this.util.isMediaComponent);
             if (!container || container.getElementsByTagName('figcaption').length > 0 || !video.style.width) {
                 videoPlugin._update_videoCover.call(this, video);
             }

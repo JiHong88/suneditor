@@ -14,8 +14,8 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
 > - Pasting from Microsoft Word and Excel.
 > - Custom table selection, merge and split.
-> - Media embeds, image uploads.
-> - Can use CodeMirror.
+> - Media embed, images upload.
+> - Can use CodeMirror, KaTeX.
 > - And.. many other features :)
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2301)
@@ -30,15 +30,11 @@ Pure javscript based WYSIWYG web editor, with no dependencies
     - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
+- [Use KaTeX (math plugin)](#use-katex-math-plugin)
 - [Options](#options)
 - [Functions](#functions)
 - [Plugins list](#plugins-list)
 - [Examples](#examples)
-    - [Defining menu items](#defining-menu-items)
-    - [Char count, Button groups](#char-count-button-groups)
-    - [Iframe, fullPage and use CodeMirror](#iframe-fullpage-and-use-codemirror)
-    - [Image management](#image-management)
-    - [User Functions](#user-functions)
 - [Options template](#options-template)
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
@@ -143,14 +139,14 @@ suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
-        ['paragraphStyle'],
+        ['paragraphStyle', 'blockquote'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
         '/', // Line break
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
-        ['table', 'link', 'image', 'video'],
+        ['table', 'link', 'image', 'video', /** 'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template']
@@ -171,16 +167,14 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, lineHeight, 
-    table, template, formatBlock, paragraphStyle, textStyle, link, image, video} from 'suneditor/src/plugins'
+import {align, font, fontSize, fontColor, hiliteColor, 
+        horizontalRule, image, template} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo', 'removeFormat'],
-        [font, fontSize, formatBlock],
-        [paragraphStyle, textStyle, fontColor, hiliteColor],
-        [align, horizontalRule, list, lineHeight],
-        [table, link, image, video, template]
+        [align, font, fontSize, fontColor, hiliteColor],
+        [horizontalRule, image, template]
     ],
 })
 ```
@@ -202,13 +196,13 @@ const initEditor = suneditor.init({
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
-        'paragraphStyle',
+        'paragraphStyle', 'blockquote',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video',
+        'table', 'link', 'image', 'video', /** 'math' */, // You must add the 'katex' library at options to use the 'math' plugin.
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ]
@@ -231,8 +225,9 @@ initEditor.create('sample_2', {
 
 ## Use CodeMirror
 ```html
+<!-- https://github.com/codemirror/CodeMirror -->
 <!-- codeMirror (^5.0.0) -->
-<!-- Use version 5.0.0 or later. -->
+<!-- Use version 5.x.x -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
@@ -248,7 +243,7 @@ import 'codemirror/mode/htmlmixed/htmlmixed'
 import 'codemirror/lib/codemirror.css'
 
 suneditor.create('sample', {
-    codeMirror: CodeMirror,
+    codeMirror: CodeMirror // window.CodeMirror,
     // Set options
     // codeMirror: {
     //     src: CodeMirror,
@@ -261,9 +256,38 @@ suneditor.create('sample', {
 });
 ```
 
+## Use KaTeX (math plugin)
+```html
+<!-- https://github.com/KaTeX/KaTeX -->
+<!-- KaTeX (^0.11.1) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
+```
+```javascript
+import 'suneditor/dist/css/suneditor.min.css'
+import suneditor from 'suneditor'
+// Import katex
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+
+suneditor.create('sample', {
+    katex: katex // window.katex,
+    // Set options
+    // katex: {
+    //     src: katex,
+    //     options: {...}
+    // }
+    buttonList: [
+        ['math']
+    ]
+});
+```
+
 ## Options
 ```java
 plugins: [
+    // command
+    blockquote,
     // Submenu
     align,
     font,
@@ -281,12 +305,27 @@ plugins: [
     // Dialog
     image,
     link,
-    video
+    video,
+    math // You must add the 'katex' library at options to use the 'math' plugin.
 ]               : Plugins array.     default: null {Array}
 
+// Whitelist--------------------------------------å---------------------------------------------------------
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
+                        ex) 'mark|canvas|label|select|option|input'
+// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
+pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
+                        ex) 'p|h[1-6]'
+attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
+                        // Base whitelist: 'contenteditable|colspan|rowspan|target|href|src|class|type'
+                        // Attributes used in the editor: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
+                        ex) {
+                            'all': 'style', // Apply to all tags
+                            'input': 'checked' // Apply to input tag
+                        }
 // Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
-mode            : The mode of the editor ('classic', 'inline', 'balloon'). default: 'classic' {String}
+mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode. default: 'auto' {Number|String}
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
@@ -300,7 +339,7 @@ iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     or put the URL value.                                        default: 'suneditor' {Array|String}
                     ex) 'main' or ['suneditor', 'http://suneditor.com/sample/css/sample.css']
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
-                  Use version 5.0.0 or later.
+                  Use version 5.x.x // https://github.com/codemirror/CodeMirror
                   ex) codeMirror: CodeMirror // Default option
                       codeMirror: { // Custom option
                         src: CodeMirror,
@@ -310,6 +349,17 @@ codeMirror      : If you put the CodeMirror object as an option, you can do Code
                             * htmlMode: true,
                             * lineNumbers: true
                             * lineWrapping: true
+                            */
+                        }
+                      }
+katex           : Required library for math plugins.               default: null {Object}
+                  Use version 0.x.x // https://github.com/KaTeX/KaTeX
+                  ex) katex: katex // Default option
+                      katex: { // Custom option
+                        src: katex,
+                        options: {
+                            /** default options **
+                            * throwOnError: false,
                             */
                         }
                       }
@@ -355,12 +405,14 @@ fontSizeUnit    : The font size unit.                               default: 'px
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+                    // "blockquote": range format, "pre": free format, "Other tags": replace format
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
-                    command: 'replace' || 'range', // default: "replace"
-                    class: '__se__format__xxx' || null, // Class names must always begin with "__se__format__"
+                    command: 'replace' || 'range' || 'free', // default: "replace"
+                    class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx'
+                    // Class names must always begin with "__se__format__(replace, range, free)_"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
@@ -450,8 +502,12 @@ imageUrlInput   : Choose whether to create a image url input tag in the image up
 imageUploadHeader : Http Header when uploading images.              default: null {Object}
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
+                  request format: {
+                            "file-0": {},
+                            "file-1": {}
+                        }
                   When not used, it enters base64 data
-                  return {
+                  response format: {
                             "errorMessage": "insert error message",
                             "result": [
                                 {
@@ -516,13 +572,13 @@ buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
-                    // ['paragraphStyle'],
+                    // ['paragraphStyle', 'blockquote'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                     // ['fontColor', 'hiliteColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
-                    // ['table', 'link', 'image', 'video'],
+                    // ['table', 'link', 'image', 'video', 'math'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
@@ -621,23 +677,30 @@ editor.toolbar.show();
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
 // It is not called in exceptional cases and is called after the default event function has finished.
-editor.onScroll = function (e) { console.log('onScroll', e) }
+// e: event object, core: Core object
+editor.onScroll = function (e, core) { console.log('onScroll', e) }
 
-editor.onClick = function (e) { console.log('onClick', e) }
+editor.onMouseDown = function (e, core) { console.log('onMouseDown', e) }
 
-editor.onKeyDown = function (e) { console.log('onKeyDown', e) }
+editor.onClick = function (e, core) { console.log('onClick', e) }
 
-editor.onKeyUp = function (e) { console.log('onKeyUp', e) }
+editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 
-editor.onDrop = function (e) { console.log('onDrop', e) }
+editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
-editor.onChange = function (contents) { console.log('onChange', contents) }
+editor.onDrop = function (e, core) { console.log('onDrop', e) }
+
+editor.onChange = function (contents, core) { console.log('onChange', contents) }
+
+editor.onFocus = function (e, core) { console.log('onFocus', e) }
+
+editor.onBlur = function (e, core) { console.log('onBlur', e) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
 editor.onload = function (core, reload) {
     console.log('onload-core', core)
-    console.log('onload-reload', reload)    
+    console.log('onload-reload', reload)
 }
 
 // Paste event.
@@ -646,8 +709,23 @@ editor.onload = function (core, reload) {
 /**
  * cleanData : HTML string modified for editor format
  * maxCharCount : maxChartCount option (true if max character is exceeded)
+ * core: Core object
 */
-editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', e, cleanData, maxCharCount) }
+editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Called before the image is uploaded
+// If false is returned, no image upload is performed.
+/**
+ * files: Files array
+ * info: Input information
+ * core: Core object
+ * return {Boolean}
+ */
+editor.onImageUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
 
 // Called when the image is uploaded or the uploaded image is deleted.
 /**
@@ -655,15 +733,16 @@ editor.onPaste = function (e, cleanData, maxCharCount) { console.log('onPaste', 
  * index: Uploaded index (key value)
  * state: Upload status ('create', 'update', 'delete')
  * imageInfo: {
- * * index: data index
- * * name: file name
- * * size: file size
- * * select: select function
- * * delete: delete function
+ * - index: data index
+ * - name: file name
+ * - size: file size
+ * - select: select function
+ * - delete: delete function
  * }
  * remainingFilesCount: Count of remaining image files
+ * core: Core object
 */
-editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
     console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
@@ -673,16 +752,71 @@ editor.onImageUpload = function (targetImgElement, index, state, imageInfo, rema
 /**
  * errorMessage: Error message to show
  * result: Result object 
+ * core: Core object
+ * return {Boolean}
 */
-editor.onImageUploadError = function (errorMessage, result) {
+editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
+    return Boolean
+}
+
+// It replaces the default callback function of the image upload
+/**
+ * response: Response object
+ * info (Input information): {
+ * - linkValue: Link url value
+ * - linkNewWindow: Open in new window Check Value
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update image if true, create image if false
+ * - currentImage: If isUpdate is true, the currently selected image.
+ * }
+ * core: Core object
+ */
+editor.imageUploadHandler = function (response, info, core) {
+    // Example of upload method
+    const res = JSON.parse(response.responseText);
+    
+    // Error
+    if (res.errorMessage) {
+        if (typeof editor.onImageUploadError === 'function') {
+            if (core.onImageUploadError(res.errorMessage, res.result)) {
+                core.notice.open.call(core, res.errorMessage);
+            }
+        } else {
+            core.notice.open.call(core, res.errorMessage);
+        }
+        /** 
+         * You can do the same thing using the core private function.
+         * The core._imageUploadError function returns false when "editor.onImageUploadError" function is not defined.
+        */
+        // if (core._imageUploadError(res.errorMessage, res.result)) {
+        //     core.notice.open.call(core, res.errorMessage);
+        // }
+    }
+    // Success
+    else {
+        const fileList = res.result;
+        const imagePlugin = core.plugins.image;
+
+        for (let i = 0, len = fileList.length, file; i < len; i++) {
+            // The file object must have name and size attributes.
+            file = {name: fileList[i].name, size: fileList[i].size};
+            // For existing image updates, the "info" attributes are predefined in the element.
+            // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
+            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.currentImage, file);
+            // The image is created and a format element(p, div..) is added below it.
+            else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+        }
+    }
 }
 
 /**
  * toolbar: Toolbar Element
  * context: The editor's context object (editor.getContext())
 */
-editor.showInline = function (toolbar, context) {
+editor.showInline = function (toolbar, context, core) {
     console.log('toolbar', toolbar);
     console.log('context', context);
 }
@@ -700,14 +834,21 @@ editor.showInline = function (toolbar, context) {
     </thead>
     <tbody>
         <tr>
+            <td align="left">blockquote</td>
+            <td align="left"><strong>command</strong></td>
+        </tr>
+        <tr>
             <td align="left">image</td>
-            <td align="left" rowspan="3"><strong>dialog</strong></td>
+            <td align="left" rowspan="4"><strong>dialog</strong></td>
         </tr>
         <tr>
             <td align="left">link</td>
         </tr>
         <tr>
             <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">math</td>
         </tr>
         <tr>
             <td align="left">align</td>
@@ -753,15 +894,7 @@ editor.showInline = function (toolbar, context) {
 </table>
 
 ## Examples
-<a id="defining-menu-items"></a> [Defining menu items](http://suneditor.com/sample/html/examples.html#setting)
-
-<a id="char-count-button-groups"></a> [Char count, Button groups](http://suneditor.com/sample/html/examples.html#groups)
-
-<a id="iframe-fullpage-and-use-codemirror"></a> [Iframe, fullPage and use CodeMirror](http://suneditor.com/sample/html/examples.html#CodeMirror)
-
-<a id="image-management"></a> [Image management](http://suneditor.com/sample/html/examples.html#image)
-
-<a id="user-functions"></a> [User Functions](http://suneditor.com/sample/html/examples.html#functions)
+[Examples](http://suneditor.com/sample/html/examples.html)
 
 ## Options template
 [Options template](http://suneditor.com/sample/html/options.html)

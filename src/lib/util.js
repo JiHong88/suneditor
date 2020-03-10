@@ -21,8 +21,8 @@ const util = {
      * @private
      */
     _tagConvertor: function (text) {
-        const ec = {'b': 'strong', 'i': 'em', 'var': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(b|strong|var|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
+        const ec = {'b': 'strong', 'i': 'em', 'u': 'ins', 'strike': 'del', 's': 'del'};
+        return text.replace(/(<\/?)(b|strong|i|em|u|ins|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
             return t + ((typeof ec[n] === 'string') ? ec[n] : n);
         });
     },
@@ -210,87 +210,6 @@ const util = {
     },
 
     /**
-     * @description Converts contents into a format that can be placed in an editor
-     * @param {String} contents contents
-     * @returns {String}
-     */
-    convertContentsForEditor: function (contents) {
-        let returnHTML = '';
-        let tag = this._d.createRange().createContextualFragment(contents).childNodes;
-
-        for (let i = 0, len = tag.length, baseHtml; i < len; i++) {
-            baseHtml = tag[i].outerHTML || tag[i].textContent;
-
-            if (tag[i].nodeType === 3) {
-                const textArray = baseHtml.split(/\n/g);
-                let text = '';
-                for (let t = 0, tLen = textArray.length; t < tLen; t++) {
-                    text = textArray[t].trim();
-                    if (text.length > 0) returnHTML += '<p>' + text + '</p>';
-                }
-            } else {
-                returnHTML += baseHtml.replace(/(?!>)\s+(?=<)/g, ' ');
-            }
-        }
-
-        if (returnHTML.length === 0) {
-            contents = this._HTMLConvertor(contents);
-            returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
-        }
-
-        return this._tagConvertor(returnHTML.replace(this._deleteExclusionTags, ''));
-    },
-
-    /**
-     * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-     * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
-     * @param {Number|null} indentSize The indent size of the tag (default: 0)
-     * @returns {String}
-     */
-    convertHTMLForCodeView: function (html, indentSize) {
-        let returnHTML = '';
-        const reg = this._w.RegExp;
-        const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR)$', 'i');
-        const isFormatElement = this.isFormatElement.bind(this);
-        const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
-        const util = this;
-
-        indentSize *= 1;
-        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
-
-        (function recursionFunc (element, indent, lineBR) {
-            const children = element.childNodes;
-            const elementRegTest = brReg.test(element.nodeName);
-            const elementIndent = (elementRegTest ? indent : '');
-
-            for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
-                node = children[i];
-                nodeRegTest = brReg.test(node.nodeName);
-                br = nodeRegTest ? '\n' : '';
-                lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
-
-                if (node.nodeType === 3) {
-                    returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
-                    continue;
-                }
-
-                if (node.childNodes.length === 0) {
-                    returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
-                    continue;
-                }
-                
-                node.innerHTML = node.innerHTML;
-                const tag = node.nodeName.toLowerCase();
-                returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
-                recursionFunc(node, indent + indentSize, '');
-                returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
-            }
-        }(wDoc, '', '\n'));
-
-        return returnHTML.trim() + '\n';
-    },
-
-    /**
      * @description It is judged whether it is the edit region top div element or iframe's body tag.
      * @param {Element} element The element to check
      * @returns {Boolean}
@@ -301,28 +220,41 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H1-6, LI, TH, TD)
+     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
+     * Format element also contain "free format Element"
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && /^(P|DIV|H[1-6]|LI|TH|TD)$/i.test(element.nodeName) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
-     * * Range format element is wrap the format element  (P, DIV, H1-6, LI)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * * Range format element is wrap the format element  (util.isFormatElement)
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|PRE|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || element.getAttribute('data-format') === 'range')) return true;
+        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'))) return true;
         return false;
     },
 
     /**
-     * @description It is judged whether it is the component(img, iframe cover, table, hr) element - ".se-component"
+     * @description It is judged whether it is the free format element. (PRE)
+     * Free format elements's line break is "BR" tag.
+     * Free format elements is included in the format element.
+     * @param {Element} element 
+     * @returns {Boolean}
+     */
+    isFreeFormatElement: function (element) {
+        if (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
+        return false;
+    },
+
+    /**
+     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
@@ -331,7 +263,16 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
+     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
+     * @param {Element} element The element to check
+     * @returns {Boolean}
+     */
+    isMediaComponent: function (element) {
+        return element && /se-component/.test(element.className);
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element}
@@ -354,7 +295,7 @@ const util = {
     },
 
     /**
-     * @description If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
+     * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
      * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
@@ -371,6 +312,28 @@ const util = {
             element = element.parentNode;
         }
 
+        return null;
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
+     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Function|null} validation Additional validation function.
+     * @returns {Element}
+     */
+    getFreeFormatElement: function (element, validation) {
+        if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
+
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isFreeFormatElement(element) && validation(element)) return element;
+
+            element = element.parentNode;
+        }
+        
         return null;
     },
 
@@ -403,6 +366,31 @@ const util = {
         copyEl = copyEl.cloneNode(false);
         copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
         this.copyTagAttributes(originEl, copyEl);
+    },
+
+    /**
+     * @description Get the item from the array that matches the condition.
+     * @param {Array} array Array to get item
+     * @param {Function|null} validation Conditional function
+     * @param {Boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
+     * If false, returns only one item that meet the criteria otherwise return null.
+     * @returns {Array|Object}
+     */
+    getArrayItem: function (array, validation, multi) {
+        if (!array || array.length === 0) return null;
+
+        validation = validation || function () { return true; };
+        const arr = [];
+        
+        for (let i = 0, len = array.length, a; i < len; i++) {
+            a = array[i];
+            if (validation(a)) {
+                if (!multi) return a;
+                else arr.push(a);
+            }
+        }
+
+        return !multi ? null : arr;
     },
 
     /**
@@ -454,7 +442,7 @@ const util = {
      */
     getPositionIndex: function (node) {
         let idx = 0;
-        while (!!(node = node.previousSibling)) {
+        while ((node = node.previousSibling)) {
             idx += 1;
         }
         return idx;
@@ -659,7 +647,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
@@ -674,7 +662,7 @@ const util = {
     /**
      * @description Get all child nodes of the argument value element (Include text nodes)
      * @param {Element} element element to get child node
-     * @param {(function|null)} validation Conditional function
+     * @param {function|null} validation Conditional function
      * @returns {Array}
      */
     getListChildNodes: function (element, validation) {
@@ -684,7 +672,7 @@ const util = {
         validation = validation || function () { return true; };
 
         (function recursionFunc(current) {
-            if ((element !== current && validation(current)) || /^BR$/i.test(element.nodeName)) {
+            if (element !== current && validation(current)) {
                 children.push(current);
             }
 
@@ -699,10 +687,13 @@ const util = {
     /**
      * @description Returns the number of parents nodes.
      * "0" when the parent node is the WYSIWYG area.
+     * "-1" when the element argument is the WYSIWYG area.
      * @param {Element} element The element to check
      * @returns {Number}
      */
     getElementDepth: function (element) {
+        if (!element || this.isWysiwygDiv(element)) return -1;
+
         let depth = 0;
         element = element.parentNode;
 
@@ -790,7 +781,7 @@ const util = {
                 query = '^' + query.split(':')[1] + '$';
             } else {
                 attr = 'nodeName';
-                query = '^' + query + '$';
+                query = '^' + (query === 'text' ? '#' + query : query) + '$';
             }
 
             const regExp = new this._w.RegExp(query, 'i');
@@ -903,7 +894,7 @@ const util = {
     hasClass: function (element, className) {
         if (!element) return;
 
-        return element.classList.contains(className.trim());
+        return (new this._w.RegExp(className)).test(element.className);
     },
 
     /**
@@ -971,16 +962,18 @@ const util = {
      * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
      * @param {Element} item Element to be remove
      * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
+     * @param {Element|null} stopParent Stop when the parent node reaches stopParent
      * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
      */
-    removeItemAllParents: function (item, validation) {
+    removeItemAllParents: function (item, validation, stopParent) {
         if (!item) return null;
         let cc = null;
         if (!validation) {
             validation = function (current) {
+                if (current === stopParent || this.isComponent(current)) return false;
                 const text = current.textContent.trim();
                 return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-            };
+            }.bind(this);
         }
 
         (function recursionFunc (element) {
@@ -1001,15 +994,309 @@ const util = {
     },
 
     /**
-     * @description Delete a empty child node of argument element
-     * @param {Element} element Element node
+     * @description Detach Nested all nested lists under the "baseNode".
+     * Returns a list with nested removed.
+     * @param {Element} baseNode Element on which to base.
+     * @param {Boolean} all If true, it also detach all nested lists of a returned list.
+     * @returns {Element}
      */
-    removeEmptyNode: function (element) {
+    detachNestedList: function (baseNode, all) {
+        const rNode = this.__deleteNestedList(baseNode);
+        let rangeElement, cNodes;
+
+        if (rNode) {
+            rangeElement = rNode.cloneNode(false);
+            cNodes = rNode.childNodes;
+            const index = this.getPositionIndex(baseNode);
+            while (cNodes[index]) {
+                rangeElement.appendChild(cNodes[index]);
+            }
+        } else {
+            rangeElement = baseNode;
+        }
+        
+        let rChildren;
+        if (!all) {
+            const depth = this.getElementDepth(baseNode) + 2;
+            rChildren = this.getListChildren(baseNode, function (current) { return this.isListCell(current) && !current.previousElementSibling && this.getElementDepth(current) === depth; }.bind(this));
+        } else {
+            rChildren = this.getListChildren(rangeElement, function (current) { return this.isListCell(current) && !current.previousElementSibling; }.bind(this));
+        }
+
+        for (let i = 0, len = rChildren.length; i < len; i++) {
+            this.__deleteNestedList(rChildren[i]);
+        }
+        
+        if (rNode) {
+            rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
+            if (cNodes && cNodes.length === 0) this.removeItem(rNode);
+        }
+
+        return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
+    },
+
+    /**
+     * @description Sub function of util.detachNestedList method.
+     * @private
+     */
+    __deleteNestedList: function (baseNode) {
+        const baseParent = baseNode.parentNode;
+        let sibling = baseParent;
+        let parent = sibling.parentNode;
+        let liSibling, liParent, child, index, c;
+        
+        while (this.isListCell(parent)) {
+            index = this.getPositionIndex(baseNode);
+            liSibling = parent.nextElementSibling;
+            liParent = parent.parentNode;
+            child = sibling;
+            while(child) {
+                sibling = sibling.nextSibling;
+                if (this.isList(child)) {
+                    c = child.childNodes;
+                    while (c[index]) {
+                        liParent.insertBefore(c[index], liSibling);
+                    }
+                    if (c.length === 0) this.removeItem(child);
+                } else {
+                    liParent.appendChild(child);
+                }
+                child = sibling;
+            }
+            sibling = liParent;
+            parent = liParent.parentNode;
+        }
+
+        if (baseParent.children.length === 0) this.removeItem(baseParent);
+
+        return liParent;
+    },
+
+    /**
+     * @description Split all tags based on "baseNode"
+     * Returns the last element of the splited tag.
+     * @param {Node} baseNode Element or text node on which to base
+     * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+     * @param {Number} depth The nesting depth of the element being split. (default: 0)
+     * @returns {Element}
+     */
+    splitElement: function (baseNode, offset, depth) {
+        const bp = baseNode.parentNode;
+        let index = 0, newEl, children, temp;
+        let next = true;
+        if (!depth || depth < 0) depth = 0;
+
+        if (baseNode.nodeType === 3) {
+            index = this.getPositionIndex(baseNode);
+            if (offset >= 0) {
+                baseNode.splitText(offset);
+                const after = this.getNodeFromPath([index + 1], bp);
+                if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
+            }
+        } else if (baseNode.nodeType === 1) {
+            if (!baseNode.previousSibling) {
+                if (this.getElementDepth(baseNode) === depth) next = false;
+            } else {
+                baseNode = baseNode.previousSibling;
+            }
+        }
+
+        let depthEl = baseNode;
+        while (this.getElementDepth(depthEl) > depth) {
+            index = this.getPositionIndex(depthEl) + 1;
+            depthEl = depthEl.parentNode;
+
+            temp = newEl;
+            newEl = depthEl.cloneNode(false);
+            children = depthEl.childNodes;
+
+            if (temp) {
+                if (this.isListCell(newEl) && this.isList(temp) && temp.firstElementChild) {
+                    newEl.innerHTML = temp.firstElementChild.innerHTML;
+                    util.removeItem(temp.firstElementChild);
+                    if (temp.children.length > 0) newEl.appendChild(temp);
+                } else {
+                }
+                newEl.appendChild(temp);
+            }
+
+            while (children[index]) {
+                newEl.appendChild(children[index]);
+            }
+        }
+
+        const pElement = depthEl.parentNode;
+        if (next) depthEl = depthEl.nextSibling;
+        if (!newEl) return depthEl;
+
+        this.mergeSameTags(newEl, null, null, false);
+        this.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(this));
+        
+        if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
+        else newEl = depthEl;
+
+        if (bp.childNodes.length === 0) this.removeItem(bp);
+
+        return newEl;
+    },
+
+    /**
+     * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
+     * If "offset" has been changed, it will return as much "offset" as it has been modified.
+     * "a", "b" You can send a maximum of two nodepaths.
+     * @param {Element} element Element object.
+     * @param {Object|null} nodePath_s Start NodePath object (util.getNodePath)
+     * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
+     * @param {Boolean} onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
+     * @returns {Object} {a: 0, b: 0}
+     */
+    mergeSameTags: function (element, nodePath_s, nodePath_e, onlyText) {
         const inst = this;
+        const offsets = {a: 0, b: 0};
+
+        (function recursionFunc(current, depth, depthIndex, includedPath_s, includedPath_e) {
+            const children = current.childNodes;
+            
+            for (let i = 0, len = children.length, child, next; i < len; i++) {
+                child = children[i];
+                next = children[i + 1];
+                if (!child) break;
+                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) continue;
+                if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
+                    inst.copyTagAttributes(child, current);
+                    current.parentNode.insertBefore(child, current);
+                    inst.removeItem(current);
+
+                    // update nodePath
+                    if (nodePath_s && nodePath_s[depth] === i) {
+                        nodePath_s.splice(depth, 1);
+                        nodePath_s[depth] = i;
+                    }
+
+                    if (nodePath_e && nodePath_e[depth] === i) {
+                        nodePath_e.splice(depth, 1);
+                        nodePath_e[depth] = i;
+                    }
+                }
+                if (!next) {
+                    if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                    break;
+                }
+
+                if (child.nodeName === next.nodeName && inst.isSameAttributes(child, next) && child.href === next.href) {
+                    const childs = child.childNodes;
+                    let childLength = 0;
+                    for (let n = 0, nLen = childs.length; n < nLen; n++) {
+                        if (childs[n].textContent.length > 0) childLength++;
+                    }
+
+                    const l = child.lastChild;
+                    const r = next.firstChild;
+                    if (l && r) {
+                        const textOffset = l.nodeType === 3 && r.nodeType === 3;
+                        let addOffset = l.textContent.length;
+                        let tempL = l.previousSibling;
+                        while(tempL && tempL.nodeType === 3) {
+                            addOffset += tempL.textContent.length;
+                            tempL = tempL.previousSibling;
+                        }
+
+                        if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
+
+                        // start
+                        if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
+                            if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
+                                includedPath_s = false;
+                            } else {
+                                nodePath_s[depth] -= 1;
+                                if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
+                                    nodePath_s[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.a += addOffset;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // end
+                        if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
+                            if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
+                                includedPath_e = false;
+                            } else {
+                                nodePath_e[depth] -= 1;
+                                if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
+                                    nodePath_e[depth + 1] += childLength;
+                                    if (textOffset) {
+                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                            offsets.b += addOffset;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (child.nodeType === 3) child.textContent += next.textContent;
+                    else child.innerHTML += next.innerHTML;
+                    
+                    inst.removeItem(next);
+                    i--;
+                } else if (child.nodeType === 1) {
+                    recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                }
+            }
+        })(element, 0, 0, true, true);
+
+        return offsets;
+    },
+
+    /**
+     * @description Remove nested tags without other child nodes.
+     * @param {Element} element Element object
+     * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+     */
+    mergeNestedTags: function (element, validation) {
+        if (typeof validation === 'string') {
+            validation = function (current) { return this.test(current.tagName); }.bind(new this._w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+        } else if (typeof validation !== 'function') {
+            validation = function () { return true; };
+        }
         
         (function recursionFunc(current) {
-            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && !/^BR$/i.test(current.nodeName) && 
-                    (!current.firstChild || !/^BR$/i.test(current.firstChild.nodeName)) && !inst.isComponent(current)) {
+            let children = current.children;
+            if (children.length === 1 && children[0].nodeName === current.nodeName && validation(current)) {
+                const temp = children[0];
+                children = temp.children;
+                while (children[0]) {
+                    current.appendChild(children[0]);
+                }
+                current.removeChild(temp);
+            }
+
+            for (let i = 0, len = current.children.length; i < len; i++) {
+                recursionFunc(current.children[i]);
+            }
+        })(element);
+    },
+
+    /**
+     * @description Delete a empty child node of argument element
+     * @param {Element} element Element node
+     * @param {Node|null} notRemoveNode Do not remove node
+     */
+    removeEmptyNode: function (element, notRemoveNode) {
+        const inst = this;
+
+        if (notRemoveNode) {
+            notRemoveNode = inst.getParentElement(notRemoveNode, function (current) {
+                return element === current.parentElement;
+            });
+        }
+        
+        (function recursionFunc(current) {
+            if (inst._notTextNode(current) || current === notRemoveNode || current.getAttribute('contenteditable') === 'false') return 0;
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
@@ -1029,55 +1316,61 @@ const util = {
     },
 
     /**
-     * @description Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|a)
+     * @description Sort a element array by depth of element.
+     * @param {Array} array Array object
+     * @param {Boolean} des true: descending order / false: ascending order
+     */
+    sortByDepth: function (array, des) {
+        const t = !des ? -1 : 1;
+        const f = t * -1;
+
+        array.sort(function (a, b) {
+            if (!this.isListCell(a) || !this.isListCell(b)) return 0;
+            a = this.getElementDepth(a);
+            b = this.getElementDepth(b);
+            return a > b ? t : a < b ? f : 0;
+        }.bind(this));
+    },
+
+    /**
+     * @description Nodes that need to be added without modification when changing text nodes
      * @param {Element} element Element to check
      * @returns {Boolean}
-     */
-    isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)$/i.test(element.nodeName);
-    },
-
-    /**
-     * @description Gets the clean HTML code for editor
-     * @param {String} html HTML string
-     * @returns {String}
-     */
-    cleanHTML: function (html) {
-        const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
-        const domTree = this._d.createRange().createContextualFragment(html).childNodes;
-        let cleanHTML = '';
-
-        for (let i = 0, len = domTree.length; i < len; i++) {
-            if (!tagsAllowed.test(domTree[i].nodeName)) {
-                cleanHTML += domTree[i].nodeType === 1 ? domTree[i].outerHTML : domTree[i].nodeType === 3 ? domTree[i].textContent : '';
-            }
-        }
-
-        cleanHTML = cleanHTML
-            .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-            .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                const v = m.match(/((?:contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")/ig);
-                if (v) {
-                    for (let i = 0, len = v.length; i < len; i++) {
-                        if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
-                        t += ' ' + v[i];
-                    }
-                }
-                return t;
-            })
-            .replace(/<\/?(span[^>^<]*)>/g, '')
-            .replace(this._deleteExclusionTags, '');
-
-        return this._tagConvertor(cleanHTML || html);
-    },
-
-    /**
-     * @description Delete Exclusion tags regexp object
-     * @returns {Object}
      * @private
      */
-    _deleteExclusionTags: (function () {
-        const exclusionTags = 'br|p|div|pre|blockquote|h[1-6]|ol|ul|dl|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|mark'.split('|');
+    _isIgnoreNodeChange: function (element) {
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
+    },
+
+    /**
+     * @description Nodes that must remain undetached when changing text nodes
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _isMaintainedNode: function (element) {
+        return element.nodeType !== 3 && /^(a|label)$/i.test(typeof element === 'string' ? element : element.nodeName);
+    },
+
+    /**
+     * @description Nodes without text
+     * @param {Element} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _notTextNode: function (element) {
+        return element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
+    },
+
+    /**
+     * @description Create whitelist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * @param {String} list Tags list ("br|p|div|pre...")
+     * @returns {RegExp}
+     * @private
+     */
+    createTagsWhitelist: function (list) {
+        const exclusionTags = list.split('|');
         let regStr = '<\\/?(';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
@@ -1087,7 +1380,7 @@ const util = {
         regStr += '[^>^<])+>';
 
         return new RegExp(regStr, 'g');
-    })()
+    }
 };
 
 export default util;

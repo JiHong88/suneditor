@@ -54,6 +54,27 @@
         .inline-margin {
             margin-top: 10px;
         }
+
+        @media (max-width: 560px) {
+            .tab button {
+                padding: 12px 24px;
+            }
+        }
+        @media (max-width: 475px) {
+            .tab button {
+                padding: 12px 16px;
+            }
+        }
+        @media (max-width: 407px) {
+            .tab button {
+                padding: 12px 10px;
+            }
+        }
+        @media (max-width: 380px) {
+            .tab button {
+                padding: 12px 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -86,12 +107,13 @@
 </nav>
 
 
-<div class="content" style="max-width: 1452px;">
+<div class="content" style="max-width: 1528px;">
     <!-- Tab links -->
     <div class="tab">
         <button class="tablinks active" onclick="openTab(event, 'classic')">Classic</button>
-        <button class="tablinks" onclick="openTab(event, 'balloon')">Balloon</button>
         <button class="tablinks" onclick="openTab(event, 'inline')">Inline</button>
+        <button class="tablinks" onclick="openTab(event, 'balloon')">Balloon</button>
+        <button class="tablinks" onclick="openTab(event, 'balloon_always')">Balloon-always</button>
     </div>
 
     <!-- Tab content -->
@@ -108,19 +130,6 @@
             <p><span style="font-size: 16px;"><span style="font-family: Impact;">Table</span></span></p>
             <table style="width: auto;"><thead><tr><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th><th><div>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</div></th></tr></thead><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table>
             <p><br></p>
-            <p><br></p>
-        </textarea>
-    </div>
-
-    <div id="balloon" class="tabcontent">
-        <div class="inline-margin"></div>
-        <textarea id="editor_balloon" style="display:none;">
-            <p><br></p>
-            <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="width: 640px; max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
-            <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
-            <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
-            <pre><div>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</div></pre>
-            <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
             <p><br></p>
         </textarea>
     </div>
@@ -150,6 +159,30 @@
         </textarea>
     </div>
 
+    <div id="balloon" class="tabcontent">
+        <div class="inline-margin"></div>
+        <textarea id="editor_balloon" style="display:none;">
+            <p><br></p>
+            <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat1.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="width: 640px; max-width: 100%;"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
+            <h3>The Suneditor is based on pure JavaScript, with no dependencies.</h3>
+            <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
+            <pre><div>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</div></pre>
+            <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
+            <p><br></p>
+        </textarea>
+    </div>
+
+    <div id="balloon_always" class="tabcontent">
+        <div class="inline-margin"></div>
+        <textarea id="editor_balloon_always" style="display:none;">
+            <p><br></p>
+            <p>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</p>
+            <pre><div>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</div></pre>
+            <p>Suneditor distributed under the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
+            <p><br></p>
+        </textarea>
+    </div>
+
     <footer>
         <p>SunEditor distributed under the MIT license.</p>
         <p><a href="https://github.com/JiHong88/SunEditor" target="_blank" style="color:#f4b124;">Go to GitHub SunEditor</a></p>
@@ -166,6 +199,9 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
 <script>
     SUNEDITOR.create('editor_classic', {
         display: 'block',
@@ -176,16 +212,16 @@
         buttonList: [
             ['undo', 'redo'],
             ['font', 'fontSize', 'formatBlock'],
-            ['paragraphStyle'],
+            ['paragraphStyle', 'blockquote'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['fontColor', 'hiliteColor', 'textStyle'],
             ['removeFormat'],
             ['outdent', 'indent'],
             ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['table', 'link', 'image', 'video'],
+            ['table', 'link', 'image', 'video', 'math'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print'],
-            ['save', 'template']
+            ['save', 'template'],
         ],
         placeholder: 'Start typing something...',
         templates: [
@@ -198,19 +234,8 @@
                 html: '<p>HTML source2</p>'
             }
         ],
-        codeMirror: CodeMirror
-    });
-
-    SUNEDITOR.create('editor_balloon', {
-        mode: 'balloon',
-        display: 'block',
-        width: '100%',
-        height: 'auto',
-        popupDisplay: 'full',
-        buttonList: [
-            ['fontSize', 'fontColor', 'bold', 'align', 'horizontalRule', 'table', 'codeView']
-        ],
-        placeholder: 'Start typing something...'
+        codeMirror: CodeMirror,
+        katex: katex
     });
 
     SUNEDITOR.create('editor_inline1', {
@@ -245,6 +270,30 @@
         popupDisplay: 'full',
         buttonList: [
             ['link', 'image', 'video']
+        ],
+        placeholder: 'Start typing something...'
+    });
+
+    SUNEDITOR.create('editor_balloon', {
+        mode: 'balloon',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['fontSize', 'fontColor', 'bold', 'underline', 'align', 'horizontalRule', 'table', 'codeView']
+        ],
+        placeholder: 'Start typing something...'
+    });
+
+    SUNEDITOR.create('editor_balloon_always', {
+        mode: 'balloon-always',
+        display: 'block',
+        width: '100%',
+        height: 'auto',
+        popupDisplay: 'full',
+        buttonList: [
+            ['bold', 'italic', 'link', 'undo', 'redo']
         ],
         placeholder: 'Start typing something...'
     });

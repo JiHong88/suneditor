@@ -51,6 +51,7 @@
     "karma": "^3.1.4",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.2",
+    "katex": "^0.11.1",
     "lodash": "^4.17.14",
     "mini-css-extract-plugin": "^0.4.5",
     "optimize-css-assets-webpack-plugin": "^5.0.3",

@@ -53,6 +53,7 @@
             hr_dashed: '대시',
             table: '테이블',
             link: '링크',
+            math: '수식',
             image: '이미지',
             video: '동영상',
             fullScreen: '전체 화면',
@@ -78,6 +79,12 @@
                 url: '인터넷 주소',
                 text: '화면 텍스트',
                 newWindowCheck: '새창으로 열기'
+            },
+            mathBox: {
+                title: '수식',
+                inputLabel: '수학적 표기법',
+                fontSizeLabel: '글자 크기',
+                previewLabel: '미리보기'
             },
             imageBox: {
                 title: '이미지 삽입',

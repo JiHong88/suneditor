@@ -13,7 +13,8 @@ export default {
         const context = core.context;
         context.dialog = {
             kind: '',
-            updateModal: false
+            updateModal: false,
+            _closeSignal: false
         };
 
         /** dialog */
@@ -36,6 +37,7 @@ export default {
         context.dialog.modal = dialog_area;
 
         /** add event listeners */
+        context.dialog.modal.addEventListener('mousedown', this.onMouseDown_dialog.bind(core));
         context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(core));
         
         /** append html */
@@ -45,10 +47,18 @@ export default {
         dialog_div = null, dialog_back = null, dialog_area = null;
     },
 
+    onMouseDown_dialog: function (e) {
+        if (/se-dialog-inner/.test(e.target.className)) {
+            this.context.dialog._closeSignal = true;
+        } else {
+            this.context.dialog._closeSignal = false;
+        }
+    },
+
     onClick_dialog: function (e) {
         e.stopPropagation();
 
-        if (/se-dialog-inner/.test(e.target.className) || /close/.test(e.target.getAttribute('data-command'))) {
+        if (/close/.test(e.target.getAttribute('data-command')) || this.context.dialog._closeSignal) {
             this.plugins.dialog.close.call(this);
         }
     },
@@ -99,9 +109,9 @@ export default {
         this.modalForm.style.display = 'none';
         this.context.dialog.back.style.display = 'none';
         this.context.dialog.modalArea.style.display = 'none';
-        this.context.dialog.kind = '';
         this.context.dialog.updateModal = false;
         this.plugins[kind].init.call(this);
+        this.context.dialog.kind = '';
         this.modalForm = null;
         this.focus();
     }

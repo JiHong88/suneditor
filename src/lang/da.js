@@ -56,6 +56,7 @@
             hr_dashed: 'Streget',
             table: 'Tabel',
             link: 'Link',
+            math: 'Math',
             image: 'Billede',
             video: 'Video',
             fullScreen: 'Fuld skærm',
@@ -81,6 +82,12 @@
                 url: 'URL til link',
                 text: 'Tekst for link',
                 newWindowCheck: 'Åben i nyt faneblad'
+            },
+            mathBox: {
+                title: 'Math',
+                inputLabel: 'Matematisk notation',
+                fontSizeLabel: 'Skriftstørrelse',
+                previewLabel: 'Preview'
             },
             imageBox: {
                 title: 'Indsæt billede',

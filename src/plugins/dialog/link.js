@@ -11,6 +11,7 @@ import dialog from '../modules/dialog';
 
 export default {
     name: 'link',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog]);
 
@@ -57,7 +58,7 @@ export default {
         dialog.innerHTML = '' +
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
-                    '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
@@ -108,6 +109,10 @@ export default {
             '</div>';
 
         return link_btn;
+    },
+
+    open: function () {
+        this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
     },
 
     submit: function (e) {
@@ -167,6 +172,19 @@ export default {
         return false;
     },
 
+    active: function (element) {
+        if (!element) {
+            if (this.controllerArray[0] === this.context.link.linkBtn) this.controllersOff();
+        } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
+            if (this.controllerArray[0] !== this.context.link.linkBtn) {
+                this.plugins.link.call_controller_linkButton.call(this, element);
+            }
+            return true;
+        }
+
+        return false;
+    },
+
     on: function (update) {
         if (!update) {
             this.context.link.linkAnchorText.value = this.getSelection().toString();
@@ -203,7 +221,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn, this.plugins.link.init.bind(this));
+        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), 'link');
     },
 
     onClick_linkBtn: function (e) {
