@@ -57,8 +57,11 @@
             <label><input type="checkbox" id="pasteTagsWhitelist">&nbsp;&nbsp;pasteTagsWhitelist</label>
             <input type="text" id="pasteTagsWhitelist_value" placeholder="String (p|h[1-4])" style="width:320px">
             <br><br>
-            <label><input type="checkbox" id="addAttributesWhitelist">&nbsp;&nbsp;addAttributesWhitelist</label>
-            <input type="text" id="addAttributesWhitelist_value" placeholder="String (style|name)" style="width:320px">
+            <label><input type="checkbox" id="attributesWhitelist">&nbsp;&nbsp;attributesWhitelist</label><br>
+            <span>{</span><br>
+            <span>&nbsp;&nbsp;all: 'style',</span><br>
+            <span>&nbsp;&nbsp;input: 'checked'</span><br>
+            <span>}</span>
             <br>
             
             <h4 style="color: #b94a48;">--Layout</h4>
@@ -95,7 +98,8 @@
             <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
             <input type="text" id="iframeCSSFileName_value" placeholder="String (suneditor)">
             <br><br>
-            <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }
+            <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }<br>
+            <label><input type="checkbox" id="katex" checked disabled>&nbsp;&nbsp;katex</label> { katex: katex } // Use "math" plugin
 
             <br>
             <h4 style="color: #b94a48;">--Display</h4>
@@ -302,6 +306,9 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/json-lint.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/javascript/javascript.js"></script>
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
 <style>
 .CodeMirror {
     font-family: monospace;
@@ -341,7 +348,10 @@ function sun_create () {
     var options = {
         addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
         pasteTagsWhitelist: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
-        addAttributesWhitelist: document.getElementById('addAttributesWhitelist').checked ? document.getElementById('addAttributesWhitelist_value').value : undefined,
+        attributesWhitelist: !document.getElementById('attributesWhitelist').checked ? undefined : {
+            'all': 'style',
+            'input': 'checked'
+        },
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
@@ -349,6 +359,7 @@ function sun_create () {
         fullPage: document.getElementById('fullPage').checked? true : undefined,
         iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
+        katex: katex,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
@@ -407,13 +418,13 @@ function sun_create () {
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
-            'paragraphStyle',
+            'paragraphStyle', 'blockquote',
             'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
             'fontColor', 'hiliteColor', 'textStyle',
             'removeFormat',
             'outdent', 'indent',
             'align', 'horizontalRule', 'list', 'lineHeight',
-            'table', 'link', 'image', 'video',
+            'table', 'link', 'image', 'video', 'math',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print', 'save', 'template']
         ],

@@ -41,7 +41,7 @@ suneditor.create("sample1", {
                 dataDisplay:'container',
                 innerHTML:'<i class="se-icon-add"></i>'
             },
-            'bold'
+            'bold', 'italic'
         ]
     ]
 });

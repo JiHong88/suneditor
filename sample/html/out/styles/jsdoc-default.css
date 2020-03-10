@@ -27,7 +27,7 @@
 html
 {
     overflow: auto;
-    background-color: #fff;
+    background-color: #333;
     font-size: 14px;
 }
 
@@ -35,12 +35,12 @@ body
 {
     font-family: 'Open Sans', sans-serif;
     line-height: 1.5;
-    color: #4d4e53;
-    background-color: white;
+    color: #fff;
+    background-color: #333;
 }
 
 a, a:visited, a:active {
-    color: #0095dd;
+    color: #f4b124;
     text-decoration: none;
 }
 
@@ -85,7 +85,7 @@ article img {
 section
 {
     display: block;
-    background-color: #fff;
+    background-color: #333;
     padding: 12px 24px;
     border-bottom: 1px solid #ccc;
     margin-right: 30px;
@@ -125,7 +125,7 @@ nav ul {
 nav ul a, nav ul a:visited, nav ul a:active {
     font-family: Consolas, Monaco, 'Andale Mono', monospace;
     line-height: 18px;
-    color: #4D4E53;
+    color: #f4b124;
 }
 
 nav h3 {
@@ -177,7 +177,7 @@ h4
     font-size: 18px;
     letter-spacing: -0.33px;
     margin-bottom: 12px;
-    color: #4d4e53;
+    color: #f4b124;
 }
 
 h5, .container-overview .subsection-title
@@ -213,6 +213,14 @@ td, th
     display: table-cell;
 }
 
+th {
+    color: #000;
+}
+
+td {
+    color: #ccc;
+}
+
 thead tr
 {
     background-color: #ddd;
@@ -245,7 +253,7 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 }
 
 .type-signature {
-    color: #aaa;
+    color: #ffebc1;
 }
 
 .name, .signature {
@@ -334,7 +342,7 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 }
 
 .params .name, .props .name, .name code {
-    color: #4D4E53;
+    color: #fff;
     font-family: Consolas, Monaco, 'Andale Mono', monospace;
     font-size: 100%;
 }

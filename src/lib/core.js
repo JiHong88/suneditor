@@ -1046,12 +1046,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     } else {
                         if (!util.isBreak(parentNode)) {
                             const focusNode = parentNode.childNodes[startOff];
-                            if (focusNode !== null && util.isBreak(focusNode)) {
+                            if (focusNode) {
                                 if (!focusNode.nextSibling) {
                                     parentNode.removeChild(focusNode);
                                     afterNode = null;
                                 } else {
-                                    afterNode = focusNode;
+                                    afterNode = util.isBreak(focusNode) ? focusNode.nextSibling : focusNode;
                                 }
                             } else {
                                 afterNode = null;
@@ -1178,6 +1178,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     startCon = endCon = commonCon;
                 } else {
                     startCon = endCon = childNodes[0];
+                    if (util.isBreak(startCon)) {
+                        return {
+                            container: startCon,
+                            offset: 0
+                        };
+                    }
                 }
 
                 startIndex = endIndex = 0;
@@ -1746,12 +1752,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     let afterNode = null;
                     const focusNode = startCon.childNodes[startOff];
 
-                    if (focusNode !== null && util.isBreak(focusNode)) {
+                    if (focusNode) {
                         if (!focusNode.nextSibling) {
                             startCon.removeChild(focusNode);
                             afterNode = null;
                         } else {
-                            afterNode = focusNode.nextSibling;
+                            afterNode = util.isBreak(focusNode) ? focusNode.nextSibling : focusNode;
                         }
                     }
 

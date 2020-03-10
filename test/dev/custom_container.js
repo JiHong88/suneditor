@@ -21,6 +21,8 @@ export default {
         // Always bind "core" when calling a plugin function
         let listDiv = this.setSubmenu.call(core);
 
+        // You must bind "core" object when registering an event.
+        /** add event listeners */
         listDiv.querySelector('.__se_container').addEventListener('click', this.onClick.bind(core));
 
         /** append html */
@@ -36,7 +38,9 @@ export default {
                 '<ul>' +
                     '<li>' +
                         '<div class="se-submenu-form-group __se_container">' +
+                            // The "position" of each element surrounding the button must be "relative".
                             '<div style="position:relative;">' +
+                                // Enter the button name of the plug-in or default command in the button's "data-command"
                                 '<button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;">' +
                                     '<i class="se-icon-bold"></i>' +
                                     '<span class="se-tooltip-inner">' +

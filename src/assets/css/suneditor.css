@@ -260,6 +260,7 @@
 .sun-editor .se-submenu-form-group input:focus {border-color:#80bdff; outline:0; -webkit-box-shadow:0 0 0 0.2rem #c7deff; box-shadow:0 0 0 0.2rem #c7deff;}
 .sun-editor .se-submenu-form-group button {float:right; width:35px; height:35px; margin:0 0 0 4px !important;}
 .sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}
+.sun-editor .se-submenu-form-group > div {position:relative;}
 /** submenu layer - color input */
 .sun-editor .se-submenu-form-group .se-color-input {width:72px; text-transform:uppercase; border:none; border-bottom:2px solid #b1b1b1; outline:none;}
 .sun-editor .se-submenu-form-group .se-color-input:focus {outline:none; border-bottom:3px solid #b1b1b1; -webkit-box-shadow:none; box-shadow:none;}

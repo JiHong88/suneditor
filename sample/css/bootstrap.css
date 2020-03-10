@@ -727,7 +727,7 @@ input[type="button"].btn-block {
   float: left;
   height: 50px;
   padding: 15px 15px;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 20px;
 }
 .navbar-brand:hover,
@@ -795,7 +795,8 @@ input[type="button"].btn-block {
 .navbar-inverse {
   background-color: #f4b124;
   border-color: #ffebc1;
-  padding-top: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 .navbar-inverse .navbar-brand {
   color: #333;

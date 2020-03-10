@@ -139,7 +139,7 @@ suneditor.create('sample', {
     buttonList: [
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock'],
-        ['blockquote', 'paragraphStyle'],
+        ['paragraphStyle', 'blockquote'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['fontColor', 'hiliteColor', 'textStyle'],
         ['removeFormat'],
@@ -196,7 +196,7 @@ const initEditor = suneditor.init({
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
-        'blockquote', 'paragraphStyle',
+        'paragraphStyle', 'blockquote',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
@@ -316,8 +316,13 @@ addTagsWhitelist      : Add tags to the default tags whitelist of editor. defaul
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
 pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
                         ex) 'p|h[1-6]'
-addAttributesWhitelist: Add attributes whitelist of tags that should be kept undeleted from the editor.
-                        ex) 'style|name'
+attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
+                        // Base whitelist: 'contenteditable|colspan|rowspan|target|href|src|class|type'
+                        // Attributes used in the editor: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
+                        ex) {
+                            'all': 'style', // Apply to all tags
+                            'input': 'checked' // Apply to input tag
+                        }
 // Layout-------------------------------------------------------------------------------------------------------
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
@@ -567,7 +572,7 @@ buttonList      : Defines button list to array {Array}
                   default: [
                     ['undo', 'redo'],
                     // ['font', 'fontSize', 'formatBlock'],
-                    // ['blockquote', 'paragraphStyle'],
+                    // ['paragraphStyle', 'blockquote'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                     // ['fontColor', 'hiliteColor', 'textStyle'],
                     ['removeFormat'],

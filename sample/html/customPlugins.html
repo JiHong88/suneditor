@@ -12,6 +12,44 @@
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
     <style>
+        .accordion {
+            background-color: #ffebc1;
+            color: #000;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+        }
+
+        .active, .accordion:hover {
+            background-color: #ffc449;
+        }
+
+        .panel {
+            padding: 0;
+            background-color: black;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+
+        .accordion:after {
+            content: '\02795';
+            font-size: 13px;
+            color: #777;
+            float: right;
+            margin-left: 5px;
+            }
+
+        .active:after {
+            content: "\2796";
+        }
+
+        /** custom class */
         .__se__format__range_custom {
             border: 5px solid #f4b124;
             background-color: #f4b12433;
@@ -56,10 +94,144 @@
 
 <div class="content">
     <article class="markdown-body entry-content">
+        <!-- container -->
+        <a id="container" href="#container"><h4 class="sub-title">1. Plugins container</h4></a>
+        <button class="accordion">sample ↓</button>
+        <div class="panel">
+            <textarea id="ex_container" style="width: 1080px; height: 150px;"></textarea>
+            <br>
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) Adds a container of type "submenu" that contains a plugin.</span>
+<span class="pl-k">var</span> <span class="pl-s1">custom_container</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// plugin name</span>
+    <span class="pl-c1">name</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span>
+
+    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// data display</span>
+    <span class="pl-c1">display</span>: <span class="pl-s">'container'</span><span class="pl-kos">,</span>
+
+    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// add function - It is called only once when the plugin is first run.</span>
+    <span class="pl-c">// This function generates HTML to append and register the event.</span>
+    <span class="pl-c">// arguments - (core : core object, targetElement : clicked button element)</span>
+    <span class="pl-en">add</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+
+        <span class="pl-c">// Registering a namespace for caching as a plugin name in the context object</span>
+        <span class="pl-k">const</span> <span class="pl-s1">context</span> <span class="pl-c1">=</span> <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">;</span>
+        <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customContainer</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span><span class="pl-kos">}</span><span class="pl-kos">;</span>
+
+        <span class="pl-c">// Generate submenu HTML</span>
+        <span class="pl-c">// Always bind "core" when calling a plugin function</span>
+        <span class="pl-k">let</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setSubmenu</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-c">// You must bind "core" object when registering an event.</span>
+        <span class="pl-c">/** add event listeners */</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-submenu-form-group'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">onClick</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-c">/** append html */</span>
+        <span class="pl-s1">targetElement</span><span class="pl-kos">.</span><span class="pl-c1">parentNode</span><span class="pl-kos">.</span><span class="pl-en">appendChild</span><span class="pl-kos">(</span><span class="pl-s1">listDiv</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span>
+
+    <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-list-layer'</span><span class="pl-kos">;</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
+            <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
+                <span class="pl-s">'&lt;div class="se-submenu-form-group"&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-c">// @Required</span>
+                    <span class="pl-c">// The "position" style of each element surrounding the button must be "relative".</span>
+                    <span class="pl-c">// suneditor.css: .sun-editor .se-submenu-form-group > div {position:relative;}</span>
+                    <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-c">// Enter the button name of the plug-in or default command in the button's "data-command"</span>
+                        <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;"&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;i class="se-icon-bold"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
+                                <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Quote&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="blockquote"&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /&gt;&lt;/svg&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
+                                <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Quote&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="link"&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;i class="se-icon-link"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
+                                <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Link&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="table"&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;i class="se-icon-grid"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
+                                <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Table&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="textStyle"&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;i class="se-icon-text-style"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
+                                <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Text style&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+                <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
+            <span class="pl-s">'&lt;/div&gt;'</span><span class="pl-kos">;</span>
+
+        <span class="pl-k">return</span> <span class="pl-s1">listDiv</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span>
+
+    <span class="pl-en">onClick</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-en">preventDefault</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-en">stopPropagation</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+
+        <span class="pl-k">let</span> <span class="pl-s1">target</span> <span class="pl-c1">=</span> <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">target</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">command</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
+
+        <span class="pl-k">while</span> <span class="pl-kos">(</span>!<span class="pl-s1">command</span> <span class="pl-c1">&amp;&amp;</span> !<span class="pl-pds">/<span class="pl-cce">^</span>UL<span class="pl-cce">$</span>/i</span><span class="pl-kos">.</span><span class="pl-en">test</span><span class="pl-kos">(</span><span class="pl-s1">target</span><span class="pl-kos">.</span><span class="pl-c1">tagName</span><span class="pl-kos">)</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">command</span> <span class="pl-c1">=</span> <span class="pl-s1">target</span><span class="pl-kos">.</span><span class="pl-en">getAttribute</span><span class="pl-kos">(</span><span class="pl-s">'data-command'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">command</span><span class="pl-kos">)</span> <span class="pl-k">break</span><span class="pl-kos">;</span>
+            <span class="pl-s1">target</span> <span class="pl-c1">=</span> <span class="pl-s1">target</span><span class="pl-kos">.</span><span class="pl-c1">parentNode</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+
+        <span class="pl-k">if</span> <span class="pl-kos">(</span>!<span class="pl-s1">command</span><span class="pl-kos">)</span> <span class="pl-k">return</span><span class="pl-kos">;</span>
+
+        <span class="pl-k">const</span> <span class="pl-s1">plugin</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">plugins</span><span class="pl-kos">[</span><span class="pl-s1">command</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">actionCall</span><span class="pl-kos">(</span><span class="pl-s1">command</span><span class="pl-kos">,</span> <span class="pl-kos">(</span><span class="pl-s1">plugin</span> ? <span class="pl-s1">plugin</span><span class="pl-kos">.</span><span class="pl-c1">display</span> : <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-s1">target</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span><span class="pl-kos">;</span></pre></div>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'ex_container'</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
+    <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">custom_container</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+    <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
+        <span class="pl-kos">[</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-c1">name</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
+                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span>
+                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+                <span class="pl-c1">title</span>:<span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
+                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'container'</span><span class="pl-kos">,</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path fill="currentColor" d="M2 2V22H22V2M19.12 19.03H4.87V5H19.13V19.03M14.83 10.71H17.69V17.59H14.83M14.83 6.41H17.69V9.27H14.83M6.3 6.41V17.59H13.4V14.72H9.17V9.28H13.4V6.41Z" /&gt;&lt;/svg&gt;'</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">]</span>
+    <span class="pl-kos">]</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+        </div>
+        
+
         <!-- command -->
-        <a id="command" href="#command"><h4 class="sub-title">1. Command</h4></a>
-        <textarea id="ex_command" style="width: 1080px; height: 150px;"></textarea>
-        <br>
+        <a id="command" href="#command"><h4 class="sub-title">2. Command</h4></a>
+        <button class="accordion">sample ↓</button>
+        <div class="panel">
+            <textarea id="ex_command" style="width: 1080px; height: 150px;"></textarea>
+            <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A command plugin to add "Range format element(util.isRangeFormatElement)" to selection</span>
 <span class="pl-k">var</span> <span class="pl-s1">plugin_command</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
@@ -126,12 +298,15 @@
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
 <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+        </div>
 
 
         <!-- submenu -->
-        <a id="submenu" href="#submenu"><h4 class="sub-title">2. Submenu</h4></a>
-        <textarea id="ex_submenu" style="width: 1080px; height: 150px;"></textarea>
-        <br>
+        <a id="submenu" href="#submenu"><h4 class="sub-title">3. Submenu</h4></a>
+        <button class="accordion">sample ↓</button>
+        <div class="panel">
+            <textarea id="ex_submenu" style="width: 1080px; height: 150px;"></textarea>
+            <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A submenu plugin that appends the contents of the input element to the editor</span>
 <span class="pl-k">var</span> <span class="pl-s1">plugin_submenu</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
@@ -174,7 +349,8 @@
 
     <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-
+        <span class="pl-c">// @Required</span>
+        <span class="pl-c">// A "se-submenu" class is required for the top level element.</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-submenu se-list-layer'</span><span class="pl-kos">;</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
@@ -279,12 +455,16 @@
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
 <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
+        </div>
 
 
         <!-- dialog -->
-        <a id="dialog" href="#dialog"><h4 class="sub-title">3. Dialog</h4></a>
-        <textarea id="ex_dialog" style="width: 1080px; height: 150px;"></textarea>
-        <br>
+        <a id="dialog" href="#dialog"><h4 class="sub-title">4. Dialog</h4></a>
+        <button class="accordion">sample ↓</button>
+        <div class="panel">
+            <textarea id="ex_dialog" style="width: 1080px; height: 150px;"></textarea>
+            <br>
+        </div>
     </article>
 
     <footer>
@@ -298,6 +478,128 @@
 <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
 <script src="../../dist/suneditor.min.js"></script>
 <script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } 
+        });
+    }
+
+    // ex) Adds a container of type "submenu" that contains a plugin.
+    var custom_container = {
+        // @Required
+        // plugin name
+        name: 'custom_container',
+
+        // @Required
+        // data display
+        display: 'container',
+
+        // @Required
+        // add function - It is called only once when the plugin is first run.
+        // This function generates HTML to append and register the event.
+        // arguments - (core : core object, targetElement : clicked button element)
+        add: function (core, targetElement) {
+
+            // Registering a namespace for caching as a plugin name in the context object
+            const context = core.context;
+            context.customContainer = {};
+
+            // Generate submenu HTML
+            // Always bind "core" when calling a plugin function
+            let listDiv = this.setSubmenu.call(core);
+
+            // You must bind "core" object when registering an event.
+            /** add event listeners */
+            listDiv.querySelector('.se-submenu-form-group').addEventListener('click', this.onClick.bind(core));
+
+            /** append html */
+            targetElement.parentNode.appendChild(listDiv);
+        },
+
+        setSubmenu: function () {
+            const listDiv = this.util.createElement('DIV');
+            listDiv.className = 'se-list-layer';
+            listDiv.innerHTML = '' +
+                '<div class="se-list-inner">' +
+                    '<div class="se-submenu-form-group">' +
+                        // @Required
+                        // The "position" style of each element surrounding the button must be "relative".
+                        // suneditor.css: .sun-editor .se-submenu-form-group > div {position:relative;}
+                        '<div>' +
+                            // Enter the button name of the plug-in or default command in the button's "data-command"
+                            '<button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;">' +
+                                '<i class="se-icon-bold"></i>' +
+                                '<span class="se-tooltip-inner">' +
+                                    '<span class="se-tooltip-text">Quote</span>' +
+                                '</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="se-btn se-tooltip" data-command="blockquote">' +
+                                '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>' +
+                                '<span class="se-tooltip-inner">' +
+                                    '<span class="se-tooltip-text">Quote</span>' +
+                                '</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="se-btn se-tooltip" data-command="link">' +
+                                '<i class="se-icon-link"></i>' +
+                                '<span class="se-tooltip-inner">' +
+                                    '<span class="se-tooltip-text">Link</span>' +
+                                '</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="se-btn se-tooltip" data-command="table">' +
+                                '<i class="se-icon-grid"></i>' +
+                                '<span class="se-tooltip-inner">' +
+                                    '<span class="se-tooltip-text">Table</span>' +
+                                '</span>' +
+                            '</button>' +
+                        '</div>' +
+                        '<div>' +
+                            '<button type="button" class="se-btn se-tooltip" data-command="textStyle">' +
+                                '<i class="se-icon-text-style"></i>' +
+                                '<span class="se-tooltip-inner">' +
+                                    '<span class="se-tooltip-text">Text style</span>' +
+                                '</span>' +
+                            '</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+
+            return listDiv;
+        },
+
+        onClick: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let target = e.target;
+            let command = '';
+
+            while (!command && !/^UL$/i.test(target.tagName)) {
+                command = target.getAttribute('data-command');
+                if (command) break;
+                target = target.parentNode;
+            }
+
+            if (!command) return;
+
+            const plugin = this.plugins[command];
+            this.actionCall(command, (plugin ? plugin.display : ''), target);
+        }
+    };
+
     // ex) A command plugin to add "Range format element(util.isRangeFormatElement)" to selection
     var plugin_command = {
         // @Required
@@ -392,7 +694,8 @@
 
         setSubmenu: function () {
             const listDiv = this.util.createElement('DIV');
-
+            // @Required
+            // A "se-submenu" class is required for the top level element.
             listDiv.className = 'se-submenu se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
@@ -485,6 +788,22 @@
     var plugin_dialog = {
         
     };
+
+    SUNEDITOR.create(document.getElementById('ex_container'), {
+        plugins: [custom_container],
+        buttonList: [
+            [
+                {
+                    name: 'custom_container', 
+                    dataCommand: 'custom_container',
+                    buttonClass:'', 
+                    title:'custom_container', 
+                    dataDisplay:'container',
+                    innerHTML:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M2 2V22H22V2M19.12 19.03H4.87V5H19.13V19.03M14.83 10.71H17.69V17.59H14.83M14.83 6.41H17.69V9.27H14.83M6.3 6.41V17.59H13.4V14.72H9.17V9.28H13.4V6.41Z" /></svg>'
+                }
+            ]
+        ]
+    });
 
     SUNEDITOR.create(document.getElementById('ex_command'), {
         plugins: [plugin_command],

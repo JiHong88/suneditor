@@ -120,7 +120,9 @@ function deleteCheckedImages() {
 
 // utils
 function JSONstringify(json, lang) {
-    json = Object.assign(JSON.parse(JSON.stringify(json)), {lang: 'SUNEDITOR_LANG.' + lang, "lang(In nodejs)": lang})
+    var codeMirror = !json.codeMirror ? {} : {codeMirror: "window.CodeMirror"}
+    var katex = !json.katex ? {} : {katex: "window.katex"}
+    json = Object.assign(JSON.parse(JSON.stringify(json)), {lang: 'SUNEDITOR_LANG.' + lang, "lang(In nodejs)": lang}, codeMirror, katex)
     
     if (typeof json !== 'string') {
         json = JSON.stringify(json, undefined, '\t');
