@@ -961,21 +961,25 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (commonCon.nodeType === 3) {
                         if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
                         else afterNode = commonCon.nextSibling;
-                    }
-                    else {
+                    } else {
                         if (!util.isBreak(parentNode)) {
-                            if (parentNode.lastChild !== null && util.isBreak(parentNode.lastChild)) {
-                                parentNode.removeChild(parentNode.lastChild);
+                            const focusNode = parentNode.childNodes[startOff];
+                            if (focusNode !== null && util.isBreak(focusNode)) {
+                                if (!focusNode.nextSibling) {
+                                    parentNode.removeChild(focusNode);
+                                    afterNode = null;
+                                } else {
+                                    afterNode = focusNode;
+                                }
+                            } else {
+                                afterNode = null;
                             }
-                            afterNode = null;
                         } else {
                             afterNode = parentNode;
                             parentNode = parentNode.parentNode;
                         }
                     }
-                }
-                /** Select range nodes */
-                else {
+                } else { /** Select range nodes */
                     const isSameContainer = startCon === endCon;
 
                     if (isSameContainer) {
@@ -998,11 +1002,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
                 }
             }
+            // has afterNode
             else {
                 parentNode = afterNode.parentNode;
                 afterNode = afterNode.nextSibling;
             }
 
+            // --- insert node ---
             try {
                 if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
                     if (util.isList(afterNode)) {
@@ -1056,29 +1062,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         removeNode: function () {
             const range = this.getRange();
             let container, offset = 0;
-
-            // native function
-            // if (range.deleteContents) {
-            //     range.deleteContents();
-            //     container = range.endContainer || range.startContainer;
-
-            //     if (container.nodeType === 3) {
-            //         offset = range.startOffset;
-            //     } else {
-            //         container = util.getEdgeChildNodes((range.endContainer ? range.endContainer.childNodes[range.endOffset] : range.startContainer.childNodes[range.startOffset]), null).sc;
-            //     }
-
-            //     // set range
-            //     this.setRange(container, offset, container, offset);
-            //     // history stack
-            //     this.history.push(true);
-
-            //     return {
-            //         container: container,
-            //         offset: offset
-            //     };
-            // }
-
             let startCon = range.startContainer;
             let endCon = range.endContainer;
             const startOff = range.startOffset;
@@ -4105,7 +4088,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
-            if (!rects) return;
 
             let scrollLeft = 0;
             let scrollTop = 0;
@@ -4127,6 +4109,33 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
+
+            if (!rects) {
+                const node = core.getSelectionNode();
+                if (util.isFormatElement(node)) {
+                    const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                    core.insertNode(zeroWidth, null);
+                    core.setRange(zeroWidth, 1, zeroWidth, 1);
+                    core._editorRange();
+                    rects = core.getRange().getClientRects();
+                    rects = rects[isDirTop ? 0 : rects.length - 1];
+                }
+
+                if (!rects) {
+                    const nodeOffset = util.getOffset(node, context.element.wysiwygFrame);
+                    rects = {
+                        left: nodeOffset.left,
+                        top: nodeOffset.top,
+                        right: nodeOffset.left,
+                        bottom: nodeOffset.top + node.offsetHeight,
+                        noText: true
+                    };
+                    scrollLeft = 0;
+                    scrollTop = 0;
+                }
+
+                isDirTop = true;
+            }
             
             const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
             const toolbarWidth = toolbar.offsetWidth;
@@ -4152,12 +4161,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
             const padding = 1;
             const toolbarWidth = toolbar.offsetWidth;
-            const toolbarHeight = toolbar.offsetHeight;
+            const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbar.offsetHeight;
 
             const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
             const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
-            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - stickyTop + scrollTop;
+            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
             toolbar.style.left = _w.Math.floor(l) + 'px';
