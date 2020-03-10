@@ -176,6 +176,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _attributesWhitelistRegExp: null,
 
         /**
+         * @description Attributes of tags whitelist used by the cleanHTML method
+         * @private
+         */
+        _attributesTagsWhitelist: null,
+
+        /**
          * @description binded controllersOff method
          * @private
          */
@@ -3318,7 +3324,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
 
                 this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                this._wd.body.innerHTML = util.convertContentsForEditor(parseDocument.body.innerHTML, this.editorTagsWhitelistRegExp);
+                this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
 
                 const attrs = parseDocument.body.attributes;
                 for (let i = 0, len = attrs.length; i < len; i++) {
@@ -3327,7 +3333,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
                 if (!util.hasClass(this._wd.body, 'sun-editor-editable')) util.addClass(this._wd.body, 'sun-editor-editable');
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? util.convertContentsForEditor(code_html, this.editorTagsWhitelistRegExp) : '<p><br></p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<p><br></p>';
             }
         },
 
@@ -3336,7 +3342,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _setEditorDataToCodeView: function () {
-            const codeContents = util.convertHTMLForCodeView(context.element.wysiwyg, this._variable.codeIndent);
+            const codeContents = this.convertHTMLForCodeView(context.element.wysiwyg);
             let codeValue = '';
 
             if (options.fullPage) {
@@ -3541,7 +3547,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {String} html HTML string
          */
         setContents: function (html) {
-            const convertValue = util.convertContentsForEditor(html, this.editorTagsWhitelistRegExp);
+            const convertValue = this.convertContentsForEditor(html);
             this._resetComponents();
 
             if (!core._variable.isCodeView) {
@@ -3549,7 +3555,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 // history stack
                 core.history.push(false);
             } else {
-                const value = util.convertHTMLForCodeView(convertValue, core._variable.codeIndent);
+                const value = this.convertHTMLForCodeView(convertValue);
                 core._setCodeView(value);
             }
         },
@@ -3601,15 +3607,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             cleanHTML = cleanHTML
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                    const v = m.match(this);
+                    let v = null;
+                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
+                    if (tAttr) v = m.match(tAttr);
+                    else v = m.match(this._attributesWhitelistRegExp);
+
                     if (v) {
                         for (let i = 0, len = v.length; i < len; i++) {
                             if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
                             t += ' ' + v[i];
                         }
                     }
+
                     return t;
-                }.bind(this._attributesWhitelistRegExp))
+                }.bind(this))
                 .replace(/<\/?(span[^>^<]*)>/g, '');
 
             return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
@@ -3640,6 +3651,85 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (options.iframe) {
                 this._wd.removeEventListener(type, listener);
             }
+        },
+
+        /**
+         * @description Converts contents into a format that can be placed in an editor
+         * @param {String} contents contents
+         * @returns {String}
+         */
+        convertContentsForEditor: function (contents) {
+            let returnHTML = '';
+            let tag = this._d.createRange().createContextualFragment(contents).childNodes;
+
+            for (let i = 0, len = tag.length, baseHtml; i < len; i++) {
+                baseHtml = tag[i].outerHTML || tag[i].textContent;
+
+                if (tag[i].nodeType === 3) {
+                    const textArray = baseHtml.split(/\n/g);
+                    let text = '';
+                    for (let t = 0, tLen = textArray.length; t < tLen; t++) {
+                        text = textArray[t].trim();
+                        if (text.length > 0) returnHTML += '<p>' + text + '</p>';
+                    }
+                } else {
+                    returnHTML += baseHtml.replace(/<(?!span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/g, function (m) { return m.trim(); });
+                }
+            }
+
+            if (returnHTML.length === 0) {
+                contents = util._HTMLConvertor(contents);
+                returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+            }
+
+            return this.cleanHTML(util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, '')), null);
+        },
+
+        /**
+         * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
+         * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+         * @returns {String}
+         */
+        convertHTMLForCodeView: function (html) {
+            let returnHTML = '';
+            const reg = this._w.RegExp;
+            const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
+            const isFormatElement = util.isFormatElement.bind(util);
+            const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+
+            let indentSize = this._variable.codeIndent * 1;
+            indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+
+            (function recursionFunc (element, indent, lineBR) {
+                const children = element.childNodes;
+                const elementRegTest = brReg.test(element.nodeName);
+                const elementIndent = (elementRegTest ? indent : '');
+
+                for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
+                    node = children[i];
+                    nodeRegTest = brReg.test(node.nodeName);
+                    br = nodeRegTest ? '\n' : '';
+                    lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+
+                    if (node.nodeType === 3) {
+                        returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
+                        continue;
+                    }
+
+                    if (node.childNodes.length === 0) {
+                        returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                        continue;
+                    }
+                    
+                    node.innerHTML = node.innerHTML;
+                    const tag = node.nodeName.toLowerCase();
+                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
+                    recursionFunc(node, indent + indentSize, '');
+                    returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                }
+            }(wDoc, '', '\n'));
+
+            return returnHTML.trim() + '\n';
         },
 
         /**
@@ -3740,9 +3830,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         /**
          * @description Initializ core variable
+         * @param {Boolean} reload Is relooad?
+         * @param {String} _initHTML initial html string when "reload" is true
          * @private
          */
-        _init: function (reload) {
+        _init: function (reload, _initHTML) {
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
 
@@ -3767,7 +3859,24 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist);
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
-            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + (options.addAttributesWhitelist.length > 0 ? options.addAttributesWhitelist + '|' : '') + 'contenteditable|colspan|rowspan|target|href|src|class|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
+
+            const _attr = options.attributesWhitelist;
+            const tagsAttr = {};
+            let allAttr = '';
+            if (!!_attr) {
+                const _attrKeys = _w.Object.keys(_attr);
+                for (let i = 0, len = _attrKeys.length, a; i < len; i++) {
+                    a = _attrKeys[i];
+                    if (a === 'all') {
+                        allAttr = _attr[a] + '|';
+                    } else {
+                        tagsAttr[a] = new _w.RegExp('((?:' + _attr[a] + ')\s*=\s*"[^"]*")', 'ig');
+                    }
+                }
+            }
+            
+            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
+            this._attributesTagsWhitelist = tagsAttr;
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
             this._isInline = /inline/i.test(options.mode);
@@ -3798,6 +3907,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
+
+            // Set html
+            if (!reload) {
+                this.context.element.wysiwyg.innerHTML = this.convertContentsForEditor(context.element.originElement.value);
+            } else if (_initHTML) {
+                this.context.element.wysiwyg.innerHTML = _initHTML;
+            }
 
             /** Excute history function */
             this._checkPlaceholder();
@@ -5202,16 +5318,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description Add or reset option property
          * @param {Object} options Options
          */
-        setOptions: function (options) {
+        setOptions: function (_options) {
             event._removeEvent();
 
-            core.plugins = options.plugins || core.plugins;
-            const mergeOptions = [options, options].reduce(function (init, option) {
+            core.plugins = _options.plugins || core.plugins;
+            const mergeOptions = [_options, _options].reduce(function (init, option) {
                 for (let key in option) {
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
-                        i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });
-                        o = o.length ? o : Object.keys(o).map(function(name) { return o[name]; });
+                        i = i.length ? i : _w.Object.keys(i).map(function(name) { return i[name]; });
+                        o = o.length ? o : _w.Object.keys(o).map(function(name) { return o[name]; });
                         init[key] = (o.filter(function(val) { return i.indexOf(val) === -1; })).concat(i);
                     } else {
                         init[key] = option[key];
@@ -5220,7 +5336,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 return init;
             }, {});
 
-            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);
+            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
@@ -5232,6 +5348,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             // reset context
+            const _initHTML = context.element.wysiwyg.innerHTML;
             const el = context.element;
             const constructed = {
                 _top: el.topArea,
@@ -5255,7 +5372,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             core.context = context = _Context(context.element.originElement, constructed, options);
 
             core._imagesInfoReset = true;
-            core._init(true);
+            core._init(true, _initHTML);
             event._addEvent();
             core._charCount(0, false);
 
@@ -5364,7 +5481,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
-            const convertValue = util.convertContentsForEditor(contents, this.editorTagsWhitelistRegExp);
+            const convertValue = core.convertContentsForEditor(contents);
             
             if (!core._variable.isCodeView) {
                 const temp = util.createElement('DIV');
@@ -5376,7 +5493,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     wysiwyg.appendChild(children[i]);
                 }
             } else {
-                core._setCodeView(core._getCodeView() + '\n' + util.convertHTMLForCodeView(convertValue, core._variable.codeIndent));
+                core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue));
             }
 
             // history stack
@@ -5494,7 +5611,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     };
 
     /** initialize core and add event listeners */
-    core._init(false);
+    core._init(false, null);
     event._addEvent();
     core._charCount(0, false);
 

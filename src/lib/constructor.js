@@ -49,8 +49,7 @@ export default {
         editor_div.className = 'se-wrapper';
 
         /** --- init elements and create bottom bar --- */
-        const initHTML = util.convertContentsForEditor(element.value, options._editorTagsWhitelist);
-        const initElements = this._initElements(options, top_div, tool_bar.element, arrow, initHTML);
+        const initElements = this._initElements(options, top_div, tool_bar.element, arrow);
 
         const bottomBar = initElements.bottomBar;
         const wysiwyg_div = initElements.wysiwygFrame;
@@ -193,7 +192,7 @@ export default {
             el._arrow = arrow;
         }
         
-        const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow, el.wysiwyg.innerHTML);
+        const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow);
 
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
@@ -233,11 +232,10 @@ export default {
      * @param {Element} topDiv Suneditor top div
      * @param {Element} toolBar Tool bar
      * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
-     * @param {Element} initValue Code view textarea
      * @returns {Object} Bottom bar elements (resizingBar, navigation, charCounter)
      * @private
      */
-    _initElements: function (options, topDiv, toolBar, toolBarArrow, initHTML) {
+    _initElements: function (options, topDiv, toolBar, toolBarArrow) {
         /** top div */
         topDiv.style.width = options.width;
         topDiv.style.minWidth = options.minWidth;
@@ -265,7 +263,6 @@ export default {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
             wysiwygDiv.className += ' sun-editor-editable';
-            wysiwygDiv.innerHTML = initHTML;
         } else {
             const cssTags = (function () {
                 const linkNames = options.iframeCSSFileName;
@@ -306,7 +303,6 @@ export default {
                     cssTags;
                 this.contentDocument.body.className = 'sun-editor-editable';
                 this.contentDocument.body.setAttribute('contenteditable', true);
-                this.contentDocument.body.innerHTML = initHTML;
             });
         }
         
@@ -389,7 +385,7 @@ export default {
         options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
-        options.addAttributesWhitelist = typeof options.addAttributesWhitelist === 'string' ? options.addAttributesWhitelist : '';
+        options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
