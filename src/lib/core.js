@@ -350,15 +350,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Element|null} _target Plugin target button (This is not necessary if you have a button list when creating the editor)
          */
         callPlugin: function (pluginName, callBackFunction, _target) {
+            _target = _target || pluginCallButtons[pluginName];
+
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
-                this.plugins[pluginName].add(this, _target || pluginCallButtons[pluginName]);
+                if(!_target) return false;
+                this.plugins[pluginName].add(this, _target);
                 this.initPlugins[pluginName] = true;
             }
 
-            if (this.plugins[pluginName].active) {
-                this.commandMap[pluginName] = _target || pluginCallButtons[pluginName];
+            if (this.plugins[pluginName].active && !this.commandMap[pluginName]) {
+                if(!_target) return false;
+                this.commandMap[pluginName] = _target;
                 this.activePlugins.push(pluginName);
             }
                 
@@ -1920,18 +1924,23 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
             // multi line 
             else {
-                // start
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
-                // mid
-                for (let i = 1; i < endLength; i++) {
-                    newNode = appendNode.cloneNode(false);
-                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
-                }
                 // end
                 if (endLength > 0) {
                     newNode = appendNode.cloneNode(false);
                     end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
-                } else {
+                }
+
+                // mid
+                for (let i = endLength - 1; i > 0; i--) {
+                    newNode = appendNode.cloneNode(false);
+                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
+                }
+
+                // start
+                newNode = appendNode.cloneNode(false);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+
+                if (endLength <= 0) {
                     end = start;
                 }
             }
@@ -2707,6 +2716,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
                         util.addClass(child, newClass);
+                    } else if (util._isIgnoreNodeChange(child)) {
+                        continue;
                     } else if (len === 1) {
                         children = child.childNodes;
                         len = children.length;
@@ -3682,7 +3693,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
             }
 
-            return this.cleanHTML(util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, '')), null);
+            return util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, ''));
         },
 
         /**
@@ -4170,7 +4181,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
                 const tablePlugin = core.plugins.table;
-                if (tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
+                if (tablePlugin && tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
                     core.callPlugin('table', function () {
                         tablePlugin.onTableCellMultiSelect.call(core, tableCell, false);
                     });

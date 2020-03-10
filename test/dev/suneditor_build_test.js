@@ -29,6 +29,7 @@ suneditor.create("sample1", {
     // mode: "balloon",
     // iframe: true,
     width: '100%',
+    height: '500px',
     imageFileInput: false,
     buttonList: [
         [
@@ -39,7 +40,8 @@ suneditor.create("sample1", {
                 title:'custom_container', 
                 dataDisplay:'container',
                 innerHTML:'<i class="se-icon-add"></i>'
-            }
+            },
+            'bold'
         ]
     ]
 });
