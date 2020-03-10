@@ -18,7 +18,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 > - Can use CodeMirror, KaTeX.
 > - And.. many other features :)
 
-![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2301)
+![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2700)
 
 ## Table of contents
 - [Browser Support](#browser-support)
