@@ -14,6 +14,22 @@ declare module 'suneditor' {
    */
   export interface SunEditorOptions {
     /**
+     * Whitelist
+     * =========
+     */
+    /**
+     * Add tags to the default tags whitelist of editor. default: '' {String}
+     */
+    addTagsWhitelist?: string;
+    /**
+     * Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
+     */
+    pasteTagsWhitelist?: string;
+    /**
+     * Add attributes whitelist of tags that should be kept undeleted from the editor.
+     */
+    attributesWhitelist?: Record<string, string>;
+    /**
      * Layout
      * ======
      */
@@ -167,9 +183,23 @@ declare module 'suneditor' {
      */
     imageResizing?: boolean;
     /**
+     * Choose whether the image height input is visible.
+     */
+    imageHeightShow?: boolean;
+    /**
      * The default width size of the image frame
      */
     imageWidth?: number;
+    /**
+     * If true, image size can only be scaled by percentage.
+     */
+    imageSizeOnlyPercentage?: boolean;
+    /**
+     * Choose whether to image rotation buttons display.
+     * When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.
+     * If you want the button to be visible, put it a true.
+     */
+    imageRotation?: boolean;
     /**
      * Choose whether to create a file input tag in the image upload window
      */
@@ -178,6 +208,10 @@ declare module 'suneditor' {
      * Choose whether to create a image url input tag in the image upload window
      */
     imageUrlInput?: boolean;
+    /**
+     * Http Header when uploading images.
+     */
+    imageUploadHeader?: Record<string, string>;
     /**
      * The image upload to server mapping address
      */
@@ -195,9 +229,36 @@ declare module 'suneditor' {
      */
     videoResizing?: boolean;
     /**
+     * Choose whether the video height input is visible.
+     */
+    videoHeightShow?: boolean;
+    /**
+     * Choose whether the video ratio options is visible.
+     */
+    videoRatioShow?: boolean;
+    /**
      * The default width size of the video frame
      */
     videoWidth?: number;
+    /**
+     * If true, video size can only be scaled by percentage.
+     */
+    videoSizeOnlyPercentage?: boolean;
+    /**
+     * Choose whether to video rotation buttons display.
+     * When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.
+     * If you want the button to be visible, put it a true.
+     */
+    videoRotation?: boolean;
+    /**
+     * The default aspect ratio of the video.
+     * Up to four decimal places are allowed.
+     */
+    videoRatio?: number;
+    /**
+     * Video ratio selection options.
+     */
+    videoRatioList?: { name: string; value: number }[];
     /**
      * The default heigth size of the video frame
      */
