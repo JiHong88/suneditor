@@ -632,7 +632,7 @@ export default {
         contextImage._container = container;
 
         // set size
-        this.plugins.image.applySize.call(this);
+        this.plugins.image.applySize.call(this, width, height);
 
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);

@@ -49,7 +49,7 @@ suneditor.create("sample1", {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    mode: 'balloon-always', 
+    // mode: 'balloon-always', 
     katex: Katex,
     // attributesWhitelist: 'style',
     buttonList: [

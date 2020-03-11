@@ -969,14 +969,17 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
                 }
             } else {
-                if (this.getRange().collapsed && r.container.nodeType === 3) {
+                if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
                     oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    formatEl = oNode.previousSibling;
+                    if (oNode) formatEl = oNode.previousSibling;
                 }
+
                 this.insertNode(element, formatEl);
                 if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
             }
+
+            this.setRange(oNode, 0, oNode, 0);
 
             // history stack
             if (!notHistoryPush) this.history.push(false);
@@ -1025,6 +1028,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         insertNode: function (oNode, afterNode) {
             const range = this.getRange();
             let parentNode = null;
+            let originAfter = null;
 
             if (!afterNode) {
                 const startCon = range.startContainer;
@@ -1051,7 +1055,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                     parentNode.removeChild(focusNode);
                                     afterNode = null;
                                 } else {
-                                    afterNode = util.isBreak(focusNode) ? focusNode.nextSibling : focusNode;
+                                    afterNode = util.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
                                 }
                             } else {
                                 afterNode = null;
@@ -1088,6 +1092,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             else {
                 parentNode = afterNode.parentNode;
                 afterNode = afterNode.nextSibling;
+                originAfter = true;
             }
 
             // --- insert node ---
@@ -1096,7 +1101,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (util.isList(afterNode)) {
                         parentNode = afterNode;
                         afterNode = null;
-                    } else if (!afterNode) {
+                    } else if (!originAfter && !afterNode) {
                         const r = this.removeNode();
                         const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container)) ? r.container : (util.getFormatElement(r.container) || r.container.parentNode)) : r.container;
                         parentNode = container.parentNode;
@@ -1414,7 +1419,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
-            core._lastEffectNode = null;
+            this._lastEffectNode = null;
             util.mergeSameTags(rangeElement, null, null, false);
             util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
@@ -1635,7 +1640,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 };
             }
 
-            core._lastEffectNode = null;
+            this._lastEffectNode = null;
             if (notHistoryPush) return edge;
             
             if (!remove && edge) {
@@ -1648,8 +1653,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             // history stack
             this.history.push(false);
-            
-            event._applyTagEffects();
         },
 
         /**
@@ -1747,7 +1750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 return;
             }
 
-            if (range.collapsed) {
+            if (range.collapsed && !isRemoveFormat) {
                 if (startCon.nodeType === 1 && !util.isBreak(startCon)) {
                     let afterNode = null;
                     const focusNode = startCon.childNodes[startOff];
@@ -1757,7 +1760,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             startCon.removeChild(focusNode);
                             afterNode = null;
                         } else {
-                            afterNode = util.isBreak(focusNode) ? focusNode.nextSibling : focusNode;
+                            afterNode = util.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
                         }
                     }
 
@@ -1771,6 +1774,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     endCon = range.endContainer;
                     endOff = range.endOffset;
                 }
+            }
+
+            if (util.isFormatElement(startCon)) {
+                startCon = startCon.childNodes[startOff];
+                startOff = 0;
+            }
+            if (util.isFormatElement(endCon)) {
+                endCon = endCon.childNodes[endOff];
+                endOff = endCon.textContent.length;
             }
 
             if (isRemoveNode) {
@@ -2390,8 +2402,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (isRemoveFormat) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(collapsed ? util.zeroWidthSpace : removeNode.textContent);
-                    pNode.replaceChild(textNode, removeNode);
+                    let textNode = util.createTextNode(util.zeroWidthSpace);
+                    
+                    if (collapsed) {
+                        pNode.replaceChild(textNode, removeNode);
+                    } else {
+                        const rChildren = removeNode.childNodes;
+                        while (rChildren[0]) {
+                            textNode = rChildren[0];
+                            pNode.insertBefore(textNode, removeNode);
+                        }
+                        util.removeItem(removeNode);
+                    }
 
                     if (i === 0) startContainer = endContainer = textNode;
                 }
@@ -2678,8 +2700,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (isRemoveFormat) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.replaceChild(textNode, removeNode);
+
+                    const rChildren = removeNode.childNodes;
+                    const textNode = rChildren[0];
+                    while (rChildren[0]) {
+                        pNode.insertBefore(rChildren[0], removeNode);
+                    }
+                    util.removeItem(removeNode);
+
                     if (i === 0) container = textNode;
                 }
             } else if (isRemoveNode) {
@@ -2748,7 +2776,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     if (child.nodeName === newNodeName) {
                         child.style.cssText += newCssText;
                         util.addClass(child, newClass);
-                    } else if (util._isIgnoreNodeChange(child)) {
+                    } else if (!util.isBreak(child) && util._isIgnoreNodeChange(child)) {
                         continue;
                     } else if (len === 1) {
                         children = child.childNodes;
@@ -2812,8 +2840,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (isRemoveFormat && isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.replaceChild(textNode, removeNode);
+                    
+                    const rChildren = removeNode.childNodes;
+                    while (rChildren[0]) {
+                        pNode.insertBefore(rChildren[0], removeNode);
+                    }
+                    util.removeItem(removeNode);
                 }
             } else if (isRemoveNode) {
                 for (let i = 0; i < nNodeArray.length; i++) {
@@ -3063,8 +3095,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (isRemoveFormat) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(removeNode.textContent);
-                    pNode.replaceChild(textNode, removeNode);
+                    
+                    const rChildren = removeNode.childNodes;
+                    let textNode = null;
+                    while (rChildren[0]) {
+                        textNode = rChildren[0];
+                        pNode.insertBefore(textNode, removeNode);
+                    }
+                    util.removeItem(removeNode);
 
                     if (i === nNodeArray.length - 1) {
                         container = textNode;
@@ -3238,14 +3276,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {String} command Separator ("indent" or "outdent")
          */
         indent: function (command) {
+            const range = this.getRange();
             const rangeLines = this.getSelectedElements();
             const cells = [];
             const shift = 'indent' !== command;
+            let sc = range.startContainer;
+            let ec = range.endContainer;
+            let so = range.startOffset;
+            let eo = range.endOffset;
 
             for (let i = 0, len = rangeLines.length, f, margin; i < len; i++) {
                 f = rangeLines[i];
 
-                if (!util.isListCell(f) || !core.plugins.list) {
+                if (!util.isListCell(f) || !this.plugins.list) {
                     margin = /\d+/.test(f.style.marginLeft) ? util.getNumber(f.style.marginLeft, 0) : 0;
                     if (shift) {
                         margin -= 25;
@@ -3262,11 +3305,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             // list cells
             if (cells.length > 0) {
-                core.plugins.list.editInsideList.call(core, shift, cells);
+                this.plugins.list.editInsideList.call(this, shift, cells);
             }
 
             this._lastEffectNode = null;
-            event._applyTagEffects();
+            this.setRange(sc, so, ec, eo);
+
             // history stack
             this.history.push(false);
         },
@@ -4504,6 +4548,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
+                    // nested list
                     const commonCon = range.commonAncestorContainer;
                     formatEl = util.getFormatElement(range.startContainer);
                     rangeEl = util.getRangeFormatElement(formatEl);
@@ -4517,13 +4562,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 if (range.startContainer.nodeType === 3) {
                                     core.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
                                 }
-
                                 // history stack
                                 core.history.push(true);
                             } else {
                                 let prev = formatEl.previousElementSibling || rangeEl.parentNode;
                                 if (util.isListCell(prev)) {
                                     e.preventDefault();
+
                                     const prevLast = prev.lastElementChild;
                                     if (util.isList(prevLast)) {
                                         prev = prevLast.lastElementChild;
@@ -4555,13 +4600,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             break;
                         }
 
+                        // detach range
                         if (!selectRange && range.startOffset === 0) {
                             let detach = true;
                             let comm = commonCon;
                             while (comm && comm !== rangeEl && !util.isWysiwygDiv(comm)) {
                                 if (comm.previousSibling) {
-                                    detach = false;
-                                    break;
+                                    if (comm.previousSibling.nodeType === 1 || !util.onlyZeroWidthSpace(comm.previousSibling.textContent.trim())) {
+                                        detach = false;
+                                        break;
+                                    }
                                 }
                                 comm = comm.parentNode;
                             }
@@ -4576,6 +4624,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
+                    // component
                     if (!selectRange && range.startOffset === 0) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
                             const previousEl = formatEl.previousSibling;
@@ -4592,6 +4641,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         break;
                     }
 
+                    // component
                     if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null) && range.startOffset === selectionNode.textContent.length) {
                         let nextEl = formatEl.nextElementSibling;
                         if (util.isComponent(nextEl)) {
@@ -4614,6 +4664,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
+                    // nested list
                     formatEl = util.getFormatElement(range.startContainer);
                     rangeEl = util.getRangeFormatElement(formatEl);
                     if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.nextSibling || util.isList(selectionNode.nextSibling)) &&
@@ -4660,7 +4711,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     const cells = [];
                     let lines = [];
                     let fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
-                    let r = {sc: null, so: null, ec: null, eo: null};
+                    let r = {sc: range.startContainer, so: range.startOffset, ec: range.endContainer, eo: range.endOffset};
                     for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
                         f = selectedFormats[i];
                         if (util.isListCell(f)) {
@@ -4676,15 +4727,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     
                     // Nested list
                     if (cells.length > 0 && isEdge && core.plugins.list) {
-                        const listRange = core.plugins.list.editInsideList.call(core, shift, cells);
-                        if (fc) {
-                            r.sc = listRange.sc;
-                            r.so = listRange.so;
-                        }
-                        if (lc) {
-                            r.ec = listRange.ec;
-                            r.eo = listRange.eo;
-                        }
+                        core.plugins.list.editInsideList.call(core, shift, cells);
                     } else {
                         // table
                         const tableCell = util.getParentElement(selectionNode, util.isCell);
@@ -4747,14 +4790,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             }
                         } else {
                             const len = lines.length - 1;
-                            for (let i = 0, child; i <= len; i++) {
-                                child = lines[i].firstChild;
-                                if (!child) continue;
-    
-                                if (/^\s{1,4}$/.test(child.textContent)) {
-                                    util.removeItem(child);
-                                } else if (/^\s{1,4}/.test(child.textContent)) {
-                                    child.textContent = child.textContent.replace(/^\s{1,4}/, '');
+                            for (let i = 0, line; i <= len; i++) {
+                                line = lines[i].childNodes;
+                                for (let c = 0, cLen = line.length, child; c < cLen; c++) {
+                                    child = line[c];
+                                    if (!child) break;
+                                    if (util.onlyZeroWidthSpace(child)) continue;
+        
+                                    if (/^\s{1,4}$/.test(child.textContent)) {
+                                        util.removeItem(child);
+                                    } else if (/^\s{1,4}/.test(child.textContent)) {
+                                        child.textContent = child.textContent.replace(/^\s{1,4}/, '');
+                                    }
+                                    
+                                    break;
                                 }
                             }
     
