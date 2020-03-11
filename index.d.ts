@@ -271,5 +271,5 @@ declare module 'suneditor' {
     | 'link'
     | 'image'
     | 'video';
-  export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[] | string | string[];
+  export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[];
 }
