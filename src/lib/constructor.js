@@ -10,7 +10,6 @@
 import _defaultLang from '../lang/en';
 import util from './util';
 
-
 export default {
     /**
      * @description document create - call _createToolBar()
@@ -37,6 +36,7 @@ export default {
     
         // toolbar
         const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options.lang);
+        if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
 
@@ -49,8 +49,7 @@ export default {
         editor_div.className = 'se-wrapper';
 
         /** --- init elements and create bottom bar --- */
-        const initHTML = util.convertContentsForEditor(element.value);
-        const initElements = this._initElements(options, top_div, tool_bar.element, arrow, initHTML);
+        const initElements = this._initElements(options, top_div, tool_bar.element, arrow);
 
         const bottomBar = initElements.bottomBar;
         const wysiwyg_div = initElements.wysiwygFrame;
@@ -114,7 +113,7 @@ export default {
      * @param {Element} textarea textarea element
      * @private
      */
-    _checkCodeMirror: function(options, textarea) {
+    _checkCodeMirror: function (options, textarea) {
         if (options.codeMirror) {
             const cmOptions = [{
                 mode: 'htmlmixed',
@@ -122,9 +121,9 @@ export default {
                 lineNumbers: true,
                 lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
-                Object.keys(option).forEach(function (key) {
+                for (let key in option) {
                     init[key] = option[key];
-                });
+                }
                 return init;
             }, {});
 
@@ -142,6 +141,26 @@ export default {
         }
 
         return textarea;
+    },
+
+    /**
+     * @description Check for a katex object.
+     * @param {Object} katex katex object
+     * @private
+     */
+    _checkKatexMath: function (katex) {
+        if (!katex) throw Error('[SUNEDITOR.create.fail] To use the math button you need to add a "katex" object to the options.');
+
+        const katexOptions = [{
+            throwOnError: false,
+        }, (katex.options || {})].reduce(function (init, option) {
+            for (let key in option) {
+                init[key] = option[key];
+            }
+            return init;
+        }, {});
+
+        katex.options = katexOptions;
     },
 
     /**
@@ -163,17 +182,17 @@ export default {
         const isNewPlugins = !!mergeOptions.plugins;
 
         const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions.lang);
+        if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
         const arrow = document.createElement('DIV');
         arrow.className = 'se-arrow';
 
         if (isNewToolbar) {
-            relative.insertBefore(tool_bar.element, el.toolbar);
-            relative.removeChild(el.toolbar);
+            relative.replaceChild(tool_bar.element, el.toolbar);
             el.toolbar = tool_bar.element;
             el._arrow = arrow;
         }
         
-        const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow, el.wysiwyg.innerHTML);
+        const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow);
 
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
@@ -213,11 +232,10 @@ export default {
      * @param {Element} topDiv Suneditor top div
      * @param {Element} toolBar Tool bar
      * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
-     * @param {Element} initValue Code view textarea
      * @returns {Object} Bottom bar elements (resizingBar, navigation, charCounter)
      * @private
      */
-    _initElements: function (options, topDiv, toolBar, toolBarArrow, initHTML) {
+    _initElements: function (options, topDiv, toolBar, toolBarArrow) {
         /** top div */
         topDiv.style.width = options.width;
         topDiv.style.minWidth = options.minWidth;
@@ -245,7 +263,6 @@ export default {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
             wysiwygDiv.className += ' sun-editor-editable';
-            wysiwygDiv.innerHTML = initHTML;
         } else {
             const cssTags = (function () {
                 const linkNames = options.iframeCSSFileName;
@@ -286,7 +303,6 @@ export default {
                     cssTags;
                 this.contentDocument.body.className = 'sun-editor-editable';
                 this.contentDocument.body.setAttribute('contenteditable', true);
-                this.contentDocument.body.innerHTML = initHTML;
             });
         }
         
@@ -365,8 +381,13 @@ export default {
     _initOptions: function (element, options) {
         /** user options */
         options.lang = options.lang || _defaultLang;
+        /** Whitelist */
+        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
+        options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
+        options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
+        options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
         /** Layout */
-        options.mode = options.mode || 'classic'; // classic, inline, balloon
+        options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         // options.fullPage = options.fullPage;
@@ -428,6 +449,8 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        /** Math (katex) */
+        options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
         /** Buttons */
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],
@@ -445,7 +468,7 @@ export default {
      */
     _defaultButtons: function (lang) {
         return {
-            /** command */
+            /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
                 '<i class="se-icon-bold"></i>'
             ],
@@ -474,7 +497,7 @@ export default {
                 '<i class="se-icon-erase"></i>'
             ],
 
-            indent: ['', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
+            indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
                 '<i class="se-icon-indent-right"></i>'
             ],
 
@@ -514,17 +537,22 @@ export default {
                 '<i class="se-icon-save"></i>', true
             ],
 
+            /** plugins - command */
+            blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
+                '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>'
+            ],
+
             /** plugins - submenu */
-            font: ['se-btn-select se-btn-tool-font _se_command_font_family', lang.toolbar.font, 'font', 'submenu',
+            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'submenu',
                 '<span class="txt">' + lang.toolbar.font + '</span><i class="se-icon-arrow-down"></i>'
             ],
             
             formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt _se_command_format">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
+                '<span class="txt">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt _se_command_font_size">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
+                '<span class="txt">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
             ],
 
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
@@ -536,10 +564,10 @@ export default {
             ],
 
             align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu',
-                '<i class="se-icon-align-left _se_command_align"></i>'
+                '<i class="se-icon-align-left"></i>'
             ],
 
-            list: ['_se_command_list', lang.toolbar.list, 'list', 'submenu',
+            list: ['', lang.toolbar.list, 'list', 'submenu',
                 '<i class="se-icon-list-number"></i>'
             ],
 
@@ -576,6 +604,9 @@ export default {
 
             video: ['', lang.toolbar.video, 'video', 'dialog',
                 '<i class="se-icon-video"></i>'
+            ],
+            math: ['', lang.toolbar.math, 'math', 'dialog',
+                '<i class="se-icon-math"></i>'
             ]
         };
     },
@@ -604,7 +635,7 @@ export default {
      * @param {string} buttonClass className in button
      * @param {string} title Title in button
      * @param {string} dataCommand The data-command property of the button
-     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu')
+     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu', 'command')
      * @param {string} innerHTML Html in button
      * @param {string} _disabled Button disabled
      * @returns {Element}

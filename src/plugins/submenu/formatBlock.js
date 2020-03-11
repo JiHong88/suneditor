@@ -9,9 +9,12 @@
 
 export default {
     name: 'formatBlock',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.formatBlock = {
+            targetText: targetElement.querySelector('.txt'),
+            targetTooltip: targetElement.parentNode.querySelector('.se-tooltip-text'),
             _formatList: null,
             currentFormat: ''
         };
@@ -41,24 +44,26 @@ export default {
         const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
-        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs; i < len; i++) {
+        for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
             format = formatList[i];
             
             if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
                 tagName = format.toLowerCase();
-                command = tagName === 'pre' || tagName === 'blockquote' ? 'range' : 'replace';
+                command = tagName === 'blockquote' ? 'range' : tagName === 'pre' ? 'free' : 'replace';
                 h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
                 name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+                className = '';
                 attrs = '';
             } else {
                 tagName = format.tag.toLowerCase();
                 command = format.command;
                 name = format.name || tagName;
-                attrs = format.class ? ' class="' + format.class + '"' : '';
+                className = format.class;
+                attrs = className ? ' class="' + className + '"' : '';
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '">' +
                     '<' + tagName + attrs + '>' + name + '</' + tagName + '>' +
                 '</button></li>';
         }
@@ -69,17 +74,52 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        let formatTitle = this.lang.toolbar.formats;
+        const target = this.context.formatBlock.targetText;
+        const tooltip = this.context.formatBlock.targetTooltip;
+
+        if (!element) {
+            this.util.changeTxt(target, formatTitle);
+            this.util.changeTxt(tooltip, formatTitle);
+        } else if (this.util.isFormatElement(element)) {
+            const formatContext = this.context.formatBlock;
+            const formatList = formatContext._formatList;
+            const nodeName = element.nodeName.toLowerCase();
+            const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
+
+            for (let i = 0, len = formatList.length, f; i < len; i++) {
+                f = formatList[i];
+                if (nodeName === f.getAttribute('data-value') && className === f.getAttribute('data-class')) {
+                    formatTitle = f.title;
+                    break;
+                }
+            }
+
+            this.util.changeTxt(target, formatTitle);
+            this.util.changeTxt(tooltip, formatTitle);
+            target.setAttribute('data-value', nodeName);
+            target.setAttribute('data-class', className);
+
+            return true;
+        }
+
+        return false;
+    },
+
     on: function () {
         const formatContext = this.context.formatBlock;
         const formatList = formatContext._formatList;
-        const currentFormat = (this.commandMap.FORMAT.getAttribute('data-focus') || 'P').toLowerCase();
+        const target = formatContext.targetText;
+        const currentFormat = (target.getAttribute('data-value') || '') + (target.getAttribute('data-class') || '');
 
         if (currentFormat !== formatContext.currentFormat) {
-            for (let i = 0, len = formatList.length; i < len; i++) {
-                if (currentFormat === formatList[i].getAttribute('data-value')) {
-                    this.util.addClass(formatList[i], 'active');
+            for (let i = 0, len = formatList.length, f; i < len; i++) {
+                f = formatList[i];
+                if (currentFormat === f.getAttribute('data-value') + f.getAttribute('data-class')) {
+                    this.util.addClass(f, 'active');
                 } else {
-                    this.util.removeClass(formatList[i], 'active');
+                    this.util.removeClass(f, 'active');
                 }
             }
 
@@ -92,11 +132,12 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let command = null, value = null, tag = null;
+        let command = null, value = null, tag = null, className = '';
         
         while (!command && !/UL/i.test(target.tagName)) {
             command = target.getAttribute('data-command');
             value = target.getAttribute('data-value');
+            className = target.getAttribute('data-class');
             if (command) {
                 tag = target.firstChild;
                 break;
@@ -106,92 +147,116 @@ export default {
 
         if (!command) return;
 
-        // blockquote, pre
+        // blockquote
         if (command === 'range') {
             const rangeElement = tag.cloneNode(false);
             this.applyRangeFormatElement(rangeElement);
         }
-        // others
+        // free, replace
         else {
             const range = this.getRange();
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
 
-            let selectedFormsts = this.getSelectedElementsAndComponents();
+            const util = this.util;
+            const selectedFormsts = this.getSelectedElementsAndComponents(false);
             if (selectedFormsts.length === 0) return;
 
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
-            const firstPath = this.util.getNodePath(range.startContainer, first, null);
-            const lastPath = this.util.getNodePath(range.endContainer, last, null);
+            const firstPath = util.getNodePath(range.startContainer, first, null);
+            const lastPath = util.getNodePath(range.endContainer, last, null);
             
-            // remove list
-            let rangeArr = {};
-            let listFirst = false;
-            let listLast = false;
-            const passComponent = function (current) { return !this.isComponent(current); }.bind(this.util);
-
-            for (let i = 0, len = selectedFormsts.length, r, o, lastIndex, isList; i < len; i++) {
-                lastIndex = i === len - 1;
-                o = this.util.getRangeFormatElement(selectedFormsts[i], passComponent);
-                isList = this.util.isList(o);
-                if (!r && isList) {
-                    r = o;
-                    rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
-                    if (i === 0) listFirst = true;
-                } else if (r && isList) {
-                    if (r !== o) {
-                        const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
-                        if (listFirst) {
-                            first = edge.sc;
-                            listFirst = false;
-                        }
-                        if (lastIndex) last = edge.ec;
-
-                        if (isList) {
-                            r = o;
-                            rangeArr = {r: r, f: [this.util.getParentElement(selectedFormsts[i], 'LI')]};
-                            if (lastIndex) listLast = true;
-                        } else {
-                            r = null;
-                        }
-                    } else {
-                        rangeArr.f.push(this.util.getParentElement(selectedFormsts[i], 'LI'));
-                        if (lastIndex) listLast = true;
-                    }
-                }
-
-                if (lastIndex && this.util.isList(r)) {
-                    const edge = this.detachRangeFormatElement(rangeArr.r, rangeArr.f, null, false, true);
-                    if (listLast || len === 1) {
-                        last = edge.ec;
-                        if (listFirst) first = edge.sc || last;
-                    }
-                }
-            }
+            // remove selected list
+            const rlist = this.detachList(selectedFormsts, false);
+            if (rlist.sc) first = rlist.sc;
+            if (rlist.ec) last = rlist.ec;
 
             // change format tag
-            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            selectedFormsts = this.getSelectedElementsAndComponents();
-            for (let i = 0, len = selectedFormsts.length, node, newFormat; i < len; i++) {
-                node = selectedFormsts[i];
-                
-                if (node.nodeName.toLowerCase() !== value.toLowerCase() && !this.util.isComponent(node)) {
-                    newFormat = tag.cloneNode(false);
-                    this.util.copyFormatAttributes(newFormat, node);
-                    newFormat.innerHTML = node.innerHTML;
+            this.setRange(util.getNodeFromPath(firstPath, first), startOffset, util.getNodeFromPath(lastPath, last), endOffset);
+            const modifiedFormsts = this.getSelectedElementsAndComponents(false);
 
-                    node.parentNode.insertBefore(newFormat, node);
-                    this.util.removeItem(node);
+            // free format
+            if (command === 'free') {
+                const len = modifiedFormsts.length - 1;
+                let parentNode = modifiedFormsts[len].parentNode;
+                let freeElement = tag.cloneNode(false);
+                const focusElement = freeElement;
+    
+                for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
+                    f = modifiedFormsts[i];
+                    if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
+    
+                    isComp = util.isComponent(f);
+                    html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
+                    before = util.getParentElement(f, function (current) {
+                        return current.parentNode === parentNode;
+                    });
+    
+                    if (parentNode !== f.parentNode || isComp) {
+                        if (util.isFormatElement(parentNode)) {
+                            parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
+                            parentNode = parentNode.parentNode;
+                        } else {
+                            parentNode.insertBefore(freeElement, before ? before.nextSibling : null);
+                            parentNode = f.parentNode;
+                        }
+
+                        next = freeElement.nextSibling;
+                        if (next && freeElement.nodeName === next.nodeName && util.isSameAttributes(freeElement, next)) {
+                            freeElement.innerHTML += '<BR>' + next.innerHTML;
+                            util.removeItem(next);
+                        }
+
+                        freeElement = tag.cloneNode(false);
+                        first = true;
+                    }
+    
+                    inner = freeElement.innerHTML;
+                    freeElement.innerHTML = ((first || !html || !inner || /<br>$/i.test(html)) ? html : html + '<BR>') + inner;
+
+                    if (i === 0) {
+                        parentNode.insertBefore(freeElement, f);
+                        next = f.nextSibling;
+                        if (next && freeElement.nodeName === next.nodeName && util.isSameAttributes(freeElement, next)) {
+                            freeElement.innerHTML += '<BR>' + next.innerHTML;
+                            util.removeItem(next);
+                        }
+
+                        const prev = freeElement.previousSibling;
+                        if (prev && freeElement.nodeName === prev.nodeName && util.isSameAttributes(freeElement, prev)) {
+                            prev.innerHTML += '<BR>' + freeElement.innerHTML;
+                            util.removeItem(freeElement);
+                        }
+                    }
+
+                    if (!isComp) util.removeItem(f);
+                    if (!!html) first = false;
                 }
-
-                if (i === 0) first = newFormat || node;
-                if (i === len - 1) last = newFormat || node;
-                newFormat = null;
+    
+                this.setRange(focusElement, 0, focusElement, 0);
+            }
+            // replace format
+            else {
+                for (let i = 0, len = modifiedFormsts.length, node, newFormat; i < len; i++) {
+                    node = modifiedFormsts[i];
+                    
+                    if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !util.isComponent(node)) {
+                        newFormat = tag.cloneNode(false);
+                        util.copyFormatAttributes(newFormat, node);
+                        newFormat.innerHTML = node.innerHTML;
+    
+                        node.parentNode.replaceChild(newFormat, node);
+                    }
+    
+                    if (i === 0) first = newFormat || node;
+                    if (i === len - 1) last = newFormat || node;
+                    newFormat = null;
+                }
+    
+                this.setRange(util.getNodeFromPath(firstPath, first), startOffset, util.getNodeFromPath(lastPath, last), endOffset);
             }
 
-            this.setRange(this.util.getNodeFromPath(firstPath, first), startOffset, this.util.getNodeFromPath(lastPath, last), endOffset);
-            
             // history stack
             this.history.push(false);
         }

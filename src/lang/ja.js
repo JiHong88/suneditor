@@ -53,6 +53,7 @@
             hr_dashed: 'ダッシュ',
             table: 'テーブル',
             link: 'リンク',
+            math: '数学',
             image: '画像',
             video: '動画',
             fullScreen: 'フルスクリーン',
@@ -78,6 +79,12 @@
                 url: 'インターネットアドレス',
                 text: '画面のテキスト',
                 newWindowCheck: '別ウィンドウで開く'
+            },
+            mathBox: {
+                title: '数学',
+                inputLabel: '数学表記',
+                fontSizeLabel: 'サイズ',
+                previewLabel: 'プレビュー'
             },
             imageBox: {
                 title: '画像の挿入',

@@ -9,19 +9,82 @@ import { ko } from '../../src/lang';
 import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
+import Resolutions from './Resolutions';
+import custom_container from './custom_container';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
-import lineHeight from '../../src/plugins/submenu/lineHeight'
+
+import 'katex/dist/katex.min.css';
+import Katex from 'katex';
+
 
 const align = require('../../src/plugins/submenu/align')
 
+
+suneditor.create("sample1", {
+    plugins: [custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    // mode: "balloon",
+    // iframe: true,
+    width: '100%',
+    height: '500px',
+    imageFileInput: false,
+    buttonList: [
+        [
+            {
+                name: 'custom_container', 
+                dataCommand: 'custom_container',
+                buttonClass:'', 
+                title:'custom_container', 
+                dataDisplay:'container',
+                innerHTML:'<i class="se-icon-add"></i>'
+            },
+            'bold', 'italic'
+        ]
+    ]
+});
+
+
 let s1 = suneditor.create('editor', {
-  plugins: plugins,
-  buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat', 'codeView', 'preview']],
-  width: '100%'
+    plugins: plugins,
+    // mode: 'balloon-always', 
+    katex: Katex,
+    // attributesWhitelist: 'style',
+    buttonList: [
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'blockquote', 'paragraphStyle',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'fontColor', 'hiliteColor', 'textStyle',
+        'removeFormat',
+        'outdent', 'indent',
+        'align', 'horizontalRule', 'list', 'lineHeight',
+        'table', 'link', 'image', 'video', 'math',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print', 'save', 'template']
+    ],
+    width: '100%',
+    height: '500',
+    // fullPage: true,
+    // pasteTagsWhitelist: 'p|h[1-6]',
+    formats: [
+        { 
+            tag: 'div', // Tag name
+            name: 'NORMAL', // default: tag name 
+            command: 'free', // default: "replace" 
+            class: '__se__format__free_NORMAL', // Class names must always begin with "__se__format__" 
+        }, 
+        { 
+            tag: 'div', // Tag name
+            name: 'CODE', // default: tag name 
+            command: 'replace', // default: "replace" 
+            class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
+        },
+        'pre',
+        'blockquote'
+    ]
 })
 
 window.cm = CodeMirror
@@ -45,7 +108,7 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.destroy();
+    s1.core.focus();
 }
 
 window.sun_create1 = function () {
@@ -53,30 +116,42 @@ window.sun_create1 = function () {
     s1 = suneditor.create('editor', {
         plugins: [align, plugins.link],
         buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
-        width: '100%'
+        width: '100%',
+        height: 'auto'
       })
 }
 
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    lang: lang.ko,
+    // lang: lang.ko,
     plugins: plugins,
+    // mode: 'balloon-always',
     buttonList: [
-        ['undo', 'redo','removeFormat',
-        'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'textStyle',
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'blockquote', 'paragraphStyle',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor',
+        'fontColor', 'hiliteColor', 'textStyle',
+        'removeFormat',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'table',
-        'link', 'image', 'video',
+        'align', 'horizontalRule', 'list', 'lineHeight',
+        'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save']
+        'preview', 'print', 'save', 'template']
     ],
-    height: 'auto',
+    katex: Katex,
+    height: '400',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
-    // mode: 'inline'
+    fullPage: true,
+    addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
+    imageUploadUrl: 'http://localhost:3000/files/upload',
+    attributesWhitelist: {
+        // 'input': 'type',
+        'all': 'type'
+    }
+    // mode: 'inline',
     // videoHeightShow: false,
     // videoRatioShow: false,
     // imageHeightShow: false,
@@ -89,12 +164,19 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 
 ss.onload = function (core) {
     console.log('onload', core);
+    core.focus();
 };
 ss.onScroll = function (e) {
     console.log('onScroll', e);
 };
 ss.onClick = function (e) {
     console.log('onClick', e);
+};
+ss.onFocus = function (e, core) {
+    console.log('onFocus', e);
+};
+ss.onBlur = function (e, core) {
+    console.log('onBlur', e);
 };
 ss.onKeyDown = function (e) {
     console.log('onKeyDown', e);
@@ -108,6 +190,16 @@ ss.onDrop = function (e) {
 
 ss.onChange = function (contents) {
     console.log('change')
+}
+
+// ss.imageUploadHandler = function (response, core) {
+//     console.log('rrrr', response)
+// }
+
+ss.onImageUploadBefore = function (files, info, core) {
+    console.log('files--', files);
+    console.log('info--', info);
+    return true;
 }
 
 ss.onImageUpload = function () {
@@ -145,11 +237,22 @@ window.sun_insertHTML = function (html) {
 
 window.sun_getContents = function () {
     // alert(ss.getContents());
+
     console.log(ss.getContents());
+
+    // ss.core.commandHandler(null, 'selectAll')
+    // let t = '';
+    // const lines = ss.core.getSelectedElements();
+    // for (let i = 0, len = lines.length; i < len; i++) {
+    //     t += lines[i].textContent + '\n';
+    // }
+    // console.log(t);
+
+    // console.log(ss.core.context.element.wysiwyg.textContent)
 }
 
 window.sun_setContents = function (content) {
-    ss.setContents(content);
+    ss.setContents('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
     ss.core.history.reset(true);
     // ss.core.context.tool.save.disabled = true;
 }
@@ -287,7 +390,7 @@ const newOption = {
     placeholder: 'Placeholder...'
 }
 const newOption2 = {
-    plugins: plugins,
+    plugins: [plugins.align],
     mode: 'classic',
     maxHeight: '400px',
     height: 150,

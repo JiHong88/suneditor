@@ -31,13 +31,13 @@ export default {
      * @description Create the suneditor
      * @param {String|Element} idOrElement textarea Id or textarea element
      * @param {Json} options user options
-     * @returns {{save: save, getContext: getContext, getContent: getContent, setContent: setContent, appendContent: appendContent, disabled: disabled, enabled: enabled, show: show, hide: hide, destroy: destroy}}
+     * @returns {Object}
      */
     create: function (idOrElement, options, _init_options) {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
             options =  [_init_options, options].reduce(function (init, option) {
-                            Object.keys(option).forEach(function (key) {
+                            for (let key in option) {
                                 if (key === 'plugins' && option[key] && init[key]) {
                                     let i = init[key], o = option[key];
                                     i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });
@@ -46,7 +46,7 @@ export default {
                                 } else {
                                     init[key] = option[key];
                                 }
-                            });
+                            }
                             return init;
                         }, {});
         }

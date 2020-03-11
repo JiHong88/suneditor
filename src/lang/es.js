@@ -53,6 +53,7 @@
 			hr_dashed: 'Línea horizontal discontinua',
 			table: 'Tabla',
 			link: 'Link',
+			math: 'Matemáticas',
 			image: 'Imagen',
 			video: 'Video',
 			fullScreen: 'Pantalla completa',
@@ -79,6 +80,12 @@
 				text: 'Texto para mostrar',
 				newWindowCheck: 'Abrir en una nueva ventana'
 			},
+			mathBox: {
+                title: 'Matemáticas',
+                inputLabel: 'Notación Matemática',
+                fontSizeLabel: 'Tamaño de fuente',
+                previewLabel: 'Vista previa'
+            },
 			imageBox: {
 				title: 'Insertar imagen',
 				file: 'Seleccionar desde los archivos',

@@ -9,6 +9,7 @@
 
 export default {
     name: 'table',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.table = {
@@ -290,6 +291,12 @@ export default {
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
+        if (!this.getSelection().isCollapsed) {
+            this.controllersOff();
+            this.util.removeClass(tdElement, 'se-table-selected-cell');
+            return;
+        }
+
         const contextTable = this.context.table;
         const tablePlugin = this.plugins.table;
         const tableController = contextTable.tableController;
@@ -305,7 +312,7 @@ export default {
         tableController.style.display = 'block';
         tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
 
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this));
+        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), 'table');
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -1307,7 +1314,7 @@ export default {
             this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this));
+                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this), 'table');
                 if (!tablePlugin._ref) this.controllersOff();
             }.bind(this);
 

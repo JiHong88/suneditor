@@ -263,67 +263,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertContentsForEditor"><span class="type-signature"></span>convertContentsForEditor<span class="signature">(contents)</span><span
-                    class="type-signature"> &rarr; {String}</span></h4>
-            <div class="description">
-                Converts contents into a format that can be placed in an editor.
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>contents</code></td>
-                    <td class="type">
-                        <span class="param-type">String</span>
-                    </td>
-                    <td class="description last">Contents</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
-            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html, indentSize)</span><span
-                    class="type-signature"> &rarr; {String}</span></h4>
-            <div class="description">
-                Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>html</code></td>
-                    <td class="type">
-                        <span class="param-type">Element|String</span>
-                    </td>
-                    <td class="description last">WYSIWYG element (context.element.wysiwyg) or HTML string</td>
-                </tr>
-                <tr>
-                    <td class="name"><code>indentSize</code></td>
-                    <td class="type">
-                        <span class="param-type">Number|null</span>
-                    </td>
-                    <td class="description last">The indent size of the tag (default: 0)</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="isWysiwygDiv"><span class="type-signature"></span>isWysiwygDiv<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
@@ -354,7 +293,8 @@
             <h4 class="name" id="isFormatElement"><span class="type-signature"></span>isFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the format element. (P, DIV, H1-6, LI, TH, TD)
+                It is judged whether it is the format element. (P, DIV, H[1-6], PRE, LI)<br>
+                Format element also contain "free format Element"
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -381,8 +321,37 @@
             <h4 class="name" id="isRangeFormatElement"><span class="type-signature"></span>isRangeFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, PRE, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)<br>
-                Range format element is wrap the format element  (P, DIV, H1-6, LI)
+                It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)<br>
+                Range format element is wrap the format element  (<a href="#isFormatElement">util.isFormatElement</a>)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">The element to check</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isFreeFormatElement"><span class="type-signature"></span>isFreeFormatElement<span class="signature">(element)</span><span
+                    class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                It is judged whether it is the free format element. (PRE)<br>
+                Free format elements's line break is "BR" tag.<br>
+                Free format elements is included in the format element.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -409,7 +378,34 @@
             <h4 class="name" id="isComponent"><span class="type-signature"></span>isComponent<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the component(img, iframe cover, table, hr) element - ".sun-editor-id-comp"
+                It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">The element to check</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isMediaComponent"><span class="type-signature"></span>isMediaComponent<span class="signature">(element)</span><span
+                    class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -436,7 +432,7 @@
             <h4 class="name" id="getFormatElement"><span class="type-signature"></span>getFormatElement<span
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
-                If a parent node that contains an argument node finds a format node (P, DIV, H[1-6], LI), it returns that node.
+                If a parent node that contains an argument node finds a format node (<a href="#isFormatElement">util.isFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -470,7 +466,41 @@
             <h4 class="name" id="getRangeFormatElement"><span class="type-signature"></span>getRangeFormatElement<span
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
-                If a parent node that contains an argument node finds a format node (BLOCKQUOTE, TABLE, TH, TD, OL, UL, PRE), it returns that node.
+                If a parent node that contains an argument node finds a format node (<a href="#isRangeFormatElement">util.isRangeFormatElement</a>), it returns that node.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Additional validation function.</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getFreeFormatElement"><span class="type-signature"></span>getFreeFormatElement<span
+                class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
+            <div class="description">
+                If a parent node that contains an argument node finds a free format node (<a href="#isFreeFormatElement">util.isFreeFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -563,6 +593,50 @@
                         <span class="param-type">Element</span>
                     </td>
                     <td class="description last">Element to copy</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getArrayItem"><span class="type-signature"></span>getArrayItem<span
+                    class="signature">(array, validation, multi)</span><span class="type-signature"> &rarr; {Array|Object}</span></h4>
+            <div class="description">
+                Get the item from the array that matches the condition.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Array to get item</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Conditional function</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>multi</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">
+                        If true, returns all items that meet the criteria otherwise, returns an empty array.<br>
+                        If false, returns only one item that meet the criteria otherwise return null.
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -1115,7 +1189,8 @@
         </h4>
         <div class="description">
             Returns the number of parents nodes.<br>
-            "0" when the parent node is the WYSIWYG area.
+            "0" when the parent node is the WYSIWYG area.<br>
+            "-1" when the element argument is the WYSIWYG area.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1382,6 +1457,47 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="setStyle"><span class="type-signature"></span>setStyle<span class="signature">(element, styleName, value)</span>
+            <span class="type-signature"></span></h4>
+        <div class="description">
+            Set style, if all styles are deleted, the style properties are deleted.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element to set style</td>
+            </tr>
+            <tr>
+                <td class="name"><code>styleName</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">Style attribute name (marginLeft, textAlign...)</td>
+            </tr>
+            <tr>
+                <td class="name"><code>value</code></td>
+                <td class="type">
+                    <span class="param-type">String|Number</span>
+                </td>
+                <td class="description last">Style value</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="hasClass"><span class="type-signature"></span>hasClass<span class="signature">(element, className)</span>
             <span class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
@@ -1545,7 +1661,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="removeItemAllParents"><span class="type-signature"></span>removeItemAllParents<span class="signature">(item, validation)</span><span
+        <h4 class="name" id="removeItemAllParents"><span class="type-signature"></span>removeItemAllParents<span class="signature">(item, validation, stopParent)</span><span
             class="type-signature"> &rarr; {Object|null}</span></h4>
         <div class="description">
             Delete all parent nodes that match the condition.<br>
@@ -1575,12 +1691,180 @@
                 </td>
                 <td class="description last">Validation function. default(Deleted if it only have breakLine and blanks)</td>
             </tr>
+            <tr>
+                <td class="name"><code>stopParent</code></td>
+                <td class="type">
+                    <span class="param-type">Element|null</span>
+                </td>
+                <td class="description last">Stop when the parent node reaches stopParent</td>
+            </tr>
             </tbody>
         </table>
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="removeEmptyNode"><span class="type-signature"></span>removeEmptyNode<span class="signature">(element)</span><span
+        <h4 class="name" id="detachNestedList"><span class="type-signature"></span>detachNestedList<span class="signature">(baseNode, all)</span><span
+            class="type-signature"> &rarr; {Element}</span></h4>
+        <div class="description">
+            Detach Nested all nested lists under the "baseNode".<br>
+            Returns a list with nested removed.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>baseNode</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element on which to base.</td>
+            </tr>
+            <tr>
+                <td class="name"><code>all</code></td>
+                <td class="type">
+                    <span class="param-type">Boolean</span>
+                </td>
+                <td class="description last">If true, it also detach all nested lists of a returned list.</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="splitElement"><span class="type-signature"></span>splitElement<span class="signature">(baseNode, offset, depth)</span><span
+            class="type-signature"> &rarr; {Element}</span></h4>
+        <div class="description">
+            Split all tags based on "baseNode"<br>
+            Returns the last element of the splited tag.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>baseNode</code></td>
+                <td class="type">
+                    <span class="param-type">Node</span>
+                </td>
+                <td class="description last">Element or text node on which to base</td>
+            </tr>
+            <tr>
+                <td class="name"><code>offset</code></td>
+                <td class="type">
+                    <span class="param-type">Number|null</span>
+                </td>
+                <td class="description last">Text offset of "baseNode" (Only valid when "baseNode" is a text node)</td>
+            </tr>
+            <tr>
+                <td class="name"><code>depth</code></td>
+                <td class="type">
+                    <span class="param-type">Number</span>
+                </td>
+                <td class="description last">The nesting depth of the element being split. (default: 0)</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="mergeSameTags"><span class="type-signature"></span>mergeSameTags<span class="signature">(element, nodePath_s, nodePath_e, onlyText)</span><span
+            class="type-signature"> &rarr; {Object}</span> {a: 0, b: 0}</h4>
+        <div class="description">
+            Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.<br>
+            If "offset" has been changed, it will return as much "offset" as it has been modified.<br>
+            "a", "b" You can send a maximum of two nodepaths.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element object</td>
+            </tr>
+            <tr>
+                <td class="name"><code>nodePath_s</code></td>
+                <td class="type">
+                    <span class="param-type">Object|null</span>
+                </td>
+                <td class="description last">Start NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
+            </tr>
+            <tr>
+                <td class="name"><code>nodePath_e</code></td>
+                <td class="type">
+                    <span class="param-type">Object|null</span>
+                </td>
+                <td class="description last">End NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
+            </tr>
+            <tr>
+                <td class="name"><code>onlyText</code></td>
+                <td class="type">
+                    <span class="param-type">Boolean</span>
+                </td>
+                <td class="description last">If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="mergeNestedTags"><span class="type-signature"></span>mergeNestedTags<span class="signature">(element, validation)</span><span
+            class="type-signature"></span></h4>
+        <div class="description">
+            Merge nested tags without other child nodes.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Element object</td>
+            </tr>
+            <tr>
+                <td class="name"><code>validation</code></td>
+                <td class="type">
+                    <span class="param-type">Function|String|null</span>
+                </td>
+                <td class="description last">Validation function / String("tag1|tag2..") / If null, all tags are applicable.</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="removeEmptyNode"><span class="type-signature"></span>removeEmptyNode<span class="signature">(element, notRemoveNode)</span><span
                 class="type-signature"></span></h4>
         <div class="description">
             Delete a empty child node of argument element
@@ -1602,42 +1886,22 @@
                 </td>
                 <td class="description last">Element node</td>
             </tr>
-            </tbody>
-        </table>
-        <dl class="details"></dl>
-
-
-        <h4 class="name" id="isIgnoreNodeChange"><span class="type-signature"></span>isIgnoreNodeChange<span class="signature">(element)</span><span
-                class="type-signature"> &rarr; {Boolean}</span></h4>
-        <div class="description">
-            Nodes that need to be added without modification when changing text nodes !(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a)
-        </div>
-        <h5>Parameters:</h5>
-        <table class="params">
-            <thead>
             <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th class="last">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td class="name"><code>element</code></td>
+                <td class="name"><code>notRemoveNode</code></td>
                 <td class="type">
-                    <span class="param-type">Element</span>
+                    <span class="param-type">Node|null</span>
                 </td>
-                <td class="description last">Element to check</td>
+                <td class="description last">Do not remove node</td>
             </tr>
             </tbody>
         </table>
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html)</span><span
-                class="type-signature"> &rarr; {String}</span></h4>
+        <h4 class="name" id="sortByDepth"><span class="type-signature"></span>sortByDepth<span class="signature">(array, des)</span><span
+                class="type-signature"></span></h4>
         <div class="description">
-            Gets the clean HTML code for editor
+            Sort a element array by depth of element.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1650,11 +1914,46 @@
             </thead>
             <tbody>
             <tr>
-                <td class="name"><code>html</code></td>
+                <td class="name"><code>array</code></td>
+                <td class="type">
+                    <span class="param-type">Array</span>
+                </td>
+                <td class="description last">Array object</td>
+            </tr>
+            <tr>
+                <td class="name"><code>des</code></td>
+                <td class="type">
+                    <span class="param-type">Boolean</span>
+                </td>
+                <td class="description last">true: descending order / false: ascending order</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="createTagsWhitelist"><span class="type-signature"></span>createTagsWhitelist<span class="signature">(list)</span><span
+                class="type-signature"> &rarr; {RegExp}</span></h4>
+        <div class="description">
+            Create whitelist RegExp object.<br>
+            Return RegExp format: new RegExp("<span style="color:#d73a49">&lt;\\/?(</span><span style="color: #23853a;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0a3667">?!\\b<span style="color: #23853a;">list[i]</span>\\b</span><span style="color: #23853a;">)</span><span style="color:#d73a49">)[^>^&gt;])+></span>", "<span style="color:#d73a49">g</span>")
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>list</code></td>
                 <td class="type">
                     <span class="param-type">String</span>
                 </td>
-                <td class="description last">HTML string</td>
+                <td class="description last">Tags list ("br|p|div|pre...")</td>
             </tr>
             </tbody>
         </table>
@@ -1682,16 +1981,18 @@
         <li><a href="document-util.html#getPageStyle">getPageStyle</a></li>
         <li><a href="document-util.html#getIframeDocument">getIframeDocument</a></li>
         <li><a href="document-util.html#getAttributesToString">getAttributesToString</a></li>
-        <li><a href="document-util.html#convertContentsForEditor">convertContentsForEditor</a></li>
-        <li><a href="document-util.html#convertHTMLForCodeView">convertHTMLForCodeView</a></li>
         <li><a href="document-util.html#isWysiwygDiv">isWysiwygDiv</a></li>
         <li><a href="document-util.html#isFormatElement">isFormatElement</a></li>
         <li><a href="document-util.html#isRangeFormatElement">isRangeFormatElement</a></li>
+        <li><a href="document-util.html#isFreeFormatElement">isFreeFormatElement</a></li>
         <li><a href="document-util.html#isComponent">isComponent</a></li>
+        <li><a href="document-util.html#isMediaComponent">isMediaComponent</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
+        <li><a href="document-util.html#getFreeFormatElement">getFreeFormatElement</a></li>
         <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
+        <li><a href="document-util.html#getArrayItem">getArrayItem</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
@@ -1716,15 +2017,20 @@
         <li><a href="document-util.html#getOffset">getOffset</a></li>
         <li><a href="document-util.html#getOverlapRangeAtIndex">getOverlapRangeAtIndex</a></li>
         <li><a href="document-util.html#changeTxt">changeTxt</a></li>
+        <li><a href="document-util.html#setStyle">setStyle</a></li>
         <li><a href="document-util.html#hasClass">hasClass</a></li>
         <li><a href="document-util.html#addClass">addClass</a></li>
         <li><a href="document-util.html#removeClass">removeClass</a></li>
         <li><a href="document-util.html#toggleClass">toggleClass</a></li>
         <li><a href="document-util.html#removeItem">removeItem</a></li>
         <li><a href="document-util.html#removeItemAllParents">removeItemAllParents</a></li>
+        <li><a href="document-util.html#detachNestedList">detachNestedList</a></li>
+        <li><a href="document-util.html#splitElement">splitElement</a></li>
+        <li><a href="document-util.html#mergeSameTags">mergeSameTags</a></li>
+        <li><a href="document-util.html#mergeNestedTags">mergeNestedTags</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
-        <li><a href="document-util.html#isIgnoreNodeChange">isIgnoreNodeChange</a></li>
-        <li><a href="document-util.html#cleanHTML">cleanHTML</a></li>
+        <li><a href="document-util.html#sortByDepth">sortByDepth</a></li>
+        <li><a href="document-util.html#createTagsWhitelist">createTagsWhitelist</a></li>
     </ul>
 </nav>
 

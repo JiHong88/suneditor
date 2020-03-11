@@ -13,6 +13,7 @@ import notice from '../modules/notice';
 
 export default {
     name: 'image',
+    display: 'dialog',
     add: function (core) {
         core.addModule([dialog, resizing, notice]);
         
@@ -55,7 +56,7 @@ export default {
         let image_dialog = this.setDialog.call(core);
         context.image.modal = image_dialog;
         context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
-        context.image.imgInputFile = context.image.focusElement = image_dialog.querySelector('._se_image_file');
+        context.image.imgInputFile = context.image.focusElement = (image_dialog.querySelector('._se_image_file') || image_dialog.querySelector('._se_image_url'));
         context.image.altText = image_dialog.querySelector('._se_image_alt');
         context.image.imgLink = image_dialog.querySelector('._se_image_link');
         context.image.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
@@ -102,7 +103,7 @@ export default {
 
         let html = '' +
             '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                     '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
@@ -193,6 +194,10 @@ export default {
         return dialog;
     },
 
+    open: function () {
+        this.plugins.dialog.open.call(this, 'image', 'image' === this.currentControllerName);
+    },
+
     openTab: function (e) {
         const modal = this.context.image.modal;
         const targetElement = (e === 'init' ? modal.querySelector('._se_tab_link') : e.target);
@@ -223,9 +228,9 @@ export default {
         this.util.addClass(targetElement, 'active');
 
         // focus
-        if (tabName === 'image') {
-            this.context.image.imgInputFile.focus();
-        } else if (tabName === 'url') {
+        if (tabName === 'image' && this.context.image.focusElement) {
+            this.context.image.focusElement.focus();
+        } else if (tabName === 'url' && this.context.image.imgLink) {
             this.context.image.imgLink.focus();
         }
 
@@ -271,6 +276,18 @@ export default {
             const imageUploadHeader = this.context.option.imageUploadHeader;
             const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
+            const info = {
+                linkValue: this.context.image._linkValue,
+                linkNewWindow: this.context.image.imgLinkNewWindowCheck.checked,
+                inputWidth: this.context.image.inputX.value,
+                inputHeight: this.context.image.inputY.value,
+                align: this.context.image._align,
+                isUpdate: this.context.dialog.updateModal,
+                currentImage: this.context.image._element
+            };
+
+            if (!this._imageUploadBefore(files, info)) return;
+
             if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
                 const formData = new FormData();
 
@@ -279,9 +296,9 @@ export default {
                 }
 
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.inputX.value, this.context.image.inputY.value, this.context.image._align, this.context.dialog.updateModal, this.context.image._element);
+                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
-                if(typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
+                if(imageUploadHeader !== null && typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
                         this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
                     }
@@ -290,7 +307,7 @@ export default {
             }
             else {
                 for (let i = 0; i < filesLen; i++) {
-                    this.plugins.image.setup_reader.call(this, files[i], this.context.image._linkValue, this.context.image.imgLinkNewWindowCheck.checked, this.context.image.inputX.value, this.context.image.inputY.value, this.context.image._align, i, filesLen - 1);
+                    this.plugins.image.setup_reader.call(this, files[i], info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, i, filesLen - 1);
                 }
             }
         }
@@ -300,8 +317,9 @@ export default {
         try {
             this.plugins.image.submitAction.call(this, this.context.image.imgInputFile.files);
         } catch (e) {
-            this.closeLoading();
             throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
+        } finally {
+            this.closeLoading();
         }
     },
 
@@ -330,22 +348,24 @@ export default {
         reader.readAsDataURL(file);
     },
 
-    callBack_imgUpload: function (linkValue, linkNewWindow, width, height, align, update, updateElement) {
+    callBack_imgUpload: function (info) {
         if (this.context.image._xmlHttp.readyState === 4) {
             if (this.context.image._xmlHttp.status === 200) {
-                const response = JSON.parse(this.context.image._xmlHttp.responseText);
+                
+                if (!this._imageUploadHandler(this.context.image._xmlHttp, info, this)) {
+                    const response = JSON.parse(this.context.image._xmlHttp.responseText);
 
-                if (response.errorMessage) {
-                    this.closeLoading();
-                    if (this._imageUploadError(response.errorMessage, response.result)) {
-                        notice.open.call(this, response.errorMessage);
-                    }
-                } else {
-                    const fileList = response.result;
-                    for (let i = 0, len = fileList.length, file; i < len; i++) {
-                        file = {name: fileList[i].name, size: fileList[i].size};
-                        if (update) this.plugins.image.update_src.call(this, fileList[i].url, updateElement, file);
-                        else this.plugins.image.create_image.call(this, fileList[i].url, linkValue, linkNewWindow, width, height, align, file);
+                    if (response.errorMessage) {
+                        if (this._imageUploadError(response.errorMessage, response.result)) {
+                            notice.open.call(this, response.errorMessage);
+                        }
+                    } else {
+                        const fileList = response.result;
+                        for (let i = 0, len = fileList.length, file; i < len; i++) {
+                            file = {name: fileList[i].name, size: fileList[i].size};
+                            if (info.isUpdate) this.plugins.image.update_src.call(this, fileList[i].url, info.currentImage, file);
+                            else this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+                        }
                     }
                 }
 
@@ -354,7 +374,7 @@ export default {
             // error
             else {
                 this.closeLoading();
-                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseURL: ' + this.context.image._xmlHttp.responseURL);
+                throw Error('[SUNEDITOR.imageUpload.fail] status: ' + this.context.image._xmlHttp.status + ', responseText: ' + this.context.image._xmlHttp.responseText);
             }
         }
     },
@@ -498,7 +518,7 @@ export default {
             img.setAttribute('origin-size', img.naturalWidth + ',' + img.naturalHeight);
         }
         if (!img.getAttribute('data-origin')) {
-            const container = this.util.getParentElement(img, this.util.isComponent);
+            const container = this.util.getParentElement(img, this.util.isMediaComponent);
             const cover = this.util.getParentElement(img, 'FIGURE');
 
             const w = this.plugins.resizing._module_getSizeX.call(this, this.context.image, img, cover, container);
@@ -537,10 +557,10 @@ export default {
         for (let i = 0, len = imagesInfo.length; i < len; i++) {
             infoIndex[i] = imagesInfo[i].index;
         }
-
+        
         for (let i = 0, len = images.length, img; i < len; i++) {
             img = images[i];
-            if (!this.util.getParentElement(img, this.util.isComponent)) {
+            if (!this.util.getParentElement(img, this.util.isMediaComponent)) {
                 currentImages.push(this._variable._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
@@ -612,7 +632,7 @@ export default {
         contextImage._container = container;
 
         // set size
-        this.plugins.image.applySize.call(this);
+        this.plugins.image.applySize.call(this, width, height);
 
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
@@ -698,8 +718,7 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            existElement.parentNode.insertBefore(container, existElement);
-            this.util.removeItem(existElement);
+            existElement.parentNode.replaceChild(container, existElement);
             imageEl = container.querySelector('img');
 
             contextImage._element = imageEl;
@@ -756,11 +775,13 @@ export default {
     },
 
     onModifyMode: function (element, size) {
+        if (!element) return;
+        
         const contextImage = this.context.image;
         contextImage._linkElement = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
-        contextImage._container = this.util.getParentElement(element, this.util.isComponent);
+        contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.getAttribute('data-align') || 'none';
 
@@ -965,7 +986,7 @@ export default {
 
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, this.util.isComponent) || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         

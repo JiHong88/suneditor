@@ -9,9 +9,11 @@
 
 export default {
     name: 'align',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.align = {
+            targetIcon: targetElement.querySelector('i'),
             _alignList: null,
             currentAlign: ''
         };
@@ -50,10 +52,28 @@ export default {
         return listDiv;
     },
 
+    active: function (element) {
+        const target = this.context.align.targetIcon;
+
+        if (!element) {
+            target.className = 'se-icon-align-left';
+            target.removeAttribute('data-focus');
+        } else if (this.util.isFormatElement(element)) {
+            const textAlign = element.style.textAlign;
+            if (textAlign) {
+                target.className = 'se-icon-align-' + textAlign;
+                target.setAttribute('data-focus', textAlign);
+            }
+            return true;
+        }
+
+        return false;
+    },
+
     on: function () {
         const alignContext = this.context.align;
         const alignList = alignContext._alignList;
-        const currentAlign = this.commandMap.ALIGN.getAttribute('data-focus') || 'left';
+        const currentAlign = alignContext.targetIcon.getAttribute('data-focus') || 'left';
 
         if (currentAlign !== alignContext.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {
@@ -84,10 +104,13 @@ export default {
 
         const selectedFormsts = this.getSelectedElements();
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            selectedFormsts[i].style.textAlign = value;
+            this.util.setStyle(selectedFormsts[i], 'textAlign', (value === 'left' ? '' : value));
         }
 
         this.submenuOff();
         this.focus();
+        
+        // history stack
+        this.history.push(false);
     }
 };

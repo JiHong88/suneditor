@@ -9,6 +9,7 @@
 
 export default {
     name: 'textStyle',
+    display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.textStyle = {

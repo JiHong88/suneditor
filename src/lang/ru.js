@@ -53,6 +53,7 @@
             hr_dashed: 'Штриховая',
             table: 'Таблица',
             link: 'Ссылка',
+            math: 'математический',
             image: 'Изображение',
             video: 'Видео',
             fullScreen: 'Полный экран',
@@ -78,6 +79,12 @@
                 url: 'Ссылка',
                 text: 'Текст',
                 newWindowCheck: 'Открывать в новом окне'
+            },
+            mathBox: {
+                title: 'математический',
+                inputLabel: 'Математическая запись',
+                fontSizeLabel: 'Кегль',
+                previewLabel: 'Предварительный просмотр'
             },
             imageBox: {
                 title: 'Вставить изображение',
