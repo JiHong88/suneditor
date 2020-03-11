@@ -24,9 +24,15 @@
             font-size: 15px;
             transition: 0.4s;
         }
-
-        .active, .accordion:hover {
+        .accordion.active, .accordion:hover {
             background-color: #ffc449;
+        }
+
+        .acc-desc {
+            background-color: #ffafaf;
+        }
+        .acc-desc.active, .acc-desc:hover {
+            background-color: #fc6868;
         }
 
         .panel {
@@ -94,6 +100,54 @@
 
 <div class="content">
     <article class="markdown-body entry-content">
+        <!-- base -->
+        <button class="accordion acc-desc">How to add a plugin ↓</button>
+        <div class="panel">
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Define custom plugin</span>
+<span class="pl-k">var</span> <span class="pl-s1">customPlugin</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+    <span class="pl-c">// <span class="pl-k">@Required</span> common</span>
+    <span class="pl-c1">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span>
+    <span class="pl-c1">display</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+    <span class="pl-c1">add</span>: <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span><span class="pl-kos">}</span><span class="pl-kos">,</span>
+    ...
+<span class="pl-kos">}</span>
+
+<span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'ex_custom'</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
+    <span class="pl-c">// --- When using CDN ---</span>
+    <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">customPlugin</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+    
+    <span class="pl-c">// --- When using node.js ---</span>
+    <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">custom_container</span><span class="pl-kos">,</span> <span class="pl-s1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">blockquote</span><span class="pl-kos">,</span> <span class="pl-s1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">link</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+    <span class="pl-c">// ------ all plguins</span>
+    <span class="pl-c1">plugins</span>: <span class="pl-kos">{</span>
+        ...<span class="pl-s1">plugins</span><span class="pl-kos">,</span>
+        ...<span class="pl-kos">{</span>custom_container<span class="pl-kos">}</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span>
+    
+    <span class="pl-c">// --- Add button list ---</span>
+    <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
+        <span class="pl-kos">[</span>
+            <span class="pl-kos">{</span>
+                <span class="pl-c">// plugin's name attribute</span>
+                <span class="pl-c1">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span> 
+                <span class="pl-c">// name of the plugin to be recognized by the toolbar.</span>
+                <span class="pl-c">// It must be the same as the name attribute of the plugin </span>
+                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span>
+                <span class="pl-c">// button's class ("se-btn" class is registered, basic button click css is applied.)</span>
+                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+                <span class="pl-c">// HTML title attribute</span>
+                <span class="pl-c1">title</span>: <span class="pl-s">'Custom plugin'</span><span class="pl-kos">,</span> 
+                <span class="pl-c">// Enter the "display" attribute value of your custom plugin.</span>
+                <span class="pl-c1">dataDisplay</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+                <span class="pl-c">// HTML to be append to button</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="se-icon-add"&gt;&lt;/i&gt;'</span>
+            <span class="pl-kos">}</span>
+        <span class="pl-kos">]</span>
+    <span class="pl-kos">]</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span></pre></div>
+        </div>
+
+
         <!-- container -->
         <a id="container" href="#container"><h4 class="sub-title">1. Plugins container</h4></a>
         <button class="accordion">sample ↓</button>

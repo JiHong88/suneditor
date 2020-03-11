@@ -317,8 +317,9 @@ addTagsWhitelist      : Add tags to the default tags whitelist of editor. defaul
 pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
                         ex) 'p|h[1-6]'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
-                        // Base whitelist: 'contenteditable|colspan|rowspan|target|href|src|class|type'
-                        // Attributes used in the editor: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
+                        // -- Fixed whitelist --
+                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type'
+                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
                         ex) {
                             'all': 'style', // Apply to all tags
                             'input': 'checked' // Apply to input tag
