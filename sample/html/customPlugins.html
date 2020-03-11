@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css">
     <style>
         .accordion {
             background-color: #ffebc1;
@@ -26,13 +27,6 @@
         }
         .accordion.active, .accordion:hover {
             background-color: #ffc449;
-        }
-
-        .acc-desc {
-            background-color: #ffafaf;
-        }
-        .acc-desc.active, .acc-desc:hover {
-            background-color: #fc6868;
         }
 
         .panel {
@@ -101,11 +95,11 @@
 <div class="content">
     <article class="markdown-body entry-content">
         <!-- base -->
-        <button class="accordion acc-desc">How to add a plugin ↓</button>
-        <div class="panel">
-<div class="highlight highlight-source-js"><pre><span class="pl-c">// Define custom plugin</span>
+        <button class="accordion active">How to add a plugin ↓</button>
+        <div class="panel" style="max-height: 998px;">
+<div class="highlight highlight-source-js"><pre><span class="pl-ent">// Define custom plugin</span>
 <span class="pl-k">var</span> <span class="pl-s1">customPlugin</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// <span class="pl-k">@Required</span> common</span>
+    <span class="pl-c">// @Required common</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span>
     <span class="pl-c1">display</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
     <span class="pl-c1">add</span>: <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span><span class="pl-kos">}</span><span class="pl-kos">,</span>
@@ -113,18 +107,18 @@
 <span class="pl-kos">}</span>
 
 <span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'ex_custom'</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// --- When using CDN ---</span>
+    <span class="pl-ent">// ------ When using CDN</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">customPlugin</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
     
-    <span class="pl-c">// --- When using node.js ---</span>
+    <span class="pl-ent">// ------ When using node.js</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">custom_container</span><span class="pl-kos">,</span> <span class="pl-s1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">blockquote</span><span class="pl-kos">,</span> <span class="pl-s1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">link</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
-    <span class="pl-c">// ------ all plguins</span>
+    <span class="pl-ent">// --- all plguins</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">{</span>
         ...<span class="pl-s1">plugins</span><span class="pl-kos">,</span>
         ...<span class="pl-kos">{</span>custom_container<span class="pl-kos">}</span>
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
     
-    <span class="pl-c">// --- Add button list ---</span>
+    <span class="pl-ent">// ------ Add button list</span>
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
         <span class="pl-kos">[</span>
             <span class="pl-kos">{</span>
@@ -139,8 +133,16 @@
                 <span class="pl-c1">title</span>: <span class="pl-s">'Custom plugin'</span><span class="pl-kos">,</span> 
                 <span class="pl-c">// Enter the "display" attribute value of your custom plugin.</span>
                 <span class="pl-c1">dataDisplay</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
-                <span class="pl-c">// HTML to be append to button</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="se-icon-add"&gt;&lt;/i&gt;'</span>
+                
+                <span class="pl-ent">// ------ HTML to be append to button</span>
+                <span class="pl-ent">// --- Inline svg (These are the free icon sites you can use)</span>
+                <span class="pl-ent">// https://materialdesignicons.com/</span>
+                <span class="pl-ent">// https://material.io/resources/icons/?style=baseline</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;&lt;path d="M0 0h24v24H0z" fill="none"/&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
+                <span class="pl-ent">// --- Icon class (This icon uses Font Awesome)</span>
+                <span class="pl-ent">// https://fontawesome.com/, https://www.jsdelivr.com/package/npm/@fortawesome/fontawesome-free</span>
+                <span class="pl-ent">// &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css"&gt;</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
@@ -347,7 +349,8 @@
                 <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">title</span>:<span class="pl-s">'Custom plugin of the comand'</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'command'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="se-icon-add"&gt;&lt;/i&gt;'</span>
+                <span class="pl-c">// This icon uses Font Awesome</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
@@ -504,7 +507,7 @@
                 <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">title</span>:<span class="pl-s">'Custom plugin of the submenu'</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'submenu'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="se-icon-add"&gt;&lt;/i&gt;'</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;&lt;path d="M0 0h24v24H0z" fill="none"/&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
@@ -869,7 +872,7 @@
                     buttonClass:'', 
                     title:'Custom plugin of the comand', 
                     dataDisplay:'command',
-                    innerHTML:'<i class="se-icon-add"></i>'
+                    innerHTML:'<i class="fas fa-font"></i>'
                 }
             ]
         ]
@@ -885,7 +888,7 @@
                     buttonClass:'', 
                     title:'Custom plugin of the submenu', 
                     dataDisplay:'submenu',
-                    innerHTML:'<i class="se-icon-add"></i>'
+                    innerHTML:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'
                 }
             ]
         ]
@@ -901,7 +904,7 @@
                     buttonClass:'', 
                     title:'Custom plugin of the dialog', 
                     dataDisplay:'dialog',
-                    innerHTML:'<i class="se-icon-add"></i>'
+                    innerHTML:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" /></svg>'
                 }
             ]
         ]
