@@ -1,5 +1,4 @@
 import { DisplayProperty, PositionProperty } from 'csstype';
-import CodeMirror from 'codemirror';
 
 declare module 'suneditor' {
   export function create(
@@ -38,9 +37,9 @@ declare module 'suneditor' {
      */
     lang?: object;
     /**
-     * The mode of the editor (classic, inline, balloon)
+     * The mode of the editor (classic, inline, balloon, balloon-always)
      */
-    mode?: 'classic' | 'inline' | 'balloon';
+    mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always';
     /**
      * Button List
      */
@@ -71,9 +70,9 @@ declare module 'suneditor' {
      */
     codeMirror?: object;
     /**
-     * Generated CodeMirror Object
+     * katex Object
      */
-    codeMirrorEditor?: CodeMirror;
+    katex?: object;
     /**
      * Display
      * =======
@@ -331,6 +330,7 @@ declare module 'suneditor' {
     | 'textStyle'
     | 'link'
     | 'image'
-    | 'video';
+    | 'video'
+    | 'math';
   export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[];
 }
