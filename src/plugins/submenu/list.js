@@ -217,7 +217,7 @@ export default {
                 isCell = util.isListCell(fTag);
                 rangeTag = util.isRangeFormatElement(originParent) ? originParent : null;
                 parentTag = isCell && !util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
-                siblingTag = isCell && !util.isWysiwygDiv(originParent) ? !next ? originParent : originParent.nextSibling : fTag.nextSibling;
+                siblingTag = isCell && !util.isWysiwygDiv(originParent) ? (!next || util.isListCell(parentTag)) ? originParent : originParent.nextSibling : fTag.nextSibling;
 
                 newCell = util.createElement('LI');
                 util.copyFormatAttributes(newCell, fTag);
@@ -231,7 +231,6 @@ export default {
                     while (fChildren[0]) {
                         newCell.appendChild(fChildren[0]);
                     }
-                    // newCell.innerHTML = fTag.innerHTML;
                 }
                 list.appendChild(newCell);
 
@@ -245,7 +244,7 @@ export default {
 
                 util.removeItem(fTag);
                 if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
-                if (next && util.getRangeFormatElement(nextParent, passComponent) !== util.getRangeFormatElement(originParent, passComponent)) {
+                if (next && (util.getRangeFormatElement(nextParent, passComponent) !== util.getRangeFormatElement(originParent, passComponent) || (util.isList(nextParent) && util.isList(originParent) && util.getElementDepth(nextParent) !== util.getElementDepth(originParent)))) {
                     list = util.createElement(command);
                 }
 
