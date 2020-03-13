@@ -1,5 +1,5 @@
 import { DisplayProperty, PositionProperty } from 'csstype';
-import CodeMirror from 'codemirror';
+import * as CodeMirror from 'codemirror';
 
 declare module 'suneditor' {
   export function create(
@@ -73,7 +73,7 @@ declare module 'suneditor' {
     /**
      * Generated CodeMirror Object
      */
-    codeMirrorEditor?: CodeMirror;
+    codeMirrorEditor?: CodeMirror.Editor;
     /**
      * Display
      * =======
