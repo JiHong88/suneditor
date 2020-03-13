@@ -110,15 +110,21 @@ export default {
         const util = this.util;
         util.sortByDepth(selectedFormats, true);
 
-        let isRemove = true;
-        let edgeFirst = null;
-        let edgeLast = null;
-        
         // merge
         let firstSel = selectedFormats[0];
         let lastSel = selectedFormats[selectedFormats.length - 1];
         let topEl = (util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
         let bottomEl = (util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
+
+        const range = this.getRange();
+        const originRange = {
+            sc: range.startContainer,
+            so: range.startOffset,
+            ec: range.endContainer,
+            eo: range.endOffset
+        };
+
+        let isRemove = true;
 
         for (let i = 0, len = selectedFormats.length; i < len; i++) {
             if (!util.isList(util.getRangeFormatElement(selectedFormats[i], function (current) {
@@ -144,7 +150,7 @@ export default {
 
             const currentFormat = util.getRangeFormatElement(firstSel);
             const cancel = currentFormat && currentFormat.tagName === command;
-            let rangeArr, tempList, edge;
+            let rangeArr, tempList;
             const passComponent = function (current) {
                 return !this.isComponent(current);
             }.bind(util);
@@ -161,13 +167,12 @@ export default {
                 } else {
                     if (r !== o) {
                         if (detach && util.isListCell(o.parentNode)) {
-                            edge = this.plugins.list._detachNested.call(this, rangeArr.f);
+                            this.plugins.list._detachNested.call(this, rangeArr.f);
                         } else {
-                            edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                            this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
                         }
                         
                         o = selectedFormats[i].parentNode;
-                        if (!edgeFirst) edgeFirst = edge;
                         if (!cancel) tempList = util.createElement(command);
                         
                         r = o;
@@ -179,11 +184,10 @@ export default {
                 
                 if (i === len - 1) {
                     if (detach && util.isListCell(o.parentNode)) {
-                        edgeLast = this.plugins.list._detachNested.call(this, rangeArr.f);
+                        this.plugins.list._detachNested.call(this, rangeArr.f);
                     } else {
-                        edgeLast = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                        this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
                     }
-                    if (!edgeFirst) edgeFirst = edgeLast;
                 }
             }
         } else {
@@ -261,16 +265,9 @@ export default {
                 lastList = list.children[bottomNumber];
                 util.removeItem(bottomEl);
             }
-
-            edgeFirst = edgeLast = util.getEdgeChildNodes(firstList.firstChild, lastList.lastChild);
         }
         
-        return {
-            sc: edgeFirst.sc,
-            so: 0,
-            ec: edgeLast.ec,
-            eo: edgeLast.ec.textContent.length
-        };
+        return originRange;
     },
 
     _detachNested: function (cells) {
