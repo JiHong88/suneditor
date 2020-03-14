@@ -12,6 +12,7 @@ import _Context from './context';
 import _history from './history';
 import _util from './util';
 import notice from '../plugins/modules/notice';
+import icons from '../assets/defaultIcons';
 
 /**
  * @description SunEditor constuctor function.
@@ -92,6 +93,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description loaded language
          */
         lang: lang,
+
+        /**
+         * @description The selection node (core.getSelectionNode()) to which the effect was last applied
+         */
+        effectNode: null,
 
         /**
          * @description submenu element
@@ -186,12 +192,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _bindControllersOff: null,
-
-        /**
-         * @description The selection node (core.getSelectionNode()) to which the effect was last applied
-         * @private
-         */
-        _lastEffectNode: null,
 
         /**
          * @description Is inline mode?
@@ -507,7 +507,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this._notHideToolbar = false;
             this._resizingName = '';
             this.currentControllerName = '';
-            this._lastEffectNode = null;
+            this.effectNode = null;
             if (!this._bindControllersOff) return;
 
             this.removeDocEvent('mousedown', this._bindControllersOff);
@@ -1419,7 +1419,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
-            this._lastEffectNode = null;
+            this.effectNode = null;
             util.mergeSameTags(rangeElement, null, null, false);
             util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
@@ -1640,7 +1640,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 };
             }
 
-            this._lastEffectNode = null;
+            this.effectNode = null;
             if (notHistoryPush) return edge;
             
             if (!remove && edge) {
@@ -3308,7 +3308,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.plugins.list.editInsideList.call(this, shift, cells);
             }
 
-            this._lastEffectNode = null;
+            this.effectNode = null;
             this.setRange(sc, so, ec, eo);
 
             // history stack
@@ -3498,8 +3498,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                util.removeClass(element.firstElementChild, 'se-icon-expansion');
-                util.addClass(element.firstElementChild, 'se-icon-reduction');
+                element.firstElementChild.outerHTML = icons.reduction;
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3531,9 +3530,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-
-                util.removeClass(element.firstElementChild, 'se-icon-reduction');
-                util.addClass(element.firstElementChild, 'se-icon-expansion');
+                element.firstElementChild.outerHTML = icons.expansion;
             }
         },
 
@@ -4116,8 +4113,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         _applyTagEffects: function () {
             let selectionNode = core.getSelectionNode();
-            if (selectionNode === core._lastEffectNode) return;
-            core._lastEffectNode = selectionNode;
+            if (selectionNode === core.effectNode) return;
+            core.effectNode = selectionNode;
 
             const commandMap = core.commandMap;
             const classOnCheck = this._onButtonsCheck;

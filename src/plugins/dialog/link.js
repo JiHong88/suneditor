@@ -8,6 +8,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
+import icons from '../../assets/defaultIcons';
 
 export default {
     name: 'link',
@@ -59,7 +60,7 @@ export default {
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                        icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
                 '</div>' +
@@ -94,15 +95,15 @@ export default {
             '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-                        '<i class="se-icon-edit"></i>' +
+                        icons.edit +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="unlink" tabindex="-1" class="se-tooltip">' +
-                        '<i class="se-icon-unlink"></i>' +
+                        icons.unlink +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.unlink + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-                        '<i class="se-icon-delete"></i>' +
+                        icons.delete +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                     '</button>' +
                 '</div>' +

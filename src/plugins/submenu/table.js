@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import icons from '../../assets/defaultIcons';
+
 export default {
     name: 'table',
     display: 'submenu',
@@ -19,7 +21,6 @@ export default {
             _trElements: null,
             _tableXY: [],
             _maxWidth: true,
-            resizeIcon: null,
             resizeText: null,
             headerButton: null,
             mergeButton: null,
@@ -34,7 +35,11 @@ export default {
             _physical_cellIndex: 0,
             _logical_cellIndex: 0,
             _current_colSpan: 0,
-            _current_rowSpan: 0
+            _current_rowSpan: 0,
+            icons: {
+                expansion: icons.expansion,
+                reduction: icons.reduction
+            }
         };
 
         /** set submenu */
@@ -48,7 +53,7 @@ export default {
         /** set table controller */
         let tableController = this.setController_table.call(core);
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('._se_table_resize > i');
+        context.table.resizeButton = tableController.querySelector('._se_table_resize');
         context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
         context.table.headerButton = tableController.querySelector('._se_table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
@@ -99,15 +104,15 @@ export default {
             '<div>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="resize" class="se-tooltip _se_table_resize">' +
-                        '<i class="se-icon-expansion"></i>' +
+                        icons.expansion +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="header" class="se-tooltip _se_table_header">' +
-                        '<i class="se-icon-table-header"></i>' +
+                        icons.table_header +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="remove" class="se-tooltip">' +
-                        '<i class="se-icon-delete"></i>' +
+                        icons.delete +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                     '</button>' +
                 '</div>' +
@@ -126,19 +131,19 @@ export default {
             '<div>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
-                        '<i class="se-icon-insert-row-above"></i>' +
+                        icons.insert_row_above +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
-                        '<i class="se-icon-insert-row-below"></i>' +
+                        icons.insert_row_below +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
-                        '<i class="se-icon-delete-row"></i>' +
+                        icons.delete_row +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="merge" class="_se_table_merge_button se-tooltip" disabled>' +
-                        '<i class="se-icon-merge-cell"></i>' +
+                        icons.merge_cell +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
                     '</button>' +
                 '</div>' +
@@ -146,19 +151,19 @@ export default {
             '<div>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
-                        '<i class="se-icon-insert-column-left"></i>' +
+                        icons.insert_column_left +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
-                        '<i class="se-icon-insert-column-right"></i>' +
+                        icons.insert_column_right +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
-                        '<i class="se-icon-delete-column"></i>' +
+                        icons.delete_column +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
-                        '<i class="se-icon-split-cell"></i>' +
+                        icons.split_cell +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
                     '</button>' +
                     '<div class="se-btn-group-sub sun-editor-common se-list-layer">' +
@@ -1057,23 +1062,21 @@ export default {
 
     resizeTable: function () {
         const contextTable = this.context.table;
-        const icon =  contextTable.resizeIcon;
+        const icon =  contextTable.resizeButton.querySelector('svg');
         const span = contextTable.resizeText;
-
-        let removeClass = 'se-icon-expansion';
-        let addClass = 'se-icon-reduction';
-        let text = contextTable.minText;
-        let width = '100%';
+        let sizeIcon, text, width;
 
         if (!contextTable._maxWidth) {
-            removeClass = 'se-icon-reduction';
-            addClass = 'se-icon-expansion';
+            sizeIcon = contextTable.icons.expansion;
             text = contextTable.maxText;
             width = 'auto';
+        } else {
+            sizeIcon = contextTable.icons.reduction;
+            text = contextTable.minText;
+            width = '100%';
         }
         
-        this.util.removeClass(icon, removeClass);
-        this.util.addClass(icon, addClass);
+        icon.outerHTML = sizeIcon;
         this.util.changeTxt(span, text);
         contextTable._element.style.width = width;
     },

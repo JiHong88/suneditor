@@ -7,15 +7,23 @@
  */
 'use strict';
 
+import icons from '../../assets/defaultIcons';
+
 export default {
     name: 'align',
     display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
         context.align = {
-            targetIcon: targetElement.querySelector('i'),
+            targetButton: targetElement,
             _alignList: null,
-            currentAlign: ''
+            currentAlign: '',
+            icons: {
+                justify: icons.align_justify,
+                left: icons.align_left,
+                right: icons.align_right,
+                center: icons.align_center
+            }
         };
 
         /** set submenu */
@@ -42,10 +50,26 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="se-submenu se-list-inner se-list-align">' +
                 '<ul class="se-list-basic">' +
-                    '<li><button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '"><span class="se-icon-align-left"></span>' + lang.toolbar.alignLeft + '</button></li>' +
-                    '<li><button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '"><span class="se-icon-align-center"></span>' + lang.toolbar.alignCenter + '</button></li>' +
-                    '<li><button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '"><span class="se-icon-align-right"></span>' + lang.toolbar.alignRight + '</button></li>' +
-                    '<li><button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '"><span class="se-icon-align-justify"></span>' + lang.toolbar.alignJustify + '</button></li>' +
+                    '<li>' +
+                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
+                            '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
+                        '</button>' +
+                    '</li>' +
+                    '<li>' +
+                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
+                            '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
+                        '</button>' +
+                    '</li>' +
+                    '<li>' +
+                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
+                            '<span class="se-list-icon">' + icons.align_right +'</span>' + lang.toolbar.alignRight +
+                        '</button>' +
+                    '</li>' +
+                    '<li>' +
+                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
+                            '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
+                        '</button>' +
+                    '</li>' +
                 '</ul>' +
             '</div>';
 
@@ -53,18 +77,19 @@ export default {
     },
 
     active: function (element) {
-        const target = this.context.align.targetIcon;
+        const targetButton = this.context.align.targetButton;
+        const target = targetButton.querySelector('svg');
 
         if (!element) {
-            target.className = 'se-icon-align-left';
-            target.removeAttribute('data-focus');
+            target.outerHTML = this.context.align.icons.left;
+            targetButton.removeAttribute('data-focus');
         } else if (this.util.isFormatElement(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
-                target.className = 'se-icon-align-' + textAlign;
-                target.setAttribute('data-focus', textAlign);
+                target.outerHTML = this.context.align.icons[textAlign];
+                targetButton.setAttribute('data-focus', textAlign);
+                return true;
             }
-            return true;
         }
 
         return false;
@@ -73,7 +98,7 @@ export default {
     on: function () {
         const alignContext = this.context.align;
         const alignList = alignContext._alignList;
-        const currentAlign = alignContext.targetIcon.getAttribute('data-focus') || 'left';
+        const currentAlign = alignContext.targetButton.getAttribute('data-focus') || 'left';
 
         if (currentAlign !== alignContext.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {
@@ -107,6 +132,7 @@ export default {
             this.util.setStyle(selectedFormsts[i], 'textAlign', (value === 'left' ? '' : value));
         }
 
+        this.effectNode = null;
         this.submenuOff();
         this.focus();
         

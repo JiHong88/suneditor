@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import icons from '../../assets/defaultIcons';
+
 export default {
     name: 'list',
     display: 'submenu',
@@ -14,9 +16,12 @@ export default {
         const context = core.context;
         context.list = {
             targetButton: targetElement,
-            targetIcon: targetElement.querySelector('i'),
             _list: null,
-            currentList: ''
+            currentList: '',
+            icons: {
+                bullets: icons.list_bullets,
+                number: icons.list_number
+            }
         };
 
         /** set submenu */
@@ -44,11 +49,11 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="OL">' +
-                        '<i class="se-icon-list-number"></i>' +
+                        icons.list_number +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
                     '</button></li>' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="UL">' +
-                        '<i class="se-icon-list-bullets"></i>' +
+                        icons.list_bullets +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
                     '</button></li>' +
                 '</ul>' +
@@ -59,24 +64,21 @@ export default {
 
     active: function (element) {
         const button = this.context.list.targetButton;
-        const icon = this.context.list.targetIcon;
+        const icon = button.querySelector('svg');
         const util = this.util;
 
         if (!element) {
             button.removeAttribute('data-focus');
-            util.removeClass(icon, 'se-icon-list-bullets');
-            util.addClass(icon, 'se-icon-list-number');
+            icon.outerHTML = this.context.list.icons.number;
             util.removeClass(button, 'active');
         } else if (util.isList(element)) {
             const nodeName = element.nodeName;
             button.setAttribute('data-focus', nodeName);
             util.addClass(button, 'active');
             if (/UL/i.test(nodeName)) {
-                util.removeClass(icon, 'se-icon-list-number');
-                util.addClass(icon, 'se-icon-list-bullets');
+                icon.outerHTML = this.context.list.icons.bullets;
             } else {
-                util.removeClass(icon, 'se-icon-list-bullets');
-                util.addClass(icon, 'se-icon-list-number');
+                icon.outerHTML = this.context.list.icons.number;
             }
             
             return true;

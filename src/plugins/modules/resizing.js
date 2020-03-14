@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import icons from '../../assets/defaultIcons';
+
 export default {
     name: 'resizing',
     add: function (core) {
@@ -22,7 +24,13 @@ export default {
             _rotateVertical: false,
             _resize_direction: '',
             _move_path: null,
-            _isChange: false
+            _isChange: false,
+            alignIcons: {
+                basic: icons.align_justify,
+                left: icons.align_left,
+                right: icons.align_right,
+                center: icons.align_center
+            }
         };
 
         /** resize controller, button */
@@ -46,8 +54,6 @@ export default {
         context.resizing.alignMenuList = context.resizing.alignMenu.querySelectorAll('button');
 
         context.resizing.alignButton = resize_button.querySelector('._se_resizing_align_button');
-        context.resizing.alignButtonIcon = context.resizing.alignButton.querySelector('i');
-
         context.resizing.autoSizeButton = resize_button.querySelector('._se_resizing_btn_group ._se_auto_size');
         context.resizing.captionButton = resize_button.querySelector('._se_resizing_caption_button');
 
@@ -114,67 +120,67 @@ export default {
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="auto" class="se-tooltip _se_auto_size">' +
-                    '<i class="se-icon-auto-size"></i>' +
+                    icons.auto_size +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.autoSize + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip _se_rotation">' +
-                    '<i class="se-icon-rotate-left"></i>' +
+                    icons.rotate_left +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="rotate" data-value="90" class="se-tooltip _se_rotation">' +
-                    '<i class="se-icon-rotate-right"></i>' +
+                    icons.rotate_right +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
                 '</button>' +
             '</div>' +
             '<div class="se-btn-group">' +
                 '<button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
-                    '<i class="se-icon-mirror-horizontal"></i>' +
+                    icons.mirror_horizontal +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
-                    '<i class="se-icon-mirror-vertical"></i>' +
+                    icons.mirror_vertical +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
-                    '<i class="se-icon-align-justify"></i>' +
+                    icons.align_justify +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
                 '</button>' +
                 '<div class="se-btn-group-sub sun-editor-common se-list-layer se-resizing-align-list">' +
                     '<div class="se-list-inner">' +
                         '<ul class="se-list-basic">' +
                             '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
-                                '<i class="se-icon-align-justify"></i>' +
+                                icons.align_justify +
                                 '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
                             '</button></li>' +
                             '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
-                                '<i class="se-icon-align-left"></i>' +
+                                icons.align_left +
                                 '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
                             '</button></li>' +
                             '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
-                                '<i class="se-icon-align-center"></i>' +
+                                icons.align_center +
                                 '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
                             '</button></li>' +
                             '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
-                                '<i class="se-icon-align-right"></i>' +
+                                icons.align_right +
                                 '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
                             '</button></li>' +
                         '</ul>' +
                     '</div>' +
                 '</div>' +
                 '<button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
-                    '<i class="se-icon-caption"></i>' +
+                    icons.caption +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
                 '</button>' +
                     '<button type="button" data-command="revert" class="se-tooltip">' +
-                    '<i class="se-icon-revert"></i>' +
+                    icons.revert +
                 '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="update" class="se-tooltip">' +
-                    '<i class="se-icon-modify"></i>' +
+                    icons.modify +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="delete" class="se-tooltip">' +
-                    '<i class="se-icon-delete"></i>' +
+                    icons.delete +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                 '</button>' +
             '</div>';
@@ -338,8 +344,7 @@ export default {
 
         // align icon
         const alignList = contextResizing.alignMenuList;
-        this.util.removeClass(contextResizing.alignButtonIcon, 'se-icon-align\\-[a-z]+');
-        this.util.addClass(contextResizing.alignButtonIcon, 'se-icon-align-' + (align === 'basic' ? 'justify' : align));
+        contextResizing.alignButton.querySelector('svg').outerHTML = contextResizing.alignIcons[align];
         for (let i = 0, len = alignList.length; i < len; i++) {
             if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
             else this.util.removeClass(alignList[i], 'on');

@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import icons from '../../assets/defaultIcons';
+
 export default {
     name: 'notice',
     add: function (core) {
@@ -22,7 +24,7 @@ export default {
         notice_button.className = 'close';
         notice_button.setAttribute('aria-label', 'Close');
         notice_button.setAttribute('title', core.lang.dialogBox.close);
-        notice_button.innerHTML = '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>';
+        notice_button.innerHTML = icons.cancel;
         
         notice_div.appendChild(notice_span);
         notice_div.appendChild(notice_button);

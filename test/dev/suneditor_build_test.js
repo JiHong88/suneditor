@@ -39,7 +39,7 @@ suneditor.create("sample1", {
                 buttonClass:'', 
                 title:'custom_container', 
                 dataDisplay:'container',
-                innerHTML:'<i class="se-icon-add"></i>'
+                innerHTML:''
             },
             'bold', 'italic'
         ]
@@ -553,7 +553,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
                 // HTML to be append to button
-                innerHTML:'<i class="se-icon-checked"></i>'
+                innerHTML:''
             }
         ]
     ],

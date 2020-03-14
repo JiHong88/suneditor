@@ -1,3 +1,5 @@
+import icons from '../../src/assets/defaultIcons';
+
 export default {
     // @Required
     // plugin name
@@ -42,7 +44,7 @@ export default {
                             '<div style="position:relative;">' +
                                 // Enter the button name of the plug-in or default command in the button's "data-command"
                                 '<button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;">' +
-                                    '<i class="se-icon-bold"></i>' +
+                                    icons.bold +
                                     '<span class="se-tooltip-inner">' +
                                         '<span class="se-tooltip-text">Quote</span>' +
                                     '</span>' +
@@ -58,7 +60,7 @@ export default {
                             '</div>' +
                             '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="link">' +
-                                    '<i class="se-icon-link"></i>' +
+                                    icons.link +
                                     '<span class="se-tooltip-inner">' +
                                         '<span class="se-tooltip-text">Link</span>' +
                                     '</span>' +
@@ -66,7 +68,7 @@ export default {
                             '</div>' +
                             '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="table">' +
-                                    '<i class="se-icon-grid"></i>' +
+                                    icons.table +
                                     '<span class="se-tooltip-inner">' +
                                         '<span class="se-tooltip-text">Table</span>' +
                                     '</span>' +
@@ -74,7 +76,7 @@ export default {
                             '</div>' +
                             '<div style="position:relative;">' +
                                 '<button type="button" class="se-btn se-tooltip" data-command="textStyle">' +
-                                    '<i class="se-icon-text-style"></i>' +
+                                    icons.text_style +
                                     '<span class="se-tooltip-inner">' +
                                         '<span class="se-tooltip-text">Text style</span>' +
                                     '</span>' +
