@@ -551,7 +551,7 @@ const util = {
             if (reg('(\s|^)' + class_a[i] + '(\s|$)').test(class_b.value)) compClass++;
         }
 
-        return compStyle === style_b.length && compClass === class_b.length;
+        return (compStyle === style_b.length && compStyle === style_a.length) && (compClass === class_b.length && compClass === class_a.length);
     },
 
     /**
@@ -1163,20 +1163,46 @@ const util = {
                 if (!child) break;
                 if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) continue;
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
-                    inst.copyTagAttributes(child, current);
-                    current.parentNode.insertBefore(child, current);
-                    inst.removeItem(current);
-
                     // update nodePath
+                    let c, p, cDepth, spliceDepth;
                     if (nodePath_s && nodePath_s[depth] === i) {
-                        nodePath_s.splice(depth, 1);
-                        nodePath_s[depth] = i;
+                        c = child, p = current, cDepth = depth, spliceDepth = true;
+                        while (cDepth >= 0) {
+                            if (inst.getArrayIndex(p.childNodes, c) !== nodePath_s[cDepth]) {
+                                spliceDepth = false;
+                                break;
+                            }
+                            c = child.parentNode;
+                            p = c.parentNode;
+                            cDepth--;
+                        }
+                        if (spliceDepth) {
+                            nodePath_s.splice(depth, 1);
+                            nodePath_s[depth] = i;
+                        }
                     }
 
                     if (nodePath_e && nodePath_e[depth] === i) {
-                        nodePath_e.splice(depth, 1);
-                        nodePath_e[depth] = i;
+                        c = child, p = current, cDepth = depth, spliceDepth = true;
+                        while (cDepth >= 0) {
+                            if (inst.getArrayIndex(p.childNodes, c) !== nodePath_s[cDepth]) {
+                                spliceDepth = false;
+                                break;
+                            }
+                            c = child.parentNode;
+                            p = c.parentNode;
+                            cDepth--;
+                        }
+                        if (spliceDepth) {
+                            nodePath_e.splice(depth, 1);
+                            nodePath_e[depth] = i;
+                        }
                     }
+
+                    // merge tag
+                    inst.copyTagAttributes(child, current);
+                    current.parentNode.insertBefore(child, current);
+                    inst.removeItem(current);
                 }
                 if (!next) {
                     if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
