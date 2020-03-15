@@ -4578,7 +4578,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                     e.preventDefault();
 
                                     const prevLast = prev.lastElementChild;
-                                    if (util.isList(prevLast)) {
+                                    if (!prev.contains(formatEl) && util.isList(prevLast)) {
                                         prev = prevLast.lastElementChild;
                                     }
 

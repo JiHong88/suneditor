@@ -393,10 +393,17 @@
 /** --- show blocks mode */
 .sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
 .sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
-.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6,
-.sun-editor-editable.se-show-block li, .sun-editor-editable.se-show-block ol, .sun-editor-editable.se-show-block ul {
+.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6, .sun-editor-editable.se-show-block li, 
+.sun-editor-editable.se-show-block ol, .sun-editor-editable.se-show-block ul, 
+.sun-editor-editable.se-show-block pre {
     border:1px dashed #3f9dff !important;
-    padding:10px 8px 8px 8px !important;
+    padding:14px 8px 8px 8px !important;
+}
+.sun-editor-editable.se-show-block ol, .sun-editor-editable.se-show-block ul {
+    border:1px dashed #d539ff !important;
+}
+.sun-editor-editable.se-show-block pre {
+    border:1px dashed #27c022 !important;
 }
 .se-show-block p {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;}
 .se-show-block div {background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;}
