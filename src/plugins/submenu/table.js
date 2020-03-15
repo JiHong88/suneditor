@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'table',
@@ -37,8 +37,8 @@ export default {
             _current_colSpan: 0,
             _current_rowSpan: 0,
             icons: {
-                expansion: icons.expansion,
-                reduction: icons.reduction
+                expansion: _icons.expansion,
+                reduction: _icons.reduction
             }
         };
 
@@ -97,6 +97,7 @@ export default {
 
     setController_table: function () {
         const lang = this.lang;
+        const icons = _icons;
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table';
@@ -123,6 +124,7 @@ export default {
 
     setController_tableEditor: function () {
         const lang = this.lang;
+        const icons = _icons;
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';

@@ -1,7 +1,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'math',
@@ -61,7 +61,7 @@ export default {
         '<form class="editor_math">' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    icons.cancel +
+                    _icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +
             '</div>' +
@@ -103,11 +103,11 @@ export default {
         '<div class="link-content">' +
             '<div class="se-btn-group">' +
                 '<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-                    icons.edit +
+                    _icons.edit +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-                    icons.delete +
+                    _icons.delete +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                 '</button>' +
             '</div>' +

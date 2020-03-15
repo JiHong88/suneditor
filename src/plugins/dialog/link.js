@@ -8,7 +8,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'link',
@@ -60,7 +60,7 @@ export default {
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        icons.cancel +
+                        _icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
                 '</div>' +
@@ -87,6 +87,7 @@ export default {
     /** modify controller button */
     setController_LinkButton: function () {
         const lang = this.lang;
+        const icons = _icons;
         const link_btn = this.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';

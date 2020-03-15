@@ -12,7 +12,7 @@ import _Context from './context';
 import _history from './history';
 import _util from './util';
 import notice from '../plugins/modules/notice';
-import icons from '../assets/defaultIcons';
+import _icons from '../assets/defaultIcons';
 
 /**
  * @description SunEditor constuctor function.
@@ -28,6 +28,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
+    const icons = _icons;
 
     /**
      * @description editor core object
@@ -63,6 +64,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description Notice object
          */
         notice: notice,
+
+        /**
+         * @description Icons object
+         */
+        icons: icons,
 
         /**
          * @description History object for undo, redo

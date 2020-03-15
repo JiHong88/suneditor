@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import icons from '../assets/defaultIcons';
+import _icons from '../assets/defaultIcons';
 import _defaultLang from '../lang/en';
 import util from './util';
 
@@ -468,6 +468,7 @@ export default {
      * @private
      */
     _defaultButtons: function (lang) {
+        const icons = _icons;
         return {
             /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],

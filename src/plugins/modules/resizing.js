@@ -7,11 +7,12 @@
  */
 'use strict';
 
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'resizing',
     add: function (core) {
+        const icons = _icons;
         const context = core.context;
         context.resizing = {
             _resizeClientX: 0,
@@ -101,6 +102,7 @@ export default {
 
     setController_button: function () {
         const lang = this.lang;
+        const icons = _icons;
         const resize_button = this.util.createElement("DIV");
 
         resize_button.className = "se-controller se-controller-resizing";

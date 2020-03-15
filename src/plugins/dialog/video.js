@@ -9,7 +9,7 @@
 
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'video',
@@ -96,7 +96,7 @@ export default {
             '<form class="editor_video">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        icons.cancel +
+                        _icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
                 '</div>' +
@@ -131,7 +131,7 @@ export default {
                                 html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
                             }
                         html += '</select>' +
-                        '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + icons.revert + '</button>' +
+                        '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + _icons.revert + '</button>' +
                     '</div>' +
                     '<div class="se-dialog-form se-dialog-form-footer"' + onlyPercentDisplay + onlyWidthDisplay + '>' +
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +

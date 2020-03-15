@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import icons from '../../assets/defaultIcons';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'list',
@@ -19,8 +19,8 @@ export default {
             _list: null,
             currentList: '',
             icons: {
-                bullets: icons.list_bullets,
-                number: icons.list_number
+                bullets: _icons.list_bullets,
+                number: _icons.list_number
             }
         };
 
@@ -49,11 +49,11 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="OL">' +
-                        icons.list_number +
+                        _icons.list_number +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.orderList + '</span></span>' +
                     '</button></li>' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="UL">' +
-                        icons.list_bullets +
+                        _icons.list_bullets +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.unorderList + '</span></span>' +
                     '</button></li>' +
                 '</ul>' +
