@@ -1420,7 +1420,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             this.effectNode = null;
-            util.mergeSameTags(rangeElement, null, null, false);
+            util.mergeSameTags(rangeElement, null, false);
             util.mergeNestedTags(rangeElement, function (current) { return this.isList(current); }.bind(util));
 
             // Nested list
@@ -1632,7 +1632,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     removeArray: removeArray
                 };
             } else {
-                const childEdge = util.getEdgeChildNodes(firstNode, ((!lastNode || !lastNode.parentNode) ? firstNode : lastNode));
+                if (!firstNode) firstNode = lastNode;
+                if (!lastNode) lastNode = firstNode;
+                const childEdge = util.getEdgeChildNodes(firstNode, (lastNode.parentNode ? firstNode : lastNode));
                 edge = {
                     cc: (childEdge.sc || childEdge.ec).parentNode,
                     sc: childEdge.sc,
@@ -2402,20 +2404,29 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (isRemoveFormat) {
                 for (let i = 0; i < nNodeArray.length; i++) {
                     let removeNode = nNodeArray[i];
-                    let textNode = util.createTextNode(util.zeroWidthSpace);
+                    let textNode, textNode_s, textNode_e;
                     
                     if (collapsed) {
+                        textNode = util.createTextNode(util.zeroWidthSpace);
                         pNode.replaceChild(textNode, removeNode);
                     } else {
                         const rChildren = removeNode.childNodes;
+                        textNode_s = rChildren[0];
                         while (rChildren[0]) {
-                            textNode = rChildren[0];
-                            pNode.insertBefore(textNode, removeNode);
+                            textNode_e = rChildren[0];
+                            pNode.insertBefore(textNode_e, removeNode);
                         }
                         util.removeItem(removeNode);
                     }
 
-                    if (i === 0) startContainer = endContainer = textNode;
+                    if (i === 0) {
+                        if (collapsed) {
+                            startContainer = endContainer = textNode;
+                        } else {
+                            startContainer = textNode_s;
+                            endContainer = textNode_e;
+                        }
+                    }
                 }
             } else {
                 if (isRemoveNode) {
@@ -2439,7 +2450,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             // endContainer reset
             const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
 
-            if (endContainer.textContent.length === 0) {
+            if (!util.isBreak(endContainer) && endContainer.textContent.length === 0) {
                 util.removeItem(endContainer);
                 endContainer = startContainer;
             }
@@ -2458,7 +2469,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             endOffset = (collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s);
 
             // tag merge
-            const newOffsets = util.mergeSameTags(pNode, startPath, endPath, true);
+            const newOffsets = util.mergeSameTags(pNode, [startPath, endPath], true);
 
             element.parentNode.replaceChild(pNode, element);
 
@@ -2467,9 +2478,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             return {
                 startContainer: startContainer,
-                startOffset: startOffset + newOffsets.a,
+                startOffset: startOffset + newOffsets[0],
                 endContainer: endContainer,
-                endOffset: endOffset + newOffsets.b
+                endOffset: endOffset + newOffsets[1]
             };
         },
 
@@ -2737,12 +2748,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = util.mergeSameTags(pNode, path, null, true);
+                const newOffsets = util.mergeSameTags(pNode, [path], true);
 
                 element.parentNode.replaceChild(pNode, element);
 
                 container = util.getNodeFromPath(path, pNode);
-                offset += newOffsets.a;
+                offset += newOffsets[0];
             }
 
             return {
@@ -2854,7 +2865,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             util.removeEmptyNode(pNode, newInnerNode);
-            util.mergeSameTags(pNode, null, null, true);
+            util.mergeSameTags(pNode, null, true);
 
             // node change
             element.parentNode.replaceChild(pNode, element);
@@ -3139,12 +3150,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 offset += offsets.s;
 
                 // tag merge
-                const newOffsets = util.mergeSameTags(pNode, path, null, true);
+                const newOffsets = util.mergeSameTags(pNode, [path], true);
 
                 element.parentNode.replaceChild(pNode, element);
 
                 container = util.getNodeFromPath(path, pNode);
-                offset += newOffsets.a;
+                offset += newOffsets[0];
             }
 
             return {
@@ -4724,7 +4735,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     
                     // Nested list
                     if (cells.length > 0 && isEdge && core.plugins.list) {
-                        core.plugins.list.editInsideList.call(core, shift, cells);
+                        r = core.plugins.list.editInsideList.call(core, shift, cells);
                     } else {
                         // table
                         const tableCell = util.getParentElement(selectionNode, util.isCell);

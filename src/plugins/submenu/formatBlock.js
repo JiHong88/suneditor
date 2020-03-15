@@ -164,8 +164,8 @@ export default {
 
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
-            const firstPath = util.getNodePath(range.startContainer, first, null);
-            const lastPath = util.getNodePath(range.endContainer, last, null);
+            const firstPath = util.getNodePath(range.startContainer, first, null, null);
+            const lastPath = util.getNodePath(range.endContainer, last, null, null);
             
             // remove selected list
             const rlist = this.detachList(selectedFormsts, false);

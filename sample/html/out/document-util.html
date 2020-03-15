@@ -1780,12 +1780,12 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="mergeSameTags"><span class="type-signature"></span>mergeSameTags<span class="signature">(element, nodePath_s, nodePath_e, onlyText)</span><span
-            class="type-signature"> &rarr; {Object}</span> {a: 0, b: 0}</h4>
+        <h4 class="name" id="mergeSameTags"><span class="type-signature"></span>mergeSameTags<span class="signature">(element, nodePathArray, onlyText)</span><span
+            class="type-signature"> &rarr; {Array}</span> [offset, ..]</h4>
         <div class="description">
             Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.<br>
             If "offset" has been changed, it will return as much "offset" as it has been modified.<br>
-            "a", "b" You can send a maximum of two nodepaths.
+            An array containing change offsets is returned in the order of the "nodePathArray" array.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1805,18 +1805,11 @@
                 <td class="description last">Element object</td>
             </tr>
             <tr>
-                <td class="name"><code>nodePath_s</code></td>
+                <td class="name"><code>nodePathArray</code></td>
                 <td class="type">
-                    <span class="param-type">Object|null</span>
+                    <span class="param-type">Array|null</span>
                 </td>
-                <td class="description last">Start NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
-            </tr>
-            <tr>
-                <td class="name"><code>nodePath_e</code></td>
-                <td class="type">
-                    <span class="param-type">Object|null</span>
-                </td>
-                <td class="description last">End NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
+                <td class="description last">Array of <a href="#getNodePath">util.getNodePath</a> object <span style="color:#ff5565">[util.getNodePath(), ..]</span></td>
             </tr>
             <tr>
                 <td class="name"><code>onlyText</code></td>
@@ -1936,7 +1929,7 @@
                 class="type-signature"> &rarr; {RegExp}</span></h4>
         <div class="description">
             Create whitelist RegExp object.<br>
-            Return RegExp format: new RegExp("<span style="color:#d73a49">&lt;\\/?(</span><span style="color: #23853a;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0a3667">?!\\b<span style="color: #23853a;">list[i]</span>\\b</span><span style="color: #23853a;">)</span><span style="color:#d73a49">)[^>^&gt;])+></span>", "<span style="color:#d73a49">g</span>")
+            Return RegExp format: new RegExp("<span style="color:#ff5565">&lt;\\/?(</span><span style="color: #44fd6f;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0d80ff">?!\\b<span style="color: #44fd6f;">list[i]</span>\\b</span><span style="color: #44fd6f;">)</span><span style="color:#ff5565">)[^>^&gt;])+></span>", "<span style="color:#ff5565">g</span>")
         </div>
         <h5>Parameters:</h5>
         <table class="params">

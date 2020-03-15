@@ -269,6 +269,7 @@ export default {
             }
         }
         
+        this.effectNode = null;
         return originRange;
     },
 
@@ -331,15 +332,15 @@ export default {
             }
             range = this.plugins.list.editList.call(this, originList.nodeName.toUpperCase(), selectedCells, true);
         } else {
-            range = { sc: selectedCells[0], so: cellsLen > 1 || !this.getRange().collapsed ? 0 : 1, ec: lastCell, eo: 1 };
             let innerList = this.util.createElement(originList.nodeName);
-            let prev = range.sc.previousElementSibling;
-            let next = range.sc.nextElementSibling;
+            let prev = selectedCells[0].previousElementSibling;
+            let next = lastCell.nextElementSibling;
+            const nodePath = { s: null, e: null, sl: originList, el: originList };
 
             for (let i = 0, len = cellsLen, c; i < len; i++) {
                 c = selectedCells[i];
                 if (c.parentNode !== originList) {
-                    this.plugins.list._insiedList.call(this, originList, innerList, prev, next);
+                    this.plugins.list._insiedList.call(this, originList, innerList, prev, next, nodePath);
                     originList = c.parentNode;
                     innerList = this.util.createElement(originList.nodeName);
                 }
@@ -349,13 +350,22 @@ export default {
                 innerList.appendChild(c);
             }
             
-            innerList = this.plugins.list._insiedList.call(this, originList, innerList, prev, next);
+            this.plugins.list._insiedList.call(this, originList, innerList, prev, next, nodePath);
+
+            const sc = this.util.getNodeFromPath(nodePath.s, nodePath.sl);
+            const ec = this.util.getNodeFromPath(nodePath.e, nodePath.el);
+            range = {
+                sc: sc,
+                so: 0,
+                ec: ec,
+                eo: ec.textContent.length
+            };
         }
 
         return range;
     },
 
-    _insiedList: function (originList, innerList, prev, next) {
+    _insiedList: function (originList, innerList, prev, next, nodePath) {
         let insertPrev = false;
 
         if (prev && innerList.tagName === prev.tagName) {
@@ -386,8 +396,19 @@ export default {
             }
 
             originList.insertBefore(innerList, next);
-            this.util.mergeSameTags(originList, null, null, false);
+
+            if (!nodePath.s) {
+                nodePath.s = this.util.getNodePath(innerList.firstElementChild.firstChild, originList, null);
+                nodePath.sl = originList;
+            }
+
+            const slPath = originList.contains(nodePath.sl) ? this.util.getNodePath(nodePath.sl, originList) : null;
+            nodePath.e = this.util.getNodePath(innerList.lastElementChild.firstChild, originList, null);
+            nodePath.el = originList;
+
+            this.util.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
             this.util.mergeNestedTags(originList);
+            if (slPath) nodePath.sl = this.util.getNodeFromPath(slPath, originList);
         }
 
         return innerList;
