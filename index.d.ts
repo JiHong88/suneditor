@@ -6,12 +6,14 @@ declare module 'suneditor' {
     options: SunEditorOptions,
     _init_options?: SunEditorOptions
   ): any;
+
   export function init(init_options: SunEditorOptions): any;
 
   /**
    * SunEditor Options
    */
   export interface SunEditorOptions {
+    plugins: any;
     /**
      * Whitelist
      * =========
@@ -68,11 +70,11 @@ declare module 'suneditor' {
     /**
      * CodeMirror core object
      */
-    codeMirror?: object;
+    codeMirror?: any | { src: any; options: object };
     /**
-     * katex Object
+     * Use "math" plugin
      */
-    katex?: object;
+    katex?: any | { src: any; options: object };
     /**
      * Display
      * =======
@@ -259,10 +261,6 @@ declare module 'suneditor' {
      */
     videoRatioList?: { name: string; value: number }[];
     /**
-     * The default heigth size of the video frame
-     */
-    videoHeight?: number;
-    /**
      * The query string of a YouTube embedded URL
      */
     youtubeQuery?: string;
@@ -291,11 +289,23 @@ declare module 'suneditor' {
      */
     placeholder?: string;
   }
-  export type FormatTagName = 'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+  export type FormatTagName =
+    'p'
+    | 'div'
+    | 'blockquote'
+    | 'pre'
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | { tag: string; name?: string; command: 'replace' | 'range' | 'free'; class: string };
   export type TemplatesItem = { name: string; html: string };
   export type LineHeightsItem = { text: string; value: number };
-  export type ParagraphStyles = [string, { name: string; class: string }];
-  export type TextStyles = [string, { name: string; style: string; tag: string }];
+  export type ParagraphStyles = (string | { name: string; class: string; _class?: string })[];
+  export type TextStyles = (string | { name: string; style: string; tag: string; _class?: string })[];
   export type ButtonListDefaults =
     | '/' // Line Break
     | 'bold'
