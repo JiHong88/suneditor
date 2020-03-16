@@ -64,6 +64,8 @@ export default {
         context.table.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
         context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
         context.table.splitButton = resizeDiv.querySelector('._se_table_split_button');
+        context.table.insertRowAboveButton = resizeDiv.querySelector('._se_table_insert_row_a');
+        context.table.insertRowBelowButton = resizeDiv.querySelector('._se_table_insert_row_b');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -132,11 +134,11 @@ export default {
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +
                 '<div class="se-btn-group">' +
-                    '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip _se_table_insert_row_a">' +
                         icons.insert_row_above +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip _se_table_insert_row_b">' +
                         icons.insert_row_below +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
                     '</button>' +
@@ -298,14 +300,15 @@ export default {
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
-        if (!this.getSelection().isCollapsed) {
+        const tablePlugin = this.plugins.table;
+
+        if (!this.getSelection().isCollapsed && !tablePlugin._selectedCell) {
             this.controllersOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
-
+        
         const contextTable = this.context.table;
-        const tablePlugin = this.plugins.table;
         const tableController = contextTable.tableController;
         
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
@@ -1085,6 +1088,14 @@ export default {
 
     setActiveButton: function (fixedCell, selectedCell) {
         const contextTable = this.context.table;
+
+        if (/^TH$/i.test(fixedCell.nodeName)) {
+            contextTable.insertRowAboveButton.setAttribute('disabled', true);
+            contextTable.insertRowBelowButton.setAttribute('disabled', true);
+        } else {
+            contextTable.insertRowAboveButton.removeAttribute('disabled');
+            contextTable.insertRowBelowButton.removeAttribute('disabled');
+        }
 
         if (!selectedCell || fixedCell === selectedCell) {
             contextTable.splitButton.removeAttribute('disabled');
