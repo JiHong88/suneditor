@@ -1578,7 +1578,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     }
 
                     if (!newList && util.isListCell(insNode)) {
-                        if (util.getElementDepth(insNode) !== util.getElementDepth(next) && (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false))) {
+                        if (next && util.getElementDepth(insNode) !== util.getElementDepth(next) && (util.isListCell(parent) || util.getArrayItem(insNode.children, util.isList, false))) {
                             const insNext = insNode.nextElementSibling;
                             const detachRange = util.detachNestedList(insNode, false);
                             if ((rangeElement !== detachRange) || insNext !== insNode.nextElementSibling) {
@@ -1588,8 +1588,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         } else {
                             const inner = insNode;
                             insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                            const isCell = util.isListCell(insNode);
                             const innerChildren = inner.childNodes;
                             while (innerChildren[0]) {
+                                if (util.isList(innerChildren[0]) && !isCell) break;
                                 insNode.appendChild(innerChildren[0]);
                             }
                             util.copyFormatAttributes(insNode, inner);
@@ -1645,7 +1647,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             else if (!firstNode) firstNode = rangeElement.previousSibling;
             rangeRight = rangeElement.nextSibling;
 
-            util.removeItem(rangeElement);
+            if (rangeElement.children.length === 0) {
+                util.removeItem(rangeElement);
+            } else {
+                util.removeEmptyNode(rangeElement, null);
+            }
 
             let edge = null;
             if (remove) {
@@ -4601,9 +4607,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                                 if (util.isListCell(prev)) {
                                     e.preventDefault();
 
-                                    const prevLast = prev.lastElementChild;
-                                    if (!prev.contains(formatEl) && util.isList(prevLast)) {
-                                        prev = prevLast.lastElementChild;
+                                    let prevLast = prev;
+                                    if (!prev.contains(formatEl) && util.isListCell(prevLast) && util.isList(prevLast.lastElementChild)) {
+                                        prevLast = prevLast.lastElementChild.lastElementChild;
+                                        while (util.isListCell(prevLast) && util.isList(prevLast.lastElementChild)) {
+                                            prevLast = prevLast.lastElementChild && prevLast.lastElementChild.lastElementChild;
+                                        }
+                                        prev = prevLast;
                                     }
 
                                     let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
@@ -5363,7 +5373,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         }
     };
 
-    /** User function */
+    /** functions */
     const functions = {
         /**
          * @description Core, Util object
@@ -5520,6 +5530,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             event.onResize_window();
             
             core.focus();
+        },
+
+        /**
+         * @description Set default style (options.defaultStyle)
+         * @param {String} style Style string
+         */
+        setDefaultStyle: function (style) {
+            if (typeof style === 'string' && style.trim().length > 0) {
+                context.element.wysiwyg.style.cssText = style;
+            } else {
+                context.element.wysiwyg.style.cssText.removeAttribute('style');
+            }
         },
 
         /**

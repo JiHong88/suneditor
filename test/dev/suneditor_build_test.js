@@ -67,6 +67,7 @@ let s1 = suneditor.create('editor', {
     ],
     width: '100%',
     height: '500',
+    defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
     formats: [
@@ -108,7 +109,7 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.core.focus();
+    s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
 }
 
 window.sun_create1 = function () {

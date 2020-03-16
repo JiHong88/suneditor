@@ -258,7 +258,7 @@ export default {
         // wysiwyg div or iframe
         const wysiwygDiv = document.createElement(!options.iframe ? 'DIV' : 'IFRAME');
         wysiwygDiv.className = 'se-wrapper-inner se-wrapper-wysiwyg';
-        wysiwygDiv.style.display = 'block';
+        if (options.defaultStyle) wysiwygDiv.style.cssText = options.defaultStyle;
 
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
@@ -412,6 +412,8 @@ export default {
         options.height = options.height ? (util.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        /** Editing area default style */
+        options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
