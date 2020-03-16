@@ -25,7 +25,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [Resolutions, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -34,11 +34,11 @@ suneditor.create("sample1", {
     buttonList: [
         [
             {
-                name: 'custom_container', 
-                dataCommand: 'custom_container',
+                name: 'Resolutions', 
+                dataCommand: 'Resolutions',
                 buttonClass:'', 
-                title:'custom_container', 
-                dataDisplay:'container',
+                title:'Resolutions', 
+                dataDisplay:'submenu',
                 innerHTML:''
             },
             'bold', 'italic'

@@ -1136,6 +1136,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
+                let offset = 1;
                 if (oNode.nodeType === 3) {
                     const previous = oNode.previousSibling;
                     const next = oNode.nextSibling;
@@ -1156,9 +1157,24 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         startOffset: previousText.length,
                         endOffset: oNode.textContent.length - nextText.length
                     };
+                } else {
+                    let zeroWidth = null;
+                    if (!oNode.previousSibling) {
+                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                        oNode.parentNode.insertBefore(zeroWidth, oNode);
+                    }
+                    if (!oNode.nextSibling) {
+                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                        oNode.parentNode.appendChild(zeroWidth);
+                    }
+
+                    if (util._isIgnoreNodeChange(oNode)) {
+                        oNode = oNode.nextSibling;
+                        offset = 0;
+                    }
                 }
 
-                this.setRange(oNode, 1, oNode, 1);
+                this.setRange(oNode, offset, oNode, offset);
 
                 // history stack
                 this.history.push(true);
@@ -3798,7 +3814,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                     }
                 } else {
-                    returnHTML += baseHtml.replace(/<(?!span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/g, function (m) { return m.trim(); });
+                    returnHTML += baseHtml.replace(/<(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^\/^>^<]+>\s+(?=<)/g, function (m) { return m.trim(); });
                 }
             }
 
