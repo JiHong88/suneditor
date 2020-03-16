@@ -9,6 +9,7 @@ import { ko } from '../../src/lang';
 import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
+import custom_plugin_dialog from './custom_plugin_dialog';
 import Resolutions from './Resolutions';
 import custom_container from './custom_container';
 
@@ -25,7 +26,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [Resolutions, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [custom_plugin_dialog, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -34,11 +35,11 @@ suneditor.create("sample1", {
     buttonList: [
         [
             {
-                name: 'Resolutions', 
-                dataCommand: 'Resolutions',
+                name: 'customLink', 
+                dataCommand: 'customLink',
                 buttonClass:'', 
-                title:'Resolutions', 
-                dataDisplay:'submenu',
+                title:'Custom - Link', 
+                dataDisplay:'dialog',
                 innerHTML:''
             },
             'bold', 'italic'
@@ -70,6 +71,13 @@ let s1 = suneditor.create('editor', {
     defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
+    attributesWhitelist: {
+        table: "style",
+        tbody: "style",
+        thead: "style",
+        tr: "style",
+        td: "style"
+    },
     formats: [
         { 
             tag: 'div', // Tag name
@@ -246,7 +254,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML(html)
+    ss.insertHTML('aaaaa')
 }
 
 window.sun_getContents = function () {

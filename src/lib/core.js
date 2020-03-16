@@ -1106,7 +1106,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         parentNode = commonCon;
                         afterNode = endCon;
 
-                        while (afterNode.parentNode !== commonCon) {
+                        while (afterNode && afterNode.parentNode !== commonCon) {
                             afterNode = afterNode.parentNode;
                         }
                     }
@@ -1128,8 +1128,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     } else if (!originAfter && !afterNode) {
                         const r = this.removeNode();
                         const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container)) ? r.container : (util.getFormatElement(r.container) || r.container.parentNode)) : r.container;
-                        parentNode = container.parentNode;
-                        afterNode = container.nextSibling;
+                        parentNode = util.isWysiwygDiv(container) ? container : container.parentNode;
+                        afterNode = util.isWysiwygDiv(container) ? null : container.nextSibling;
                     }
                 }
                 parentNode.insertBefore(oNode, afterNode);
@@ -3814,7 +3814,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (text.length > 0) returnHTML += '<p>' + text + '</p>';
                     }
                 } else {
-                    returnHTML += baseHtml.replace(/<(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^\/^>^<]+>\s+(?=<)/g, function (m) { return m.trim(); });
+                    returnHTML += util.htmlRemoveWhiteSpace(baseHtml);
                 }
             }
 
@@ -5241,7 +5241,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (cleanData) {
                 e.stopPropagation();
                 e.preventDefault();
-                core.execCommand('insertHTML', false, cleanData);
+                functions.insertHTML(cleanData);
             } else {
                 // history stack
                 core.history.push(true);
@@ -5284,7 +5284,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 const cleanData = core.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
                 if (cleanData) {
                     event._setDropLocationSelection(e);
-                    core.execCommand('insertHTML', false, cleanData);
+                    functions.insertHTML(cleanData);
                 }
             }
 
@@ -5628,21 +5628,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {Element|String} html HTML Element or HTML string or plain string
          */
         insertHTML: function (html) {
-            if (!html.nodeType || html.nodeType !== 1) {
-                const template = util.createElement('DIV');
-                template.innerHTML = html;
-                html = template.firstChild || template.content.firstChild;
-            }
-
-            let afterNode = null;
-            if (util.isFormatElement(html) || /^(IMG|IFRAME)$/i.test(html.nodeName)) {
-                afterNode = util.getFormatElement(core.getSelectionNode());
-            }
-
-            if (util.isComponent(html)) {
-                core.insertComponent(html, false);
+            if (typeof html === 'string') {
+                const parseDocument = (new core._w.DOMParser()).parseFromString(util.htmlRemoveWhiteSpace(html), 'text/html');
+                const children = parseDocument.body.childNodes;
+                let c, a;
+                while ((c = children[0])) {
+                    core.insertNode(c, a);
+                    a = c;
+                }
             } else {
-                core.insertNode(html, afterNode);
+                if (util.isComponent(html)) {
+                    core.insertComponent(html, false);
+                } else {
+                    core.insertNode(html, null);
+                }
             }
             
             core.focus();

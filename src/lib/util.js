@@ -1319,6 +1319,16 @@ const util = {
     },
 
     /**
+     * @description Remove whitespace between tags in HTML string.
+     * @param {String} html HTML string
+     * @returns {String}
+     */
+    htmlRemoveWhiteSpace: function (html) {
+        if (!html) return '';
+        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
+    },
+
+    /**
      * @description Sort a element array by depth of element.
      * @param {Array} array Array object
      * @param {Boolean} des true: descending order / false: ascending order
@@ -1356,7 +1366,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**
