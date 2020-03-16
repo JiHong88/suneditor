@@ -136,13 +136,14 @@
                 
                 <span class="pl-ent">// ------ HTML to be append to button</span>
                 <span class="pl-ent">// --- Inline svg (These are the free icon sites you can use)</span>
-                <span class="pl-ent">// https://icon-icons.com</span>
-                <span class="pl-ent">// https://materialdesignicons.com</span>
-                <span class="pl-ent">// https://material.io/resources/icons/?style=baseline</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;&lt;path d="M0 0h24v24H0z" fill="none"/&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
+                <span class="pl-ent">// The default size of the svg file is 16px.(suneditor.css:54L)</span>
+                <span class="pl-c">// https://icon-icons.com</span>
+                <span class="pl-c">// https://materialdesignicons.com</span>
+                <span class="pl-c">// https://material.io/resources/icons/?style=baseline</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;"&gt;&lt;path d="M0 0h24v24H0z" fill="none"/&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
                 <span class="pl-ent">// --- Icon class (This icon uses Font Awesome)</span>
-                <span class="pl-ent">// https://fontawesome.com/, https://www.jsdelivr.com/package/npm/@fortawesome/fontawesome-free</span>
-                <span class="pl-ent">// &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css"&gt;</span>
+                <span class="pl-c">// https://fontawesome.com/, https://www.jsdelivr.com/package/npm/@fortawesome/fontawesome-free</span>
+                <span class="pl-c">// &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css"&gt;</span>
                 <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
@@ -173,6 +174,8 @@
     <span class="pl-c">// arguments - (core : core object, targetElement : clicked button element)</span>
     <span class="pl-en">add</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
 
+        <span class="pl-c">// Icons object</span>
+        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span>
         <span class="pl-c">// Registering a namespace for caching as a plugin name in the context object</span>
         <span class="pl-k">const</span> <span class="pl-s1">context</span> <span class="pl-c1">=</span> <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customContainer</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span><span class="pl-kos">}</span><span class="pl-kos">;</span>
@@ -201,7 +204,7 @@
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-c">// Enter the button name of the plug-in or default command in the button's "data-command"</span>
                         <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;"&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;i class="se-icon-bold"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-k">icons.bold</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Quote&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
@@ -209,7 +212,7 @@
                     <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="blockquote"&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /&gt;&lt;/svg&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;svg viewBox="0 0 24 24" style="width:24px;height:24px;"&gt;&lt;path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /&gt;&lt;/svg&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Quote&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
@@ -217,7 +220,7 @@
                     <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="link"&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;i class="se-icon-link"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-k">icons.link</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Link&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
@@ -225,7 +228,7 @@
                     <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="table"&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;i class="se-icon-grid"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-k">icons.table</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Table&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
@@ -233,7 +236,7 @@
                     <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;button type="button" class="se-btn se-tooltip" data-command="textStyle"&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;i class="se-icon-text-style"&gt;&lt;/i&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-k">icons.text_style</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;span class="se-tooltip-inner"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;span class="se-tooltip-text"&gt;Text style&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
@@ -275,7 +278,7 @@
                 <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">title</span>:<span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'container'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path fill="currentColor" d="M2 2V22H22V2M19.12 19.03H4.87V5H19.13V19.03M14.83 10.71H17.69V17.59H14.83M14.83 6.41H17.69V9.27H14.83M6.3 6.41V17.59H13.4V14.72H9.17V9.28H13.4V6.41Z" /&gt;&lt;/svg&gt;'</span>
+                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg viewBox="0 0 24 24" style="width:24px;height:24px;"&gt;&lt;path fill="currentColor" d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /&gt;&lt;/svg&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
@@ -535,6 +538,7 @@
 <!-- suneditor -->
 <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
 <script src="../../dist/suneditor.min.js"></script>
+<script src="../../src/assets/defaultIcons.js"></script>
 <script>
     var acc = document.getElementsByClassName("accordion");
     var i;
@@ -584,6 +588,7 @@
 
         setSubmenu: function () {
             const listDiv = this.util.createElement('DIV');
+            const icons = this.icons;
             listDiv.className = 'se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
@@ -592,9 +597,10 @@
                         // The "position" style of each element surrounding the button must be "relative".
                         // suneditor.css: .sun-editor .se-submenu-form-group > div {position:relative;}
                         '<div>' +
+                            // @Required
                             // Enter the button name of the plug-in or default command in the button's "data-command"
                             '<button type="button" class="se-btn se-tooltip" data-command="bold" style="margin: 0 !important;">' +
-                                '<i class="se-icon-bold"></i>' +
+                                icons.bold +
                                 '<span class="se-tooltip-inner">' +
                                     '<span class="se-tooltip-text">Quote</span>' +
                                 '</span>' +
@@ -602,7 +608,7 @@
                         '</div>' +
                         '<div>' +
                             '<button type="button" class="se-btn se-tooltip" data-command="blockquote">' +
-                                '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>' +
+                                icons.blockquote +
                                 '<span class="se-tooltip-inner">' +
                                     '<span class="se-tooltip-text">Quote</span>' +
                                 '</span>' +
@@ -610,7 +616,7 @@
                         '</div>' +
                         '<div>' +
                             '<button type="button" class="se-btn se-tooltip" data-command="link">' +
-                                '<i class="se-icon-link"></i>' +
+                                icons.link +
                                 '<span class="se-tooltip-inner">' +
                                     '<span class="se-tooltip-text">Link</span>' +
                                 '</span>' +
@@ -618,7 +624,7 @@
                         '</div>' +
                         '<div>' +
                             '<button type="button" class="se-btn se-tooltip" data-command="table">' +
-                                '<i class="se-icon-grid"></i>' +
+                                icons.table +
                                 '<span class="se-tooltip-inner">' +
                                     '<span class="se-tooltip-text">Table</span>' +
                                 '</span>' +
@@ -626,7 +632,7 @@
                         '</div>' +
                         '<div>' +
                             '<button type="button" class="se-btn se-tooltip" data-command="textStyle">' +
-                                '<i class="se-icon-text-style"></i>' +
+                                icons.text_style +
                                 '<span class="se-tooltip-inner">' +
                                     '<span class="se-tooltip-text">Text style</span>' +
                                 '</span>' +
@@ -857,7 +863,7 @@
                     buttonClass:'', 
                     title:'custom_container', 
                     dataDisplay:'container',
-                    innerHTML:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M2 2V22H22V2M19.12 19.03H4.87V5H19.13V19.03M14.83 10.71H17.69V17.59H14.83M14.83 6.41H17.69V9.27H14.83M6.3 6.41V17.59H13.4V14.72H9.17V9.28H13.4V6.41Z" /></svg>'
+                    innerHTML:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'
                 }
             ]
         ]
