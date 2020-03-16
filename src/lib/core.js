@@ -5533,7 +5533,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
-         * @description Set default style (options.defaultStyle)
+         * @description Set "options.defaultStyle" style.
+         * Define the style of the edit area
+         * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
          * @param {String} style Style string
          */
         setDefaultStyle: function (style) {
