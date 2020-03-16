@@ -69,16 +69,16 @@ export default {
 
         if (!element) {
             button.removeAttribute('data-focus');
-            icon.outerHTML = this.context.list.icons.number;
+            util.changeIcon(icon, this.context.list.icons.number);
             util.removeClass(button, 'active');
         } else if (util.isList(element)) {
             const nodeName = element.nodeName;
             button.setAttribute('data-focus', nodeName);
             util.addClass(button, 'active');
             if (/UL/i.test(nodeName)) {
-                icon.outerHTML = this.context.list.icons.bullets;
+                util.changeIcon(icon, this.context.list.icons.bullets);
             } else {
-                icon.outerHTML = this.context.list.icons.number;
+                util.changeIcon(icon, this.context.list.icons.number);
             }
             
             return true;

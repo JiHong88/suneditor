@@ -66,7 +66,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         notice: notice,
 
         /**
-         * @description Icons object
+         * @description Default icons object
          */
         icons: icons,
 
@@ -3515,7 +3515,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                element.firstElementChild.outerHTML = icons.reduction;
+                util.changeIcon(element.querySelector('svg'), icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3547,7 +3547,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-                element.firstElementChild.outerHTML = icons.expansion;
+                util.changeIcon(element.querySelector('svg'), icons.expansion);
             }
         },
 

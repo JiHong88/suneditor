@@ -346,7 +346,7 @@ export default {
 
         // align icon
         const alignList = contextResizing.alignMenuList;
-        contextResizing.alignButton.querySelector('svg').outerHTML = contextResizing.alignIcons[align];
+        this.util.changeIcon(contextResizing.alignButton.querySelector('svg'), contextResizing.alignIcons[align]);
         for (let i = 0, len = alignList.length; i < len; i++) {
             if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
             else this.util.removeClass(alignList[i], 'on');

@@ -1336,6 +1336,20 @@ const util = {
     },
 
     /**
+     * @description Replace icon
+     * @param {Element} icon Icon element (svg, i)
+     * @param {String|Element} newIcon String or element of the icon to apply
+     */
+    changeIcon: function (icon, newIcon) {
+        if (typeof newIcon === 'string') {
+            const parser = new this._w.DOMParser();
+            newIcon = parser.parseFromString(newIcon, 'image/svg+xml').firstElementChild;
+        }
+        
+        icon.parentNode.replaceChild(newIcon, icon);
+    },
+
+    /**
      * @description Nodes that need to be added without modification when changing text nodes
      * @param {Element} element Element to check
      * @returns {Boolean}

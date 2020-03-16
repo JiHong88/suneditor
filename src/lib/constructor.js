@@ -471,7 +471,7 @@ export default {
         const icons = _icons;
         return {
             /** default command */
-            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],
+            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.audio],
             underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '', icons.underline],
             italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '', icons.italic],
             strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '', icons.strike],
