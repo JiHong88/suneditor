@@ -5629,18 +5629,27 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         insertHTML: function (html) {
             if (typeof html === 'string') {
-                const parseDocument = (new core._w.DOMParser()).parseFromString(util.htmlRemoveWhiteSpace(html), 'text/html');
-                const children = parseDocument.body.childNodes;
-                let c, a;
-                while ((c = children[0])) {
-                    core.insertNode(c, a);
-                    a = c;
+                html = util.htmlRemoveWhiteSpace(html);
+                try {
+                    const parseDocument = (new core._w.DOMParser()).parseFromString(html, 'text/html');
+                    const children = parseDocument.body.childNodes;
+                    let c, a;
+                    while ((c = children[0])) {
+                        core.insertNode(c, a);
+                        a = c;
+                    }
+                } catch (error) {
+                    core.execCommand('insertHTML', false, html);
                 }
             } else {
                 if (util.isComponent(html)) {
                     core.insertComponent(html, false);
                 } else {
-                    core.insertNode(html, null);
+                    let afterNode = null;
+                    if (util.isFormatElement(html) || /^(IMG|IFRAME)$/i.test(html.nodeName)) {
+                        afterNode = util.getFormatElement(core.getSelectionNode());	
+                    }
+                    core.insertNode(html, afterNode);
                 }
             }
             
