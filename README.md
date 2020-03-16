@@ -549,7 +549,7 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents).                            default: userFunction.save {Function}
+                  Arguments - (contents).                            default: functions.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -813,13 +813,27 @@ editor.imageUploadHandler = function (response, info, core) {
     }
 }
 
+// Called just before the inline toolbar is positioned and displayed on the screen.
 /**
  * toolbar: Toolbar Element
- * context: The editor's context object (editor.getContext())
+ * context: The editor's context object (editor.getContext()|core.context)
+ * core Core object
 */
 editor.showInline = function (toolbar, context, core) {
     console.log('toolbar', toolbar);
     console.log('context', context);
+}
+
+// Called just after the controller is positioned and displayed on the screen.
+// controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+/**
+ * name: The name of the plugin that called the controller
+ * controllers: Array of Controller elements
+ * core: Core object
+*/
+editor.showController = function (name, controllers, core) {
+    console.log('plugin name', name);
+    console.log('controller elements', controllers);
 }
 ```
 

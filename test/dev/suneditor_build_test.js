@@ -210,6 +210,19 @@ ss.showInline = function (toolbar, context) {
 
 },
 
+ss.showController = function (name, controllers, core) {
+    let c = null;
+    console.log('target', core.currentControllerTarget);
+    for (let i in controllers) {
+        c = controllers[i];
+        if (core.util.hasClass(c, 'se-controller-resizing')) {
+            const updateButton = c.querySelector('[data-command="update"]');
+            if (name === 'image') updateButton.setAttribute('disabled', true);
+            else updateButton.removeAttribute('disabled');
+        }
+    }
+}
+
 window.sun_noticeOpen = function () {
     ss.noticeOpen('test notice');
 }

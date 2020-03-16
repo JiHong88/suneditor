@@ -17,12 +17,12 @@ import _icons from '../assets/defaultIcons';
 /**
  * @description SunEditor constuctor function.
  * create core object and event registration.
- * core, event, userFunction
+ * core, event, functions
  * @param context
  * @param plugins
  * @param lang
  * @param options
- * @returns {Object} UserFunction Object
+ * @returns {Object} functions Object
  */
 export default function (context, pluginCallButtons, plugins, lang, options) {
     const _d = context.element.originElement.ownerDocument || document;
@@ -160,6 +160,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         currentControllerName: '',
 
         /**
+         * @description The target element of current controller
+         */
+        currentControllerTarget: null,
+
+        /**
          * @description An array of buttons whose class name is not "code-view-enabled"
          */
         codeViewDisabledButtons: null,
@@ -247,7 +252,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUploadBefore: function (files, info) {
-            if (typeof userFunction.onImageUploadBefore === 'function') return userFunction.onImageUploadBefore(files, info, core);
+            if (typeof functions.onImageUploadBefore === 'function') return functions.onImageUploadBefore(files, info, core);
             return true;
         },
 
@@ -256,7 +261,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof userFunction.onImageUpload === 'function') userFunction.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, core);
+            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, core);
         },
 
         /**
@@ -264,7 +269,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUploadError: function (errorMessage, result) {
-            if (typeof userFunction.onImageUploadError === 'function') return userFunction.onImageUploadError(errorMessage, result, core);
+            if (typeof functions.onImageUploadError === 'function') return functions.onImageUploadError(errorMessage, result, core);
             return true;
         },
 
@@ -273,8 +278,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUploadHandler: function (response, info, core) {
-            if (typeof userFunction.imageUploadHandler === 'function') {
-                userFunction.imageUploadHandler(response, info, core);
+            if (typeof functions.imageUploadHandler === 'function') {
+                functions.imageUploadHandler(response, info, core);
                 return true;
             } else {
                 return false;
@@ -494,6 +499,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     continue;
                 }
 
+                if (typeof arg === 'function') {
+                    this.controllerArray[i] = arg;
+                    continue;
+                }
+
+                if (!util.hasClass(arg, 'se-controller')) {
+                    this.currentControllerTarget = arg;
+                    continue;
+                }
+
                 if (arg.style) arg.style.display = 'block';
                 this.controllerArray[i] = arg;
             }
@@ -502,6 +517,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this._bindControllersOff = this.controllersOff.bind(this);
             this.addDocEvent('mousedown', this._bindControllersOff, false);
             this.addDocEvent('keydown', this._bindControllersOff, false);
+
+            if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, core);
         },
 
         /**
@@ -513,6 +530,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this._notHideToolbar = false;
             this._resizingName = '';
             this.currentControllerName = '';
+            this.currentControllerTarget = null;
             this.effectNode = null;
             if (!this._bindControllersOff) return;
 
@@ -3254,8 +3272,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
                         options.callBackSave(this.getContents(false));
-                    } else if (typeof userFunction.save === 'function') {
-                        userFunction.save();
+                    } else if (typeof functions.save === 'function') {
+                        functions.save();
                     } else {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
@@ -3955,7 +3973,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     this._iframeAutoHeight();
                 }
 
-                if (typeof userFunction.onload === 'function') return userFunction.onload(core, reload);
+                if (typeof functions.onload === 'function') return functions.onload(core, reload);
             }.bind(this));
 
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist);
@@ -4282,7 +4300,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 event._hideToolbar();
             }
 
-            if (userFunction.onMouseDown) userFunction.onMouseDown(e, core);
+            if (functions.onMouseDown) functions.onMouseDown(e, core);
         },
 
         onClick_wysiwyg: function (e) {
@@ -4346,7 +4364,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
-            if (userFunction.onClick) userFunction.onClick(e, core);
+            if (functions.onClick) functions.onClick(e, core);
         },
 
         _balloonDelay: null,
@@ -4493,7 +4511,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             core._inlineToolbarAttr.width = toolbar.style.width = options.toolbarWidth;
             core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
             
-            if (typeof userFunction.showInline === 'function') userFunction.showInline(toolbar, context, core);
+            if (typeof functions.showInline === 'function') functions.showInline(toolbar, context, core);
 
             event.onScroll_window();
             core._inlineToolbarAttr.isShow = true;
@@ -4969,7 +4987,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
-            if (userFunction.onKeyDown) userFunction.onKeyDown(e, core);
+            if (functions.onKeyDown) functions.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -5047,25 +5065,25 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 core.history.push(true);
             }
 
-            if (userFunction.onKeyUp) userFunction.onKeyUp(e, core);
+            if (functions.onKeyUp) functions.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             if (core._isBalloon) event._hideToolbar();
-            if (userFunction.onScroll) userFunction.onScroll(e, core);
+            if (functions.onScroll) functions.onScroll(e, core);
         },
 
         onFocus_wysiwyg: function (e) {
             core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
-            if (userFunction.onFocus) userFunction.onFocus(e, core);
+            if (functions.onFocus) functions.onFocus(e, core);
         },
 
         onBlur_wysiwyg: function (e) {
             core.hasFocus = false;
             if (core._isInline || core._isBalloon) event._hideToolbar();
-            if (userFunction.onBlur) userFunction.onBlur(e, core);
+            if (functions.onBlur) functions.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -5182,7 +5200,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
             const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
-            if (typeof userFunction.onPaste === 'function' && !userFunction.onPaste(e, cleanData, maxCharCount, core)) {
+            if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -5244,7 +5262,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             }
 
-            if (userFunction.onDrop) userFunction.onDrop(e, core);
+            if (functions.onDrop) functions.onDrop(e, core);
         },
 
         _setDropLocationSelection: function (e) {
@@ -5258,7 +5276,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _onChange_historyStack: function () {
             event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (userFunction.onChange) userFunction.onChange(core.getContents(true), core);
+            if (functions.onChange) functions.onChange(core.getContents(true), core);
         },
 
         _addEvent: function () {
@@ -5346,7 +5364,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     };
 
     /** User function */
-    const userFunction = {
+    const functions = {
         /**
          * @description Core, Util object
          */
@@ -5369,7 +5387,23 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onPaste: null,
         onFocus: null,
         onBlur: null,
+
+        /**
+         * @description Called just before the inline toolbar is positioned and displayed on the screen.
+         * @param {Element} toolbar Toolbar Element
+         * @param {Object} context The editor's context object (editor.getContext())
+         * @param {Object} core Core object
+         */
         showInline: null,
+
+        /**
+         * @description Called just after the controller is positioned and displayed on the screen.
+         * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+         * @param {String} name The name of the plugin that called the controller
+         * @param {Array} controllers Array of Controller elements
+         * @param {Object} core Core object
+         */
+        showController: null,
 
         /**
          * @description It replaces the default callback function of the image upload
@@ -5722,7 +5756,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     core._charCount(0, false);
 
     // functionss
-    core.functions = userFunction;
+    core.functions = functions;
 
-    return userFunction;
+    return functions;
 }

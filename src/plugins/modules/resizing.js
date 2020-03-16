@@ -81,7 +81,7 @@ export default {
     setController_resize: function () {
         const resize_container = this.util.createElement('DIV');
         
-        resize_container.className = 'se-resizing-container';
+        resize_container.className = 'se-controller se-resizing-container';
         resize_container.style.display = 'none';
         resize_container.innerHTML = '' +
             '<div class="se-modal-resize"></div>' +
@@ -378,7 +378,7 @@ export default {
         }
 
         this._resizingName = plugin;
-        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, plugin);
+        this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, targetElement, plugin);
 
         // button group
         const overLeft = this.context.element.wysiwygFrame.offsetWidth - l - contextResizing.resizeButton.offsetWidth;

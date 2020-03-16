@@ -223,7 +223,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), 'link');
+        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), selectionATag, 'link');
     },
 
     onClick_linkBtn: function (e) {

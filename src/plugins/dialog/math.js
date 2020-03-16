@@ -247,7 +247,7 @@ export default {
             mathBtn.firstElementChild.style.left = '20px';
         }
 
-        this.controllersOn(mathBtn, this.plugins.math.init.bind(this), 'math');
+        this.controllersOn(mathBtn, this.plugins.math.init.bind(this), mathTag, 'math');
     },
 
     onClick_mathBtn: function (e) {

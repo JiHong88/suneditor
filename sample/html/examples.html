@@ -548,13 +548,27 @@
 <span class="pl-c"><span class="pl-c">//</span> It replaces the default callback function of the image upload.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">imageUploadHandler</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
 
+<span class="pl-c"><span class="pl-c">// Called just before the inline toolbar is positioned and displayed on the screen.</span></span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * toolbar: Toolbar Element</span>
-<span class="pl-c"> * context: The editor's context object (editor.getContext())</span>
+<span class="pl-c"> * context: The editor's context object (editor.getContext()|core.context)</span>
+<span class="pl-c"> * core: Core object</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar);
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
+}
+
+<span class="pl-c"><span class="pl-c">// Called just after the controller is positioned and displayed on the screen.</span></span>
+<span class="pl-c"><span class="pl-c">// controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]</span></span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * name: The name of the plugin that called the controller</span>
+<span class="pl-c"> * controllers: Array of Controller elements</span>
+<span class="pl-c"> * core: Core object</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">name</span>, <span class="pl-smi">controllers</span>, <span class="pl-smi">core</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>plugin name<span class="pl-pds">'</span></span>, name);
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>controller elements<span class="pl-pds">'</span></span>, controllers);
 }</pre></div>
         
     </article>
@@ -819,6 +833,10 @@
         suneditor.showInline = function (toolbar, context) {
             console.log('toolbar', toolbar);
             console.log('context', context);
+        }
+        suneditor.showController = function (name, controllers, core) {
+            console.log('plugin name', name);
+            console.log('controller elements', controllers);
         }
     }
 
