@@ -13,6 +13,7 @@
 const util = {
     _d: document,
     _w: window,
+    _parser: new window.DOMParser(),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -607,6 +608,15 @@ const util = {
      */
     isAnchor: function (node) {
         return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a media node (img, iframe, audio, video, canvas)
+     * @param {Element|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isMedia: function (node) {
+        return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
@@ -1352,8 +1362,7 @@ const util = {
      */
     changeIcon: function (icon, newIcon) {
         if (typeof newIcon === 'string') {
-            const parser = new this._w.DOMParser();
-            newIcon = parser.parseFromString(newIcon, 'image/svg+xml').firstElementChild;
+            newIcon = this._parser.parseFromString(newIcon, 'image/svg+xml').firstElementChild;
         }
         
         icon.parentNode.replaceChild(newIcon, icon);

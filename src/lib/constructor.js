@@ -258,8 +258,7 @@ export default {
         // wysiwyg div or iframe
         const wysiwygDiv = document.createElement(!options.iframe ? 'DIV' : 'IFRAME');
         wysiwygDiv.className = 'se-wrapper-inner se-wrapper-wysiwyg';
-        if (options.defaultStyle) wysiwygDiv.style.cssText = options.defaultStyle;
-
+        
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');

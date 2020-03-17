@@ -46,10 +46,17 @@ export default {
     setDialog: function () {
         const lang = this.lang;
         const dialog = this.util.createElement('DIV');
+        const targetList = [
+            { target: '_blank', name: 'New window'},
+            { target: '_parent', name: 'Parent frame'},
+            { target: '_top', name: 'First frame', selected: true},
+            { target: 'AnyFrame', name: 'Frame name'},
+            { target: '_dialog', name: 'Self defined dialog'}
+        ];
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = '' +
+        let html = '' +
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
@@ -65,14 +72,23 @@ export default {
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
                     '</div>' +
-                    '<div class="se-dialog-form-footer">' +
-                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                    '<div class="se-dialog-form se-dialog-form-footer">' +
+                        '<select class="se-input-select" title="links">';
+                            for (let i = 0, len = targetList.length, t, selected; i < len; i++) {
+                                t = targetList[i];
+                                selected = t.selected ? ' selected' : '';
+                                html += '<option value="' + t.target + '"' + selected + '>' + t.name + '</option>';
+                            }
+                        html += '</select>' +
                     '</div>' +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
                     '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
+
+
+        dialog.innerHTML = html;
 
         return dialog;
     },
