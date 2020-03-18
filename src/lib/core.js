@@ -4693,6 +4693,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
+                    if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        core._setDefaultFormat('P');
+                        return false;
+                    }
+
                     if (!formatEl.nextElementSibling && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
                      (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.firstChild.textContent))))) {
                         e.preventDefault();
