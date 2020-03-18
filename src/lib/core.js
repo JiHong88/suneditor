@@ -248,6 +248,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         _sticky: false,
 
         /**
+         * @description Variables for controlling focus and blur events
+         * @private
+         */
+        _antiBlur: false,
+
+        /**
          * @description If true, (initialize, reset) all indexes of image information
          * @private
          */
@@ -439,6 +445,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
             if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
+            this._antiBlur = true;
         },
 
         /**
@@ -456,6 +463,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.submenuActiveButton = null;
                 this._notHideToolbar = false;
             }
+
+            this._antiBlur = false;
         },
 
         /**
@@ -480,6 +489,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.addDocEvent('mousedown', this._bindedContainerOff, false);
 
             if (this.plugins[containerName].on) this.plugins[containerName].on.call(this);
+            this._antiBlur = true;
         },
 
         /**
@@ -497,6 +507,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.containerActiveButton = null;
                 this._notHideToolbar = false;
             }
+
+            this._antiBlur = false;
         },
 
         /**
@@ -512,22 +524,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             for (let i = 0, arg; i < arguments.length; i++) {
                 arg = arguments[i];
-
                 if (typeof arg === 'string') {
                     this.currentControllerName = arg;
                     continue;
                 }
-
                 if (typeof arg === 'function') {
                     this.controllerArray[i] = arg;
                     continue;
                 }
-
                 if (!util.hasClass(arg, 'se-controller')) {
                     this.currentControllerTarget = arg;
                     continue;
                 }
-
                 if (arg.style) arg.style.display = 'block';
                 this.controllerArray[i] = arg;
             }
@@ -538,6 +546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.addDocEvent('keydown', this._bindControllersOff, false);
 
             if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, core);
+            this._antiBlur = true;
         },
 
         /**
@@ -566,6 +575,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 this.controllerArray = [];
             }
+
+            this._antiBlur = false;
         },
 
         /**
@@ -640,7 +651,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 }
             } else {
                 focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-                this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+                if (!focusEl) this._nativeFocus();
+                else this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
             }
         },
 
@@ -4388,6 +4400,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             if (!/^input|textarea$/i.test(target.nodeName)) {
                 e.preventDefault();
+            } else {
+                core._antiBlur = false;
             }
 
             if (util.getParentElement(target, '.se-submenu')) {
@@ -5275,12 +5289,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         onFocus_wysiwyg: function (e) {
+            if (core._antiBlur) return;
             core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
             if (functions.onFocus) functions.onFocus(e, core);
         },
 
         onBlur_wysiwyg: function (e) {
+            if (core._antiBlur) return;
             core.hasFocus = false;
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (functions.onBlur) functions.onBlur(e, core);

@@ -14,7 +14,7 @@
 .sun-editor-common td, .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {margin:0; padding:0; border:0;}
 .sun-editor-common dl, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common menu, .sun-editor-common li {list-style:none !important;}
 .sun-editor-common hr {margin:6px 0 6px 0 !important;}
-.sun-editor textarea {resize:none !important; border:0 !important;}
+.sun-editor textarea {resize:none; border:0; padding:0;}
 .sun-editor button {border:0 none; background-color:transparent; touch-action:manipulation; cursor:pointer; outline:none;}
 .sun-editor input, .sun-editor select, .sun-editor textarea, .sun-editor button {vertical-align:middle;}
 .sun-editor button span {display:block; margin:0; padding:0;}
@@ -211,7 +211,7 @@
 .sun-editor .se-wrapper {position:relative !important; width:100%; height:auto; overflow:hidden; z-index:1;}
 .sun-editor .se-wrapper .se-wrapper-inner {width:100%; height:100%; min-height:65px; overflow-y:auto; overflow-x:auto; -webkit-overflow-scrolling:touch; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
 .sun-editor .se-wrapper .se-wrapper-inner:focus {outline:none;}
-.sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:0; margin:0;}
+.sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:4px; margin:0; resize:none !important;}
 .sun-editor .se-wrapper .se-wrapper-wysiwyg {background-color:#fff; display:block;}
 .sun-editor .se-wrapper .se-wrapper-code-mirror {font-size:13px;}
 /** --- placeholder */
@@ -273,7 +273,7 @@
 .sun-editor .se-dialog-tabs button.active {background-color:#fff;border-bottom:0;}
 
 /* dialog - modal - math */
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical !important; height:4rem; border:1px solid #ccc !important; font-size:13px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical; height:4rem; border:1px solid #ccc; font-size:13px; padding:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
 

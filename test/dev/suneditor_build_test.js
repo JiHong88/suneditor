@@ -154,7 +154,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        // 'table', 
+        'table', 
         'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']

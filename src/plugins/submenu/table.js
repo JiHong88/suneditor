@@ -1153,6 +1153,7 @@ export default {
     },
 
     _onCellMultiSelect: function (e) {
+        this._antiBlur = true;
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
