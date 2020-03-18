@@ -74,8 +74,10 @@ export default {
         resizeDiv.addEventListener('click', this.onClick_tableController.bind(core));
         tableController.addEventListener('click', this.onClick_tableController.bind(core));
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
+
+        /** append controller */
         context.element.relative.appendChild(resizeDiv);
         context.element.relative.appendChild(tableController);
 

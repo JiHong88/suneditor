@@ -24,11 +24,10 @@ export default {
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
-
         context.formatBlock._formatList = listDiv.querySelectorAll('li button');
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;

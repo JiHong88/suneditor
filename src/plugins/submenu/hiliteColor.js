@@ -34,8 +34,8 @@ export default {
 
         context.hiliteColor.colorList = listDiv.querySelectorAll('li button');
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;

@@ -97,6 +97,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         initPlugins: {},
 
         /**
+         * @description Object for managing submenu elements
+         * @private
+         */
+        _targetPlugins: {},
+
+        /**
          * @description loaded language
          */
         lang: lang,
@@ -367,13 +373,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
             } else if (!this.initPlugins[pluginName]){
-                if(!_target) return false;
                 this.plugins[pluginName].add(this, _target);
                 this.initPlugins[pluginName] = true;
+            } else if (typeof this._targetPlugins[pluginName] === 'object' && !!_target) {
+                this.initMenuTarget(pluginName, _target, this._targetPlugins[pluginName]);
             }
 
-            if (this.plugins[pluginName].active && !this.commandMap[pluginName]) {
-                if(!_target) return false;
+            if (this.plugins[pluginName].active && !this.commandMap[pluginName] && !!_target) {
                 this.commandMap[pluginName] = _target;
                 this.activePlugins.push(pluginName);
             }
@@ -392,6 +398,22 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     this.plugins[moduleName] = moduleArray[i];
                     if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
                 }
+            }
+        },
+
+        /**
+         * @description Method for managing submenu element.
+         * You must add the "submenu" element using the this method at custom plugin.
+         * @param {String} pluginName Plugin name
+         * @param {Element|null} target Target button
+         * @param {Element} menu Submenu element
+         */
+        initMenuTarget: function (pluginName, target, menu) {
+            if (!target) {
+                this._targetPlugins[pluginName] = menu;
+            } else {
+                target.parentNode.appendChild(menu);
+                this._targetPlugins[pluginName] = true;
             }
         },
 
@@ -1688,7 +1710,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             else if (!firstNode) firstNode = rangeElement.previousSibling;
             rangeRight = rangeElement.nextSibling;
 
-            if (rangeElement.children.length === 0) {
+            if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
                 util.removeItem(rangeElement);
             } else {
                 util.removeEmptyNode(rangeElement, null);

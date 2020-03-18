@@ -30,11 +30,10 @@ export default {
 
         /** add event listeners */
         listUl.addEventListener('click', this.pickup.bind(core));
-
         context.list._list = listUl.querySelectorAll('li button');
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null, listUl = null;

@@ -26,7 +26,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_plugin_dialog, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [custom_plugin_dialog, custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -42,10 +42,18 @@ suneditor.create("sample1", {
                 dataDisplay:'dialog',
                 innerHTML:''
             },
+            {
+                name: 'custom_container', 
+                dataCommand: 'custom_container',
+                buttonClass:'', 
+                title:'Custom - Container', 
+                dataDisplay:'container',
+                innerHTML:''
+            },
             'bold', 'italic'
         ]
     ],
-    maxCharCount: 20
+    maxCharCount: 2000
 });
 
 
@@ -62,7 +70,8 @@ let s1 = suneditor.create('editor', {
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'lineHeight',
+        // 'list',
+        'align', 'horizontalRule', 'lineHeight',
         'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
@@ -94,7 +103,7 @@ let s1 = suneditor.create('editor', {
         },
         'pre',
         'blockquote'
-    ]
+    ],
 })
 
 window.cm = CodeMirror
@@ -145,7 +154,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video', 'math',
+        // 'table', 
+        'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
@@ -161,7 +171,17 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     attributesWhitelist: {
         // 'input': 'type',
         'all': 'type'
-    }
+    },
+    templates: [
+        {
+            name: 'Template-1',
+            html: '<p>HTML source1</p>'
+        },
+        {
+            name: 'Template-2',
+            html: '<p>HTML source2</p>'
+        }
+    ],
     // mode: 'inline',
     // videoHeightShow: false,
     // videoRatioShow: false,
