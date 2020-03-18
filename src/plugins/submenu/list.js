@@ -295,6 +295,7 @@ export default {
         }
 
         if (originList.children.length === 0) this.util.removeItem(originList);
+        this.util.mergeSameTags(parentNode);
 
         const edge = this.util.getEdgeChildNodes(first, last);
 

@@ -657,8 +657,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             
             const range = this._wd.createRange();
-            range.setStart(startCon, startOff);
-            range.setEnd(endCon, endOff);
+
+            try {
+                range.setStart(startCon, startOff);
+                range.setEnd(endCon, endOff);
+            } catch (error) {
+                this._nativeFocus();
+            }
 
             const selection = this.getSelection();
 

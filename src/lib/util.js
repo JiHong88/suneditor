@@ -1173,7 +1173,12 @@ const util = {
                 child = children[i];
                 next = children[i + 1];
                 if (!child) break;
-                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) continue;
+                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) {
+                    if (inst.isTable(child) || inst.isListCell(child)) {
+                        recursionFunc(child, depth + 1, i);
+                    }
+                    continue;
+                }
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
                     // update nodePath
                     if (nodePathArray) {
