@@ -139,6 +139,10 @@ declare module 'suneditor' {
      * The max-height size of the editor
      */
     maxHeight?: string;
+    /** 
+     * Editing area default style 
+    */
+    defaultStyle?: String;
     /**
      * Defining menu items
      * ===================

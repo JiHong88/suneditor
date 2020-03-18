@@ -15,15 +15,20 @@
     <!--<h1 class="page-title">Global</h1>-->
     <section>
         <header>
-            <h2></h2>
+            <h2>.functions</h2>
         </header>
         <article>
             <div class="container-overview">
                 <dl class="details">
+                    <dd>It can be accessed from "core.functions" or object returned after editor creation.</dd>
+                    <dd>--- events ---</dd>
+                    <dd>It can be redefined by receiving event object as parameter.</dd>
+                    <dd>It is not called in exceptional cases and is called after the default event function has finished.</dd>
                 </dl>
             </div>
             <h3 class="subsection-title">Methods</h3>
-
+            <div class="description">
+            </div>
 
             <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions<span
                     class="signature">(options)</span></h4>
@@ -332,12 +337,11 @@
         <dl class="details"></dl>
 
 
-
-            <h3 class="subsection-title">Events</h3>
-            <div class="description">
-                It can be redefined by receiving event object as parameter.
-                It is not called in exceptional cases and is called after the default event function has finished.
-            </div>
+        <h4 class="subsection-title" id="titleEvent">events==</h4>
+        <div class="description">
+            It can be redefined by receiving event object as parameter.<br>
+            It is not called in exceptional cases and is called after the default event function has finished.
+        </div>
 
             <h4 class="name" id="onload"><span class="type-signature"></span>onload<span
                     class="signature">(core, reload)</span><span class="type-signature"></span></h4>
@@ -989,10 +993,7 @@
         <li><a href="document-user.html#hide">hide</a></li>
         <li><a href="document-user.html#destroy">destroy</a></li>
         <li><a href="document-user.html#toolbar">{toolbar}</a></li>
-    </ul>
-
-    <h3>Events</h3>
-    <ul>
+        <li><a href="document-user.html#titleEvent"><h4 class="subsection-title" style="font-size: 20px;">events==</h4></a></li>
         <li><a href="document-user.html#onload">onload</a></li>
         <li><a href="document-user.html#onScroll">onScroll</a></li>
         <li><a href="document-user.html#onClick">onClick</a></li>

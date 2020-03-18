@@ -44,7 +44,8 @@ suneditor.create("sample1", {
             },
             'bold', 'italic'
         ]
-    ]
+    ],
+    maxCharCount: 20
 });
 
 
@@ -148,6 +149,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
+    // maxCharCount: 20,
     katex: Katex,
     height: 'auto',
     width: '100%',

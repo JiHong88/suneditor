@@ -434,8 +434,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.submenuActiveButton = null;
                 this._notHideToolbar = false;
             }
-            
-            this.focus();
         },
 
         /**
@@ -477,8 +475,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this.containerActiveButton = null;
                 this._notHideToolbar = false;
             }
-            
-            this.focus();
         },
 
         /**
@@ -588,7 +584,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             } else {
                 try {
                     const range = this.getRange();
-                    this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+
+                    if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
+                        const format = util.createElement('P');
+                        const br = util.createElement('BR');
+                        format.appendChild(br);
+                        this.setRange(br, 0, 0, br);
+                    } else {
+                        this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                    }
                 } catch (e) {
                     this._nativeFocus();
                 }
@@ -3275,18 +3279,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             switch (command) {
                 case 'selectAll':
                     const wysiwyg = context.element.wysiwyg;
-                    let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
-                    let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
-                    
-                    if ((first.getAttribute && first.getAttribute('contenteditable') === 'false') || util.isMedia(first) || util.getParentElement(first, util.isComponent)) {
-                        first = util.createTextNode(util.zeroWidthSpace);
-                        wysiwyg.insertBefore(first, wysiwyg.firstChild);
-                    }
-                    if ((last.getAttribute && last.getAttribute('contenteditable') === 'false') || util.isMedia(last) || util.getParentElement(last, util.isComponent)) {
-                        last = util.createTextNode(util.zeroWidthSpace);
-                        wysiwyg.appendChild(last);
-                    }
-
+                    const first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
+                    const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
+                    if (!first || !last) return;
                     this.setRange(first, 0, last, last.textContent.length);
                     this.focus();
                     break;
@@ -3448,7 +3443,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
                 this._resourcesStateChange();
                 this._checkComponents();
-                this.focus();
+                this._nativeFocus();
 
                 // history stack
                 this.history.push(false);
@@ -4364,11 +4359,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onMouseDown_toolbar: function (e) {
             let target = e.target;
 
+            if (!/^input|textarea$/i.test(target.nodeName)) {
+                e.preventDefault();
+            }
+
             if (util.getParentElement(target, '.se-submenu')) {
                 e.stopPropagation();
                 core._notHideToolbar = true;
             } else {
-                e.preventDefault();
                 let command = target.getAttribute('data-command');
                 let className = target.className;
     
@@ -4660,6 +4658,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const ctrl = e.ctrlKey || e.metaKey;
             const alt = e.altKey;
 
+            core.submenuOff();
             if (!event._directionKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
             if (core._isBalloon) {
                 event._hideToolbar();
@@ -4692,20 +4691,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                             core.plugins[resizingName].destroy.call(core);
                             break;
                         }
-    
-                        if (util.isWysiwygDiv(selectionNode.parentNode) && util.isFormatElement(selectionNode) && !util.isListCell(selectionNode) && selectionNode.childNodes.length === 0) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            selectionNode.innerHTML = '<br>';
-                            if (!selectionNode.nextElementSibling) {
-                                const attrs = selectionNode.attributes;
-                                while (attrs[0]) {
-                                    selectionNode.removeAttribute(attrs[0].name);
-                                }
-                                core.execCommand('formatBlock', false, 'P');
-                            }
-                            return false;
+                    }
+
+                    if (!formatEl.nextElementSibling && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
+                     (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.firstChild.textContent))))) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        formatEl.innerHTML = '<br>';
+                        const attrs = formatEl.attributes;
+                        while (attrs[0]) {
+                            formatEl.removeAttribute(attrs[0].name);
                         }
+                        core.execCommand('formatBlock', false, 'P');
+                        return false;
                     }
 
                     // clean remove tag
@@ -4818,8 +4816,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
                             const previousEl = formatEl.previousSibling;
                             util.removeItem(previousEl);
+                            break;
                         }
                     }
+
+                    if (selectRange) event._rangedeleteAssistant(range.startContainer, range.endContainer);
 
                     break;
                 case 46: /** delete key */
@@ -4893,6 +4894,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                         break;
                     }
+
+                    if (selectRange) event._rangedeleteAssistant(range.startContainer, range.endContainer);
 
                     break;
                 case 9: /** tab key */
@@ -5149,7 +5152,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 if (textKey) {
                     e.preventDefault();
                     e.stopPropagation();
-                    return false;
                 }
             }
 
@@ -5216,11 +5218,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            if (!core._charCount(1, textKey)) {
+            if (!core._charCount(0, textKey)) {
                 if (e.key.length === 1) {
                     e.preventDefault();
                     e.stopPropagation();
-                    return false;
                 }
             }
 
@@ -5442,6 +5443,21 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(core.getContents(true), core);
+        },
+
+        _rangedeleteAssistant: function (start, end) {
+            start = util.getParentElement(start, function (current) { return current.getAttribute && (current.getAttribute('contenteditable') === 'false' || this.isComponent(current)); }.bind(util));
+            end = util.getParentElement(end, function (current) { return current.getAttribute && (current.getAttribute('contenteditable') === 'false' || this.isComponent(current)); }.bind(util));
+
+            _w.setTimeout(function (start, end) {
+                if (start) {
+                    this.removeItem(start);
+                    if(start === end) return;
+                }
+                if (end) {
+                    this.removeItem(end);
+                }
+            }.bind(util, start, end));
         },
 
         _addEvent: function () {
