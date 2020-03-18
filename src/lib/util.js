@@ -1367,10 +1367,17 @@ const util = {
      */
     changeIcon: function (icon, newIcon) {
         if (typeof newIcon === 'string') {
-            newIcon = this._parser.parseFromString(newIcon, 'image/svg+xml').firstElementChild;
+            if (icon.outerHTML) {
+                icon.outerHTML = newIcon;
+            } else {
+                const doc = this.createElement('DIV');
+                doc.innerHTML = newIcon;
+                newIcon = doc.firstChild;
+                icon.parentNode.replaceChild(newIcon, icon);
+            }
+        } else if (newIcon.nodeType === 1) {
+            icon.parentNode.replaceChild(newIcon, icon);
         }
-        
-        icon.parentNode.replaceChild(newIcon, icon);
     },
 
     /**
