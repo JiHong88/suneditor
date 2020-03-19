@@ -163,7 +163,7 @@
         <!-- container -->
         <a id="container" href="#container"><h4 class="sub-title">1. Plugins container</h4></a>
         <button class="accordion">sample ↓</button>
-        <div class="panel">
+        <div class="panel" style="display: none;">
             <textarea id="ex_container" style="width: 1080px; height: 150px;"></textarea>
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) Adds a container of type "submenu" that contains a plugin.</span>
@@ -300,7 +300,7 @@
         <!-- command -->
         <a id="command" href="#command"><h4 class="sub-title">2. Command</h4></a>
         <button class="accordion">sample ↓</button>
-        <div class="panel">
+        <div class="panel" style="display: none;">
             <textarea id="ex_command" style="width: 1080px; height: 150px;"></textarea>
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A command plugin to add "Range format element(util.isRangeFormatElement)" to selection</span>
@@ -418,7 +418,7 @@
         <!-- submenu -->
         <a id="submenu" href="#submenu"><h4 class="sub-title">3. Submenu</h4></a>
         <button class="accordion">sample ↓</button>
-        <div class="panel">
+        <div class="panel" style="display: none;">
             <textarea id="ex_submenu" style="width: 1080px; height: 150px;"></textarea>
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A submenu plugin that appends the contents of the input element to the editor</span>
@@ -578,7 +578,7 @@
         <!-- dialog -->
         <a id="dialog" href="#dialog"><h4 class="sub-title">4. Dialog</h4></a>
         <button class="accordion">sample ↓</button>
-        <div class="panel">
+        <div class="panel" style="display: none;">
             <textarea id="ex_dialog" style="width: 1080px; height: 150px;"></textarea>
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// Import "dialog" module</span>
@@ -933,7 +933,9 @@
             var panel = this.nextElementSibling;
             if (panel.style.maxHeight) {
                 panel.style.maxHeight = null;
+                panel.style.display = 'none';
             } else {
+                panel.style.display = 'block';
                 panel.style.maxHeight = panel.scrollHeight + "px";
             } 
         });
