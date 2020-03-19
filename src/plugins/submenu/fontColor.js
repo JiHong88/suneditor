@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import colorPicker from '../modules/colorPicker';
+import colorPicker from '../modules/_colorPicker';
 
 export default {
     name: 'fontColor',

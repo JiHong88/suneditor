@@ -1,41 +1,60 @@
 'use strict';
 
+// Import "dialog" module
 import dialog from '../../src/plugins/modules/dialog';
 
 // ex) A dialog plugin that appends the contents of the input element to the editor
 export default {
+    // @Required
+    // plugin name
     name: 'customLink',
+
+    // @Required
+    // data display
     display: 'dialog',
+
+    // @Required
+    // add function - It is called only once when the plugin is first run.
+    // This function generates HTML to append and register the event.
+    // arguments - (core : core object, targetElement : clicked button element)
     add: function (core) {
+
+        // If you are using a module, you must register the module using the "addModule" method.
         core.addModule([dialog]);
 
+        // @Required
+        // Registering a namespace for caching as a plugin name in the context object
         const context = core.context;
-        context.link = {
-            focusElement: null,
-            linkNewWindowCheck: null,
+        context.customLink = {
+            focusElement: null, // @Overriding // This element has focus when the dialog is opened.
+            targetSelect: null,
             linkAnchorText: null,
             _linkAnchor: null
         };
 
         /** link dialog */
         let link_dialog = this.setDialog.call(core);
-        context.link.modal = link_dialog;
-        context.link.focusElement = link_dialog.querySelector('._se_link_url');
-        context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
-        context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
+        context.customLink.modal = link_dialog;
+        context.customLink.focusElement = link_dialog.querySelector('._se_link_url');
+        context.customLink.linkAnchorText = link_dialog.querySelector('._se_link_text');
+        context.customLink.targetSelect = link_dialog.querySelector('.se-input-select');
 
-        /** link button */
+        /** link controller */
         let link_controller = this.setController_LinkButton.call(core);
-        context.link.linkBtn = link_controller;
-        context.link._linkAnchor = null;
+        context.customLink.linkController = link_controller;
+        context.customLink._linkAnchor = null;
+        // @Required
+        // You must register the event propagation stop code in the "mousedown" event of the controller.
         link_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
         link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        link_controller.addEventListener('click', this.onClick_linkBtn.bind(core));
+        link_controller.addEventListener('click', this.onClick_linkController.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
+
+        /** append controller */
         context.element.relative.appendChild(link_controller);
 
         /** empty memory */
@@ -122,8 +141,12 @@ export default {
         return link_btn;
     },
 
+    // @Required
+    // This method is called when the plugin button is clicked.
+    // Open the modal window here.
     open: function () {
-        this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
+        // open.call(core, pluginName, isModify)
+        this.plugins.dialog.open.call(this, 'customLink', 'customLink' === this.currentControllerName);
     },
 
     submit: function (e) {
@@ -133,9 +156,9 @@ export default {
         e.stopPropagation();
 
         const submitAction = function () {
-            if (this.context.link.focusElement.value.trim().length === 0) return false;
+            if (this.context.customLink.focusElement.value.trim().length === 0) return false;
 
-            const contextLink = this.context.link;
+            const contextLink = this.context.customLink;
             const url = contextLink.focusElement.value;
             const anchor = contextLink.linkAnchorText;
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
@@ -144,7 +167,7 @@ export default {
                 const oA = this.util.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
-                oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                oA.target = (contextLink.targetSelect.checked ? '_blank' : '');
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -159,7 +182,7 @@ export default {
             } else {
                 contextLink._linkAnchor.href = url;
                 contextLink._linkAnchor.textContent = anchorText;
-                contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                contextLink._linkAnchor.target = (contextLink.targetSelect.checked ? '_blank' : '');
 
                 // set range
                 this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
@@ -183,12 +206,15 @@ export default {
         return false;
     },
 
+    // @Overriding
+    // Plugins with active methods load immediately when the editor loads.
+    // Called each time the selection is moved.
     active: function (element) {
         if (!element) {
-            if (this.controllerArray[0] === this.context.link.linkBtn) this.controllersOff();
+            if (this.controllerArray.indexOf(this.context.customLink.linkController) > -1) this.controllersOff();
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-            if (this.controllerArray[0] !== this.context.link.linkBtn) {
-                this.plugins.link.call_controller_linkButton.call(this, element);
+            if (this.controllerArray.indexOf(this.context.customLink.linkController) < 0) {
+                this.plugins.customLink.call_controller_linkButton.call(this, element);
             }
             return true;
         }
@@ -196,22 +222,25 @@ export default {
         return false;
     },
 
+    // @Overriding
+    // This method is called just before the dialog opens.
+    // If "update" argument is true, it is not a new call, but a call to modify an already created element.
     on: function (update) {
         if (!update) {
-            this.context.link.linkAnchorText.value = this.getSelection().toString();
+            this.context.customLink.linkAnchorText.value = this.getSelection().toString();
         }
         
-        if (this.context.link._linkAnchor) {
+        if (this.context.customLink._linkAnchor) {
             this.context.dialog.updateModal = true;
-            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
-            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
-            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
+            this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
+            this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;
+            this.context.customLink.targetSelect.checked = (/_blank/i.test(this.context.customLink._linkAnchor.target) ? true : false);
         }
     },
 
     call_controller_linkButton: function (selectionATag) {
-        this.editLink = this.context.link._linkAnchor = selectionATag;
-        const linkBtn = this.context.link.linkBtn;
+        this.editLink = this.context.customLink._linkAnchor = selectionATag;
+        const linkBtn = this.context.customLink.linkController;
         const link = linkBtn.querySelector('a');
 
         link.href = selectionATag.href;
@@ -232,33 +261,33 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), selectionATag, 'link');
+        this.controllersOn(linkBtn, selectionATag, 'customLink');
     },
 
-    onClick_linkBtn: function (e) {
+    onClick_linkController: function (e) {
         e.stopPropagation();
 
-        const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
+        const command = e.target.getAttribute('data-command');
         if (!command) return;
 
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
-            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
-            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
-            this.plugins.dialog.open.call(this, 'link', true);
+            this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
+            this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;
+            this.context.customLink.targetSelect.checked = (/_blank/i.test(this.context.customLink._linkAnchor.target) ? true : false);
+            this.plugins.dialog.open.call(this, 'customLink', true);
         }
         else if (/unlink/.test(command)) {
-            const sc = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-            const ec = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            const sc = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+            const ec = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
             this.setRange(sc, 0, ec, ec.textContent.length);
             this.nodeChange(null, null, ['A'], false);
         }
         else {
             /** delete */
-            this.util.removeItem(this.context.link._linkAnchor);
-            this.context.link._linkAnchor = null;
+            this.util.removeItem(this.context.customLink._linkAnchor);
+            this.context.customLink._linkAnchor = null;
             this.focus();
 
             // history stack
@@ -268,14 +297,15 @@ export default {
         this.controllersOff();
     },
 
+    // @Required
+    // This method is called when the dialog window is closed.
+    // Initialize the properties.
     init: function () {
-        if (!/link/i.test(this.context.dialog.kind)) {
-            const contextLink = this.context.link;
-            contextLink.linkBtn.style.display = 'none';
-            contextLink._linkAnchor = null;
-            contextLink.focusElement.value = '';
-            contextLink.linkAnchorText.value = '';
-            contextLink.linkNewWindowCheck.checked = false;
-        }
+        const contextLink = this.context.customLink;
+        contextLink.linkController.style.display = 'none';
+        contextLink._linkAnchor = null;
+        contextLink.focusElement.value = '';
+        contextLink.linkAnchorText.value = '';
+        contextLink.targetSelect.checked = false;
     }
 };

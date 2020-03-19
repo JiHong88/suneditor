@@ -155,7 +155,8 @@ export default {
                 contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
 
                 // set range
-                this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
+                const textNode = contextLink._linkAnchor.childNodes[0];
+                this.setRange(textNode, 0, textNode, textNode.textContent.length);
             }
 
             // history stack
@@ -238,9 +239,10 @@ export default {
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
-            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
-            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
+            const contextLink = this.context.link;
+            contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
+            contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {

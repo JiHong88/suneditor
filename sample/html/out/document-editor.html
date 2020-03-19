@@ -483,7 +483,7 @@
             <h4 class="name" id="codeViewDisabledButtons"><span class="type-signature"></span>codeViewDisabledButtons<span
                     class="type-signature"></span></h4>
             <div class="description">
-                An array of buttons whose class name is not "code-view-enabled"
+                An array of buttons whose class name is not <span style="color:#ff5565">"code-view-enabled"</span>
             </div>
             <dl class="details"></dl>
 
@@ -855,7 +855,7 @@
             <h4 class="name" id="controllersOn"><span class="type-signature"></span>controllersOn<span
                     class="signature">(arguments)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Show controller at editor area (link button, image resize button, init function, etc..)
+                Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1596,6 +1596,34 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="toggleDisabledButtons"><span class="type-signature"></span>toggleDisabledButtons<span
+                    class="signature">(disabled)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.<br>
+                <a href="#codeViewDisabledButtons">core.codeViewDisabledButtons</a> (An array of buttons whose className is not <span style="color:#ff5565">"code-view-enabled"</span>)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">{Boolean} disabled Disabled value</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="toggleDisplayBlocks"><span class="type-signature"></span>toggleDisplayBlocks<span
                     class="signature">()</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1951,6 +1979,7 @@
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>
         <li><a href="document-editor.html#indent">indent</a></li>
+        <li><a href="document-editor.html#toggleDisabledButtons">toggleDisabledButtons</a></li>
         <li><a href="document-editor.html#toggleDisplayBlocks">toggleDisplayBlocks</a></li>
         <li><a href="document-editor.html#toggleCodeView">toggleCodeView</a></li>
         <li><a href="document-editor.html#toggleFullScreen">toggleFullScreen</a></li>

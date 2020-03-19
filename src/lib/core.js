@@ -11,7 +11,7 @@ import _Constructor from './constructor';
 import _Context from './context';
 import _history from './history';
 import _util from './util';
-import _notice from '../plugins/modules/notice';
+import _notice from '../plugins/modules/_notice';
 import _icons from '../assets/defaultIcons';
 
 /**
@@ -513,7 +513,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         },
 
         /**
-         * @description Show controller at editor area (link button, image resize button, init function, etc..)
+         * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
          * @param {*} arguments controller elements, functions..
          */
         controllersOn: function () {
@@ -4073,6 +4073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 this._iframeAutoHeight();
                 this._checkPlaceholder();
 
+                if (reload) this.focus();
                 if (typeof functions.onload === 'function') return functions.onload(core, reload);
             }.bind(this));
 
@@ -5760,8 +5761,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             event._offStickyToolbar();
             event.onResize_window();
-            
-            core.focus();
         },
 
         /**
@@ -5783,7 +5782,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {String} message Notice message
          */
         noticeOpen: function (message) {
-            core.addModule([core.notice]);
             core.notice.open.call(core, message);
         },
 
@@ -5791,7 +5789,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description Close a notice area
          */
         noticeClose: function () {
-            core.addModule([core.notice]);
             core.notice.close.call(core);
         },
 
@@ -6021,6 +6018,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
     // functionss
     core.functions = functions;
+
+    // register notice module
+    core.addModule([_notice]);
 
     return functions;
 }

@@ -9,14 +9,13 @@
 
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
-import notice from '../modules/notice';
 import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, resizing, notice]);
+        core.addModule([dialog, resizing]);
         
         const context = core.context;
         context.image = {
@@ -271,7 +270,7 @@ export default {
                         'currentSize': infoSize,
                         'uploadSize': fileSize
                     })) {
-                        notice.open.call(this, err);
+                        this.functions.noticeOpen(err);
                     }
 
                     this.closeLoading();
@@ -365,7 +364,7 @@ export default {
 
                     if (response.errorMessage) {
                         if (this._imageUploadError(response.errorMessage, response.result)) {
-                            notice.open.call(this, response.errorMessage);
+                            this.functions.noticeOpen(response.errorMessage);
                         }
                     } else {
                         const fileList = response.result;
