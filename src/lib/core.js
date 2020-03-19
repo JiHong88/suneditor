@@ -4574,7 +4574,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const selection = core.getSelection();
 
             let isDirTop;
-            if (selection.focusNode === selection.anchorNode) {
+            if (core._isBalloonAlways && range.collapsed) {
+                isDirTop = true;
+            } else if (selection.focusNode === selection.anchorNode) {
                 isDirTop = selection.focusOffset < selection.anchorOffset;
             } else {
                 const childNodes = util.getListChildNodes(range.commonAncestorContainer);
