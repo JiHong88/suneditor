@@ -13,7 +13,6 @@
 const util = {
     _d: document,
     _w: window,
-    _parser: new window.DOMParser(),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.

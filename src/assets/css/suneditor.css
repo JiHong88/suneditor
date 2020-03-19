@@ -205,7 +205,7 @@
 .sun-editor .se-submenu-form-group > div {position:relative;}
 /** submenu layer - color input */
 .sun-editor .se-submenu-form-group .se-color-input {width:72px; text-transform:uppercase; border:none; border-bottom:2px solid #b1b1b1; outline:none;}
-.sun-editor .se-submenu-form-group .se-color-input:focus {outline:none; border-bottom:3px solid #b1b1b1; -webkit-box-shadow:none; box-shadow:none;}
+.sun-editor .se-submenu-form-group .se-color-input:focus {border-bottom:3px solid #b1b1b1;}
 
 /** --- editor area */
 .sun-editor .se-wrapper {position:relative !important; width:100%; height:auto; overflow:hidden; z-index:1;}
@@ -276,6 +276,7 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical; height:4rem; border:1px solid #ccc; font-size:13px; padding:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview > span {display:inline-block; -webkit-box-shadow:0 0 0 0.1rem #c7deff; box-shadow:0 0 0 0.1rem #c7deff;}
 
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}

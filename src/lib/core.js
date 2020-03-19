@@ -11,7 +11,7 @@ import _Constructor from './constructor';
 import _Context from './context';
 import _history from './history';
 import _util from './util';
-import notice from '../plugins/modules/notice';
+import _notice from '../plugins/modules/notice';
 import _icons from '../assets/defaultIcons';
 
 /**
@@ -64,7 +64,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         /**
          * @description Notice object
          */
-        notice: notice,
+        notice: _notice,
 
         /**
          * @description Default icons object
@@ -3437,6 +3437,19 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.history.push(false);
         },
 
+
+        /**
+         * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
+         * core.codeViewDisabledButtons (An array of buttons whose class name is not "code-view-enabled")
+         * @param {Boolean} disabled Disabled value
+         */
+        toggleDisabledButtons: function (disabled) {
+            const disButtons = this.codeViewDisabledButtons;
+            for (let i = 0, len = disButtons.length; i < len; i++) {
+                disButtons[i].disabled = disabled;
+            }
+        },
+
         /**
          * @description Add or remove the class name of "body" so that the code block is visible
          */
@@ -3450,11 +3463,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
-            const disButtons = this.codeViewDisabledButtons;
-            for (let i = 0, len = disButtons.length; i < len; i++) {
-                disButtons[i].disabled = !isCodeView;
-            }
-
+            this.toggleDisabledButtons(!isCodeView);
             this.controllersOff();
 
             if (isCodeView) {
@@ -4398,10 +4407,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onMouseDown_toolbar: function (e) {
             let target = e.target;
 
-            if (!/^input|textarea$/i.test(target.nodeName)) {
-                e.preventDefault();
-            } else {
+            if (/^input|textarea$/i.test(target.nodeName)) {
                 core._antiBlur = false;
+            } else {
+                e.preventDefault();
             }
 
             if (util.getParentElement(target, '.se-submenu')) {
@@ -5772,16 +5781,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @param {String} message Notice message
          */
         noticeOpen: function (message) {
-            core.addModule([notice]);
-            notice.open.call(core, message);
+            core.addModule([core.notice]);
+            core.notice.open.call(core, message);
         },
 
         /**
          * @description Close a notice area
          */
         noticeClose: function () {
-            core.addModule([notice]);
-            notice.close.call(core);
+            core.addModule([core.notice]);
+            core.notice.close.call(core);
         },
 
         /**

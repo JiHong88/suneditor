@@ -46,12 +46,19 @@
     float: none;
 }
 
-/* span */
+/** span */
 .sun-editor-editable span {
     display: inline;
     vertical-align: baseline;
     margin: 0;
     padding: 0;
+}
+/* katex */
+.sun-editor-editable span.katex {
+    display: inline-block;
+}
+.sun-editor-editable[contenteditable="true"] span.katex {
+    outline: 1px dashed #e1e1e1;
 }
 
 /* a */
@@ -342,6 +349,12 @@
 .sun-editor-editable[contenteditable="true"] figure figcaption {
     display: block;
     z-index: 2;
+}
+.sun-editor-editable[contenteditable="true"] figure figcaption:focus {
+    border-color: #80bdff;
+    outline: 0;
+    -webkit-box-shadow: 0 0 0 0.2rem #c7deff;
+    box-shadow: 0 0 0 0.2rem #c7deff;
 }
 
 /** image, video iframe figure cover */
