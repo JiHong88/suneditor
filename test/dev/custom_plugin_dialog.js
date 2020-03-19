@@ -3,7 +3,7 @@
 // Import "dialog" module
 import dialog from '../../src/plugins/modules/dialog';
 
-// ex) A dialog plugin that appends the contents of the input element to the editor
+// ex) A link dialog plugin with multiple target options.
 export default {
     // @Required
     // plugin name
@@ -167,7 +167,7 @@ export default {
                 const oA = this.util.createElement('A');
                 oA.href = url;
                 oA.textContent = anchorText;
-                oA.target = (contextLink.targetSelect.checked ? '_blank' : '');
+                oA.target = contextLink.targetSelect.selectedOptions[0].value;
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -182,7 +182,7 @@ export default {
             } else {
                 contextLink._linkAnchor.href = url;
                 contextLink._linkAnchor.textContent = anchorText;
-                contextLink._linkAnchor.target = (contextLink.targetSelect.checked ? '_blank' : '');
+                contextLink._linkAnchor.target = contextLink.targetSelect.selectedOptions[0].value;
 
                 // set range
                 this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
@@ -211,10 +211,12 @@ export default {
     // Called each time the selection is moved.
     active: function (element) {
         if (!element) {
-            if (this.controllerArray.indexOf(this.context.customLink.linkController) > -1) this.controllersOff();
+            if (this.controllerArray.indexOf(this.context.customLink.linkController) > -1) {
+                this.controllersOff();
+            }
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
             if (this.controllerArray.indexOf(this.context.customLink.linkController) < 0) {
-                this.plugins.customLink.call_controller_linkButton.call(this, element);
+                this.plugins.customLink.call_controller.call(this, element);
             }
             return true;
         }
@@ -227,18 +229,17 @@ export default {
     // If "update" argument is true, it is not a new call, but a call to modify an already created element.
     on: function (update) {
         if (!update) {
+            this.plugins.customLink.init.call(this);
             this.context.customLink.linkAnchorText.value = this.getSelection().toString();
-        }
-        
-        if (this.context.customLink._linkAnchor) {
+        } else if (this.context.customLink._linkAnchor) {
             this.context.dialog.updateModal = true;
             this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
             this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;
-            this.context.customLink.targetSelect.checked = (/_blank/i.test(this.context.customLink._linkAnchor.target) ? true : false);
+            this.context.customLink.targetSelect.value = this.context.customLink._linkAnchor.target || '';
         }
     },
 
-    call_controller_linkButton: function (selectionATag) {
+    call_controller: function (selectionATag) {
         this.editLink = this.context.customLink._linkAnchor = selectionATag;
         const linkBtn = this.context.customLink.linkController;
         const link = linkBtn.querySelector('a');
@@ -261,6 +262,7 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
+        // Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
         this.controllersOn(linkBtn, selectionATag, 'customLink');
     },
 
@@ -273,9 +275,10 @@ export default {
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
-            this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;
-            this.context.customLink.targetSelect.checked = (/_blank/i.test(this.context.customLink._linkAnchor.target) ? true : false);
+            const contextLink = this.context.customLink;
+            contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
+            contextLink.targetSelect.value = contextLink.targetSelect.value;
             this.plugins.dialog.open.call(this, 'customLink', true);
         }
         else if (/unlink/.test(command)) {
@@ -306,6 +309,6 @@ export default {
         contextLink._linkAnchor = null;
         contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
-        contextLink.targetSelect.checked = false;
+        contextLink.targetSelect.selectedIndex = 0;
     }
 };
