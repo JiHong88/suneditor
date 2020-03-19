@@ -31,22 +31,24 @@ export default {
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
 
-        /** link button */
-        let link_button = this.setController_LinkButton.call(core);
-        context.link.linkBtn = link_button;
+        /** link controller */
+        let link_controller = this.setController_LinkButton.call(core);
+        context.link.linkController = link_controller;
         context.link._linkAnchor = null;
-        link_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+        link_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
         link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        link_button.addEventListener('click', this.onClick_linkBtn.bind(core));
+        link_controller.addEventListener('click', this.onClick_linkController.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
-        context.element.relative.appendChild(link_button);
+
+        /** append controller */
+        context.element.relative.appendChild(link_controller);
 
         /** empty memory */
-        link_dialog = null, link_button = null;
+        link_dialog = null, link_controller = null;
     },
 
     /** dialog */
@@ -176,10 +178,12 @@ export default {
 
     active: function (element) {
         if (!element) {
-            if (this.controllerArray[0] === this.context.link.linkBtn) this.controllersOff();
+            if (this.controllerArray.indexOf(this.context.link.linkController) > -1) {
+                this.controllersOff();
+            }
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-            if (this.controllerArray[0] !== this.context.link.linkBtn) {
-                this.plugins.link.call_controller_linkButton.call(this, element);
+            if (this.controllerArray.indexOf(this.context.link.linkController) < 0) {
+                this.plugins.link.call_controller.call(this, element);
             }
             return true;
         }
@@ -189,10 +193,9 @@ export default {
 
     on: function (update) {
         if (!update) {
+            this.plugins.link.init.call(this);
             this.context.link.linkAnchorText.value = this.getSelection().toString();
-        }
-        
-        if (this.context.link._linkAnchor) {
+        } else if (this.context.link._linkAnchor) {
             this.context.dialog.updateModal = true;
             this.context.link.focusElement.value = this.context.link._linkAnchor.href;
             this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
@@ -200,9 +203,9 @@ export default {
         }
     },
 
-    call_controller_linkButton: function (selectionATag) {
+    call_controller: function (selectionATag) {
         this.editLink = this.context.link._linkAnchor = selectionATag;
-        const linkBtn = this.context.link.linkBtn;
+        const linkBtn = this.context.link.linkController;
         const link = linkBtn.querySelector('a');
 
         link.href = selectionATag.href;
@@ -223,10 +226,10 @@ export default {
             linkBtn.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(linkBtn, this.plugins.link.init.bind(this), selectionATag, 'link');
+        this.controllersOn(linkBtn, selectionATag, 'link');
     },
 
-    onClick_linkBtn: function (e) {
+    onClick_linkController: function (e) {
         e.stopPropagation();
 
         const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
@@ -260,13 +263,11 @@ export default {
     },
 
     init: function () {
-        if (!/link/i.test(this.context.dialog.kind)) {
-            const contextLink = this.context.link;
-            contextLink.linkBtn.style.display = 'none';
-            contextLink._linkAnchor = null;
-            contextLink.focusElement.value = '';
-            contextLink.linkAnchorText.value = '';
-            contextLink.linkNewWindowCheck.checked = false;
-        }
+        const contextLink = this.context.link;
+        contextLink.linkController.style.display = 'none';
+        contextLink._linkAnchor = null;
+        contextLink.focusElement.value = '';
+        contextLink.linkAnchorText.value = '';
+        contextLink.linkNewWindowCheck.checked = false;
     }
 };

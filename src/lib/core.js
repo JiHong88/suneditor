@@ -429,6 +429,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         submenuOn: function (element) {
             if (this._bindedSubmenuOff) this._bindedSubmenuOff();
+            if (this._bindControllersOff) this.controllersOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
 
@@ -4406,6 +4407,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         onMouseDown_toolbar: function (e) {
             let target = e.target;
+            if (core._bindControllersOff) e.stopPropagation();
 
             if (/^input|textarea$/i.test(target.nodeName)) {
                 core._antiBlur = false;
