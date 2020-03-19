@@ -141,6 +141,11 @@
             <input type="text" id="maxHeight_value" placeholder="Number, ..style">
 
             <br>
+            <h4 style="color: #b94a48;">--Editing area default style</h4>
+            <label><input type="checkbox" id="defaultStyle">&nbsp;&nbsp;defaultStyle</label>
+            <input type="text" id="defaultStyle_value" placeholder="String (font-family: cursive; font-size: 10px;)" style="width:320px">
+
+            <br>
             <h4 style="color: #b94a48;">--Defining menu items</h4>
             <label><input type="checkbox" id="font">&nbsp;&nbsp;font</label>
             <span>[ 'Arial', 'tahoma', 'Courier New,Courier' ]</span>
@@ -373,6 +378,7 @@ function sun_create () {
         height: document.getElementById('height').checked ? document.getElementById('height_value').value : undefined,
         minHeight: document.getElementById('minHeight').checked ? document.getElementById('minHeight_value').value : undefined,
         maxHeight: document.getElementById('maxHeight').checked ? document.getElementById('maxHeight_value').value : undefined,
+        defaultStyle: document.getElementById('defaultStyle').checked ? document.getElementById('defaultStyle_value').value : undefined,
         font: !document.getElementById('font').checked ? undefined : [
             'Arial',
             'tahoma',

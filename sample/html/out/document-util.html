@@ -15,11 +15,12 @@
     <!--<h1 class="page-title">Global</h1>-->
     <section>
         <header>
-            <h2></h2>
+            <h2>.util</h2>
         </header>
         <article>
             <div class="container-overview">
                 <dl class="details">
+                    <dd>It can be accessed from "core.util" or object's "util" property returned after editor creation.</dd>
                 </dl>
             </div>
 
@@ -1049,6 +1050,33 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="isMedia"><span class="type-signature"></span>isMedia<span class="signature">(node)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Check the node is a media node (img, iframe, audio, video, canvas)
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>node</code></td>
+                <td class="type">
+                    <span class="param-type">Element|String</span>
+                </td>
+                <td class="description last">The element or element name to check</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="isNumber"><span class="type-signature"></span>isNumber<span class="signature">(text)</span><span
                 class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
@@ -1780,12 +1808,12 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="mergeSameTags"><span class="type-signature"></span>mergeSameTags<span class="signature">(element, nodePath_s, nodePath_e, onlyText)</span><span
-            class="type-signature"> &rarr; {Object}</span> {a: 0, b: 0}</h4>
+        <h4 class="name" id="mergeSameTags"><span class="type-signature"></span>mergeSameTags<span class="signature">(element, nodePathArray, onlyText)</span><span
+            class="type-signature"> &rarr; {Array}</span> [offset, ..]</h4>
         <div class="description">
             Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.<br>
             If "offset" has been changed, it will return as much "offset" as it has been modified.<br>
-            "a", "b" You can send a maximum of two nodepaths.
+            An array containing change offsets is returned in the order of the "nodePathArray" array.
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -1805,18 +1833,11 @@
                 <td class="description last">Element object</td>
             </tr>
             <tr>
-                <td class="name"><code>nodePath_s</code></td>
+                <td class="name"><code>nodePathArray</code></td>
                 <td class="type">
-                    <span class="param-type">Object|null</span>
+                    <span class="param-type">Array|null</span>
                 </td>
-                <td class="description last">Start NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
-            </tr>
-            <tr>
-                <td class="name"><code>nodePath_e</code></td>
-                <td class="type">
-                    <span class="param-type">Object|null</span>
-                </td>
-                <td class="description last">End NodePath object (<a href="#getNodePath">util.getNodePath</a>)</td>
+                <td class="description last">Array of <a href="#getNodePath">util.getNodePath</a> object <span style="color:#ff5565">[util.getNodePath(), ..]</span></td>
             </tr>
             <tr>
                 <td class="name"><code>onlyText</code></td>
@@ -1898,6 +1919,33 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="htmlRemoveWhiteSpace"><span class="type-signature"></span>htmlRemoveWhiteSpace<span class="signature">(html)</span><span
+            class="type-signature"> &rarr; {String}</span></h4>
+        <div class="description">
+            Remove whitespace between tags in HTML string.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>html</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">HTML string</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="sortByDepth"><span class="type-signature"></span>sortByDepth<span class="signature">(array, des)</span><span
                 class="type-signature"></span></h4>
         <div class="description">
@@ -1932,11 +1980,45 @@
         <dl class="details"></dl>
 
 
+        <h4 class="name" id="changeIcon"><span class="type-signature"></span>changeIcon<span class="signature">(icon, newIcon)</span><span
+                class="type-signature"></span></h4>
+        <div class="description">
+            Replace icon.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>icon</code></td>
+                <td class="type">
+                    <span class="param-type">Element</span>
+                </td>
+                <td class="description last">Icon element (svg, i)</td>
+            </tr>
+            <tr>
+                <td class="name"><code>newIcon</code></td>
+                <td class="type">
+                    <span class="param-type">String|Element</span>
+                </td>
+                <td class="description last">String or element of the icon to apply</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
         <h4 class="name" id="createTagsWhitelist"><span class="type-signature"></span>createTagsWhitelist<span class="signature">(list)</span><span
                 class="type-signature"> &rarr; {RegExp}</span></h4>
         <div class="description">
             Create whitelist RegExp object.<br>
-            Return RegExp format: new RegExp("<span style="color:#d73a49">&lt;\\/?(</span><span style="color: #23853a;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0a3667">?!\\b<span style="color: #23853a;">list[i]</span>\\b</span><span style="color: #23853a;">)</span><span style="color:#d73a49">)[^>^&gt;])+></span>", "<span style="color:#d73a49">g</span>")
+            Return RegExp format: new RegExp("<span style="color:#ff5565">&lt;\\/?(</span><span style="color: #44fd6f;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0d80ff">?!\\b<span style="color: #44fd6f;">list[i]</span>\\b</span><span style="color: #44fd6f;">)</span><span style="color:#ff5565">)[^>^&gt;])+></span>", "<span style="color:#ff5565">g</span>")
         </div>
         <h5>Parameters:</h5>
         <table class="params">
@@ -2006,6 +2088,7 @@
         <li><a href="document-util.html#isCell">isCell</a></li>
         <li><a href="document-util.html#isBreak">isBreak</a></li>
         <li><a href="document-util.html#isAnchor">isAnchor</a></li>
+        <li><a href="document-util.html#isMedia">isMedia</a></li>
         <li><a href="document-util.html#isNumber">isNumber</a></li>
         <li><a href="document-util.html#getNumber">getNumber</a></li>
         <li><a href="document-util.html#getListChildren">getListChildren</a></li>
@@ -2029,7 +2112,9 @@
         <li><a href="document-util.html#mergeSameTags">mergeSameTags</a></li>
         <li><a href="document-util.html#mergeNestedTags">mergeNestedTags</a></li>
         <li><a href="document-util.html#removeEmptyNode">removeEmptyNode</a></li>
+        <li><a href="document-util.html#htmlRemoveWhiteSpace">htmlRemoveWhiteSpace</a></li>
         <li><a href="document-util.html#sortByDepth">sortByDepth</a></li>
+        <li><a href="document-util.html#changeIcon">changeIcon</a></li>
         <li><a href="document-util.html#createTagsWhitelist">createTagsWhitelist</a></li>
     </ul>
 </nav>

@@ -60,36 +60,41 @@ export default {
     onClick: function () {
         this.history.push(true);
 
-        const initialEditorContent = this.getContents();
-        const title = initialEditorContent.search('Resolutions') === -1 ? '<h4><u>Resolutions</u></h4>' : '';
+        // const initialEditorContent = this.getContents();
+        // const title = initialEditorContent.search('Resolutions') === -1 ? '<h4><u>Resolutions</u></h4>' : '';
 
-        if(this.context.custom.textElement.value.length > 0) {
-            // Get Input value
-            let value = title;
-            const lines = this.context.custom.textElement.value.split('\n');
-            for (let i = 0, len = lines.length; i < len; i++) {
-                value += '<p>' + lines[i] + '</p>';
-            }
+        // if(this.context.custom.textElement.value.length > 0) {
+        //     // Get Input value
+        //     let value = title;
+        //     const lines = this.context.custom.textElement.value.split('\n');
+        //     for (let i = 0, len = lines.length; i < len; i++) {
+        //         value += '<p>' + lines[i] + '</p>';
+        //     }
 
-            // rendering
-            const template = this.util.createElement('DIV');
-            template.innerHTML = value;
+        //     // rendering
+        //     const template = this.util.createElement('DIV');
+        //     template.innerHTML = value;
             
-            // insert
-            const children = template.children;
-            let after, child;
-            while (children[0]) {
-                child = children[0];
-                this.insertNode(child, after);
-                after = child;
-            }
+        //     // insert
+        //     const children = template.children;
+        //     let after, child;
+        //     while (children[0]) {
+        //         child = children[0];
+        //         this.insertNode(child, after);
+        //         after = child;
+        //     }
 
-            // set range (It is not necessary this code in the next version)
-            // this.setRange(after, 1, after, 1);
+        //     // set range (It is not necessary this code in the next version)
+        //     // this.setRange(after, 1, after, 1);
             
-            // clear content
-            this.context.custom.textElement.value = null;
-        }
+        //     // clear content
+        //     this.context.custom.textElement.value = null;
+        // }
+
+        const a = this.util.createElement('span');
+        a.setAttribute('contenteditable', false);
+        a.textContent = 'AAA';
+        this.insertNode(a);
 
         // submenu off
         this.submenuOff();

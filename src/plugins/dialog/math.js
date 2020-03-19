@@ -1,6 +1,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'math',
@@ -31,22 +32,22 @@ export default {
         context.math.focusElement.addEventListener('change', this._renderMathExp.bind(context.math), false);
         context.math.fontSizeElement.addEventListener('change', function (e) { this.fontSize = e.target.value; }.bind(context.math.previewElement.style), false);
 
-        /** math button */
-        let math_button = this.setController_MathButton.call(core);
-        context.math.mathBtn = math_button;
+        /** math controller */
+        let math_controller = this.setController_MathButton.call(core);
+        context.math.mathController = math_controller;
         context.math._mathExp = null;
-        math_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+        math_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
         math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);
-        math_button.addEventListener('click', this.onClick_mathBtn.bind(core));
+        math_controller.addEventListener('click', this.onClick_mathController.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(math_dialog);
-        context.element.relative.appendChild(math_button);
+        context.element.relative.appendChild(math_controller);
 
         /** empty memory */
-        math_dialog = null, math_button = null;
+        math_dialog = null, math_controller = null;
     },
 
     /** dialog */
@@ -60,7 +61,7 @@ export default {
         '<form class="editor_math">' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                    _icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +
             '</div>' +
@@ -102,11 +103,11 @@ export default {
         '<div class="link-content">' +
             '<div class="se-btn-group">' +
                 '<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
-                    '<i class="se-icon-edit"></i>' +
+                    _icons.edit +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
-                    '<i class="se-icon-delete"></i>' +
+                    _icons.delete +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                 '</button>' +
             '</div>' +
@@ -201,11 +202,13 @@ export default {
 
     active: function (element) {
         if (!element) {
-            if (this.controllerArray[0] === this.context.math.mathBtn) this.controllersOff();
+            if (this.controllerArray.indexOf(this.context.math.mathController) > -1) {
+                this.controllersOff();
+            }
         } else if (element.getAttribute('data-exp')) {
-            if (this.controllerArray[0] !== this.context.math.mathBtn) {
+            if (this.controllerArray.indexOf(this.context.math.mathController) < 0) {
                 this.setRange(element, 0, element, 1);
-                this.plugins.math.call_controller_mathButton.call(this, element);
+                this.plugins.math.call_controller.call(this, element);
             }
             return true;
         }
@@ -214,23 +217,25 @@ export default {
     },
 
     on: function (update) {
-        const contextMath = this.context.math;
-
-        if (contextMath._mathExp && update) {
-            const exp = contextMath._mathExp.getAttribute('data-exp');
-            const fontSize = contextMath._mathExp.getAttribute('data-font-size') || '1em';
-
-            this.context.dialog.updateModal = true;
-            contextMath.focusElement.value = exp;
-            contextMath.fontSizeElement.value = fontSize;
-            contextMath.previewElement.innerHTML = contextMath._renderer(exp);
-            contextMath.previewElement.style.fontSize = fontSize;
+        if (!update) {
+            this.plugins.math.init.call(this);
+        } else {
+            const contextMath = this.context.math;
+            if (contextMath._mathExp) {
+                const exp = contextMath._mathExp.getAttribute('data-exp');
+                const fontSize = contextMath._mathExp.getAttribute('data-font-size') || '1em';
+                this.context.dialog.updateModal = true;
+                contextMath.focusElement.value = exp;
+                contextMath.fontSizeElement.value = fontSize;
+                contextMath.previewElement.innerHTML = contextMath._renderer(exp);
+                contextMath.previewElement.style.fontSize = fontSize;
+            }
         }
     },
 
-    call_controller_mathButton: function (mathTag) {
+    call_controller: function (mathTag) {
         this.context.math._mathExp = mathTag;
-        const mathBtn = this.context.math.mathBtn;
+        const mathBtn = this.context.math.mathController;
 
         const offset = this.util.getOffset(mathTag, this.context.element.wysiwygFrame);
         mathBtn.style.top = (offset.top + mathTag.offsetHeight + 10) + 'px';
@@ -246,10 +251,10 @@ export default {
             mathBtn.firstElementChild.style.left = '20px';
         }
 
-        this.controllersOn(mathBtn, this.plugins.math.init.bind(this), 'math');
+        this.controllersOn(mathBtn, mathTag, 'math');
     },
 
-    onClick_mathBtn: function (e) {
+    onClick_mathController: function (e) {
         e.stopPropagation();
 
         const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
@@ -274,12 +279,10 @@ export default {
     },
 
     init: function () {
-        if (!/math/i.test(this.context.dialog.kind)) {
-            const contextMath = this.context.math;
-            contextMath.mathBtn.style.display = 'none';
-            contextMath._mathExp = null;
-            contextMath.focusElement.value = '';
-            contextMath.previewElement.innerHTML = '';
-        }
+        const contextMath = this.context.math;
+        contextMath.mathController.style.display = 'none';
+        contextMath._mathExp = null;
+        contextMath.focusElement.value = '';
+        contextMath.previewElement.innerHTML = '';
     }
 };

@@ -551,7 +551,7 @@ const util = {
             if (reg('(\s|^)' + class_a[i] + '(\s|$)').test(class_b.value)) compClass++;
         }
 
-        return compStyle === style_b.length && compClass === class_b.length;
+        return (compStyle === style_b.length && compStyle === style_a.length) && (compClass === class_b.length && compClass === class_a.length);
     },
 
     /**
@@ -607,6 +607,15 @@ const util = {
      */
     isAnchor: function (node) {
         return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a media node (img, iframe, audio, video, canvas)
+     * @param {Element|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isMedia: function (node) {
+        return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node.nodeName);
     },
 
     /**
@@ -1129,7 +1138,7 @@ const util = {
         if (next) depthEl = depthEl.nextSibling;
         if (!newEl) return depthEl;
 
-        this.mergeSameTags(newEl, null, null, false);
+        this.mergeSameTags(newEl, null, false);
         this.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(this));
         
         if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
@@ -1143,43 +1152,64 @@ const util = {
     /**
      * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
      * If "offset" has been changed, it will return as much "offset" as it has been modified.
-     * "a", "b" You can send a maximum of two nodepaths.
+     * An array containing change offsets is returned in the order of the "nodePathArray" array.
      * @param {Element} element Element object.
-     * @param {Object|null} nodePath_s Start NodePath object (util.getNodePath)
-     * @param {Object|null} nodePath_e End NodePath object (util.getNodePath)
+     * @param {Array|null} nodePathArray Array of NodePath object ([util.getNodePath(), ..])
      * @param {Boolean} onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
-     * @returns {Object} {a: 0, b: 0}
+     * @returns {Array} [offset, ..]
      */
-    mergeSameTags: function (element, nodePath_s, nodePath_e, onlyText) {
+    mergeSameTags: function (element, nodePathArray, onlyText) {
         const inst = this;
-        const offsets = {a: 0, b: 0};
+        let offsets = null;
+        if (nodePathArray && nodePathArray.length > 0) {
+            offsets = this._w.Array.apply(null, new this._w.Array(nodePathArray.length)).map(this._w.Number.prototype.valueOf, 0);
+        }
 
-        (function recursionFunc(current, depth, depthIndex, includedPath_s, includedPath_e) {
+        (function recursionFunc(current, depth, depthIndex) {
             const children = current.childNodes;
             
             for (let i = 0, len = children.length, child, next; i < len; i++) {
                 child = children[i];
                 next = children[i + 1];
                 if (!child) break;
-                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) continue;
+                if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) {
+                    if (inst.isTable(child) || inst.isListCell(child)) {
+                        recursionFunc(child, depth + 1, i);
+                    }
+                    continue;
+                }
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
+                    // update nodePath
+                    if (nodePathArray) {
+                        let path, c, p, cDepth, spliceDepth;
+                        for (let n in nodePathArray) {
+                            path = nodePathArray[n];
+                            if (path && path[depth] === i) {
+                                c = child, p = current, cDepth = depth, spliceDepth = true;
+                                while (cDepth >= 0) {
+                                    if (inst.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
+                                        spliceDepth = false;
+                                        break;
+                                    }
+                                    c = child.parentNode;
+                                    p = c.parentNode;
+                                    cDepth--;
+                                }
+                                if (spliceDepth) {
+                                    path.splice(depth, 1);
+                                    path[depth] = i;
+                                }
+                            }
+                        }
+                    }
+
+                    // merge tag
                     inst.copyTagAttributes(child, current);
                     current.parentNode.insertBefore(child, current);
                     inst.removeItem(current);
-
-                    // update nodePath
-                    if (nodePath_s && nodePath_s[depth] === i) {
-                        nodePath_s.splice(depth, 1);
-                        nodePath_s[depth] = i;
-                    }
-
-                    if (nodePath_e && nodePath_e[depth] === i) {
-                        nodePath_e.splice(depth, 1);
-                        nodePath_e[depth] = i;
-                    }
                 }
                 if (!next) {
-                    if (child.nodeType === 1) recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                    if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
                     break;
                 }
 
@@ -1203,33 +1233,20 @@ const util = {
 
                         if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
 
-                        // start
-                        if (includedPath_s && nodePath_s && nodePath_s[depth] > i) {
-                            if (depth > 0 && nodePath_s[depth - 1] !== depthIndex) {
-                                includedPath_s = false;
-                            } else {
-                                nodePath_s[depth] -= 1;
-                                if (nodePath_s[depth + 1] >= 0 && nodePath_s[depth] === i) {
-                                    nodePath_s[depth + 1] += childLength;
-                                    if (textOffset) {
-                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                            offsets.a += addOffset;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // end
-                        if (includedPath_e && nodePath_e && nodePath_e[depth] > i) {
-                            if (depth > 0 && nodePath_e[depth - 1] !== depthIndex) {
-                                includedPath_e = false;
-                            } else {
-                                nodePath_e[depth] -= 1;
-                                if (nodePath_e[depth + 1] >= 0 && nodePath_e[depth] === i) {
-                                    nodePath_e[depth + 1] += childLength;
-                                    if (textOffset) {
-                                        if (l && l.nodeType === 3 && r && r.nodeType === 3) {
-                                            offsets.b += addOffset;
+                        if (nodePathArray) {
+                            let path = null;
+                            for (let n in nodePathArray) {
+                                path = nodePathArray[n];
+                                if (path && path[depth] > i) {
+                                    if (depth > 0 && path[depth - 1] !== depthIndex) continue;
+    
+                                    path[depth] -= 1;
+                                    if (path[depth + 1] >= 0 && path[depth] === i) {
+                                        path[depth + 1] += childLength;
+                                        if (textOffset) {
+                                            if (l && l.nodeType === 3 && r && r.nodeType === 3) {
+                                                offsets[n] += addOffset;
+                                            }
                                         }
                                     }
                                 }
@@ -1243,10 +1260,10 @@ const util = {
                     inst.removeItem(next);
                     i--;
                 } else if (child.nodeType === 1) {
-                    recursionFunc(child, depth + 1, i, includedPath_s, includedPath_e);
+                    recursionFunc(child, depth + 1, i);
                 }
             }
-        })(element, 0, 0, true, true);
+        })(element, 0, 0);
 
         return offsets;
     },
@@ -1316,6 +1333,16 @@ const util = {
     },
 
     /**
+     * @description Remove whitespace between tags in HTML string.
+     * @param {String} html HTML string
+     * @returns {String}
+     */
+    htmlRemoveWhiteSpace: function (html) {
+        if (!html) return '';
+        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
+    },
+
+    /**
      * @description Sort a element array by depth of element.
      * @param {Array} array Array object
      * @param {Boolean} des true: descending order / false: ascending order
@@ -1333,13 +1360,33 @@ const util = {
     },
 
     /**
+     * @description Replace icon
+     * @param {Element} icon Icon element (svg, i)
+     * @param {String|Element} newIcon String or element of the icon to apply
+     */
+    changeIcon: function (icon, newIcon) {
+        if (typeof newIcon === 'string') {
+            if (icon.outerHTML) {
+                icon.outerHTML = newIcon;
+            } else {
+                const doc = this.createElement('DIV');
+                doc.innerHTML = newIcon;
+                newIcon = doc.firstChild;
+                icon.parentNode.replaceChild(newIcon, icon);
+            }
+        } else if (newIcon.nodeType === 1) {
+            icon.parentNode.replaceChild(newIcon, icon);
+        }
+    },
+
+    /**
      * @description Nodes that need to be added without modification when changing text nodes
      * @param {Element} element Element to check
      * @returns {Boolean}
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(span|font|b|strong|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**

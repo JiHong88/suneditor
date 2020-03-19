@@ -558,9 +558,9 @@ a.btn.disabled {
   background-color: #fff;
 }
 .btn-link {
-  font-weight: normal;
-  color: #337ab7;
-  border-radius: 0;
+  font-weight: bold;
+  color: #44a7ff;
+  border-color: #44a7ff;
 }
 .btn-link,
 .btn-link:active,
@@ -570,22 +570,20 @@ a.btn.disabled {
   -webkit-box-shadow: none;
   box-shadow: none;
 }
-.btn-link,
 .btn-link:hover,
 .btn-link:focus,
 .btn-link:active {
-  border-color: transparent;
+  border-color: #5cdaff;
 }
 .btn-link:hover,
 .btn-link:focus {
-  color: #23527c;
-  text-decoration: underline;
+  color: #5cdaff;
+  border-color: #5cdaff;
   background-color: transparent;
 }
 .btn-link[disabled]:hover,
 .btn-link[disabled]:focus {
   color: #777;
-  text-decoration: none;
 }
 .btn-lg,
 .btn-group-lg > .btn {
