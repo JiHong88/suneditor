@@ -48,24 +48,32 @@ export default function (core, change) {
         if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
 
         stackIndex++;
-        const range = core.getRange();
+        const range = core._variable._range;
 
         if (stack.length > stackIndex) {
             stack = stack.slice(0, stackIndex);
             if (redo) redo.setAttribute('disabled', true);
         }
 
-        stack[stackIndex] = {
-            contents: current,
-            s: {
-                path: util.getNodePath(range.startContainer, null),
-                offset: range.startOffset
-            },
-            e: {
-                path: util.getNodePath(range.endContainer, null),
-                offset: range.endOffset
-            }
-        };
+        if (!range) {
+            stack[stackIndex] = {
+                contents: current,
+                s: { path: [0, 0], offset: [0, 0] },
+                e: { path: 0, offset: 0 }
+            };
+        } else {
+            stack[stackIndex] = {
+                contents: current,
+                s: {
+                    path: util.getNodePath(range.startContainer, null, null),
+                    offset: range.startOffset
+                },
+                e: {
+                    path: util.getNodePath(range.endContainer, null, null),
+                    offset: range.endOffset
+                }
+            };
+        }
 
         if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 

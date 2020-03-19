@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import colorPicker from '../modules/colorPicker';
+import colorPicker from '../modules/_colorPicker';
 
 export default {
     name: 'fontColor',
@@ -31,11 +31,10 @@ export default {
         listDiv.querySelector('._se_color_picker_submit').addEventListener('click', this.submit.bind(core));
         listDiv.querySelector('._se_color_picker_remove').addEventListener('click', this.remove.bind(core));
         listDiv.addEventListener('click', this.pickup.bind(core));
-
         context.fontColor.colorList = listDiv.querySelectorAll('li button');
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;

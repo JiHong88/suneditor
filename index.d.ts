@@ -139,6 +139,10 @@ declare module 'suneditor' {
      * The max-height size of the editor
      */
     maxHeight?: string;
+    /** 
+     * Editing area default style 
+    */
+    defaultStyle?: String;
     /**
      * Defining menu items
      * ===================
@@ -340,6 +344,7 @@ declare module 'suneditor' {
     | 'textStyle'
     | 'link'
     | 'image'
-    | 'video';
+    | 'video'
+    | 'math';
   export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[];
 }

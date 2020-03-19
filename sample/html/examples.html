@@ -327,7 +327,9 @@
     <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
     <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
     <button type="button" class="btn btn-md btn-default" onclick="sun_setOptions()" id="opt1">setOptions</button>
-    <button type="button" class="btn btn-md btn-default" onclick="sun_replaceOptions()" id="opt2" style="display: none;">replaceOptions</button>
+    <button type="button" class="btn btn-md btn-link" onclick="sun_resetOptions()" id="opt2" style="display: none;">resetOptions</button>
+    <button type="button" class="btn btn-md btn-default" onclick="sun_setDefaultStyle()" id="ds1">setDefaultStyle</button>
+    <button type="button" class="btn btn-md btn-link" onclick="sun_resetDefaultStyle()" id="ds2" style="display: none;">resetDefaultStyle</button>
     <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
     <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
     <div></div>
@@ -353,8 +355,10 @@
     <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
 </form>
 
-<div class="highlight highlight-source-js"><pre><span class="pl-k">function</span> <span class="pl-en">sun_setOptions</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">setOptions</span>({
+<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+
+<span class="pl-k">function</span> <span class="pl-en">sun_setOptions</span>() {
+    <span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
         mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>,
         minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
         colorList<span class="pl-k">:</span> [
@@ -364,13 +368,10 @@
             [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
         ]
     });
-
-    <span class="pl-smi">opt1</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
-    <span class="pl-smi">opt2</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>inline-block<span class="pl-pds">'</span></span>;
 }
 
-<span class="pl-k">function</span> <span class="pl-en">sun_replaceOptions</span>() {
-    <span class="pl-smi">suneditor</span>.<span class="pl-en">setOptions</span>({
+<span class="pl-k">function</span> <span class="pl-en">sun_resetOptions</span>() {
+    <span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
         mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>,
         minHeight<span class="pl-k">:</span> <span class="pl-c1">null</span>,
         colorList<span class="pl-k">:</span> <span class="pl-c1">null</span>,
@@ -384,12 +385,15 @@
             [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
         ],
     });
+}
 
-    <span class="pl-smi">opt1</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>inline-block<span class="pl-pds">'</span></span>;
-    <span class="pl-smi">opt2</span>.<span class="pl-c1">style</span>.<span class="pl-c1">display</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>none<span class="pl-pds">'</span></span>;
-}</pre></div>
+<span class="pl-k">function</span> <span class="pl-en">sun_setDefaultStyle</span>() {
+    <span class="pl-smi">editor</span>.<span class="pl-en">setDefaultStyle</span>(<span class="pl-s"><span class="pl-pds">'</span>font-family: cursive; font-size: 10px;<span class="pl-pds">'</span></span>);
+}
 
-<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
+<span class="pl-k">function</span> <span class="pl-en">sun_resetDefaultStyle</span>() {
+    <span class="pl-smi">editor</span>.<span class="pl-en">setDefaultStyle</span>(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>);
+}
 
 <span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
 
@@ -548,13 +552,27 @@
 <span class="pl-c"><span class="pl-c">//</span> It replaces the default callback function of the image upload.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">imageUploadHandler</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
 
+<span class="pl-c"><span class="pl-c">// Called just before the inline toolbar is positioned and displayed on the screen.</span></span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * toolbar: Toolbar Element</span>
-<span class="pl-c"> * context: The editor's context object (editor.getContext())</span>
+<span class="pl-c"> * context: The editor's context object (editor.getContext()|core.context)</span>
+<span class="pl-c"> * core: Core object</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar);
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
+}
+
+<span class="pl-c"><span class="pl-c">// Called just after the controller is positioned and displayed on the screen.</span></span>
+<span class="pl-c"><span class="pl-c">// controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]</span></span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * name: The name of the plugin that called the controller</span>
+<span class="pl-c"> * controllers: Array of Controller elements</span>
+<span class="pl-c"> * core: Core object</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">name</span>, <span class="pl-smi">controllers</span>, <span class="pl-smi">core</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>plugin name<span class="pl-pds">'</span></span>, name);
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>controller elements<span class="pl-pds">'</span></span>, controllers);
 }</pre></div>
         
     </article>
@@ -672,6 +690,8 @@
     var suneditor = null;
     var opt1 = document.getElementById('opt1');
     var opt2 = document.getElementById('opt2');
+    var ds1 = document.getElementById('ds1');
+    var ds2 = document.getElementById('ds2');
 
     var options = {
         buttonList: [
@@ -702,7 +722,7 @@
         opt2.style.display = 'inline-block';
     }
 
-    function sun_replaceOptions() {
+    function sun_resetOptions() {
         suneditor.setOptions({
             mode: 'classic',
             minHeight: null,
@@ -720,6 +740,18 @@
 
         opt1.style.display = 'inline-block';
         opt2.style.display = 'none';
+    }
+
+    function sun_setDefaultStyle() {
+        suneditor.setDefaultStyle('font-family: cursive; font-size: 10px;');
+        ds1.style.display = 'none';
+        ds2.style.display = 'inline-block';
+    }
+
+    function sun_resetDefaultStyle() {
+        suneditor.setDefaultStyle('');
+        ds1.style.display = 'inline-block';
+        ds2.style.display = 'none';
     }
 
     function sun_noticeOpen(message) {
@@ -819,6 +851,10 @@
         suneditor.showInline = function (toolbar, context) {
             console.log('toolbar', toolbar);
             console.log('context', context);
+        }
+        suneditor.showController = function (name, controllers, core) {
+            console.log('plugin name', name);
+            console.log('controller elements', controllers);
         }
     }
 

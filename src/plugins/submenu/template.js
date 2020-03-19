@@ -20,8 +20,8 @@ export default {
         /** add event listeners */
         templateDiv.querySelector('ul').addEventListener('click', this.pickup.bind(core));
 
-        /** append html */
-        targetElement.parentNode.appendChild(templateDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, templateDiv);
 
         /** empty memory */
         templateDiv = null;

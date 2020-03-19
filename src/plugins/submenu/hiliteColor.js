@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import colorPicker from '../modules/colorPicker';
+import colorPicker from '../modules/_colorPicker';
 
 export default {
     name: 'hiliteColor',
@@ -34,8 +34,8 @@ export default {
 
         context.hiliteColor.colorList = listDiv.querySelectorAll('li button');
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;

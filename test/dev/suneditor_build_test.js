@@ -9,6 +9,7 @@ import { ko } from '../../src/lang';
 import lang from '../../src/lang';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
+import custom_plugin_dialog from './custom_plugin_dialog';
 import Resolutions from './Resolutions';
 import custom_container from './custom_container';
 
@@ -25,7 +26,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [custom_plugin_dialog, custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -34,16 +35,25 @@ suneditor.create("sample1", {
     buttonList: [
         [
             {
+                name: 'customLink', 
+                dataCommand: 'customLink',
+                buttonClass:'', 
+                title:'Custom - Link', 
+                dataDisplay:'dialog',
+                innerHTML:''
+            },
+            {
                 name: 'custom_container', 
                 dataCommand: 'custom_container',
                 buttonClass:'', 
-                title:'custom_container', 
+                title:'Custom - Container', 
                 dataDisplay:'container',
-                innerHTML:'<i class="se-icon-add"></i>'
+                innerHTML:''
             },
             'bold', 'italic'
         ]
-    ]
+    ],
+    maxCharCount: 2000
 });
 
 
@@ -60,15 +70,24 @@ let s1 = suneditor.create('editor', {
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'lineHeight',
+        // 'list',
+        'align', 'horizontalRule', 'lineHeight',
         'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
     width: '100%',
     height: '500',
+    defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
+    attributesWhitelist: {
+        table: "style",
+        tbody: "style",
+        thead: "style",
+        tr: "style",
+        td: "style"
+    },
     formats: [
         { 
             tag: 'div', // Tag name
@@ -84,7 +103,7 @@ let s1 = suneditor.create('editor', {
         },
         'pre',
         'blockquote'
-    ]
+    ],
 })
 
 window.cm = CodeMirror
@@ -108,7 +127,7 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.core.focus();
+    s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
 }
 
 window.sun_create1 = function () {
@@ -135,22 +154,34 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video', 'math',
+        'table', 
+        'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
+    // maxCharCount: 20,
     katex: Katex,
-    height: '400',
+    height: 'auto',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
-    fullPage: true,
+    // fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
     attributesWhitelist: {
         // 'input': 'type',
         'all': 'type'
-    }
+    },
+    templates: [
+        {
+            name: 'Template-1',
+            html: '<p>HTML source1</p>'
+        },
+        {
+            name: 'Template-2',
+            html: '<p>HTML source2</p>'
+        }
+    ],
     // mode: 'inline',
     // videoHeightShow: false,
     // videoRatioShow: false,
@@ -210,6 +241,19 @@ ss.showInline = function (toolbar, context) {
 
 },
 
+ss.showController = function (name, controllers, core) {
+    let c = null;
+    console.log('target', core.currentControllerTarget);
+    for (let i in controllers) {
+        c = controllers[i];
+        if (core.util.hasClass(c, 'se-controller-resizing')) {
+            const updateButton = c.querySelector('[data-command="update"]');
+            if (name === 'image') updateButton.setAttribute('disabled', true);
+            else updateButton.removeAttribute('disabled');
+        }
+    }
+}
+
 window.sun_noticeOpen = function () {
     ss.noticeOpen('test notice');
 }
@@ -232,7 +276,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML(html)
+    ss.insertHTML('aaaaa')
 }
 
 window.sun_getContents = function () {
@@ -553,7 +597,7 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
                 // 'submenu' or 'dialog' or '' (command button)
                 dataDisplay:'submenu',
                 // HTML to be append to button
-                innerHTML:'<i class="se-icon-checked"></i>'
+                innerHTML:''
             }
         ]
     ],

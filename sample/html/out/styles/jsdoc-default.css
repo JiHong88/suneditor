@@ -163,6 +163,13 @@ h2, h3.subsection-title
     font-weight: 700;
     letter-spacing: -1px;
     margin-bottom: 12px;
+    color: #ffe4c4;
+}
+
+h4.subsection-title {
+    color: #ffe4c4;
+    font-size: 25px;
+    font-weight: 400;
 }
 
 h3
@@ -260,9 +267,9 @@ tr > th:last-child { border-right: 1px solid #ddd; }
     font-family: Consolas, Monaco, 'Andale Mono', monospace;
 }
 
-.details { margin-top: 14px; border-left: 2px solid #DDD; }
+.details { margin-top: 14px; border-left: 2px solid #ffe4c4; color: #ffe4c4;}
 .details dt { width: 120px; float: left; padding-left: 10px;  padding-top: 6px; }
-.details dd { margin-left: 70px; }
+.details dd { margin-left: 30px; }
 .details ul { margin: 0; }
 .details ul { list-style-type: none; }
 .details li { margin-left: 30px; padding-top: 6px; }

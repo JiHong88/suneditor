@@ -9,13 +9,13 @@
 
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
-import notice from '../modules/notice';
+import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, resizing, notice]);
+        core.addModule([dialog, resizing]);
         
         const context = core.context;
         context.image = {
@@ -55,8 +55,9 @@ export default {
         /** image dialog */
         let image_dialog = this.setDialog.call(core);
         context.image.modal = image_dialog;
+        context.image.imgInputFile = image_dialog.querySelector('._se_image_file');
         context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
-        context.image.imgInputFile = context.image.focusElement = (image_dialog.querySelector('._se_image_file') || image_dialog.querySelector('._se_image_url'));
+        context.image.focusElement = (context.image.imgInputFile || context.image.imgUrlFile);
         context.image.altText = image_dialog.querySelector('._se_image_alt');
         context.image.imgLink = image_dialog.querySelector('._se_image_link');
         context.image.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
@@ -65,6 +66,7 @@ export default {
         /** add event listeners */
         context.image.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         context.image.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        if (context.image.imgInputFile && context.image.imgUrlFile) context.image.imgInputFile.addEventListener('change', this._fileInputChange.bind(context.image));
         
         context.image.proportion = {};
         context.image.inputX = {};
@@ -104,7 +106,7 @@ export default {
         let html = '' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    '<i aria-hidden="true" data-command="close" class="se-icon-cancel"></i>' +
+                    _icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
@@ -114,7 +116,7 @@ export default {
             '</div>' +
             '<form class="editor_image" method="post" enctype="multipart/form-data">' +
                 '<div class="_se_tab_content _se_tab_content_image">' +
-                    '<div class="se-dialog-body">';
+                    '<div class="se-dialog-body"><div style="border-bottom: 1px dashed #ccc;">';
 
             if (option.imageFileInput) {
                 html += '' +
@@ -132,7 +134,7 @@ export default {
                         '</div>';
             }
 
-            html += '' +
+            html += '</div>' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
                         '</div>';
@@ -160,7 +162,7 @@ export default {
                             '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                             '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" disabled' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
                             '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;"><i class="se-icon-revert"></i></button>' +
+                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + _icons.revert + '</button>' +
                         '</div>' ;
             }
 
@@ -192,6 +194,11 @@ export default {
         dialog.innerHTML = html;
 
         return dialog;
+    },
+
+    _fileInputChange: function () {
+        if (!this.imgInputFile.value) this.imgUrlFile.removeAttribute('disabled');
+        else this.imgUrlFile.setAttribute('disabled', true);
     },
 
     open: function () {
@@ -263,7 +270,7 @@ export default {
                         'currentSize': infoSize,
                         'uploadSize': fileSize
                     })) {
-                        notice.open.call(this, err);
+                        this.functions.noticeOpen(err);
                     }
 
                     this.closeLoading();
@@ -357,7 +364,7 @@ export default {
 
                     if (response.errorMessage) {
                         if (this._imageUploadError(response.errorMessage, response.result)) {
-                            notice.open.call(this, response.errorMessage);
+                            this.functions.noticeOpen(response.errorMessage);
                         }
                     } else {
                         const fileList = response.result;
@@ -1019,6 +1026,7 @@ export default {
         const contextImage = this.context.image;
         if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';
         if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = '';
+        if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgUrlFile.removeAttribute('disabled');
         contextImage.altText.value = '';
         contextImage.imgLink.value = '';
         contextImage.imgLinkNewWindowCheck.checked = false;

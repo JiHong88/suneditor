@@ -15,15 +15,20 @@
     <!--<h1 class="page-title">Global</h1>-->
     <section>
         <header>
-            <h2></h2>
+            <h2>.functions</h2>
         </header>
         <article>
             <div class="container-overview">
                 <dl class="details">
+                    <dd>It can be accessed from "core.functions" or object returned after editor creation.</dd>
+                    <dd>--- events ---</dd>
+                    <dd>It can be redefined by receiving event object as parameter.</dd>
+                    <dd>It is not called in exceptional cases and is called after the default event function has finished.</dd>
                 </dl>
             </div>
             <h3 class="subsection-title">Methods</h3>
-
+            <div class="description">
+            </div>
 
             <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions<span
                     class="signature">(options)</span></h4>
@@ -332,12 +337,11 @@
         <dl class="details"></dl>
 
 
-
-            <h3 class="subsection-title">Events</h3>
-            <div class="description">
-                It can be redefined by receiving event object as parameter.
-                It is not called in exceptional cases and is called after the default event function has finished.
-            </div>
+        <h4 class="subsection-title" id="titleEvent">events==</h4>
+        <div class="description">
+            It can be redefined by receiving event object as parameter.<br>
+            It is not called in exceptional cases and is called after the default event function has finished.
+        </div>
 
             <h4 class="name" id="onload"><span class="type-signature"></span>onload<span
                     class="signature">(core, reload)</span><span class="type-signature"></span></h4>
@@ -884,11 +888,9 @@
 
 
             <h4 class="name" id="showInline"><span class="type-signature"></span>showInline<span
-                    class="signature">(toolbar, context)</span><span class="type-signature"></span></h4>
+                    class="signature">(toolbar, context, core)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Paste event.<br>
-                Called before the editor's default event action.<br>
-                If it returns false, it stops without executing the rest of the action.
+                Called just before the inline toolbar is positioned and displayed on the screen.
             </div>
             <table class="params">
                 <thead>
@@ -911,7 +913,55 @@
                     <td class="type">
                         <span class="param-type">Object</span>
                     </td>
-                    <td class="description last">The editor's context object</td>
+                    <td class="description last">The editor's context object (editor.getContext()|core.context)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="showController"><span class="type-signature"></span>showController<span
+                    class="signature">(name, controllers, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called just after the controller is positioned and displayed on the screen.<br>
+                controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>name</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">The name of the plugin that called the controller</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>controllers</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Array of Controller elements</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
                 </tr>
                 </tbody>
             </table>
@@ -924,6 +974,7 @@
 <nav>
     <h2><a href="../../index.html">SunEditor</a></h2>
     <h3><a href="index.html">Index</a></h3>
+    <h3>Functions</h3>
     <ul>
         <li><a href="document-user.html#setOptions">setOptions</a></li>
         <li><a href="document-user.html#noticeOpen">noticeOpen</a></li>
@@ -942,10 +993,7 @@
         <li><a href="document-user.html#hide">hide</a></li>
         <li><a href="document-user.html#destroy">destroy</a></li>
         <li><a href="document-user.html#toolbar">{toolbar}</a></li>
-    </ul>
-
-    <h3>Useable events</h3>
-    <ul>
+        <li><a href="document-user.html#titleEvent"><h4 class="subsection-title" style="font-size: 20px;">events==</h4></a></li>
         <li><a href="document-user.html#onload">onload</a></li>
         <li><a href="document-user.html#onScroll">onScroll</a></li>
         <li><a href="document-user.html#onClick">onClick</a></li>
@@ -961,6 +1009,7 @@
         <li><a href="document-user.html#onImageUploadError">onImageUploadError</a></li>
         <li><a href="document-user.html#imageUploadHandler">imageUploadHandler</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>
+        <li><a href="document-user.html#showController">showController</a></li>
     </ul>
 </nav>
 

@@ -17,8 +17,8 @@ export default {
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.horizontalRulePick.bind(core));
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;

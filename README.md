@@ -392,6 +392,11 @@ minHeight       : The min-height size of the editor.
 maxHeight       : The max-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
 
+// Editing area default style------------------------------------------------------------------------------------
+defaultStyle    : You can define the style of the edit area. (className: 'sun-editor-editable')
+                  It affects the entire editing area.               default: '' {String}
+                  ex) 'font-family: cursive; font-size: 10px;'
+
 // Defining menu items-------------------------------------------------------------------------------------------
 font            : Change default font-family array.                 default: [...] {Array}
                   Default value: [
@@ -549,7 +554,7 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents).                            default: userFunction.save {Function}
+                  Arguments - (contents).                            default: functions.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -603,6 +608,11 @@ editor.setOptions({
         ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
     ]
 });
+
+// Set "options.defaultStyle" style.
+// Define the style of the edit area
+// It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
+editor.setDefaultStyle('font-family: cursive; font-size: 10px;');
 
 // Open a notice area
 editor.noticeOpen('test notice');
@@ -813,13 +823,27 @@ editor.imageUploadHandler = function (response, info, core) {
     }
 }
 
+// Called just before the inline toolbar is positioned and displayed on the screen.
 /**
  * toolbar: Toolbar Element
- * context: The editor's context object (editor.getContext())
+ * context: The editor's context object (editor.getContext()|core.context)
+ * core Core object
 */
 editor.showInline = function (toolbar, context, core) {
     console.log('toolbar', toolbar);
     console.log('context', context);
+}
+
+// Called just after the controller is positioned and displayed on the screen.
+// controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+/**
+ * name: The name of the plugin that called the controller
+ * controllers: Array of Controller elements
+ * core: Core object
+*/
+editor.showController = function (name, controllers, core) {
+    console.log('plugin name', name);
+    console.log('controller elements', controllers);
 }
 ```
 

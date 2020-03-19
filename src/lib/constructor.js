@@ -7,6 +7,7 @@
  */
 'use strict';
 
+import _icons from '../assets/defaultIcons';
 import _defaultLang from '../lang/en';
 import util from './util';
 
@@ -257,8 +258,7 @@ export default {
         // wysiwyg div or iframe
         const wysiwygDiv = document.createElement(!options.iframe ? 'DIV' : 'IFRAME');
         wysiwygDiv.className = 'se-wrapper-inner se-wrapper-wysiwyg';
-        wysiwygDiv.style.display = 'block';
-
+        
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
@@ -411,6 +411,8 @@ export default {
         options.height = options.height ? (util.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        /** Editing area default style */
+        options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
@@ -467,147 +469,47 @@ export default {
      * @private
      */
     _defaultButtons: function (lang) {
+        const icons = _icons;
         return {
             /** default command */
-            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '',
-                '<i class="se-icon-bold"></i>'
-            ],
-
-            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '',
-                '<i class="se-icon-underline"></i>'
-            ],
-
-            italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '',
-                '<i class="se-icon-italic"></i>'
-            ],
-
-            strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '',
-                '<i class="se-icon-strokethrough"></i>'
-            ],
-
-            subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '',
-                '<i class="se-icon-subscript"></i>'
-            ],
-
-            superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '',
-                '<i class="se-icon-superscript"></i>'
-            ],
-
-            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '',
-                '<i class="se-icon-erase"></i>'
-            ],
-
-            indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '',
-                '<i class="se-icon-indent-right"></i>'
-            ],
-
-            outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '',
-                '<i class="se-icon-indent-left"></i>', true
-            ],
-
-            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '',
-                '<i class="se-icon-expansion"></i>'
-            ],
-
-            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '',
-                '<i class="se-icon-showBlocks"></i>'
-            ],
-
-            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '',
-                '<i class="se-icon-code-view"></i>'
-            ],
-
-            undo: ['_se_command_undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '',
-                '<i class="se-icon-undo"></i>', true
-            ],
-
-            redo: ['_se_command_redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '',
-                '<i class="se-icon-redo"></i>', true
-            ],
-
-            preview: ['', lang.toolbar.preview, 'preview', '',
-                '<i class="se-icon-preview"></i>'
-            ],
-
-            print: ['', lang.toolbar.print, 'print', '',
-                '<i class="se-icon-print"></i>'
-            ],
-
-            save: ['_se_command_save', lang.toolbar.save, 'save', '',
-                '<i class="se-icon-save"></i>', true
-            ],
-
+            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],
+            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '', icons.underline],
+            italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '', icons.italic],
+            strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '', icons.strike],
+            subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
+            superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
+            removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
+            indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '', icons.outdent],
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '', icons.indent],
+            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
+            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
+            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
+            undo: ['_se_command_undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '', icons.undo],
+            redo: ['_se_command_redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '', icons.redo],
+            preview: ['', lang.toolbar.preview, 'preview', '', icons.preview],
+            print: ['', lang.toolbar.print, 'print', '', icons.print],
+            save: ['_se_command_save', lang.toolbar.save, 'save', '', icons.save],
             /** plugins - command */
-            blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command',
-                '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H17L19,13V7H13V13H16M6,17H9L11,13V7H5V13H8L6,17Z" /></svg>'
-            ],
-
+            blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
             /** plugins - submenu */
-            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'submenu',
-                '<span class="txt">' + lang.toolbar.font + '</span><i class="se-icon-arrow-down"></i>'
-            ],
-            
-            formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu',
-                '<span class="txt">' + lang.toolbar.formats + '</span><i class="se-icon-arrow-down"></i>'
-            ],
-
-            fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu',
-                '<span class="txt">' + lang.toolbar.fontSize + '</span><i class="se-icon-arrow-down"></i>'
-            ],
-
-            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu',
-                '<i class="se-icon-fontColor"></i>'
-            ],
-
-            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu',
-                '<i class="se-icon-hiliteColor"></i>'
-            ],
-
-            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu',
-                '<i class="se-icon-align-left"></i>'
-            ],
-
-            list: ['', lang.toolbar.list, 'list', 'submenu',
-                '<i class="se-icon-list-number"></i>'
-            ],
-
-            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu',
-                '<i class="se-icon-hr"></i>'
-            ],
-
-            table: ['', lang.toolbar.table, 'table', 'submenu',
-                '<i class="se-icon-grid"></i>'
-            ],
-
-            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu',
-                '<i class="se-icon-line-height"></i>'
-            ],
-
-            template: ['', lang.toolbar.template, 'template', 'submenu',
-                '<i class="se-icon-template"></i>'
-            ],
-            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'submenu',
-                '<i class="se-icon-paragraph-style"></i>'
-            ],
-            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'submenu',
-                '<i class="se-icon-text-style"></i>'
-            ],
-
+            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'submenu', '<span class="txt">' + lang.toolbar.font + '</span>' + icons.arrow_down],
+            formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
+            fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
+            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', icons.font_color],
+            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', icons.highlight_color],
+            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu', icons.align_left],
+            list: ['', lang.toolbar.list, 'list', 'submenu', icons.list_number],
+            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', icons.horizontal_rule],
+            table: ['', lang.toolbar.table, 'table', 'submenu', icons.table],
+            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu', icons.line_height],
+            template: ['', lang.toolbar.template, 'template', 'submenu', icons.template],
+            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'submenu', icons.paragraph_style],
+            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'submenu', icons.text_style],
             /** plugins - dialog */
-            link: ['', lang.toolbar.link, 'link', 'dialog',
-                '<i class="se-icon-link"></i>'
-            ],
-
-            image: ['', lang.toolbar.image, 'image', 'dialog',
-                '<i class="se-icon-image"></i>'
-            ],
-
-            video: ['', lang.toolbar.video, 'video', 'dialog',
-                '<i class="se-icon-video"></i>'
-            ],
-            math: ['', lang.toolbar.math, 'math', 'dialog',
-                '<i class="se-icon-math"></i>'
-            ]
+            link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
+            image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
+            video: ['', lang.toolbar.video, 'video', 'dialog', icons.video],
+            math: ['', lang.toolbar.math, 'math', 'dialog', icons.math]
         };
     },
 

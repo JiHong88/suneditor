@@ -7,6 +7,8 @@
  */
 'use strict';
 
+import _icons from '../../assets/defaultIcons';
+
 export default {
     name: 'table',
     display: 'submenu',
@@ -19,7 +21,6 @@ export default {
             _trElements: null,
             _tableXY: [],
             _maxWidth: true,
-            resizeIcon: null,
             resizeText: null,
             headerButton: null,
             mergeButton: null,
@@ -34,7 +35,11 @@ export default {
             _physical_cellIndex: 0,
             _logical_cellIndex: 0,
             _current_colSpan: 0,
-            _current_rowSpan: 0
+            _current_rowSpan: 0,
+            icons: {
+                expansion: _icons.expansion,
+                reduction: _icons.reduction
+            }
         };
 
         /** set submenu */
@@ -48,7 +53,7 @@ export default {
         /** set table controller */
         let tableController = this.setController_table.call(core);
         context.table.tableController = tableController;
-        context.table.resizeIcon = tableController.querySelector('._se_table_resize > i');
+        context.table.resizeButton = tableController.querySelector('._se_table_resize');
         context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
         context.table.headerButton = tableController.querySelector('._se_table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
@@ -59,6 +64,8 @@ export default {
         context.table.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
         context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
         context.table.splitButton = resizeDiv.querySelector('._se_table_split_button');
+        context.table.insertRowAboveButton = resizeDiv.querySelector('._se_table_insert_row_a');
+        context.table.insertRowBelowButton = resizeDiv.querySelector('._se_table_insert_row_b');
         resizeDiv.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
         
         /** add event listeners */
@@ -67,8 +74,10 @@ export default {
         resizeDiv.addEventListener('click', this.onClick_tableController.bind(core));
         tableController.addEventListener('click', this.onClick_tableController.bind(core));
 
-        /** append html */
-        targetElement.parentNode.appendChild(listDiv);
+        /** append target button menu */
+        core.initMenuTarget(this.name, targetElement, listDiv);
+
+        /** append controller */
         context.element.relative.appendChild(resizeDiv);
         context.element.relative.appendChild(tableController);
 
@@ -92,6 +101,7 @@ export default {
 
     setController_table: function () {
         const lang = this.lang;
+        const icons = _icons;
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table';
@@ -99,15 +109,15 @@ export default {
             '<div>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="resize" class="se-tooltip _se_table_resize">' +
-                        '<i class="se-icon-expansion"></i>' +
+                        icons.expansion +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="header" class="se-tooltip _se_table_header">' +
-                        '<i class="se-icon-table-header"></i>' +
+                        icons.table_header +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.tableHeader + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="remove" class="se-tooltip">' +
-                        '<i class="se-icon-delete"></i>' +
+                        icons.delete +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                     '</button>' +
                 '</div>' +
@@ -118,6 +128,7 @@ export default {
 
     setController_tableEditor: function () {
         const lang = this.lang;
+        const icons = _icons;
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';
@@ -125,20 +136,20 @@ export default {
             '<div class="se-arrow se-arrow-up"></div>' +
             '<div>' +
                 '<div class="se-btn-group">' +
-                    '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip">' +
-                        '<i class="se-icon-insert-row-above"></i>' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-tooltip _se_table_insert_row_a">' +
+                        icons.insert_row_above +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowAbove + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip">' +
-                        '<i class="se-icon-insert-row-below"></i>' +
+                    '<button type="button" data-command="insert" data-value="row" data-option="down" class="se-tooltip _se_table_insert_row_b">' +
+                        icons.insert_row_below +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertRowBelow + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="delete" data-value="row" class="se-tooltip">' +
-                        '<i class="se-icon-delete-row"></i>' +
+                        icons.delete_row +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteRow + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="merge" class="_se_table_merge_button se-tooltip" disabled>' +
-                        '<i class="se-icon-merge-cell"></i>' +
+                        icons.merge_cell +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mergeCells + '</span></span>' +
                     '</button>' +
                 '</div>' +
@@ -146,19 +157,19 @@ export default {
             '<div>' +
                 '<div class="se-btn-group">' +
                     '<button type="button" data-command="insert" data-value="cell" data-option="left" class="se-tooltip">' +
-                        '<i class="se-icon-insert-column-left"></i>' +
+                        icons.insert_column_left +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnBefore + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="insert" data-value="cell" data-option="right" class="se-tooltip">' +
-                        '<i class="se-icon-insert-column-right"></i>' +
+                        icons.insert_column_right +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.insertColumnAfter + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="delete" data-value="cell" class="se-tooltip">' +
-                        '<i class="se-icon-delete-column"></i>' +
+                        icons.delete_column +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.deleteColumn + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="onsplit" class="_se_table_split_button se-tooltip">' +
-                        '<i class="se-icon-split-cell"></i>' +
+                        icons.split_cell +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
                     '</button>' +
                     '<div class="se-btn-group-sub sun-editor-common se-list-layer">' +
@@ -291,14 +302,15 @@ export default {
 
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
-        if (!this.getSelection().isCollapsed) {
+        const tablePlugin = this.plugins.table;
+
+        if (!this.getSelection().isCollapsed && !tablePlugin._selectedCell) {
             this.controllersOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
-
+        
         const contextTable = this.context.table;
-        const tablePlugin = this.plugins.table;
         const tableController = contextTable.tableController;
         
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
@@ -312,7 +324,7 @@ export default {
         tableController.style.display = 'block';
         tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
 
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), 'table');
+        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -1057,29 +1069,35 @@ export default {
 
     resizeTable: function () {
         const contextTable = this.context.table;
-        const icon =  contextTable.resizeIcon;
+        const icon =  contextTable.resizeButton.querySelector('svg');
         const span = contextTable.resizeText;
-
-        let removeClass = 'se-icon-expansion';
-        let addClass = 'se-icon-reduction';
-        let text = contextTable.minText;
-        let width = '100%';
+        let sizeIcon, text, width;
 
         if (!contextTable._maxWidth) {
-            removeClass = 'se-icon-reduction';
-            addClass = 'se-icon-expansion';
+            sizeIcon = contextTable.icons.expansion;
             text = contextTable.maxText;
             width = 'auto';
+        } else {
+            sizeIcon = contextTable.icons.reduction;
+            text = contextTable.minText;
+            width = '100%';
         }
         
-        this.util.removeClass(icon, removeClass);
-        this.util.addClass(icon, addClass);
+        this.util.changeIcon(icon, sizeIcon);
         this.util.changeTxt(span, text);
         contextTable._element.style.width = width;
     },
 
     setActiveButton: function (fixedCell, selectedCell) {
         const contextTable = this.context.table;
+
+        if (/^TH$/i.test(fixedCell.nodeName)) {
+            contextTable.insertRowAboveButton.setAttribute('disabled', true);
+            contextTable.insertRowBelowButton.setAttribute('disabled', true);
+        } else {
+            contextTable.insertRowAboveButton.removeAttribute('disabled');
+            contextTable.insertRowBelowButton.removeAttribute('disabled');
+        }
 
         if (!selectedCell || fixedCell === selectedCell) {
             contextTable.splitButton.removeAttribute('disabled');
@@ -1135,6 +1153,7 @@ export default {
     },
 
     _onCellMultiSelect: function (e) {
+        this._antiBlur = true;
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isCell);
 
@@ -1314,7 +1333,7 @@ export default {
             this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this), 'table');
+                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this), tdElement, 'table');
                 if (!tablePlugin._ref) this.controllersOff();
             }.bind(this);
 
