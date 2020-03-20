@@ -4052,30 +4052,10 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         _init: function (reload, _initHTML) {
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-            this._wd = _d;
-
-            _w.setTimeout(function () {
-                if (options.iframe) {
-                    this._wd = context.element.wysiwygFrame.contentDocument;
-                    context.element.wysiwyg = this._wd.body;
-                    if (options.height === 'auto') {
-                        this._iframeAuto = this._wd.body;
-                    }
-                }
-
-                this._initWysiwygArea(reload, _initHTML);
-
-                this._checkComponents();
-                this._imagesInfoInit = false;
-                this._imagesInfoReset = false;
-                
-                this.history.reset(true);
-                this._iframeAutoHeight();
-                this._checkPlaceholder();
-
-                if (reload) this.focus();
-                if (typeof functions.onload === 'function') return functions.onload(core, reload);
-            }.bind(this));
+            this._wd = options.iframe ? context.element.wysiwygFrame.contentDocument : _d;
+            if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
+            
+            this._initWysiwygArea(reload, _initHTML);
 
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist);
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
@@ -4130,6 +4110,17 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             // Excute history function
             this.history = _history(this, event._onChange_historyStack);
+
+            // Init, validate
+            this._checkComponents();
+            this._imagesInfoInit = false;
+            this._imagesInfoReset = false;
+            
+            this.history.reset(true);
+            this._iframeAutoHeight();
+            this._checkPlaceholder();
+
+            if (typeof functions.onload === 'function') return functions.onload(core, reload);
         },
 
         /**

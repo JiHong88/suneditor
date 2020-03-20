@@ -165,7 +165,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
-    // fullPage: true,
+    fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
     attributesWhitelist: {
@@ -192,7 +192,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // videoResizing: false,
     // videoSizeOnlyPercentage: true
 });
-
+// ss.setContents('fsafsa')
 ss.onload = function (core) {
     console.log('onload', core);
     core.focus();
