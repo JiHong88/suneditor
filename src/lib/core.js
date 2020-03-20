@@ -3826,31 +3826,25 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             cleanHTML = cleanHTML
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
-                .replace(/(<[a-zA-Z0-9]+[^>]*)(>)([^>^<]*)(<\/[a-zA-Z0-9]+>)/g, function (m, t, e, c, l) {
+                .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
-                    const tag = t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase();
-                    const tAttr = this._attributesTagsWhitelist[tag];
+                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
-                    let node = '<' + tag;
                     if (v) {
                         for (let i = 0, len = v.length; i < len; i++) {
                             if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
-                            node += ' ' + v[i];
+                            t += ' ' + v[i];
                         }
                     }
 
-                    if (tag === 'span' && node === ('<' + tag)) {
-                        node = c;
-                    } else {
-                        node += e + c + l;
-                    }
-
-                    return node;
+                    return t;
                 }.bind(this));
-
+            
+            if (!this._attributesTagsWhitelist.span) cleanHTML = cleanHTML.replace(/<\/?(span[^>^<]*)>/g, '');
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
+            
             return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
         },
 
