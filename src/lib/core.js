@@ -265,7 +265,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUploadBefore: function (files, info) {
-            if (typeof functions.onImageUploadBefore === 'function') return functions.onImageUploadBefore(files, info, core);
+            if (typeof functions.onImageUploadBefore === 'function') return functions.onImageUploadBefore(files, info, this);
             return true;
         },
 
@@ -274,7 +274,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, core);
+            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, this);
         },
 
         /**
@@ -282,7 +282,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @private
          */
         _imageUploadError: function (errorMessage, result) {
-            if (typeof functions.onImageUploadError === 'function') return functions.onImageUploadError(errorMessage, result, core);
+            if (typeof functions.onImageUploadError === 'function') return functions.onImageUploadError(errorMessage, result, this);
             return true;
         },
 
@@ -290,9 +290,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description An user callback function of the image upload
          * @private
          */
-        _imageUploadHandler: function (response, info, core) {
+        _imageUploadHandler: function (response, info) {
             if (typeof functions.imageUploadHandler === 'function') {
-                functions.imageUploadHandler(response, info, core);
+                functions.imageUploadHandler(response, info, this);
                 return true;
             } else {
                 return false;
@@ -546,7 +546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.addDocEvent('mousedown', this._bindControllersOff, false);
             this.addDocEvent('keydown', this._bindControllersOff, false);
 
-            if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, core);
+            if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, this);
             this._antiBlur = true;
         },
 
@@ -808,7 +808,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     
                     let format = util.getFormatElement(tempCon);
                     if (format === util.getRangeFormatElement(format)) {
-                        format = util.createElement(util.isCell(tempCon) ? 'DIV' : 'P');
+                        format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : 'P');
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
                     }
@@ -3806,7 +3806,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
          * @param {String|RegExp} whitelist Regular expression of allowed tags.
-         * RegExp object is create by util.createTagsWhitelist method. (core.editorTagsWhitelistRegExp, core.pasteTagsWhitelistRegExp)
+         * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
@@ -3814,31 +3814,43 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const domTree = this._d.createRange().createContextualFragment(html).childNodes;
             let cleanHTML = '';
 
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                if (!tagsAllowed.test(domTree[i].nodeName)) {
-                    cleanHTML += domTree[i].nodeType === 1 ? domTree[i].outerHTML : domTree[i].nodeType === 3 ? domTree[i].textContent : '';
+            for (let i = 0, len = domTree.length, t; i < len; i++) {
+                t = domTree[i];
+                if (t.nodeType === 8 && this._allowHTMLComments) {
+                    cleanHTML += '<p>' + t.textContent.trim() + '</p>';
+                } else if (!tagsAllowed.test(t.nodeName)) {
+                    cleanHTML += t.nodeType === 1 ? t.outerHTML : t.nodeType === 3 ? t.textContent : '';
                 }
             }
 
             cleanHTML = cleanHTML
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-                .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
+                .replace(this.editorTagsWhitelistRegExp, '')
+                .replace(/(<[a-zA-Z0-9]+[^>]*)(>)([^>^<]*)(<\/[a-zA-Z0-9]+>)/g, function (m, t, e, c, l) {
                     let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
+                    const tag = t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase();
+                    const tAttr = this._attributesTagsWhitelist[tag];
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
+                    let node = '<' + tag;
                     if (v) {
                         for (let i = 0, len = v.length; i < len; i++) {
                             if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
-                            t += ' ' + v[i];
+                            node += ' ' + v[i];
                         }
                     }
 
-                    return t;
-                }.bind(this))
-                .replace(/<\/?(span[^>^<]*)>/g, '');
+                    if (tag === 'span' && node === ('<' + tag)) {
+                        node = c;
+                    } else {
+                        node += e + c + l;
+                    }
 
+                    return node;
+                }.bind(this));
+
+            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
         },
 
@@ -3878,10 +3890,20 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             let returnHTML = '';
             let tag = this._d.createRange().createContextualFragment(contents).childNodes;
 
-            for (let i = 0, len = tag.length, baseHtml; i < len; i++) {
-                baseHtml = tag[i].outerHTML || tag[i].textContent;
+            for (let i = 0, len = tag.length, baseHtml, t; i < len; i++) {
+                t = tag[i];
+                
+                if (t.nodeType === 8) {
+                    if (this._allowHTMLComments) {
+                        baseHtml = '<p>' + t.textContent.trim() + '</p>';
+                    } else {
+                        continue;
+                    }
+                } else {
+                    baseHtml = t.outerHTML || t.textContent;
+                }
 
-                if (tag[i].nodeType === 3) {
+                if (t.nodeType === 3) {
                     const textArray = baseHtml.split(/\n/g);
                     let text = '';
                     for (let t = 0, tLen = textArray.length; t < tLen; t++) {
@@ -4055,9 +4077,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this._wd = options.iframe ? context.element.wysiwygFrame.contentDocument : _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
-            this._initWysiwygArea(reload, _initHTML);
-
-            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist);
+            this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', ''));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
             const _attr = options.attributesWhitelist;
@@ -4112,15 +4133,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             this.history = _history(this, event._onChange_historyStack);
 
             // Init, validate
-            this._checkComponents();
-            this._imagesInfoInit = false;
-            this._imagesInfoReset = false;
-            
-            this.history.reset(true);
-            this._iframeAutoHeight();
-            this._checkPlaceholder();
+            this._initWysiwygArea(reload, _initHTML);
+            _w.setTimeout(function () {
+                this._checkComponents();
+                this._imagesInfoInit = false;
+                this._imagesInfoReset = false;
+                
+                this.history.reset(true);
+                this._iframeAutoHeight();
+                this._checkPlaceholder();
 
-            if (typeof functions.onload === 'function') return functions.onload(core, reload);
+                if (typeof functions.onload === 'function') return functions.onload(this, reload);
+            }.bind(this));
         },
 
         /**
@@ -4194,11 +4218,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (rangeEl) {
                 format = util.createElement(formatName || 'P');
                 format.innerHTML = rangeEl.innerHTML;
+                if (format.childNodes.length === 0) format.innerHTML = '<br>';
+
                 rangeEl.innerHTML = format.outerHTML;
                 format = rangeEl.firstElementChild;
                 focusNode = util.getEdgeChildNodes(format, null).sc;
 
-                if (!focusNode.sc) {
+                if (!focusNode) {
                     focusNode = util.createTextNode(util.zeroWidthSpace);
                     format.insertBefore(focusNode, format.firstChild);
                 }
@@ -4524,7 +4550,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     const prevLi = selectionNode.nextElementSibling;
                     oLi.appendChild(selectionNode);
                     rangeEl.insertBefore(oLi, prevLi);
-                } else if (!util.isWysiwygDiv(selectionNode)) {
+                } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode)) {
                     core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 }
                 e.preventDefault();
@@ -4721,7 +4747,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             /** default key action */
-            const selectionNode = core.getSelectionNode();
+            let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const resizingName = core._resizingName;
@@ -4739,7 +4765,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                     }
 
-                    if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild) {
+                    if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
                         core._setDefaultFormat('P');
@@ -4955,9 +4981,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     e.preventDefault();
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
-                    core.controllersOff();
                     const isEdge = (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset));            
                     const selectedFormats = core.getSelectedElements();
+                    selectionNode = core.getSelectionNode();
                     const cells = [];
                     let lines = [];
                     let fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
@@ -5094,7 +5120,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         }
                         
                         if (selectionFormat) {
-                            functions.insertHTML((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>');
+                            functions.insertHTML(((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>'), true);
 
                             let focusNode = wSelection.focusNode;
                             const wOffset = wSelection.focusOffset;
@@ -5250,7 +5276,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             const formatEl = util.getFormatElement(selectionNode);
             const rangeEl = util.getRangeFormatElement(selectionNode);
-            if ((!formatEl && range.collapsed) || formatEl === rangeEl) {
+            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode)) {
                 core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 selectionNode = core.getSelectionNode();
             }
@@ -5436,7 +5462,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (cleanData) {
                 e.stopPropagation();
                 e.preventDefault();
-                functions.insertHTML(cleanData);
+                functions.insertHTML(cleanData, true);
             } else {
                 // history stack
                 core.history.push(true);
@@ -5479,7 +5505,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 const cleanData = core.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
                 if (cleanData) {
                     event._setDropLocationSelection(e);
-                    functions.insertHTML(cleanData);
+                    functions.insertHTML(cleanData, true);
                 }
             }
 
@@ -5833,9 +5859,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
          */
-        insertHTML: function (html) {
+        insertHTML: function (html, _clean) {
             if (typeof html === 'string') {
-                html = util.htmlRemoveWhiteSpace(html);
+                if (!_clean) html = core.cleanHTML(html);
                 try {
                     const parseDocument = core._parser.parseFromString(html, 'text/html');
                     const children = parseDocument.body.childNodes;
@@ -5844,6 +5870,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                         core.insertNode(c, a);
                         a = c;
                     }
+                    const offset = a.nodeType === 3 ? a.textContent.length : 1;
+                    core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
                 }
