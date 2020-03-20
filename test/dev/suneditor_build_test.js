@@ -88,6 +88,7 @@ let s1 = suneditor.create('editor', {
         tr: "style",
         td: "style"
     },
+    addTagsWhitelist: '//',
     formats: [
         { 
             tag: 'div', // Tag name
@@ -165,12 +166,15 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
-    // fullPage: true,
+    fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
     attributesWhitelist: {
-        // 'input': 'type',
-        'all': 'type'
+        table: "style",
+        tbody: "style",
+        thead: "style",
+        tr: "style",
+        td: "style"
     },
     templates: [
         {
@@ -192,7 +196,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // videoResizing: false,
     // videoSizeOnlyPercentage: true
 });
-
+// ss.setContents('fsafsa')
 ss.onload = function (core) {
     console.log('onload', core);
     core.focus();

@@ -312,7 +312,7 @@ plugins: [
 // Whitelist--------------------------------------å---------------------------------------------------------
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
-                        ex) 'mark|canvas|label|select|option|input'
+                        ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
 pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
                         ex) 'p|h[1-6]'

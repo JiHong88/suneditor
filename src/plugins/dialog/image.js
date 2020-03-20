@@ -359,7 +359,7 @@ export default {
         if (this.context.image._xmlHttp.readyState === 4) {
             if (this.context.image._xmlHttp.status === 200) {
                 
-                if (!this._imageUploadHandler(this.context.image._xmlHttp, info, this)) {
+                if (!this._imageUploadHandler(this.context.image._xmlHttp, info)) {
                     const response = JSON.parse(this.context.image._xmlHttp.responseText);
 
                     if (response.errorMessage) {
