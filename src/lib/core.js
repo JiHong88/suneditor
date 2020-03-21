@@ -3976,23 +3976,25 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
 
             const maxCharCount = options.maxCharCount;
+            const wysiwyg = context.element.wysiwyg;
 
             _w.setTimeout(function () {
-                charCounter.textContent = context.element.wysiwyg.textContent.length;
+                charCounter.textContent = wysiwyg.textContent.length;
             });
 
             if (maxCharCount > 0) {
                 let over = false;
-                const count = context.element.wysiwyg.textContent.length;
+                const count = wysiwyg.textContent.length;
                 
                 if (count > maxCharCount) {
-                    core._editorRange();
-                    const range = core.getRange();
+                    if (count > maxCharCount + 1 && !blink) return true;
+                    this._editorRange();
+                    const range = this.getRange();
                     const endOff = range.endOffset - 1;
-                    const text = core.getSelectionNode().textContent;
+                    const text = this.getSelectionNode().textContent;
 
-                    core.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
-                    core.setRange(range.endContainer, endOff, range.endContainer, endOff);
+                    this.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
+                    this.setRange(range.endContainer, endOff, range.endContainer, endOff);
                     over = true;
                 } else if ((count + nextCharCount) > maxCharCount) {
                     over = true;

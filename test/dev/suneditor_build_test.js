@@ -70,7 +70,7 @@ let s1 = suneditor.create('editor', {
         'fontColor', 'hiliteColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
-        // 'list',
+        'list',
         'align', 'horizontalRule', 'lineHeight',
         'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
@@ -105,7 +105,58 @@ let s1 = suneditor.create('editor', {
         'pre',
         'blockquote'
     ],
+    maxCharCount: 20
 })
+
+// s1.core._charCount = function (nextCharCount, blink) {
+//     const charCounter = this.context.element.charCounter;
+//     if (!charCounter) return true;
+//     if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
+
+//     const maxCharCount = this.context.options.maxCharCount;
+//     const wysiwyg = this.context.element.wysiwyg;
+
+//     ///// -- get empty list ////
+//     const emptyListCount = this.util.getListChildren(wysiwyg, function (current) {
+//         return this.isListCell(current) && current.childNodes.length === 1 && this.isBreak(current.firstChild)
+//     }.bind(this.util)).length;
+//     //// ------------------ ////
+
+//     this._w.setTimeout(function () {
+//         charCounter.textContent = wysiwyg.textContent.length + emptyListCount; // add empty list
+//     });
+
+//     if (maxCharCount > 0) {
+//         let over = false;
+//         const count = wysiwyg.textContent.length + emptyListCount; // add empty list
+        
+//         if (count > maxCharCount) {
+//             this._editorRange();
+//             const range = this.getRange();
+//             const endOff = range.endOffset - 1;
+//             const text = this.getSelectionNode().textContent;
+
+//             this.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
+//             this.setRange(range.endContainer, endOff, range.endContainer, endOff);
+//             over = true;
+//         } else if ((count + nextCharCount) > maxCharCount) {
+//             over = true;
+//         }
+
+//         if (over) {
+//             if (blink && !this.util.hasClass(charCounter, 'se-blink')) {
+//                 this.util.addClass(charCounter, 'se-blink');
+//                 this._w.setTimeout(function () {
+//                     this.removeClass(charCounter, 'se-blink');
+//                 }.bind(this.util), 600);
+//             }
+
+//             return false;
+//         }
+//     }
+
+//     return true;
+// }.bind(s1.core)
 
 window.cm = CodeMirror
 
