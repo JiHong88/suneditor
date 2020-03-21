@@ -7,8 +7,6 @@
  */
 'use strict';
 
-import _icons from '../../assets/defaultIcons';
-
 export default {
     name: 'colorPicker',
     add: function (core) {
@@ -23,7 +21,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.createColorList(core.context.option, core.lang, this._makeColorList);
+        let listDiv = this.createColorList(core, this._makeColorList);
 
         /** caching */
         context.colorPicker.colorListHTML = listDiv;
@@ -32,7 +30,9 @@ export default {
         listDiv = null;
     },
 
-    createColorList: function (option, lang, makeColor) {
+    createColorList: function (core, makeColor) {
+        const option = core.context.option;
+        const lang = core.lang;
         const colorList = !option.colorList || option.colorList.length === 0 ?
             [
                 '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000',
@@ -65,11 +65,11 @@ export default {
             '<form class="se-submenu-form-group">' +
                 '<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
                 '<button type="submit" class="se-btn-primary se-tooltip _se_color_picker_submit">' +
-                    _icons.checked +
+                    core.icons.checked +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.submitButton + '</span></span>' +
                 '</button>' +
                 '<button type="button" class="se-btn se-tooltip _se_color_picker_remove">' +
-                    _icons.erase +
+                    core.icons.erase +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.removeFormat + '</span></span>' +
                 '</button>' +
             '</form>' +

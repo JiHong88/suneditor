@@ -156,12 +156,12 @@ const util = {
 
     /**
      * @description Returns the CSS text that has been applied to the current page.
-     * @param {Element|null} iframe To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)
+     * @param {Element|null} doc To get the CSS text of an document(core._wd). If null get the current document.
      * @returns {String}
      */
-    getPageStyle: function (iframe) {
+    getPageStyle: function (doc) {
         let cssText = '';
-        const sheets = (iframe ? this.getIframeDocument(iframe) : this._d).styleSheets;
+        const sheets = (doc || this._d).styleSheets;
         
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
             try {

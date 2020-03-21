@@ -12,6 +12,7 @@ import _defaultLang from '../lang/en';
 import util from './util';
 
 export default {
+    icons: null,
     /**
      * @description document create - call _createToolBar()
      * @param {element} element Textarea
@@ -104,7 +105,8 @@ export default {
             },
             options: options,
             plugins: tool_bar.plugins,
-            pluginCallButtons: tool_bar.pluginCallButtons
+            pluginCallButtons: tool_bar.pluginCallButtons,
+            _icons: this.icons
         };
     },
 
@@ -462,6 +464,14 @@ export default {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
+
+        /** --- Define icons --- */
+        this.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
+            for (let key in _new) {
+                _default[key] = _new[key];
+            }
+            return _default;
+        }, {});
     },
 
     /**
@@ -469,7 +479,7 @@ export default {
      * @private
      */
     _defaultButtons: function (lang) {
-        const icons = _icons;
+        const icons = this.icons;
         return {
             /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],

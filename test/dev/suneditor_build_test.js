@@ -76,10 +76,14 @@ let s1 = suneditor.create('editor', {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
+    icons: {
+        undo: '',
+        bold: ''
+    },
     width: '100%',
     height: '500',
     defaultStyle: 'font-size: 10px;',
-    // fullPage: true,
+    fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
     attributesWhitelist: {
         table: "style",
@@ -88,7 +92,7 @@ let s1 = suneditor.create('editor', {
         tr: "style",
         td: "style"
     },
-    addTagsWhitelist: '//',
+    // addTagsWhitelist: '//',
     formats: [
         { 
             tag: 'div', // Tag name
@@ -105,7 +109,7 @@ let s1 = suneditor.create('editor', {
         'pre',
         'blockquote'
     ],
-    maxCharCount: 20
+    maxCharCount: 200
 })
 
 // s1.core._charCount = function (nextCharCount, blink) {
@@ -426,6 +430,11 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['save', 'template'],
     ],
+    icons: {
+        underline: '',
+        strike: '',
+        caption: ''
+    },
     templates: [
         {
             name: 'template1',

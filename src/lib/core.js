@@ -12,7 +12,6 @@ import _Context from './context';
 import _history from './history';
 import _util from './util';
 import _notice from '../plugins/modules/_notice';
-import _icons from '../assets/defaultIcons';
 
 /**
  * @description SunEditor constuctor function.
@@ -22,9 +21,10 @@ import _icons from '../assets/defaultIcons';
  * @param plugins
  * @param lang
  * @param options
+ * @param _icons
  * @returns {Object} functions Object
  */
-export default function (context, pluginCallButtons, plugins, lang, options) {
+export default function (context, pluginCallButtons, plugins, lang, options, _icons) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
@@ -3676,16 +3676,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             const printDocument = util.getIframeDocument(iframe);
             const contentsHTML = this.getContents(true);
+            const wDoc = this._wd;
 
             if (options.iframe) {
-                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
-                const arrts = options.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
 
                 printDocument.write('' +
                     '<!DOCTYPE html><html>' +
                     '<head>' +
-                    wDocument.head.innerHTML +
-                    '<style>' + util.getPageStyle(context.element.wysiwygFrame) + '</style>' +
+                    wDoc.head.innerHTML +
+                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
@@ -3694,7 +3694,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 const contents = util.createElement('DIV');
                 const style = util.createElement('STYLE');
 
-                style.innerHTML = util.getPageStyle();
+                style.innerHTML = util.getPageStyle(wDoc);
                 contents.className = 'sun-editor-editable';
                 contents.innerHTML = contentsHTML;
 
@@ -3729,15 +3729,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
+            const wDoc = this._wd;
 
             if (options.iframe) {
-                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
-                const arrts = options.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
 
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
                     '<head>' +
-                    wDocument.head.innerHTML +
+                    wDoc.head.innerHTML +
                     '<style>body {overflow: auto !important;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
@@ -3750,7 +3750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
-                    '<style>' + util.getPageStyle() + '</style>' +
+                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
                     '</head>' +
                     '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
                     '</html>'
@@ -3817,7 +3817,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
                 if (t.nodeType === 8 && this._allowHTMLComments) {
-                    cleanHTML += '<p>' + t.textContent.trim() + '</p>';
+                    cleanHTML += '<__comment__>' + t.textContent.trim() + '</__comment__>';
                 } else if (!tagsAllowed.test(t.nodeName)) {
                     cleanHTML += t.nodeType === 1 ? t.outerHTML : t.nodeType === 3 ? t.textContent : '';
                 }
@@ -3826,6 +3826,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             cleanHTML = cleanHTML
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
+                .replace('<__comment__>', '<!-- ')
+                .replace('</__comment__>', ' -->')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
                     const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
@@ -3889,7 +3891,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 
                 if (t.nodeType === 8) {
                     if (this._allowHTMLComments) {
-                        baseHtml = '<p>' + t.textContent.trim() + '</p>';
+                        baseHtml = '<__comment__>' + t.textContent.trim() + '</__comment__>';
                     } else {
                         continue;
                     }
@@ -3914,7 +3916,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
             }
 
-            return util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, ''));
+            return util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, '').replace('<__comment__>', '<!-- ').replace('</__comment__>', ' -->'));
         },
 
         /**
@@ -3942,6 +3944,11 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     nodeRegTest = brReg.test(node.nodeName);
                     br = nodeRegTest ? '\n' : '';
                     lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+
+                    if (node.nodeType === 8) {
+                        returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+                        continue;
+                    }
 
                     if (node.nodeType === 3) {
                         returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
@@ -4070,24 +4077,22 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         _init: function (reload, _initHTML) {
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-            this._wd = options.iframe ? context.element.wysiwygFrame.contentDocument : _d;
+            this._wd = options.iframe ? util.getIframeDocument(context.element.wysiwygFrame) : _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
-            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', ''));
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
             const _attr = options.attributesWhitelist;
             const tagsAttr = {};
             let allAttr = '';
             if (!!_attr) {
-                const _attrKeys = _w.Object.keys(_attr);
-                for (let i = 0, len = _attrKeys.length, a; i < len; i++) {
-                    a = _attrKeys[i];
-                    if (a === 'all') {
-                        allAttr = _attr[a] + '|';
+                for (let k in _attr) {
+                    if (k === 'all') {
+                        allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[a] = new _w.RegExp('((?:' + _attr[a] + ')\s*=\s*"[^"]*")', 'ig');
+                        tagsAttr[k] = new _w.RegExp('((?:' + _attr[k] + ')\s*=\s*"[^"]*")', 'ig');
                     }
                 }
             }
@@ -5975,13 +5980,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            _w.Object.keys(core).forEach(function(key) {delete core[key];});
-            _w.Object.keys(event).forEach(function(key) {delete event[key];});
-            _w.Object.keys(context).forEach(function(key) {delete context[key];});
-            _w.Object.keys(pluginCallButtons).forEach(function(key) {delete pluginCallButtons[key];});
+            for (var k in core) { delete core[k]; }
+            for (var k in event) { delete event[k]; }
+            for (var k in context) { delete context[k]; }
+            for (var k in pluginCallButtons) { delete pluginCallButtons[k]; }
             
             /** remove user object */
-            _w.Object.keys(this).forEach(function(key) {delete this[key];}.bind(this));
+            for (var k in this) { delete this[k]; }
         },
 
         /**
