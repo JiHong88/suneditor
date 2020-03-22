@@ -374,8 +374,14 @@ popupDisplay    : Size of background area when activating dialog window ('full'|
 resizingBar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
 showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+
+// Character count-----------------------------------------------------------------------------------------------
 charCounter     : Shows the number of characters in the editor.     
                   If the maxCharCount option has a value, it becomes true. default: false {Boolean}
+charCounterType : Defines the calculation method of the "charCounter" option.
+                  ('char': character length, 'byte': binary data length)      default: 'char' {String}
+charCounterLabel: Text to be displayed in the "charCounter" area of the bottom bar.
+                  Screen ex) 'charCounterLabel: ' 20 / 200          default: null {String}
 maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
 
 // Width size----------------------------------------------------------------------------------------------------
@@ -572,6 +578,12 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
+icons           : You can redefine icons.                            default: null {Object}
+                  ex) {
+                      bold: '<span class="se-icon-text">B</span>',
+                      table: '<i class="xx xxx></i>',
+                      insert_row_above: '<svg></svg>'
+                  }
 
 // Buttons--------------------------------------------------------------------------------------------------------
 buttonList      : Defines button list to array {Array}
@@ -694,6 +706,8 @@ editor.onScroll = function (e, core) { console.log('onScroll', e) }
 editor.onMouseDown = function (e, core) { console.log('onMouseDown', e) }
 
 editor.onClick = function (e, core) { console.log('onClick', e) }
+
+editor.onInput = function (e, core) { console.log('onInput', e) }
 
 editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 

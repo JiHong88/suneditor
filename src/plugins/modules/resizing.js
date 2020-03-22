@@ -133,29 +133,29 @@
                         '<span>50%</span>' +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.resize50 + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="auto" class="se-tooltip _se_auto_size">' +
+                    '<button type="button" data-command="auto" class="se-btn se-tooltip _se_auto_size">' +
                         icons.auto_size +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.autoSize + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="rotate" data-value="-90" class="se-tooltip _se_rotation">' +
+                    '<button type="button" data-command="rotate" data-value="-90" class="se-btn se-tooltip _se_rotation">' +
                         icons.rotate_left +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateLeft + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="rotate" data-value="90" class="se-tooltip _se_rotation">' +
+                    '<button type="button" data-command="rotate" data-value="90" class="se-btn se-tooltip _se_rotation">' +
                         icons.rotate_right +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.rotateRight + '</span></span>' +
                     '</button>' +
                 '</div>' +
-                '<div class="se-btn-group">' +
-                    '<button type="button" data-command="mirror" data-value="h" class="se-tooltip">' +
+                '<div class="se-btn-group" style="padding-top: 0;">' +
+                    '<button type="button" data-command="mirror" data-value="h" class="se-btn se-tooltip">' +
                         icons.mirror_horizontal +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorHorizontal + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="mirror" data-value="v" class="se-tooltip">' +
+                    '<button type="button" data-command="mirror" data-value="v" class="se-btn se-tooltip">' +
                         icons.mirror_vertical +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.mirrorVertical + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="onalign" class="se-tooltip _se_resizing_align_button">' +
+                    '<button type="button" data-command="onalign" class="se-btn se-tooltip _se_resizing_align_button">' +
                         icons.align_justify +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.align + '</span></span>' +
                     '</button>' +
@@ -181,19 +181,19 @@
                             '</ul>' +
                         '</div>' +
                     '</div>' +
-                    '<button type="button" data-command="caption" class="se-tooltip _se_resizing_caption_button">' +
+                    '<button type="button" data-command="caption" class="se-btn se-tooltip _se_resizing_caption_button">' +
                         icons.caption +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
                     '</button>' +
-                        '<button type="button" data-command="revert" class="se-tooltip">' +
+                    '<button type="button" data-command="revert" class="se-btn se-tooltip">' +
                         icons.revert +
-                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="update" class="se-tooltip">' +
+                    '<button type="button" data-command="update" class="se-btn se-tooltip">' +
                         icons.modify +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                     '</button>' +
-                    '<button type="button" data-command="delete" class="se-tooltip">' +
+                    '<button type="button" data-command="delete" class="se-btn se-tooltip">' +
                         icons.delete +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                     '</button>' +

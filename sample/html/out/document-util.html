@@ -26,6 +26,22 @@
 
             <h3 class="subsection-title">Members</h3>
 
+            <h4 class="name" id="isIE"><span class="type-signature"></span>isIE<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                check IE browser
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isIE_Edge"><span class="type-signature"></span>isIE_Edge<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                check IE or Edge browser
+            </div>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="zeroWidthSpace"><span class="type-signature"></span>zeroWidthSpace<span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -176,7 +192,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="getPageStyle"><span class="type-signature"></span>getPageStyle<span class="signature">(iframe)</span><span
+            <h4 class="name" id="getPageStyle"><span class="type-signature"></span>getPageStyle<span class="signature">(doc)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Returns the Style text that has been applied to the current page.
@@ -192,11 +208,11 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>iframe</code></td>
+                    <td class="name"><code>doc</code></td>
                     <td class="type">
                         <span class="param-type">Element|null</span>
                     </td>
-                    <td class="description last">To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)</td>
+                    <td class="description last">To get the CSS text of an document(core._wd). If null get the current document.</td>
                 </tr>
                 </tbody>
             </table>
@@ -2051,6 +2067,8 @@
     <h3>util</h3>
     <ul>
         <li><b>Members</b></li>
+        <li><a href="document-util.html#isIE">isIE</a></li>
+        <li><a href="document-util.html#isIE_Edge">isIE_Edge</a></li>
         <li><a href="document-util.html#zeroWidthSpace">zeroWidthSpace</a></li>
         <li><a href="document-util.html#zeroWidthRegExp">zeroWidthRegExp</a></li>
         <li><a href="document-util.html#onlyZeroWidthRegExp">onlyZeroWidthRegExp</a></li>

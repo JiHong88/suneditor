@@ -9,7 +9,6 @@
 
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
-import _icons from '../../assets/defaultIcons';
 
 export default {
     name: 'image',
@@ -106,7 +105,7 @@ export default {
         let html = '' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    _icons.cancel +
+                    this.icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
@@ -162,7 +161,7 @@ export default {
                             '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                             '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" disabled' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
                             '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + _icons.revert + '</button>' +
+                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + this.icons.revert + '</button>' +
                         '</div>' ;
             }
 
@@ -305,7 +304,7 @@ export default {
                 this.context.image._xmlHttp = this.util.getXMLHttpRequest();
                 this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
                 this.context.image._xmlHttp.open('post', imageUploadUrl, true);
-                if(imageUploadHeader !== null && typeof imageUploadHeader === 'object' && Object.keys(imageUploadHeader).length > 0){
+                if(imageUploadHeader !== null && typeof imageUploadHeader === 'object' && this._w.Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
                         this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
                     }

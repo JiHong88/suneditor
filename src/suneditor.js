@@ -77,6 +77,6 @@ export default {
             element.parentNode.appendChild(cons.constructed._top);
         }
 
-        return core(_Context(element, cons.constructed, cons.options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options);
+        return core(_Context(element, cons.constructed, cons.options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._icons);
     }
 };

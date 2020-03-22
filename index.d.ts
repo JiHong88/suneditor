@@ -104,9 +104,21 @@ declare module 'suneditor' {
      */
     showPathLabel?: boolean;
     /**
+     * Character count
+     * ===============
+     */
+    /**
      * Shows the number of characters in the editor
      */
     charCounter?: boolean;
+    /**
+     * Defines the calculation method of the "charCounter" option
+     */
+    charCounterType?: String;
+    /**
+     * Text to be displayed in the "charCounter" area of the bottom bar.
+     */
+    charCounterLabel?: String;
     /**
      * The maximum number of characters allowed to be inserted into the editor
      */
@@ -292,6 +304,10 @@ declare module 'suneditor' {
      * The placeholder text
      */
     placeholder?: string;
+    /**
+     * You can redefine icons.
+     */
+    icons?: Record<string, string>;
   }
 
   export type FormatTagName =

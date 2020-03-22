@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <!-- suneditor -->
+    <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+    <!-- codeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -488,6 +494,8 @@
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onMouseDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onMouseDown<span class="pl-pds">'</span></span>, e) }
 
+<span class="pl-smi">editor</span>.<span class="pl-en">onInput</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onInput<span class="pl-pds">'</span></span>, e) }
+
 <span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e) }
 
 <span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
@@ -585,10 +593,8 @@
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<link href="../../dist/css/suneditor.min.css" rel="stylesheet">
 <script src="../../dist/suneditor.min.js"></script>
 <!-- codeMirror -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
@@ -838,6 +844,7 @@
         suneditor.onScroll = function (e) { console.log('onScroll', e); }
         suneditor.onMouseDown = function (e) { console.log('onMouseDown', e) }
         suneditor.onClick = function (e) { console.log('onClick', e) }
+        suneditor.onInput = function (e) { console.log('onInput', e) }
         suneditor.onKeyDown = function (e) { console.log('onKeyDown', e) }
         suneditor.onKeyUp = function (e) { console.log('onKeyUp', e) }
         suneditor.onDrop = function (e) { console.log('onDrop', e) }

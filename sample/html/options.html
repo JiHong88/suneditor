@@ -11,6 +11,13 @@
     <link rel="stylesheet" href="../css/bootstrap.css" media="all">
     <link rel="stylesheet" href="../css/sample.css" media="all">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
+    <!-- suneditor -->
+    <link href="../../dist/css/suneditor.min.css" rel="stylesheet">
+    <!-- codeMirror -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.css">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
     <style>
         .sun-editor-editable .__se__customClass, .sun-editor .__se__customClass {
             border: 1px solid #b1b1b1;
@@ -115,10 +122,22 @@
             <br>
             <h4 style="color: #b94a48;">--Bottom resizing bar</h4>
             <label><input type="checkbox" id="resizingBar" checked>&nbsp;&nbsp;resizingBar</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="showPathLabel" checked>&nbsp;&nbsp;showPathLabel</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="showPathLabel" checked>&nbsp;&nbsp;showPathLabel</label>
+            
+            <br>
+            <h4 style="color: #b94a48;">--Character count</h4>
             <label><input type="checkbox" id="charCounter">&nbsp;&nbsp;charCounter</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="maxCharCount">&nbsp;&nbsp;maxCharCount</label>
             <input type="text" id="maxCharCount_value" placeholder="Number">
+            <br><br>
+            <label><input type="checkbox" id="charCounterType">&nbsp;&nbsp;charCounterType</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_charCounterType_1" name="radio_charCounterType" value="char" checked>&nbsp;&nbsp;char</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_charCounterType_2" name="radio_charCounterType" value="byte">&nbsp;&nbsp;byte</label>
+            <br><br>
+            <label><input type="checkbox" id="charCounterLabel">&nbsp;&nbsp;charCounterLabel</label>
+            <input type="text" id="charCounterLabel_value" placeholder="String">
 
             <br>
             <h4 style="color: #b94a48;">--Size</h4>
@@ -258,7 +277,11 @@
             <h4 style="color: #b94a48;">--ETC</h4>
             <label><input type="checkbox" id="placeholder">&nbsp;&nbsp;placeholder</label>
             <input type="text" id="placeholder_value" placeholder="String" style="width: 200px">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+            <label><input type="checkbox" id="icons">&nbsp;&nbsp;icons</label><br>
+            <span>{</span><br>
+            <span>&nbsp;&nbsp;paragraph_style: '&lt;svg&gt;&lt;path d=".."/&gt;&lt;/svg&gt;'</span><br>
+            <span>}</span>
         </div>
         <br>
         
@@ -296,23 +319,19 @@
 
 <script src="../js/common.js"></script>
 <!-- suneditor -->
-<link href="../../dist/css/suneditor.min.css" rel="stylesheet">
 <script src="../../dist/suneditor.min.js"></script>
 <!-- codeMirror -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
 <!-- code mirror options display -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/edit/matchbrackets.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/edit/closebrackets.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/lint.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/addon/lint/json-lint.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/javascript/javascript.js"></script>
 <!-- KaTeX -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css">
 <script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
 <style>
 .CodeMirror {
@@ -370,6 +389,8 @@ function sun_create () {
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
         showPathLabel: document.getElementById('showPathLabel').checked ? undefined : false,
         charCounter: document.getElementById('charCounter').checked ? true : undefined,
+        charCounterType: document.getElementById('charCounterType').checked ? (document.getElementById('radio_charCounterType_1').checked ? 'char' : 'byte') : undefined,
+        charCounterLabel: document.getElementById('charCounterLabel').checked ? document.getElementById('charCounterLabel_value').value : undefined,
         maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : undefined,
         display: document.getElementById('display').checked ? document.getElementById('display_value').value : undefined,
         width: document.getElementById('width').checked ? document.getElementById('width_value').value : undefined,
@@ -421,6 +442,7 @@ function sun_create () {
         textStyles: document.getElementById('textStyles').checked ? ['translucent', {name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}] : undefined,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
+        icons: document.getElementById('icons').checked ? { paragraph_style: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' } : undefined,
         buttonList: [
             ['undo', 'redo',
             'font', 'fontSize', 'formatBlock',
