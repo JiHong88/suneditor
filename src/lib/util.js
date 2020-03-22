@@ -213,6 +213,7 @@ const util = {
 
     /**
      * @descriptionGets Get the length in bytes of a string.
+     * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
      * @param {String} text String text
      * @returns {Number}
      */
