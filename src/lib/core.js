@@ -3998,16 +3998,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const count = core._getCharLength(wysiwyg.textContent);
                 
                 if (count > maxCharCount) {
-                    if (nextCharCount === 0) return true;
-                    this._editorRange();
-                    const range = this.getRange();
-                    const endOff = range.endOffset - 1;
-                    const text = this.getSelectionNode().textContent;
-                    const slicePosition = range.endOffset - (count - maxCharCount);
-
-                    this.getSelectionNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
-                    this.setRange(range.endContainer, endOff, range.endContainer, endOff);
                     over = true;
+                    if (nextCharCount > 0) {
+                        this._editorRange();
+                        const range = this.getRange();
+                        const endOff = range.endOffset - 1;
+                        const text = this.getSelectionNode().textContent;
+                        const slicePosition = range.endOffset - (count - maxCharCount);
+    
+                        this.getSelectionNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
+                        this.setRange(range.endContainer, endOff, range.endContainer, endOff);
+                    }
                 } else if ((count + nextCharCount) > maxCharCount) {
                     over = true;
                 }
@@ -4021,7 +4022,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         }, 600);
                     }
 
-                    return false;
+                    if (nextCharCount > 0) return false;
                 }
             }
 
@@ -4744,7 +4745,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-            const data = (e.data || '');
+            const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
             
             if (!core._charCount(data)) {
                 e.preventDefault();
@@ -5269,6 +5270,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onKeyUp_wysiwyg: function (e) {
             if (event._onShortcutKey) return;
             core._editorRange();
+
             const range = core.getRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
@@ -5323,6 +5325,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
+
+            // --IE (backspace, enter, delete) input event not working
+            if(util.isIE && /^(8|13|46)$/.test(keyCode)) {
+                core._charCount('');
+                // component check
+                core._checkComponents();
+                // history stack
+                core.history.push(true);
+            }
+
             if (functions.onKeyUp) functions.onKeyUp(e, core);
         },
 
