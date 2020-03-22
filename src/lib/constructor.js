@@ -12,6 +12,7 @@ import _defaultLang from '../lang/en';
 import util from './util';
 
 export default {
+    icons: null,
     /**
      * @description document create - call _createToolBar()
      * @param {element} element Textarea
@@ -60,6 +61,7 @@ export default {
         // resizing bar
         const resizing_bar = bottomBar.resizingBar;
         const navigation = bottomBar.navigation;
+        const char_wrapper = bottomBar.charWrapper;
         const char_counter = bottomBar.charCounter;
     
         // loading box
@@ -96,6 +98,7 @@ export default {
                 _placeholder: placeholder_span,
                 _resizingBar: resizing_bar,
                 _navigation: navigation,
+                _charWrapper: char_wrapper,
                 _charCounter: char_counter,
                 _loading: loading_box,
                 _resizeBack: resize_back,
@@ -104,7 +107,8 @@ export default {
             },
             options: options,
             plugins: tool_bar.plugins,
-            pluginCallButtons: tool_bar.pluginCallButtons
+            pluginCallButtons: tool_bar.pluginCallButtons,
+            _icons: this.icons
         };
     },
 
@@ -205,6 +209,7 @@ export default {
         
         el.resizingBar = bottomBar.resizingBar;
         el.navigation = bottomBar.navigation;
+        el.charWrapper = bottomBar.charWrapper;
         el.charCounter = bottomBar.charCounter;
 
         editorArea.removeChild(el.wysiwygFrame);
@@ -233,7 +238,7 @@ export default {
      * @param {Element} topDiv Suneditor top div
      * @param {Element} toolBar Tool bar
      * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
-     * @returns {Object} Bottom bar elements (resizingBar, navigation, charCounter)
+     * @returns {Object} Bottom bar elements (resizingBar, navigation, charWrapper, charCounter)
      * @private
      */
     _initElements: function (options, topDiv, toolBar, toolBarArrow) {
@@ -323,6 +328,7 @@ export default {
         /** resize bar */
         let resizingBar = null;
         let navigation = null;
+        let charWrapper = null;
         let charCounter = null;
         if (options.resizingBar) {
             resizingBar = document.createElement('DIV');
@@ -335,8 +341,15 @@ export default {
 
             /** char counter */
             if (options.charCounter) {
-                const charWrapper = document.createElement('DIV');
+                charWrapper = document.createElement('DIV');
                 charWrapper.className = 'se-char-counter-wrapper';
+
+                if (options.charCounterLabel) {
+                    const charLabel = document.createElement('SPAN');
+                    charLabel.className = 'se-char-label';
+                    charLabel.textContent = options.charCounterLabel;
+                    charWrapper.appendChild(charLabel);
+                }
     
                 charCounter = document.createElement('SPAN');
                 charCounter.className = 'se-char-counter';
@@ -364,6 +377,7 @@ export default {
             bottomBar: {
                 resizingBar: resizingBar,
                 navigation: navigation,
+                charWrapper: charWrapper,
                 charCounter: charCounter
             },
             wysiwygFrame: wysiwygDiv,
@@ -401,7 +415,10 @@ export default {
         /** Bottom resizing bar */
         options.resizingBar = options.resizingBar === undefined ? (/inline|balloon/i.test(options.mode) ? false : true) : options.resizingBar;
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        /** Character count */
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
+        options.charCounterType = options.charCounterType === 'byte' ? 'byte' : 'char';
+        options.charCounterLabel = typeof options.charCounterLabel === 'string' ? options.charCounterLabel.trim() : null;
         options.maxCharCount = util.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */
         options.width = options.width ? (util.isNumber(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
@@ -462,6 +479,14 @@ export default {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
+
+        /** --- Define icons --- */
+        this.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
+            for (let key in _new) {
+                _default[key] = _new[key];
+            }
+            return _default;
+        }, {});
     },
 
     /**
@@ -469,7 +494,7 @@ export default {
      * @private
      */
     _defaultButtons: function (lang) {
-        const icons = _icons;
+        const icons = this.icons;
         return {
             /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],

@@ -7,13 +7,11 @@
  */
 'use strict';
 
-import _icons from '../../assets/defaultIcons';
-
 export default {
     name: 'align',
     display: 'submenu',
     add: function (core, targetElement) {
-        const icons = _icons;
+        const icons = core.icons;
         const context = core.context;
         context.align = {
             targetButton: targetElement,
@@ -44,7 +42,7 @@ export default {
 
     setSubmenu: function () {
         const lang = this.lang;
-        const icons = _icons;
+        const icons = this.icons;
         const listDiv = this.util.createElement('DIV');
 
         listDiv.className = 'se-list-layer';

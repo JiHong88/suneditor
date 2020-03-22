@@ -12,7 +12,6 @@ import _Context from './context';
 import _history from './history';
 import _util from './util';
 import _notice from '../plugins/modules/_notice';
-import _icons from '../assets/defaultIcons';
 
 /**
  * @description SunEditor constuctor function.
@@ -22,9 +21,10 @@ import _icons from '../assets/defaultIcons';
  * @param plugins
  * @param lang
  * @param options
+ * @param _icons
  * @returns {Object} functions Object
  */
-export default function (context, pluginCallButtons, plugins, lang, options) {
+export default function (context, pluginCallButtons, plugins, lang, options, _icons) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
@@ -3676,16 +3676,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             const printDocument = util.getIframeDocument(iframe);
             const contentsHTML = this.getContents(true);
+            const wDoc = this._wd;
 
             if (options.iframe) {
-                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
-                const arrts = options.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
 
                 printDocument.write('' +
                     '<!DOCTYPE html><html>' +
                     '<head>' +
-                    wDocument.head.innerHTML +
-                    '<style>' + util.getPageStyle(context.element.wysiwygFrame) + '</style>' +
+                    wDoc.head.innerHTML +
+                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
@@ -3694,7 +3694,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 const contents = util.createElement('DIV');
                 const style = util.createElement('STYLE');
 
-                style.innerHTML = util.getPageStyle();
+                style.innerHTML = util.getPageStyle(wDoc);
                 contents.className = 'sun-editor-editable';
                 contents.innerHTML = contentsHTML;
 
@@ -3705,7 +3705,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             try {
                 iframe.focus();
                 // IE or Edge
-                if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
+                if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
                     try {
                         iframe.contentWindow.document.execCommand('print', false, null);
                     } catch (e) {
@@ -3729,15 +3729,15 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
+            const wDoc = this._wd;
 
             if (options.iframe) {
-                const wDocument = util.getIframeDocument(context.element.wysiwygFrame);
-                const arrts = options.fullPage ? util.getAttributesToString(wDocument.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
 
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
                     '<head>' +
-                    wDocument.head.innerHTML +
+                    wDoc.head.innerHTML +
                     '<style>body {overflow: auto !important;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
@@ -3750,7 +3750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
-                    '<style>' + util.getPageStyle() + '</style>' +
+                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
                     '</head>' +
                     '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
                     '</html>'
@@ -3817,15 +3817,18 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
                 if (t.nodeType === 8 && this._allowHTMLComments) {
-                    cleanHTML += '<p>' + t.textContent.trim() + '</p>';
+                    cleanHTML += '<__comment__>' + t.textContent.trim() + '</__comment__>';
                 } else if (!tagsAllowed.test(t.nodeName)) {
                     cleanHTML += t.nodeType === 1 ? t.outerHTML : t.nodeType === 3 ? t.textContent : '';
                 }
             }
 
             cleanHTML = cleanHTML
+                .replace(/\n/g, '')
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
+                .replace('<__comment__>', '<!-- ')
+                .replace('</__comment__>', ' -->')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
                     const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
@@ -3889,7 +3892,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 
                 if (t.nodeType === 8) {
                     if (this._allowHTMLComments) {
-                        baseHtml = '<p>' + t.textContent.trim() + '</p>';
+                        baseHtml = '<__comment__>' + t.textContent.trim() + '</__comment__>';
                     } else {
                         continue;
                     }
@@ -3911,10 +3914,16 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
             if (returnHTML.length === 0) {
                 contents = util._HTMLConvertor(contents);
-                returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+                return '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
             }
 
-            return util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, ''));
+            returnHTML = returnHTML
+                .replace(this.editorTagsWhitelistRegExp, '')
+                .replace(/\n/g, '')
+                .replace('<__comment__>', '<!-- ')
+                .replace('</__comment__>', ' -->');
+
+            return util._tagConvertor(returnHTML);
         },
 
         /**
@@ -3943,11 +3952,14 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     br = nodeRegTest ? '\n' : '';
                     lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
 
+                    if (node.nodeType === 8) {
+                        returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+                        continue;
+                    }
                     if (node.nodeType === 3) {
                         returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
-
                     if (node.childNodes.length === 0) {
                         returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                         continue;
@@ -3966,51 +3978,64 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
 
         /**
          * @description The current number of characters is counted and displayed.
-         * @param {Number} nextCharCount Length of character to be added.
+         * @param {String} inputText Text added.
          * @returns {Boolean}
          * @private
          */
-        _charCount: function (nextCharCount, blink) {
+        _charCount: function (inputText) {
             const charCounter = context.element.charCounter;
-            if (!charCounter) return true;
-            if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
-
             const maxCharCount = options.maxCharCount;
+            const wysiwyg = context.element.wysiwyg;
+            let nextCharCount = 0;
+            if (!!inputText) nextCharCount = core._getCharLength(inputText);
 
-            _w.setTimeout(function () {
-                charCounter.textContent = context.element.wysiwyg.textContent.length;
-            });
+            if (charCounter) {
+                _w.setTimeout(function () { charCounter.textContent = core._getCharLength(wysiwyg.textContent); });
+            }
 
             if (maxCharCount > 0) {
                 let over = false;
-                const count = context.element.wysiwyg.textContent.length;
+                const count = core._getCharLength(wysiwyg.textContent);
                 
                 if (count > maxCharCount) {
-                    core._editorRange();
-                    const range = core.getRange();
-                    const endOff = range.endOffset - 1;
-                    const text = core.getSelectionNode().textContent;
-
-                    core.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
-                    core.setRange(range.endContainer, endOff, range.endContainer, endOff);
                     over = true;
+                    if (nextCharCount > 0) {
+                        this._editorRange();
+                        const range = this.getRange();
+                        const endOff = range.endOffset - 1;
+                        const text = this.getSelectionNode().textContent;
+                        const slicePosition = range.endOffset - (count - maxCharCount);
+    
+                        this.getSelectionNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
+                        this.setRange(range.endContainer, endOff, range.endContainer, endOff);
+                    }
                 } else if ((count + nextCharCount) > maxCharCount) {
                     over = true;
                 }
 
                 if (over) {
-                    if (blink && !util.hasClass(charCounter, 'se-blink')) {
-                        util.addClass(charCounter, 'se-blink');
+                    const charWrapper = context.element.charWrapper;
+                    if (charWrapper && !util.hasClass(charWrapper, 'se-blink')) {
+                        util.addClass(charWrapper, 'se-blink');
                         _w.setTimeout(function () {
-                            util.removeClass(charCounter, 'se-blink');
+                            util.removeClass(charWrapper, 'se-blink');
                         }, 600);
                     }
 
-                    return false;
+                    if (nextCharCount > 0) return false;
                 }
             }
 
             return true;
+        },
+
+        /**
+         * @description Method used only in "_charCount".
+         * Depending on the option, the length of the character is taken.
+         * @param {String} text Text content
+         */
+        _getCharLength: function (text) {
+            return options.charCounterType === 'byte' ? util.getByteLength(text) : text.length;
         },
 
         /**
@@ -4068,24 +4093,22 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         _init: function (reload, _initHTML) {
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-            this._wd = options.iframe ? context.element.wysiwygFrame.contentDocument : _d;
+            this._wd = options.iframe ? util.getIframeDocument(context.element.wysiwygFrame) : _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
-            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', ''));
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
             const _attr = options.attributesWhitelist;
             const tagsAttr = {};
             let allAttr = '';
             if (!!_attr) {
-                const _attrKeys = _w.Object.keys(_attr);
-                for (let i = 0, len = _attrKeys.length, a; i < len; i++) {
-                    a = _attrKeys[i];
-                    if (a === 'all') {
-                        allAttr = _attr[a] + '|';
+                for (let k in _attr) {
+                    if (k === 'all') {
+                        allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[a] = new _w.RegExp('((?:' + _attr[a] + ')\s*=\s*"[^"]*")', 'ig');
+                        tagsAttr[k] = new _w.RegExp('((?:' + _attr[k] + ')\s*=\s*"[^"]*")', 'ig');
                     }
                 }
             }
@@ -4174,7 +4197,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
          */
         _iframeAutoHeight: function () {
             if (this._iframeAuto) {
-                context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
+                _w.setTimeout(function () { context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px'; });
             }
         },
 
@@ -4717,11 +4740,32 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
         },
 
+        onInput_wysiwyg: function (e) {
+            core._editorRange();
+
+            const range = core.getRange();
+            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
+            const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
+            
+            if (!core._charCount(data)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // component check
+            if (selectRange || !data) core._checkComponents();
+            
+            // history stack
+            core.history.push(true);
+
+            if (functions.onInput) functions.onInput(e, core);
+        },
+
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
-            const ctrl = e.ctrlKey || e.metaKey;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
             const alt = e.altKey;
 
             core.submenuOff();
@@ -5215,17 +5259,9 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             }
 
             const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
-
             if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
                 const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                 core.insertNode(zeroWidth, null);
-            }
-
-            if (!core._charCount(1, textKey)) {
-                if (textKey) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
             }
 
             if (functions.onKeyDown) functions.onKeyDown(e, core);
@@ -5234,6 +5270,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onKeyUp_wysiwyg: function (e) {
             if (event._onShortcutKey) return;
             core._editorRange();
+
             const range = core.getRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
@@ -5279,10 +5316,8 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 event._applyTagEffects();
             }
 
-            core._checkComponents();
-            
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && util.getByteLength(e.key) < 3) {
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;
@@ -5291,16 +5326,12 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            if (!core._charCount(0, textKey)) {
-                if (e.key.length === 1) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }
-
-            // history stack
-            const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
-            if (historyKey) {
+            // --IE (backspace, enter, delete) input event not working
+            if(util.isIE && /^(8|13|46)$/.test(keyCode)) {
+                core._charCount('');
+                // component check
+                core._checkComponents();
+                // history stack
                 core.history.push(true);
             }
 
@@ -5438,7 +5469,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             const clipboardData = e.clipboardData;
             if (!clipboardData) return true;
 
-            const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
+            const maxCharCount = core._charCount(clipboardData.getData('text/plain'));
             const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
@@ -5466,9 +5497,6 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
                 core._resourcesStateChange();
-                core._charCount(0, false);
-                // history stack
-                core.history.push(false);
             });
         },
 
@@ -5490,7 +5518,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                     context.image.imgInputFile.files = null;
                 });
             // check char count
-            } else if (!core._charCount(dataTransfer.getData('text/plain').length, true)) {
+            } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -5544,6 +5572,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             /** editor area */
             eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
             eventWysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+            eventWysiwyg.addEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg, false);
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
@@ -5592,6 +5621,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
             eventWysiwyg.removeEventListener('click', event.onClick_wysiwyg);
+            eventWysiwyg.removeEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg);
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
@@ -5636,6 +5666,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
         onScroll: null,
         onMouseDown: null,
         onClick: null,
+        onInput: null,
         onKeyDown: null,
         onKeyUp: null,
         onDrop: null,
@@ -5757,6 +5788,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
                 _resizingBar: el.resizingBar,
                 _navigation: el.navigation,
                 _charCounter: el.charCounter,
+                _charWrapper: el.charWrapper,
                 _loading: el.loading,
                 _resizeBack: el.resizeBackground,
                 _stickyDummy: el._stickyDummy,
@@ -5770,7 +5802,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             core._imagesInfoReset = true;
             core._init(true, _initHTML);
             event._addEvent();
-            core._charCount(0, false);
+            core._charCount('');
 
             event._offStickyToolbar();
             event.onResize_window();
@@ -5973,13 +6005,13 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            _w.Object.keys(core).forEach(function(key) {delete core[key];});
-            _w.Object.keys(event).forEach(function(key) {delete event[key];});
-            _w.Object.keys(context).forEach(function(key) {delete context[key];});
-            _w.Object.keys(pluginCallButtons).forEach(function(key) {delete pluginCallButtons[key];});
+            for (var k in core) { delete core[k]; }
+            for (var k in event) { delete event[k]; }
+            for (var k in context) { delete context[k]; }
+            for (var k in pluginCallButtons) { delete pluginCallButtons[k]; }
             
             /** remove user object */
-            _w.Object.keys(this).forEach(function(key) {delete this[key];}.bind(this));
+            for (var k in this) { delete this[k]; }
         },
 
         /**
@@ -6029,7 +6061,7 @@ export default function (context, pluginCallButtons, plugins, lang, options) {
     /** initialize core and add event listeners */
     core._init(false, null);
     event._addEvent();
-    core._charCount(0, false);
+    core._charCount('');
 
     // functionss
     core.functions = functions;

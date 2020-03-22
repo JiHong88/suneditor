@@ -36,7 +36,7 @@ export default function (core, change) {
         }
 
         core._checkComponents();
-        core._charCount(0, false);
+        core._charCount('');
         core._resourcesStateChange();
         
         // onChange
@@ -78,7 +78,7 @@ export default function (core, change) {
         if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
         core._checkComponents();
-        core._charCount(0, false);
+        core._charCount('');
         // onChange
         change();
     }

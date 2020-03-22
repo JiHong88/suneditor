@@ -13,6 +13,8 @@
 const util = {
     _d: document,
     _w: window,
+    isIE: window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null,
+    isIE_Edge: (window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null) || (window.navigator.appVersion.indexOf('Edge') > -1),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -156,12 +158,12 @@ const util = {
 
     /**
      * @description Returns the CSS text that has been applied to the current page.
-     * @param {Element|null} iframe To get the CSS text of an iframe, send an iframe object. (context.element.wysiwygFrame)
+     * @param {Element|null} doc To get the CSS text of an document(core._wd). If null get the current document.
      * @returns {String}
      */
-    getPageStyle: function (iframe) {
+    getPageStyle: function (doc) {
         let cssText = '';
-        const sheets = (iframe ? this.getIframeDocument(iframe) : this._d).styleSheets;
+        const sheets = (doc || this._d).styleSheets;
         
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
             try {
@@ -207,6 +209,36 @@ const util = {
         }
 
         return attrString;
+    },
+
+    /**
+     * @descriptionGets Get the length in bytes of a string.
+     * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
+     * @param {String} text String text
+     * @returns {Number}
+     */
+    getByteLength: function(text) {
+        const encoder = this._w.encodeURIComponent;
+        let cr, cl;
+        if (this.isIE_Edge) {
+            cl = this._w.unescape(encoder(text.toString())).length;
+            cr = 0;
+
+            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            }
+
+            return cl + cr;
+        } else {
+            cl = (new this._w.TextEncoder('utf-8').encode(text.toString())).length;
+            cr = 0;
+
+            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            }
+
+            return cl + cr;
+        }
     },
 
     /**
