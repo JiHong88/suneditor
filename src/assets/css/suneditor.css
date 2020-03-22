@@ -69,6 +69,10 @@
     font-size: 15px;
     line-height: 2;
 }
+.sun-editor button > [class="se-icon-text"] {
+    font-size: 20px;
+    line-height: 1;
+}
 
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
@@ -224,9 +228,9 @@
 /** resizing bar - nabigation */
 .sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
-.sun-editor .se-resizing-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; font-size:10px; background:transparent;}
-.sun-editor .se-resizing-bar .se-char-counter-wrapper span {color:#999; font-size:13px; font-family:Helvetica Neue, sans-serif;}
-.sun-editor .se-resizing-bar .se-char-counter.se-blink {color:#b94a48; animation:blinker 0.2s linear infinite;}
+.sun-editor .se-resizing-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; color:#999; font-size:13px; background:transparent;}
+.sun-editor .se-resizing-bar .se-char-counter-wrapper.se-blink {color:#b94a48; animation:blinker 0.2s linear infinite;}
+.sun-editor .se-resizing-bar .se-char-counter-wrapper .se-char-label {margin-right:4px;}
 
 /* --- dialog ---------------------------------------------------------- */
 .sun-editor .se-dialog {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}

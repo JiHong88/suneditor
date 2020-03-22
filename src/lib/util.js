@@ -13,6 +13,8 @@
 const util = {
     _d: document,
     _w: window,
+    isIE: window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null,
+    isIE_Edge: (window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null) || (window.navigator.appVersion.indexOf('Edge') > -1),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -207,6 +209,35 @@ const util = {
         }
 
         return attrString;
+    },
+
+    /**
+     * @descriptionGets Get the length in bytes of a string.
+     * @param {String} text String text
+     * @returns {Number}
+     */
+    getByteLength: function(text) {
+        const encoder = this._w.encodeURIComponent;
+        let cr, cl;
+        if (this.isIE_Edge) {
+            cl = this._w.unescape(encoder(text.toString())).length;
+            cr = 0;
+
+            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            }
+
+            return cl + cr;
+        } else {
+            cl = (new this._w.TextEncoder('utf-8').encode(text.toString())).length;
+            cr = 0;
+
+            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            }
+
+            return cl + cr;
+        }
     },
 
     /**

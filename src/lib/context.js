@@ -24,6 +24,7 @@ const _Context = function (element, cons, options) {
             toolbar: cons._toolBar,
             resizingBar: cons._resizingBar,
             navigation: cons._navigation,
+            charWrapper: cons._charWrapper,
             charCounter: cons._charCounter,
             editorArea: cons._editorArea,
             wysiwygFrame: cons._wysiwygArea,

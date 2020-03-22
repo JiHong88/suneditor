@@ -78,12 +78,12 @@ let s1 = suneditor.create('editor', {
     ],
     icons: {
         undo: '',
-        bold: ''
+        bold: '<span class="se-icon-text">B</span>'
     },
     width: '100%',
     height: '500',
     defaultStyle: 'font-size: 10px;',
-    fullPage: true,
+    // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
     attributesWhitelist: {
         table: "style",
@@ -92,6 +92,7 @@ let s1 = suneditor.create('editor', {
         tr: "style",
         td: "style"
     },
+    addTagsWhitelist: '//',
     // addTagsWhitelist: '//',
     formats: [
         { 
@@ -109,6 +110,8 @@ let s1 = suneditor.create('editor', {
         'pre',
         'blockquote'
     ],
+    charCounterType: 'byte',
+    charCounterLabel: 'BYTE : ',
     maxCharCount: 200
 })
 
@@ -505,6 +508,8 @@ const newOption2 = {
     imageWidth: '100%',
     colorList: null,
     iframe: true,
+    charCounter: true,
+    maxCharCount: 200
 }
 const newOption3 = {
     plugins: plugins,

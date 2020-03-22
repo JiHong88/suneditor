@@ -3705,7 +3705,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             try {
                 iframe.focus();
                 // IE or Edge
-                if (_w.navigator.userAgent.indexOf('MSIE') !== -1 || !!_d.documentMode || !!_w.StyleMedia) {
+                if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
                     try {
                         iframe.contentWindow.document.execCommand('print', false, null);
                     } catch (e) {
@@ -3824,6 +3824,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             cleanHTML = cleanHTML
+                .replace(/\n/g, '')
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
                 .replace('<__comment__>', '<!-- ')
@@ -3913,10 +3914,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (returnHTML.length === 0) {
                 contents = util._HTMLConvertor(contents);
-                returnHTML = '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
+                return '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
             }
 
-            return util._tagConvertor(returnHTML.replace(this.editorTagsWhitelistRegExp, '').replace('<__comment__>', '<!-- ').replace('</__comment__>', ' -->'));
+            returnHTML = returnHTML
+                .replace(this.editorTagsWhitelistRegExp, '')
+                .replace(/\n/g, '')
+                .replace('<__comment__>', '<!-- ')
+                .replace('</__comment__>', ' -->');
+
+            return util._tagConvertor(returnHTML);
         },
 
         /**
@@ -3949,12 +3956,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
                         continue;
                     }
-
                     if (node.nodeType === 3) {
                         returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
-
                     if (node.childNodes.length === 0) {
                         returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                         continue;
@@ -3973,34 +3978,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description The current number of characters is counted and displayed.
-         * @param {Number} nextCharCount Length of character to be added.
+         * @param {String} inputText Text added.
          * @returns {Boolean}
          * @private
          */
-        _charCount: function (nextCharCount, blink) {
+        _charCount: function (inputText) {
             const charCounter = context.element.charCounter;
-            if (!charCounter) return true;
-            if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
-
             const maxCharCount = options.maxCharCount;
             const wysiwyg = context.element.wysiwyg;
+            let nextCharCount = 0;
+            if (!!inputText) nextCharCount = core._getCharLength(inputText);
 
-            _w.setTimeout(function () {
-                charCounter.textContent = wysiwyg.textContent.length;
-            });
+            if (charCounter) {
+                _w.setTimeout(function () { charCounter.textContent = core._getCharLength(wysiwyg.textContent); });
+            }
 
             if (maxCharCount > 0) {
                 let over = false;
-                const count = wysiwyg.textContent.length;
+                const count = core._getCharLength(wysiwyg.textContent);
                 
                 if (count > maxCharCount) {
-                    if (count > maxCharCount + 1 && !blink) return true;
+                    if (nextCharCount === 0) return true;
                     this._editorRange();
                     const range = this.getRange();
                     const endOff = range.endOffset - 1;
                     const text = this.getSelectionNode().textContent;
+                    const slicePosition = range.endOffset - (count - maxCharCount);
 
-                    this.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
+                    this.getSelectionNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
                     this.setRange(range.endContainer, endOff, range.endContainer, endOff);
                     over = true;
                 } else if ((count + nextCharCount) > maxCharCount) {
@@ -4008,10 +4013,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 if (over) {
-                    if (blink && !util.hasClass(charCounter, 'se-blink')) {
-                        util.addClass(charCounter, 'se-blink');
+                    const charWrapper = context.element.charWrapper;
+                    if (charWrapper && !util.hasClass(charWrapper, 'se-blink')) {
+                        util.addClass(charWrapper, 'se-blink');
                         _w.setTimeout(function () {
-                            util.removeClass(charCounter, 'se-blink');
+                            util.removeClass(charWrapper, 'se-blink');
                         }, 600);
                     }
 
@@ -4020,6 +4026,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             return true;
+        },
+
+        /**
+         * @description Method used only in "_charCount".
+         * Depending on the option, the length of the character is taken.
+         * @param {String} text Text content
+         */
+        _getCharLength: function (text) {
+            return options.charCounterType === 'byte' ? util.getByteLength(text) : text.length;
         },
 
         /**
@@ -4181,7 +4196,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _iframeAutoHeight: function () {
             if (this._iframeAuto) {
-                context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
+                _w.setTimeout(function () { context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px'; });
             }
         },
 
@@ -4724,11 +4739,32 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
+        onInput_wysiwyg: function (e) {
+            core._editorRange();
+
+            const range = core.getRange();
+            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
+            const data = (e.data || '');
+            
+            if (!core._charCount(data)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // component check
+            if (selectRange || !data) core._checkComponents();
+            
+            // history stack
+            core.history.push(true);
+
+            if (functions.onInput) functions.onInput(e, core);
+        },
+
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
-            const ctrl = e.ctrlKey || e.metaKey;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
             const alt = e.altKey;
 
             core.submenuOff();
@@ -5222,17 +5258,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
-
             if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
                 const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                 core.insertNode(zeroWidth, null);
-            }
-
-            if (!core._charCount(1, textKey)) {
-                if (textKey) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
             }
 
             if (functions.onKeyDown) functions.onKeyDown(e, core);
@@ -5286,10 +5314,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event._applyTagEffects();
             }
 
-            core._checkComponents();
-            
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent)) {
+            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && util.getByteLength(e.key) < 3) {
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;
@@ -5297,20 +5323,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
-
-            if (!core._charCount(0, textKey)) {
-                if (e.key.length === 1) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            }
-
-            // history stack
-            const historyKey = !ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode);
-            if (historyKey) {
-                core.history.push(true);
-            }
-
             if (functions.onKeyUp) functions.onKeyUp(e, core);
         },
 
@@ -5445,7 +5457,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const clipboardData = e.clipboardData;
             if (!clipboardData) return true;
 
-            const maxCharCount = core._charCount(clipboardData.getData('text/plain').length, true);
+            const maxCharCount = core._charCount(clipboardData.getData('text/plain'));
             const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
@@ -5473,9 +5485,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
                 core._resourcesStateChange();
-                core._charCount(0, false);
-                // history stack
-                core.history.push(false);
             });
         },
 
@@ -5497,7 +5506,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     context.image.imgInputFile.files = null;
                 });
             // check char count
-            } else if (!core._charCount(dataTransfer.getData('text/plain').length, true)) {
+            } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -5551,6 +5560,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             /** editor area */
             eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
             eventWysiwyg.addEventListener('click', event.onClick_wysiwyg, false);
+            eventWysiwyg.addEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg, false);
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
@@ -5599,6 +5609,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
             eventWysiwyg.removeEventListener('click', event.onClick_wysiwyg);
+            eventWysiwyg.removeEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg);
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
@@ -5643,6 +5654,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onScroll: null,
         onMouseDown: null,
         onClick: null,
+        onInput: null,
         onKeyDown: null,
         onKeyUp: null,
         onDrop: null,
@@ -5764,6 +5776,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _resizingBar: el.resizingBar,
                 _navigation: el.navigation,
                 _charCounter: el.charCounter,
+                _charWrapper: el.charWrapper,
                 _loading: el.loading,
                 _resizeBack: el.resizeBackground,
                 _stickyDummy: el._stickyDummy,
@@ -5777,7 +5790,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core._imagesInfoReset = true;
             core._init(true, _initHTML);
             event._addEvent();
-            core._charCount(0, false);
+            core._charCount('');
 
             event._offStickyToolbar();
             event.onResize_window();
@@ -6036,7 +6049,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     /** initialize core and add event listeners */
     core._init(false, null);
     event._addEvent();
-    core._charCount(0, false);
+    core._charCount('');
 
     // functionss
     core.functions = functions;
