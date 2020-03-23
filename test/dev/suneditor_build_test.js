@@ -186,7 +186,23 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
+    // s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
+    s1.setContents('<!DOCTYPE html>'+
+    '<html lang="en">'+
+    '<head>'+
+        '<meta charset="UTF-8">'+
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+        '<meta name="author" content="https://github.com/JiHong88" />'+
+        '<meta name="description" content="Pure javascript wysiwyg web editor" /> <!-- meta comment -->'+
+    '<style>'+
+    '/* css comment goes here */'+
+    '</style>'+
+    '</head>'+
+    '<body>'+
+    '<!-- html comment goes here -->'+
+
+    '</body>'+
+    '</html>')
 }
 
 window.sun_create1 = function () {

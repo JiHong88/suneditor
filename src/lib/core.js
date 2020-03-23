@@ -3827,8 +3827,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 .replace(/\n/g, '')
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
-                .replace('<__comment__>', '<!-- ')
-                .replace('</__comment__>', ' -->')
+                .replace(/<__comment__>/g, '<!-- ')
+                .replace(/<\/__comment__>/g, ' -->')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
                     const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
@@ -3920,8 +3920,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             returnHTML = returnHTML
                 .replace(this.editorTagsWhitelistRegExp, '')
                 .replace(/\n/g, '')
-                .replace('<__comment__>', '<!-- ')
-                .replace('</__comment__>', ' -->');
+                .replace(/<__comment__>/g, '<!-- ')
+                .replace(/<\/__comment__>/g, ' -->');
 
             return util._tagConvertor(returnHTML);
         },
