@@ -5016,6 +5016,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 9: /** tab key */
+                    if (resizingName) break;
                     e.preventDefault();
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
@@ -5242,6 +5243,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         });
                     }
                     
+                    break;
+                case 27:
+                    if (resizingName) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        core.controllersOff();
+                        return false;
+                    }
                     break;
             }
 

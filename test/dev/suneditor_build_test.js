@@ -112,7 +112,7 @@ let s1 = suneditor.create('editor', {
     ],
     charCounterType: 'byte',
     charCounterLabel: 'BYTE : ',
-    maxCharCount: 200
+    maxCharCount: 2000
 })
 
 // s1.core._charCount = function (nextCharCount, blink) {
