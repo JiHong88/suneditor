@@ -5941,6 +5941,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
             
             core.focus();
+            
+            // history stack
+            core.history.push(false);
         },
 
         /**
