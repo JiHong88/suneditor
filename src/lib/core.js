@@ -4822,7 +4822,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         return false;
                     }
 
-                    if (!formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
+                    if (!selectRange && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
                      (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))))) {
                         e.preventDefault();
                         e.stopPropagation();
