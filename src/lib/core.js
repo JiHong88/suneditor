@@ -4093,7 +4093,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _init: function (reload, _initHTML) {
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-            this._wd = options.iframe ? util.getIframeDocument(context.element.wysiwygFrame) : _d;
+            this._wd = _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
@@ -4150,8 +4150,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.history = _history(this, event._onChange_historyStack);
 
             // Init, validate
-            this._initWysiwygArea(reload, _initHTML);
+            if (!options.iframe) this._initWysiwygArea(reload, _initHTML);
             _w.setTimeout(function () {
+                // after iframe loaded
+                if (options.iframe) {
+                    this._wd = context.element.wysiwygFrame.contentDocument;
+                    context.element.wysiwyg = this._wd.body;
+                    this._initWysiwygArea(reload, _initHTML);
+                    if (options.height === 'auto') this._iframeAuto = this._wd.body;
+                }
+
                 this._checkComponents();
                 this._imagesInfoInit = false;
                 this._imagesInfoReset = false;
@@ -4810,8 +4818,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         return false;
                     }
 
-                    if (!formatEl.nextElementSibling && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
-                     (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.firstChild.textContent))))) {
+                    if (!formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
+                     (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))))) {
                         e.preventDefault();
                         e.stopPropagation();
                         formatEl.innerHTML = '<br>';
@@ -4819,7 +4827,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         while (attrs[0]) {
                             formatEl.removeAttribute(attrs[0].name);
                         }
-                        core.execCommand('formatBlock', false, 'P');
+                        core.setRange(formatEl.firstChild, 1, formatEl.firstChild, 1);
                         return false;
                     }
 
@@ -4841,7 +4849,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 }
                             }
 
-                            util.removeItem(selectionNode.parentNode);
+                            selectionNode.textContent = '';
+                            util.removeItemAllParents(selectionNode, null, formatEl);
                             offset = typeof offset === 'number' ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
                             core.setRange(prev, offset, prev, offset);
                             break;
@@ -4961,9 +4970,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                             if (util.onlyZeroWidthSpace(formatEl)) {
                                 util.removeItem(formatEl);
+                                // table component
+                                if (util.isTable(nextEl)) {
+                                    let cell = util.getChildElement(nextEl, util.isCell, false);
+                                    cell = cell.firstElementChild || cell;
+                                    core.setRange(cell, 0, cell, 0);
+                                    break;
+                                }
                             }
 
-                            if (util.hasClass(nextEl, 'se-component') || /^IMG$/i.test(nextEl.nodeName)) {
+                            // resizing component
+                            if (util.hasClass(nextEl, 'se-component') || /^(IMG|IFRAME)$/i.test(nextEl.nodeName)) {
                                 e.stopPropagation();
                                 if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
@@ -4972,6 +4989,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                     core.selectComponent(nextEl.querySelector('iframe'), 'video');
                                 }
                             }
+
                             break;
                         }
                     }

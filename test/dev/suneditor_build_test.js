@@ -206,15 +206,26 @@ window.sun_destroy1 = function () {
 }
 
 window.sun_create1 = function () {
-    s1.destroy();
-    s1 = suneditor.create('editor', {
-        plugins: [align, plugins.link],
-        buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
-        width: '100%',
-        height: 'auto'
-      })
+    // s1.destroy();
+    // s1 = suneditor.create('editor', {
+    //     plugins: [align, plugins.link],
+    //     buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
+    //     width: '100%',
+    //     height: 'auto'
+    //   })
 }
 
+s1.onKeyDown = function (e, core) {
+    const keyCode = e.keyCode
+    const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
+    if (ctrl && keyCode === 187) {
+        e.preventDefault();
+        const anchor = core.util.getParentElement(core.getSelectionNode(), core.util.isAnchor)
+        if (anchor) {
+            window.open(anchor.href)
+        }
+    }
+}
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
@@ -273,7 +284,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
     console.log('onload', core);
-    core.focus();
+    // core.focus();
 };
 ss.onScroll = function (e) {
     console.log('onScroll', e);
