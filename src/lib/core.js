@@ -3497,8 +3497,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
                 }
 
-                this._resourcesStateChange();
-                this._checkComponents();
                 this._nativeFocus();
 
                 // history stack
@@ -3859,43 +3857,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description Add an event to document.
-         * When created as an Iframe, the same event is added to the document in the Iframe.
-         * @param {String} type Event type
-         * @param {Function} listener Event listener
-         * @param {Boolean} useCapture Use event capture
-         */
-        addDocEvent: function (type, listener, useCapture) {
-            _d.addEventListener(type, listener, useCapture);
-            if (options.iframe) {
-                this._wd.addEventListener(type, listener);
-            }
-        },
-
-        /**
-         * @description Remove events from document.
-         * When created as an Iframe, the event of the document inside the Iframe is also removed.
-         * @param {String} type Event type
-         * @param {Function} listener Event listener
-         */
-        removeDocEvent: function (type, listener) {
-            _d.removeEventListener(type, listener);
-            if (options.iframe) {
-                this._wd.removeEventListener(type, listener);
-            }
-        },
-
-        /**
          * @description Converts contents into a format that can be placed in an editor
          * @param {String} contents contents
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
             let returnHTML = '';
-            let tag = this._d.createRange().createContextualFragment(contents).childNodes;
+            const domTree = this._d.createRange().createContextualFragment(contents).childNodes;
 
-            for (let i = 0, len = tag.length, baseHtml, t; i < len; i++) {
-                t = tag[i];
+            for (let i = 0, len = domTree.length, baseHtml, t; i < len; i++) {
+                t = domTree[i];
                 
                 if (t.nodeType === 8) {
                     if (this._allowHTMLComments) {
@@ -3981,6 +3952,33 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }(wDoc, '', '\n'));
 
             return returnHTML.trim() + '\n';
+        },
+
+        /**
+         * @description Add an event to document.
+         * When created as an Iframe, the same event is added to the document in the Iframe.
+         * @param {String} type Event type
+         * @param {Function} listener Event listener
+         * @param {Boolean} useCapture Use event capture
+         */
+        addDocEvent: function (type, listener, useCapture) {
+            _d.addEventListener(type, listener, useCapture);
+            if (options.iframe) {
+                this._wd.addEventListener(type, listener);
+            }
+        },
+
+        /**
+         * @description Remove events from document.
+         * When created as an Iframe, the event of the document inside the Iframe is also removed.
+         * @param {String} type Event type
+         * @param {Function} listener Event listener
+         */
+        removeDocEvent: function (type, listener) {
+            _d.removeEventListener(type, listener);
+            if (options.iframe) {
+                this._wd.removeEventListener(type, listener);
+            }
         },
 
         /**
@@ -4172,8 +4170,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this._imagesInfoReset = false;
                 
                 this.history.reset(true);
-                this._iframeAutoHeight();
-                this._checkPlaceholder();
+                this._resourcesStateChange();
 
                 if (typeof functions.onload === 'function') return functions.onload(this, reload);
             }.bind(this));
@@ -4834,7 +4831,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         while (attrs[0]) {
                             formatEl.removeAttribute(attrs[0].name);
                         }
-                        core.setRange(formatEl.firstChild, 1, formatEl.firstChild, 1);
+                        core._nativeFocus();
                         return false;
                     }
 
@@ -5334,7 +5331,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.setRange(oFormatTag, 0, oFormatTag, 0);
                 event._applyTagEffects();
 
-                core._checkComponents();
                 core.history.push(false);
                 return;
             }
@@ -5360,14 +5356,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            // --IE (backspace, enter, delete) input event not working
-            if(util.isIE && /^(8|13|46)$/.test(keyCode)) {
-                core._charCount('');
-                // component check
-                core._checkComponents();
-                // history stack
-                core.history.push(true);
-            }
+            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
+            core._charCount('');
+            // component check
+            if (selectRange) core._checkComponents();
+            // history stack
+            core.history.push(true);
 
             if (functions.onKeyUp) functions.onKeyUp(e, core);
         },
@@ -5530,7 +5524,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
-                core._resourcesStateChange();
+                // history stack
+                core.history.push(false);
             });
         },
 
