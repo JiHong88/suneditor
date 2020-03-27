@@ -1941,6 +1941,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
+            this._resetRangeToTextNode();
+            range = this.getRange();
+            startCon = range.startContainer;
+            startOff = range.startOffset;
+            endCon = range.endContainer;
+            endOff = range.endOffset;
+
             let start = {}, end = {};
             let newNode, styleRegExp = '', classRegExp = '', removeNodeRegExp = '';
 
@@ -5941,7 +5948,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
             
             core.focus();
-            
+
             // history stack
             core.history.push(false);
         },
