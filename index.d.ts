@@ -13,11 +13,7 @@ declare module 'suneditor' {
    * SunEditor Options
    */
   export interface SunEditorOptions {
-    plugins: any;
-    /**
-     * Whitelist
-     * =========
-     */
+    plugins: Plugin[];
     /**
      * Add tags to the default tags whitelist of editor. default: '' {String}
      */
@@ -37,7 +33,7 @@ declare module 'suneditor' {
     /**
      * language object
      */
-    lang?: object;
+    lang?: Lang;
     /**
      * The mode of the editor (classic, inline, balloon, balloon-always)
      */
@@ -363,4 +359,150 @@ declare module 'suneditor' {
     | 'video'
     | 'math';
   export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[];
+
+  export interface Plugin {
+    name: string;
+    display: string;
+    add: (core: any, targetElement?: any) => void;
+    active: (element: any) => boolean;
+  }
+
+  export interface CommandPlugin extends Plugin {
+    action: () => void;
+  }
+
+  export interface SubmenuPlugin extends Plugin {
+    on: () => void;
+  }
+
+  export interface DialogPlugin extends Plugin {
+    open: () => void;
+    on: () => void;
+    init: () => void;
+  }
+
+  export interface Lang {
+    toolbar: {
+      default: string,
+      save: string,
+      font: string,
+      formats: string,
+      fontSize: string,
+      bold: string,
+      underline: string,
+      italic: string,
+      strike: string,
+      subscript: string,
+      superscript: string,
+      removeFormat: string,
+      fontColor: string,
+      hiliteColor: string,
+      indent: string,
+      outdent: string,
+      align: string,
+      alignLeft: string,
+      alignRight: string,
+      alignCenter: string,
+      alignJustify: string,
+      list: string,
+      orderList: string,
+      unorderList: string,
+      horizontalRule: string,
+      hr_solid: string,
+      hr_dotted: string,
+      hr_dashed: string,
+      table: string,
+      link: string,
+      math: string,
+      image: string,
+      video: string,
+      fullScreen: string,
+      showBlocks: string,
+      codeView: string,
+      undo: string,
+      redo: string,
+      preview: string,
+      print: string,
+      tag_p: string,
+      tag_div: string,
+      tag_h: string,
+      tag_blockquote: string,
+      tag_pre: string,
+      template: string,
+      lineHeight: string,
+      paragraphStyle: string,
+      textStyle: string
+    };
+    dialogBox: {
+      linkBox: {
+        title: string,
+        url: string,
+        text: string,
+        newWindowCheck: string
+      },
+      mathBox: {
+        title: string,
+        inputLabel: string,
+        fontSizeLabel: string,
+        previewLabel: string
+      },
+      imageBox: {
+        title: string,
+        file: string,
+        url: string,
+        altText: string
+      },
+      videoBox: {
+        title: string,
+        url: string
+      },
+      caption: string,
+      close: string,
+      submitButton: string,
+      revertButton: string,
+      proportion: string,
+      basic: string,
+      left: string,
+      right: string,
+      center: string,
+      width: string,
+      height: string,
+      size: string,
+      ratio: string
+    };
+    controller: {
+      edit: string,
+      unlink: string,
+      remove: string,
+      insertRowAbove: string,
+      insertRowBelow: string,
+      deleteRow: string,
+      insertColumnBefore: string,
+      insertColumnAfter: string,
+      deleteColumn: string,
+      resize100: string,
+      resize75: string,
+      resize50: string,
+      resize25: string,
+      autoSize: string,
+      mirrorHorizontal: string,
+      mirrorVertical: string,
+      rotateLeft: string,
+      rotateRight: string,
+      maxSize: string,
+      minSize: string,
+      tableHeader: string,
+      mergeCells: string,
+      splitCells: string,
+      HorizontalSplit: string,
+      VerticalSplit: string
+    };
+    menu: {
+      spaced: string,
+      bordered: string,
+      neon: string,
+      translucent: string,
+      shadow: string
+    };
+  }
 }
