@@ -4501,7 +4501,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (target.disabled) return;
             
             if (!core.hasFocus) core.focus();
-            core._editorRange();
+            if (!core._variable.isCodeView) core._editorRange();
             core.actionCall(command, display, target);
         },
 

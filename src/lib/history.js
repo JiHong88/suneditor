@@ -110,7 +110,7 @@ export default function (core, change) {
                 _w.clearTimeout(pushDelay);
                 pushDelay = null;
                 pushStack();
-            }, 350);
+            }, 400);
         },
 
         /**
