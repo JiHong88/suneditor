@@ -438,7 +438,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             util.addClass(element, 'on');
             this.submenuActiveButton = element;
 
-            const overLeft = this.context.element.toolbar.offsetWidth - (element.parentElement.offsetLeft + this.submenu.offsetWidth);
+            const toolbarW = this.context.element.toolbar.offsetWidth;
+            const menuW = this.submenu.offsetWidth;
+            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
             if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
             else this.submenu.style.left = '1px';
 
@@ -482,7 +484,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             util.addClass(element, 'on');
             this.containerActiveButton = element;
 
-            const overLeft = this.context.element.toolbar.offsetWidth - (element.parentElement.offsetLeft + this.container.offsetWidth);
+            const toolbarW = this.context.element.toolbar.offsetWidth;
+            const menuW = this.container.offsetWidth;
+            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
             if (overLeft < 0) this.container.style.left = overLeft + 'px';
             else this.container.style.left = '1px';
 
@@ -508,8 +512,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this.containerActiveButton = null;
                 this._notHideToolbar = false;
             }
-
-            this._antiBlur = false;
         },
 
         /**
@@ -541,13 +543,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this.controllerArray[i] = arg;
             }
 
-            this._notHideToolbar = true;
             this._bindControllersOff = this.controllersOff.bind(this);
             this.addDocEvent('mousedown', this._bindControllersOff, false);
             this.addDocEvent('keydown', this._bindControllersOff, false);
 
             if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, this);
-            this._antiBlur = true;
         },
 
         /**
@@ -556,7 +556,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         controllersOff: function (e) {
             if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
 
-            this._notHideToolbar = false;
             this._resizingName = '';
             this.currentControllerName = '';
             this.currentControllerTarget = null;
@@ -4558,7 +4557,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             } else {
                 e.preventDefault();
             }
-            e.stopPropagation();
 
             let target = e.target;
             let display = target.getAttribute('data-display');
@@ -4606,8 +4604,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onClick_wysiwyg: function (e) {
             const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
-
-            e.stopPropagation();
 
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
                 const imageComponent = targetElement.querySelector('IMG');
@@ -5449,6 +5445,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onBlur_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = false;
+            core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (functions.onBlur) functions.onBlur(e, core);
         },

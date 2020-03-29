@@ -35,6 +35,7 @@ export default function (core, change) {
             if (redo) redo.removeAttribute('disabled');
         }
 
+        core.controllersOff();
         core._checkComponents();
         core._charCount('');
         core._resourcesStateChange();
