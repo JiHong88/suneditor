@@ -593,10 +593,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description Use focus method of document
-         * @private
+         * @description Focus to wysiwyg area using "native focus function"
          */
-        _nativeFocus: function () {
+        nativeFocus: function () {
             const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
             if (caption) {
                 caption.focus();
@@ -614,7 +613,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (context.element.wysiwygFrame.style.display === 'none') return;
 
             if (options.iframe) {
-                this._nativeFocus();
+                this.nativeFocus();
             } else {
                 try {
                     const range = this.getRange();
@@ -628,7 +627,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
                     }
                 } catch (e) {
-                    this._nativeFocus();
+                    this.nativeFocus();
                 }
             }
 
@@ -650,10 +649,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 } else if (videoComponent) {
                     this.selectComponent(videoComponent, 'video');
                 }
-            } else {
+            } else if (focusEl) {
                 focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-                if (!focusEl) this._nativeFocus();
+                if (!focusEl) this.nativeFocus();
                 else this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+            } else {
+                this.nativeFocus();
             }
         },
 
@@ -675,7 +676,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 range.setStart(startCon, startOff);
                 range.setEnd(endCon, endOff);
             } catch (error) {
-                this._nativeFocus();
+                this.nativeFocus();
             }
 
             const selection = this.getSelection();
@@ -1103,14 +1104,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {undefined|Object}
          */
         insertNode: function (oNode, afterNode) {
+            const isComp = util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || util.isComponent(oNode);
+
+            if (!afterNode && isComp) {
+                const r = this.removeNode();
+                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
+                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
+                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                    if (afterNode) afterNode = afterNode.previousSibling;
+                }
+            }
+
             const range = this.getRange();
             const startCon = range.startContainer;
             const startOff = range.startOffset;
             const endCon = range.endContainer;
             const endOff = range.endOffset;
             const commonCon = range.commonAncestorContainer;
-            let parentNode = null;
-            let originAfter = null;
+            let parentNode, originAfter = null;
 
             if (!afterNode) {
                 parentNode = startCon;
@@ -1153,11 +1164,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
                         parentNode.removeChild(removeNode);
+                        if (parentNode.childNodes.length === 0 && isComp) {
+                            parentNode.innerHTML = '<br>';
+                        }
                     }
                     else {
-                        this.removeNode();
-                        parentNode = commonCon;
-                        afterNode = endCon;
+                        const removedTag = this.removeNode();
+                        const container = removedTag.container;
+                        const prevContainer = removedTag.prevContainer;
+                        if (container && container.childNodes.length === 0 && isComp) {
+                            if (util.isFormatElement(container)) {
+                                container.innerHTML = '<br>';
+                            } else if (util.isRangeFormatElement(container)) {
+                                container.innerHTML = '<p><br></p>';
+                            }
+                        }
+
+                        if (!isComp && prevContainer) {
+                            parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
+                            if (parentNode.contains(container)) {
+                                afterNode = container;
+                                while (afterNode.parentNode === parentNode) {
+                                    afterNode = afterNode.parentNode;
+                                }
+                            } else {
+                                afterNode = null;
+                            }
+                        } else {
+                            parentNode = isComp ? commonCon : container;
+                            afterNode = isComp ? endCon : null;
+                        }
 
                         while (afterNode && afterNode.parentNode !== commonCon) {
                             afterNode = afterNode.parentNode;
@@ -1175,6 +1211,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // --- insert node ---
             try {
                 if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
+                    const oldParent = parentNode;
                     if (util.isList(afterNode)) {
                         parentNode = afterNode;
                         afterNode = null;
@@ -1185,12 +1222,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         parentNode = rangeCon ? container : container.parentNode;
                         afterNode = rangeCon ? null : container.nextSibling;
                     }
+
+                    if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
                 }
 
                 if (afterNode === commonCon && util.isBreak(afterNode) && !util.isBreak(oNode)) {
                     afterNode = afterNode.nextSibling;
                 }
 
+                if (isComp && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
+                    afterNode = parentNode.nextElementSibling;
+                    parentNode = parentNode.parentNode;
+                }
                 parentNode.insertBefore(oNode, afterNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
@@ -1278,7 +1321,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             } else {
                 if (childNodes.length === 0) {
-                    if (util.isFormatElement(commonCon) || util.isRangeFormatElement(commonCon) || util.isFormatElement(commonCon)) {
+                    if (util.isFormatElement(commonCon) || util.isRangeFormatElement(commonCon) || util.isWysiwygDiv(commonCon)) {
                         return {
                             container: commonCon,
                             offset: 0
@@ -1366,6 +1409,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+            
+            if (!util.isWysiwygDiv(container)) {
+                const rc = util.removeItemAllParents(container);
+                if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
+            }
 
             // set range
             this.setRange(container, offset, container, offset);
@@ -1374,7 +1422,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             return {
                 container: container,
-                offset: offset
+                offset: offset,
+                prevContainer: startCon && startCon.parentNode ? startCon : null
             };
         },
 
@@ -3258,8 +3307,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     container = pNode.firstChild;
                     offset = container.textContent.length;
                 } else if (util.onlyZeroWidthSpace(container)) {
-                    container = pNode;
-                    offset = 0;
+                    container = newInnerNode;
+                    offset = 1;
                 }
                 
                 // node change
@@ -3333,12 +3382,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this.focus();
                     break;
                 case 'codeView':
-                    this.toggleCodeView();
                     util.toggleClass(target, 'active');
+                    this.toggleCodeView();
                     break;
                 case 'fullScreen':
-                    this.toggleFullScreen(target);
                     util.toggleClass(target, 'active');
+                    this.toggleFullScreen(target);
                     break;
                 case 'indent':
                 case 'outdent':
@@ -3361,8 +3410,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this.preview();
                     break;
                 case 'showBlocks':
-                    this.toggleDisplayBlocks();
                     util.toggleClass(target, 'active');
+                    this.toggleDisplayBlocks();
                     break;
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
@@ -3497,7 +3546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
                 }
 
-                this._nativeFocus();
+                this.nativeFocus();
 
                 // history stack
                 this.history.push(false);
@@ -3808,6 +3857,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Returns HTML string according to tag type and configuration.
+         * Use only "cleanHTML", "convertContentsForEditor"
+         * @param {Node} node Node
+         * @param {Boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
+         * @private
+         */
+        _makeLine: function (node, requireFormat) {
+            // element
+            if (node.nodeType === 1) {
+                if (util._notAllowedTags(node)) return '';
+                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node))) {
+                    return node.outerHTML;
+                } else {
+                    return '<p>' + node.outerHTML + '</p>';
+                }
+            }
+            // text
+            if (node.nodeType === 3) {
+                if (!requireFormat) return node.textContent;
+                const textArray = node.textContent.split(/\n/g);
+                let html = '';
+                for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
+                    text = textArray[i].trim();
+                    if (text.length > 0) html += '<p>' + text + '</p>';
+                }
+                return html;
+            }
+            // comments
+            if (node.nodeType === 8 && this._allowHTMLComments) {
+                return '<__comment__>' + node.textContent.trim() + '</__comment__>';
+            }
+
+            return '';
+        },
+
+        /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
          * @param {String|RegExp} whitelist Regular expression of allowed tags.
@@ -3815,17 +3900,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            const tagsAllowed = new this._w.RegExp('^(meta|script|link|style|[a-z]+\:[a-z]+)$', 'i');
-            const domTree = this._d.createRange().createContextualFragment(html).childNodes;
+            const dom = this._d.createRange().createContextualFragment(html);
+            util._consistencyCheckOfHTML(dom);
+            
+            const domTree = dom.childNodes;
             let cleanHTML = '';
+            let requireFormat = false;
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 8 && this._allowHTMLComments) {
-                    cleanHTML += '<__comment__>' + t.textContent.trim() + '</__comment__>';
-                } else if (!tagsAllowed.test(t.nodeName)) {
-                    cleanHTML += t.nodeType === 1 ? t.outerHTML : t.nodeType === 3 ? t.textContent : '';
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
+                    requireFormat = true;
+                    break;
                 }
+            }
+
+            for (let i = 0, len = domTree.length; i < len; i++) {
+                cleanHTML += this._makeLine(domTree[i], requireFormat);
             }
 
             cleanHTML = cleanHTML
@@ -3862,39 +3953,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
+            const dom = this._d.createRange().createContextualFragment(contents);
+            util._consistencyCheckOfHTML(dom);
+            
             let returnHTML = '';
-            const domTree = this._d.createRange().createContextualFragment(contents).childNodes;
-
-            for (let i = 0, len = domTree.length, baseHtml, t; i < len; i++) {
-                t = domTree[i];
-                
-                if (t.nodeType === 8) {
-                    if (this._allowHTMLComments) {
-                        baseHtml = '<__comment__>' + t.textContent.trim() + '</__comment__>';
-                    } else {
-                        continue;
-                    }
-                } else {
-                    baseHtml = t.outerHTML || t.textContent;
-                }
-
-                if (t.nodeType === 3) {
-                    const textArray = baseHtml.split(/\n/g);
-                    let text = '';
-                    for (let t = 0, tLen = textArray.length; t < tLen; t++) {
-                        text = textArray[t].trim();
-                        if (text.length > 0) returnHTML += '<p>' + text + '</p>';
-                    }
-                } else {
-                    returnHTML += util.htmlRemoveWhiteSpace(baseHtml);
-                }
+            const domTree = dom.childNodes;
+            for (let i = 0, len = domTree.length; i < len; i++) {
+                returnHTML += this._makeLine(domTree[i], true);
             }
 
-            if (returnHTML.length === 0) {
-                contents = util._HTMLConvertor(contents);
-                return '<p>' + (contents.length > 0 ? contents : '<br>') + '</p>';
-            }
+            if (returnHTML.length === 0) return '<p><br></p>';
 
+            returnHTML = util.htmlRemoveWhiteSpace(returnHTML);
             returnHTML = returnHTML
                 .replace(this.editorTagsWhitelistRegExp, '')
                 .replace(/\n/g, '')
@@ -4247,10 +4317,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (rangeEl) {
                 format = util.createElement(formatName || 'P');
                 format.innerHTML = rangeEl.innerHTML;
-                if (format.childNodes.length === 0) format.innerHTML = '<br>';
+                if (util.onlyZeroWidthSpace(format)) format.innerHTML = util.zeroWidthSpace;
 
                 rangeEl.innerHTML = format.outerHTML;
-                format = rangeEl.firstElementChild;
+                format = rangeEl.firstChild;
                 focusNode = util.getEdgeChildNodes(format, null).sc;
 
                 if (!focusNode) {
@@ -4268,10 +4338,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (commonCon.childNodes.length === 1 && util.isBreak(commonCon.firstChild)) {
                     br = commonCon.firstChild;
                 } else {
-                    br = util.createElement('BR');
+                    br = util.createTextNode(util.zeroWidthSpace);
                     commonCon.appendChild(br);
                 }
-                this.setRange(br, 0, br, 0);
+                this.setRange(br, 1, br, 1);
             }
 
             this.execCommand('formatBlock', false, (formatName || 'P'));
@@ -4294,6 +4364,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
+            this.effectNode = null;
             this.setRange(focusNode, offset, focusNode, offset);
         }
     };
@@ -4456,7 +4527,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let target = e.target;
             if (core._bindControllersOff) e.stopPropagation();
 
-            if (/^input|textarea$/i.test(target.nodeName)) {
+            if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
                 core._antiBlur = false;
             } else {
                 e.preventDefault();
@@ -4482,7 +4553,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onClick_toolbar: function (e) {
-            e.preventDefault();
+            if (/^(input|textarea|select|option)$/i.test(e.target.nodeName)) {
+                core._antiBlur = false;
+            } else {
+                e.preventDefault();
+            }
             e.stopPropagation();
 
             let target = e.target;
@@ -4567,13 +4642,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            core._editorRange();
             _w.setTimeout(core._editorRange.bind(core));
+            core._editorRange();
 
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode);
             const rangeEl = util.getRangeFormatElement(selectionNode);
-            if (core.getRange().collapsed && (!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
+            if ((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
                 if (util.isList(rangeEl)) {
                     const oLi = util.createElement('LI');
                     const prevLi = selectionNode.nextElementSibling;
@@ -4584,7 +4659,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
                 e.preventDefault();
                 core.focus();
-            } else {                
+            } else {
                 event._applyTagEffects();
             }
 
@@ -4755,18 +4830,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onInput_wysiwyg: function (e) {
             core._editorRange();
 
-            const range = core.getRange();
-            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-            const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
-            
+            const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core._charCount(data)) {
                 e.preventDefault();
                 e.stopPropagation();
             }
 
-            // component check
-            if (selectRange || !data) core._checkComponents();
-            
             // history stack
             core.history.push(true);
 
@@ -4781,7 +4850,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const alt = e.altKey;
 
             core.submenuOff();
-            if (!event._directionKeyCode.test(keyCode)) _w.setTimeout(core._resourcesStateChange);
+
             if (core._isBalloon) {
                 event._hideToolbar();
             }
@@ -4831,7 +4900,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         while (attrs[0]) {
                             formatEl.removeAttribute(attrs[0].name);
                         }
-                        core._nativeFocus();
+                        core.nativeFocus();
                         return false;
                     }
 
@@ -5356,10 +5425,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             core._charCount('');
-            // component check
-            if (selectRange) core._checkComponents();
+
             // history stack
             core.history.push(true);
 
@@ -5920,12 +5987,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 try {
                     const parseDocument = core._parser.parseFromString(html, 'text/html');
                     const children = parseDocument.body.childNodes;
-                    let c, a;
+                    let c, a, t;
                     while ((c = children[0])) {
-                        core.insertNode(c, a);
+                        t = core.insertNode(c, a);
                         a = c;
                     }
-                    const offset = a.nodeType === 3 ? a.textContent.length : 1;
+                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): 1;
                     core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
@@ -5942,6 +6009,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
+            core.effectNode = null;
             core.focus();
 
             // history stack

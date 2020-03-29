@@ -588,9 +588,13 @@ export default {
         this._variable._videosCnt--;
         const container = this.context.video._container;
         let focusEl = (container.previousElementSibling || container.nextElementSibling);
+
+        const emptyDiv = container.parentNode;
         this.util.removeItem(container);
         this.plugins.video.init.call(this);
         this.controllersOff();
+
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
 
         // focus
         this.focusEdge(focusEl);

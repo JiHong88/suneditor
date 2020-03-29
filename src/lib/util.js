@@ -252,14 +252,23 @@ const util = {
     },
 
     /**
+     * @description It is judged whether it is a node related to the text style.
+     * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
+     * @param {Element|String} element The element to check
+     * @returns {Boolean}
+     */
+    isTextStyleElement: function (element) {
+        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName);
+    },
+
+    /**
      * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
      * Format element also contain "free format Element"
      * @param {Element} element The element to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TD|TH)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
-        return false;
+        return (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TD|TH)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
     },
 
     /**
@@ -269,8 +278,7 @@ const util = {
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'))) return true;
-        return false;
+        return (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)')));
     },
 
     /**
@@ -281,8 +289,7 @@ const util = {
      * @returns {Boolean}
      */
     isFreeFormatElement: function (element) {
-        if (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element)) return true;
-        return false;
+        return (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
     },
 
     /**
@@ -1042,7 +1049,7 @@ const util = {
      * @returns {Element}
      */
     detachNestedList: function (baseNode, all) {
-        const rNode = this.__deleteNestedList(baseNode);
+        const rNode = this._deleteNestedList(baseNode);
         let rangeElement, cNodes;
 
         if (rNode) {
@@ -1065,7 +1072,7 @@ const util = {
         }
 
         for (let i = 0, len = rChildren.length; i < len; i++) {
-            this.__deleteNestedList(rChildren[i]);
+            this._deleteNestedList(rChildren[i]);
         }
         
         if (rNode) {
@@ -1080,7 +1087,7 @@ const util = {
      * @description Sub function of util.detachNestedList method.
      * @private
      */
-    __deleteNestedList: function (baseNode) {
+    _deleteNestedList: function (baseNode) {
         const baseParent = baseNode.parentNode;
         let sibling = baseParent;
         let parent = sibling.parentNode;
@@ -1418,7 +1425,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(typeof element === 'string' ? element : element.nodeName));
+        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !this.isTextStyleElement(element));
     },
 
     /**
@@ -1442,6 +1449,15 @@ const util = {
     },
 
     /**
+     * @description Check not Allowed tags
+     * @param {Element} element Element to check
+     * @private
+     */
+    _notAllowedTags: function (element) {
+        return  /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
+    },
+
+    /**
      * @description Create whitelist RegExp object.
      * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
      * @param {String} list Tags list ("br|p|div|pre...")
@@ -1459,6 +1475,60 @@ const util = {
         regStr += '[^>^<])+>';
 
         return new RegExp(regStr, 'g');
+    },
+
+    /**
+     * @description Fix tags that do not fit the editor format.
+     * @param {DOCUMENT_FRAGMENT_NODE} documentFragment Document fragment (nodeType === 11)
+     * @private
+     */
+    _consistencyCheckOfHTML: function (documentFragment) {
+        // wrong position
+        const wrongTags = this.getListChildren(documentFragment, function (current) {
+            return (this.isFormatElement(current) || this.isComponent(current)) && current.parentNode.nodeType === 1 && !this.isRangeFormatElement(current.parentNode);
+        }.bind(this));
+        
+        const checkTags = [];
+        for (let i = 0, len = wrongTags.length, t, tp; i < len; i++) {
+            t = wrongTags[i];
+            tp = t.parentNode;
+            tp.parentNode.insertBefore(t, tp);
+            checkTags.push(tp);
+        }
+
+        for (let i = 0, len = checkTags.length, t; i < len; i++) {
+            t = checkTags[i];
+            if (this.onlyZeroWidthSpace(t.textContent.trim())) {
+                this.removeItem(t);
+            }
+        }
+
+        // remove empty tags
+        const emptyTags = this.getListChildren(documentFragment, function (current) {
+            return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !util.getParentElement(current, '.katex');
+        }.bind(this));
+
+        for (let i in emptyTags) {
+            this.removeItem(emptyTags[i]);
+        }
+
+        // wrong list
+        const wrongList = this.getListChildren(documentFragment, function (current) {
+            return this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current);
+        }.bind(this));
+
+        for (let i = 0, len = wrongList.length, t, tp, children; i < len; i++) {
+            t = wrongList[i];
+
+            tp = this.createElement('LI');
+            children = t.childNodes;
+            while (children[0]) {
+                tp.appendChild(children[0]);
+            }
+            
+            t.parentNode.insertBefore(tp, t);
+            this.removeItem(t);
+        }
     }
 };
 

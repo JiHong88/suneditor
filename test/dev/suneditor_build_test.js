@@ -26,7 +26,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_plugin_dialog, custom_container, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -40,7 +40,7 @@ suneditor.create("sample1", {
                 buttonClass:'', 
                 title:'Custom - Link', 
                 dataDisplay:'dialog',
-                innerHTML:''
+                innerHTML:'D'
             },
             {
                 name: 'custom_container', 
@@ -48,9 +48,17 @@ suneditor.create("sample1", {
                 buttonClass:'', 
                 title:'Custom - Container', 
                 dataDisplay:'container',
-                innerHTML:''
+                innerHTML:'C'
             },
-            'bold', 'italic'
+            {
+                name: 'Resolutions', 
+                dataCommand: 'Resolutions',
+                buttonClass:'', 
+                title:'Resolutions - Container', 
+                dataDisplay:'submenu',
+                innerHTML:'S'
+            },
+            'bold', 'italic', 'template'
         ]
     ],
     maxCharCount: 2000
@@ -77,7 +85,7 @@ let s1 = suneditor.create('editor', {
         'preview', 'print', 'save', 'template']
     ],
     icons: {
-        undo: '',
+        undo: 'U',
         bold: '<span class="se-icon-text">B</span>'
     },
     width: '100%',
@@ -85,13 +93,13 @@ let s1 = suneditor.create('editor', {
     defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
-    attributesWhitelist: {
-        table: "style",
-        tbody: "style",
-        thead: "style",
-        tr: "style",
-        td: "style"
-    },
+    // attributesWhitelist: {
+    //     table: "style",
+    //     tbody: "style",
+    //     thead: "style",
+    //     tr: "style",
+    //     td: "style"
+    // },
     addTagsWhitelist: '//',
     // addTagsWhitelist: '//',
     formats: [
@@ -186,23 +194,24 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
+    s1.destroy()
     // s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
-    s1.setContents('<!DOCTYPE html>'+
-    '<html lang="en">'+
-    '<head>'+
-        '<meta charset="UTF-8">'+
-        '<meta name="viewport" content="width=device-width, initial-scale=1">'+
-        '<meta name="author" content="https://github.com/JiHong88" />'+
-        '<meta name="description" content="Pure javascript wysiwyg web editor" /> <!-- meta comment -->'+
-    '<style>'+
-    '/* css comment goes here */'+
-    '</style>'+
-    '</head>'+
-    '<body>'+
-    '<!-- html comment goes here -->'+
+    // s1.setContents('<!DOCTYPE html>'+
+    // '<html lang="en">'+
+    // '<head>'+
+    //     '<meta charset="UTF-8">'+
+    //     '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+    //     '<meta name="author" content="https://github.com/JiHong88" />'+
+    //     '<meta name="description" content="Pure javascript wysiwyg web editor" /> <!-- meta comment -->'+
+    // '<style>'+
+    // '/* css comment goes here */'+
+    // '</style>'+
+    // '</head>'+
+    // '<body>'+
+    // '<!-- html comment goes here -->'+
 
-    '</body>'+
-    '</html>')
+    // '</body>'+
+    // '</html>')
 }
 
 window.sun_create1 = function () {
@@ -254,13 +263,13 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullPage: true,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
     imageUploadUrl: 'http://localhost:3000/files/upload',
-    attributesWhitelist: {
-        table: "style",
-        tbody: "style",
-        thead: "style",
-        tr: "style",
-        td: "style"
-    },
+    // attributesWhitelist: {
+    //     table: "style",
+    //     tbody: "style",
+    //     thead: "style",
+    //     tr: "style",
+    //     td: "style"
+    // },
     templates: [
         {
             name: 'Template-1',
@@ -437,7 +446,7 @@ const editor = suneditor.init({
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     lang: lang.ru,
-    mode: 'balloon',
+    mode: 'balloon-always',
     // toolbarWidth: 500,
     plugins: plugins,
     // maxHeight: '400px',

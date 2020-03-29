@@ -537,7 +537,7 @@ export default {
     },
 
     checkImagesInfo: function () {
-        const images = this.context.element.wysiwyg.getElementsByTagName('IMG');
+        const images = [].slice.call(this.context.element.wysiwyg.getElementsByTagName('IMG'));
         const imagePlugin = this.plugins.image;
         const imagesInfo = this._variable._imagesInfo;
 
@@ -551,9 +551,18 @@ export default {
                         'size': img.getAttribute('data-file-size') || 0
                     });
                 }
+                return;
+            } else {
+                let infoUpdate = false;
+                for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                    if (images.indexOf(imagesInfo[i].element) === -1) {
+                        infoUpdate = true;
+                        break;
+                    }
+                }
+                // pass
+                if (!infoUpdate) return;
             }
-            // pass
-            return;
         }
 
         // check images
@@ -996,10 +1005,12 @@ export default {
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
+        const emptyDiv = imageContainer.parentNode;
         this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
-
         this.controllersOff();
+
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
 
         // focus
         this.focusEdge(focusEl);
