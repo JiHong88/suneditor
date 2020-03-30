@@ -417,7 +417,7 @@ export default {
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         /** Character count */
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-        options.charCounterType = options.charCounterType === 'byte' ? 'byte' : 'char';
+        options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
         options.charCounterLabel = typeof options.charCounterLabel === 'string' ? options.charCounterLabel.trim() : null;
         options.maxCharCount = util.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */

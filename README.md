@@ -379,9 +379,11 @@ showPathLabel   : Displays the current node structure to resizingBar.  default: 
 charCounter     : Shows the number of characters in the editor.     
                   If the maxCharCount option has a value, it becomes true. default: false {Boolean}
 charCounterType : Defines the calculation method of the "charCounter" option.
-                  ('char': character length, 'byte': binary data length)      default: 'char' {String}
+                  'char': Characters length.
+                  'byte': Binary data size of characters.
+                  'byte-html': Binary data size of the full HTML string.   default: 'char' {String}
 charCounterLabel: Text to be displayed in the "charCounter" area of the bottom bar.
-                  Screen ex) 'charCounterLabel: ' 20 / 200          default: null {String}
+                  Screen ex) 'charCounterLabel : 20/200'.           default: null {String}
 maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
 
 // Width size----------------------------------------------------------------------------------------------------
@@ -665,6 +667,11 @@ editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
 
 // Change the contents of the suneditor
 editor.setContents('set contents');
+
+// Get the editor's number of characters or binary data size.
+// You can use the "charCounterType" option format.
+// If argument is no value, the currently set "charCounterType" option is used.
+editor.getCharCount((null || 'char' || 'byte' || 'byte-html'));
 
 // Add content to the suneditor
 editor.appendContents('append contents');

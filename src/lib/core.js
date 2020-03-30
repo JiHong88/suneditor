@@ -177,6 +177,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         codeViewDisabledButtons: null,
 
         /**
+         * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
+         * ^(options._editorTagsWhitelist)$
+         * @private
+         */
+        _htmlCheckWhitelistRegExp: null,
+
+        /**
          * @description Editor tags whitelist (RegExp object)
          * util.createTagsWhitelist(options._editorTagsWhitelist)
          */
@@ -794,6 +801,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let endOff = range.endOffset;
             let tempCon, tempOffset, tempChild;
 
+            if (util.isFormatElement(startCon)) {
+                startCon = startCon.childNodes[startOff];
+                startOff = 0;
+            }
+            if (util.isFormatElement(endCon)) {
+                endCon = endCon.childNodes[endOff];
+                endOff = 0;
+            }
+
             // startContainer
             tempCon = util.isWysiwygDiv(startCon) ? context.element.wysiwyg.firstChild : startCon;
             tempOffset = startOff;
@@ -859,7 +875,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     tempCon.parentNode.insertBefore(emptyText, tempCon);
                     tempCon = emptyText;
                     tempOffset = 1;
-                    if (onlyBreak) {
+                    if (onlyBreak && !tempCon.previousSibling) {
                         util.removeItem(endCon);
                     }
                 }
@@ -1989,13 +2005,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            this._resetRangeToTextNode();
-            range = this.getRange();
-            startCon = range.startContainer;
-            startOff = range.startOffset;
-            endCon = range.endContainer;
-            endOff = range.endOffset;
-
             let start = {}, end = {};
             let newNode, styleRegExp = '', classRegExp = '', removeNodeRegExp = '';
 
@@ -2098,6 +2107,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // get line nodes
             const lineNodes = this.getSelectedElements();
+            range = this.getRange();
+            startCon = range.startContainer;
+            startOff = range.startOffset;
+            endCon = range.endContainer;
+            endOff = range.endOffset;
 
             if (!util.getFormatElement(startCon)) {
                 startCon = util.getChildElement(lineNodes[0], function (current) { return current.nodeType === 3; });
@@ -2154,6 +2168,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (endLength <= 0) {
                     end = start;
+                } else if (!end.container) {
+                    end.container = start.container;
+                    end.offset = start.container.textContent.length;
                 }
             }
 
@@ -3300,6 +3317,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     element.appendChild(container);
                 }
             } else {
+                if (newInnerNode.textContent.length === 0) {
+                    util.removeEmptyNode(pNode, null);
+                    return {
+                        container: null,
+                        offset: 0
+                    };
+                }
+
                 util.removeEmptyNode(pNode, newInnerNode);
 
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
@@ -3899,8 +3924,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            const dom = this._d.createRange().createContextualFragment(html);
-            util._consistencyCheckOfHTML(dom);
+            const dom = _d.createRange().createContextualFragment(html);
+            try {
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+            } catch (error) {
+                console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
+            }
             
             const domTree = dom.childNodes;
             let cleanHTML = '';
@@ -3952,8 +3981,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            const dom = this._d.createRange().createContextualFragment(contents);
-            util._consistencyCheckOfHTML(dom);
+            const dom = _d.createRange().createContextualFragment(contents);
+            try {
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+            } catch (error) {
+                console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
+            }
             
             let returnHTML = '';
             const domTree = dom.childNodes;
@@ -3980,13 +4013,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         convertHTMLForCodeView: function (html) {
             let returnHTML = '';
-            const reg = this._w.RegExp;
+            const reg = _w.RegExp;
             const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const isFormatElement = util.isFormatElement.bind(util);
-            const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+            const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 
             let indentSize = this._variable.codeIndent * 1;
-            indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+            indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
             (function recursionFunc (element, indent, lineBR) {
                 const children = element.childNodes;
@@ -4059,17 +4092,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _charCount: function (inputText) {
             const charCounter = context.element.charCounter;
             const maxCharCount = options.maxCharCount;
-            const wysiwyg = context.element.wysiwyg;
             let nextCharCount = 0;
-            if (!!inputText) nextCharCount = core._getCharLength(inputText);
+            if (!!inputText) nextCharCount = core._getCharLength(inputText, options.charCounterType);
 
             if (charCounter) {
-                _w.setTimeout(function () { charCounter.textContent = core._getCharLength(wysiwyg.textContent); });
+                _w.setTimeout(function () { charCounter.textContent = functions.getCharCount(null); });
             }
 
             if (maxCharCount > 0) {
                 let over = false;
-                const count = core._getCharLength(wysiwyg.textContent);
+                const count = functions.getCharCount(null);
                 
                 if (count > maxCharCount) {
                     over = true;
@@ -4106,10 +4138,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Method used only in "_charCount".
          * Depending on the option, the length of the character is taken.
-         * @param {String} text Text content
+         * @param {String} content Content to count
+         * @param {String} charCounterType option - charCounterType
+         * @returns {Number}
          */
-        _getCharLength: function (text) {
-            return options.charCounterType === 'byte' ? util.getByteLength(text) : text.length;
+        _getCharLength: function (content, charCounterType) {
+            return /byte/.test(charCounterType) ? util.getByteLength(content) : content.length;
         },
 
         /**
@@ -4171,6 +4205,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
+            this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
@@ -5015,8 +5050,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         }
                     }
 
-                    if (selectRange) event._rangedeleteAssistant(range.startContainer, range.endContainer);
-
                     break;
                 case 46: /** delete key */
                     if (resizingName) {
@@ -5098,8 +5131,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         }
                         break;
                     }
-
-                    if (selectRange) event._rangedeleteAssistant(range.startContainer, range.endContainer);
 
                     break;
                 case 9: /** tab key */
@@ -5641,21 +5672,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (functions.onChange) functions.onChange(core.getContents(true), core);
         },
 
-        _rangedeleteAssistant: function (start, end) {
-            start = util.getParentElement(start, function (current) { return current.getAttribute && (current.getAttribute('contenteditable') === 'false' || this.isComponent(current)); }.bind(util));
-            end = util.getParentElement(end, function (current) { return current.getAttribute && (current.getAttribute('contenteditable') === 'false' || this.isComponent(current)); }.bind(util));
-
-            _w.setTimeout(function (start, end) {
-                if (start) {
-                    this.removeItem(start);
-                    if(start === end) return;
-                }
-                if (end) {
-                    this.removeItem(end);
-                }
-            }.bind(util, start, end));
-        },
-
         _addEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
 
@@ -5955,6 +5971,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Get the editor's number of characters or binary data size.
+         * You can use the "charCounterType" option format.
+         * @param {String|null} charCounterType options - charCounterType ('char', 'byte', 'byte-html')
+         * If argument is no value, the currently set "charCounterType" option is used.
+         * @returns {Number}
+         */
+        getCharCount: function (charCounterType) {
+            charCounterType = typeof charCounterType === 'string' ? charCounterType : options.charCounterType;
+            return core._getCharLength((charCounterType === 'byte-html' ? context.element.wysiwyg.innerHTML : context.element.wysiwyg.textContent), charCounterType);
+        },
+
+        /**
          * @description Gets uploaded images informations
          * @returns {Array}
          */
@@ -5982,10 +6010,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (typeof html === 'string') {
                 if (!_clean) html = core.cleanHTML(html);
                 try {
-                    const parseDocument = core._parser.parseFromString(html, 'text/html');
-                    const children = parseDocument.body.childNodes;
+                    const dom = _d.createRange().createContextualFragment(html);
+                    const domTree = dom.childNodes;
                     let c, a, t;
-                    while ((c = children[0])) {
+                    while ((c = domTree[0])) {
                         t = core.insertNode(c, a);
                         a = c;
                     }

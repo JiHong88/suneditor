@@ -1480,13 +1480,24 @@ const util = {
     /**
      * @description Fix tags that do not fit the editor format.
      * @param {DOCUMENT_FRAGMENT_NODE} documentFragment Document fragment (nodeType === 11)
+     * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+        // empty whitelist
+        const emptyWhitelistTags = [];
         // wrong position
         const wrongTags = this.getListChildren(documentFragment, function (current) {
-            return (this.isFormatElement(current) || this.isComponent(current)) && current.parentNode.nodeType === 1 && !this.isRangeFormatElement(current.parentNode);
+            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
+                emptyWhitelistTags.push(current);
+                return false;
+            }
+            return (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) && !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
         }.bind(this));
+
+        for (let i in emptyWhitelistTags) {
+            this.removeItem(emptyWhitelistTags[i]);
+        }
         
         const checkTags = [];
         for (let i = 0, len = wrongTags.length, t, tp; i < len; i++) {

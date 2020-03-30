@@ -118,9 +118,9 @@ let s1 = suneditor.create('editor', {
         'pre',
         'blockquote'
     ],
-    charCounterType: 'byte',
-    charCounterLabel: 'BYTE : ',
-    maxCharCount: 2000
+    charCounterType: 'char',
+    charCounterLabel: 'HTML BYTE : ',
+    maxCharCount: 650
 })
 
 // s1.core._charCount = function (nextCharCount, blink) {

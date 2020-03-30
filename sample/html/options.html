@@ -135,6 +135,8 @@
             <label><input type="radio" id="radio_charCounterType_1" name="radio_charCounterType" value="char" checked>&nbsp;&nbsp;char</label>
             &nbsp;&nbsp;&nbsp;
             <label><input type="radio" id="radio_charCounterType_2" name="radio_charCounterType" value="byte">&nbsp;&nbsp;byte</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_charCounterType_3" name="radio_charCounterType" value="byte-html">&nbsp;&nbsp;byte-html</label>
             <br><br>
             <label><input type="checkbox" id="charCounterLabel">&nbsp;&nbsp;charCounterLabel</label>
             <input type="text" id="charCounterLabel_value" placeholder="String">
@@ -389,7 +391,7 @@ function sun_create () {
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
         showPathLabel: document.getElementById('showPathLabel').checked ? undefined : false,
         charCounter: document.getElementById('charCounter').checked ? true : undefined,
-        charCounterType: document.getElementById('charCounterType').checked ? (document.getElementById('radio_charCounterType_1').checked ? 'char' : 'byte') : undefined,
+        charCounterType: document.getElementById('charCounterType').checked ? (document.querySelector('input[name="radio_charCounterType"]:checked').value) : undefined,
         charCounterLabel: document.getElementById('charCounterLabel').checked ? document.getElementById('charCounterLabel_value').value : undefined,
         maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : undefined,
         display: document.getElementById('display').checked ? document.getElementById('display_value').value : undefined,
