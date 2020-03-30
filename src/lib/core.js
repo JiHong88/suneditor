@@ -839,7 +839,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             endCon = tempCon;
                             endOff = 1;
                         }
-                        util.removeItem(startCon);
                     }
                 }
             }
@@ -1239,10 +1238,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
 
                     if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
-                }
-
-                if (afterNode === commonCon && util.isBreak(afterNode) && !util.isBreak(oNode)) {
-                    afterNode = afterNode.nextSibling;
                 }
 
                 if (isComp && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
@@ -2147,6 +2142,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
+                if (start.container === end.container && util.zeroWidthRegExp.test(start.container.textContent)) {
+                    start.offset = end.offset = 1;
+                }
             }
             // multi line 
             else {
@@ -4922,7 +4920,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         return false;
                     }
 
-                    if (!selectRange && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && util.isFormatElement(formatEl) && !util.isListCell(formatEl) &&
+                    if (!selectRange && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && (util.isFormatElement(formatEl) && !util.isFreeFormatElement(formatEl)) && !util.isListCell(formatEl) &&
                      (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))))) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -5389,6 +5387,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
                 const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                 core.insertNode(zeroWidth, null);
+                core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
 
             if (functions.onKeyDown) functions.onKeyDown(e, core);
@@ -5729,6 +5728,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element.toolbar.removeEventListener('mousedown', event.onMouseDown_toolbar);
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
+            eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
             eventWysiwyg.removeEventListener('click', event.onClick_wysiwyg);
             eventWysiwyg.removeEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg);
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
@@ -5739,7 +5739,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
             
-            eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
             eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
