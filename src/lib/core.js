@@ -323,7 +323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Elements that need to change text or className for each selection change
          * After creating the editor, "activePlugins" are added.
          * @property {Element} STRONG bold button
-         * @property {Element} INS underline button
+         * @property {Element} U underline button
          * @property {Element} EM italic button
          * @property {Element} DEL strike button
          * @property {Element} SUB subscript button
@@ -339,7 +339,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _defaultCommand: {
             bold: 'STRONG',
-            underline: 'INS',
+            underline: 'U',
             italic: 'EM',
             strike: 'DEL',
             subscript: 'SUB',
@@ -3459,7 +3459,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
-                default : // 'STRONG', 'INS', 'EM', 'DEL', 'SUB', 'SUP'
+                default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'
                     command = this._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
@@ -4243,7 +4243,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this.commandMap = {
                 STRONG: context.tool.bold,
-                INS: context.tool.underline,
+                U: context.tool.underline,
                 EM: context.tool.italic,
                 DEL: context.tool.strike,
                 SUB: context.tool.subscript,
@@ -4423,7 +4423,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|INS|EM|DEL|SUB|SUP)$'),
+        _onButtonsCheck: new _w.RegExp('^(STRONG|U|EM|DEL|SUB|SUP)$'),
         _frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
@@ -4454,7 +4454,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
                     break;
                 case 'U':
-                    command = 'INS';
+                    command = 'U';
                     break;
                 case 'I':
                     command = 'EM';
