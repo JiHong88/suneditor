@@ -1494,7 +1494,9 @@ const util = {
                 emptyWhitelistTags.push(current);
                 return false;
             }
-            return current.parentNode !== documentFragment && (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) && !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
+            return current.parentNode !== documentFragment &&
+             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current) || (((this.isMedia(current) && !this.isAnchor(current.parentNode)) || (this.isMedia(current.firstElementChild) && this.isAnchor(current))) && !this.getParentElement(current, this.isComponent))) &&
+              !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {

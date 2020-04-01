@@ -3902,7 +3902,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // element
             if (node.nodeType === 1) {
                 if (util._notAllowedTags(node)) return '';
-                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node))) {
+                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
                     return '<p>' + node.outerHTML + '</p>';
@@ -4758,8 +4758,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const editorWidth = context.element.topArea.offsetWidth;
-            const stickyTop = event._getEditorOffsets().top;
-            const editorLeft = event._getEditorOffsets().left;
+            const offsets = event._getEditorOffsets();
+            const stickyTop = offsets.top;
+            const editorLeft = offsets.left;
             
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
@@ -5565,8 +5566,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let t = 0, l = 0, s = 0;
 
             while (offsetEl) {
-                l += offsetEl.offsetLeft;
                 t += offsetEl.offsetTop;
+                l += offsetEl.offsetLeft;
                 s += offsetEl.scrollTop;
                 offsetEl = offsetEl.offsetParent;
             }

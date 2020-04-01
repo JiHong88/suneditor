@@ -59,6 +59,7 @@ const icons: {
   mirror_horizontal: string,
   mirror_vertical: string,
   checked: string,
+  line_break: String,
   attachment: string,
   map: string,
   magic_stick: string,

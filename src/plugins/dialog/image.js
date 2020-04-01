@@ -673,11 +673,10 @@ export default {
 
         if (container === null) {
             cover = cover.cloneNode(true);
+            imageEl = cover.querySelector('img');
             isNewContainer = true;
             container = this.plugins.resizing.set_container.call(this, cover, 'se-image-container');
-        }
-        
-        if (isNewContainer) {
+        } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
         }
@@ -710,7 +709,7 @@ export default {
 
         // link
         if (linkValue.trim().length > 0) {
-            if (contextImage._linkElement !== null) {
+            if (contextImage._linkElement !== null && cover.contains(contextImage._linkElement)) {
                 contextImage._linkElement.href = linkValue;
                 contextImage._linkElement.target = (contextImage.imgLinkNewWindowCheck.checked ? '_blank' : '');
                 imageEl.setAttribute('data-image-link', linkValue);

@@ -257,7 +257,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     // maxCharCount: 20,
     katex: Katex,
-    height: '500px',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
@@ -696,9 +695,6 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
             {
                 // plugin's name attribute
                 name: 'custom_plugin_submenu', 
-                // name of the plugin to be recognized by the toolbar.
-                // It must be the same as the name attribute of the plugin 
-                dataCommand: 'custom_plugin_submenu',
                 // button's class ("se-btn" class is registered, basic button click css is applied.)
                 buttonClass:'se-btn', 
                 // HTML title attribute
