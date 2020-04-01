@@ -202,7 +202,11 @@ declare module 'suneditor' {
     /**
      * The default width size of the image frame
      */
-    imageWidth?: number;
+    imageWidth?: String;
+    /**
+     * The default height size of the image frame
+     */
+    imageHeight?: String;
     /**
      * If true, image size can only be scaled by percentage.
      */
@@ -252,7 +256,11 @@ declare module 'suneditor' {
     /**
      * The default width size of the video frame
      */
-    videoWidth?: number;
+    videoWidth?: String;
+    /**
+     * The default height size of the video frame
+     */
+    videoHeight?: String;
     /**
      * If true, video size can only be scaled by percentage.
      */

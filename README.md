@@ -506,6 +506,7 @@ textStyles      : You can apply custom style or class to selected text.
 imageResizing   : Can resize the image.                               default: true {Boolean}
 imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
 imageWidth      : The default width size of the image frame.          default: 'auto' {String}
+imageHeight     : The default height size of the image frame.         default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
                   When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
@@ -539,6 +540,7 @@ videoResizing   : Can resize the video iframe.                         default: 
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
 videoWidth      : The default width size of the video frame.           default: '100%' {String}
+videoHeight     : The default height size of the video frame.          default: '56.25%' {String}
 videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
 videoRotation   : Choose whether to video rotation buttons display.
                   When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.

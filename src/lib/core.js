@@ -261,6 +261,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _antiBlur: false,
 
         /**
+         * @description Component line breaker element
+         * @private
+         */
+        _lineBreaker: null,
+        _lineBreakerButton: null,
+
+        /**
          * @description If true, (initialize, reset) all indexes of image information
          * @private
          */
@@ -370,7 +377,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _imagesInfo: [],
             _imageIndex: 0,
-            _videosCnt: 0
+            _videosCnt: 0,
+            _lineBreakComp: null,
+            _lineBreakDir: ''
         },
 
         /**
@@ -519,6 +528,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this.containerActiveButton = null;
                 this._notHideToolbar = false;
             }
+
+            this._antiBlur = false;
         },
 
         /**
@@ -553,6 +564,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._bindControllersOff = this.controllersOff.bind(this);
             this.addDocEvent('mousedown', this._bindControllersOff, false);
             this.addDocEvent('keydown', this._bindControllersOff, false);
+            this._antiBlur = true;
 
             if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, this);
         },
@@ -693,6 +705,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             selection.addRange(range);
             this._editorRange();
+            if (options.iframe) this.nativeFocus();
         },
 
         /**
@@ -4252,6 +4265,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
+            this._lineBreaker = context.element.lineBreaker;
+            this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
             // Excute history function
             this.history = _history(this, event._onChange_historyStack);
@@ -4611,9 +4626,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.actionCall(command, display, target);
         },
 
-        /**
-         * @warning Events are registered only when there is a table plugin.
-         */
         onMouseDown_wysiwyg: function (e) {
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
             
@@ -4746,13 +4758,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const editorWidth = context.element.topArea.offsetWidth;
-            const stickyTop = event._getStickyOffsetTop();
-            let editorLeft = 0;
-            let topArea = context.element.topArea;
-            while (topArea && !/^(BODY|HTML)$/i.test(topArea.nodeName)) {
-                editorLeft += topArea.offsetLeft;
-                topArea = topArea.offsetParent;
-            }
+            const stickyTop = event._getEditorOffsets().top;
+            const editorLeft = event._getEditorOffsets().left;
             
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
@@ -5042,8 +5049,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     // component
                     if (!selectRange && range.startOffset === 0) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
-                            const previousEl = formatEl.previousSibling;
-                            util.removeItem(previousEl);
+                            let previousEl = formatEl.previousSibling;
+                            if (util.hasClass(previousEl, 'se-image-container') || /^IMG$/i.test(previousEl.nodeName)) {
+                                previousEl = /^IMG$/i.test(previousEl.nodeName) ? previousEl : previousEl.querySelector('img');
+                                core.selectComponent(previousEl, 'image');
+                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
+                            } else if (util.hasClass(previousEl, 'se-video-container')) {
+                                core.selectComponent(previousEl.querySelector('iframe'), 'video');
+                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
+                            }
                             break;
                         }
                     }
@@ -5461,6 +5475,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
+            core._lineBreaker.style.display = 'none';
             if (core._isBalloon) event._hideToolbar();
             if (functions.onScroll) functions.onScroll(e, core);
         },
@@ -5531,7 +5546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
-            const editorTop = event._getStickyOffsetTop() - (core._isInline ? element.toolbar.offsetHeight : 0);
+            const editorTop = event._getEditorOffsets().top - (core._isInline ? element.toolbar.offsetHeight : 0);
             
             if (y < editorTop) {
                 event._offStickyToolbar();
@@ -5545,16 +5560,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
-        _getStickyOffsetTop: function () {
+        _getEditorOffsets: function () {
             let offsetEl = context.element.topArea;
-            let offsetTop = 0;
+            let t = 0, l = 0, s = 0;
 
             while (offsetEl) {
-                offsetTop += offsetEl.offsetTop;
+                l += offsetEl.offsetLeft;
+                t += offsetEl.offsetTop;
+                s += offsetEl.scrollTop;
                 offsetEl = offsetEl.offsetParent;
             }
 
-            return offsetTop;
+            return {
+                top: t,
+                left: l,
+                scroll: s
+            };
         },
 
         _onStickyToolbar: function () {
@@ -5657,6 +5678,62 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (functions.onDrop) functions.onDrop(e, core);
         },
 
+        onmouseMove_wysiwyg: function (e) {
+            const component = util.getParentElement(e.target, util.isComponent);
+            const lineBreakerStyle = core._lineBreaker.style;
+
+            if (component) {
+                let scrollTop = 0;
+                let el = context.element.wysiwyg;
+                do {
+                    scrollTop += el.scrollTop;
+                    el = el.parentElement;
+                } while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
+
+                const wScroll = context.element.wysiwyg.scrollTop;
+                const offsets = event._getEditorOffsets();
+                const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
+                const y = e.pageY + scrollTop + (options.iframe ? context.element.toolbar.offsetHeight : 0);
+                const c = componentTop + (options.iframe ? scrollTop : offsets.top);
+
+                let dir = '', top = '';
+                if (!util.isFormatElement(component.previousElementSibling) && y < (c + 20)) {
+                    top = componentTop;
+                    dir = 't';
+                } else if (!util.isFormatElement(component.nextElementSibling) && y > (c + component.offsetHeight - 20)) {
+                    top = componentTop + component.offsetHeight;
+                    dir = 'b';
+                } else {
+                    lineBreakerStyle.display = 'none';
+                    return;
+                }
+
+                core._variable._lineBreakComp = component;
+                core._variable._lineBreakDir = dir;
+                core._lineBreakerButton.style.left = ((component.offsetLeft + component.offsetWidth) / 2) + 'px';
+                lineBreakerStyle.top = (top - wScroll) + 'px';
+                lineBreakerStyle.display = 'block';
+            } // off line breaker
+            else if (lineBreakerStyle.display !== 'none') {
+                lineBreakerStyle.display = 'none';
+            }
+        },
+
+        _onLineBreak: function () {
+            const component = core._variable._lineBreakComp;
+
+            const format = util.createElement('P');
+            format.innerHTML = '<br>';
+            component.parentNode.insertBefore(format, core._variable._lineBreakDir === 't' ? component : component.nextSibling);
+
+            core._lineBreaker.style.display = 'none';
+            core._variable._lineBreakComp = null;
+
+            core.setRange(format.firstChild, 1, format.firstChild, 1);
+            // history stack
+            core.history.push(false);
+        },
+
         _setDropLocationSelection: function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -5690,6 +5767,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
             eventWysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
+
+            /** line breaker */
+            eventWysiwyg.addEventListener('mousemove', event.onmouseMove_wysiwyg, false);
+            core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
@@ -5738,6 +5819,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
+
+            eventWysiwyg.removeEventListener('mousemove', event.onmouseMove_wysiwyg);
+            core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
@@ -5898,6 +5982,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _charCounter: el.charCounter,
                 _charWrapper: el.charWrapper,
                 _loading: el.loading,
+                _lineBreaker: el.lineBreaker,
                 _resizeBack: el.resizeBackground,
                 _stickyDummy: el._stickyDummy,
                 _arrow: el._arrow

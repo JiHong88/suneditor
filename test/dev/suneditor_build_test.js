@@ -89,7 +89,7 @@ let s1 = suneditor.create('editor', {
         bold: '<span class="se-icon-text">B</span>'
     },
     width: '100%',
-    height: '500',
+    height: '200px',
     defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
@@ -239,6 +239,7 @@ s1.onKeyDown = function (e, core) {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lang: lang.ko,
     plugins: plugins,
+    height: '500px',
     // mode: 'balloon-always',
     buttonList: [
         ['undo', 'redo',
@@ -256,13 +257,16 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     // maxCharCount: 20,
     katex: Katex,
-    height: 'auto',
+    height: '500px',
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     fullPage: true,
+    // videoHeight: '56.22%',
+    videoRatio: 0.75,
+    // imageHeight: 400,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
-    imageUploadUrl: 'http://localhost:3000/files/upload',
+    // imageUploadUrl: 'http://localhost:3000/files/upload',
     // attributesWhitelist: {
     //     table: "style",
     //     tbody: "style",
@@ -339,18 +343,18 @@ ss.showInline = function (toolbar, context) {
 
 },
 
-ss.showController = function (name, controllers, core) {
-    let c = null;
-    console.log('target', core.currentControllerTarget);
-    for (let i in controllers) {
-        c = controllers[i];
-        if (core.util.hasClass(c, 'se-controller-resizing')) {
-            const updateButton = c.querySelector('[data-command="update"]');
-            if (name === 'image') updateButton.setAttribute('disabled', true);
-            else updateButton.removeAttribute('disabled');
-        }
-    }
-}
+// ss.showController = function (name, controllers, core) {
+//     let c = null;
+//     console.log('target', core.currentControllerTarget);
+//     for (let i in controllers) {
+//         c = controllers[i];
+//         if (core.util.hasClass(c, 'se-controller-resizing')) {
+//             const updateButton = c.querySelector('[data-command="update"]');
+//             if (name === 'image') updateButton.setAttribute('disabled', true);
+//             else updateButton.removeAttribute('disabled');
+//         }
+//     }
+// }
 
 window.sun_noticeOpen = function () {
     ss.noticeOpen('test notice');
@@ -445,12 +449,12 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    lang: lang.ru,
-    mode: 'inline',
+    // lang: lang.ru,
+    // mode: 'inline',
     // toolbarWidth: 150,
     plugins: plugins,
     // maxHeight: '400px',
-    height: 'auto',
+    height: '700px',
     // height: 400,
     fontSizeUnit: 'pt',
     imageResizing: true,
@@ -761,7 +765,7 @@ window.sun_create4 = function() {
         mode: 'classic',
         // toolbarWidth: 800,
         maxCharCount: 280,
-        height: 'auto',
+        height: '500px',
         placeholder: 'Start typing something..5.'
         // callBackSave: (contents) => {
         //     console.log('callback')

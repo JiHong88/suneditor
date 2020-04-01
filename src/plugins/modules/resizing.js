@@ -709,7 +709,7 @@
                     this.plugins[this.context.resizing._resize_plugin].init.call(this);
                 } else {
                     // element resize
-                    this.plugins.resizing.cancel_controller_resize.call(this);
+                    this.plugins.resizing.cancel_controller_resize.call(this, direction);
                     // history stack
                     if (change) this.history.push(false);
                 }
@@ -757,7 +757,7 @@
             contextResizing._isChange = true;
         },
     
-        cancel_controller_resize: function () {
+        cancel_controller_resize: function (direction) {
             const isVertical = this.context.resizing._rotateVertical;
             this.controllersOff();
             this.context.element.resizeBackground.style.display = 'none';
@@ -775,7 +775,7 @@
                 }
             }
     
-            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, false);
+            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, false, direction);
             this.plugins[this.context.resizing._resize_plugin].init.call(this);
         }
     };

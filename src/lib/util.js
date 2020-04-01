@@ -1492,7 +1492,7 @@ const util = {
                 emptyWhitelistTags.push(current);
                 return false;
             }
-            return (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) && !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
+            return current.parentNode !== documentFragment && (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) && !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {

@@ -30,7 +30,7 @@ export default {
             _defaultSizeX: 'auto',
             _defaultSizeY: 'auto',
             _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
-            _origin_h: '',
+            _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,
             _altText: '',
             _caption: null,
             captionCheckEl: null,
@@ -75,6 +75,7 @@ export default {
             context.image.inputX = image_dialog.querySelector('._se_image_size_x');
             context.image.inputY = image_dialog.querySelector('._se_image_size_y');
             context.image.inputX.value = context.option.imageWidth;
+            context.image.inputY.value = context.option.imageHeight;
             
             context.image.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
             context.image.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
@@ -159,8 +160,8 @@ export default {
                         html += '' +
                             '<input class="se-input-control _se_image_size_x" placeholder="auto"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + ' />' +
                             '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
-                            '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" disabled' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
-                            '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked disabled/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                            '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto"' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
+                            '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
                             '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + this.icons.revert + '</button>' +
                         '</div>' ;
             }
@@ -590,7 +591,7 @@ export default {
                 if (!img.style.width) {
                     const size = (img.getAttribute('data-size') || img.getAttribute('data-origin') || '').split(',');
                     imagePlugin.onModifyMode.call(this, img, null);
-                    imagePlugin.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || ''));
+                    imagePlugin.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || this.context.option.imageHeight));
                 }
             } else {
                 currentImages.push(img.getAttribute('data-index') * 1);
@@ -839,9 +840,7 @@ export default {
         if (!update) {
             const contextImage = this.context.image;
             contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
-            contextImage.inputY.value = contextImage._origin_h = '';
-            contextImage.inputY.disabled = true;
-            contextImage.proportion.disabled = true;
+            contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
         }
     },
 
@@ -867,13 +866,15 @@ export default {
         return false;
     },
 
-    setSize: function (w, h, notResetPercentage) {
+    setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
+        const onlyW = /^(rw|lw)$/.test(direction);
+        const onlyH = /^(th|bh)$/.test(direction);
 
         this.plugins.image.cancelPercentAttr.call(this);
 
-        contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
-        contextImage._element.style.height = this.util.isNumber(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
+        if (!onlyH) contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
+        if (!onlyW) contextImage._element.style.height = this.util.isNumber(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
 
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
         if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
@@ -1047,10 +1048,7 @@ export default {
 
         if (contextImage._resizing) {
             contextImage.inputX.value = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
-            contextImage.inputY.value = '';
-            contextImage.inputX.disabled = false;
-            contextImage.inputY.disabled = false;
-            contextImage.proportion.disabled = false;
+            contextImage.inputY.value = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
             contextImage.proportion.checked = true;
             contextImage._ratio = false;
             contextImage._ratioX = 1;
