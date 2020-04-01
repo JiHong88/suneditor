@@ -585,11 +585,11 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
-        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
+        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
         
-        oButton.innerHTML = innerHTML;
+        oButton.innerHTML = (innerHTML || '<span class="se-icon-text">!</span>');
         oLi.appendChild(oButton);
 
         return {
@@ -649,11 +649,16 @@ export default {
                             plugins[pluginName] = button;
                         } else {
                             pluginName = button.name;
-                            module = [button.buttonClass, button.title, button.dataCommand, button.dataDisplay, button.innerHTML];
+                            module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
                         module = defaultButtonList[button];
                         pluginName = button;
+                        if (!module) {
+                            const custom = plugins[pluginName];
+                            if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
+                            module = [custom.buttonClass, custom.title, custom.name, custom.display, custom.innerHTML, custom._disabled];
+                        }
                     }
 
                     buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);

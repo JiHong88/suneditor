@@ -1173,6 +1173,8 @@ const util = {
             }
         }
 
+        if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0)) depthEl.innerHTML = '<br>';
+
         const pElement = depthEl.parentNode;
         if (next) depthEl = depthEl.nextSibling;
         if (!newEl) return depthEl;

@@ -34,14 +34,14 @@ suneditor.create("sample1", {
     imageFileInput: false,
     buttonList: [
         [
-            {
-                name: 'customLink', 
-                dataCommand: 'customLink',
-                buttonClass:'', 
-                title:'Custom - Link', 
-                dataDisplay:'dialog',
-                innerHTML:'D'
-            },
+            // {
+            //     name: 'customLink', 
+            //     dataCommand: 'customLink',
+            //     buttonClass:'', 
+            //     title:'Custom - Link', 
+            //     dataDisplay:'dialog',
+            //     innerHTML:'D'
+            // },
             {
                 name: 'custom_container', 
                 dataCommand: 'custom_container',
@@ -58,7 +58,7 @@ suneditor.create("sample1", {
                 dataDisplay:'submenu',
                 innerHTML:'S'
             },
-            'bold', 'italic', 'template'
+            'bold', 'italic', 'template', 'customLink'
         ]
     ],
     maxCharCount: 2000
