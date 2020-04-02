@@ -11,6 +11,7 @@ import lang from '../../src/lang';
 import custom_plugin_submenu from './custom_plugin_submenu';
 import custom_plugin_dialog from './custom_plugin_dialog';
 import Resolutions from './Resolutions';
+import subLib from './sub_lib';
 import custom_container from './custom_container';
 
 import 'codemirror/lib/codemirror.css';
@@ -26,7 +27,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
+    plugins: [custom_plugin_dialog, subLib, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
     // mode: "balloon",
     // iframe: true,
     width: '100%',
@@ -58,7 +59,7 @@ suneditor.create("sample1", {
                 dataDisplay:'submenu',
                 innerHTML:'S'
             },
-            'bold', 'italic', 'template', 'customLink'
+            'bold', 'italic', 'template', 'customLink', 'subLib'
         ]
     ],
     maxCharCount: 2000

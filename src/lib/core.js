@@ -4600,18 +4600,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onClick_toolbar: function (e) {
-            if (/^(input|textarea|select|option)$/i.test(e.target.nodeName)) {
-                core._antiBlur = false;
-            } else {
-                e.preventDefault();
-            }
-
             let target = e.target;
             let display = target.getAttribute('data-display');
             let command = target.getAttribute('data-command');
             let className = target.className;
 
-            while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
+            while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
                 target = target.parentNode;
                 command = target.getAttribute('data-command');
                 display = target.getAttribute('data-display');
@@ -6102,7 +6096,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         t = core.insertNode(c, a);
                         a = c;
                     }
-                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): 1;
+                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
                     core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
