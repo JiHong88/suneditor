@@ -2493,8 +2493,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
                             if (util._isIgnoreNodeChange(child)) {
-                                pNode.appendChild(child);
-                                i--; len--;
+                                pNode.appendChild(child.cloneNode(true));
                                 if (!collapsed) {
                                     newInnerNode = newInnerNode.cloneNode(false);
                                     pNode.appendChild(newInnerNode);
@@ -2742,10 +2741,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child);
+                                pNode.appendChild(child.cloneNode(true));
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
-                                i--; len--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -3018,11 +3016,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             pNode.appendChild(newInnerNode);
                             newInnerNode = newInnerNode.cloneNode(false);
                         }
-                        pNode.appendChild(child);
+                        pNode.appendChild(child.cloneNode(true));
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
-                        i--; len--;
                         continue;
                     } else {
                         vNode = validation(child);
@@ -3129,10 +3126,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.insertBefore(child, ancestor);
-                                pNode.insertBefore(newInnerNode, child);
+                                const cloneChild = child.cloneNode(true);
+                                pNode.insertBefore(cloneChild, ancestor);
+                                pNode.insertBefore(newInnerNode, cloneChild);
                                 nNodeArray.push(newInnerNode);
-                                i++;
                             } else {
                                 recursionFunc(child, child);
                             }
