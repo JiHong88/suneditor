@@ -3328,7 +3328,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     element.appendChild(container);
                 }
             } else {
-                if (newInnerNode.textContent.length === 0) {
+                if (!isRemoveNode && newInnerNode.textContent.length === 0) {
                     util.removeEmptyNode(pNode, null);
                     return {
                         container: null,
@@ -6084,10 +6084,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
+         * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
          */
-        insertHTML: function (html, _clean) {
+        insertHTML: function (html, notCleaningData) {
             if (typeof html === 'string') {
-                if (!_clean) html = core.cleanHTML(html);
+                if (!notCleaningData) html = core.cleanHTML(html);
                 try {
                     const dom = _d.createRange().createContextualFragment(html);
                     const domTree = dom.childNodes;

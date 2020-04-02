@@ -1263,9 +1263,10 @@ const util = {
 
                     const l = child.lastChild;
                     const r = next.firstChild;
+                    let addOffset = 0;
                     if (l && r) {
                         const textOffset = l.nodeType === 3 && r.nodeType === 3;
-                        let addOffset = l.textContent.length;
+                        addOffset = l.textContent.length;
                         let tempL = l.previousSibling;
                         while(tempL && tempL.nodeType === 3) {
                             addOffset += tempL.textContent.length;
@@ -1295,8 +1296,27 @@ const util = {
                         }
                     }
 
-                    if (child.nodeType === 3) child.textContent += next.textContent;
-                    else child.innerHTML += next.innerHTML;
+                    if (child.nodeType === 3) {
+                        addOffset = child.textContent.length;
+                        child.textContent += next.textContent;
+                        if (nodePathArray) {
+                            let path = null;
+                            for (let n in nodePathArray) {
+                                path = nodePathArray[n];
+                                if (path && path[depth] > i) {
+                                    if (depth > 0 && path[depth - 1] !== depthIndex) continue;
+    
+                                    path[depth] -= 1;
+                                    if (path[depth + 1] >= 0 && path[depth] === i) {
+                                        path[depth + 1] += childLength;
+                                        offsets[n] += addOffset;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        child.innerHTML += next.innerHTML;
+                    }
                     
                     inst.removeItem(next);
                     i--;
