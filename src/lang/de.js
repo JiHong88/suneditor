@@ -22,6 +22,7 @@
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
+        code: 'de',
         toolbar: {
             default: 'Standard',
             save: 'Speichern',

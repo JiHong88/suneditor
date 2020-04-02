@@ -1384,8 +1384,11 @@ export default {
                 this.plugins.table.resizeTable.call(this);
                 break;
             case 'remove':
+                const emptyDiv = contextTable._element.parentNode;
                 this.util.removeItem(contextTable._element);
                 this.controllersOff();
+
+                if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
         }
 
         this.focus();

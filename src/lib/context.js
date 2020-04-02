@@ -32,6 +32,7 @@ const _Context = function (element, cons, options) {
             code: cons._codeArea,
             placeholder: cons._placeholder,
             loading: cons._loading,
+            lineBreaker: cons._lineBreaker,
             resizeBackground: cons._resizeBack,
             _stickyDummy: cons._stickyDummy,
             _arrow: cons._arrow

@@ -35,6 +35,7 @@ export default function (core, change) {
             if (redo) redo.removeAttribute('disabled');
         }
 
+        core.controllersOff();
         core._checkComponents();
         core._charCount('');
         core._resourcesStateChange();
@@ -44,6 +45,7 @@ export default function (core, change) {
     }
 
     function pushStack () {
+        core._checkComponents();
         const current = core.getContents(true);
         if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
 
@@ -77,7 +79,6 @@ export default function (core, change) {
 
         if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
-        core._checkComponents();
         core._charCount('');
         // onChange
         change();
@@ -110,7 +111,7 @@ export default function (core, change) {
                 _w.clearTimeout(pushDelay);
                 pushDelay = null;
                 pushStack();
-            }, 350);
+            }, 400);
         },
 
         /**

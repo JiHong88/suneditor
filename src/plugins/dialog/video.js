@@ -29,7 +29,7 @@ export default {
             _defaultSizeX: '100%',
             _defaultSizeY: (context.option.videoRatio * 100) + '%',
             _origin_w: context.option.videoWidth === '100%' ? '' : context.option.videoWidth,
-            _origin_h: '',
+            _origin_h: context.option.videoHeight === '56.25%' ? '' : context.option.videoHeight,
             _proportionChecked: true,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
@@ -64,6 +64,7 @@ export default {
             context.video.inputX = video_dialog.querySelector('._se_video_size_x');
             context.video.inputY = video_dialog.querySelector('._se_video_size_y');
             context.video.inputX.value = context.option.videoWidth;
+            context.video.inputY.value = context.option.videoHeight;
 
             context.video.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
             context.video.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
@@ -345,7 +346,7 @@ export default {
         }
 
         const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
-        this.plugins.video.applySize.call(this, (size[0] || this.context.option.videoWidth), (size[1] || ''));
+        this.plugins.video.applySize.call(this, (size[0] || this.context.option.videoWidth), (size[1] || this.context.option.videoHeight));
 
         existElement.parentNode.replaceChild(container, existElement);
         if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
@@ -393,11 +394,16 @@ export default {
     },
 
     on: function (update) {
+        const contextVideo = this.context.video;
+
         if (!update) {
-            const contextVideo = this.context.video;
             contextVideo.inputX.value = contextVideo._origin_w = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
-            contextVideo.inputY.value = contextVideo._origin_h = '';
+            contextVideo.inputY.value = contextVideo._origin_h = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
             contextVideo.proportion.disabled = true;
+        }
+
+        if (contextVideo._resizing) {
+            this.plugins.video.setVideoRatioSelect.call(this, contextVideo._origin_h || contextVideo._defaultRatio);
         }
     },
     
@@ -456,22 +462,33 @@ export default {
         } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.video.setAutoSize.call(this);
         } else {
-            this.plugins.video.setSize.call(this, w, (h || contextVideo._defaultRatio), false);
+            this.plugins.video.setSize.call(this, w, (h || contextVideo._videoRatio || contextVideo._defaultRatio), false);
         }
 
         return false;
     },
 
-    setSize: function (w, h, notResetPercentage) {
+    setSize: function (w, h, notResetPercentage, direction) {
         const contextVideo = this.context.video;
+        const onlyW = /^(rw|lw)$/.test(direction);
+        const onlyH = /^(th|bh)$/.test(direction);
 
-        w = this.util.getNumber(w, 0);
-        h = this.util.isNumber(h) ? h + contextVideo.sizeUnit : !h ? '' : h;
+        if (!onlyH) w = this.util.getNumber(w, 0);
+        if (!onlyW) h = this.util.isNumber(h) ? h + contextVideo.sizeUnit : !h ? '' : h;
 
-        contextVideo._element.style.width = w ? w + contextVideo.sizeUnit : '';
-        contextVideo._cover.style.paddingBottom = contextVideo._cover.style.height = h;
-        if (!/%$/.test(h)) contextVideo._element.style.height = h;
-        else contextVideo._element.style.height = '';
+        if (!onlyH) contextVideo._element.style.width = w ? w + contextVideo.sizeUnit : '';
+        if (!onlyW) contextVideo._cover.style.paddingBottom = contextVideo._cover.style.height = h;
+
+        if (!onlyH && !/%$/.test(w)) {
+            contextVideo._cover.style.width = '';
+            contextVideo._container.style.width = '';
+        }
+
+        if (!onlyW && !/%$/.test(h)) {
+            contextVideo._element.style.height = h;
+        } else {
+            contextVideo._element.style.height = '';
+        }
 
         if (!notResetPercentage) contextVideo._element.removeAttribute('data-percentage');
 
@@ -588,9 +605,13 @@ export default {
         this._variable._videosCnt--;
         const container = this.context.video._container;
         let focusEl = (container.previousElementSibling || container.nextElementSibling);
+
+        const emptyDiv = container.parentNode;
         this.util.removeItem(container);
         this.plugins.video.init.call(this);
         this.controllersOff();
+
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
 
         // focus
         this.focusEdge(focusEl);
@@ -603,13 +624,13 @@ export default {
         const contextVideo = this.context.video;
         contextVideo.focusElement.value = '';
         contextVideo._origin_w = this.context.option.videoWidth;
-        contextVideo._origin_h = '';
+        contextVideo._origin_h = this.context.option.videoHeight;
 
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
         
         if (contextVideo._resizing) {
             contextVideo.inputX.value = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
-            contextVideo.inputY.value = '';
+            contextVideo.inputY.value = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
             contextVideo.proportion.checked = true;
             contextVideo.proportion.disabled = true;
             this.plugins.video.setVideoRatioSelect.call(this, contextVideo._defaultRatio);

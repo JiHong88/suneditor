@@ -13,6 +13,10 @@ export default {
     // data display
     display: 'dialog',
 
+    title: 'L---I---N---k',
+    innerHTML: '<span class="se-icon-text">L</span>',
+    buttonClass: 'se-btn-primary',
+
     // @Required
     // add function - It is called only once when the plugin is first run.
     // This function generates HTML to append and register the event.

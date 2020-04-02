@@ -9,8 +9,8 @@
 .sun-editor-editable {
     font-family: Helvetica Neue, sans-serif;
     font-size: 13px;
-    line-height: 1.5;
     color: #333;
+    line-height: 1.5;
     text-align: left;
     background-color: #fff;
     word-break: break-all;
@@ -23,6 +23,9 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
 }
 
 /** controllers on tag */
@@ -80,8 +83,9 @@
     display: block;
     padding: 8px;
     margin: 0 0 10px;
-    line-height: 1.45;
+    font-family: monospace;
     color: #666;
+    line-height: 1.45;
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;

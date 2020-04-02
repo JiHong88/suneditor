@@ -68,6 +68,11 @@ export default {
         const loading_box = doc.createElement('DIV');
         loading_box.className = 'se-loading-box sun-editor-common';
         loading_box.innerHTML = '<div class="se-loading-effect"></div>';
+
+        // enter line
+        const line_breaker = doc.createElement('DIV');
+        line_breaker.className = 'se-line-breaker';
+        line_breaker.innerHTML = '<button class="se-btn">' + this.icons.line_break + '</button>';
     
         // resize operation background
         const resize_back = doc.createElement('DIV');
@@ -82,6 +87,7 @@ export default {
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
+        relative.appendChild(line_breaker);
         if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
@@ -101,6 +107,7 @@ export default {
                 _charWrapper: char_wrapper,
                 _charCounter: char_counter,
                 _loading: loading_box,
+                _lineBreaker: line_breaker,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,
                 _arrow: arrow
@@ -417,7 +424,7 @@ export default {
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         /** Character count */
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-        options.charCounterType = options.charCounterType === 'byte' ? 'byte' : 'char';
+        options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
         options.charCounterLabel = typeof options.charCounterLabel === 'string' ? options.charCounterLabel.trim() : null;
         options.maxCharCount = util.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */
@@ -443,6 +450,7 @@ export default {
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
         options.imageWidth = !options.imageWidth ? 'auto' : util.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
+        options.imageHeight = !options.imageHeight ? 'auto' : util.isNumber(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
         options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
         options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
         options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
@@ -455,11 +463,12 @@ export default {
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
         options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
-        options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth) ? '100%' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth) ? '' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoHeight = !options.videoHeight || !util.getNumber(options.videoHeight) ? '' : util.isNumber(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
         options.videoSizeOnlyPercentage = !!options.videoSizeOnlyPercentage;
         options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
         options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
-        options.videoRatio = util.getNumber(options.videoRatio, 4) || 0.5625; // 16:9
+        options.videoRatio = (util.getNumber(options.videoRatio, 4) || 0.5625);
         options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         /** Defining save button */
@@ -498,7 +507,7 @@ export default {
         return {
             /** default command */
             bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],
-            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'INS', '', icons.underline],
+            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'U', '', icons.underline],
             italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '', icons.italic],
             strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '', icons.strike],
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
@@ -576,11 +585,11 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
-        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + title + '</span></span>';
+        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
         
-        oButton.innerHTML = innerHTML;
+        oButton.innerHTML = (innerHTML || '<span class="se-icon-text">!</span>');
         oLi.appendChild(oButton);
 
         return {
@@ -640,11 +649,16 @@ export default {
                             plugins[pluginName] = button;
                         } else {
                             pluginName = button.name;
-                            module = [button.buttonClass, button.title, button.dataCommand, button.dataDisplay, button.innerHTML];
+                            module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
                         module = defaultButtonList[button];
                         pluginName = button;
+                        if (!module) {
+                            const custom = plugins[pluginName];
+                            if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
+                            module = [custom.buttonClass, custom.title, custom.name, custom.display, custom.innerHTML, custom._disabled];
+                        }
                     }
 
                     buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);

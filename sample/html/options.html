@@ -135,6 +135,8 @@
             <label><input type="radio" id="radio_charCounterType_1" name="radio_charCounterType" value="char" checked>&nbsp;&nbsp;char</label>
             &nbsp;&nbsp;&nbsp;
             <label><input type="radio" id="radio_charCounterType_2" name="radio_charCounterType" value="byte">&nbsp;&nbsp;byte</label>
+            &nbsp;&nbsp;&nbsp;
+            <label><input type="radio" id="radio_charCounterType_3" name="radio_charCounterType" value="byte-html">&nbsp;&nbsp;byte-html</label>
             <br><br>
             <label><input type="checkbox" id="charCounterLabel">&nbsp;&nbsp;charCounterLabel</label>
             <input type="text" id="charCounterLabel_value" placeholder="String">
@@ -209,6 +211,9 @@
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
             <input type="text" id="imageWidth_value" placeholder="String.. (auto)" style="width: 200px">
             <br><br>
+            <label><input type="checkbox" id="imageHeight">&nbsp;&nbsp;imageHeight</label>
+            <input type="text" id="imageHeight_value" placeholder="String.. (auto)" style="width: 200px">
+            <br><br>
             <label><input type="checkbox" id="imageSizeOnlyPercentage">&nbsp;&nbsp;imageSizeOnlyPercentage</label>
             <br><br>
             <label><input type="checkbox" id="imageRotation">&nbsp;&nbsp;imageRotation</label>
@@ -236,6 +241,9 @@
             <br><br>
             <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
             <input type="text" id="videoWidth_value" placeholder="String.. (100%)">
+            <br><br>
+            <label><input type="checkbox" id="videoHeight">&nbsp;&nbsp;videoHeight</label>
+            <input type="text" id="videoHeight_value" placeholder="String.. (56.25%)">
             <br><br>
             <label><input type="checkbox" id="videoSizeOnlyPercentage">&nbsp;&nbsp;videoSizeOnlyPercentage</label>
             <br><br>
@@ -389,7 +397,7 @@ function sun_create () {
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
         showPathLabel: document.getElementById('showPathLabel').checked ? undefined : false,
         charCounter: document.getElementById('charCounter').checked ? true : undefined,
-        charCounterType: document.getElementById('charCounterType').checked ? (document.getElementById('radio_charCounterType_1').checked ? 'char' : 'byte') : undefined,
+        charCounterType: document.getElementById('charCounterType').checked ? (document.querySelector('input[name="radio_charCounterType"]:checked').value) : undefined,
         charCounterLabel: document.getElementById('charCounterLabel').checked ? document.getElementById('charCounterLabel_value').value : undefined,
         maxCharCount: document.getElementById('maxCharCount').checked ? document.getElementById('maxCharCount_value').value : undefined,
         display: document.getElementById('display').checked ? document.getElementById('display_value').value : undefined,
@@ -420,6 +428,7 @@ function sun_create () {
         imageFileInput: document.getElementById('imageFileInput').checked ? undefined : false,
         imageUrlInput: document.getElementById('imageUrlInput').checked ? undefined : false,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
+        imageHeight: document.getElementById('imageHeight').checked ? document.getElementById('imageHeight_value').value : undefined,
         imageSizeOnlyPercentage: document.getElementById('imageSizeOnlyPercentage').checked ? true : undefined,
         imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
@@ -429,6 +438,7 @@ function sun_create () {
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
         videoRatioShow: document.getElementById('videoRatioShow').checked ? undefined : false,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
+        videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : undefined,
         videoSizeOnlyPercentage: document.getElementById('videoSizeOnlyPercentage').checked ? true : undefined,
         videoRotation: document.getElementById('videoRotation').checked ? document.getElementById('radio_videoRotation_1').checked : undefined,
         videoRatio: document.getElementById('videoRatio').checked ? document.getElementById('videoRatio_value').value : undefined,

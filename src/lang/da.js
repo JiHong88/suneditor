@@ -25,6 +25,7 @@
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
+        code: 'da',
         toolbar: {
             default: 'Default',
             save: 'Gem',

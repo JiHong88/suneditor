@@ -98,21 +98,55 @@
     <article class="markdown-body entry-content">
         <!-- base -->
         <button class="accordion active">How to add a plugin ↓</button>
-        <div class="panel" style="max-height: 1036px;">
+        <div class="panel" style="max-height: 1780px;">
 <div class="highlight highlight-source-js"><pre>
+<span class="pl-ent">/** You can use "dialog", "resizing" modules */</span>
+<span class="pl-ent">/** An example of using the module can be seen in the 4.dialog sample. */</span>
 <span class="pl-c">// import dialog from '/src/plugins/modules/[dialog, resizing]';</span>
 <span class="pl-c">// &lt;script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/plugins/modules/[dialog, resizing].js"&gt;&lt;/script&gt;</span>
 <span class="pl-c">// SUNEDITOR_MODULES['dialog', 'resizing']</span>
-<span class="pl-ent">// You can use "dialog", "resizing" modules</span>
-<span class="pl-ent">// An example of using the module can be seen in the 4.dialog sample.</span>
-<span class="pl-c">-----------------------------------------------------------------------</span>
+<span class="pl-ent">/** ----------------------------------------------------------------------- */</span>
+
+<span class="pl-ent">/** These are the free icon sites you can use */</span>
+<span class="pl-c">// --svg</span>
+<span class="pl-c">// https://icons8.com/</span>
+<span class="pl-c">// https://icon-icons.com</span>
+<span class="pl-c">// https://materialdesignicons.com</span>
+<span class="pl-c">// https://material.io/resources/icons/?style=baseline</span>
+<span class="pl-c">// https://www.freepik.com/</span>
+<span class="pl-c">// --icon class</span>
+<span class="pl-c">// https://fontawesome.com/, https://www.jsdelivr.com/package/npm/@fortawesome/fontawesome-free</span>
+<span class="pl-c">// &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css"&gt;</span>
+<span class="pl-ent">/** ----------------------------------------------------------------------- */</span>
 
 <span class="pl-ent">// Define custom plugin</span>
+<span class="pl-ent">// Common properties</span>
 <span class="pl-k">var</span> <span class="pl-s1">customPlugin</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// @Required common</span>
+    <span class="pl-k"><span class="pl-c">//</span> @Required @Unique</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span>
+    <span class="pl-k"><span class="pl-c">//</span> @Required</span>
     <span class="pl-c1">display</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
-    <span class="pl-c1">add</span>: <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span><span class="pl-kos">}</span><span class="pl-kos">,</span>
+    
+    <span class="pl-k"><span class="pl-c">//</span> @options</span>
+    <span class="pl-k"><span class="pl-c">//</span> * You can also set from the button list</span>
+    <span class="pl-ent">// HTML title attribute (tooltip) - default: plugin's name</span>
+    <span class="pl-c1">title</span>: <span class="pl-s">'Custom tooltip'</span>,
+    <span class="pl-ent">// HTML to be append to button (icon)</span>
+    <span class="pl-ent">// Recommend using the inline svg icon. - default: "&lt;span class="se-icon-text"&gt;!&lt;/span&gt;"</span>
+    <span class="pl-c1">innerHTML</span>: <span class="pl-s">'&lt;svg /&gt;, &lt;i class="" /&gt;, &lt;span class="se-icon-text"&gt;C&lt;/span&gt;',</span>
+    <span class="pl-ent">// The class of the button. - default: "se-btn"</span>
+    <span class="pl-ent">// Do not recommend using it unless it is a special situation.</span>
+    <span class="pl-c1">buttonClass</span>: <span class="pl-s">''</span>,
+
+    <span class="pl-k"><span class="pl-c">//</span> @Required</span>
+    <span class="pl-c1">add</span>: <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-c">// How to set language when setting button properties of plugin directly in plugin</span>
+        <span class="pl-k">const</span> <span class="pl-s1">titleList</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
+            <span class="pl-c1">en</span>: <span class="pl-s">'Custom'</span>,
+            <span class="pl-c1">ko</span>: <span class="pl-s">'사용자 정의'</span>,
+        <span class="pl-kos">}</span>
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">=</span> <span class="pl-s1">titleList</span><span class="pl-kos">[</span><span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">.</span><span class="pl-en">code</span><span class="pl-kos">]</span>
+    <span class="pl-kos">}</span><span class="pl-kos">,</span>
     ...
 <span class="pl-kos">}</span>
 
@@ -125,35 +159,34 @@
     <span class="pl-ent">// --- all plguins</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">{</span>
         ...<span class="pl-s1">plugins</span><span class="pl-kos">,</span>
-        ...<span class="pl-kos">{</span>custom_container<span class="pl-kos">}</span>
+        custom_container
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
     
     <span class="pl-ent">// ------ Add button list</span>
+    <span class="pl-ent">// --- Add the name of the plugin to the button list.</span>
+    <span class="pl-ent">// --- Button settings use the contents defined in the plugin.</span>
+    <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
+        <span class="pl-kos">[</span> <span class="pl-s">'custom_example'</span> <span class="pl-kos">]</span>
+    <span class="pl-kos">]</span>
+    <span class="pl-ent">// --- You can set the button's properties directly.</span>
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
         <span class="pl-kos">[</span>
             <span class="pl-kos">{</span>
                 <span class="pl-c">// plugin's name attribute</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span> 
-                <span class="pl-c">// name of the plugin to be recognized by the toolbar.</span>
                 <span class="pl-c">// It must be the same as the name attribute of the plugin </span>
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span>
-                <span class="pl-c">// button's class ("se-btn" class is registered, basic button click css is applied.)</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+                <span class="pl-k">name</span>: <span class="pl-s">'custom_example'</span><span class="pl-kos">,</span> 
+                <span class="pl-c">// Enter the "display" attribute value of your custom plugin.</span>
+                <span class="pl-k">dataDisplay</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+                
+                <span class="pl-k"><span class="pl-c">//</span> @options</span>
                 <span class="pl-c">// HTML title attribute</span>
                 <span class="pl-c1">title</span>: <span class="pl-s">'Custom plugin'</span><span class="pl-kos">,</span> 
-                <span class="pl-c">// Enter the "display" attribute value of your custom plugin.</span>
-                <span class="pl-c1">dataDisplay</span>: <span class="pl-kos">(</span><span class="pl-s">'container'</span> <span class="pl-c1">||</span> <span class="pl-s">'command'</span> <span class="pl-c1">||</span> <span class="pl-s">'submenu'</span> <span class="pl-c1">||</span> <span class="pl-s">'dialog'</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
-                
+                <span class="pl-c">// button's class ("se-btn" class is registered, basic button click css is applied.)</span>
+                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-ent">// ------ HTML to be append to button</span>
-                <span class="pl-ent">// --- Inline svg (These are the free icon sites you can use)</span>
-                <span class="pl-ent">// The default size of the svg file is 16px.(suneditor.css:54L)</span>
-                <span class="pl-c">// https://icon-icons.com</span>
-                <span class="pl-c">// https://materialdesignicons.com</span>
-                <span class="pl-c">// https://material.io/resources/icons/?style=baseline</span>
+                <span class="pl-ent">// --- Inline svg (The default size of the svg file is 16px.(suneditor.css:54L))</span>
                 <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;"&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
                 <span class="pl-ent">// --- Icon class (This icon uses Font Awesome)</span>
-                <span class="pl-c">// https://fontawesome.com/, https://www.jsdelivr.com/package/npm/@fortawesome/fontawesome-free</span>
-                <span class="pl-c">// &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.8.2/css/all.min.css"&gt;</span>
                 <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
@@ -170,7 +203,7 @@
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) Adds a container of type "submenu" that contains a plugin.</span>
 <span class="pl-k">var</span> <span class="pl-s1">custom_container</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// <span class="pl-k">@Required @Unique</span></span>
     <span class="pl-c">// plugin name</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span>
 
@@ -286,11 +319,10 @@
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
         <span class="pl-kos">[</span>
             <span class="pl-kos">{</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+                <span class="pl-k">name</span>: <span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
+                <span class="pl-k">dataDisplay</span>:<span class="pl-s">'container'</span><span class="pl-kos">,</span>
                 <span class="pl-c1">title</span>:<span class="pl-s">'custom_container'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'container'</span><span class="pl-kos">,</span>
+                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg viewBox="0 0 24 24" style="width:24px;height:24px;"&gt;&lt;path fill="currentColor" d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" /&gt;&lt;/svg&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
@@ -307,12 +339,17 @@
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A command plugin to add "Range format element(util.isRangeFormatElement)" to selection</span>
 <span class="pl-k">var</span> <span class="pl-s1">plugin_command</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// <span class="pl-k">@Required @Unique</span></span>
     <span class="pl-c">// plugin name</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'customCommand'</span><span class="pl-kos">,</span>
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
     <span class="pl-c">// data display</span>
     <span class="pl-c1">display</span>: <span class="pl-s">'command'</span><span class="pl-kos">,</span>
+
+    <span class="pl-c">// <span class="pl-k">@Options</span></span>
+    <span class="pl-c1">title</span>: <span class="pl-s">'Add range tag'</span>, 
+    <span class="pl-c1">buttonClass</span>: <span class="pl-s">''</span>, 
+    <span class="pl-c1">innerHTML</span>: <span class="pl-s">'&lt;i class="fas fa-carrot"&gt;&lt;/i&gt;'</span>,
 
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
     <span class="pl-c">// add function - It is called only once when the plugin is first run.</span>
@@ -362,6 +399,12 @@
 <span class="pl-k">var</span> <span class="pl-s1">plugin_command_2</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'customCommand_2'</span><span class="pl-kos">,</span>
     <span class="pl-c1">display</span>: <span class="pl-s">'command'</span><span class="pl-kos">,</span>
+
+    <span class="pl-c1">title</span>:<span class="pl-s">'Text node change'</span><span class="pl-kos">,</span> 
+    <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+    <span class="pl-c">// This icon uses Font Awesome</span>
+    <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span><span class="pl-kos">,</span> 
+
     <span class="pl-en">add</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-k">const</span> <span class="pl-s1">context</span> <span class="pl-c1">=</span> <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customCommand_2</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
@@ -392,26 +435,7 @@
 <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'ex_command'</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">plugin_command</span><span class="pl-kos">,</span> <span class="pl-s1">plugin_command_2</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
-        <span class="pl-kos">[</span>
-            <span class="pl-kos">{</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'customCommand'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'customCommand'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">title</span>:<span class="pl-s">'Add range tag'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'command'</span><span class="pl-kos">,</span>
-                <span class="pl-c">// This icon uses Font Awesome</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-carrot"&gt;&lt;/i&gt;'</span>
-            <span class="pl-kos">}</span><span class="pl-kos">,</span>
-            <span class="pl-kos">{</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'customCommand_2'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'customCommand_2'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">title</span>:<span class="pl-s">'Text node change'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'command'</span><span class="pl-kos">,</span>
-                <span class="pl-c">// This icon uses Font Awesome</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;i class="fas fa-font"&gt;&lt;/i&gt;'</span>
-            <span class="pl-kos">}</span>
-        <span class="pl-kos">]</span>
+        <span class="pl-kos">[</span clss="pl-s">'customCommand'<span></span>, <span class="pl-s">'customCommand_2'</span><span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
 <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
         </div>
@@ -425,13 +449,18 @@
             <br>
 <div class="highlight highlight-source-js"><pre><span class="pl-c">// ex) A submenu plugin that appends the contents of the input element to the editor</span>
 <span class="pl-k">var</span> <span class="pl-s1">plugin_submenu</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-    <span class="pl-c">// <span class="pl-k">@Required</span></span>
+    <span class="pl-c">// <span class="pl-k">@Required @Unique</span></span>
     <span class="pl-c">// plugin name</span>
     <span class="pl-c1">name</span>: <span class="pl-s">'custom_plugin_submenu'</span><span class="pl-kos">,</span>
 
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
     <span class="pl-c">// data display</span>
     <span class="pl-c1">display</span>: <span class="pl-s">'submenu'</span><span class="pl-kos">,</span>
+
+    <span class="pl-c">// <span class="pl-k">@Options</span></span>
+    <span class="pl-c1">title</span>: <span class="pl-s">'Custom plugin of the submenu'</span>,
+    <span class="pl-c1">buttonClass</span>: <span class="pl-s">''</span>, 
+    <span class="pl-c1">innerHTML</span>: <span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>,
 
     <span class="pl-c">// <span class="pl-k">@Required</span></span>
     <span class="pl-c">// add function - It is called only once when the plugin is first run.</span>
@@ -562,16 +591,7 @@
 <div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'ex_submenu'</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
     <span class="pl-c1">plugins</span>: <span class="pl-kos">[</span><span class="pl-s1">plugin_submenu</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
-        <span class="pl-kos">[</span>
-            <span class="pl-kos">{</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'custom_plugin_submenu'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'custom_plugin_submenu'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">title</span>:<span class="pl-s">'Custom plugin of the submenu'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'submenu'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"&gt;&lt;path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/&gt;&lt;/svg&gt;'</span>
-            <span class="pl-kos">}</span>
-        <span class="pl-kos">]</span>
+        <span class="pl-kos">[</span><span class="pl-s">'custom_plugin_submenu'</span><span class="pl-kos">,</span><span class="pl-kos">]</span>
     <span class="pl-kos">]</span>
 <span class="pl-kos">}</span><span class="pl-kos">)</span><span class="pl-kos">;</span></pre></div>
         </div>
@@ -902,11 +922,10 @@
     <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
         <span class="pl-kos">[</span>
             <span class="pl-kos">{</span>
-                <span class="pl-c1">name</span>: <span class="pl-s">'customLink'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataCommand</span>: <span class="pl-s">'customLink'</span><span class="pl-kos">,</span>
-                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
+                <span class="pl-k">name</span>: <span class="pl-s">'customLink'</span><span class="pl-kos">,</span> 
+                <span class="pl-k">dataDisplay</span>:<span class="pl-s">'dialog'</span><span class="pl-kos">,</span>
                 <span class="pl-c1">title</span>:<span class="pl-s">'Custom link'</span><span class="pl-kos">,</span> 
-                <span class="pl-c1">dataDisplay</span>:<span class="pl-s">'dialog'</span><span class="pl-kos">,</span>
+                <span class="pl-c1">buttonClass</span>:<span class="pl-s">''</span><span class="pl-kos">,</span> 
                 <span class="pl-c1">innerHTML</span>:<span class="pl-s">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" /&gt;&lt;/svg&gt;'</span>
             <span class="pl-kos">}</span>
         <span class="pl-kos">]</span>
@@ -944,7 +963,7 @@
 
     // ex) Adds a container of type "submenu" that contains a plugin.
     var custom_container = {
-        // @Required
+        // @Required @Unique
         // plugin name
         name: 'custom_container',
 
@@ -1057,12 +1076,17 @@
 
     // ex) A command plugin to add "Range format element(util.isRangeFormatElement)" to selection
     var plugin_command = {
-        // @Required
+        // @Required @Unique
         // plugin name
         name: 'customCommand',
         // @Required
         // data display
         display: 'command',
+
+        //@Options
+        title: 'Add range tag', 
+        buttonClass: '', 
+        innerHTML: '<i class="fas fa-carrot"></i>',
 
         // @Required
         // add function - It is called only once when the plugin is first run.
@@ -1112,6 +1136,10 @@
     var plugin_command_2 = {
         name: 'customCommand_2',
         display: 'command',
+        title:'Text node change', 
+        buttonClass:'', 
+        // This icon uses Font Awesome
+        innerHTML:'<i class="fas fa-font"></i>',
         add: function (core, targetElement) {
             const context = core.context;
             context.customCommand_2 = {
@@ -1142,13 +1170,18 @@
 
     // ex) A submenu plugin that appends the contents of the input element to the editor
     var plugin_submenu = {
-        // @Required
+        // @Required @Unique
         // plugin name
         name: 'custom_plugin_submenu',
 
         // @Required
         // data display
         display: 'submenu',
+
+        // @Options
+        title: 'Custom plugin of the submenu', 
+        buttonClass: '', 
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>',
 
         // @Required
         // add function - It is called only once when the plugin is first run.
@@ -1278,7 +1311,7 @@
 
     // ex) A link dialog plugin with multiple target options.
     var plugin_dialog = {
-        // @Required
+        // @Required @Unique
         // plugin name
         name: 'customLink',
 
@@ -1592,10 +1625,9 @@
             [
                 {
                     name: 'custom_container', 
-                    dataCommand: 'custom_container',
-                    buttonClass:'', 
-                    title:'custom_container', 
                     dataDisplay:'container',
+                    title:'custom_container', 
+                    buttonClass:'', 
                     innerHTML:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'
                 }
             ]
@@ -1605,41 +1637,14 @@
     SUNEDITOR.create(document.getElementById('ex_command'), {
         plugins: [plugin_command, plugin_command_2],
         buttonList: [
-            [
-                {
-                    name: 'customCommand', 
-                    dataCommand: 'customCommand',
-                    buttonClass:'', 
-                    title:'Add range tag', 
-                    dataDisplay:'command',
-                    innerHTML:'<i class="fas fa-carrot"></i>'
-                },
-                {
-                    name: 'customCommand_2', 
-                    dataCommand: 'customCommand_2',
-                    buttonClass:'', 
-                    title:'Text node change', 
-                    dataDisplay:'command',
-                    innerHTML:'<i class="fas fa-font"></i>'
-                }
-            ]
+            ['customCommand', 'customCommand_2']
         ]
     });
 
     SUNEDITOR.create(document.getElementById('ex_submenu'), {
         plugins: [plugin_submenu],
         buttonList: [
-            [
-                {
-                    name: 'custom_plugin_submenu', 
-                    dataCommand: 'custom_plugin_submenu',
-                    buttonClass:'', 
-                    title:'Custom plugin of the submenu', 
-                    dataDisplay:'submenu',
-                    innerHTML:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'
-                },
-                'codeView'
-            ]
+            ['custom_plugin_submenu']
         ]
     });
 
@@ -1649,10 +1654,9 @@
             [
                 {
                     name: 'customLink', 
-                    dataCommand: 'customLink',
-                    buttonClass:'', 
-                    title:'Custom link', 
                     dataDisplay:'dialog',
+                    title:'Custom link', 
+                    buttonClass:'', 
                     innerHTML:'<svg viewBox="0 0 24 24"><path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C7.22,12.88 7.22,9.71 9.17,7.76V7.76L12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.59,9.17C9.41,10.34 9.41,12.24 10.59,13.41M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.78,11.12 16.78,14.29 14.83,16.24V16.24L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L13.41,14.83C14.59,13.66 14.59,11.76 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z" /></svg>'
                 }
             ]

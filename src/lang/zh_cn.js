@@ -22,6 +22,7 @@
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
+        code: 'zh_cn',
         toolbar: {
             default: '默认',
             save: '保存',
