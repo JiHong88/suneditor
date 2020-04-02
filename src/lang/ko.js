@@ -22,6 +22,7 @@
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
+        code: 'ko',
         toolbar: {
             default: '기본값',
             save: '저장',

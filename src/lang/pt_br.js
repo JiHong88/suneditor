@@ -23,6 +23,7 @@
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const lang = {
+        code: 'pt_br',
         toolbar: {
             default: 'Padrão',
             save: 'Salvar',
