@@ -230,8 +230,8 @@ export default {
         this.context.table.tableHighlight.style.width = x + 'em';
         this.context.table.tableHighlight.style.height = y + 'em';
 
-        let x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
-        let y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
+        let x_u = 10; // x < 5 ? 5 : (x > 9 ? 10 : x + 1);
+        let y_u = 10; //y < 5 ? 5 : (y > 9 ? 10 : y + 1);
         this.context.table.tableUnHighlight.style.width = x_u + 'em';
         this.context.table.tableUnHighlight.style.height = y_u + 'em';
 
@@ -247,8 +247,8 @@ export default {
 
         highlight.width = '1em';
         highlight.height = '1em';
-        unHighlight.width = '5em';
-        unHighlight.height = '5em';
+        unHighlight.width = '10em';
+        unHighlight.height = '10em';
 
         this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
         this.submenuOff();
