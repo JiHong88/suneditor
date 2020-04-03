@@ -4847,7 +4847,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
                 isDirTop = true;
                 resetTop = true;
-            } else if (isDirTop && _d.scrollingElement.offsetTop > space) {
+            } else if (isDirTop && _d.documentElement.offsetTop > space) {
                 isDirTop = false;
                 resetTop = true;
             }
@@ -5610,7 +5610,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         _getPageBottomSpace: function () {
-            return _d.scrollingElement.scrollHeight - (event._getEditorOffsets().top + context.element.topArea.offsetHeight);
+            return _d.documentElement.scrollHeight - (event._getEditorOffsets().top + context.element.topArea.offsetHeight);
         },
 
         _onStickyToolbar: function () {
