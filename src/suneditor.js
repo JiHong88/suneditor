@@ -11,7 +11,6 @@ import core from './lib/core';
 import _Constructor from './lib/constructor';
 import _Context from './lib/context';
 
-
 export default {
     /**
      * @description Returns the create function with preset options.

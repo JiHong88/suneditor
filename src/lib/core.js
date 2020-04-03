@@ -17,11 +17,12 @@ import _notice from '../plugins/modules/_notice';
  * @description SunEditor constuctor function.
  * create core object and event registration.
  * core, event, functions
- * @param context
- * @param plugins
- * @param lang
- * @param options
- * @param _icons
+ * @param {Object} context
+ * @param {Object} pluginCallButtons
+ * @param {Object} plugins 
+ * @param {Object} lang
+ * @param {Object} options
+ * @param {Object} _icons
  * @returns {Object} functions Object
  */
 export default function (context, pluginCallButtons, plugins, lang, options, _icons) {

@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "module": "ES2015",
+      "target": "es5",
+      "sourceMap": true,
+      "allowJs": true,
+      "emitDeclarationOnly": true,
+      "checkJs": true,
+      "declaration": true
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }

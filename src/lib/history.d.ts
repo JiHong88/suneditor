@@ -1,0 +1,36 @@
+export default function _default(core: any, change: any): {
+    /**
+     * @description History stack
+     */
+    stack: any[];
+    /**
+     * @description Saving the current status to the history object stack
+     * If "delay" is true, it will be saved after 500 miliseconds
+     * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
+     * @param {Boolean} delay If true, delays 500 milliseconds
+     */
+    push: (delay: boolean) => void;
+    /**
+     * @description Undo function
+     */
+    undo: () => void;
+    /**
+     * @description Redo function
+     */
+    redo: () => void;
+    /**
+     * @description Go to the history stack for that index.
+     * If "index" is -1, go to the last stack
+     * @param {Number} index Stack index
+     */
+    go: (index: number) => void;
+    /**
+     * @description Reset the history object
+     */
+    reset: (ignoreChangeEvent: any) => void;
+    /**
+     * @description Remove all stacks and remove the timeout function.
+     * @private
+     */
+    _destroy: () => void;
+};
