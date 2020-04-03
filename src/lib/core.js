@@ -17,11 +17,12 @@ import _notice from '../plugins/modules/_notice';
  * @description SunEditor constuctor function.
  * create core object and event registration.
  * core, event, functions
- * @param context
- * @param plugins
- * @param lang
- * @param options
- * @param _icons
+ * @param {Object} context
+ * @param {Object} pluginCallButtons
+ * @param {Object} plugins 
+ * @param {Object} lang
+ * @param {Object} options
+ * @param {Object} _icons
  * @returns {Object} functions Object
  */
 export default function (context, pluginCallButtons, plugins, lang, options, _icons) {
@@ -450,16 +451,41 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const submenuName = this._submenuName = element.getAttribute('data-command');
 
             this.submenu = element.nextElementSibling;
+            this.submenu.style.top = '-10000px';
+            this.submenu.style.visibility = 'hidden';
             this.submenu.style.display = 'block';
             util.addClass(element, 'on');
             this.submenuActiveButton = element;
 
-            const toolbarW = this.context.element.toolbar.offsetWidth;
+            const toolbar = this.context.element.toolbar;
+            const toolbarW = toolbar.offsetWidth;
             const menuW = this.submenu.offsetWidth;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
             if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
             else this.submenu.style.left = '1px';
 
+
+            let t = 0;
+            let offsetEl = element;
+            while (offsetEl && offsetEl !== toolbar) {
+                t += offsetEl.offsetTop;
+                offsetEl = offsetEl.offsetParent;
+            }
+
+            if (this._isBalloon) {
+                t += toolbar.offsetTop + element.offsetHeight;
+            } else {
+                t -= element.offsetHeight;
+            }
+
+            const space = t + this.submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
+            if (space > 0 && event._getPageBottomSpace() < space) {
+                this.submenu.style.top = (-1 * (this.submenu.offsetHeight + 3)) + 'px';
+            } else {
+                this.submenu.style.top = '';
+            }
+
+            this.submenu.style.visibility = '';
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
@@ -571,6 +597,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Hide controller at editor area (link button, image resize button..)
+         * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
          */
         controllersOff: function (e) {
             if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
@@ -640,7 +667,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         const format = util.createElement('P');
                         const br = util.createElement('BR');
                         format.appendChild(br);
-                        this.setRange(br, 0, 0, br);
+                        this.setRange(br, 0, br, 0);
                     } else {
                         this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
                     }
@@ -678,9 +705,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Set current editor's range object
-         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
-         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Node} endCon The endContainer property of the selection object.
          * @param {Number} endOff The endOffset property of the selection object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
@@ -835,8 +862,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         tempOffset = 0;
                     }
     
-                    let format = util.getFormatElement(tempCon);
-                    if (format === util.getRangeFormatElement(format)) {
+                    let format = util.getFormatElement(tempCon, null);
+                    if (format === util.getRangeFormatElement(format, null)) {
                         format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : 'P');
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
@@ -874,8 +901,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
                     }
     
-                    let format = util.getFormatElement(tempCon);
-                    if (format === util.getRangeFormatElement(format)) {
+                    let format = util.getFormatElement(tempCon, null);
+                    if (format === util.getRangeFormatElement(format, null)) {
                         format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
@@ -927,11 +954,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 return validation ? validation(current) : util.isFormatElement(current);
             });
 
-            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) lineNodes.unshift(util.getFormatElement(commonCon));
+            if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon)) lineNodes.unshift(util.getFormatElement(commonCon, null));
             if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
-            let startLine = util.getFormatElement(startCon);
-            let endLine = util.getFormatElement(endCon);
+            let startLine = util.getFormatElement(startCon, null);
+            let endLine = util.getFormatElement(endCon, null);
             let startIdx = null;
             let endIdx = null;
             
@@ -975,7 +1002,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const commonCon = this.getRange().commonAncestorContainer;
             const myComponent = util.getParentElement(commonCon, util.isComponent);
             const selectedLines = util.isTable(commonCon) ? 
-                this.getSelectedElements() :
+                this.getSelectedElements(null) :
                 this.getSelectedElements(function (current) {
                     const component = this.getParentElement(current, this.isComponent);
                     return (this.isFormatElement(current) && (!component || component === myComponent)) || (this.isComponent(current) && !this.getFormatElement(current));
@@ -1029,7 +1056,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Element}
          */
         appendFormatTag: function (element, formatNode) {
-            const currentFormatEl = util.getFormatElement(this.getSelectionNode());
+            const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
             const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : 'P';
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = '<br>';
@@ -1057,7 +1084,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const r = this.removeNode();
             let oNode = null;
             let selectionNode = this.getSelectionNode();
-            let formatEl = util.getFormatElement(selectionNode);
+            let formatEl = util.getFormatElement(selectionNode, null);
 
             if (util.isListCell(formatEl)) {
                 if (/^HR$/i.test(element.nodeName)) {
@@ -1110,7 +1137,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         core.plugins.image.openModify.call(core, true);
                         core.plugins.image.update_image.call(core, true, true, true);
                     }
-                });
+                }, null);
             } else if (componentName === 'video') {
                 if (!core.plugins.video) return;
 
@@ -1118,7 +1145,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.callPlugin('video', function () {
                     const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
                     core.plugins.video.onModifyMode.call(core, element, size);
-                });
+                }, null);
             }
         },
 
@@ -1126,8 +1153,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Delete selected node and insert argument value node
          * If the "afterNode" exists, it is inserted after the "afterNode"
          * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
-         * @param {Element} oNode Element to be inserted
-         * @param {Element|null} afterNode If the node exists, it is inserted after the node
+         * @param {Node} oNode Element to be inserted
+         * @param {Node|null} afterNode If the node exists, it is inserted after the node
          * @returns {undefined|Object}
          */
         insertNode: function (oNode, afterNode) {
@@ -1244,7 +1271,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         afterNode = null;
                     } else if (!originAfter && !afterNode) {
                         const r = this.removeNode();
-                        const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container)) ? r.container : (util.getFormatElement(r.container) || r.container.parentNode)) : r.container;
+                        const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
                         const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
                         parentNode = rangeCon ? container : container.parentNode;
                         afterNode = rangeCon ? null : container.nextSibling;
@@ -1323,7 +1350,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let beforeNode = null;
             let afterNode = null;
 
-            const childNodes = util.getListChildNodes(commonCon);
+            const childNodes = util.getListChildNodes(commonCon, null);
             let startIndex = util.getArrayIndex(childNodes, startCon);
             let endIndex = util.getArrayIndex(childNodes, endCon);
 
@@ -1366,7 +1393,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             function remove (item) {
-                const format = util.getFormatElement(item);
+                const format = util.getFormatElement(item, null);
                 util.removeItem(item);
 
                 if(util.isListCell(format)) {
@@ -1377,7 +1404,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         while (children[0]) {
                             format.insertBefore(children[0], list);
                         }
-                        util.removeItemAllParents(child);
+                        util.removeItemAllParents(child, null, null);
                     }
                 }
             }
@@ -1434,7 +1461,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
             
             if (!util.isWysiwygDiv(container)) {
-                const rc = util.removeItemAllParents(container);
+                const rc = util.removeItemAllParents(container, null, null);
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
@@ -1494,7 +1521,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (util.isRangeFormatElement(last) || util.isFormatElement(last)) {
                 standTag = last;
             } else {
-                standTag = util.getRangeFormatElement(last) || util.getFormatElement(last);
+                standTag = util.getRangeFormatElement(last, null) || util.getFormatElement(last, null);
             }
 
             if (util.isCell(standTag)) {
@@ -2114,25 +2141,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             };
 
             // get line nodes
-            const lineNodes = this.getSelectedElements();
+            const lineNodes = this.getSelectedElements(null);
             range = this.getRange();
             startCon = range.startContainer;
             startOff = range.startOffset;
             endCon = range.endContainer;
             endOff = range.endOffset;
 
-            if (!util.getFormatElement(startCon)) {
-                startCon = util.getChildElement(lineNodes[0], function (current) { return current.nodeType === 3; });
+            if (!util.getFormatElement(startCon, null)) {
+                startCon = util.getChildElement(lineNodes[0], function (current) { return current.nodeType === 3; }, false);
                 startOff = 0;
             }
 
-            if (!util.getFormatElement(endCon)) {
-                endCon = util.getChildElement(lineNodes[lineNodes.length - 1], function (current) { return current.nodeType === 3; });
+            if (!util.getFormatElement(endCon, null)) {
+                endCon = util.getChildElement(lineNodes[lineNodes.length - 1], function (current) { return current.nodeType === 3; }, false);
                 endOff = endCon.textContent.length;
             }
 
             
-            const oneLine = util.getFormatElement(startCon) === util.getFormatElement(endCon);
+            const oneLine = util.getFormatElement(startCon, null) === util.getFormatElement(endCon, null);
             const endLength = lineNodes.length - (oneLine ? 0 : 1);
 
             // node Changes
@@ -2195,7 +2222,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Strip remove node
-         * @param {Element} removeNode The remove node
+         * @param {Node} removeNode The remove node
          * @private
          */
         _stripRemoveNode: function (removeNode) {
@@ -2236,10 +2263,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description wraps text nodes of line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
-         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Function} validation Check if the node should be stripped.
+         * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
-         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Node} endCon The endContainer property of the selection object.
          * @param {Number} endOff The endOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
@@ -2493,8 +2520,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (startPass) {
                         if (child.nodeType === 1 && !util.isBreak(child)) {
                             if (util._isIgnoreNodeChange(child)) {
-                                pNode.appendChild(child);
-                                i--; len--;
+                                pNode.appendChild(child.cloneNode(true));
                                 if (!collapsed) {
                                     newInnerNode = newInnerNode.cloneNode(false);
                                     pNode.appendChild(newInnerNode);
@@ -2682,12 +2708,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description wraps first line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
-         * @param {Element} startCon The startContainer property of the selection object.
+         * @param {Function} validation Check if the node should be stripped.
+         * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {{container: *, offset: *}}
+         * @returns {Object} { container, offset }
          * @private
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -2742,10 +2768,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child);
+                                pNode.appendChild(child.cloneNode(true));
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
-                                i--; len--;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2960,7 +2985,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description wraps mid lines selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
+         * @param {Function} validation Check if the node should be stripped.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @private
@@ -3018,11 +3043,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             pNode.appendChild(newInnerNode);
                             newInnerNode = newInnerNode.cloneNode(false);
                         }
-                        pNode.appendChild(child);
+                        pNode.appendChild(child.cloneNode(true));
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
-                        i--; len--;
                         continue;
                     } else {
                         vNode = validation(child);
@@ -3069,12 +3093,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description wraps last line selected text.
          * @param {Element} element The node of the line that contains the selected text node.
          * @param {Element} newInnerNode The dom that will wrap the selected text area
-         * @param {function} validation Check if the node should be stripped.
-         * @param {Element} endCon The endContainer property of the selection object.
+         * @param {Function} validation Check if the node should be stripped.
+         * @param {Node} endCon The endContainer property of the selection object.
          * @param {Number} endOff The endOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {{container: *, offset: *}}
+         * @returns {Object} { container, offset }
          * @private
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -3129,10 +3153,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.insertBefore(child, ancestor);
-                                pNode.insertBefore(newInnerNode, child);
+                                const cloneChild = child.cloneNode(true);
+                                pNode.insertBefore(cloneChild, ancestor);
+                                pNode.insertBefore(newInnerNode, cloneChild);
                                 nNodeArray.push(newInnerNode);
-                                i++;
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -3328,7 +3352,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     element.appendChild(container);
                 }
             } else {
-                if (newInnerNode.textContent.length === 0) {
+                if (!isRemoveNode && newInnerNode.textContent.length === 0) {
                     util.removeEmptyNode(pNode, null);
                     return {
                         container: null,
@@ -3491,7 +3515,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         indent: function (command) {
             const range = this.getRange();
-            const rangeLines = this.getSelectedElements();
+            const rangeLines = this.getSelectedElements(null);
             const cells = [];
             const shift = 'indent' !== command;
             let sc = range.startContainer;
@@ -3555,8 +3579,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
-            this.toggleDisabledButtons(!isCodeView);
             this.controllersOff();
+            this.toggleDisabledButtons(!isCodeView);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -3677,6 +3701,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const wysiwygFrame = context.element.wysiwygFrame;
             const code = context.element.code;
             const _var = this._variable;
+            this.controllersOff();
 
             if (!_var.isFullScreen) {
                 _var.isFullScreen = true;
@@ -4163,12 +4188,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _checkComponents: function () {
             if (this.plugins.image) {
-                if (!this.initPlugins.image) this.callPlugin('image', this.plugins.image.checkImagesInfo.bind(this));
+                if (!this.initPlugins.image) this.callPlugin('image', this.plugins.image.checkImagesInfo.bind(this), null);
                 else this.plugins.image.checkImagesInfo.call(this);
             }
 
             if (this.plugins.video) {
-                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this));
+                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this), null);
                 else this.plugins.video.checkVideosInfo.call(this);
             }
         },
@@ -4358,7 +4383,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _setDefaultFormat: function (formatName) {
             const commonCon = this.getRange().commonAncestorContainer;
-            const rangeEl = util.getRangeFormatElement(commonCon);
+            const rangeEl = util.getRangeFormatElement(commonCon, null);
             let focusNode, offset, format;
 
             if (rangeEl) {
@@ -4395,7 +4420,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             focusNode = util.getEdgeChildNodes(commonCon, commonCon);
             focusNode = focusNode ? focusNode.ec : commonCon;
 
-            format = util.getFormatElement(focusNode);
+            format = util.getFormatElement(focusNode, null);
             if (!format) {
                 this.removeRange();
                 this._editorRange();
@@ -4600,18 +4625,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onClick_toolbar: function (e) {
-            if (/^(input|textarea|select|option)$/i.test(e.target.nodeName)) {
-                core._antiBlur = false;
-            } else {
-                e.preventDefault();
-            }
-
             let target = e.target;
             let display = target.getAttribute('data-display');
             let command = target.getAttribute('data-command');
             let className = target.className;
 
-            while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
+            while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
                 target = target.parentNode;
                 command = target.getAttribute('data-command');
                 display = target.getAttribute('data-display');
@@ -4635,7 +4654,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (tablePlugin && tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
                     core.callPlugin('table', function () {
                         tablePlugin.onTableCellMultiSelect.call(core, tableCell, false);
-                    });
+                    }, null);
                 }
             }
 
@@ -4687,8 +4706,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core._editorRange();
 
             const selectionNode = core.getSelectionNode();
-            const formatEl = util.getFormatElement(selectionNode);
-            const rangeEl = util.getRangeFormatElement(selectionNode);
+            const formatEl = util.getFormatElement(selectionNode, null);
+            const rangeEl = util.getRangeFormatElement(selectionNode, null);
             if ((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
                 if (util.isList(rangeEl)) {
                     const oLi = util.createElement('LI');
@@ -4741,7 +4760,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             } else if (selection.focusNode === selection.anchorNode) {
                 isDirTop = selection.focusOffset < selection.anchorOffset;
             } else {
-                const childNodes = util.getListChildNodes(range.commonAncestorContainer);
+                const childNodes = util.getListChildNodes(range.commonAncestorContainer, null);
                 isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode);
             }
 
@@ -4762,6 +4781,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const stickyTop = offsets.top;
             const editorLeft = offsets.left;
             
+            toolbar.style.top = '-10000px';
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
 
@@ -4791,7 +4811,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 isDirTop = true;
             }
-            
+
             const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
             const toolbarWidth = toolbar.offsetWidth;
             const toolbarHeight = toolbar.offsetHeight;
@@ -4821,8 +4841,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - (toolbarWidth / 2) + scrollLeft;
             const overRight = absoluteLeft + toolbarWidth - editorWidth;
             
-            const t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
+            let t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
+
+            let resetTop = false;
+            const space = t + (isDirTop ? (event._getEditorOffsets().top) : (toolbar.offsetHeight - context.element.wysiwyg.offsetHeight));
+            if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
+                isDirTop = true;
+                resetTop = true;
+            } else if (isDirTop && _d.documentElement.offsetTop > space) {
+                isDirTop = false;
+                resetTop = true;
+            }
+
+            if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
             toolbar.style.left = _w.Math.floor(l) + 'px';
             toolbar.style.top = _w.Math.floor(t) + 'px';
@@ -4907,8 +4939,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const resizingName = core._resizingName;
-            let formatEl = util.getFormatElement(selectionNode) || selectionNode;
-            let rangeEl = util.getRangeFormatElement(formatEl);
+            let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
+            let rangeEl = util.getRangeFormatElement(formatEl, null);
 
             switch (keyCode) {
                 case 8: /** backspace key */
@@ -4969,11 +5001,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     // nested list
                     const commonCon = range.commonAncestorContainer;
-                    formatEl = util.getFormatElement(range.startContainer);
-                    rangeEl = util.getRangeFormatElement(formatEl);
+                    formatEl = util.getFormatElement(range.startContainer, null);
+                    rangeEl = util.getRangeFormatElement(formatEl, null);
                     if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || util.isList(selectionNode.previousSibling)))) &&
-                         (util.getFormatElement(range.startContainer) !== util.getFormatElement(range.endContainer) ? rangeEl.contains(range.startContainer) : (range.startOffset === 0  && range.collapsed))) {
+                         (util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null) ? rangeEl.contains(range.startContainer) : (range.startOffset === 0  && range.collapsed))) {
                             if (range.startContainer !== range.endContainer) {
                                 e.preventDefault();
 
@@ -5110,10 +5142,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
 
                     // nested list
-                    formatEl = util.getFormatElement(range.startContainer);
-                    rangeEl = util.getRangeFormatElement(formatEl);
+                    formatEl = util.getFormatElement(range.startContainer, null);
+                    rangeEl = util.getRangeFormatElement(formatEl, null);
                     if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.nextSibling || util.isList(selectionNode.nextSibling)) &&
-                     (util.getFormatElement(range.startContainer) !== util.getFormatElement(range.endContainer) ? rangeEl.contains(range.endContainer) : (range.endOffset === selectionNode.textContent.length && range.collapsed))))) {
+                     (util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null) ? rangeEl.contains(range.endContainer) : (range.endOffset === selectionNode.textContent.length && range.collapsed))))) {
                         if (range.startContainer !== range.endContainer) core.removeNode();
                         
                         let next = util.getArrayItem(formatEl.children, util.isList, false);
@@ -5152,7 +5184,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
                     const isEdge = (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset));            
-                    const selectedFormats = core.getSelectedElements();
+                    const selectedFormats = core.getSelectedElements(null);
                     selectionNode = core.getSelectionNode();
                     const cells = [];
                     let lines = [];
@@ -5272,7 +5304,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     
                     break;
                 case 13: /** enter key */
-                    const freeFormatEl = util.getFreeFormatElement(selectionNode);
+                    const freeFormatEl = util.getFreeFormatElement(selectionNode, null);
                     if (!shift && freeFormatEl) {
                         e.preventDefault();
                         const selectionFormat = selectionNode === freeFormatEl;
@@ -5339,7 +5371,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             
                             newEl.innerHTML = '<br>';
                             util.copyFormatAttributes(newEl, formatEl);
-                            util.removeItemAllParents(formatEl, null);
+                            util.removeItemAllParents(formatEl, null, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
                         }
@@ -5371,7 +5403,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         core.callPlugin(resizingName, function () {
                             const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
                             core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
-                        });
+                        }, null);
                     }
                     
                     break;
@@ -5445,8 +5477,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 return;
             }
 
-            const formatEl = util.getFormatElement(selectionNode);
-            const rangeEl = util.getRangeFormatElement(selectionNode);
+            const formatEl = util.getFormatElement(selectionNode, null);
+            const rangeEl = util.getRangeFormatElement(selectionNode, null);
             if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode)) {
                 core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 selectionNode = core.getSelectionNode();
@@ -5579,6 +5611,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             };
         },
 
+        _getPageBottomSpace: function () {
+            return _d.documentElement.scrollHeight - (event._getEditorOffsets().top + context.element.topArea.offsetHeight);
+        },
+
         _onStickyToolbar: function () {
             const element = context.element;
 
@@ -5661,7 +5697,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     context.image.imgInputFile.files = files;
                     core.plugins.image.onRender_imgInput.call(core);
                     context.image.imgInputFile.files = null;
-                });
+                }, null);
             // check char count
             } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
@@ -6082,7 +6118,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         insertImage: function (files) {
             if (!core.plugins.image || !files) return;
 
-            if (!core.initPlugins.image) core.callPlugin('image', core.plugins.image.submitAction.bind(core, files));
+            if (!core.initPlugins.image) core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
             else core.plugins.image.submitAction.call(core, files);
             core.focus();
         },
@@ -6090,10 +6126,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
+         * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
          */
-        insertHTML: function (html, _clean) {
+        insertHTML: function (html, notCleaningData) {
             if (typeof html === 'string') {
-                if (!_clean) html = core.cleanHTML(html);
+                if (!notCleaningData) html = core.cleanHTML(html, null);
                 try {
                     const dom = _d.createRange().createContextualFragment(html);
                     const domTree = dom.childNodes;
@@ -6102,7 +6139,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         t = core.insertNode(c, a);
                         a = c;
                     }
-                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): 1;
+                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
                     core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
@@ -6113,7 +6150,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 } else {
                     let afterNode = null;
                     if (util.isFormatElement(html) || util.isMedia(html)) {
-                        afterNode = util.getFormatElement(core.getSelectionNode());	
+                        afterNode = util.getFormatElement(core.getSelectionNode(), null);	
                     }
                     core.insertNode(html, afterNode);
                 }

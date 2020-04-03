@@ -571,17 +571,8 @@
             <span class="pl-s1">span</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">value</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setRange</span><span class="pl-kos">(</span><span class="pl-s1">span</span><span class="pl-kos">,</span> <span class="pl-c1">1</span><span class="pl-kos">,</span> <span class="pl-s1">span</span><span class="pl-kos">,</span> <span class="pl-c1">1</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
-            <span class="pl-k">const</span> <span class="pl-s1">node</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'span'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-            <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">addClass</span><span class="pl-kos">(</span><span class="pl-s1">node</span><span class="pl-kos">,</span> <span class="pl-s">'se-custom-tag'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-            <span class="pl-s1">node</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span> <span class="pl-c1">=</span> <span class="pl-s1">value</span><span class="pl-kos">;</span>
+            <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">functions</span><span class="pl-kos">.</span><span class="pl-en">insertHTML</span><span class="pl-kos">(</span><span class="pl-s">'&lt;span class="se-custom-tag"&gt;'</span> <span class="pl-smi">+</span> <span class="pl-c1">value</span> <span class="pl-smi">+</span> <span class="pl-s">'&lt;/span&gt;'</span>, <span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customSubmenu</span><span class="pl-kos">.</span><span class="pl-c1">textElement</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
-
-
-            <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">insertNode</span><span class="pl-kos">(</span><span class="pl-s1">node</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-            <span class="pl-k">const</span> <span class="pl-s1">zeroWidthSpace</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createTextNode</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-c1">zeroWidthSpace</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-            <span class="pl-s1">node</span><span class="pl-kos">.</span><span class="pl-c1">parentNode</span><span class="pl-kos">.</span><span class="pl-en">insertBefore</span><span class="pl-kos">(</span><span class="pl-s1">zeroWidthSpace</span><span class="pl-kos">,</span> <span class="pl-s1">node</span><span class="pl-kos">.</span><span class="pl-c1">nextSibling</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-
-            <span class="pl-c">// this.setRange(zeroWidthSpace, 1, zeroWidthSpace, 1);</span>
         <span class="pl-kos">}</span>
 
         <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">submenuOff</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
@@ -1164,6 +1155,8 @@
             } else {
                 this.nodeChange(null, ['background-color'], ['mark'], true);
             }
+
+            this.focus();
         }
     }
 
@@ -1292,17 +1285,8 @@
                 span.textContent = value;
                 this.setRange(span, 1, span, 1);
             } else {
-                const node = this.util.createElement('span');
-                this.util.addClass(node, 'se-custom-tag');
-                node.textContent = value;
+                this.functions.insertHTML('<span class="se-custom-tag">' + value + '</span>', true);
                 this.context.customSubmenu.textElement.value = '';
-    
-                
-                this.insertNode(node);
-                const zeroWidthSpace = this.util.createTextNode(this.util.zeroWidthSpace);
-                node.parentNode.insertBefore(zeroWidthSpace, node.nextSibling);
-                
-                // this.setRange(zeroWidthSpace, 1, zeroWidthSpace, 1);
             }
 
             this.submenuOff();

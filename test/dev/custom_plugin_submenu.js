@@ -4,6 +4,8 @@
 export default {
     // plugin name (Required)
     name: 'custom_plugin_submenu',
+    display: 'submenu',
+    innerHTML: 'T',
 
     // add function - It is called only once when the plugin is first run.
     // This function generates HTML to append and register the event.
@@ -20,14 +22,14 @@ export default {
         let listDiv = this.setSubmenu.call(core);
 
         // Input tag caching
-        context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
+        // context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
 
         // You must bind "core" object when registering an event.
         /** add event listeners */
         listDiv.getElementsByTagName('BUTTON')[0].addEventListener('click', this.onClick.bind(core));
-        context.custom.textElement.addEventListener('mousedown', function () {
+        // context.custom.textElement.addEventListener('mousedown', function () {
 
-        });
+        // });
 
         /** append html */
         targetElement.parentNode.appendChild(listDiv);
@@ -41,7 +43,8 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="se-list-inner se-list-align">' +
             '   <ul class="se-list-basic">' +
-            '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+            // '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
+            '       <li><select><option>111</option><option>222</option></select></li>' +
             '       <li><button type="button" class="se-btn se-tooltip">' +
             '               <span>OK</span>' +
             '               <span class="se-tooltip-inner">' +

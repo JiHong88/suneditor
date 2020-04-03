@@ -151,12 +151,12 @@ export default {
      * @returns {String}
      */
     rgb2hex: function (rgb) {
-        rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+        const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 
-        return (rgb && rgb.length === 4) ? "#" +
-            ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-            ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-            ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+        return (rgbMatch && rgbMatch.length === 4) ? "#" +
+            ("0" + parseInt(rgbMatch[1],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgbMatch[2],10).toString(16)).slice(-2) +
+            ("0" + parseInt(rgbMatch[3],10).toString(16)).slice(-2) : '';
     },
 
     colorName2hex: function (colorName) {

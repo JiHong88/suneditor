@@ -19,7 +19,7 @@ const util = {
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
      * @param {String} text 
-     * @returns {String}
+     * @returns {String} HTML string
      * @private
      */
     _tagConvertor: function (text) {
@@ -32,7 +32,7 @@ const util = {
     /**
      * @description HTML Reserved Word Converter.
      * @param {String} contents 
-     * @returns {String}
+     * @returns {String} HTML string
      * @private
      */
     _HTMLConvertor: function (contents) {
@@ -69,7 +69,7 @@ const util = {
 
     /**
      * @description Gets XMLHttpRequest object
-     * @returns {Object}
+     * @returns {XMLHttpRequest|ActiveXObject}
      */
     getXMLHttpRequest: function () {
         /** IE */
@@ -158,8 +158,8 @@ const util = {
 
     /**
      * @description Returns the CSS text that has been applied to the current page.
-     * @param {Element|null} doc To get the CSS text of an document(core._wd). If null get the current document.
-     * @returns {String}
+     * @param {Document|null} doc To get the CSS text of an document(core._wd). If null get the current document.
+     * @returns {String} Styles string
      */
     getPageStyle: function (doc) {
         let cssText = '';
@@ -243,7 +243,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the edit region top div element or iframe's body tag.
-     * @param {Element} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
@@ -254,7 +254,7 @@ const util = {
     /**
      * @description It is judged whether it is a node related to the text style.
      * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
-     * @param {Element|String} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isTextStyleElement: function (element) {
@@ -264,7 +264,7 @@ const util = {
     /**
      * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
      * Format element also contain "free format Element"
-     * @param {Element} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
@@ -274,7 +274,7 @@ const util = {
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
      * * Range format element is wrap the format element  (util.isFormatElement)
-     * @param {Element} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
@@ -285,7 +285,7 @@ const util = {
      * @description It is judged whether it is the free format element. (PRE)
      * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
-     * @param {Element} element 
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isFreeFormatElement: function (element) {
@@ -294,7 +294,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
-     * @param {Element} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isComponent: function (element) {
@@ -303,7 +303,7 @@ const util = {
 
     /**
      * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
-     * @param {Element} element The element to check
+     * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isMediaComponent: function (element) {
@@ -312,9 +312,9 @@ const util = {
 
     /**
      * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.
-     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Node} element Reference node.
      * @param {Function|null} validation Additional validation function.
-     * @returns {Element}
+     * @returns {Element|null}
      */
     getFormatElement: function (element, validation) {
         if (!element) return null;
@@ -335,7 +335,7 @@ const util = {
 
     /**
      * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
-     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Node} element Reference node.
      * @param {Function|null} validation Additional validation function.
      * @returns {Element|null}
      */
@@ -356,9 +356,9 @@ const util = {
 
     /**
      * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
-     * @param {Element} element Reference element if null or no value, it is relative to the current focus node.
+     * @param {Node} element Reference node.
      * @param {Function|null} validation Additional validation function.
-     * @returns {Element}
+     * @returns {Element|null}
      */
     getFreeFormatElement: function (element, validation) {
         if (!element) return null;
@@ -380,7 +380,6 @@ const util = {
      * @description Add style and className of copyEl to originEl
      * @param {Element} originEl Origin element
      * @param {Element} copyEl Element to copy
-     * @private
      */
     copyTagAttributes: function (originEl, copyEl) {
         if (copyEl.style.cssText) {
@@ -409,7 +408,7 @@ const util = {
 
     /**
      * @description Get the item from the array that matches the condition.
-     * @param {Array} array Array to get item
+     * @param {Array|HTMLCollection|NodeList} array Array to get item
      * @param {Function|null} validation Conditional function
      * @param {Boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
      * If false, returns only one item that meet the criteria otherwise return null.
@@ -434,8 +433,8 @@ const util = {
 
     /**
      * @description Get the index of the argument value in the element array
-     * @param {Array} array element array
-     * @param {Element} element The element to find index
+     * @param {Array|HTMLCollection|NodeList} array element array
+     * @param {Node} element The element to find index
      * @returns {Number}
      */
     getArrayIndex: function (array, element) {
@@ -452,8 +451,8 @@ const util = {
 
     /**
      * @description Get the next index of the argument value in the element array
-     * @param {Array} array element array
-     * @param {Element} item The element to find index
+     * @param {Array|HTMLCollection|NodeList} array element array
+     * @param {Node} item The element to find index
      * @returns {Number}
      */
     nextIdx: function (array, item) {
@@ -464,8 +463,8 @@ const util = {
 
     /**
      * @description Get the previous index of the argument value in the element array
-     * @param {Array} array Element array
-     * @param {Element} item The element to find index
+     * @param {Array|HTMLCollection|NodeList} array Element array
+     * @param {Node} item The element to find index
      * @returns {Number}
      */
     prevIdx: function (array, item) {
@@ -489,9 +488,9 @@ const util = {
 
     /**
      * @description Returns the position of the "node" in the "parentNode" in a numerical array.
-     * ex) <p><span>aa</span><span>bb</span></p> - (node: "bb", parentNode: "<P>") -> [1, 0]
+     * ex) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
      * @param {Node} node The Node to find position path
-     * @param {Element|null} parentNode Parent node. If null, wysiwyg div area
+     * @param {Node|null} parentNode Parent node. If null, wysiwyg div area
      * @param {Object|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
      * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
      * Do not use unless absolutely necessary.
@@ -542,8 +541,8 @@ const util = {
     /**
      * @description Returns the node in the location of the path array obtained from "util.getNodePath".
      * @param {Array} offsets Position array, array obtained from "util.getNodePath"
-     * @param {Element} parentNode Base parent element
-     * @returns {Element}
+     * @param {Node} parentNode Base parent element
+     * @returns {Node}
      */
     getNodeFromPath: function (offsets, parentNode) {
         let current = parentNode;
@@ -565,8 +564,8 @@ const util = {
     /**
      * @description Compares the style and class for equal values.
      * Returns true if both are text nodes.
-     * @param {Node} a Node object
-     * @param {Node} b Node object
+     * @param {Node} a Node to compare
+     * @param {Node} b Node to compare
      * @returns {Boolean}
      */
     isSameAttributes: function (a, b) {
@@ -595,7 +594,7 @@ const util = {
 
     /**
      * @description Check the node is a list (ol, ul)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isList: function (node) {
@@ -604,7 +603,7 @@ const util = {
 
     /**
      * @description Check the node is a list cell (li)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isListCell: function (node) {
@@ -613,7 +612,7 @@ const util = {
 
     /**
      * @description Check the node is a table (table, thead, tbody, tr, th, td)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isTable: function (node) {
@@ -622,7 +621,7 @@ const util = {
 
     /**
      * @description Check the node is a table cell (td, th)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isCell: function (node) {
@@ -631,7 +630,7 @@ const util = {
 
     /**
      * @description Check the node is a break node (BR)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isBreak: function (node) {
@@ -641,7 +640,7 @@ const util = {
 
     /**
      * @description Check the node is a anchor node (A)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isAnchor: function (node) {
@@ -650,7 +649,7 @@ const util = {
 
     /**
      * @description Check the node is a media node (img, iframe, audio, video, canvas)
-     * @param {Element|String} node The element or element name to check
+     * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
      */
     isMedia: function (node) {
@@ -683,9 +682,9 @@ const util = {
     },
 
     /**
-     * @description Get all child nodes of the argument value element (Without text node)
-     * @param {Element|String} element element to get child node
-     * @param {(function|null)} validation Conditional function
+     * @description Get all "children" of the argument value element (Without text nodes)
+     * @param {Element} element element to get child node
+     * @param {Function|null} validation Conditional function
      * @returns {Array}
      */
     getListChildren: function (element, validation) {
@@ -708,9 +707,9 @@ const util = {
     },
 
     /**
-     * @description Get all child nodes of the argument value element (Include text nodes)
-     * @param {Element} element element to get child node
-     * @param {function|null} validation Conditional function
+     * @description Get all "childNodes" of the argument value element (Include text nodes)
+     * @param {Node} element element to get child node
+     * @param {Function|null} validation Conditional function
      * @returns {Array}
      */
     getListChildNodes: function (element, validation) {
@@ -736,7 +735,7 @@ const util = {
      * @description Returns the number of parents nodes.
      * "0" when the parent node is the WYSIWYG area.
      * "-1" when the element argument is the WYSIWYG area.
-     * @param {Element} element The element to check
+     * @param {Node} element The element to check
      * @returns {Number}
      */
     getElementDepth: function (element) {
@@ -850,8 +849,8 @@ const util = {
      * 2. The last node of all the child nodes of the "last" element is returned.
      * 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
      * { sc: "first", ec: "last" }
-     * @param {Element} first First element
-     * @param {Element|null} last Last element
+     * @param {Node} first First element
+     * @param {Node|null} last Last element
      * @returns {Object}
      */
     getEdgeChildNodes: function (first, last) {
@@ -869,8 +868,8 @@ const util = {
 
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
-     * @param {Element} element Element node
-     * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
+     * @param {Node} element Reference node
+     * @param {Node|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
      * @returns {Object}
      */
     getOffset: function (element, wysiwygFrame) {
@@ -895,7 +894,7 @@ const util = {
 
     /**
      * @description It compares the start and end indexes of "a" and "b" and returns the number of overlapping indexes in the range.
-     * ex) 1, 5, 4, 6 => 2 (4 ~ 5)
+     * ex) 1, 5, 4, 6 => "2" (4 ~ 5)
      * @param {Number} aStart Start index of "a"
      * @param {Number} aEnd End index of "a"
      * @param {Number} bStart Start index of "b"
@@ -911,7 +910,7 @@ const util = {
 
     /**
      * @description Set the text content value of the argument value element
-     * @param {Element} element Element to replace text content
+     * @param {Node} element Element to replace text content
      * @param {String} txt Text to be applied
      */
     changeTxt: function (element, txt) {
@@ -994,7 +993,7 @@ const util = {
 
     /**
      * @description Delete argumenu value element
-     * @param {Element} item Element to be remove
+     * @param {Node} item Node to be remove
      */
     removeItem: function (item) {
         if (!item) return;
@@ -1008,7 +1007,7 @@ const util = {
     /**
      * @description Delete all parent nodes that match the condition.
      * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
-     * @param {Element} item Element to be remove
+     * @param {Node} item Node to be remove
      * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
      * @param {Element|null} stopParent Stop when the parent node reaches stopParent
      * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
@@ -1044,7 +1043,7 @@ const util = {
     /**
      * @description Detach Nested all nested lists under the "baseNode".
      * Returns a list with nested removed.
-     * @param {Element} baseNode Element on which to base.
+     * @param {Node} baseNode Element on which to base.
      * @param {Boolean} all If true, it also detach all nested lists of a returned list.
      * @returns {Element}
      */
@@ -1194,7 +1193,7 @@ const util = {
      * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
      * If "offset" has been changed, it will return as much "offset" as it has been modified.
      * An array containing change offsets is returned in the order of the "nodePathArray" array.
-     * @param {Element} element Element object.
+     * @param {Element} element Element
      * @param {Array|null} nodePathArray Array of NodePath object ([util.getNodePath(), ..])
      * @param {Boolean} onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
      * @returns {Array} [offset, ..]
@@ -1263,9 +1262,10 @@ const util = {
 
                     const l = child.lastChild;
                     const r = next.firstChild;
+                    let addOffset = 0;
                     if (l && r) {
                         const textOffset = l.nodeType === 3 && r.nodeType === 3;
-                        let addOffset = l.textContent.length;
+                        addOffset = l.textContent.length;
                         let tempL = l.previousSibling;
                         while(tempL && tempL.nodeType === 3) {
                             addOffset += tempL.textContent.length;
@@ -1295,8 +1295,27 @@ const util = {
                         }
                     }
 
-                    if (child.nodeType === 3) child.textContent += next.textContent;
-                    else child.innerHTML += next.innerHTML;
+                    if (child.nodeType === 3) {
+                        addOffset = child.textContent.length;
+                        child.textContent += next.textContent;
+                        if (nodePathArray) {
+                            let path = null;
+                            for (let n in nodePathArray) {
+                                path = nodePathArray[n];
+                                if (path && path[depth] > i) {
+                                    if (depth > 0 && path[depth - 1] !== depthIndex) continue;
+    
+                                    path[depth] -= 1;
+                                    if (path[depth + 1] >= 0 && path[depth] === i) {
+                                        path[depth + 1] += childLength;
+                                        offsets[n] += addOffset;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        child.innerHTML += next.innerHTML;
+                    }
                     
                     inst.removeItem(next);
                     i--;
@@ -1422,7 +1441,7 @@ const util = {
 
     /**
      * @description Nodes that need to be added without modification when changing text nodes
-     * @param {Element} element Element to check
+     * @param {Node} element Element to check
      * @returns {Boolean}
      * @private
      */
@@ -1432,7 +1451,7 @@ const util = {
 
     /**
      * @description Nodes that must remain undetached when changing text nodes
-     * @param {Element} element Element to check
+     * @param {Node} element Element to check
      * @returns {Boolean}
      * @private
      */
@@ -1442,7 +1461,7 @@ const util = {
 
     /**
      * @description Nodes without text
-     * @param {Element} element Element to check
+     * @param {Node} element Element to check
      * @returns {Boolean}
      * @private
      */
@@ -1452,7 +1471,7 @@ const util = {
 
     /**
      * @description Check not Allowed tags
-     * @param {Element} element Element to check
+     * @param {Node} element Element to check
      * @private
      */
     _notAllowedTags: function (element) {
@@ -1481,7 +1500,7 @@ const util = {
 
     /**
      * @description Fix tags that do not fit the editor format.
-     * @param {DOCUMENT_FRAGMENT_NODE} documentFragment Document fragment (nodeType === 11)
+     * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
      * @private
      */

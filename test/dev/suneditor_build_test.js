@@ -11,6 +11,7 @@ import lang from '../../src/lang';
 import custom_plugin_submenu from './custom_plugin_submenu';
 import custom_plugin_dialog from './custom_plugin_dialog';
 import Resolutions from './Resolutions';
+// import subLib from './sub_lib';
 import custom_container from './custom_container';
 
 import 'codemirror/lib/codemirror.css';
@@ -26,8 +27,8 @@ const align = require('../../src/plugins/submenu/align')
 
 
 suneditor.create("sample1", {
-    plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle],
-    // mode: "balloon",
+    plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle, custom_plugin_submenu],
+    mode: "balloon",
     // iframe: true,
     width: '100%',
     height: '500px',
@@ -58,7 +59,7 @@ suneditor.create("sample1", {
                 dataDisplay:'submenu',
                 innerHTML:'S'
             },
-            'bold', 'italic', 'template', 'customLink'
+            'bold', 'italic', 'template', 'customLink', 'custom_plugin_submenu'
         ]
     ],
     maxCharCount: 2000
@@ -67,7 +68,7 @@ suneditor.create("sample1", {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    // mode: 'balloon-always', 
+    mode: 'balloon-always',
     katex: Katex,
     // attributesWhitelist: 'style',
     buttonList: [
@@ -691,23 +692,11 @@ window.sun_create2 = function () {
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
     buttonList: [
         [plugins.formatBlock, 'align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
-        [
-            {
-                // plugin's name attribute
-                name: 'custom_plugin_submenu', 
-                // button's class ("se-btn" class is registered, basic button click css is applied.)
-                buttonClass:'se-btn', 
-                // HTML title attribute
-                title:'Custom plugin of the submenu', 
-                // 'submenu' or 'dialog' or '' (command button)
-                dataDisplay:'submenu',
-                // HTML to be append to button
-                innerHTML:''
-            }
-        ]
     ],
+    mode: 'balloon-always',
     lang: ko,
     width: '100%',
+    height: '500px',
     stickyToolbar: false,
     popupDisplay: 'local',
     // iframe: true,
@@ -715,15 +704,15 @@ let s3 = editor.create(document.getElementsByName('editor3')[0], {
     // resizingBar: false
     // showPathLabel:false
     charCounter: true,
-    formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
-        tag: 'div',
-        class: '__se__format__aaa',
-        name: 'red div',
-        style: 'margin: 10px; background-color: #f5f5f5;',
-        command: 'replace'
-    }],
+    // formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
+    //     tag: 'div',
+    //     class: '__se__format__aaa',
+    //     name: 'red div',
+    //     style: 'margin: 10px; background-color: #f5f5f5;',
+    //     command: 'replace'
+    // }],
     placeholder: 'Start typing something.4..',
-    maxCharCount: 280,
+    // maxCharCount: 280,
 });
 window.sun_destroy3 = function () {
     s3.destroy();
