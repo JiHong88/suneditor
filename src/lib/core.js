@@ -597,9 +597,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Hide controller at editor area (link button, image resize button..)
+         * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
          */
-        controllersOff: function () {
-            if (this._resizingName) return;
+        controllersOff: function (e) {
+            if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
 
             this._resizingName = '';
             this.currentControllerName = '';
@@ -3578,8 +3579,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
-            this.toggleDisabledButtons(!isCodeView);
             this.controllersOff();
+            this.toggleDisabledButtons(!isCodeView);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -3700,6 +3701,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const wysiwygFrame = context.element.wysiwygFrame;
             const code = context.element.code;
             const _var = this._variable;
+            this.controllersOff();
 
             if (!_var.isFullScreen) {
                 _var.isFullScreen = true;
