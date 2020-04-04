@@ -1,5 +1,3 @@
-import { DisplayProperty, PositionProperty } from 'csstype';
-
 declare module 'suneditor' {
   export function create(
     idOrElement: string | Element,
@@ -78,11 +76,11 @@ declare module 'suneditor' {
     /**
      * The position property of editor
      */
-    position?: PositionProperty;
+    position?: string;
     /**
      * The display property of editor
      */
-    display?: DisplayProperty;
+    display?: string;
     /**
      * Size of background area when activating dialog window ('full'||'local')
      */
@@ -110,11 +108,11 @@ declare module 'suneditor' {
     /**
      * Defines the calculation method of the "charCounter" option
      */
-    charCounterType?: String;
+    charCounterType?: 'char' | 'byte' | 'byte-html';
     /**
      * Text to be displayed in the "charCounter" area of the bottom bar.
      */
-    charCounterLabel?: String;
+    charCounterLabel?: string;
     /**
      * The maximum number of characters allowed to be inserted into the editor
      */
@@ -150,7 +148,7 @@ declare module 'suneditor' {
     /** 
      * Editing area default style 
     */
-    defaultStyle?: String;
+    defaultStyle?: string;
     /**
      * Defining menu items
      * ===================
@@ -202,11 +200,11 @@ declare module 'suneditor' {
     /**
      * The default width size of the image frame
      */
-    imageWidth?: String;
+    imageWidth?: string;
     /**
      * The default height size of the image frame
      */
-    imageHeight?: String;
+    imageHeight?: string;
     /**
      * If true, image size can only be scaled by percentage.
      */
@@ -256,11 +254,11 @@ declare module 'suneditor' {
     /**
      * The default width size of the video frame
      */
-    videoWidth?: String;
+    videoWidth?: string;
     /**
      * The default height size of the video frame
      */
-    videoHeight?: String;
+    videoHeight?: string;
     /**
      * If true, video size can only be scaled by percentage.
      */
@@ -390,6 +388,7 @@ declare module 'suneditor' {
   }
 
   export interface Lang {
+    code: string,
     toolbar: {
       default: string,
       save: string,
