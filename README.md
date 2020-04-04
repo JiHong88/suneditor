@@ -772,6 +772,8 @@ editor.onImageUploadBefore: function (files, info, core) {
  * - size: file size
  * - select: select function
  * - delete: delete function
+ * - element: img element
+ * - src: src attribute of img tag
  * }
  * remainingFilesCount: Count of remaining image files
  * core: Core object
