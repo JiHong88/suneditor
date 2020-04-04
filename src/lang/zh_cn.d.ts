@@ -1,5 +1,5 @@
-import { Lang } from 'suneditor';
+import { Lang } from './Lang';
 
-const zhCn: Lang;
+declare const zhCn: Lang;
 
 export default zhCn;

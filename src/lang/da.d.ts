@@ -1,5 +1,5 @@
-import { Lang } from 'suneditor';
+import { Lang } from './Lang';
 
-const da: Lang;
+declare const da: Lang;
 
 export default da;
