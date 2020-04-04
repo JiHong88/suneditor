@@ -360,7 +360,7 @@ interface Core {
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @returns
      */
-    detachRangeFormatElement(rangeElement: Element, selectedFormats?: Element[], newRangeElement?: Element, remove: boolean, notHistoryPush: boolean): {cc: Node, sc: Node, ec: Node, removeArray: Element[]}
+    detachRangeFormatElement(rangeElement: Element, selectedFormats: Element[] | null, newRangeElement: Element | null, remove: boolean, notHistoryPush: boolean): {cc: Node, sc: Node, ec: Node, removeArray: Element[]}
 
     /**
      * @description "selectedFormats" array are detached from the list element.
