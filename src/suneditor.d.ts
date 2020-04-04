@@ -2,7 +2,7 @@ import { SunEditorOptions } from './options.d';
 import SunEditor from './lib/core';
 
 declare namespace _default {
-    export function init(init_options: SunEditorOptions): SunEditor;
+    export function init(init_options: SunEditorOptions): { create: Function; };
     export function create(idOrElement: String | Element, options: SunEditorOptions, _init_options?: SunEditorOptions): SunEditor;
 }
 

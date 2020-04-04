@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const table: SubmenuPlugin;
+declare const table: SubmenuPlugin;
 
 export default table;

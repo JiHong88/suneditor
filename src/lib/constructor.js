@@ -15,7 +15,7 @@ export default {
     icons: null,
     /**
      * @description document create - call _createToolBar()
-     * @param {element} element Textarea
+     * @param {Element} element Textarea
      * @param {Object} options Options
      * @returns {Object}
      */

@@ -9,6 +9,10 @@
 
 export default {
     name: 'notice',
+    /**
+     * @description Constructor
+     * @param {Object} core Core object 
+     */
     add: function (core) {
         const context = core.context;
         context.notice = {};
@@ -40,17 +44,28 @@ export default {
         notice_div = null;
     },
 
+    /**
+     * @description Event when clicking the cancel button
+     * @param {MouseEvent} e Event object
+     */
     onClick_cancel: function (e) {
         e.preventDefault();
         e.stopPropagation();
         this.plugins.notice.close.call(this);
     },
 
+    /**
+     * @description  Open the notice panel
+     * @param {String} text Notice message
+     */
     open: function (text)  {
         this.context.notice.message.textContent = text;
         this.context.notice.modal.style.display = 'block';
     },
 
+    /**
+     * @description  Open the notice panel
+     */
     close: function () {
         this.context.notice.modal.style.display = 'none';
     }

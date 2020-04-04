@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const hiliteColor: SubmenuPlugin;
+declare const hiliteColor: SubmenuPlugin;
 
 export default hiliteColor;

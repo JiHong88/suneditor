@@ -4,7 +4,20 @@ import { Lang } from './../lang/Lang.d';
 import { SunEditorOptions } from './../options.d';
 import { Context } from './context';
 import Util from './util';
+import { Module } from '../plugins/Module';
+import _Notice from '../plugins/modules/_notice';
 
+type Controllers = Array<string|Function|Element>;
+type ImageInfo =  {
+    index: number;
+    name: string;
+    size: string|number;
+    select: Function;
+    delete: Function;
+    element: Element;
+    src: string;
+};
+​​
 interface Core {
     /**
      * @description Util object
@@ -19,7 +32,7 @@ interface Core {
     /**
      * @description Notice object
      */
-    notice: any; // TODO provide type for modules/_notice
+    notice: _Notice; // TODO provide type for modules/_notice
 
     /**
      * @description Default icons object
@@ -49,7 +62,7 @@ interface Core {
     /**
      * @description Whether the plugin is initialized
      */
-    initPlugins: any; // TODO proper type (Record<string, boolean> ?)
+    initPlugins: Record<string, boolean>; // TODO proper type (Record<string, boolean> ?)
 
     /**
      * @description loaded language
@@ -84,7 +97,7 @@ interface Core {
     /**
      * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
      */
-    controllerArray: any[]; // TODO controller type
+    controllerArray: Controllers; // TODO controller type
 
     /**
      * @description The name of the plugin that called the currently active controller
@@ -151,7 +164,7 @@ interface Core {
      * @description If the module is not added, add the module and call the 'add' function
      * @param moduleArray module object's Array [dialog, resizing]
      */
-    addModule(moduleArray: any[]): void // TODO add Module interface
+    addModule(moduleArray: Module[]): void // TODO add Module interface
 
     /**
      * @description Method for managing submenu element.
@@ -188,7 +201,7 @@ interface Core {
      * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
      * @param arguments controller elements, functions..
      */
-    controllersOn(...arguments: any[]): void; // TODO type controllers
+    controllersOn(...arguments: Controllers): void; // TODO type controllers
 
     /**
      * @description Hide controller at editor area (link button, image resize button..)
@@ -273,7 +286,7 @@ interface Core {
      * @param offset The offset property of the selection object.
      * @returns
      */
-    isEdgePoint(container: any, offset: number): boolean; // TODO type container
+    isEdgePoint(container: Node, offset: number): boolean; // TODO type container
 
     /**
      * @description Show loading box
@@ -321,14 +334,14 @@ interface Core {
      * @param afterNode If the node exists, it is inserted after the node
      * @returns
      */
-    insertNode(oNode: Node, afterNode?: Node): { startOffset: any, endOffset: any } | undefined; // TODO better return types
+    insertNode(oNode: Node, afterNode?: Node): { startOffset: Node, endOffset: number } | undefined; // TODO better return types
     
     /**
      * @description Delete the currently selected nodes and reset selection range
-     * Returns {container: "the last element after deletion", offset: "offset"}
+     * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
      * @returns
      */
-    removeNode(): { container: any; offset: any }; // TODO better return types
+    removeNode(): { container: Node; offset: number; prevContainer?: Node }; // TODO better return types
 
     /**
      * @description Appended all selected format Element to the argument element and insert
@@ -557,7 +570,7 @@ export default class SunEditor {
      * @param controllers Array of Controller elements
      * @param core Core object
      */
-    showController: (name: String, controllers: any[], core: Core) => void;
+    showController: (name: String, controllers: Controllers, core: Core) => void;
 
     /**
      * @description It replaces the default callback function of the image upload
@@ -595,9 +608,11 @@ export default class SunEditor {
      * - size: file size
      * - select: select function
      * - delete: delete function
+     * - element: img element
+     * - src: src attribute of img tag
      * @param core Core object
      */
-    onImageUpload: (targetImgElement: HTMLImageElement, index: number, state: string, imageInfo: { index: number, name: string, size: number, select: Function, delete: Function }, core: Core) => void;
+    onImageUpload: (targetImgElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed
@@ -663,9 +678,16 @@ export default class SunEditor {
     // TODO proper type for images info
     /**
      * @description Gets uploaded images informations
+     * - index: data index
+     * - name: file name
+     * - size: file size
+     * - select: select function
+     * - delete: delete function
+     * - element: img element
+     * - src: src attribute of img tag
      * @returns {Array}
      */
-    getImagesInfo(): any[];
+    getImagesInfo(): ImageInfo[];
 
      /**
      * @description Upload images using image plugin

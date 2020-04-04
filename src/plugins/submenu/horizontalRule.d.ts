@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const horizontalRule: SubmenuPlugin;
+declare const horizontalRule: SubmenuPlugin;
 
 export default horizontalRule;

@@ -1,5 +1,5 @@
-import { DialogPlugin } from 'suneditor';
+import { DialogPlugin } from '../DialogPlugin';
 
-const image: DialogPlugin;
+declare const image: DialogPlugin;
 
 export default image;

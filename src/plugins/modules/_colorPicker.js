@@ -9,6 +9,10 @@
 
 export default {
     name: 'colorPicker',
+    /**
+     * @description Constructor
+     * @param {Object} core Core object 
+     */
     add: function (core) {
         const context = core.context;
         context.colorPicker = {
@@ -30,6 +34,12 @@ export default {
         listDiv = null;
     },
 
+    /**
+     * @description Create color list
+     * @param {Object} core Core object 
+     * @param {Function} makeColor this._makeColorList
+     * @returns {String} HTML string
+     */
     createColorList: function (core, makeColor) {
         const option = core.context.option;
         const lang = core.lang;
@@ -78,6 +88,11 @@ export default {
         return list;
     },
 
+    /**
+     * @description Internal function used by this.createColorList
+     * @param {Array} colorList Color list
+     * @private
+     */
     _makeColorList: function (colorList) {
         let list = '';
 
@@ -95,6 +110,11 @@ export default {
         return list;
     },
     
+    /**
+     * @description Displays or resets the currently selected color at color list.
+     * @param {Node} node Current Selected node
+     * @param {String|null} color Color value
+     */
     init: function (node, color) {
         const colorPicker = this.plugins.colorPicker;
         let fillColor = color ? color : colorPicker.getColorInNode.call(this, node) || this.context.colorPicker._defaultColor;
@@ -114,17 +134,30 @@ export default {
         colorPicker.setInputText.call(this, colorPicker.colorName2hex.call(this, fillColor));
     },
 
+    /**
+     * @description Store color values
+     * @param {String} hexColorStr Hax color value
+     */
     setCurrentColor: function (hexColorStr) {
         this.context.colorPicker._currentColor = hexColorStr;
         this.context.colorPicker._colorInput.style.borderColor = hexColorStr;
     },
 
+    /**
+     * @description Set color at input element
+     * @param {String} hexColorStr Hax color value
+     */
     setInputText: function (hexColorStr) {
         hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
         this.context.colorPicker._colorInput.value = hexColorStr;
         this.plugins.colorPicker.setCurrentColor.call(this, hexColorStr);
     },
 
+    /**
+     * @description Gets color value at color property of node
+     * @param {Node} node Selected node 
+     * @returns {String}
+     */
     getColorInNode: function (node) {
         let findColor = '';
         const styleProperty = this.context.colorPicker._styleProperty;
@@ -139,7 +172,7 @@ export default {
 
     /**
      * @description Function to check hex format color
-     * @param {String} str
+     * @param {String} str Color value
      */
     isHexColor: function (str) {
         return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
@@ -147,7 +180,7 @@ export default {
 
     /**
      * @description Function to convert hex format to a rgb color
-     * @param {String} rgb - RGB color format
+     * @param {String} rgb RGB color format
      * @returns {String}
      */
     rgb2hex: function (rgb) {
@@ -159,6 +192,11 @@ export default {
             ("0" + parseInt(rgbMatch[3],10).toString(16)).slice(-2) : '';
     },
 
+    /**
+     * @description Converts color values of other formats to hex color values and returns.
+     * @param {String} colorName Color value
+     * @returns {String}
+     */
     colorName2hex: function (colorName) {
         if (/^#/.test(colorName)) return colorName;
         var temp = this.util.createElement('div');

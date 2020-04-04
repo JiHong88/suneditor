@@ -1,5 +1,5 @@
-import { DialogPlugin } from 'suneditor';
+import { DialogPlugin } from '../DialogPlugin';
 
-const video: DialogPlugin;
+declare const video: DialogPlugin;
 
 export default video;

@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const template: SubmenuPlugin;
+declare const template: SubmenuPlugin;
 
 export default template;

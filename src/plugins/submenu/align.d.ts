@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const align: SubmenuPlugin;
+declare const align: SubmenuPlugin;
 
 export default align;

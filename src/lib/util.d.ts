@@ -1,4 +1,3 @@
-export default util;
 declare interface util {
     isIE: boolean;
     isIE_Edge: boolean;
@@ -69,3 +68,5 @@ declare interface util {
     changeIcon(icon: Element, newIcon: string | Element): void;
     createTagsWhitelist(list: string): RegExp;
 }
+
+export default util;

@@ -1,5 +1,5 @@
-import { DialogPlugin } from 'suneditor';
+import { DialogPlugin } from '../DialogPlugin';
 
-const link: DialogPlugin;
+declare const link: DialogPlugin;
 
 export default link;

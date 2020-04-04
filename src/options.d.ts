@@ -2,13 +2,13 @@ import { Lang } from './lang/Lang';
 import { Plugin } from './plugins/Plugin';
 
 export interface SunEditorOptions {
-    plugins: Plugin[];
+    plugins: Plugin[] | Record<string, Plugin>;
     /**
-     * Add tags to the default tags whitelist of editor. default: '' {String}
+     * Add tags to the default tags whitelist of editor.
      */
     addTagsWhitelist?: string;
     /**
-     * Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
+     * Whitelist of tags when pasting.
      */
     pasteTagsWhitelist?: string;
     /**
@@ -200,6 +200,11 @@ export interface SunEditorOptions {
      * If true, image size can only be scaled by percentage.
      */
     imageSizeOnlyPercentage?: boolean;
+    /**
+     * It is determined by "imageSizeOnlyPercentage".
+     * @pivate
+     */
+    _videoSizeUnit?: '%' | 'px';
     /**
      * Choose whether to image rotation buttons display.
      * When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.

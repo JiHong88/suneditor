@@ -1335,7 +1335,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Delete the currently selected nodes and reset selection range
-         * Returns {container: "the last element after deletion", offset: "offset"}
+         * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
          * @returns {Object}
          */
         removeNode: function () {
@@ -5957,6 +5957,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - size: file size
          * - select: select function
          * - delete: delete function
+         * - element: img element
+         * - src: src attribute of img tag
          * @param {Object} core Core object
          */
         onImageUpload: null,
@@ -6105,6 +6107,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Gets uploaded images informations
+         * - index: data index
+         * - name: file name
+         * - size: file size
+         * - select: select function
+         * - delete: delete function
+         * - element: img element
+         * - src: src attribute of img tag
          * @returns {Array}
          */
         getImagesInfo: function () {

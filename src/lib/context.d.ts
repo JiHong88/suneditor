@@ -1,4 +1,5 @@
 import { SunEditorOptions } from './../options.d';
+import { Plugin } from '../plugins/Plugin';
 
 declare interface EditorElement {
     originElement: Element;
@@ -26,8 +27,16 @@ export interface Context {
     option: SunEditorOptions;
 }
 
+type Constructor = {
+    constructed: Record<string, Element|null>;
+    options: SunEditorOptions,
+    plugins: Plugin[],
+    pluginCallButtons: Record<string, Element>,
+    _icons: Record<string, string>
+};
+
 // TODO type "constructor"
-declare function _Context(element: Element, cons: any, options: SunEditorOptions): Context;
+declare function _Context(element: Element, cons: Constructor, options: SunEditorOptions): Context;
 
 export default _Context;
 
