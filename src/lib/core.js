@@ -1025,8 +1025,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Determine if this offset is the edge offset of container
-         * @param {Object} container The container property of the selection object.
-         * @param {Number} offset The offset property of the selection object.
+         * @param {Node} container The node of the selection object. (range.startContainer..)
+         * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {

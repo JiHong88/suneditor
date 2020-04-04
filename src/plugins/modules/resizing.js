@@ -223,7 +223,7 @@
     
             if (!container || !cover || !element) return '';
     
-            return this.util.getNumber(cover.style.paddingBottom) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
+            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
         },
     
         _module_setModifyInputSize: function (contextPlugin, currentModule) {
@@ -283,8 +283,8 @@
                 if (xUnit !== yUnit) {
                     contextPlugin._ratio = false;
                 } else if (!contextPlugin._ratio) {
-                    const x = this.util.getNumber(xValue);
-                    const y = this.util.getNumber(yValue);
+                    const x = this.util.getNumber(xValue, 0);
+                    const y = this.util.getNumber(yValue, 0);
     
                     contextPlugin._ratio = true;
                     contextPlugin._ratioX = x / y;
@@ -376,7 +376,7 @@
     
             // percentage active
             const pButtons = contextResizing.percentageButtons;
-            const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width) / 100) + '' : '' ;
+            const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width, 0) / 100) + '' : '' ;
             for (let i = 0, len = pButtons.length; i < len; i++) {
                 if (pButtons[i].getAttribute('data-value') === value) {
                     this.util.addClass(pButtons[i], 'active');
@@ -832,7 +832,7 @@
                 const padding = 16;
                 const limit = this.context.element.wysiwygFrame.clientWidth - (padding * 2) - 2;
                 
-                if (this.util.getNumber(w) > limit) {
+                if (this.util.getNumber(w, 0) > limit) {
                     h = this._w.Math.round((h / w) * limit);
                     w = limit;
                 }

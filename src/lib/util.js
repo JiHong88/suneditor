@@ -669,7 +669,7 @@ const util = {
      * @description Get a number.
      * @param {String|Number} text Text string or number
      * @param {Number} maxDec Maximum number of decimal places (-1 : Infinity)
-     * @returns {Number|null}
+     * @returns {Number}
      */
     getNumber: function (text, maxDec) {
         if (!text) return null;
@@ -868,8 +868,8 @@ const util = {
 
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
-     * @param {Node} element Reference node
-     * @param {Node|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
+     * @param {Node} element Target node
+     * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
      * @returns {Object}
      */
     getOffset: function (element, wysiwygFrame) {
