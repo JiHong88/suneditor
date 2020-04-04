@@ -1,4 +1,6 @@
-export default function _default(core: any, change: any): {
+import { Core } from "./core";
+
+export interface History {
     /**
      * @description History stack
      */
@@ -33,4 +35,6 @@ export default function _default(core: any, change: any): {
      * @private
      */
     _destroy: () => void;
-};
+}
+
+export default function _default(core: Core, change: any): History;
