@@ -9,6 +9,11 @@
     "declaration": true
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "sample",
+    "test",
+    "dist",
+    "src/asstes",
+    "src/lang"
   ]
 }
