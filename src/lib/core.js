@@ -5649,8 +5649,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const clipboardData = e.clipboardData;
             if (!clipboardData) return true;
 
-            const maxCharCount = core._charCount(clipboardData.getData('text/plain'));
+            const plainText = clipboardData.getData('text/plain').replace(/\n/g, '');
             const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
+            const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
