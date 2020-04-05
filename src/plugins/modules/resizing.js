@@ -526,7 +526,7 @@
                     }
     
                     this.plugins.resizing.resetTransform.call(this, contextEl);
-                    currentModule.setPercentSize.call(this, (value * 100), percentY);
+                    currentModule.setPercentSize.call(this, (value * 100), (this.util.getNumber(percentY, 0) === null || !/%$/.test(percentY)) ? '' : percentY);
                     currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                     break;
                 case 'mirror':
