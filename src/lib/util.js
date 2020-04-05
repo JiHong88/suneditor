@@ -1483,7 +1483,6 @@ const util = {
      * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
      * @param {String} list Tags list ("br|p|div|pre...")
      * @returns {RegExp}
-     * @private
      */
     createTagsWhitelist: function (list) {
         const exclusionTags = list.split('|');

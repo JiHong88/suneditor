@@ -32,7 +32,7 @@ interface Core {
     /**
      * @description Notice object
      */
-    notice: _Notice; // TODO provide type for modules/_notice
+    notice: _Notice;
 
     /**
      * @description Default icons object
@@ -62,7 +62,7 @@ interface Core {
     /**
      * @description Whether the plugin is initialized
      */
-    initPlugins: Record<string, boolean>; // TODO proper type (Record<string, boolean> ?)
+    initPlugins: Record<string, boolean>;
 
     /**
      * @description loaded language
@@ -97,7 +97,7 @@ interface Core {
     /**
      * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
      */
-    controllerArray: Controllers; // TODO controller type
+    controllerArray: Controllers;
 
     /**
      * @description The name of the plugin that called the currently active controller
@@ -164,7 +164,7 @@ interface Core {
      * @description If the module is not added, add the module and call the 'add' function
      * @param moduleArray module object's Array [dialog, resizing]
      */
-    addModule(moduleArray: Module[]): void // TODO add Module interface
+    addModule(moduleArray: Module[]): void;
 
     /**
      * @description Method for managing submenu element.
@@ -201,7 +201,7 @@ interface Core {
      * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
      * @param arguments controller elements, functions..
      */
-    controllersOn(...arguments: Controllers): void; // TODO type controllers
+    controllersOn(...arguments: Controllers): void;
 
     /**
      * @description Hide controller at editor area (link button, image resize button..)
@@ -286,7 +286,7 @@ interface Core {
      * @param offset The offset property of the selection object.
      * @returns
      */
-    isEdgePoint(container: Node, offset: number): boolean; // TODO type container
+    isEdgePoint(container: Node, offset: number): boolean;
 
     /**
      * @description Show loading box
@@ -334,14 +334,14 @@ interface Core {
      * @param afterNode If the node exists, it is inserted after the node
      * @returns
      */
-    insertNode(oNode: Node, afterNode?: Node): { startOffset: Node, endOffset: number } | undefined; // TODO better return types
+    insertNode(oNode: Node, afterNode?: Node): { startOffset: Node, endOffset: number } | undefined;
     
     /**
      * @description Delete the currently selected nodes and reset selection range
      * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
      * @returns
      */
-    removeNode(): { container: Node; offset: number; prevContainer?: Node }; // TODO better return types
+    removeNode(): { container: Node; offset: number; prevContainer?: Node };
 
     /**
      * @description Appended all selected format Element to the argument element and insert
@@ -562,7 +562,6 @@ export default class SunEditor {
      */
     showInline: (toolbar: Element, context: Context, core: Core) => void;
 
-    // TODO controller type
     /**
      * @description Called just after the controller is positioned and displayed on the screen.
      * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
@@ -675,7 +674,6 @@ export default class SunEditor {
      */
     getCharCount(charCounterType?: string): number;
 
-    // TODO proper type for images info
     /**
      * @description Gets uploaded images informations
      * - index: data index

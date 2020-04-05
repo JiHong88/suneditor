@@ -5,7 +5,6 @@ export default {
     // plugin name (Required)
     name: 'custom_plugin_submenu',
     display: 'submenu',
-    innerHTML: 'T',
 
     // add function - It is called only once when the plugin is first run.
     // This function generates HTML to append and register the event.

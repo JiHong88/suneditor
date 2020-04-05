@@ -585,11 +585,12 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
         
-        oButton.innerHTML = (innerHTML || '<span class="se-icon-text">!</span>');
+        oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
 
         return {
