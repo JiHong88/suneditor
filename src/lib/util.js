@@ -919,6 +919,26 @@ const util = {
     },
 
     /**
+     * @description Replace element
+     * @param {Element} element Target element
+     * @param {String|Element} newElement String or element of the new element to apply
+     */
+    changeElement: function (element, newElement) {
+        if (typeof newElement === 'string') {
+            if (element.outerHTML) {
+                element.outerHTML = newElement;
+            } else {
+                const doc = this.createElement('DIV');
+                doc.innerHTML = newElement;
+                newElement = doc.firstChild;
+                element.parentNode.replaceChild(newElement, element);
+            }
+        } else if (newElement.nodeType === 1) {
+            element.parentNode.replaceChild(newElement, element);
+        }
+    },
+
+    /**
      * @description Set style, if all styles are deleted, the style properties are deleted.
      * @param {Element} element Element to set style
      * @param {String} styleName Style attribute name (marginLeft, textAlign...)
@@ -1417,26 +1437,6 @@ const util = {
             b = this.getElementDepth(b);
             return a > b ? t : a < b ? f : 0;
         }.bind(this));
-    },
-
-    /**
-     * @description Replace icon
-     * @param {Element} icon Icon element (svg, i)
-     * @param {String|Element} newIcon String or element of the icon to apply
-     */
-    changeIcon: function (icon, newIcon) {
-        if (typeof newIcon === 'string') {
-            if (icon.outerHTML) {
-                icon.outerHTML = newIcon;
-            } else {
-                const doc = this.createElement('DIV');
-                doc.innerHTML = newIcon;
-                newIcon = doc.firstChild;
-                icon.parentNode.replaceChild(newIcon, icon);
-            }
-        } else if (newIcon.nodeType === 1) {
-            icon.parentNode.replaceChild(newIcon, icon);
-        }
     },
 
     /**

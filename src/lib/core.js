@@ -3744,7 +3744,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                util.changeIcon(element.querySelector('svg'), icons.reduction);
+                util.changeElement(element.querySelector('svg'), icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3776,7 +3776,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-                util.changeIcon(element.querySelector('svg'), icons.expansion);
+                util.changeElement(element.querySelector('svg'), icons.expansion);
             }
         },
 
