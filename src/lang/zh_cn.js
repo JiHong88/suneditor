@@ -121,6 +121,7 @@
             insertColumnBefore: '在左侧插入',
             insertColumnAfter: '在右侧插入',
             deleteColumn: '删除列',
+            fixedColumnWidth: '固定列宽',
             resize100: '放大 100%',
             resize75: '放大 75%',
             resize50: '放大 50%',

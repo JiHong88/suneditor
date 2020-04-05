@@ -62,7 +62,9 @@ suneditor.create("sample1", {
             'bold', 'italic', 'template', 'customLink', 'custom_plugin_submenu'
         ]
     ],
-    maxCharCount: 2000
+    maxCharCount: 2000,
+    charCounterType: 'byte',
+    resizingBar: true
 });
 
 

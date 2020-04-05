@@ -295,6 +295,19 @@
     padding:0.4em;
     background-clip: padding-box;
 }
+/** table style class */
+.sun-editor-editable table.se-table-size-auto {
+    width: auto !important;
+}
+.sun-editor-editable table.se-table-size-100 {
+    width: 100% !important;
+}
+.sun-editor-editable table.se-table-layout-auto {
+    table-layout: auto !important;
+}
+.sun-editor-editable table.se-table-layout-fixed {
+    table-layout: fixed !important;
+}
 /** table - select class */
 .sun-editor-editable table td.se-table-selected-cell, .sun-editor-editable table th.se-table-selected-cell {
     border: 1px double #4592ff;

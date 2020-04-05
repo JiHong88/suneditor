@@ -19,6 +19,7 @@ export default {
             _trElements: null,
             _tableXY: [],
             _maxWidth: true,
+            _fixedColumn: false,
             resizeText: null,
             headerButton: null,
             mergeButton: null,
@@ -53,6 +54,7 @@ export default {
         context.table.tableController = tableController;
         context.table.resizeButton = tableController.querySelector('._se_table_resize');
         context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
+        context.table.columnFixedButton = tableController.querySelector('._se_table_fixed_column');
         context.table.headerButton = tableController.querySelector('._se_table_header');
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
@@ -109,6 +111,10 @@ export default {
                     '<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">' +
                         icons.expansion +
                         '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.maxSize + '</span></span>' +
+                    '</button>' +
+                    '<button type="button" data-command="layout" class="se-btn se-tooltip _se_table_fixed_column">' +
+                        icons.fixed_column_width +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.fixedColumnWidth + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="header" class="se-btn se-tooltip _se_table_header">' +
                         icons.table_header +
@@ -275,6 +281,7 @@ export default {
         contextTable._trElements = null;
         contextTable._tableXY = [];
         contextTable._maxWidth = true;
+        contextTable._fixedColumn = false;
         contextTable._physical_cellCnt = 0;
         contextTable._logical_cellCnt = 0;
         contextTable._rowCnt = 0;
@@ -312,8 +319,10 @@ export default {
         const tableElement = contextTable._element;
         const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
 
-        contextTable._maxWidth = !tableElement.style.width || tableElement.style.width === '100%';
-        tablePlugin.resizeTable.call(this);
+        contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
+        contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
+        tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
+
         tableController.style.left = offset.left + 'px';
         tableController.style.display = 'block';
         tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
@@ -1061,25 +1070,45 @@ export default {
         }
     },
 
-    resizeTable: function () {
+    setTableStyle: function (styles) {
         const contextTable = this.context.table;
-        const icon =  contextTable.resizeButton.querySelector('svg');
-        const span = contextTable.resizeText;
-        let sizeIcon, text, width;
+        const tableElement = contextTable._element;
+        let icon, span, sizeIcon, text;
 
-        if (!contextTable._maxWidth) {
-            sizeIcon = contextTable.icons.expansion;
-            text = contextTable.maxText;
-            width = 'auto';
-        } else {
-            sizeIcon = contextTable.icons.reduction;
-            text = contextTable.minText;
-            width = '100%';
+        if (styles.indexOf('width') > -1) {
+            icon =  contextTable.resizeButton.querySelector('svg');
+            span = contextTable.resizeText;
+
+            if (!contextTable._maxWidth) {
+                sizeIcon = contextTable.icons.expansion;
+                text = contextTable.maxText;
+                contextTable.columnFixedButton.style.display = 'none';
+                this.util.removeClass(tableElement, 'se-table-size-100');
+                this.util.addClass(tableElement, 'se-table-size-auto');
+            } else {
+                sizeIcon = contextTable.icons.reduction;
+                text = contextTable.minText;
+                contextTable.columnFixedButton.style.display = 'block';
+                this.util.removeClass(tableElement, 'se-table-size-auto');
+                this.util.addClass(tableElement, 'se-table-size-100');
+            }
+            
+            this.util.changeElement(icon, sizeIcon);
+            this.util.changeTxt(span, text);
         }
-        
-        this.util.changeElement(icon, sizeIcon);
-        this.util.changeTxt(span, text);
-        contextTable._element.style.width = width;
+
+        if (styles.indexOf('column') > -1) {
+            if (!contextTable._fixedColumn) {
+                this.util.removeClass(tableElement, 'se-table-layout-fixed');
+                this.util.addClass(tableElement, 'se-table-layout-auto');
+                this.util.removeClass(contextTable.columnFixedButton, 'active');
+            } else {
+                this.util.removeClass(tableElement, 'se-table-layout-auto');
+                this.util.addClass(tableElement, 'se-table-layout-fixed');
+                this.util.addClass(contextTable.columnFixedButton, 'active');
+            }
+            
+        }
     },
 
     setActiveButton: function (fixedCell, selectedCell) {
@@ -1350,9 +1379,10 @@ export default {
         const command = target.getAttribute('data-command');
         const value = target.getAttribute('data-value');
         const option = target.getAttribute('data-option');
+        const tablePlugin = this.plugins.table;
         
-        if (typeof this.plugins.table._closeSplitMenu === 'function') {
-            this.plugins.table._closeSplitMenu();
+        if (typeof tablePlugin._closeSplitMenu === 'function') {
+            tablePlugin._closeSplitMenu();
             if (command === 'onsplit') return;
         }
 
@@ -1364,24 +1394,29 @@ export default {
         switch (command) {
             case 'insert':
             case 'delete':
-                this.plugins.table.editTable.call(this, value, option);
+                tablePlugin.editTable.call(this, value, option);
                 break;
             case 'header':
-                this.plugins.table.toggleHeader.call(this);
+                tablePlugin.toggleHeader.call(this);
                 break;
             case 'onsplit':
-                this.plugins.table.openSplitMenu.call(this);
+                tablePlugin.openSplitMenu.call(this);
                 break;
             case 'split':
-                this.plugins.table.splitCells.call(this, value);
+                tablePlugin.splitCells.call(this, value);
                 break;
             case 'merge':
-                this.plugins.table.mergeCells.call(this);
+                tablePlugin.mergeCells.call(this);
                 break;
             case 'resize':
-                contextTable.resizeDiv.style.display = 'none';
                 contextTable._maxWidth = !contextTable._maxWidth;
-                this.plugins.table.resizeTable.call(this);
+                tablePlugin.setTableStyle.call(this, 'width');
+                tablePlugin.setPositionControllerDiv.call(this, contextTable._tdElement, tablePlugin._shift);
+                break;
+            case 'layout':
+                contextTable._fixedColumn = !contextTable._fixedColumn;
+                tablePlugin.setTableStyle.call(this, 'column');
+                tablePlugin.setPositionControllerDiv.call(this, contextTable._tdElement, tablePlugin._shift);
                 break;
             case 'remove':
                 const emptyDiv = contextTable._element.parentNode;
