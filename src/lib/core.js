@@ -5747,9 +5747,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
-                core._lineBreakerButton.style.left = ((component.offsetLeft + component.offsetWidth) / 2) + 'px';
                 lineBreakerStyle.top = (top - wScroll) + 'px';
+                lineBreakerStyle.visibility = 'hidden';
                 lineBreakerStyle.display = 'block';
+                core._lineBreakerButton.style.left = (component.offsetLeft + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
+                lineBreakerStyle.visibility = '';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
                 lineBreakerStyle.display = 'none';

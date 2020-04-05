@@ -431,6 +431,7 @@ export default {
         const videos = this.context.element.wysiwyg.getElementsByTagName('IFRAME');
         if (videos.length === this._variable._videosCnt) return;
 
+        const _resize_plugin = this.context.resizing._resize_plugin;
         this.context.resizing._resize_plugin = 'video';
         const videoPlugin = this.plugins.video;
         this._variable._videosCnt = videos.length;
@@ -443,7 +444,7 @@ export default {
             }
         }
 
-        this.context.resizing._resize_plugin = '';
+        this.context.resizing._resize_plugin = _resize_plugin;
     },
 
     sizeRevert: function () {

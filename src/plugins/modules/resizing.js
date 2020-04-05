@@ -437,7 +437,7 @@
          */
         openAlignMenu: function () {
             this.util.addClass(this.context.resizing.alignButton, 'on');
-            this.context.resizing.alignMenu.style.display = 'inline-table';
+            this.context.resizing.alignMenu.style.display = 'block';
     
             this.plugins.resizing._closeAlignMenu = function () {
                 this.util.removeClass(this.context.resizing.alignButton, 'on');
@@ -558,7 +558,7 @@
                     break;
                 case 'onalign':
                     this.plugins.resizing.openAlignMenu.call(this);
-                    break;
+                    return;
                 case 'align':
                     const alignValue = value === 'basic' ? 'none' : value;
                     currentModule.setAlign.call(this, alignValue, null, null, null);
