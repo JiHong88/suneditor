@@ -1025,8 +1025,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Determine if this offset is the edge offset of container
-         * @param {Object} container The container property of the selection object.
-         * @param {Number} offset The offset property of the selection object.
+         * @param {Node} container The node of the selection object. (range.startContainer..)
+         * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
@@ -1335,7 +1335,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Delete the currently selected nodes and reset selection range
-         * Returns {container: "the last element after deletion", offset: "offset"}
+         * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
          * @returns {Object}
          */
         removeNode: function () {
@@ -3744,7 +3744,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                util.changeIcon(element.querySelector('svg'), icons.reduction);
+                util.changeElement(element.querySelector('svg'), icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3776,7 +3776,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-                util.changeIcon(element.querySelector('svg'), icons.expansion);
+                util.changeElement(element.querySelector('svg'), icons.expansion);
             }
         },
 
@@ -4640,7 +4640,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!command && !display) return;
             if (target.disabled) return;
             
-            if (!core.hasFocus) core.focus();
+            if (!core.hasFocus) core.nativeFocus();
             if (!core._variable.isCodeView) core._editorRange();
             core.actionCall(command, display, target);
         },
@@ -5747,9 +5747,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
-                core._lineBreakerButton.style.left = ((component.offsetLeft + component.offsetWidth) / 2) + 'px';
                 lineBreakerStyle.top = (top - wScroll) + 'px';
+                lineBreakerStyle.visibility = 'hidden';
                 lineBreakerStyle.display = 'block';
+                core._lineBreakerButton.style.left = (component.offsetLeft + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
+                lineBreakerStyle.visibility = '';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
                 lineBreakerStyle.display = 'none';
@@ -5957,6 +5959,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - size: file size
          * - select: select function
          * - delete: delete function
+         * - element: img element
+         * - src: src attribute of img tag
          * @param {Object} core Core object
          */
         onImageUpload: null,
@@ -6105,6 +6109,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Gets uploaded images informations
+         * - index: data index
+         * - name: file name
+         * - size: file size
+         * - select: select function
+         * - delete: delete function
+         * - element: img element
+         * - src: src attribute of img tag
          * @returns {Array}
          */
         getImagesInfo: function () {

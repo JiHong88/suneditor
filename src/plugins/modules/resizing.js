@@ -23,6 +23,10 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const resizing = {
         name: 'resizing',
+        /**
+         * @description Constructor
+         * @param {Object} core Core object 
+         */
         add: function (core) {
             const icons = core.icons;
             const context = core.context;
@@ -219,7 +223,7 @@
     
             if (!container || !cover || !element) return '';
     
-            return this.util.getNumber(cover.style.paddingBottom) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
+            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
         },
     
         _module_setModifyInputSize: function (contextPlugin, currentModule) {
@@ -279,8 +283,8 @@
                 if (xUnit !== yUnit) {
                     contextPlugin._ratio = false;
                 } else if (!contextPlugin._ratio) {
-                    const x = this.util.getNumber(xValue);
-                    const y = this.util.getNumber(yValue);
+                    const x = this.util.getNumber(xValue, 0);
+                    const y = this.util.getNumber(yValue, 0);
     
                     contextPlugin._ratio = true;
                     contextPlugin._ratioX = x / y;
@@ -307,6 +311,12 @@
             if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = y;
         },
     
+        /**
+         * @description Call the resizing module
+         * @param {Element} targetElement Resizing target element
+         * @param {string} plugin Plugin name
+         * @returns {Object} Size of resizing div {w, h, t, l}
+         */
         call_controller_resize: function (targetElement, plugin) {
             const contextResizing = this.context.resizing;
             const contextPlugin = this.context[plugin];
@@ -358,7 +368,7 @@
     
             // align icon
             const alignList = contextResizing.alignMenuList;
-            this.util.changeIcon(contextResizing.alignButton.querySelector('svg'), contextResizing.alignIcons[align]);
+            this.util.changeElement(contextResizing.alignButton.querySelector('svg'), contextResizing.alignIcons[align]);
             for (let i = 0, len = alignList.length; i < len; i++) {
                 if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
                 else this.util.removeClass(alignList[i], 'on');
@@ -366,7 +376,7 @@
     
             // percentage active
             const pButtons = contextResizing.percentageButtons;
-            const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width) / 100) + '' : '' ;
+            const value = /%$/.test(targetElement.style.width) && /%$/.test(container.style.width) ? (this.util.getNumber(container.style.width, 0) / 100) + '' : '' ;
             for (let i = 0, len = pButtons.length; i < len; i++) {
                 if (pButtons[i].getAttribute('data-value') === value) {
                     this.util.addClass(pButtons[i], 'active');
@@ -421,9 +431,13 @@
         },
     
         _closeAlignMenu: null,
+
+        /**
+         * @description Open align submenu of module
+         */
         openAlignMenu: function () {
             this.util.addClass(this.context.resizing.alignButton, 'on');
-            this.context.resizing.alignMenu.style.display = 'inline-table';
+            this.context.resizing.alignMenu.style.display = 'block';
     
             this.plugins.resizing._closeAlignMenu = function () {
                 this.util.removeClass(this.context.resizing.alignButton, 'on');
@@ -435,6 +449,10 @@
             this.addDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
         },
     
+        /**
+         * @description Return HTML string of caption(FIGCAPTION) element
+         * @returns {String}
+         */
         create_caption: function () {
             const caption = this.util.createElement('FIGCAPTION');
             caption.setAttribute('contenteditable', true);
@@ -442,6 +460,10 @@
             return caption;
         },
     
+        /**
+         * @description Cover the target element with a FIGURE element.
+         * @param {Element} element Target element
+         */
         set_cover: function (element) {
             const cover = this.util.createElement('FIGURE');
             cover.appendChild(element);
@@ -449,6 +471,12 @@
             return cover;
         },
     
+        /**
+         * @description Create a container for the resizing component and insert the element.
+         * @param {Element} cover Cover element (FIGURE)
+         * @param {String} className Class name of container (fixed: se-component)
+         * @returns {Element} Created container element
+         */
         set_container: function (cover, className) {
             const container = this.util.createElement('DIV');
             container.className = 'se-component ' + className;
@@ -458,6 +486,11 @@
             return container;
         },
     
+        /**
+         * @description Click event of resizing toolbar
+         * Performs the action of the clicked toolbar button.
+         * @param {MouseEvent} e Event object
+         */
         onClick_resizeButton: function (e) {
             e.stopPropagation();
     
@@ -493,7 +526,7 @@
                     }
     
                     this.plugins.resizing.resetTransform.call(this, contextEl);
-                    currentModule.setPercentSize.call(this, (value * 100), percentY);
+                    currentModule.setPercentSize.call(this, (value * 100), (this.util.getNumber(percentY, 0) === null || !/%$/.test(percentY)) ? '' : percentY);
                     currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
                     break;
                 case 'mirror':
@@ -525,7 +558,7 @@
                     break;
                 case 'onalign':
                     this.plugins.resizing.openAlignMenu.call(this);
-                    break;
+                    return;
                 case 'align':
                     const alignValue = value === 'basic' ? 'none' : value;
                     currentModule.setAlign.call(this, alignValue, null, null, null);
@@ -578,6 +611,10 @@
             this.history.push(false);
         },
     
+        /**
+         * @description Initialize the transform style (rotation) of the element.
+         * @param {Element} element Target element
+         */
         resetTransform: function (element) {
             const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
             this.context.resizing._rotateVertical = false;
@@ -592,6 +629,12 @@
             this.plugins[this.context.resizing._resize_plugin].setSize.call(this, size[0] ? size[0] : 'auto', size[1] ? size[1] : '', true);
         },
     
+        /**
+         * @description Set the transform style (rotation) of the element.
+         * @param {Element} element Target element
+         * @param {Number|null} width Element's width size
+         * @param {Number|null} height Element's height size
+         */
         setTransformSize: function (element, width, height) {
             let percentage = element.getAttribute('data-percentage');
             const isVertical = this.context.resizing._rotateVertical;
@@ -669,6 +712,10 @@
             element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
         },
     
+        /**
+         * @description The position of the caption is set automatically.
+         * @param {Element} element Target element (not caption element)
+         */
         setCaptionPosition: function (element) {
             const figcaption = this.util.getChildElement(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
             if (figcaption) {
@@ -676,7 +723,10 @@
             }
         },
     
-        // resizing
+        /**
+         * @description Mouse down event of resize handles
+         * @param {MouseEvent} e Event object 
+         */
         onMouseDown_resize_handle: function (e) {
             const contextResizing = this.context.resizing;
             const direction = contextResizing._resize_direction = e.target.classList[0];
@@ -723,6 +773,14 @@
             this.addDocEvent('keydown', closureFunc_bind);
         },
     
+        /**
+         * @description Mouse move event after call "onMouseDown_resize_handle" of resize handles
+         * The size of the module's "div" is adjusted according to the mouse move event.
+         * @param {Object} contextResizing "core.context.resizing" object (binding argument)
+         * @param {String} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh") (binding argument)
+         * @param {Object} plugin "core.context[currentPlugin]" object (binding argument)
+         * @param {MouseEvent} e Event object
+         */
         resizing_element: function (contextResizing, direction, plugin, e) {
             const clientX = e.clientX;
             const clientY = e.clientY;
@@ -757,6 +815,11 @@
             contextResizing._isChange = true;
         },
     
+        /**
+         * @description Resize the element to the size of the "div" adjusted in the "resizing_element" method.
+         * Called at the mouse-up event registered in "onMouseDown_resize_handle".
+         * @param {String} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh")
+         */
         cancel_controller_resize: function (direction) {
             const isVertical = this.context.resizing._rotateVertical;
             this.controllersOff();
@@ -769,7 +832,7 @@
                 const padding = 16;
                 const limit = this.context.element.wysiwygFrame.clientWidth - (padding * 2) - 2;
                 
-                if (this.util.getNumber(w) > limit) {
+                if (this.util.getNumber(w, 0) > limit) {
                     h = this._w.Math.round((h / w) * limit);
                     w = limit;
                 }

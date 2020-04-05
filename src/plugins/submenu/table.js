@@ -1077,7 +1077,7 @@ export default {
             width = '100%';
         }
         
-        this.util.changeIcon(icon, sizeIcon);
+        this.util.changeElement(icon, sizeIcon);
         this.util.changeTxt(span, text);
         contextTable._element.style.width = width;
     },

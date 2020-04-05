@@ -669,7 +669,7 @@ const util = {
      * @description Get a number.
      * @param {String|Number} text Text string or number
      * @param {Number} maxDec Maximum number of decimal places (-1 : Infinity)
-     * @returns {Number|null}
+     * @returns {Number}
      */
     getNumber: function (text, maxDec) {
         if (!text) return null;
@@ -868,8 +868,8 @@ const util = {
 
     /**
      * @description Returns the position of the left and top of argument. {left:0, top:0}
-     * @param {Node} element Reference node
-     * @param {Node|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
+     * @param {Node} element Target node
+     * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
      * @returns {Object}
      */
     getOffset: function (element, wysiwygFrame) {
@@ -916,6 +916,26 @@ const util = {
     changeTxt: function (element, txt) {
         if (!element || !txt) return;
         element.textContent = txt;
+    },
+
+    /**
+     * @description Replace element
+     * @param {Element} element Target element
+     * @param {String|Element} newElement String or element of the new element to apply
+     */
+    changeElement: function (element, newElement) {
+        if (typeof newElement === 'string') {
+            if (element.outerHTML) {
+                element.outerHTML = newElement;
+            } else {
+                const doc = this.createElement('DIV');
+                doc.innerHTML = newElement;
+                newElement = doc.firstChild;
+                element.parentNode.replaceChild(newElement, element);
+            }
+        } else if (newElement.nodeType === 1) {
+            element.parentNode.replaceChild(newElement, element);
+        }
     },
 
     /**
@@ -1420,26 +1440,6 @@ const util = {
     },
 
     /**
-     * @description Replace icon
-     * @param {Element} icon Icon element (svg, i)
-     * @param {String|Element} newIcon String or element of the icon to apply
-     */
-    changeIcon: function (icon, newIcon) {
-        if (typeof newIcon === 'string') {
-            if (icon.outerHTML) {
-                icon.outerHTML = newIcon;
-            } else {
-                const doc = this.createElement('DIV');
-                doc.innerHTML = newIcon;
-                newIcon = doc.firstChild;
-                icon.parentNode.replaceChild(newIcon, icon);
-            }
-        } else if (newIcon.nodeType === 1) {
-            icon.parentNode.replaceChild(newIcon, icon);
-        }
-    },
-
-    /**
      * @description Nodes that need to be added without modification when changing text nodes
      * @param {Node} element Element to check
      * @returns {Boolean}
@@ -1483,7 +1483,6 @@ const util = {
      * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
      * @param {String} list Tags list ("br|p|div|pre...")
      * @returns {RegExp}
-     * @private
      */
     createTagsWhitelist: function (list) {
         const exclusionTags = list.split('|');

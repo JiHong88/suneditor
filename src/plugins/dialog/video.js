@@ -179,7 +179,7 @@ export default {
         this.plugins.resizing._module_setInputSize.call(this, contextVideo, xy);
 
         if (xy === 'y') {
-            this.plugins.video.setVideoRatioSelect.call(this, e.target.value || contextVideo._videoRatio);
+            this.plugins.video.setVideoRatioSelect.call(this, e.target.value || contextVideo._defaultRatio);
         }
     },
 
@@ -431,6 +431,7 @@ export default {
         const videos = this.context.element.wysiwyg.getElementsByTagName('IFRAME');
         if (videos.length === this._variable._videosCnt) return;
 
+        const _resize_plugin = this.context.resizing._resize_plugin;
         this.context.resizing._resize_plugin = 'video';
         const videoPlugin = this.plugins.video;
         this._variable._videosCnt = videos.length;
@@ -443,7 +444,7 @@ export default {
             }
         }
 
-        this.context.resizing._resize_plugin = '';
+        this.context.resizing._resize_plugin = _resize_plugin;
     },
 
     sizeRevert: function () {
@@ -457,7 +458,7 @@ export default {
         if (!h) h = contextVideo.inputY.value;
         
         if (contextVideo._onlyPercentage || /%$/.test(w) || !w) {
-            this.plugins.video.setPercentSize.call(this, (w || '100%'), (h || contextVideo._videoRatio));
+            this.plugins.video.setPercentSize.call(this, (w || '100%'), (h || contextVideo._defaultRatio));
             return true;
         } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.video.setAutoSize.call(this);
@@ -526,7 +527,7 @@ export default {
 
     setPercentSize: function (w, h) {
         const contextVideo = this.context.video;
-        h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextVideo.sizeUnit : (h || contextVideo._videoRatio);
+        h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextVideo.sizeUnit : (h || contextVideo._defaultRatio);
 
         contextVideo._container.style.width = this.util.isNumber(w) ? w + '%' : w;
         contextVideo._container.style.height = '';

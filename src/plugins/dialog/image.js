@@ -555,8 +555,9 @@ export default {
                 return;
             } else {
                 let infoUpdate = false;
-                for (let i = 0, len = imagesInfo.length; i < len; i++) {
-                    if (images.indexOf(imagesInfo[i].element) === -1) {
+                for (let i = 0, len = imagesInfo.length, info; i < len; i++) {
+                    info = imagesInfo[i];
+                    if (images.filter(function (img) { return info.src === img.src && info.index.toString() === img.getAttribute('data-index'); }).length === 0) {
                         infoUpdate = true;
                         break;
                     }
@@ -567,6 +568,7 @@ export default {
         }
 
         // check images
+        const _resize_plugin = this.context.resizing._resize_plugin;
         this.context.resizing._resize_plugin = 'image';
         const currentImages = [];
         const infoIndex = [];
@@ -607,7 +609,7 @@ export default {
             i--;
         }
 
-        this.context.resizing._resize_plugin = '';
+        this.context.resizing._resize_plugin = _resize_plugin;
     },
 
     _onload_image: function (oImg, file) {

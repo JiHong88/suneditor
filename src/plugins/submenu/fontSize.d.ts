@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const fontSize: SubmenuPlugin;
+declare const fontSize: SubmenuPlugin;
 
 export default fontSize;

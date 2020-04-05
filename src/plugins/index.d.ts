@@ -1,3 +1,5 @@
+import { Plugin } from './Plugin';
+
 // command
 import blockquote from './command/blockquote';
 
@@ -22,5 +24,7 @@ import image from './dialog/image';
 import video from './dialog/video';
 import math from './dialog/math';
 
+declare const _plugins: Plugin[];
+
 export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, math };
-export default { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, math };
+export default _plugins;

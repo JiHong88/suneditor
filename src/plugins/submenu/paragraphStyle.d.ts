@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const paragraphStyle: SubmenuPlugin;
+declare const paragraphStyle: SubmenuPlugin;
 
 export default paragraphStyle;

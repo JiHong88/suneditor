@@ -1,5 +1,5 @@
-import { DialogPlugin } from 'suneditor';
+import { DialogPlugin } from '../DialogPlugin';
 
-const math: DialogPlugin;
+declare const math: DialogPlugin;
 
 export default math;

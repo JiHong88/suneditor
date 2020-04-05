@@ -23,6 +23,10 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const dialog = {
         name: 'dialog',
+        /**
+         * @description Constructor
+         * @param {Object} core Core object 
+         */
         add: function (core) {
             const context = core.context;
             context.dialog = {
@@ -61,6 +65,10 @@
             dialog_div = null, dialog_back = null, dialog_area = null;
         },
 
+        /**
+         * @description Event to control the behavior of closing the dialog
+         * @param {MouseEvent} e Event object
+         */
         onMouseDown_dialog: function (e) {
             if (/se-dialog-inner/.test(e.target.className)) {
                 this.context.dialog._closeSignal = true;
@@ -69,6 +77,10 @@
             }
         },
 
+        /**
+         * @description Event to close the window when the outside area of the dialog or close button is click
+         * @param {MouseEvent} e Event object
+         */
         onClick_dialog: function (e) {
             e.stopPropagation();
 
@@ -77,6 +89,11 @@
             }
         },
 
+        /**
+         * @description Open a Dialog plugin
+         * @param {String} kind Dialog plugin name
+         * @param {Boolean} update Whether it will open for update ('image' === this.currentControllerName)
+         */
         open: function (kind, update)  {
             if (this.modalForm) return false;
             if (this.plugins.dialog._bindClose) {
@@ -113,6 +130,11 @@
         },
 
         _bindClose: null,
+        
+        /**
+         * @description Close a Dialog plugin
+         * The plugin's "init" method is called.
+         */
         close: function () {
             if (this.plugins.dialog._bindClose) {
                 this._d.removeEventListener('keydown', this.plugins.dialog._bindClose);

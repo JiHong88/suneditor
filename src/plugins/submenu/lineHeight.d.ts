@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const lineHeight: SubmenuPlugin;
+declare const lineHeight: SubmenuPlugin;
 
 export default lineHeight;

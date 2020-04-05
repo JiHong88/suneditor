@@ -1,5 +1,5 @@
-import { CommandPlugin } from 'suneditor';
+import { CommandPlugin } from '../CommandPlugin';
 
-const blockquote: CommandPlugin;
+declare const blockquote: CommandPlugin;
 
 export default blockquote;

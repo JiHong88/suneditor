@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from 'suneditor';
+import { SubmenuPlugin } from '../SubmenuPlugin';
 
-const formatBlock: SubmenuPlugin;
+declare const formatBlock: SubmenuPlugin;
 
 export default formatBlock;
