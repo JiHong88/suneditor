@@ -553,6 +553,9 @@ export default class SunEditor {
     onKeyDown: EventFn;
     onKeyUp: EventFn;
     onDrop: EventFn;
+    onChange: (contents: string, core: Core) => void;
+    onBlur: EventFn;
+    onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => void;
 
     /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
