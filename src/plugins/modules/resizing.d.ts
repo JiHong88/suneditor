@@ -1,6 +1,92 @@
 import { Module } from '../Module';
 
+/**
+ * @description Require context properties when resizing module
+    inputX: Element,
+    inputY: Element,
+    _container: null,
+    _cover: null,
+    _element: null,
+    _element_w: 1,
+    _element_h: 1,
+    _element_l: 0,
+    _element_t: 0,
+    _defaultSizeX: 'auto',
+    _defaultSizeY: 'auto',
+    _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
+    _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,
+    _proportionChecked: true,
+    // -- select function --
+    _resizing: context.option.imageResizing,
+    _resizeDotHide: !context.option.imageHeightShow,
+    _rotation: context.option.imageRotation,
+    _onlyPercentage: context.option.imageSizeOnlyPercentage,
+    _ratio: false,
+    _ratioX: 1,
+    _ratioY: 1
+    _captionShow: true,
+    // -- when used caption (_captionShow: true) --
+    _caption: null,
+    _captionChecked: false,
+    captionCheckEl: null
+*/
 declare interface resizing extends Module {
+    /**
+     * @description Gets the width size
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     * @param element Target element
+     * @param cover Cover element (FIGURE)
+     * @param container Container element (DIV.se-component)
+     * @returns
+     */
+    _module_getSizeX(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
+    
+    /**
+     * @description Gets the height size
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     * @param element Target element
+     * @param cover Cover element (FIGURE)
+     * @param container Container element (DIV.se-component)
+     * @returns
+     */
+    _module_getSizeY(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
+
+    /**
+     * @description Called at the "openModify" to put the size of the current target into the size input element.
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     * @param pluginObj Plugin object
+     */
+    _module_setModifyInputSize(contextPlugin: Object, pluginObj: Object): void;
+    
+    /**
+     * @description It is called in "setInputSize" (input tag keyupEvent), 
+     * checks the value entered in the input tag, 
+     * calculates the ratio, and sets the calculated value in the input tag of the opposite size.
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     * @param xy 'x': width, 'y': height
+     */
+    _module_setInputSize(contextPlugin: Object, xy: string): void;
+    
+    /**
+     * @description It is called in "setRatio" (input and proportionCheck tags changeEvent), 
+     * checks the value of the input tag, calculates the ratio, and resets it in the input tag.
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     */
+    _module_setRatio(contextPlugin: Object): void;
+    
+    /**
+     * @description Revert size of element to origin size (plugin._origin_w, plugin._origin_h)
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     */
+    _module_sizeRevert(contextPlugin: Object): void;
+
+    /**
+     * @description Save the size data (element.setAttribute("data-size"))
+     * Used at the "setSize" method
+     * @param contextPlugin context object of plugin (core.context[plugin])
+     */
+    _module_saveCurrentSize(contextPlugin: Object): void;
+
     /**
      * @description Call the resizing module
      * @param targetElement Resizing target element

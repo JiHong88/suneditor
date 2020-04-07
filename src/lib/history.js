@@ -94,14 +94,16 @@ export default function (core, change) {
          * @description Saving the current status to the history object stack
          * If "delay" is true, it will be saved after 500 miliseconds
          * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
-         * @param {Boolean} delay If true, delays 500 milliseconds
+         * You can specify the delay time by sending a number.
+         * @param {Boolean|Number} delay If true, delays 400 milliseconds
          */
         push: function (delay) {
             _w.setTimeout(core._resourcesStateChange);
+            const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : (!delay ? 0 : 400);
             
-            if (!delay || pushDelay) {
+            if (!time || pushDelay) {
                 _w.clearTimeout(pushDelay);
-                if (!delay) {
+                if (!time) {
                     pushStack();
                     return;
                 }
@@ -111,7 +113,7 @@ export default function (core, change) {
                 _w.clearTimeout(pushDelay);
                 pushDelay = null;
                 pushStack();
-            }, 400);
+            }, time);
         },
 
         /**

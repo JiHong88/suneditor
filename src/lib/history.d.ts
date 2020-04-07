@@ -9,9 +9,10 @@ export interface History {
      * @description Saving the current status to the history object stack
      * If "delay" is true, it will be saved after 500 miliseconds
      * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
+     * You can specify the delay time by sending a number.
      * @param {Boolean} delay If true, delays 500 milliseconds
      */
-    push: (delay: boolean) => void;
+    push: (delay: boolean | number) => void;
     /**
      * @description Undo function
      */

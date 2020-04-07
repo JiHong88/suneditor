@@ -75,6 +75,9 @@ export default {
         return listDiv;
     },
 
+    /**
+     * @overriding core
+     */
     active: function (element) {
         const targetButton = this.context.align.targetButton;
         const target = targetButton.querySelector('svg');
@@ -94,6 +97,9 @@ export default {
         return false;
     },
 
+    /**
+     * @overriding submenu
+     */
     on: function () {
         const alignContext = this.context.align;
         const alignList = alignContext._alignList;

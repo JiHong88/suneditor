@@ -169,7 +169,6 @@
             <div class="description">
                 Gets uploaded images informations<br>
                 [{<br>
-                <strong>src</strong>: imgage src<br>
                 <strong>index</strong>: data index<br>
                 <strong>name</strong>: file name<br>
                 <strong>size</strong>: file size<br>
@@ -814,7 +813,7 @@
             <h4 class="name" id="onImageUpload"><span class="type-signature"></span>onImageUpload<span
                     class="signature">(targetImgElement, index, state, imageInfo, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
             <div class="description">
-                Called when the image is uploaded or the uploaded image is deleted
+                Called when the image is uploaded, updated, deleted
             </div>
             <table class="params">
                 <thead>
@@ -852,7 +851,6 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">
-                        <strong>src</strong>: imgage src<br>
                         <strong>index</strong>: data index<br>
                         <strong>name</strong>: file name<br>
                         <strong>size</strong>: file size<br>
@@ -867,7 +865,7 @@
                     <td class="type">
                         <span class="param-type">Number</span>
                     </td>
-                    <td class="description last">Count of remaining image files</td>
+                    <td class="description last">Count of remaining files to upload</td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -957,6 +955,73 @@
                         <strong>isUpdate:</strong> Update image if true, create image if false<br>
                         <strong>currentImage:</strong> If isUpdate is true, the currently selected image.
                     </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onVideoUpload"><span class="type-signature"></span>onVideoUpload<span
+                    class="signature">(targetElement, index, state, imageInfo, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called when the video(iframe) is is uploaded, updated, deleted
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>targetElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Current iframe element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>index</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Uploaded index (key value)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>state</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Upload status ('create', 'update', 'delete')</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>imageInfo</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        <strong>index</strong>: data index<br>
+                        <strong>select</strong>: select function<br>
+                        <strong>delete</strong>: delete function<br>
+                        <strong>element</strong>: iframe element<br>
+                        <strong>src</strong>: src attribute of iframe tag<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>remainingFilesCount</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Count of remaining files to upload</td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -1093,6 +1158,7 @@
         <li><a href="document-user.html#onImageUpload">onImageUpload</a></li>
         <li><a href="document-user.html#onImageUploadError">onImageUploadError</a></li>
         <li><a href="document-user.html#imageUploadHandler">imageUploadHandler</a></li>
+        <li><a href="document-user.html#onVideoUpload">onVideoUpload</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>
         <li><a href="document-user.html#showController">showController</a></li>
     </ul>

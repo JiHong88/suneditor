@@ -121,6 +121,7 @@
             insertColumnBefore: '왼쪽에 열 삽입',
             insertColumnAfter: '오른쪽에 열 삽입',
             deleteColumn: '열 삭제',
+            fixedColumnWidth: '고정 된 열 너비',
             resize100: '100% 크기',
             resize75: '75% 크기',
             resize50: '50% 크기',

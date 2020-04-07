@@ -121,6 +121,7 @@
             insertColumnBefore: 'Вставить столбец слева',
             insertColumnAfter: 'Вставить столбец справа',
             deleteColumn: 'Удалить столбец',
+            fixedColumnWidth: 'Фиксированная ширина столбца',
             resize100: 'Размер 100%',
             resize75: 'Размер 75%',
             resize50: 'Размер 50%',

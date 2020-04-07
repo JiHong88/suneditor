@@ -98,6 +98,7 @@ export interface Lang {
     insertColumnBefore: string,
     insertColumnAfter: string,
     deleteColumn: string,
+    fixedColumnWidth: string,
     resize100: string,
     resize75: string,
     resize50: string,

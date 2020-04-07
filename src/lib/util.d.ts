@@ -440,6 +440,15 @@ declare interface util {
     toggleClass(element: Element, className: string): void;
 
     /**
+     * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
+     * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
+     * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
+     * @param disabled Disabled value
+     * @param buttonList Button array
+     */
+    toggleDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
+
+    /**
      * @description Delete argumenu value element
      * @param item Node to be remove
      */
@@ -451,7 +460,7 @@ declare interface util {
      * @param item Node to be remove
      * @param validation Validation function. default(Deleted if it only have breakLine and blanks)
      * @param stopParent Stop when the parent node reaches stopParent
-     * @returns {sc: previousSibling, ec: nextSibling}
+     * @returns
      */
     removeItemAllParents(item: Node, validation?: Function, stopParent?: Element): Record<string, Node | null> | null;
     

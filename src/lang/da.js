@@ -124,6 +124,7 @@
             insertColumnBefore: 'Indsæt kolonne før',
             insertColumnAfter: 'Indsæt kolonne efter',
             deleteColumn: 'Slet kolonne',
+            fixedColumnWidth: 'Fast søjlebredde',
             resize100: 'Forstør 100%',
             resize75: 'Forstør 75%',
             resize50: 'Forstør 50%',

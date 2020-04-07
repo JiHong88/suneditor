@@ -121,6 +121,7 @@
             insertColumnBefore: 'Insert column before',
             insertColumnAfter: 'Insert column after',
             deleteColumn: 'Delete column',
+            fixedColumnWidth: 'Fixed column width',
             resize100: 'Resize 100%',
             resize75: 'Resize 75%',
             resize50: 'Resize 50%',
