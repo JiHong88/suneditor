@@ -5984,7 +5984,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - delete: delete function
          * - element: img element
          * - src: src attribute of img tag
-         * @param {Number} remainingFilesCount Count of remaining files to upload
+         * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
          * @param {Object} core Core object
          */
         onImageUpload: null,
@@ -6009,7 +6009,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - delete: delete function
          * - element: iframe element
          * - src: src attribute of iframe tag
-         * @param {Number} remainingFilesCount Count of remaining files to upload
+         * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
          * @param {Object} core Core object
          */
         onVideoUpload: null,

@@ -775,7 +775,7 @@ editor.onImageUploadBefore: function (files, info, core) {
  * - element: img element
  * - src: src attribute of img tag
  * }
- * remainingFilesCount: Count of remaining files to upload
+ * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object
 */
 editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
@@ -860,12 +860,12 @@ editor.imageUploadHandler = function (response, info, core) {
  * - element: iframe element
  * - src: src attribute of iframe tag
  * }
- * remainingFilesCount: Count of remaining files to upload
+ * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object
  */
-editor.onVideoUpload = function (targetElement, index, state, videoInfo, core) {
+editor.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount, core) {
     console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`videoInfo:${videoInfo}`)
+    console.log(`videoInfo:${videoInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called just before the inline toolbar is positioned and displayed on the screen.

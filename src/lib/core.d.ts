@@ -625,7 +625,7 @@ export default class SunEditor {
      * - delete: delete function
      * - element: img element
      * - src: src attribute of img tag
-     * @param remainingFilesCount Count of remaining files to upload
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
     onImageUpload: (targetImgElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, remainingFilesCount: number, core: Core) => void;
@@ -641,7 +641,7 @@ export default class SunEditor {
      * - delete: delete function
      * - element: iframe element
      * - src: src attribute of iframe tag
-     * @param remainingFilesCount Count of remaining files to upload
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
     onVideoUpload: (targetElement: HTMLIFrameElement, index: number, state: string, videoInfo: VideoInfo, remainingFilesCount: number, core: Core) => void;
