@@ -124,7 +124,8 @@
                         <td class="description last">
                             Saving the current status to the history object stack<br>
                             If "delay" is true, it will be saved after 500 miliseconds<br>
-                            If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
+                            If the function is called again with the "delay" argument true before it is saved, the delay time is renewal.<br>
+                            You can specify the delay time by sending a number.
                         </td>
                     </tr>
                     <tr>
@@ -497,7 +498,15 @@
             <h4 class="name" id="codeViewDisabledButtons"><span class="type-signature"></span>codeViewDisabledButtons<span
                     class="type-signature"></span></h4>
             <div class="description">
-                An array of buttons whose class name is not <span style="color:#ff5565">"code-view-enabled"</span>
+                An array of buttons whose class name is not <span style="color:#ff5565">"se-code-view-enabled"</span>
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="resizingDisabledButtons"><span class="type-signature"></span>resizingDisabledButtons<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                An array of buttons whose class name is not <span style="color:#ff5565">"se-resizing-enabled"</span>
             </div>
             <dl class="details"></dl>
 
@@ -531,8 +540,18 @@
             <h4 class="name" id="activePlugins"><span class="type-signature"></span>activePlugins<span
                     class="type-signature"></span></h4>
             <div class="description">
-                Plugins array with "active" method.
+                Plugins array with "active" method.<br>
                 "activePlugins" runs the "add" method when creating the editor.
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="componentInfoPlugins"><span class="type-signature"></span>componentInfoPlugins<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.<br>
+                "componentInfoPlugins" runs the "add" method when creating the editor.<br>
+                "checkComponentInfo" method is always call just before the "change" event.
             </div>
             <dl class="details"></dl>
 
@@ -961,7 +980,8 @@
             <h4 class="name" id="focusEdge"><span class="type-signature"></span>focusEdge<span class="signature">(focusEl)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+                If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected<br>
+                If "focusEdge" is null, then selected last element
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -976,7 +996,7 @@
                 <tr>
                     <td class="name"><code>focusEl</code></td>
                     <td class="type">
-                        <span class="param-type">Element</span>
+                        <span class="param-type">Element | null</span>
                     </td>
                     <td class="description last">Focus element.</td>
                 </tr>
@@ -1213,7 +1233,7 @@
                 The method to insert a element. (used elements : table, hr, image, video)<br>
                 This method is add the element next line and insert the new line.<br>
                 When used in a tag in "LI", it is inserted into the LI tag.<br>
-                Returns the next line added.<br>
+                Returns the first node of next line added.<br>
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1622,34 +1642,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="toggleDisabledButtons"><span class="type-signature"></span>toggleDisabledButtons<span
-                    class="signature">(disabled)</span><span class="type-signature"></span></h4>
-            <div class="description">
-                In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.<br>
-                <a href="#codeViewDisabledButtons">core.codeViewDisabledButtons</a> (An array of buttons whose className is not <span style="color:#ff5565">"code-view-enabled"</span>)
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>element</code></td>
-                    <td class="type">
-                        <span class="param-type">Element</span>
-                    </td>
-                    <td class="description last">{Boolean} disabled Disabled value</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="toggleDisplayBlocks"><span class="type-signature"></span>toggleDisplayBlocks<span
                     class="signature">()</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1963,10 +1955,12 @@
         <li><a href="document-editor.html#currentControllerTarget">currentControllerTarget</a></li>
         <li><a href="document-editor.html#controllerFunction">controllerFunction</a></li>
         <li><a href="document-editor.html#codeViewDisabledButtons">codeViewDisabledButtons</a></li>
+        <li><a href="document-editor.html#resizingDisabledButtons">resizingDisabledButtons</a></li>
         <li><a href="document-editor.html#editorTagsWhitelistRegExp">editorTagsWhitelistRegExp</a></li>
         <li><a href="document-editor.html#pasteTagsWhitelistRegExp">pasteTagsWhitelistRegExp</a></li>
         <li><a href="document-editor.html#hasFocus">hasFocus</a></li>
         <li><a href="document-editor.html#activePlugins">activePlugins</a></li>
+        <li><a href="document-editor.html#componentInfoPlugins">componentInfoPlugins</a></li>
         <li><a href="document-editor.html#commandMap">commandMap</a></li>
         <li><a href="document-editor.html#_variable">_variable</a></li>
         <li><b>Methods</b></li>
@@ -2006,7 +2000,6 @@
         <li><a href="document-editor.html#commandHandler">commandHandler</a></li>
         <li><a href="document-editor.html#removeFormat">removeFormat</a></li>
         <li><a href="document-editor.html#indent">indent</a></li>
-        <li><a href="document-editor.html#toggleDisabledButtons">toggleDisabledButtons</a></li>
         <li><a href="document-editor.html#toggleDisplayBlocks">toggleDisplayBlocks</a></li>
         <li><a href="document-editor.html#toggleCodeView">toggleCodeView</a></li>
         <li><a href="document-editor.html#toggleFullScreen">toggleFullScreen</a></li>

@@ -761,9 +761,9 @@ editor.onImageUploadBefore: function (files, info, core) {
     return Boolean
 }
 
-// Called when the image is uploaded or the uploaded image is deleted.
+// Called when the image is uploaded, updated, deleted.
 /**
- * targetImgElement: Current img element
+ * targetElement: Current img element
  * index: Uploaded index (key value)
  * state: Upload status ('create', 'update', 'delete')
  * imageInfo: {
@@ -775,11 +775,11 @@ editor.onImageUploadBefore: function (files, info, core) {
  * - element: img element
  * - src: src attribute of img tag
  * }
- * remainingFilesCount: Count of remaining image files
+ * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object
 */
-editor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount, core) {
-    console.log(`targetImgElement:${targetImgElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+editor.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
@@ -846,6 +846,26 @@ editor.imageUploadHandler = function (response, info, core) {
             else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
         }
     }
+}
+
+// Called when the video(iframe) is is uploaded, updated, deleted
+/**
+ * targetElement: Current iframe element
+ * index: Uploaded index
+ * state: Upload status ('create', 'update', 'delete')
+ * videoInfo: {
+ * - index: data index
+ * - select: select function
+ * - delete: delete function
+ * - element: iframe element
+ * - src: src attribute of iframe tag
+ * }
+ * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
+ * core: Core object
+ */
+editor.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`videoInfo:${videoInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called just before the inline toolbar is positioned and displayed on the screen.

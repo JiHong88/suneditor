@@ -12,7 +12,9 @@ var editorImageSample = null;
 const imageSize = document.getElementById('image_size');
 const imageRemove = document.getElementById('image_remove');
 const imageTable = document.getElementById('image_list');
+const videoTable = document.getElementById('video_list');
 
+let videoList = [];
 let imageList = [];
 let selectedImages = [];
 
@@ -25,15 +27,54 @@ if (document.getElementById('files_upload')) {
     })
 }
 
-function imageUpload (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+function videoUpload (targetElement, index, state, videoInfo, remainingFilesCount) {
+    console.log('videoInfo', videoInfo);
+
+    if (state === 'delete') {
+        videoList.splice(findIndex(videoList, index), 1)
+    } else {
+        if (state === 'create') {
+            videoList.push(videoInfo)
+        } else { // update
+            //
+        }
+    }
+
+    if (remainingFilesCount === 0) {
+        console.log('videoList', videoList)
+        setVideoList(videoList)
+    }
+}
+
+function setVideoList () {
+    let list = '';
+
+    for (let i = 0, video; i < videoList.length; i++) {
+        video = videoList[i];
+            
+        list += '<li>' +
+                    '<button title="delete" onclick="selectVideo(\'delete\',' + video.index + ')">X</button>' +
+                    '<a href="javascript:void(0)" onclick="selectVideo(\'select\',' + video.index + ')">' + video.src + '</a>' +
+                '</li>';
+    }
+
+    videoTable.innerHTML = list;
+}
+
+function selectVideo (type, index) {
+    videoList[findIndex(videoList, index)][type]();
+}
+
+////
+
+function imageUpload (targetElement, index, state, imageInfo, remainingFilesCount) {
     console.log('imageInfo', imageInfo);
 
     if (state === 'delete') {
         imageList.splice(findIndex(imageList, index), 1)
     } else {
         if (state === 'create') {
-            const image = editorImageSample.getImagesInfo()[findIndex(editorImageSample.getImagesInfo(), index)]
-            imageList.push(image)
+            imageList.push(imageInfo)
         } else { // update
             //
         }

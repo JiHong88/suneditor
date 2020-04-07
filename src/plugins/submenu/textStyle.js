@@ -91,6 +91,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const util = this.util;
         const textStyleContext = this.context.textStyle;

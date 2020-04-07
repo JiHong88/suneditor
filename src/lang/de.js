@@ -121,6 +121,7 @@
             insertColumnBefore: 'Spalte links einfügen',
             insertColumnAfter: 'Spalte rechts einfügen',
             deleteColumn: 'Spalte löschen',
+            fixedColumnWidth: 'Feste Spaltenbreite',
             resize100: 'Zoom 100%',
             resize75: 'Zoom 75%',
             resize50: 'Zoom 50%',

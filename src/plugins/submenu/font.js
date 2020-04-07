@@ -68,6 +68,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding core
+     */
     active: function (element) {
         const target = this.context.font.targetText;
         const tooltip = this.context.font.targetTooltip;
@@ -86,6 +89,9 @@ export default {
         return false;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const fontContext = this.context.font;
         const fontList = fontContext._fontList;

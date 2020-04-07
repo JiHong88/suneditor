@@ -17,6 +17,13 @@ type ImageInfo =  {
     element: Element;
     src: string;
 };
+type VideoInfo = {
+    index: number;
+    select: Function;
+    delete: Function;
+    element: Element;
+    src: string;
+};
 ​​
 interface Core {
     /**
@@ -110,9 +117,14 @@ interface Core {
     currentControllerTarget: Element;
 
     /**
-     * @description An array of buttons whose class name is not "code-view-enabled"
+     * @description An array of buttons whose class name is not "se-code-view-enabled"
      */
     codeViewDisabledButtons: Element[];
+
+    /**
+     * @description An array of buttons whose class name is not "se-resizing-enabled"
+     */
+    resizingDisabledButtons: Element[],
 
     /**
      * @description Editor tags whitelist (RegExp object)
@@ -136,6 +148,13 @@ interface Core {
      * "activePlugins" runs the "add" method when creating the editor.
      */
     activePlugins: Plugin[];
+
+    /**
+     * @description Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.
+     * "componentInfoPlugins" runs the "add" method when creating the editor.
+     * "checkComponentInfo" method is always call just before the "change" event.
+     */
+    componentInfoPlugins: Function[],
 
     /**
      * @description Elements that need to change text or className for each selection change
@@ -229,9 +248,10 @@ interface Core {
 
     /**
      * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+     * If "focusEdge" is null, then selected last element
      * @param focusEl Focus element
      */
-    focusEdge(focusEl: Element): void;
+    focusEdge(focusEl: Element | null): void;
 
     /**
      * @description Set current editor's range object
@@ -312,7 +332,7 @@ interface Core {
      * @description The method to insert a element. (used elements : table, hr, image, video)
      * This method is add the element next line and insert the new line.
      * When used in a tag in "LI", it is inserted into the LI tag.
-     * Returns the next line added.
+     * Returns the first node of next line added.
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @returns
@@ -420,13 +440,6 @@ interface Core {
      * @param command Separator ("indent" or "outdent")
      */
     indent (command: string): void;
-
-    /**
-     * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
-     * core.codeViewDisabledButtons (An array of buttons whose class name is not "code-view-enabled")
-     * @param disabled Disabled value
-     */
-    toggleDisabledButtons(disabled: boolean): void;
 
     /**
      * @description Add or remove the class name of "body" so that the code block is visible
@@ -545,7 +558,7 @@ export default class SunEditor {
     core: Core;
     util: Util;
     
-    onload: EventFn;
+    onload: (core: Core, reload: boolean) => void;
     onScroll: EventFn;
     onMouseDown: EventFn;
     onClick: EventFn;
@@ -553,6 +566,9 @@ export default class SunEditor {
     onKeyDown: EventFn;
     onKeyUp: EventFn;
     onDrop: EventFn;
+    onChange: (contents: string, core: Core) => void;
+    onBlur: EventFn;
+    onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => void;
 
     /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
@@ -597,8 +613,8 @@ export default class SunEditor {
     onImageUploadBefore: (files: any[], info: InputInformation, core: Core) => boolean;
 
     /**
-     * @description Called when the image is uploaded or the uploaded image is deleted
-     * @param targetImgElement Current img element
+     * @description Called when the image is uploaded, updated, deleted
+     * @param targetElement Current img element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
      * @param imageInfo Image info object
@@ -609,9 +625,26 @@ export default class SunEditor {
      * - delete: delete function
      * - element: img element
      * - src: src attribute of img tag
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetImgElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, remainingFilesCount: number, core: Core) => void;
+
+    /**
+     * @description Called when the video(iframe) is is uploaded, updated, deleted
+     * @param targetElement Current iframe element
+     * @param index Uploaded index
+     * @param state Upload status ('create', 'update', 'delete')
+     * @param videoInfo Video info object
+     * - index: data index
+     * - select: select function
+     * - delete: delete function
+     * - element: iframe element
+     * - src: src attribute of iframe tag
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
+     * @param core Core object
+     */
+    onVideoUpload: (targetElement: HTMLIFrameElement, index: number, state: string, videoInfo: VideoInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed
@@ -683,9 +716,20 @@ export default class SunEditor {
      * - delete: delete function
      * - element: img element
      * - src: src attribute of img tag
-     * @returns {Array}
+     * @returns
      */
     getImagesInfo(): ImageInfo[];
+
+    /**
+     * @description Gets uploaded videos informations
+     * - index: data index
+     * - select: select function
+     * - delete: delete function
+     * - element: iframe element
+     * - src: src attribute of iframe tag
+     * @returns
+     */
+    getVideosInfo(): VideoInfo[];
 
      /**
      * @description Upload images using image plugin

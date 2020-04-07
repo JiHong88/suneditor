@@ -318,9 +318,7 @@ export default {
             });
         }
         
-        wysiwygDiv.style.height = options.height;
-        wysiwygDiv.style.minHeight = options.minHeight;
-        wysiwygDiv.style.maxHeight = options.maxHeight;
+        wysiwygDiv.style.cssText = util._setDefaultOptionStyle(options);
 
         // textarea for code view
         const textarea = document.createElement('TEXTAREA');
@@ -436,7 +434,7 @@ export default {
         options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Editing area default style */
-        options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
+        options.defaultStyle = util._setDefaultOptionStyle(options) + (typeof options.defaultStyle === 'string' ? options.defaultStyle : '');
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
@@ -515,14 +513,14 @@ export default {
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
             indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '', icons.outdent],
             outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '', icons.indent],
-            fullScreen: ['code-view-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
+            fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
             showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
-            codeView: ['code-view-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
-            undo: ['_se_command_undo', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '', icons.undo],
-            redo: ['_se_command_redo', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '', icons.redo],
-            preview: ['', lang.toolbar.preview, 'preview', '', icons.preview],
-            print: ['', lang.toolbar.print, 'print', '', icons.print],
-            save: ['_se_command_save', lang.toolbar.save, 'save', '', icons.save],
+            codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
+            undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '', icons.undo],
+            redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '', icons.redo],
+            preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
+            print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
+            save: ['_se_command_save se-resizing-enabled', lang.toolbar.save, 'save', '', icons.save],
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
             /** plugins - submenu */

@@ -73,6 +73,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding core
+     */
     active: function (element) {
         let formatTitle = this.lang.toolbar.formats;
         const target = this.context.formatBlock.targetText;
@@ -106,6 +109,9 @@ export default {
         return false;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const formatContext = this.context.formatBlock;
         const formatList = formatContext._formatList;

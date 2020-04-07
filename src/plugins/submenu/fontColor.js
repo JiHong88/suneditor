@@ -50,6 +50,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const contextPicker = this.context.colorPicker;
         const contextFontColor = this.context.fontColor;
@@ -62,6 +65,9 @@ export default {
         this.plugins.colorPicker.init.call(this, this.getSelectionNode(), null);
     },
 
+     /**
+     * @overriding _colorPicker
+     */
     onChangeInput: function (e) {
         this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);
     },

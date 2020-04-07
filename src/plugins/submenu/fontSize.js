@@ -56,6 +56,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding core
+     */
     active: function (element) {
         if (!element) {
             this.util.changeTxt(this.context.fontSize.targetText, this.lang.toolbar.fontSize);
@@ -67,6 +70,9 @@ export default {
         return false;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const fontSizeContext = this.context.fontSize;
         const sizeList = fontSizeContext._sizeList;
