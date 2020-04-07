@@ -60,7 +60,7 @@ export default {
         let image_dialog = this.setDialog.call(core);
         contextImage.modal = image_dialog;
         contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
-        contextImage.imgUrlFile = image_dialog.querySelector('._se_image_url');
+        contextImage.imgUrlFile = image_dialog.querySelector('.se-input-url');
         contextImage.focusElement = (contextImage.imgInputFile || contextImage.imgUrlFile);
         contextImage.altText = image_dialog.querySelector('._se_image_alt');
         contextImage.imgLink = image_dialog.querySelector('._se_image_link');
@@ -68,8 +68,9 @@ export default {
         contextImage.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
 
         /** add event listeners */
-        contextImage.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
-        contextImage.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
+        image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        image_dialog.querySelector('.se-dialog-files-remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
         
         contextImage.proportion = {};
@@ -127,7 +128,10 @@ export default {
                 html += '' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.imageBox.file + '</label>' +
-                            '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                            '<div class="se-dialog-form-files">' +
+                                '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                            '</div>' +
                         '</div>' ;
             }
 
@@ -135,7 +139,7 @@ export default {
                 html += '' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.imageBox.url + '</label>' +
-                            '<input class="se-input-form _se_image_url" type="text" />' +
+                            '<input class="se-input-form se-input-url" type="text" />' +
                         '</div>';
             }
 
@@ -204,6 +208,11 @@ export default {
     _fileInputChange: function () {
         if (!this.imgInputFile.value) this.imgUrlFile.removeAttribute('disabled');
         else this.imgUrlFile.setAttribute('disabled', true);
+    },
+
+    _removeSelectedFiles: function (fileInput, urlInput) {
+        fileInput.value = '';
+        if (urlInput) urlInput.removeAttribute('disabled');
     },
 
     /**
@@ -875,10 +884,14 @@ export default {
      * @overriding dialog
      */
     on: function (update) {
+        const contextImage = this.context.image;
+        
         if (!update) {
-            const contextImage = this.context.image;
             contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
             contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
+            if (contextImage.imgInputFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
+        } else {
+            if (contextImage.imgInputFile) contextImage.imgInputFile.removeAttribute('multiple');
         }
     },
 

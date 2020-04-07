@@ -475,7 +475,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         // ['removeFormat'],
         // ['outdent', 'indent'],
         // ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
-        // ['link', 'image', 'video'],
+        ['link', 'image', 'video'],
         // ['fullScreen', 'showBlocks', 'codeView'],
         // ['preview', 'print'],
         // ['save', 'template'],

@@ -323,7 +323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description An user event function when video info is changed
          * @private
          */
-        _videoUpload: function (targetElement, index, state, videoInfo) {
+        _videoUpload: function (targetElement, index, state, videoInfo, remainingFilesCount) {
             if (typeof functions.onVideoUpload === 'function') functions.onVideoUpload(targetElement, index * 1, state, videoInfo, remainingFilesCount, this);
         },
 
