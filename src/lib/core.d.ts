@@ -716,9 +716,20 @@ export default class SunEditor {
      * - delete: delete function
      * - element: img element
      * - src: src attribute of img tag
-     * @returns {Array}
+     * @returns
      */
     getImagesInfo(): ImageInfo[];
+
+    /**
+     * @description Gets uploaded videos informations
+     * - index: data index
+     * - select: select function
+     * - delete: delete function
+     * - element: iframe element
+     * - src: src attribute of iframe tag
+     * @returns
+     */
+    getVideosInfo(): VideoInfo[];
 
      /**
      * @description Upload images using image plugin

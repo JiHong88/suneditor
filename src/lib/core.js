@@ -6165,6 +6165,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Gets uploaded videos informations
+         * - index: data index
+         * - select: select function
+         * - delete: delete function
+         * - element: iframe element
+         * - src: src attribute of iframe tag
+         * @returns {Array}
+         */
+        getVideosInfo: function () {
+            return context.video ? context.video._videosInfo : [];
+        },
+
+        /**
          * @description Upload images using image plugin
          * @param {FileList} files FileList
          */
