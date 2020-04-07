@@ -183,6 +183,15 @@
                 </ul>
             </div>
         </div>
+        <div class="image-list">
+            <div class="file-list-info">
+                <span>Video list</span>
+            </div>
+            <div class="video-file-list">
+                <ul id="video_list">
+                </ul>
+            </div>
+        </div>
 
 <!-- image management html-->
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_wrapper<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>image-list<span class="pl-pds">"</span></span>&gt;
@@ -220,7 +229,7 @@
     ],
 })
 
-<span class="pl-smi">editorImageSample</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>) {
+<span class="pl-smi">editorImageSample</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>) {
     <span class="pl-k">if</span> (state <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>delete<span class="pl-pds">'</span></span>) {
         <span class="pl-smi">imageList</span>.<span class="pl-c1">splice</span>(<span class="pl-en">findIndex</span>(imageList, index), <span class="pl-c1">1</span>)
     } <span class="pl-k">else</span> {
@@ -342,6 +351,7 @@
     <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
     <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
     <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
+    <button type="button" class="btn btn-md btn-success" onclick="sun_getVideosInfo()">getVideosInfo</button>
     <div>
         <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
         <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
@@ -429,19 +439,31 @@
 <span class="pl-c"><span class="pl-c">//</span> onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>(onlyContents<span class="pl-k">:</span> <span class="pl-c1">Boolean</span>);
 
-<span class="pl-c"><span class="pl-c">//</span> Gets a list of images uploaded to the editor</span>
+<span class="pl-c"><span class="pl-c">//</span> Gets uploaded images informations</span>
 <span class="pl-c"><span class="pl-c">/**</span> </span>
 <span class="pl-c"> * {</span>
-<span class="pl-c"> *  element: image element</span>
-<span class="pl-c"> *  src: imgage src</span>
 <span class="pl-c"> *  index: data index</span>
 <span class="pl-c"> *  name: file name</span>
 <span class="pl-c"> *  size: file size</span>
 <span class="pl-c"> *  select: select function</span>
 <span class="pl-c"> *  delete: delete function</span>
+<span class="pl-c"> *  element: image element</span>
+<span class="pl-c"> *  src: imgage src</span>
 <span class="pl-c"> * }</span>
 <span class="pl-c"> *<span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
+
+<span class="pl-c"><span class="pl-c">//</span> Gets uploaded videos informations</span>
+<span class="pl-c"><span class="pl-c">/**</span> </span>
+<span class="pl-c"> * {</span>
+<span class="pl-c"> *  index: data index</span>
+<span class="pl-c"> *  select: select function</span>
+<span class="pl-c"> *  delete: delete function</span>
+<span class="pl-c"> *  src: iframe src</span>
+<span class="pl-c"> *  element: iframe element</span>
+<span class="pl-c"> * }</span>
+<span class="pl-c"> *<span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">getVideosInfo</span>();
 
 <span class="pl-c"><span class="pl-c">//</span> Upload images using image plugin</span>
 <span class="pl-c"><span class="pl-c">//</span> document.getElementById('example_files_input').files</span>
@@ -525,20 +547,14 @@
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded, updated, deleted.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * targetImgElement: Current img element</span>
+<span class="pl-c"> * targetElement: Current img element</span>
 <span class="pl-c"> * index: Uploaded index (key value)</span>
 <span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
-<span class="pl-c"> * imageInfo: {</span>
-<span class="pl-c"> * * index: data index</span>
-<span class="pl-c"> * * name: file name</span>
-<span class="pl-c"> * * size: file size</span>
-<span class="pl-c"> * * select: select function</span>
-<span class="pl-c"> * * delete: delete function</span>
-<span class="pl-c"> * }</span>
+<span class="pl-c"> * imageInfo: Image infomation (getImagesInfo)</span>
 <span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>imageInfo:<span class="pl-s1"><span class="pl-pse">${</span>imageInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
 }
 
@@ -559,6 +575,19 @@
 <span class="pl-c"><span class="pl-c">//</span> It replaces the default callback function of the image upload.</span>
 <span class="pl-smi">editor</span>.<span class="pl-en">imageUploadHandler</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
 
+<span class="pl-c"><span class="pl-c">//</span> Called when the videos(iframe) is uploaded, updated, deleted.</span>
+<span class="pl-c"><span class="pl-c">/**</span></span>
+<span class="pl-c"> * targetElement: Current iframe element</span>
+<span class="pl-c"> * index: Uploaded index (key value)</span>
+<span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
+<span class="pl-c"> * videoInfo: Video infomation (getVideosInfo)</span>
+<span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
+<span class="pl-c"><span class="pl-c">*/</span></span>
+<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">videoInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>videoInfo:<span class="pl-s1"><span class="pl-pse">${</span>videoInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+}
+
 <span class="pl-c"><span class="pl-c">// Called just before the inline toolbar is positioned and displayed on the screen.</span></span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * toolbar: Toolbar Element</span>
@@ -577,7 +606,7 @@
 <span class="pl-c"> * controllers: Array of Controller elements</span>
 <span class="pl-c"> * core: Core object</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">name</span>, <span class="pl-smi">controllers</span>, <span class="pl-smi">core</span>) {
+<span class="pl-smi">editor</span>.<span class="pl-en">showController</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">name</span>, <span class="pl-smi">controllers</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>plugin name<span class="pl-pds">'</span></span>, name);
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>controller elements<span class="pl-pds">'</span></span>, controllers);
 }</pre></div>
@@ -690,6 +719,7 @@
     })
 
     editorImageSample.onImageUpload = imageUpload;
+    editorImageSample.onVideoUpload = videoUpload;
 
     // user function
     var suneditor = null;
@@ -706,7 +736,7 @@
             ['outdent', 'indent'],
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print'],
-            ['image']
+            ['image', 'video']
         ],
         width: '100%'
     }
@@ -739,7 +769,7 @@
                 ['outdent', 'indent'],
                 ['fullScreen', 'showBlocks', 'codeView'],
                 ['preview', 'print'],
-                ['image']
+                ['image', 'video']
             ],
         });
 
@@ -781,6 +811,10 @@
 
     function sun_getImagesInfo() {
         console.log(suneditor.getImagesInfo());
+    }
+
+    function sun_getVideosInfo() {
+        console.log(suneditor.getVideosInfo());
     }
 
     function sun_insertImage() {
@@ -851,8 +885,11 @@
         suneditor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e, cleanData, maxCharCount) }
         suneditor.onFocus = function (contents) { console.log('onFocus', contents) }
         suneditor.onBlur = function (contents) { console.log('onBlur', contents) }
-        suneditor.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) { 
-            console.log('targetImgElement:' + targetImgElement + ', index:' + index + ', state("create","update","delete"):' + state + ', imageInfo:' + imageInfo + ', remainingFilesCount:' + remainingFilesCount)
+        suneditor.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) { 
+            console.log('targetElement:' + targetElement + ', index:' + index + ', state("create","update","delete"):' + state + ', imageInfo:' + imageInfo + ', remainingFilesCount:' + remainingFilesCount)
+        }
+        suneditor.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount) { 
+            console.log('targetElement:' + targetElement + ', index:' + index + ', state("create","update","delete"):' + state + ', videoInfo:' + videoInfo + ', remainingFilesCount:' + remainingFilesCount)
         }
         suneditor.showInline = function (toolbar, context) {
             console.log('toolbar', toolbar);

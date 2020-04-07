@@ -614,7 +614,7 @@ export default class SunEditor {
 
     /**
      * @description Called when the image is uploaded, updated, deleted
-     * @param targetImgElement Current img element
+     * @param targetElement Current img element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
      * @param imageInfo Image info object
@@ -628,7 +628,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetImgElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, remainingFilesCount: number, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the video(iframe) is is uploaded, updated, deleted

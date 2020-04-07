@@ -651,7 +651,7 @@ s2.onload = function (core, isUpdate) {
     console.log('2222onload222', isUpdate)
 }
 
-s2.onImageUpload = function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
+s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) {
     console.log('imageInfo', imageInfo);
 
     if (state === 'delete') {

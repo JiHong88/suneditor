@@ -293,8 +293,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description An user event function when image info is changed
          * @private
          */
-        _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetImgElement, index * 1, state, imageInfo, remainingFilesCount, this);
+        _imageUpload: function (targetElement, index, state, imageInfo, remainingFilesCount) {
+            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetElement, index * 1, state, imageInfo, remainingFilesCount, this);
         },
 
         /**
@@ -5973,7 +5973,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Called when the image is uploaded, updated, deleted
-         * @param {Element} targetImgElement Current img element
+         * @param {Element} targetElement Current img element
          * @param {Number} index Uploaded index
          * @param {String} state Upload status ('create', 'update', 'delete')
          * @param {Object} imageInfo Image info object
