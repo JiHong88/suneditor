@@ -1012,6 +1012,19 @@ const util = {
     },
 
     /**
+     * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
+     * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
+     * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
+     * @param {Boolean} disabled Disabled value
+     * @param {Array|HTMLCollection|NodeList} buttonList Button array
+     */
+    toggleDisabledButtons: function (disabled, buttonList) {
+        for (let i = 0, len = buttonList.length; i < len; i++) {
+            buttonList[i].disabled = disabled;
+        }
+    },
+
+    /**
      * @description Delete argumenu value element
      * @param {Node} item Node to be remove
      */
@@ -1562,6 +1575,14 @@ const util = {
             t.parentNode.insertBefore(tp, t);
             this.removeItem(t);
         }
+    },
+
+    _setDefaultOptionStyle: function (options) {
+        let optionStyle = '';
+        if (options.height) optionStyle += 'height:' + options.height + ';';
+        if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
+        if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
+        return optionStyle;
     }
 };
 

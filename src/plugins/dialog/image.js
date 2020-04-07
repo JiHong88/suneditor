@@ -17,9 +17,20 @@ export default {
         core.addModule([dialog, resizing]);
         
         const context = core.context;
-        context.image = {
+        const contextImage = context.image = {
+            _imagesInfo: [],
+            _imageIndex: 0,
             sizeUnit: context.option._imageSizeUnit,
+            _altText: '',
             _linkElement: null,
+            _linkValue: '',
+            _align: 'none',
+            _floatClassRegExp: '__se__float\\-[a-z]+',
+            _uploadFileLength: 0,
+            _xmlHttp: null,
+            // @overriding resizing properties
+            inputX: null,
+            inputY: null,
             _container: null,
             _cover: null,
             _element: null,
@@ -31,58 +42,52 @@ export default {
             _defaultSizeY: 'auto',
             _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
             _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,
-            _altText: '',
-            _caption: null,
-            captionCheckEl: null,
-            _linkValue: '',
-            _align: 'none',
-            _captionChecked: false,
             _proportionChecked: true,
-            _floatClassRegExp: '__se__float\\-[a-z]+',
-            _xmlHttp: null,
-            _captionShow: true,
             _resizing: context.option.imageResizing,
-            _rotation: context.option.imageRotation,
             _resizeDotHide: !context.option.imageHeightShow,
-            _uploadFileLength: 0,
+            _rotation: context.option.imageRotation,
             _onlyPercentage: context.option.imageSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
-            _ratioY: 1
+            _ratioY: 1,
+            _captionShow: true,
+            _captionChecked: false,
+            _caption: null,
+            captionCheckEl: null
         };
 
         /** image dialog */
         let image_dialog = this.setDialog.call(core);
-        context.image.modal = image_dialog;
-        context.image.imgInputFile = image_dialog.querySelector('._se_image_file');
-        context.image.imgUrlFile = image_dialog.querySelector('._se_image_url');
-        context.image.focusElement = (context.image.imgInputFile || context.image.imgUrlFile);
-        context.image.altText = image_dialog.querySelector('._se_image_alt');
-        context.image.imgLink = image_dialog.querySelector('._se_image_link');
-        context.image.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
-        context.image.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
+        contextImage.modal = image_dialog;
+        contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
+        contextImage.imgUrlFile = image_dialog.querySelector('._se_image_url');
+        contextImage.focusElement = (contextImage.imgInputFile || contextImage.imgUrlFile);
+        contextImage.altText = image_dialog.querySelector('._se_image_alt');
+        contextImage.imgLink = image_dialog.querySelector('._se_image_link');
+        contextImage.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
+        contextImage.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
 
         /** add event listeners */
-        context.image.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
-        context.image.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        if (context.image.imgInputFile && context.image.imgUrlFile) context.image.imgInputFile.addEventListener('change', this._fileInputChange.bind(context.image));
+        contextImage.modal.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
+        contextImage.modal.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
         
-        context.image.proportion = {};
-        context.image.inputX = {};
-        context.image.inputY = {};
+        contextImage.proportion = {};
+        contextImage.inputX = {};
+        contextImage.inputY = {};
         if (context.option.imageResizing) {
-            context.image.proportion = image_dialog.querySelector('._se_image_check_proportion');
-            context.image.inputX = image_dialog.querySelector('._se_image_size_x');
-            context.image.inputY = image_dialog.querySelector('._se_image_size_y');
-            context.image.inputX.value = context.option.imageWidth;
-            context.image.inputY.value = context.option.imageHeight;
+            contextImage.proportion = image_dialog.querySelector('._se_image_check_proportion');
+            contextImage.inputX = image_dialog.querySelector('._se_image_size_x');
+            contextImage.inputY = image_dialog.querySelector('._se_image_size_y');
+            contextImage.inputX.value = context.option.imageWidth;
+            contextImage.inputY.value = context.option.imageHeight;
             
-            context.image.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
-            context.image.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
+            contextImage.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
+            contextImage.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
 
-            context.image.inputX.addEventListener('change', this.setRatio.bind(core));
-            context.image.inputY.addEventListener('change', this.setRatio.bind(core));
-            context.image.proportion.addEventListener('change', this.setRatio.bind(core));
+            contextImage.inputX.addEventListener('change', this.setRatio.bind(core));
+            contextImage.inputY.addEventListener('change', this.setRatio.bind(core));
+            contextImage.proportion.addEventListener('change', this.setRatio.bind(core));
             
             image_dialog.querySelector('.se-dialog-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
         }
@@ -201,6 +206,9 @@ export default {
         else this.imgUrlFile.setAttribute('disabled', true);
     },
 
+    /**
+     * @overriding dialog
+     */
     open: function () {
         this.plugins.dialog.open.call(this, 'image', 'image' === this.currentControllerName);
     },
@@ -258,7 +266,7 @@ export default {
             const limitSize = this.context.option.imageUploadSizeLimit;
             if (limitSize > 0) {
                 let infoSize = 0;
-                const imagesInfo = this._variable._imagesInfo;
+                const imagesInfo = this.context.image._imagesInfo;
                 for (let i = 0, len = imagesInfo.length; i < len; i++) {
                     infoSize += imagesInfo[i].size * 1;
                 }
@@ -278,19 +286,20 @@ export default {
                 }
             }
 
-            this.context.image._uploadFileLength = files.length;
+            const contextImage = this.context.image;
+            contextImage._uploadFileLength = files.length;
             const imageUploadUrl = this.context.option.imageUploadUrl;
             const imageUploadHeader = this.context.option.imageUploadHeader;
             const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
             const info = {
-                linkValue: this.context.image._linkValue,
-                linkNewWindow: this.context.image.imgLinkNewWindowCheck.checked,
-                inputWidth: this.context.image.inputX.value,
-                inputHeight: this.context.image.inputY.value,
-                align: this.context.image._align,
+                linkValue: contextImage._linkValue,
+                linkNewWindow: contextImage.imgLinkNewWindowCheck.checked,
+                inputWidth: contextImage.inputX.value,
+                inputHeight: contextImage.inputY.value,
+                align: contextImage._align,
                 isUpdate: this.context.dialog.updateModal,
-                currentImage: this.context.image._element
+                currentImage: contextImage._element
             };
 
             if (!this._imageUploadBefore(files, info)) return;
@@ -302,15 +311,15 @@ export default {
                     formData.append('file-' + i, files[i]);
                 }
 
-                this.context.image._xmlHttp = this.util.getXMLHttpRequest();
-                this.context.image._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
-                this.context.image._xmlHttp.open('post', imageUploadUrl, true);
+                contextImage._xmlHttp = this.util.getXMLHttpRequest();
+                contextImage._xmlHttp.onreadystatechange = this.plugins.image.callBack_imgUpload.bind(this, info);
+                contextImage._xmlHttp.open('post', imageUploadUrl, true);
                 if(imageUploadHeader !== null && typeof imageUploadHeader === 'object' && this._w.Object.keys(imageUploadHeader).length > 0){
                     for(let key in imageUploadHeader){
-                        this.context.image._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
+                        contextImage._xmlHttp.setRequestHeader(key, imageUploadHeader[key]);
                     }
                 }
-                this.context.image._xmlHttp.send(formData);
+                contextImage._xmlHttp.send(formData);
             }
             else {
                 for (let i = 0; i < filesLen; i++) {
@@ -416,6 +425,11 @@ export default {
         return imgTag;
     },
 
+    /**
+     * @overriding resizing
+     * @param {String} xy 'x': width, 'y': height
+     * @param {KeyboardEvent} e Event object
+     */
     setInputSize: function (xy, e) {
         if (e && e.keyCode === 32) {
             e.preventDefault();
@@ -425,6 +439,9 @@ export default {
         this.plugins.resizing._module_setInputSize.call(this, this.context.image, xy);
     },
 
+    /**
+     * @overriding resizing
+     */
     setRatio: function () {
         this.plugins.resizing._module_setRatio.call(this, this.context.image);
     },
@@ -466,16 +483,18 @@ export default {
     },
 
     setImagesInfo: function (img, file) {
-        const imagesInfo = this._variable._imagesInfo;
+        const _resize_plugin = this.context.resizing._resize_plugin;
+        this.context.resizing._resize_plugin = 'image';
+
+        const imagesInfo = this.context.image._imagesInfo;
         let dataIndex = img.getAttribute('data-index');
         let info = null;
         let state = '';
 
         // create
-        if (!dataIndex || this._imagesInfoInit) {
+        if (!dataIndex || this._componentsInfoInit) {
             state = 'create';
-            dataIndex = this._variable._imageIndex;
-            this._variable._imageIndex++;
+            dataIndex = this.context.image._imageIndex++;
 
             img.setAttribute('data-index', dataIndex);
             img.setAttribute('data-file-name', file.name);
@@ -501,12 +520,12 @@ export default {
             }
 
             if (!info) {
-                dataIndex = this._variable._imageIndex;
-                this._variable._imageIndex++;
-                info = {};
+                dataIndex = this.context.image._imageIndex++;
+                info = { index: dataIndex };
+                imagesInfo.push(info);
             }
 
-            info.src = img.src,
+            info.src = img.src;
             info.name = img.getAttribute("data-file-name");
             info.size = img.getAttribute("data-file-size") * 1;
         }
@@ -534,17 +553,27 @@ export default {
             img.setAttribute('data-size', w + ',' + h);
         }
 
+        if (!img.style.width) {
+            const size = (img.getAttribute('data-size') || img.getAttribute('data-origin') || '').split(',');
+            this.plugins.image.onModifyMode.call(this, img, null);
+            this.plugins.image.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || this.context.option.imageHeight));
+        }
+
+        this.context.resizing._resize_plugin = _resize_plugin;
         this._imageUpload(img, dataIndex, state, info, --this.context.image._uploadFileLength < 0 ? 0 : this.context.image._uploadFileLength);
     },
 
-    checkImagesInfo: function () {
+    /**
+     * @overriding core
+     */
+    checkComponentInfo: function () {
         const images = [].slice.call(this.context.element.wysiwyg.getElementsByTagName('IMG'));
         const imagePlugin = this.plugins.image;
-        const imagesInfo = this._variable._imagesInfo;
+        const imagesInfo = this.context.image._imagesInfo;
 
         if (images.length === imagesInfo.length) {
             // reset
-            if (this._imagesInfoReset) {
+            if (this._componentsInfoReset) {
                 for (let i = 0, len = images.length, img; i < len; i++) {
                     img = images[i];
                     imagePlugin.setImagesInfo.call(this, img, {
@@ -579,22 +608,17 @@ export default {
         for (let i = 0, len = images.length, img; i < len; i++) {
             img = images[i];
             if (!this.util.getParentElement(img, this.util.isMediaComponent)) {
-                currentImages.push(this._variable._imageIndex);
+                currentImages.push(this.context.image._imageIndex);
                 imagePlugin.onModifyMode.call(this, img, null);
                 imagePlugin.openModify.call(this, true);
                 imagePlugin.update_image.call(this, true, false, true);
             } else if (!img.getAttribute('data-index') || infoIndex.indexOf(img.getAttribute('data-index') * 1) < 0) {
-                currentImages.push(this._variable._imageIndex);
+                currentImages.push(this.context.image._imageIndex);
                 img.removeAttribute('data-index');
                 imagePlugin.setImagesInfo.call(this, img, {
                     'name': img.getAttribute('data-file-name') || img.src.split('/').pop(),
                     'size': img.getAttribute('data-file-size') || 0
                 });
-                if (!img.style.width) {
-                    const size = (img.getAttribute('data-size') || img.getAttribute('data-origin') || '').split(',');
-                    imagePlugin.onModifyMode.call(this, img, null);
-                    imagePlugin.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || this.context.option.imageHeight));
-                }
             } else {
                 currentImages.push(img.getAttribute('data-index') * 1);
             }
@@ -612,11 +636,12 @@ export default {
         this.context.resizing._resize_plugin = _resize_plugin;
     },
 
-    _onload_image: function (oImg, file) {
-        if (!file) return;
-        this.plugins.image.setImagesInfo.call(this, oImg, file);
-        // history stack
-        this.history.push(true);
+    /**
+     * @overriding core
+     */
+    resetComponentInfo: function () {
+        this.context.image._imagesInfo = [];
+        this.context.image._imageIndex = 0;
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
@@ -624,8 +649,6 @@ export default {
         this.context.resizing._resize_plugin = 'image';
 
         let oImg = this.util.createElement('IMG');
-        oImg.addEventListener('load', this.plugins.image._onload_image.bind(this, oImg, file));
-
         oImg.src = src;
         oImg.alt = contextImage._altText;
         oImg = this.plugins.image.onRender_link.call(this, oImg, linkValue, linkNewWindow);
@@ -656,6 +679,11 @@ export default {
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
         this.insertComponent(container, true);
+        this.plugins.image.setImagesInfo.call(this, oImg, file || {
+            'name': oImg.getAttribute('data-file-name') || oImg.src.split('/').pop(),
+            'size': oImg.getAttribute('data-file-size') || 0
+        });
+
         this.context.resizing._resize_plugin = '';
     },
 
@@ -791,6 +819,9 @@ export default {
         this._w.setTimeout(this.plugins.image.setImagesInfo.bind(this, element, file));
     },
 
+    /**
+     * @overriding resizing
+     */
     onModifyMode: function (element, size) {
         if (!element) return;
         
@@ -820,6 +851,9 @@ export default {
         }
     },
 
+    /**
+     * @overriding resizing
+     */
     openModify: function (notOpen) {
         const contextImage = this.context.image;
         contextImage.imgUrlFile.value = contextImage._element.src;
@@ -837,6 +871,9 @@ export default {
         if (!notOpen) this.plugins.dialog.open.call(this, 'image', true);
     },
 
+    /**
+     * @overriding dialog
+     */
     on: function (update) {
         if (!update) {
             const contextImage = this.context.image;
@@ -867,6 +904,9 @@ export default {
         return false;
     },
 
+    /**
+     * @overriding resizing
+     */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
         const onlyW = /^(rw|lw)$/.test(direction);
@@ -884,6 +924,9 @@ export default {
         this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
 
+    /**
+     * @overriding resizing
+     */
     setAutoSize: function () {
         const contextImage = this.context.image;
 
@@ -903,6 +946,9 @@ export default {
         this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
     
+    /**
+     * @overriding resizing
+     */
     setOriginSize: function () {
         const contextImage = this.context.image;
         contextImage._element.removeAttribute('data-percentage');
@@ -926,6 +972,9 @@ export default {
         }
     },
 
+    /**
+     * @overriding resizing
+     */
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
         h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextImage.sizeUnit : (h || '');
@@ -948,6 +997,9 @@ export default {
         this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
     },
 
+    /**
+     * @overriding resizing
+     */
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
         
@@ -962,6 +1014,9 @@ export default {
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
     },
 
+    /**
+     * @overriding resizing
+     */
     setAlign: function (align, element, cover, container) {
         const contextImage = this.context.image;
         
@@ -1001,6 +1056,9 @@ export default {
         this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
     },
 
+    /**
+     * @overriding resizing
+     */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
@@ -1012,14 +1070,14 @@ export default {
         this.plugins.image.init.call(this);
         this.controllersOff();
 
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
         // focus
         this.focusEdge(focusEl);
         
         // event
         if (dataIndex >= 0) {
-            const imagesInfo = this._variable._imagesInfo;
+            const imagesInfo = this.context.image._imagesInfo;
 
             for (let i = 0, len = imagesInfo.length; i < len; i++) {
                 if (dataIndex === imagesInfo[i].index) {
@@ -1034,6 +1092,9 @@ export default {
         this.history.push(false);
     },
 
+    /**
+     * @overriding dialog
+     */
     init: function () {
         const contextImage = this.context.image;
         if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';

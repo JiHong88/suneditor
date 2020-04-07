@@ -82,6 +82,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const paragraphContext = this.context.paragraphStyle;
         const paragraphList = paragraphContext._classList;

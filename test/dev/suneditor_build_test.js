@@ -28,7 +28,7 @@ const align = require('../../src/plugins/submenu/align')
 
 suneditor.create("sample1", {
     plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle, custom_plugin_submenu],
-    mode: "balloon",
+    // mode: "balloon",
     // iframe: true,
     width: '100%',
     height: '500px',
@@ -197,8 +197,8 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.destroy()
-    // s1.setDefaultStyle('font-family: cursive; font-size: 10px;');
+    // s1.destroy()
+    s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+
     // '<head>'+
@@ -298,14 +298,14 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 });
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
-    console.log('onload', core);
+    console.log('onload', core.context.video._videosInfo);
     // core.focus();
 };
 ss.onScroll = function (e) {
-    console.log('onScroll', e);
+    // console.log('onScroll', e);
 };
 ss.onClick = function (e) {
-    console.log('onClick', e);
+    // console.log('onClick', e);
 };
 ss.onFocus = function (e, core) {
     console.log('onFocus', e);
@@ -314,17 +314,20 @@ ss.onBlur = function (e, core) {
     console.log('onBlur', e);
 };
 ss.onKeyDown = function (e) {
-    console.log('onKeyDown', e);
+    // console.log('onKeyDown', e);
 };
 ss.onKeyUp = function (e) {
-    console.log('onKeyUp', e);
+    // console.log('onKeyUp', e);
 };
 ss.onDrop = function (e) {
-    console.log('onDrop', e);
+    // console.log('onDrop', e);
 };
-
-ss.onChange = function (contents) {
-    console.log('change')
+ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
+    // console.log(`targetElement:${targetElement}, index:${index}, state:${state}`)
+    console.log(`videoInfo-----`, videoInfo)
+}
+ss.onChange = function (contents, core) {
+    console.log('change', core.context.video._videosInfo)
 }
 
 // ss.imageUploadHandler = function (response, core) {
@@ -337,8 +340,8 @@ ss.onImageUploadBefore = function (files, info, core) {
     return true;
 }
 
-ss.onImageUpload = function () {
-    console.log(ss.getImagesInfo());
+ss.onImageUpload = function (targetElement, index, state, info) {
+    console.log('imageInfo-----', info);
 }
 
 ss.showInline = function (toolbar, context) {
@@ -402,6 +405,7 @@ window.sun_getContents = function () {
 window.sun_setContents = function (content) {
     ss.setContents('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
     ss.core.history.reset(true);
+    ss.core.focusEdge(null);
     // ss.core.context.tool.save.disabled = true;
 }
 
@@ -457,6 +461,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     plugins: plugins,
     // maxHeight: '400px',
     height: '700px',
+    defaultStyle: 'height: 500px; font-size:10px;',
     // height: 400,
     fontSizeUnit: 'pt',
     imageResizing: true,

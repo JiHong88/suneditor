@@ -173,9 +173,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         currentControllerTarget: null,
 
         /**
-         * @description An array of buttons whose class name is not "code-view-enabled"
+         * @description An array of buttons whose class name is not "se-code-view-enabled"
          */
         codeViewDisabledButtons: null,
+
+        /**
+         * @description An array of buttons whose class name is not "se-resizing-enabled"
+         */
+        resizingDisabledButtons: null,
 
         /**
          * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
@@ -269,11 +274,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _lineBreakerButton: null,
 
         /**
-         * @description If true, (initialize, reset) all indexes of image information
+         * @description If true, (initialize, reset) all indexes of image, video information
          * @private
          */
-        _imagesInfoInit: true,
-        _imagesInfoReset: false,
+        _componentsInfoInit: true,
+        _componentsInfoReset: false,
 
         /**
          * @description An user event function before image uploaded
@@ -285,7 +290,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description An user event function when image uploaded success or remove image
+         * @description An user event function when image info is changed
          * @private
          */
         _imageUpload: function (targetImgElement, index, state, imageInfo, remainingFilesCount) {
@@ -315,10 +320,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description An user event function when video info is changed
+         * @private
+         */
+        _videoUpload: function (targetElement, index, state, videoInfo) {
+            if (typeof functions.onVideoUpload === 'function') functions.onVideoUpload(targetElement, index * 1, state, videoInfo, remainingFilesCount, this);
+        },
+
+        /**
          * @description Plugins array with "active" method.
          * "activePlugins" runs the "add" method when creating the editor.
          */
         activePlugins: null,
+
+        /**
+         * @description Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.
+         * "componentInfoPlugins" runs the "add" method when creating the editor.
+         * "checkComponentInfo" method is always call just before the "change" event.
+         */
+        componentInfoPlugins: null,
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -376,9 +396,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             _wysiwygOriginCssText: '',
             _codeOriginCssText: '',
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
-            _imagesInfo: [],
-            _imageIndex: 0,
-            _videosCnt: 0,
             _lineBreakComp: null,
             _lineBreakDir: ''
         },
@@ -682,9 +699,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-         * @param {Element} focusEl Focus element
+         * If "focusEdge" is null, then selected last element
+         * @param {Element|null} focusEl Focus element
          */
         focusEdge: function (focusEl) {
+            if (!focusEl) focusEl = context.element.wysiwyg.lastElementChild;
+
             if (util.isComponent(focusEl)) {
                 const imageComponent = focusEl.querySelector('IMG');
                 const videoComponent = focusEl.querySelector('IFRAME');
@@ -1075,7 +1095,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description The method to insert a element. (used elements : table, hr, image, video)
          * This method is add the element next line and insert the new line.
          * When used in a tag in "LI", it is inserted into the LI tag.
-         * Returns the next line added.
+         * Returns the first node of next line added.
          * @param {Element} element Element to be inserted
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @returns {Element}
@@ -1111,10 +1131,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
             }
 
+            const edgeNode = util.getEdgeChildNodes(oNode, null).sc;
+            oNode = edgeNode || oNode;
             this.setRange(oNode, 0, oNode, 0);
 
             // history stack
-            if (!notHistoryPush) this.history.push(false);
+            if (!notHistoryPush) this.history.push(1);
 
             return oNode;
         },
@@ -1371,7 +1393,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             } else {
                 if (childNodes.length === 0) {
-                    if (util.isFormatElement(commonCon) || util.isRangeFormatElement(commonCon) || util.isWysiwygDiv(commonCon)) {
+                    if (util.isFormatElement(commonCon) || util.isRangeFormatElement(commonCon) || util.isWysiwygDiv(commonCon) || util.isBreak(commonCon) || util.isMedia(commonCon)) {
                         return {
                             container: commonCon,
                             offset: 0
@@ -3553,19 +3575,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.history.push(false);
         },
 
-
-        /**
-         * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
-         * core.codeViewDisabledButtons (An array of buttons whose class name is not "code-view-enabled")
-         * @param {Boolean} disabled Disabled value
-         */
-        toggleDisabledButtons: function (disabled) {
-            const disButtons = this.codeViewDisabledButtons;
-            for (let i = 0, len = disButtons.length; i < len; i++) {
-                disButtons[i].disabled = disabled;
-            }
-        },
-
         /**
          * @description Add or remove the class name of "body" so that the code block is visible
          */
@@ -3580,7 +3589,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
             this.controllersOff();
-            this.toggleDisabledButtons(!isCodeView);
+            util.toggleDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -4187,14 +4196,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _checkComponents: function () {
-            if (this.plugins.image) {
-                if (!this.initPlugins.image) this.callPlugin('image', this.plugins.image.checkImagesInfo.bind(this), null);
-                else this.plugins.image.checkImagesInfo.call(this);
-            }
-
-            if (this.plugins.video) {
-                if (!this.initPlugins.video) this.callPlugin('video', this.plugins.video.checkVideosInfo.bind(this), null);
-                else this.plugins.video.checkVideosInfo.call(this);
+            for (let i in this.componentInfoPlugins) {
+                this.componentInfoPlugins[i].checkComponentInfo.call(this);
             }
         },
 
@@ -4203,9 +4206,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resetComponents: function () {
-            this._variable._imagesInfo = [];
-            this._variable._imageIndex = 0;
-            this._variable._videosCnt = 0;
+            for (let i in this.componentInfoPlugins) {
+                this.componentInfoPlugins[i].resetComponentInfo.call(this);
+            }
         },
 
         /**
@@ -4261,7 +4264,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
-            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="code-view-enabled"])');
+            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
+            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
             this._isInline = /inline/i.test(options.mode);
             this._isBalloon = /balloon|balloon-always/i.test(options.mode);
             this._isBalloonAlways = /balloon-always/i.test(options.mode);
@@ -4279,12 +4283,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // Command plugins registration
             this.activePlugins = [];
+            this.componentInfoPlugins = [];
             let c, button;
             for (let key in plugins) {
                 c = plugins[key];
                 button = pluginCallButtons[key];
                 if (c.active && button) {
-                    core.callPlugin(key, null, button);
+                    this.callPlugin(key, null, button);
+                }
+                if (typeof c.checkComponentInfo === 'function' && typeof c.resetComponentInfo === 'function') {
+                    this.callPlugin(key, null, button);
+                    this.componentInfoPlugins.push(c);
                 }
             }
 
@@ -4308,8 +4317,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 this._checkComponents();
-                this._imagesInfoInit = false;
-                this._imagesInfoReset = false;
+                this._componentsInfoInit = false;
+                this._componentsInfoReset = false;
                 
                 this.history.reset(true);
                 this._resourcesStateChange();
@@ -4382,14 +4391,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _setDefaultFormat: function (formatName) {
-            const commonCon = this.getRange().commonAncestorContainer;
+            if (!!this._resizingName) return;
+
+            const range = this.getRange();
+            const commonCon = range.commonAncestorContainer;
+            const startCon = range.startContainer;
             const rangeEl = util.getRangeFormatElement(commonCon, null);
             let focusNode, offset, format;
+
+            if (util.getParentElement(commonCon, util.isComponent)) return;
+            if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
 
             if (rangeEl) {
                 format = util.createElement(formatName || 'P');
                 format.innerHTML = rangeEl.innerHTML;
-                if (util.onlyZeroWidthSpace(format)) format.innerHTML = util.zeroWidthSpace;
+                if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
 
                 rangeEl.innerHTML = format.outerHTML;
                 format = rangeEl.firstChild;
@@ -4639,9 +4655,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (!command && !display) return;
             if (target.disabled) return;
-            
             if (!core.hasFocus) core.nativeFocus();
             if (!core._variable.isCodeView) core._editorRange();
+
             core.actionCall(command, display, target);
         },
 
@@ -5452,7 +5468,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
                 if (core._isBalloonAlways) {
-                    event._showToolbarBalloonDelay();
+                    if (keyCode !== 27) event._showToolbarBalloonDelay();
                 } else {
                     event._showToolbarBalloon();
                     return;
@@ -5759,6 +5775,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
+        _onMouseDown_lineBreak: function (e) {
+            e.preventDefault();
+        },
+
         _onLineBreak: function () {
             const component = core._variable._lineBreakComp;
 
@@ -5810,6 +5830,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             /** line breaker */
             eventWysiwyg.addEventListener('mousemove', event.onmouseMove_wysiwyg, false);
+            core._lineBreakerButton.addEventListener('mousedown', event._onMouseDown_lineBreak, false);
             core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
 
             /** Events are registered only when there is a table plugin.  */
@@ -5861,6 +5882,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
 
             eventWysiwyg.removeEventListener('mousemove', event.onmouseMove_wysiwyg);
+            core._lineBreakerButton.removeEventListener('mousedown', event._onMouseDown_lineBreak);
             core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
@@ -5950,7 +5972,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onImageUploadBefore: null,
 
         /**
-         * @description Called when the image is uploaded or the uploaded image is deleted
+         * @description Called when the image is uploaded, updated, deleted
          * @param {Element} targetImgElement Current img element
          * @param {Number} index Uploaded index
          * @param {String} state Upload status ('create', 'update', 'delete')
@@ -5962,6 +5984,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - delete: delete function
          * - element: img element
          * - src: src attribute of img tag
+         * @param {Number} remainingFilesCount Count of remaining files to upload
          * @param {Object} core Core object
          */
         onImageUpload: null,
@@ -5974,6 +5997,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Boolean}
          */
         onImageUploadError: null,
+
+        /**
+         * @description Called when the video(iframe) is is uploaded, updated, deleted
+         * @param {Element} targetElement Current iframe element
+         * @param {Number} index Uploaded index
+         * @param {String} state Upload status ('create', 'update', 'delete')
+         * @param {Object} videoInfo Video info object
+         * - index: data index
+         * - select: select function
+         * - delete: delete function
+         * - element: iframe element
+         * - src: src attribute of iframe tag
+         * @param {Number} remainingFilesCount Count of remaining files to upload
+         * @param {Object} core Core object
+         */
+        onVideoUpload: null,
 
         /**
          * @description Add or reset option property
@@ -6034,7 +6073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.lang = lang = options.lang;
             core.context = context = _Context(context.element.originElement, constructed, options);
 
-            core._imagesInfoReset = true;
+            core._componentsInfoReset = true;
             core._init(true, _initHTML);
             event._addEvent();
             core._charCount('');
@@ -6050,10 +6089,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {String} style Style string
          */
         setDefaultStyle: function (style) {
+            const optionStyle = util._setDefaultOptionStyle(options);
+
             if (typeof style === 'string' && style.trim().length > 0) {
-                context.element.wysiwyg.style.cssText = style;
+                context.element.wysiwyg.style.cssText = optionStyle + style;
             } else {
-                context.element.wysiwyg.style.cssText.removeAttribute('style');
+                context.element.wysiwyg.style.cssText = optionStyle;
             }
         },
 
@@ -6120,7 +6161,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Array}
          */
         getImagesInfo: function () {
-            return core._variable._imagesInfo;
+            return context.image ? context.image._imagesInfo : [];
         },
 
         /**

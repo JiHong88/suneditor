@@ -61,6 +61,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const lineHeightContext = this.context.lineHeight;
         const sizeList = lineHeightContext._sizeList;

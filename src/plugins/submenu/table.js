@@ -1423,7 +1423,7 @@ export default {
                 this.util.removeItem(contextTable._element);
                 this.controllersOff();
 
-                if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv);
+                if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
         }
 
         this.focus();

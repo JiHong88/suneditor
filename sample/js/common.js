@@ -32,8 +32,7 @@ function imageUpload (targetImgElement, index, state, imageInfo, remainingFilesC
         imageList.splice(findIndex(imageList, index), 1)
     } else {
         if (state === 'create') {
-            const image = editorImageSample.getImagesInfo()[findIndex(editorImageSample.getImagesInfo(), index)]
-            imageList.push(image)
+            imageList.push(imageInfo)
         } else { // update
             //
         }
@@ -83,7 +82,7 @@ function findIndex(arr, index) {
 }
 
 function selectImage (type, index) {
-    imageList[findIndex(imageList, index)][type]();
+    imageList[index][type]();
 }
 
 function checkImage (index) {

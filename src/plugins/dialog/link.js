@@ -114,6 +114,9 @@ export default {
         return link_btn;
     },
 
+    /**
+     * @overriding dialog
+     */
     open: function () {
         this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
     },
@@ -176,6 +179,9 @@ export default {
         return false;
     },
 
+    /**
+     * @overriding core
+     */
     active: function (element) {
         if (!element) {
             if (this.controllerArray.indexOf(this.context.link.linkController) > -1) {
@@ -191,6 +197,9 @@ export default {
         return false;
     },
 
+    /**
+     * @overriding dialog
+     */
     on: function (update) {
         if (!update) {
             this.plugins.link.init.call(this);
@@ -263,6 +272,9 @@ export default {
         this.controllersOff();
     },
 
+    /**
+     * @overriding dialog
+     */
     init: function () {
         const contextLink = this.context.link;
         contextLink.linkController.style.display = 'none';

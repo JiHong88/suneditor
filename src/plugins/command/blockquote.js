@@ -18,6 +18,9 @@ export default {
         };
     },
 
+    /**
+     * @overriding core
+     */
     active: function (element) {
         if (!element) {
             this.util.removeClass(this.context.blockquote.targetButton, 'active');
@@ -29,6 +32,9 @@ export default {
         return false;
     },
 
+    /**
+     * @overriding core
+     */
     action: function () {
         const currentBlockquote = this.util.getParentElement(this.getSelectionNode(), 'blockquote');
 

@@ -59,6 +59,9 @@ export default {
         return listDiv;
     },
 
+     /**
+     * @overriding core
+     */
     active: function (element) {
         const button = this.context.list.targetButton;
         const icon = button.querySelector('svg');
@@ -84,6 +87,9 @@ export default {
         return false;
     },
 
+     /**
+     * @overriding submenu
+     */
     on: function () {
         const listContext = this.context.list;
         const list = listContext._list;

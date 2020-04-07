@@ -225,8 +225,7 @@
         <span class="pl-smi">imageList</span>.<span class="pl-c1">splice</span>(<span class="pl-en">findIndex</span>(imageList, index), <span class="pl-c1">1</span>)
     } <span class="pl-k">else</span> {
         <span class="pl-k">if</span> (state <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>create<span class="pl-pds">'</span></span>) {
-            <span class="pl-k">const</span> <span class="pl-c1">image</span> <span class="pl-k">=</span> <span class="pl-smi">editorImageSample</span>.<span class="pl-en">getImagesInfo</span>()[<span class="pl-en">findIndex</span>(<span class="pl-smi">editorImageSample</span>.<span class="pl-en">getImagesInfo</span>(), index)]
-            <span class="pl-smi">imageList</span>.<span class="pl-c1">push</span>(image)
+            <span class="pl-smi">imageList</span>.<span class="pl-c1">push</span>(<span class="pl-c1">imageInfo</span>)
         } <span class="pl-k">else</span> { <span class="pl-c"><span class="pl-c">//</span> update</span> }
     }
 
@@ -524,7 +523,7 @@
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onPaste</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">cleanData</span>, <span class="pl-smi">maxCharCount</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onPaste<span class="pl-pds">'</span></span>, e, cleanData, maxCharCount) }
 
-<span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded or the uploaded image is deleted.</span>
+<span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded, updated, deleted.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * targetImgElement: Current img element</span>
 <span class="pl-c"> * index: Uploaded index (key value)</span>
@@ -536,7 +535,7 @@
 <span class="pl-c"> * * select: select function</span>
 <span class="pl-c"> * * delete: delete function</span>
 <span class="pl-c"> * }</span>
-<span class="pl-c"> * remainingFilesCount: Count of remaining image files</span>
+<span class="pl-c"> * remainingFilesCount: Count of remaining files to upload</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetImgElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetImgElement:<span class="pl-s1"><span class="pl-pse">${</span>targetImgElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
