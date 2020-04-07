@@ -614,6 +614,9 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
+editor.core; // core object (The core object contains "util" and "functions".)
+editor.util; // util object
+
 // Add or reset option property
 editor.setOptions({
     minHeight: '300px',
