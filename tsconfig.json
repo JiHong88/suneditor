@@ -13,7 +13,6 @@
     "sample",
     "test",
     "dist",
-    "src/asstes",
-    "src/lang"
+    "src"
   ]
 }
