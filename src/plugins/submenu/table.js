@@ -317,17 +317,21 @@ export default {
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
         const tableElement = contextTable._element;
-        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
-
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
         tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
 
+        tablePlugin.setPositionControllerTop.call(this, tableElement);
+
+        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), tdElement, 'table');
+    },
+
+    setPositionControllerTop: function (tableElement) {
+        const tableController = this.context.table.tableController;
+        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
         tableController.style.left = offset.left + 'px';
         tableController.style.display = 'block';
         tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
-
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -1411,11 +1415,13 @@ export default {
             case 'resize':
                 contextTable._maxWidth = !contextTable._maxWidth;
                 tablePlugin.setTableStyle.call(this, 'width');
+                tablePlugin.setPositionControllerTop.call(this, contextTable._element);
                 tablePlugin.setPositionControllerDiv.call(this, contextTable._tdElement, tablePlugin._shift);
                 break;
             case 'layout':
                 contextTable._fixedColumn = !contextTable._fixedColumn;
                 tablePlugin.setTableStyle.call(this, 'column');
+                tablePlugin.setPositionControllerTop.call(this, contextTable._element);
                 tablePlugin.setPositionControllerDiv.call(this, contextTable._tdElement, tablePlugin._shift);
                 break;
             case 'remove':
