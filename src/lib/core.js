@@ -466,20 +466,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindControllersOff) this.controllersOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
+            const submenu = this.submenu = element.nextElementSibling;
 
-            this.submenu = element.nextElementSibling;
-            this.submenu.style.top = '-10000px';
-            this.submenu.style.visibility = 'hidden';
-            this.submenu.style.display = 'block';
+            submenu.style.top = '-10000px';
+            submenu.style.visibility = 'hidden';
+            submenu.style.display = 'block';
             util.addClass(element, 'on');
             this.submenuActiveButton = element;
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
-            const menuW = this.submenu.offsetWidth;
+            const menuW = submenu.offsetWidth;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
-            else this.submenu.style.left = '1px';
+            if (overLeft < 0) submenu.style.left = overLeft + 'px';
+            else submenu.style.left = '1px';
 
 
             let t = 0;
@@ -495,14 +495,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 t -= element.offsetHeight;
             }
 
-            const space = t + this.submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
+            const space = t + submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
             if (space > 0 && event._getPageBottomSpace() < space) {
-                this.submenu.style.top = (-1 * (this.submenu.offsetHeight + 3)) + 'px';
+                submenu.style.top = (-1 * (submenu.offsetHeight + 3)) + 'px';
             } else {
-                this.submenu.style.top = '';
+                submenu.style.top = '';
             }
 
-            this.submenu.style.visibility = '';
+            submenu.style.visibility = '';
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
@@ -537,17 +537,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindedContainerOff) this._bindedContainerOff();
 
             const containerName = this._containerName = element.getAttribute('data-command');
+            const container = this.container = element.nextElementSibling;
 
-            this.container = element.nextElementSibling;
-            this.container.style.display = 'block';
+            container.style.display = 'block';
             util.addClass(element, 'on');
             this.containerActiveButton = element;
 
             const toolbarW = this.context.element.toolbar.offsetWidth;
-            const menuW = this.container.offsetWidth;
+            const menuW = container.offsetWidth;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) this.container.style.left = overLeft + 'px';
-            else this.container.style.left = '1px';
+            if (overLeft < 0) container.style.left = overLeft + 'px';
+            else container.style.left = '1px';
 
             this._bindedContainerOff = this.containerOff.bind(this);
             this.addDocEvent('mousedown', this._bindedContainerOff, false);
