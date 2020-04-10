@@ -26,46 +26,49 @@ import Katex from 'katex';
 const align = require('../../src/plugins/submenu/align')
 
 
-suneditor.create("sample1", {
-    plugins: [custom_plugin_dialog, custom_container, Resolutions, plugins.template, plugins.blockquote, plugins.link, plugins.table, plugins.textStyle, custom_plugin_submenu],
-    // mode: "balloon",
-    // iframe: true,
-    width: '100%',
-    height: '500px',
-    imageFileInput: false,
-    buttonList: [
-        [
-            // {
-            //     name: 'customLink', 
-            //     dataCommand: 'customLink',
-            //     buttonClass:'', 
-            //     title:'Custom - Link', 
-            //     dataDisplay:'dialog',
-            //     innerHTML:'D'
-            // },
-            {
-                name: 'custom_container', 
-                dataCommand: 'custom_container',
-                buttonClass:'', 
-                title:'Custom - Container', 
-                dataDisplay:'container',
-                innerHTML:'C'
-            },
-            {
-                name: 'Resolutions', 
-                dataCommand: 'Resolutions',
-                buttonClass:'', 
-                title:'Resolutions - Container', 
-                dataDisplay:'submenu',
-                innerHTML:'S'
-            },
-            'bold', 'italic', 'template', 'customLink', 'custom_plugin_submenu'
-        ]
+let ssss = suneditor.create(("sample1"), {
+    plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
+    font: [
+        'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     ],
-    maxCharCount: 2000,
-    charCounterType: 'byte',
-    resizingBar: true
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize'],
+        ['fontColor', 'bold', 'underline', 'italic'],
+        ['align'],
+        ['link'],
+        ['table'],
+        // [{
+        //         name: 'npsButtonBgColor',
+        //         dataCommand: 'npsButtonBgColor',
+        //         buttonClass: '',
+        //         title: translator.get("invitations.npsBgColorButtonInfoText"),
+        //         dataDisplay: 'submenu',
+        //         innerHTML: NPS_BG_COLOR_ICON
+        //     },
+        //     {
+        //         name: 'npsButtonFontColor',
+        //         dataCommand: 'npsButtonFontColor',
+        //         buttonClass: '',
+        //         title: translator.get("invitations.npsFontColorButtonInfoText"),
+        //         dataDisplay: 'submenu',
+        //         innerHTML: NPS_FONT_COLOR_ICON
+        //     },
+        //     {
+        //         name: 'npsButtonFontSize',
+        //         dataCommand: 'npsButtonFontSize',
+        //         buttonClass: '',
+        //         title: translator.get("invitations.npsFontSizeButtonInfoText"),
+        //         dataDisplay: 'submenu',
+        //         innerHTML: NPS_FONT_SIZE_ICON
+        //     }
+        // ],
+        ['codeView']
+    ],
+    // lang: langToUse
 });
+
+ssss.setContents('dddddd')
 
 
 let s1 = suneditor.create('editor', {
@@ -268,7 +271,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     videoRatio: 0.75,
     // imageHeight: 400,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
-    // imageUploadUrl: 'http://localhost:3000/files/upload',
+    imageUploadUrl: 'http://localhost:3000/editor/upload',
     // attributesWhitelist: {
     //     table: "style",
     //     tbody: "style",
@@ -298,7 +301,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 });
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
-    console.log('onload', core.context.video._videosInfo);
+    console.log('onload', core.context.video._infoList);
     // core.focus();
 };
 ss.onScroll = function (e) {
@@ -327,7 +330,7 @@ ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
     console.log(`videoInfo-----`, videoInfo)
 }
 ss.onChange = function (contents, core) {
-    console.log('change', core.context.video._videosInfo)
+    console.log('change', core.context.video._infoList)
 }
 
 // ss.imageUploadHandler = function (response, core) {
@@ -340,7 +343,7 @@ ss.onImageUploadBefore = function (files, info, core) {
     return true;
 }
 
-ss.onImageUpload = function (targetElement, index, state, info) {
+ss.onImageUpload = function (targetElement, index, state, info, core) {
     console.log('imageInfo-----', info);
 }
 
@@ -565,11 +568,13 @@ const newOption3 = {
 }
 
 let imageList = [];
+let videoList = [];
 let selectedImages = [];
 const imageWrapper = document.getElementById('image_wrapper');
 const imageSize = document.getElementById('image_size');
 const imageRemove = document.getElementById('image_remove');
 const imageTable = document.getElementById('image_list');
+const videoTable = document.getElementById('video_list');
 
 window.findIndex = function (arr, index) {
     let idx = -1;
@@ -583,6 +588,25 @@ window.findIndex = function (arr, index) {
     })
 
     return idx;
+}
+
+window.setVideoList = function () {
+    let list = '';
+
+    for (let i = 0, video; i < videoList.length; i++) {
+        video = videoList[i];
+            
+        list += '<li>' +
+                    '<button title="delete" onclick="selectVideo(\'delete\',' + video.index + ')">X</button>' +
+                    '<a href="javascript:void(0)" onclick="selectVideo(\'select\',' + video.index + ')">' + video.src + '</a>' +
+                '</li>';
+    }
+
+    videoTable.innerHTML = list;
+}
+
+window.selectVideo = function (type, index) {
+    videoList[findIndex(videoList, index)][type]();
 }
 
 window.setImage = function (type, index) {
@@ -668,6 +692,25 @@ s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFi
     if (remainingFilesCount === 0) {
         console.log('imageList', imageList)
         setImageList(imageList)
+    }
+}
+
+s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount) {
+    console.log('videoInfo', videoInfo);
+
+    if (state === 'delete') {
+        videoList.splice(findIndex(videoList, index), 1)
+    } else {
+        if (state === 'create') {
+            videoList.push(videoInfo)
+        } else { // update
+            //
+        }
+    }
+
+    if (remainingFilesCount === 0) {
+        console.log('videoList', videoList)
+        setVideoList(videoList)
     }
 }
 

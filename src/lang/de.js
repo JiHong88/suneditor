@@ -95,6 +95,7 @@
             },
             videoBox: {
                 title: 'Video enfügen',
+                file: 'Datei auswählen',
                 url: 'Video-URL, YouTube'
             },
             caption: 'Beschreibung eingeben',
@@ -150,10 +151,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.de = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'de', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

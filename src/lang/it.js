@@ -95,6 +95,7 @@
             },
             videoBox: {
                 title: 'Inserisci Video',
+                file: 'Seleziona da file',
                 url: 'Indirizzo video, YouTube'
             },
             caption: 'Inserisci descrizione',
@@ -121,6 +122,7 @@
             insertColumnBefore: 'Inserisci una colonna prima',
             insertColumnAfter: 'Inserisci una colonna dopo',
             deleteColumn: 'Cancella colonna',
+            fixedColumnWidth: 'Larghezza della colonna fissa',
             resize100: 'Ridimensiona 100%',
             resize75: 'Ridimensiona 75%',
             resize50: 'Ridimensiona 50%',
@@ -149,10 +151,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.it = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'it', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

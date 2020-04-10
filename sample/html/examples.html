@@ -413,7 +413,7 @@
         <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
         <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
     </div>
-    <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
+    <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/docs/icon_js.svg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
     <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
     <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
     <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
@@ -604,22 +604,22 @@
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded, updated, deleted.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * targetElement: Current img element</span>
+<span class="pl-c"> * targetElement: Target element</span>
 <span class="pl-c"> * index: Uploaded index (key value)</span>
 <span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
-<span class="pl-c"> * imageInfo: Image infomation (getImagesInfo)</span>
+<span class="pl-c"> * info: Infomation object</span>
 <span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>imageInfo:<span class="pl-s1"><span class="pl-pse">${</span>imageInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>info:<span class="pl-s1"><span class="pl-pse">${</span>info<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
 }
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
 <span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
 <span class="pl-c"> * errorMessage: Error message to show</span>
-<span class="pl-c"> * result: Result object </span>
+<span class="pl-c"> * result: Response object </span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">alert</span>(errorMessage)
@@ -634,15 +634,15 @@
 
 <span class="pl-c"><span class="pl-c">//</span> Called when the videos(iframe) is uploaded, updated, deleted.</span>
 <span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * targetElement: Current iframe element</span>
+<span class="pl-c"> * targetElement: Target element</span>
 <span class="pl-c"> * index: Uploaded index (key value)</span>
 <span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
-<span class="pl-c"> * videoInfo: Video infomation (getVideosInfo)</span>
+<span class="pl-c"> * info: Infomation object</span>
 <span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
 <span class="pl-c"><span class="pl-c">*/</span></span>
 <span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">videoInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
     <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>videoInfo:<span class="pl-s1"><span class="pl-pse">${</span>videoInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>info:<span class="pl-s1"><span class="pl-pse">${</span>info<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
 }
 
 <span class="pl-c"><span class="pl-c">// Called just before the inline toolbar is positioned and displayed on the screen.</span></span>

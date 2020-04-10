@@ -844,7 +844,7 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Current img element</td>
+                    <td class="description last">Target element</td>
                 </tr>
                 <tr>
                     <td class="name"><code>index</code></td>
@@ -871,8 +871,8 @@
                         <strong>size</strong>: file size<br>
                         <strong>select</strong>: select function<br>
                         <strong>delete</strong>: delete function<br>
-                        <strong>element</strong>: img element<br>
-                        <strong>src</strong>: src attribute of img tag<br>
+                        <strong>element</strong>: target element<br>
+                        <strong>src</strong>: src attribute of tag<br>
                     </td>
                 </tr>
                 <tr>
@@ -920,7 +920,7 @@
                     <td class="type">
                         <span class="param-type">Object</span>
                     </td>
-                    <td class="description last">Result object</td>
+                    <td class="description last">Response object</td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -935,7 +935,7 @@
 
 
             <h4 class="name" id="imageUploadHandler"><span class="type-signature"></span>imageUploadHandler<span
-                    class="signature">(response, info, core)</span><span class="type-signature"></span></h4>
+                    class="signature">(xmlHttpRequest, info, core)</span><span class="type-signature"></span></h4>
             <div class="description">
                 It replaces the default callback function of the image upload.
             </div>
@@ -949,11 +949,11 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>response</code></td>
+                    <td class="name"><code>xmlHttpRequest</code></td>
                     <td class="type">
-                        <span class="param-type">Response</span>
+                        <span class="param-type">XMLHttpRequest</span>
                     </td>
-                    <td class="description last">Response object</td>
+                    <td class="description last">xmlHttpRequest object</td>
                 </tr>
                 <tr>
                     <td class="name"><code>info</code></td>
@@ -1002,7 +1002,7 @@
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
-                    <td class="description last">Current iframe element</td>
+                    <td class="description last">Target element</td>
                 </tr>
                 <tr>
                     <td class="name"><code>index</code></td>
@@ -1027,8 +1027,8 @@
                         <strong>index</strong>: data index<br>
                         <strong>select</strong>: select function<br>
                         <strong>delete</strong>: delete function<br>
-                        <strong>element</strong>: iframe element<br>
-                        <strong>src</strong>: src attribute of iframe tag<br>
+                        <strong>element</strong>: target element<br>
+                        <strong>src</strong>: src attribute of tag<br>
                     </td>
                 </tr>
                 <tr>

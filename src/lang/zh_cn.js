@@ -95,6 +95,7 @@
             },
             videoBox: {
                 title: '插入视频',
+                file: '上传图片',
                 url: '嵌入网址'
             },
             caption: '标题',
@@ -149,10 +150,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.zh_cn = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'zh_cn', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

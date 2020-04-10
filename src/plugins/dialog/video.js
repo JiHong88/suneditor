@@ -9,17 +9,19 @@
 
 import dialog from '../modules/dialog';
 import resizing from '../modules/resizing';
+import fileManager from '../modules/fileManager';
 
 export default {
     name: 'video',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, resizing]);
+        core.addModule([dialog, resizing, fileManager]);
 
         const context = core.context;
         const contextVideo = context.video = {
-            _videosInfo: [],
-            _videoIndex: 0,
+            _infoList: [], // @overriding fileManager
+            _infoIndex: 0, // @overriding fileManager
+            _uploadFileLength: 0, // @overriding fileManager
             sizeUnit: context.option._videoSizeUnit,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
@@ -203,16 +205,31 @@ export default {
         this.plugins.resizing._module_setRatio.call(this, this.context.video);
     },
 
+    submit: function (e) {
+        this.showLoading();
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            this.plugins.video.submitAction.call(this);
+        } finally {
+            this.plugins.dialog.close.call(this);
+            this.closeLoading();
+        }
+
+        this.focus();
+
+        return false;
+    },
+
     submitAction: function () {
         if (this.context.video.focusElement.value.trim().length === 0) return false;
         this.context.resizing._resize_plugin = 'video';
 
         const contextVideo = this.context.video;
         let oIframe = null;
-        let cover = null;
-        let container = null;
         let url = contextVideo.focusElement.value.trim();
-        contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
         /** iframe source */
         if (/^<iframe.*\/iframe>$/.test(url)) {
@@ -241,7 +258,19 @@ export default {
             oIframe.src = url;
         }
 
+        this.plugins.video.create_video.call(this, oIframe);
+    },
+
+    create_video: function (oIframe) {
+        this.context.resizing._resize_plugin = 'video';
+
+        const contextVideo = this.context.video;
+        contextVideo._align = contextVideo.modal.querySelector('input[name="suneditor_video_radio"]:checked').value;
+
+        let cover = null;
+        let container = null;
         let init = false;
+
         /** update */
         if (this.context.dialog.updateModal) {
             if (contextVideo._element.src !== oIframe.src) {
@@ -296,7 +325,7 @@ export default {
         }
 
         if (init) {
-            this.plugins.video.setVideosInfo.call(this, oIframe);
+            this.plugins.fileManager.setFileInfo.call(this, 'video', oIframe, this.functions.onVideoUpload, null, true);
         }
 
         this.context.resizing._resize_plugin = '';
@@ -305,24 +334,6 @@ export default {
         if (this.context.dialog.updateModal) {
             this.history.push(false);
         }
-    },
-
-    submit: function (e) {
-        this.showLoading();
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        try {
-            this.plugins.video.submitAction.call(this);
-        } finally {
-            this.plugins.dialog.close.call(this);
-            this.closeLoading();
-        }
-
-        this.focus();
-
-        return false;
     },
 
     _update_videoCover: function (oIframe) {
@@ -354,7 +365,7 @@ export default {
 
         existElement.parentNode.replaceChild(container, existElement);
         if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
-        this.plugins.video.setVideosInfo.call(this, oIframe);
+        this.plugins.fileManager.setFileInfo.call(this, 'video', oIframe, this.functions.onVideoUpload, null, true);
     },
 
     /**
@@ -443,150 +454,19 @@ export default {
         return ratioSelected;
     },
 
-    setVideosInfo: function (frame) {
-        const _resize_plugin = this.context.resizing._resize_plugin;
-        this.context.resizing._resize_plugin = 'video';
-
-        const videosInfo = this.context.video._videosInfo;
-        let dataIndex = frame.getAttribute('data-index');
-        let info = null;
-        let state = '';
-
-        // create
-        if (!dataIndex || this._componentsInfoInit) {
-            state = 'create';
-            dataIndex = this.context.video._videoIndex++;
-
-            frame.setAttribute('data-index', dataIndex);
-
-            info = {
-                src: frame.src,
-                index: dataIndex * 1
-            };
-
-            videosInfo.push(info);
-        } else { // update
-            state = 'update';
-            dataIndex *= 1;
-    
-            for (let i = 0, len = videosInfo.length; i < len; i++) {
-                if (dataIndex === videosInfo[i].index) {
-                    info = videosInfo[i];
-                    break;
-                }
-            }
-
-            if (!info) {
-                dataIndex = this.context.video._videoIndex++;
-                info = { index: dataIndex };
-                videosInfo.push(info);
-            }
-
-            info.src = frame.src;
-        }
-
-        // method bind
-        info.element = frame;
-        info.delete = this.plugins.video.destroy.bind(this, frame);
-        info.select = function () {
-            frame.scrollIntoView(true);
-            this._w.setTimeout(function () {
-                this.plugins.video.onModifyMode.call(this, frame, this.plugins.resizing.call_controller_resize.call(this, frame, 'video'));
-            }.bind(this));
-        }.bind(this);
-
-        if (!frame.getAttribute('data-origin')) {
-            const container = this.util.getParentElement(frame, this.util.isMediaComponent);
-            const cover = this.util.getParentElement(frame, 'FIGURE');
-
-            const w = this.plugins.resizing._module_getSizeX.call(this, this.context.video, frame, cover, container);
-            const h = this.plugins.resizing._module_getSizeY.call(this, this.context.video, frame, cover, container);
-            
-            frame.setAttribute('data-origin', w + ',' + h);
-            frame.setAttribute('data-size', w + ',' + h);
-        }
-
-        if (!frame.style.width) {
-            const size = (frame.getAttribute('data-size') || frame.getAttribute('data-origin') || '').split(',');
-            this.plugins.video.onModifyMode.call(this, frame, null);
-            this.plugins.video.applySize.call(this, (size[0] || this.context.option.videoWidth), (size[1] || this.context.option.videoHeight));
-        }
-
-        this.context.resizing._resize_plugin = _resize_plugin;
-        this._videoUpload(frame, dataIndex, state, info, 0);
-    },
-
     /**
-     * @overriding core
+     * @overriding fileManager
      */
-    checkComponentInfo: function () {
-        const videos = [].slice.call(this.context.element.wysiwyg.getElementsByTagName('IFRAME'));
+    checkFileInfo: function () {
         const videoPlugin = this.plugins.video;
-        const videosInfo = this.context.video._videosInfo;
-
-        if (videos.length === videosInfo.length) {
-            // reset
-            if (this._componentsInfoReset) {
-                for (let i = 0, len = videos.length, frame; i < len; i++) {
-                    frame = videos[i];
-                    videoPlugin.setVideosInfo.call(this, frame);
-                }
-                return;
-            } else {
-                let infoUpdate = false;
-                for (let i = 0, len = videosInfo.length, info; i < len; i++) {
-                    info = videosInfo[i];
-                    if (videos.filter(function (frame) { return info.src === frame.src && info.index.toString() === frame.getAttribute('data-index'); }).length === 0) {
-                        infoUpdate = true;
-                        break;
-                    }
-                }
-                // pass
-                if (!infoUpdate) return;
-            }
-        }
-
-        const _resize_plugin = this.context.resizing._resize_plugin;
-        this.context.resizing._resize_plugin = 'video';
-        const currentVideos = [];
-        const infoIndex = [];
-        for (let i = 0, len = videosInfo.length; i < len; i++) {
-            infoIndex[i] = videosInfo[i].index;
-        }
-
-        for (let i = 0, len = videos.length, video, container; i < len; i++) {
-            video = videos[i];
-            container = this.util.getParentElement(video, this.util.isMediaComponent);
-            if (!container || container.getElementsByTagName('figcaption').length > 0) {
-                currentVideos.push(this.context.video._videoIndex);
-                videoPlugin._update_videoCover.call(this, video);
-            } else if (!video.getAttribute('data-index') || infoIndex.indexOf(video.getAttribute('data-index') * 1) < 0) {
-                currentVideos.push(this.context.video._videoIndex);
-                video.removeAttribute('data-index');
-                videoPlugin.setVideosInfo.call(this, video);
-            } else {
-                currentVideos.push(video.getAttribute('data-index') * 1);
-            }
-        }
-
-        for (let i = 0, dataIndex; i < videosInfo.length; i++) {
-            dataIndex = videosInfo[i].index;
-            if (currentVideos.indexOf(dataIndex) > -1) continue;
-
-            videosInfo.splice(i, 1);
-            this._videoUpload(null, dataIndex, 'delete', null, 0);
-            i--;
-        }
-
-        this.context.resizing._resize_plugin = _resize_plugin;
+        fileManager.checkFileInfo.call(this, 'video', 'iframe', this.functions.onVideoUpload, videoPlugin._update_videoCover.bind(this), true);
     },
 
     /**
-     * @overriding core
+     * @overriding fileManager
      */
-    resetComponentInfo: function () {
-        this.context.video._videosInfo = [];
-        this.context.video._videoIndex = 0;
+    resetFileInfo: function () {
+        fileManager.resetFileInfo.call(this, 'video');
     },
 
     sizeRevert: function () {
@@ -782,17 +662,7 @@ export default {
         this.focusEdge(focusEl);
 
         // event
-        if (dataIndex >= 0) {
-            const videosInfo = this.context.video._videosInfo;
-
-            for (let i = 0, len = videosInfo.length; i < len; i++) {
-                if (dataIndex === videosInfo[i].index) {
-                    videosInfo.splice(i, 1);
-                    this._videoUpload(null, dataIndex, 'delete', null, 0);
-                    break;
-                }
-            }
-        }
+        this.plugins.fileManager.deleteFileInfo.call('video', dataIndex, this.functions.onVideoUpload);
 
         // history stack
         this.history.push(false);

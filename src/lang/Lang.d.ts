@@ -72,6 +72,7 @@ export interface Lang {
     },
     videoBox: {
       title: string,
+      file: string,
       url: string
     },
     caption: string,

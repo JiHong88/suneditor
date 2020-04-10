@@ -98,6 +98,7 @@
             },
             videoBox: {
                 title: 'Indsæt Video',
+                file: 'Indsæt fra fil',
                 url: 'Indlejr video / YouTube'
             },
             caption: 'Indsæt beskrivelse',
@@ -153,10 +154,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.da = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'da', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

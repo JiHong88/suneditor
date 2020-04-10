@@ -10,5 +10,5 @@ export interface Module {
      * @description Constructor
      * @param core Core object 
      */
-    add: (core: SunEditor) => void;
+    add?: (core: SunEditor) => void;
 }

@@ -281,64 +281,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _componentsInfoReset: false,
 
         /**
-         * @description An user event function before image uploaded
-         * @private
-         */
-        _imageUploadBefore: function (files, info) {
-            if (typeof functions.onImageUploadBefore === 'function') return functions.onImageUploadBefore(files, info, this);
-            return true;
-        },
-
-        /**
-         * @description An user event function when image info is changed
-         * @private
-         */
-        _imageUpload: function (targetElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetElement, index * 1, state, imageInfo, remainingFilesCount, this);
-        },
-
-        /**
-         * @description An user event function when image upload failed
-         * @private
-         */
-        _imageUploadError: function (errorMessage, result) {
-            if (typeof functions.onImageUploadError === 'function') return functions.onImageUploadError(errorMessage, result, this);
-            return true;
-        },
-
-        /**
-         * @description An user callback function of the image upload
-         * @private
-         */
-        _imageUploadHandler: function (response, info) {
-            if (typeof functions.imageUploadHandler === 'function') {
-                functions.imageUploadHandler(response, info, this);
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
-         * @description An user event function when video info is changed
-         * @private
-         */
-        _videoUpload: function (targetElement, index, state, videoInfo, remainingFilesCount) {
-            if (typeof functions.onVideoUpload === 'function') functions.onVideoUpload(targetElement, index * 1, state, videoInfo, remainingFilesCount, this);
-        },
-
-        /**
          * @description Plugins array with "active" method.
          * "activePlugins" runs the "add" method when creating the editor.
          */
         activePlugins: null,
 
         /**
-         * @description Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.
-         * "componentInfoPlugins" runs the "add" method when creating the editor.
-         * "checkComponentInfo" method is always call just before the "change" event.
+         * @description Plugins array with "checkFileInfo" and "resetFileInfo" methods.
+         * "fileInfoPlugins" runs the "add" method when creating the editor.
+         * "checkFileInfo" method is always call just before the "change" event.
          */
-        componentInfoPlugins: null,
+        fileInfoPlugins: null,
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -4196,8 +4149,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _checkComponents: function () {
-            for (let i in this.componentInfoPlugins) {
-                this.componentInfoPlugins[i].checkComponentInfo.call(this);
+            for (let i in this.fileInfoPlugins) {
+                this.fileInfoPlugins[i].checkFileInfo.call(this);
             }
         },
 
@@ -4206,8 +4159,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resetComponents: function () {
-            for (let i in this.componentInfoPlugins) {
-                this.componentInfoPlugins[i].resetComponentInfo.call(this);
+            for (let i in this.fileInfoPlugins) {
+                this.fileInfoPlugins[i].resetFileInfo.call(this);
             }
         },
 
@@ -4283,7 +4236,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // Command plugins registration
             this.activePlugins = [];
-            this.componentInfoPlugins = [];
+            this.fileInfoPlugins = [];
             let c, button;
             for (let key in plugins) {
                 c = plugins[key];
@@ -4291,9 +4244,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (c.active && button) {
                     this.callPlugin(key, null, button);
                 }
-                if (typeof c.checkComponentInfo === 'function' && typeof c.resetComponentInfo === 'function') {
+                if (typeof c.checkFileInfo === 'function' && typeof c.resetFileInfo === 'function') {
                     this.callPlugin(key, null, button);
-                    this.componentInfoPlugins.push(c);
+                    this.fileInfoPlugins.push(c);
                 }
             }
 
@@ -5973,7 +5926,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Called when the image is uploaded, updated, deleted
-         * @param {Element} targetElement Current img element
+         * @param {Element} targetElement Target element
          * @param {Number} index Uploaded index
          * @param {String} state Upload status ('create', 'update', 'delete')
          * @param {Object} imageInfo Image info object
@@ -5982,37 +5935,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: img element
-         * - src: src attribute of img tag
+         * - element: target element
+         * - src: src attribute of tag
          * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
          * @param {Object} core Core object
          */
         onImageUpload: null,
+         /**
+         * @description Called when the video(iframe) is is uploaded, updated, deleted
+         * -- arguments same "onImageUpload" --
+         */
+        onVideoUpload: null,
 
         /**
          * @description Called when the image is upload failed
          * @param {String} errorMessage Error message
-         * @param {Object} result Result info Object
+         * @param {Object} result Response Object
          * @param {Object} core Core object
          * @returns {Boolean}
          */
         onImageUploadError: null,
-
-        /**
-         * @description Called when the video(iframe) is is uploaded, updated, deleted
-         * @param {Element} targetElement Current iframe element
-         * @param {Number} index Uploaded index
-         * @param {String} state Upload status ('create', 'update', 'delete')
-         * @param {Object} videoInfo Video info object
-         * - index: data index
-         * - select: select function
-         * - delete: delete function
-         * - element: iframe element
-         * - src: src attribute of iframe tag
-         * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
-         * @param {Object} core Core object
-         */
-        onVideoUpload: null,
 
         /**
          * @description Add or reset option property
@@ -6161,7 +6103,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Array}
          */
         getImagesInfo: function () {
-            return context.image ? context.image._imagesInfo : [];
+            return context.image ? context.image._infoList : [];
         },
 
         /**
@@ -6174,7 +6116,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Array}
          */
         getVideosInfo: function () {
-            return context.video ? context.video._videosInfo : [];
+            return context.video ? context.video._infoList : [];
         },
 
         /**

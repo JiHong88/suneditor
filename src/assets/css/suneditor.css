@@ -267,11 +267,12 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-btn-check {margin-left:12px; margin-right:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form-footer .se-dialog-btn-check {margin-left:0; margin-right:4px;}
 /* dialog - modal - form - files */
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files {position:relative;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-remove {position:absolute; top:0; right:0; height:32px; opacity:0.8; border-radius:2px;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-remove > svg {width:8px; height:8px;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-remove:hover {background-color:#f0f0f0; outline:0 none;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-remove:active {background-color:#e9e9e9; -webkit-box-shadow:inset 0 3px 5px #d6d6d6; box-shadow:inset 0 3px 5px #d6d6d6;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files {position:relative; display:flex; align-items:center;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files > input {flex:auto;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button {flex:auto; opacity:0.8; border:1px solid #ccc;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button > svg {width:8px; height:8px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button:hover {background-color:#f0f0f0; outline:0 none;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button:active {background-color:#e9e9e9; -webkit-box-shadow:inset 0 3px 5px #d6d6d6; box-shadow:inset 0 3px 5px #d6d6d6;}
 /* dialog - modal - input */
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select {display:inline-block; width:auto; height:34px; font-size:14px; text-align:center; line-height:1.42857143; color:#000; border:1px solid #ccc; border-radius:4px; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-control {display:inline-block; width:70px; height:34px; font-size:14px; text-align:center; line-height:1.42857143; color:#000; border:1px solid #ccc; border-radius:4px; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}

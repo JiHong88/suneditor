@@ -95,6 +95,7 @@
             },
             videoBox: {
                 title: '動画を挿入',
+                file: 'ファイルの選択',
                 url: 'メディア埋め込まアドレス,YouTube'
             },
             caption: '説明付け',
@@ -150,10 +151,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.ja = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'ja', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

@@ -766,42 +766,41 @@ editor.onImageUploadBefore: function (files, info, core) {
 
 // Called when the image is uploaded, updated, deleted.
 /**
- * targetElement: Current img element
+ * targetElement: Target element
  * index: Uploaded index (key value)
  * state: Upload status ('create', 'update', 'delete')
- * imageInfo: {
+ * info: {
  * - index: data index
  * - name: file name
  * - size: file size
  * - select: select function
  * - delete: delete function
- * - element: img element
- * - src: src attribute of img tag
+ * - element: Target element
+ * - src: src attribute of tag
  * }
  * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object
 */
-editor.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount, core) {
+editor.onImageUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
     console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
 /**
- * errorMessage: Error message to show
- * result: Result object 
+ * response: Response object 
  * core: Core object
  * return {Boolean}
 */
-editor.onImageUploadError = function (errorMessage, result, core) {
+editor.onImageUploadError = function (response, core) {
     alert(errorMessage)
     return Boolean
 }
 
 // It replaces the default callback function of the image upload
 /**
- * response: Response object
+ * xmlHttpRequest: xmlHttpRequest object
  * info (Input information): {
  * - linkValue: Link url value
  * - linkNewWindow: Open in new window Check Value
@@ -813,26 +812,17 @@ editor.onImageUploadError = function (errorMessage, result, core) {
  * }
  * core: Core object
  */
-editor.imageUploadHandler = function (response, info, core) {
+editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
     // Example of upload method
-    const res = JSON.parse(response.responseText);
+    const res = JSON.parse(xmlHttpRequest.responseText);
     
     // Error
     if (res.errorMessage) {
-        if (typeof editor.onImageUploadError === 'function') {
-            if (core.onImageUploadError(res.errorMessage, res.result)) {
-                core.notice.open.call(core, res.errorMessage);
-            }
+        if (core.functions.onImageUploadError !== 'function' || core.functions.onImageUploadError(res.errorMessage, res, core)) {
+            core.notice.open.call(core, res.errorMessage);
         } else {
             core.notice.open.call(core, res.errorMessage);
         }
-        /** 
-         * You can do the same thing using the core private function.
-         * The core._imageUploadError function returns false when "editor.onImageUploadError" function is not defined.
-        */
-        // if (core._imageUploadError(res.errorMessage, res.result)) {
-        //     core.notice.open.call(core, res.errorMessage);
-        // }
     }
     // Success
     else {
@@ -853,15 +843,15 @@ editor.imageUploadHandler = function (response, info, core) {
 
 // Called when the video(iframe) is is uploaded, updated, deleted
 /**
- * targetElement: Current iframe element
+ * targetElement: Target element
  * index: Uploaded index
  * state: Upload status ('create', 'update', 'delete')
  * videoInfo: {
  * - index: data index
  * - select: select function
  * - delete: delete function
- * - element: iframe element
- * - src: src attribute of iframe tag
+ * - element: target element
+ * - src: src attribute of tag
  * }
  * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object

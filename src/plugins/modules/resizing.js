@@ -915,10 +915,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_MODULES) {
-            window.SUNEDITOR_MODULES = {};
+            Object.defineProperty(window, 'SUNEDITOR_MODULES', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_MODULES.resizing = resizing;
+        Object.defineProperty(window.SUNEDITOR_MODULES, 'resizing', {
+            enumerable: true,
+            writable: false,
+            configurable: false,
+            value: resizing
+        });
     }
 
     return resizing;
