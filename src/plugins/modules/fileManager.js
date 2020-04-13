@@ -23,14 +23,23 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const fileManager = {
         name: 'fileManager',
-        xmlHttp: null,
+        _xmlHttp: null,
 
+        /**
+         * @description Upload the file to the server.
+         * @param {String} uploadUrl Upload server url
+         * @param {Object|null} uploadHeader Request header
+         * @param {FormData} formData FormData in body
+         * @param {Function|null} callBack Success call back function
+         * @param {Function|null} errorCallBack Error call back function
+         * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
+         */
         upload: function (uploadUrl, uploadHeader, formData, callBack, errorCallBack) {
             this.showLoading();
             const filePlugin = this.plugins.fileManager;
-            const xmlHttp = filePlugin.xmlHttp = this.util.getXMLHttpRequest();
+            const xmlHttp = filePlugin._xmlHttp = this.util.getXMLHttpRequest();
 
-            xmlHttp.onreadystatechange = filePlugin.callBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
+            xmlHttp.onreadystatechange = filePlugin._callBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
             xmlHttp.open('post', uploadUrl, true);
             if(uploadHeader !== null && typeof uploadHeader === 'object' && this._w.Object.keys(uploadHeader).length > 0){
                 for(let key in uploadHeader){
@@ -40,7 +49,7 @@
             xmlHttp.send(formData);  
         },
 
-        callBackUpload: function (xmlHttp, callBack, errorCallBack) {
+        _callBackUpload: function (xmlHttp, callBack, errorCallBack) {
             if (xmlHttp.readyState === 4) {
                 if (xmlHttp.status === 200) {
                     try {
@@ -62,6 +71,21 @@
             }
         },
         
+        /**
+         * @description Checke the file's information and modify the tag that does not fit the format.
+         * @param {String} pluginName Plugin name
+         * @param {Array} tagNames Tag array to check
+         * @param {Function|null} uploadEventHandler Event handler to process updated file info after checking (used in "setInfo")
+         * @param {Function} modifyHandler A function to modify a tag that does not fit the format (Argument value: Tag element)
+         * @param {Boolean} resizing True if the plugin is using a resizing module
+         * @example 
+         * const modifyHandler = function (tag) {
+         *      imagePlugin.onModifyMode.call(this, tag, null);
+         *      imagePlugin.openModify.call(this, true);
+         *      imagePlugin.update_image.call(this, true, false, true);
+         *  }.bind(this);
+         *  this.plugins.fileManager.checkInfo.call(this, 'image', ['img'], this.functions.onImageUpload, modifyHandler, true);
+         */
         checkInfo: function (pluginName, tagNames, uploadEventHandler, modifyHandler, resizing) {
             let tags = [];
             for (let i in tagNames) {
@@ -128,6 +152,17 @@
             if (resizing) this.context.resizing._resize_plugin = _resize_plugin;
         },
 
+        /**
+         * @description Create info object of file and add it to "_infoList" (this.context[pluginName]._infoList[])
+         * @param {String} pluginName Plugin name 
+         * @param {Element} element 
+         * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
+         * @param {Object|null} file 
+         * @param {Boolean} resizing True if the plugin is using a resizing module
+         * @example 
+         * uploadCallBack {.. file = { name: fileList[i].name, size: fileList[i].size };
+         * this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+         */
         setInfo: function (pluginName, element, uploadEventHandler, file, resizing) {
             const _resize_plugin = resizing ? this.context.resizing._resize_plugin : '';
             if (resizing) this.context.resizing._resize_plugin = pluginName;
@@ -220,6 +255,12 @@
             if (typeof uploadEventHandler === 'function') uploadEventHandler(element, dataIndex, state, info, --context._uploadFileLength < 0 ? 0 : context._uploadFileLength, this);
         },
 
+        /**
+         * @description Delete info object at "_infoList"
+         * @param {String} pluginName Plugin name 
+         * @param {Number} index index of info object (this.context[pluginName]._infoList[].index)
+         * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
+         */
         deleteInfo: function (pluginName, index, uploadEventHandler) {
             if (index >= 0) {
                 const infoList = this.context[pluginName]._infoList;
@@ -234,6 +275,11 @@
             }
         },
 
+        /**
+         * @description Reset info object and "_infoList = []", "_infoIndex = 0"
+         * @param {String} pluginName Plugin name 
+         * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
+         */
         resetInfo: function (pluginName, uploadEventHandler) {
             const context = this.context[pluginName];
 

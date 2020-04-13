@@ -233,10 +233,10 @@
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
-            <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoFileInput">&nbsp;&nbsp;videoFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoUrlInput" checked>&nbsp;&nbsp;videoUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoRatioShow" checked>&nbsp;&nbsp;videoRatioShow</label>
             <br><br>
             <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
@@ -261,6 +261,15 @@
             <br><br>
             <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
             <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
+            <br><br>
+            <label><input type="checkbox" id="videoUploadHeader">&nbsp;&nbsp;videoUploadHeader</label>
+            <textarea id="videoUploadHeader_value" placeholder='{"Access-Control-Allow-Origin": "*"}' style="width: 300px; vertical-align: top;"></textarea>
+            <br><br>
+            <label><input type="checkbox" id="videoUploadUrl">&nbsp;&nbsp;videoUploadUrl</label>
+            <input type="text" id="videoUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoUploadSizeLimit">&nbsp;&nbsp;videoUploadSizeLimit</label>
+            <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
             
             <br>
             <h4 style="color: #b94a48;">--Defining save button</h4>
@@ -436,6 +445,8 @@ function sun_create () {
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
+        videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,
+        videoUrlInput: document.getElementById('videoUrlInput').checked ? undefined : false,
         videoRatioShow: document.getElementById('videoRatioShow').checked ? undefined : false,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : undefined,
@@ -446,6 +457,9 @@ function sun_create () {
             {name: 'Classic Film 3:2', value: 0.6666}, {name: 'HD', value: 0.5625}
         ],
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
+        videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
+        videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
+        videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
         paragraphStyles: document.getElementById('paragraphStyles').checked ? ['spaced', {name: 'Box', class: '__se__customClass'}] : undefined,

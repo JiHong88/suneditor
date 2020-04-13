@@ -279,6 +279,26 @@ export interface SunEditorOptions {
      */
     youtubeQuery?: string;
     /**
+     * Choose whether to create a file input tag in the video upload window
+     */
+    videoFileInput?: boolean;
+    /**
+     * Choose whether to create a video url input tag in the video upload window
+     */
+    videoUrlInput?: boolean;
+    /**
+     * Http Header when uploading videos.
+     */
+    videoUploadHeader?: Record<string, string>;
+    /**
+     * The video upload to server mapping address
+     */
+    videoUploadUrl?: string;
+    /**
+     * The size of the total uploadable videos (in bytes)
+     */
+    videoUploadSizeLimit?: number;
+    /**
      * Defining save button
      * ====================
      */

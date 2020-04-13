@@ -561,6 +561,29 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
+videoFileInput  : Choose whether to create a file input tag in the video upload window.  default: false {Boolean}
+videoUrlInput   : Choose whether to create a video url input tag in the video upload window.
+                  If the value of videoFileInput is false, it will be unconditionally.   default: true {Boolean}
+videoUploadHeader : Http Header when uploading videos.              default: null {Object}
+videoUploadUrl  : The video upload to server mapping address.       default: null {String}
+                  ex) "/editor/uploadVideo.ajax"
+                  request format: {
+                            "file-0": {},
+                            "file-1": {}
+                        }
+                  Use video tags. (supported video formats: '.mp4', '.webm', '.ogg')
+                  response format: {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "url": "/download/editorVideos/test_video.mp4",
+                                    "name": "test_video.mp4",
+                                    "size": "561276"
+                                }
+                            ]
+                        }
+videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
+                      Invokes the "onVideoUploadError" method.  default: null {Number}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
