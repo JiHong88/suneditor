@@ -759,6 +759,7 @@
             <span class="pl-k">const</span> <span class="pl-s1">anchor</span> <span class="pl-c1">=</span> <span class="pl-s1">contextLink</span><span class="pl-kos">.</span><span class="pl-c1">linkAnchorText</span><span class="pl-kos">;</span>
             <span class="pl-k">const</span> <span class="pl-s1">anchorText</span> <span class="pl-c1">=</span> <span class="pl-s1">anchor</span><span class="pl-kos">.</span><span class="pl-c1">value</span><span class="pl-kos">.</span><span class="pl-c1">length</span> <span class="pl-c1">===</span> <span class="pl-c1">0</span> ? <span class="pl-s1">url</span> : <span class="pl-s1">anchor</span><span class="pl-kos">.</span><span class="pl-c1">value</span><span class="pl-kos">;</span>
 
+            <span class="pl-c">// When opened for modification "this.context.dialog.updateModal" is true</span>
             <span class="pl-k">if</span> <span class="pl-kos">(</span>!<span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">updateModal</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
                 <span class="pl-k">const</span> <span class="pl-s1">oA</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'A'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
                 <span class="pl-s1">oA</span><span class="pl-kos">.</span><span class="pl-c1">href</span> <span class="pl-c1">=</span> <span class="pl-s1">url</span><span class="pl-kos">;</span>
@@ -828,6 +829,8 @@
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">init</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">linkAnchorText</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">getSelection</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">toString</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">_linkAnchor</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-c">// "update" and "this.context.dialog.updateModal" are always the same value.</span>
+            <span class="pl-c">// This code is an exception to the "link" plugin.</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">updateModal</span> <span class="pl-c1">=</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">focusElement</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">_linkAnchor</span><span class="pl-kos">.</span><span class="pl-c1">href</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">linkAnchorText</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">_linkAnchor</span><span class="pl-kos">.</span><span class="pl-c1">textContent</span><span class="pl-kos">;</span>
@@ -1454,6 +1457,7 @@
                 const anchor = contextLink.linkAnchorText;
                 const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
+                // When opened for modification "this.context.dialog.updateModal" is true
                 if (!this.context.dialog.updateModal) {
                     const oA = this.util.createElement('A');
                     oA.href = url;
@@ -1523,6 +1527,8 @@
                 this.plugins.customLink.init.call(this);
                 this.context.customLink.linkAnchorText.value = this.getSelection().toString();
             } else if (this.context.customLink._linkAnchor) {
+                // "update" and "this.context.dialog.updateModal" are always the same value.
+                // This code is an exception to the "link" plugin.
                 this.context.dialog.updateModal = true;
                 this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
                 this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;

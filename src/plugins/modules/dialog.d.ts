@@ -1,5 +1,8 @@
 import { Module } from '../Module';
 
+/**
+ * @description This is a required module of dialog plugin.
+ */
 declare interface dialog extends Module {
     /**
      * @description Open a Dialog plugin
