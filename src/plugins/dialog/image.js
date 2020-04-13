@@ -261,75 +261,93 @@ export default {
         return false;
     },
 
-    onRender_imgInput: function () {
+    submit: function (e) {
+        const contextImage = this.context.image;
+        const imagePlugin = this.plugins.image;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        contextImage._linkValue = contextImage.imgLink.value;
+        contextImage._altText = contextImage.altText.value;
+        contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
+        contextImage._captionChecked = contextImage.captionCheckEl.checked;
+        if (contextImage._resizing) contextImage._proportionChecked = contextImage.proportion.checked;
+
         try {
-            this.plugins.image.submitAction.call(this, this.context.image.imgInputFile.files);
-        } catch (e) {
-            throw Error('[SUNEDITOR.imageUpload.fail] cause : "' + e.message + '"');
+            if (this.context.dialog.updateModal) {
+                imagePlugin.update_image.call(this, false, false, false);
+            }
+            
+            if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
+                imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
+            } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
+                imagePlugin.onRender_imgUrl.call(this);
+            }
+        } catch (error) {
+            throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
-            this.closeLoading();
+            this.plugins.dialog.close.call(this);
         }
+
+        return false;
     },
 
     submitAction: function (fileList) {
-        if (fileList.length > 0) {
-            let fileSize = 0;
-            const files = [];
-            for (let i = 0, len = fileList.length; i < len; i++) {
-                if (/image/i.test(fileList[i].type)) {
-                    files.push(fileList[i]);
-                    fileSize += fileList[i].size;
-                }
+        if (fileList.length === 0) return;
+
+        let fileSize = 0;
+        const files = [];
+        for (let i = 0, len = fileList.length; i < len; i++) {
+            if (/image/i.test(fileList[i].type)) {
+                files.push(fileList[i]);
+                fileSize += fileList[i].size;
+            }
+        }
+
+        const limitSize = this.context.option.imageUploadSizeLimit;
+        if (limitSize > 0) {
+            let infoSize = 0;
+            const imagesInfo = this.context.image._infoList;
+            for (let i = 0, len = imagesInfo.length; i < len; i++) {
+                infoSize += imagesInfo[i].size * 1;
             }
 
-            const limitSize = this.context.option.imageUploadSizeLimit;
-            if (limitSize > 0) {
-                let infoSize = 0;
-                const imagesInfo = this.context.image._infoList;
-                for (let i = 0, len = imagesInfo.length; i < len; i++) {
-                    infoSize += imagesInfo[i].size * 1;
+            if ((fileSize + infoSize) > limitSize) {
+                const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
+                if (this.functions.onImageUploadError !== 'function' || this.functions.onImageUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
+                    this.functions.noticeOpen(err);
                 }
-
-                if ((fileSize + infoSize) > limitSize) {
-                    const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
-                    if (this.functions.onImageUploadError !== 'function' || this.functions.onImageUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
-                        this.functions.noticeOpen(err);
-                    }
-
-                    this.closeLoading();
-                    return;
-                }
+                return;
             }
+        }
 
-            const contextImage = this.context.image;
-            contextImage._uploadFileLength = files.length;
-            const imageUploadUrl = this.context.option.imageUploadUrl;
-            const filesLen = this.context.dialog.updateModal ? 1 : files.length;
+        const contextImage = this.context.image;
+        contextImage._uploadFileLength = files.length;
+        const imageUploadUrl = this.context.option.imageUploadUrl;
+        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
-            const info = {
-                linkValue: contextImage._linkValue,
-                linkNewWindow: contextImage.imgLinkNewWindowCheck.checked,
-                inputWidth: contextImage.inputX.value,
-                inputHeight: contextImage.inputY.value,
-                align: contextImage._align,
-                isUpdate: this.context.dialog.updateModal,
-                currentImage: contextImage._element
-            };
+        const info = {
+            linkValue: contextImage._linkValue,
+            linkNewWindow: contextImage.imgLinkNewWindowCheck.checked,
+            inputWidth: contextImage.inputX.value,
+            inputHeight: contextImage.inputY.value,
+            align: contextImage._align,
+            isUpdate: this.context.dialog.updateModal,
+            currentImage: contextImage._element
+        };
 
-            if (typeof this.functions.onImageUploadBefore === 'function' && !this.functions.onImageUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onImageUploadBefore === 'function' && !this.functions.onImageUploadBefore(files, info, this)) return;
 
-            // server upload
-            if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-                const formData = new FormData();
-                for (let i = 0; i < filesLen; i++) {
-                    formData.append('file-' + i, files[i]);
-                }
-                fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
-            } else { // base64
-                for (let i = 0; i < filesLen; i++) {
-                    this.plugins.image.setup_reader.call(this, files[i], info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, i, filesLen - 1);
-                }
+        // server upload
+        if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
+            const formData = new FormData();
+            for (let i = 0; i < filesLen; i++) {
+                formData.append('file-' + i, files[i]);
             }
+            this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
+        } else { // base64
+            this.plugins.image.setup_reader.call(this, files, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, filesLen - 1, info.isUpdate);
         }
     },
 
@@ -347,36 +365,46 @@ export default {
                 const fileList = response.result;
                 for (let i = 0, len = fileList.length, file; i < len; i++) {
                     file = { name: fileList[i].name, size: fileList[i].size };
-                    if (info.isUpdate) this.plugins.image.update_src.call(this, fileList[i].url, info.currentImage, file);
-                    else this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+                    if (info.isUpdate) {
+                        this.plugins.image.update_src.call(this, fileList[i].url, info.currentImage, file);
+                        break;
+                    } else {
+                        this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+                    }
                 }
             }
         }
+
+        this.closeLoading();
     },
 
-    setup_reader: function (file, imgLinkValue, newWindowCheck, width, height, align, index, filesLen) {
-        const reader = new FileReader();
+    setup_reader: function (files, imgLinkValue, newWindowCheck, width, height, align, filesLen, isUpdate) {
+        try {
+            const reader = new FileReader();
+    
+            for (let i = 0, file; i <= filesLen; i++) {
+                file = files[i];
+    
+                if (isUpdate) {
+                    this.context.image._element.setAttribute('data-file-name', file.name);
+                    this.context.image._element.setAttribute('data-file-size', file.size);
+                }
         
-        if (this.context.dialog.updateModal) {
-            this.context.image._element.setAttribute('data-file-name', file.name);
-            this.context.image._element.setAttribute('data-file-size', file.size);
-        }
-
-        reader.onload = function (update, updateElement, file) {
-            try {
-                this.context.image.inputX.value = width;
-                this.context.image.inputY.value = height;
-                if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
-                else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
-
-                if (index === filesLen) this.closeLoading();
-            } catch (e) {
-                this.closeLoading();
-                throw Error('[SUNEDITOR.imageFileRendering.fail] cause : "' + e.message + '"');
+                reader.onload = function (update, updateElement, file) {
+                    this.context.image.inputX.value = width;
+                    this.context.image.inputY.value = height;
+                    if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
+                    else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
+    
+                    if (i === filesLen) this.closeLoading();
+                }.bind(this, isUpdate, this.context.image._element, file);
+        
+                reader.readAsDataURL(file);
             }
-        }.bind(this, this.context.dialog.updateModal, this.context.image._element, file);
-
-        reader.readAsDataURL(file);
+        } catch (e) {
+            this.closeLoading();
+            throw Error('[SUNEDITOR.image.setup_reader.fail] cause : "' + e.message + '"');
+        }
     },
 
     onRender_imgUrl: function () {
@@ -384,11 +412,12 @@ export default {
         if (contextImage.imgUrlFile.value.trim().length === 0) return false;
 
         try {
+            this.showLoading();
             const file = {name: contextImage.imgUrlFile.value.split('/').pop(), size: 0};
             if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage.imgUrlFile.value, contextImage._element, file);
             else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);
         } catch (e) {
-            throw Error('[SUNEDITOR.imageURLRendering.fail] cause : "' + e.message + '"');
+            throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
         } finally {
             this.closeLoading();
         }
@@ -430,42 +459,6 @@ export default {
         this.plugins.resizing._module_setRatio.call(this, this.context.image);
     },
 
-    submit: function (e) {
-        const contextImage = this.context.image;
-        const imagePlugin = this.plugins.image;
-        this.showLoading();
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        contextImage._linkValue = contextImage.imgLink.value;
-        contextImage._altText = contextImage.altText.value;
-        contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
-        contextImage._captionChecked = contextImage.captionCheckEl.checked;
-        if (contextImage._resizing) contextImage._proportionChecked = contextImage.proportion.checked;
-
-        try {
-            if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this, false, false, false);
-            }
-            
-            if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
-                imagePlugin.onRender_imgInput.call(this);
-            } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
-                imagePlugin.onRender_imgUrl.call(this);
-            } else {
-                this.closeLoading();
-            }
-        } catch (error) {
-            this.closeLoading();
-            throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
-        } finally {
-            this.plugins.dialog.close.call(this);
-        }
-
-        return false;
-    },
-
     /**
      * @overriding fileManager
      */
@@ -478,14 +471,14 @@ export default {
             imagePlugin.update_image.call(this, true, false, true);
         }.bind(this);
 
-        fileManager.checkFileInfo.call(this, 'image', 'img', this.functions.onImageUpload, modifyHandler, true);
+        this.plugins.fileManager.checkInfo.call(this, 'image', ['img'], this.functions.onImageUpload, modifyHandler, true);
     },
 
     /**
      * @overriding fileManager
      */
     resetFileInfo: function () {
-        fileManager.resetFileInfo.call(this, 'image');
+        this.plugins.fileManager.resetInfo.call(this, 'image');
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
@@ -523,7 +516,7 @@ export default {
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
         this.insertComponent(container, true);
-        this.plugins.fileManager.setFileInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+        this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 
@@ -638,7 +631,7 @@ export default {
 
         // set imagesInfo
         if (init) {
-            this.plugins.fileManager.setFileInfo.call(this, 'image', imageEl, this.functions.onImageUpload, null, true);
+            this.plugins.fileManager.setInfo.call(this, 'image', imageEl, this.functions.onImageUpload, null, true);
         }
 
         if (openController) {
@@ -653,11 +646,11 @@ export default {
 
     update_src: function (src, element, file) {
         element.src = src;
-        this._w.setTimeout(this.plugins.fileManager.setFileInfo.bind(this, 'image', element, this.functions.onImageUpload, file, true));
+        this._w.setTimeout(this.plugins.fileManager.setInfo.bind(this, 'image', element, this.functions.onImageUpload, file, true));
     },
 
     /**
-     * @overriding resizing
+     * @overriding resizing, fileManager
      */
     onModifyMode: function (element, size) {
         if (!element) return;
@@ -693,7 +686,7 @@ export default {
      */
     openModify: function (notOpen) {
         const contextImage = this.context.image;
-        contextImage.imgUrlFile.value = contextImage._element.src;
+        if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = contextImage._element.src;
         contextImage._altText = contextImage.altText.value = contextImage._element.alt;
         contextImage._linkValue = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
@@ -723,15 +716,21 @@ export default {
         }
     },
 
+    /**
+     * @overriding resizing
+     */
     sizeRevert: function () {
         this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
     },
 
+    /**
+     * @overriding resizing
+     */
     applySize: function (w, h) {
         const contextImage = this.context.image;
 
-        if (!w) w = contextImage.inputX.value;
-        if (!h) h = contextImage.inputY.value;
+        if (!w) w = contextImage.inputX.value || this.context.option.imageWidth;
+        if (!h) h = contextImage.inputY.value || this.context.option.imageHeight;
         
         if ((contextImage._onlyPercentage && !!w) || /%$/.test(w)) {
             this.plugins.image.setPercentSize.call(this, w, h);
@@ -898,7 +897,14 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @overriding core, resizing, fileManager
+     */
+    select: function (element) {
+        this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
+    },
+
+    /**
+     * @overriding resizing, fileManager
      */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
@@ -931,6 +937,7 @@ export default {
         if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';
         if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = '';
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgUrlFile.removeAttribute('disabled');
+
         contextImage.altText.value = '';
         contextImage.imgLink.value = '';
         contextImage.imgLinkNewWindowCheck.checked = false;

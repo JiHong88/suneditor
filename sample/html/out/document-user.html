@@ -174,8 +174,8 @@
                 <strong>size</strong>: file size<br>
                 <strong>select</strong>: select function<br>
                 <strong>delete</strong>: delete function<br>
-                <strong>element</strong>: img element<br>
-                <strong>src</strong>: src attribute of img tag<br>
+                <strong>element</strong>: target element<br>
+                <strong>src</strong>: src attribute of tag<br>
                 }]
             </div>
             <dl class="details"></dl>
@@ -187,10 +187,12 @@
                 Gets uploaded videos informations<br>
                 [{<br>
                 <strong>index</strong>: data index<br>
+                <strong>name</strong>: file name<br>
+                <strong>size</strong>: file size<br>
                 <strong>select</strong>: select function<br>
                 <strong>delete</strong>: delete function<br>
-                <strong>element</strong>: iframe element<br>
-                <strong>src</strong>: src attribute of iframe tag<br>
+                <strong>element</strong>: target element<br>
+                <strong>src</strong>: src attribute of tag<br>
                 }]
             </div>
             <dl class="details"></dl>
@@ -811,7 +813,15 @@
                     <td class="type">
                         <span class="param-type">Object</span>
                     </td>
-                    <td class="description last">Input information</td>
+                    <td class="description last">
+                        <strong>linkValue</strong>: Link url value<br>
+                        <strong>linkNewWindow</strong>: Open in new window Check Value<br>
+                        <strong>inputWidth</strong>: Value of width input<br>
+                        <strong>inputHeight</strong>: Value of height input<br>
+                        <strong>align</strong>: Align Check Value<br>
+                        <strong>isUpdate</strong>: Update image if true, create image if false<br>
+                        <strong>currentImage</strong>: If isUpdate is true, the currently selected image<br>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -826,7 +836,7 @@
 
 
             <h4 class="name" id="onImageUpload"><span class="type-signature"></span>onImageUpload<span
-                    class="signature">(targetElement, index, state, imageInfo, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
+                    class="signature">(targetElement, index, state, info, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Called when the image is uploaded, updated, deleted
             </div>
@@ -861,7 +871,7 @@
                     <td class="description last">Upload status ('create', 'update', 'delete')</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>imageInfo</code></td>
+                    <td class="name"><code>info</code></td>
                     <td class="type">
                         <span class="param-type">Object</span>
                     </td>
@@ -983,10 +993,57 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="onVideoUpload"><span class="type-signature"></span>onVideoUpload<span
-                    class="signature">(targetElement, index, state, imageInfo, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
+            <h4 class="name" id="onVideoUploadBefore"><span class="type-signature"></span>onVideoUploadBefore<span
+                    class="signature">(files, info, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                Called when the video(iframe) is is uploaded, updated, deleted
+                Called before the video is uploaded.<br>
+                If false is returned, no video(iframe, video) upload is performed.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>files</code></td>
+                    <td class="type">
+                        <span class="param-type">FileList</span>
+                    </td>
+                    <td class="description last">Files array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>info</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        <strong>inputWidth</strong>: Value of width input<br>
+                        <strong>inputHeight</strong>: Value of height input<br>
+                        <strong>align</strong>: Align Check Value<br>
+                        <strong>isUpdate</strong>: Update video if true, create video if false<br>
+                        <strong>currentVideo</strong>: If isUpdate is true, the currently selected video<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onVideoUpload"><span class="type-signature"></span>onVideoUpload<span
+                    class="signature">(targetElement, index, state, info, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called when the video(iframe, video) is uploaded, updated, deleted
             </div>
             <table class="params">
                 <thead>
@@ -1019,12 +1076,14 @@
                     <td class="description last">Upload status ('create', 'update', 'delete')</td>
                 </tr>
                 <tr>
-                    <td class="name"><code>imageInfo</code></td>
+                    <td class="name"><code>info</code></td>
                     <td class="type">
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">
                         <strong>index</strong>: data index<br>
+                        <strong>name</strong>: file name<br>
+                        <strong>size</strong>: file size<br>
                         <strong>select</strong>: select function<br>
                         <strong>delete</strong>: delete function<br>
                         <strong>element</strong>: target element<br>
@@ -1037,6 +1096,46 @@
                         <span class="param-type">Number</span>
                     </td>
                     <td class="description last">Count of remaining files to upload (0 when added as a url)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onVideoUploadError"><span class="type-signature"></span>onVideoUploadError<span
+                    class="signature">(errorMessage, result, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                Called when the video(iframe, video) upload failed
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>errorMessage</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Error message to show</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>result</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Response object</td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -1174,7 +1273,9 @@
         <li><a href="document-user.html#onImageUpload">onImageUpload</a></li>
         <li><a href="document-user.html#onImageUploadError">onImageUploadError</a></li>
         <li><a href="document-user.html#imageUploadHandler">imageUploadHandler</a></li>
+        <li><a href="document-user.html#onVideoUploadBefore">onVideoUploadBefore</a></li>
         <li><a href="document-user.html#onVideoUpload">onVideoUpload</a></li>
+        <li><a href="document-user.html#onVideoUploadError">onVideoUploadError</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>
         <li><a href="document-user.html#showController">showController</a></li>
     </ul>

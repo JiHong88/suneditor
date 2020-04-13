@@ -121,7 +121,7 @@
             resize_div_container = null, resize_button = null, resize_handles = null;
         },
     
-        /** resize controller, button (image, iframe) */
+        /** resize controller, button (image, iframe, video) */
         setController_resize: function () {
             const resize_container = this.util.createElement('DIV');
             

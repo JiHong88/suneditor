@@ -25,34 +25,8 @@
         name: 'fileManager',
         xmlHttp: null,
 
-        /**
-         * @description Gets XMLHttpRequest object
-         * @returns {XMLHttpRequest|ActiveXObject}
-         */
-        getXMLHttpRequest: function () {
-            /** IE */
-            if (this._w.ActiveXObject) {
-                try {
-                    return new ActiveXObject('Msxml2.XMLHTTP');
-                } catch (e) {
-                    try {
-                        return new ActiveXObject('Microsoft.XMLHTTP');
-                    } catch (e1) {
-                        return null;
-                    }
-                }
-            }
-            /** netscape */
-            else if (this._w.XMLHttpRequest) {
-                return new XMLHttpRequest();
-            }
-            /** fail */
-            else {
-                return null;
-            }
-        },
-
         upload: function (uploadUrl, uploadHeader, formData, callBack, errorCallBack) {
+            this.showLoading();
             const filePlugin = this.plugins.fileManager;
             const xmlHttp = filePlugin.xmlHttp = this.util.getXMLHttpRequest();
 
@@ -72,22 +46,31 @@
                     try {
                         callBack(xmlHttp);
                     } catch (e) {
-                        throw Error('[SUNEDITOR.upload.fail] cause : "' + e.message + '"');
+                        throw Error('[SUNEDITOR.fileManager.upload.callBack.fail] cause : "' + e.message + '"');
+                    } finally {
+                        this.closeLoading();
                     }
                 } else { // exception
+                    this.closeLoading();
                     const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
                     if (typeof errorCallBack !== 'function' || errorCallBack('', res, this)) {
-                        throw Error('[SUNEDITOR.upload.fail] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText));
+                        const err = '[SUNEDITOR.fileManager.upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
+                        this.functions.noticeOpen(err);
+                        throw Error(err);
                     }
                 }
             }
         },
         
-        checkFileInfo: function (pluginName, tagName, uploadEventHandler, modifyHandler, resizing) {
-            const tags = [].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagName));
+        checkInfo: function (pluginName, tagNames, uploadEventHandler, modifyHandler, resizing) {
+            let tags = [];
+            for (let i in tagNames) {
+                tags = tags.concat([].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagNames[i])));
+            }
+
             const context = this.context[pluginName];
             const infoList = context._infoList;
-            const setFileInfo = this.plugins.fileManager.setFileInfo.bind(this);
+            const setFileInfo = this.plugins.fileManager.setInfo.bind(this);
 
             if (tags.length === infoList.length) {
                 // reset
@@ -145,16 +128,17 @@
             if (resizing) this.context.resizing._resize_plugin = _resize_plugin;
         },
 
-        resetFileInfo: function (pluginName) {
+        resetInfo: function (pluginName) {
             const context = this.context[pluginName];
             context._infoList = [];
             context._infoIndex = 0;
         },
 
-        setFileInfo: function (pluginName, element, uploadEventHandler, file, resizing) {
+        setInfo: function (pluginName, element, uploadEventHandler, file, resizing) {
             const _resize_plugin = resizing ? this.context.resizing._resize_plugin : '';
             if (resizing) this.context.resizing._resize_plugin = pluginName;
     
+            const plguin = this.plugins[pluginName];
             const context = this.context[pluginName];
             const infoList = context._infoList;
             let dataIndex = element.getAttribute('data-index');
@@ -209,35 +193,33 @@
     
             // method bind
             info.element = element;
-            info.delete = this.plugins.image.destroy.bind(this, element);
-            info.select = function () {
-                element.scrollIntoView(true);
-                this._w.setTimeout(function () {
-                    this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
-                }.bind(this));
-            }.bind(this);
+            info.delete = plguin.destroy.bind(this, element);
+            info.select = plguin.select.bind(this, element);
     
-            if (resizing && !element.getAttribute('origin-size') && element.naturalWidth) {
-                element.setAttribute('origin-size', element.naturalWidth + ',' + element.naturalHeight);
+            if (resizing) {
+                if (!element.getAttribute('origin-size') && element.naturalWidth) {
+                    element.setAttribute('origin-size', element.naturalWidth + ',' + element.naturalHeight);
+                }
+    
+                if (!element.getAttribute('data-origin')) {
+                    const container = this.util.getParentElement(element, this.util.isMediaComponent);
+                    const cover = this.util.getParentElement(element, 'FIGURE');
+        
+                    const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
+                    const h = this.plugins.resizing._module_getSizeY.call(this, context, element, cover, container);
+                    element.setAttribute('data-origin', w + ',' + h);
+                    element.setAttribute('data-size', w + ',' + h);
+                }
+        
+                if (!element.style.width) {
+                    const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+                    plguin.onModifyMode.call(this, element, null);
+                    plguin.applySize.call(this, size[0], size[1]);
+                }
+        
+                this.context.resizing._resize_plugin = _resize_plugin;
             }
 
-            if (resizing && !element.getAttribute('data-origin')) {
-                const container = this.util.getParentElement(element, this.util.isMediaComponent);
-                const cover = this.util.getParentElement(element, 'FIGURE');
-    
-                const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
-                const h = this.plugins.resizing._module_getSizeY.call(this, context, element, cover, container);
-                element.setAttribute('data-origin', w + ',' + h);
-                element.setAttribute('data-size', w + ',' + h);
-            }
-    
-            if (!element.style.width) {
-                const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
-                this.plugins.image.onModifyMode.call(this, element, null);
-                this.plugins.image.applySize.call(this, (size[0] || this.context.option.imageWidth), (size[1] || this.context.option.imageHeight));
-            }
-    
-            if (resizing) this.context.resizing._resize_plugin = _resize_plugin;
             if (typeof uploadEventHandler === 'function') uploadEventHandler(element, dataIndex, state, info, --context._uploadFileLength < 0 ? 0 : context._uploadFileLength, this);
         },
 

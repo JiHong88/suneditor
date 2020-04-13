@@ -334,10 +334,10 @@ interface Core {
 
     /**
      * @description The component(image, video) is selected and the resizing module is called.
-     * @param element Element tag (img or iframe)
-     * @param componentName Component name (image or video)
+     * @param element Element tag (img, iframe, video)
+     * @param pluginName Plugin name (image, video)
      */
-    selectComponent(element: Element, componentName: string): void;
+    selectComponent(element: Element, pluginName: string): void;
 
     /**
      * @description Delete selected node and insert argument value node
@@ -538,7 +538,8 @@ interface Toolbar {
 
 type EventFn = (e: Event, core: Core) => void;
 
-type InputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentImage: any };
+type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentImage: any };
+type videoInputInformation = { inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentVideo: any };
 
 export default class SunEditor {
     constructor(context: Context,
@@ -593,7 +594,7 @@ export default class SunEditor {
      * - currentImage: If isUpdate is true, the currently selected image.
      * @param core Core object
      */
-    imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: InputInformation, core: Core) => void;
+    imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
 
     /**
      * @description Called before the image is uploaded
@@ -603,14 +604,24 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onImageUploadBefore: (files: any[], info: InputInformation, core: Core) => boolean;
+    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core) => boolean;
+
+    /**
+     * @description Called before the video is uploaded
+     * If false is returned, no video upload is performed.
+     * @param files Files array
+     * @param info Input information
+     * @param core Core object
+     * @returns
+     */
+    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean;
 
     /**
      * @description Called when the image is uploaded, updated, deleted
      * @param targetElement Target element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
-     * @param imageInfo Image info object
+     * @param info Info object
      * - index: data index
      * - name: file name
      * - size: file size
@@ -621,15 +632,18 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, imageInfo: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+
 
     /**
-     * @description Called when the video(iframe) is is uploaded, updated, deleted
+     * @description Called when the video(iframe, video) is uploaded, updated, deleted
      * @param targetElement Target element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
-     * @param videoInfo Video info object
+     * @param info Info object
      * - index: data index
+     * - name: file name
+     * - size: file size
      * - select: select function
      * - delete: delete function
      * - element: target element
@@ -637,7 +651,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onVideoUpload: (targetElement: HTMLIFrameElement, index: number, state: string, videoInfo: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed
@@ -647,6 +661,15 @@ export default class SunEditor {
      * @returns
      */
     onImageUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Called when the video(iframe, video) upload failed
+     * @param errorMessage Error message
+     * @param result Response Object
+     * @param core Core object
+     * @returns
+     */
+    onVideoUploadError: (errorMessage: string, result: any, core: Core) => boolean;
 
     /**
      * @description Add or reset option property
@@ -714,12 +737,12 @@ export default class SunEditor {
     getImagesInfo(): fileInfo[];
 
     /**
-     * @description Gets uploaded videos informations
+     * @description Gets uploaded videos(iframe, video) informations
      * - index: data index
      * - select: select function
      * - delete: delete function
-     * - element: iframe element
-     * - src: src attribute of iframe tag
+     * - element: target element
+     * - src: src attribute of tag
      * @returns
      */
     getVideosInfo(): fileInfo[];

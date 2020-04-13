@@ -360,7 +360,7 @@
     display: block;
     background: rgba(0,0,0,0);
 }
-.sun-editor-editable[contenteditable="true"] figure a, .sun-editor-editable[contenteditable="true"] figure img, .sun-editor-editable[contenteditable="true"] figure iframe {
+.sun-editor-editable[contenteditable="true"] figure a, .sun-editor-editable[contenteditable="true"] figure img, .sun-editor-editable[contenteditable="true"] figure iframe, .sun-editor-editable[contenteditable="true"] figure video {
     z-index: 0;
 }
 .sun-editor-editable[contenteditable="true"] figure figcaption {
@@ -405,7 +405,7 @@
 }
 
 /** video */
-.sun-editor-editable .se-video-container iframe {
+.sun-editor-editable .se-video-container iframe, .sun-editor-editable .se-video-container video {
     outline: 1px solid #9e9e9e;
     position: absolute;
     top: 0;

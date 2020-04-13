@@ -536,7 +536,7 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 
 // Video----------------------------------------------------------------------------------------------------------
-videoResizing   : Can resize the video iframe.                         default: true {Boolean}
+videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
 videoWidth      : The default width size of the video frame.           default: '100%' {String}
@@ -754,11 +754,35 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
 // If false is returned, no image upload is performed.
 /**
  * files: Files array
- * info: Input information
+ * info: {
+ * - linkValue: Link url value
+ * - linkNewWindow: Open in new window Check Value
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update image if true, create image if false
+ * - currentImage: If isUpdate is true, the currently selected image.
+ * }
  * core: Core object
  * return {Boolean}
  */
 editor.onImageUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
+// Called before the video is uploaded
+// If false is returned, no video(iframe, video) upload is performed.
+// -- arguments is same "onImageUploadBefore" --
+/** info: {
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update video if true, create video if false
+ * - currentVideo: If isUpdate is true, the currently selected video.
+* }
+*/
+editor.onVideoUploadBefore: function (files, info, core) {
     console.log('files', files);
     console.log('info', info);
     return Boolean
@@ -785,15 +809,28 @@ editor.onImageUpload = function (targetElement, index, state, info, remainingFil
     console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
 }
+// Called when the video(iframe, video) is is uploaded, updated, deleted
+// -- arguments is same "onImageUpload" --
+editor.onVideoUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
+}
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
 /**
- * response: Response object 
+ * errorMessage: Error message
+ * result: Response Objectz
  * core: Core object
  * return {Boolean}
 */
-editor.onImageUploadError = function (response, core) {
+editor.onImageUploadError = function (errorMessage, result, core) {
+    alert(errorMessage)
+    return Boolean
+}
+// Called when the video(iframe, video) upload failed
+// -- arguments is same "onImageUploadError" --
+editor.onVideoUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
     return Boolean
 }
@@ -839,26 +876,6 @@ editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
             else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
         }
     }
-}
-
-// Called when the video(iframe) is is uploaded, updated, deleted
-/**
- * targetElement: Target element
- * index: Uploaded index
- * state: Upload status ('create', 'update', 'delete')
- * videoInfo: {
- * - index: data index
- * - select: select function
- * - delete: delete function
- * - element: target element
- * - src: src attribute of tag
- * }
- * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
- * core: Core object
- */
-editor.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount, core) {
-    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`videoInfo:${videoInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called just before the inline toolbar is positioned and displayed on the screen.

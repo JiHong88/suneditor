@@ -271,6 +271,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     videoRatio: 0.75,
     // imageHeight: 400,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
+    videoFileInput: true,
+    videoUploadUrl: 'http://localhost:3000/editor/upload',
     imageUploadUrl: 'http://localhost:3000/editor/upload',
     // attributesWhitelist: {
     //     table: "style",
@@ -328,6 +330,15 @@ ss.onDrop = function (e) {
 ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
     // console.log(`targetElement:${targetElement}, index:${index}, state:${state}`)
     console.log(`videoInfo-----`, videoInfo)
+}
+// ss.onVideoUploadError = function (messge, result, core) {
+//     console.log(`video error-----`, messge)
+//     return true
+// }
+ss.onVideoUploadBefore = function (files, info, core) {
+    console.log('before-----', files)
+    console.log('before----info-', info)
+    return false
 }
 ss.onChange = function (contents, core) {
     console.log('change', core.context.video._infoList)
@@ -562,9 +573,14 @@ const newOption2 = {
     maxCharCount: 200
 }
 const newOption3 = {
-    plugins: plugins,
     mode: 'inline',
-    iframe: false,
+    minHeight: '300px',
+    colorList: [
+        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
+    ],
+    buttonList: [
+        ['fontColor', 'hiliteColor']
+    ]
 }
 
 let imageList = [];

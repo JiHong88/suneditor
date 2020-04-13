@@ -389,6 +389,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
                     this.plugins[moduleName] = moduleArray[i];
+                }
+                if (!this.initPlugins[moduleName]) {
+                    this.initPlugins[moduleName] = true;
                     if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
                 }
             }
@@ -660,7 +663,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (util.isComponent(focusEl)) {
                 const imageComponent = focusEl.querySelector('IMG');
-                const videoComponent = focusEl.querySelector('IFRAME');
+                const videoComponent = focusEl.querySelector('IFRAME') || focusEl.querySelector('VIDEO');
     
                 if (imageComponent) {
                     this.selectComponent(imageComponent, 'image');
@@ -1096,32 +1099,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description The component(image, video) is selected and the resizing module is called.
-         * @param {Element} element Element tag (img or iframe)
-         * @param {String} componentName Component name (image or video)
+         * @param {Element} element Element tag (img, iframe, video)
+         * @param {String} pluginName Plugin name (image, video)
          */
-        selectComponent: function (element, componentName) {
-            if (componentName === 'image') {
-                if (!core.plugins.image) return;
-
-                core.removeRange();
-                core.callPlugin('image', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
-                    core.plugins.image.onModifyMode.call(core, element, size);
-                    
-                    if (!util.getParentElement(element, '.se-image-container')) {
-                        core.plugins.image.openModify.call(core, true);
-                        core.plugins.image.update_image.call(core, true, true, true);
-                    }
-                }, null);
-            } else if (componentName === 'video') {
-                if (!core.plugins.video) return;
-
-                core.removeRange();
-                core.callPlugin('video', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
-                    core.plugins.video.onModifyMode.call(core, element, size);
-                }, null);
-            }
+        selectComponent: function (element, pluginName) {
+            const plugin = core.plugins[pluginName];
+            if (!plugin || !plugin.select) return;
+            this.callPlugin(pluginName, plugin.select.bind(this, element), null);
         },
 
         /**
@@ -4237,16 +4221,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // Command plugins registration
             this.activePlugins = [];
             this.fileInfoPlugins = [];
-            let c, button;
+            let plugin, button;
             for (let key in plugins) {
-                c = plugins[key];
+                plugin = plugins[key];
                 button = pluginCallButtons[key];
-                if (c.active && button) {
+                if (plugin.active && button) {
                     this.callPlugin(key, null, button);
                 }
-                if (typeof c.checkFileInfo === 'function' && typeof c.resetFileInfo === 'function') {
+                if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
                     this.callPlugin(key, null, button);
-                    this.fileInfoPlugins.push(c);
+                    this.fileInfoPlugins.push(plugin);
                 }
             }
 
@@ -4257,6 +4241,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // Excute history function
             this.history = _history(this, event._onChange_historyStack);
+
+            // register notice module
+            this.addModule([_notice]);
 
             // Init, validate
             if (!options.iframe) this._initWysiwygArea(reload, _initHTML);
@@ -4640,7 +4627,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (/^FIGURE$/i.test(targetElement.nodeName)) {
                 const imageComponent = targetElement.querySelector('IMG');
-                const videoComponent = targetElement.querySelector('IFRAME');
+                const videoComponent = targetElement.querySelector('IFRAME') || targetElement.querySelector('VIDEO');
 
                 if (imageComponent) {
                     e.preventDefault();
@@ -5057,7 +5044,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 core.selectComponent(previousEl, 'image');
                                 if(formatEl.textContent.length === 0) util.removeItem(formatEl);
                             } else if (util.hasClass(previousEl, 'se-video-container')) {
-                                core.selectComponent(previousEl.querySelector('iframe'), 'video');
+                                core.selectComponent(previousEl.querySelector('iframe') || previousEl.querySelector('video'), 'video');
                                 if(formatEl.textContent.length === 0) util.removeItem(formatEl);
                             }
                             break;
@@ -5102,7 +5089,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
                                     core.selectComponent(nextEl, 'image');
                                 } else if (util.hasClass(nextEl, 'se-video-container')) {
-                                    core.selectComponent(nextEl.querySelector('iframe'), 'video');
+                                    core.selectComponent(nextEl.querySelector('iframe') || nextEl.querySelector('video'), 'video');
                                 }
                             }
 
@@ -5663,11 +5650,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const files = dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
                 event._setDropLocationSelection(e);
-                core.callPlugin('image', function () {
-                    context.image.imgInputFile.files = files;
-                    core.plugins.image.onRender_imgInput.call(core);
-                    context.image.imgInputFile.files = null;
-                }, null);
+                core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
             // check char count
             } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
@@ -5923,13 +5906,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Boolean}
          */
         onImageUploadBefore: null,
+        /**
+         * @description Called before the video is uploaded
+         * If false is returned, no video(iframe, video) upload is performed.
+         * -- arguments is same "onImageUploadBefore" --
+         */
+        onVideoUploadBefore: null,
 
         /**
          * @description Called when the image is uploaded, updated, deleted
          * @param {Element} targetElement Target element
          * @param {Number} index Uploaded index
          * @param {String} state Upload status ('create', 'update', 'delete')
-         * @param {Object} imageInfo Image info object
+         * @param {Object} info Image info object
          * - index: data index
          * - name: file name
          * - size: file size
@@ -5942,8 +5931,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         onImageUpload: null,
          /**
-         * @description Called when the video(iframe) is is uploaded, updated, deleted
-         * -- arguments same "onImageUpload" --
+         * @description Called when the video(iframe, video) is is uploaded, updated, deleted
+         * -- arguments is same "onImageUpload" --
          */
         onVideoUpload: null,
 
@@ -5955,6 +5944,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Boolean}
          */
         onImageUploadError: null,
+        /**
+         * @description Called when the video(iframe, video) upload failed
+         * -- arguments is same "onImageUploadError" --
+         */
+        onVideoUploadError: null,
 
         /**
          * @description Add or reset option property
@@ -5978,6 +5972,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 return init;
             }, {});
 
+            // set option
             const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
 
             if (cons.callButtons) {
@@ -6098,8 +6093,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: img element
-         * - src: src attribute of img tag
+         * - element: target element
+         * - src: src attribute of tag
          * @returns {Array}
          */
         getImagesInfo: function () {
@@ -6107,12 +6102,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description Gets uploaded videos informations
+         * @description Gets uploaded videos(iframe, video) informations
          * - index: data index
+         * - name: file name
+         * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: iframe element
-         * - src: src attribute of iframe tag
+         * - element: target element
+         * - src: src attribute of tag
          * @returns {Array}
          */
         getVideosInfo: function () {
@@ -6320,9 +6317,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
     // functionss
     core.functions = functions;
-
-    // register notice module
-    core.addModule([_notice]);
 
     return functions;
 }

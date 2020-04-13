@@ -219,8 +219,7 @@ export default {
         el.charWrapper = bottomBar.charWrapper;
         el.charCounter = bottomBar.charCounter;
 
-        editorArea.removeChild(el.wysiwygFrame);
-        editorArea.removeChild(el.code);
+        editorArea.innerHTML = '';
         editorArea.appendChild(wysiwygFrame);
         editorArea.appendChild(code);
 
@@ -401,7 +400,7 @@ export default {
         /** user options */
         options.lang = options.lang || _defaultLang;
         /** Whitelist */
-        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
+        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
@@ -469,6 +468,11 @@ export default {
         options.videoRatio = (util.getNumber(options.videoRatio, 4) || 0.5625);
         options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
+        options.videoFileInput = !!options.videoFileInput;
+        options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
+        options.videoUploadHeader = options.videoUploadHeader || null;
+        options.videoUploadUrl = options.videoUploadUrl || null;
+        options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;
         /** Templates Array */
