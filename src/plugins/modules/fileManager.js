@@ -128,12 +128,6 @@
             if (resizing) this.context.resizing._resize_plugin = _resize_plugin;
         },
 
-        resetInfo: function (pluginName) {
-            const context = this.context[pluginName];
-            context._infoList = [];
-            context._infoIndex = 0;
-        },
-
         setInfo: function (pluginName, element, uploadEventHandler, file, resizing) {
             const _resize_plugin = resizing ? this.context.resizing._resize_plugin : '';
             if (resizing) this.context.resizing._resize_plugin = pluginName;
@@ -194,7 +188,10 @@
             // method bind
             info.element = element;
             info.delete = plguin.destroy.bind(this, element);
-            info.select = plguin.select.bind(this, element);
+            info.select = function (element) {
+                element.scrollIntoView(true);
+                this._w.setTimeout(this.plugins.image.select.bind(this, element));
+            }.bind(this, element);
     
             if (resizing) {
                 if (!element.getAttribute('origin-size') && element.naturalWidth) {
@@ -223,7 +220,7 @@
             if (typeof uploadEventHandler === 'function') uploadEventHandler(element, dataIndex, state, info, --context._uploadFileLength < 0 ? 0 : context._uploadFileLength, this);
         },
 
-        deleteFileInfo: function (pluginName, index, uploadEventHandler) {
+        deleteInfo: function (pluginName, index, uploadEventHandler) {
             if (index >= 0) {
                 const infoList = this.context[pluginName]._infoList;
     
@@ -235,6 +232,20 @@
                     }
                 }
             }
+        },
+
+        resetInfo: function (pluginName, uploadEventHandler) {
+            const context = this.context[pluginName];
+
+            if (typeof uploadEventHandler === 'function') {
+                const infoList = context._infoList;
+                for (let i = 0, len = infoList.length; i < len; i++) {
+                    uploadEventHandler(null, infoList[i].index, 'delete', null, 0, this);
+                }
+            }
+
+            context._infoList = [];
+            context._infoIndex = 0;
         }
     };
 

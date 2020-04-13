@@ -478,7 +478,7 @@ export default {
      * @overriding fileManager
      */
     resetFileInfo: function () {
-        this.plugins.fileManager.resetInfo.call(this, 'image');
+        this.plugins.fileManager.resetInfo.call(this, 'image', this.functions.onImageUpload);
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
@@ -923,7 +923,7 @@ export default {
         this.focusEdge(focusEl);
         
         // event
-        this.plugins.fileManager.deleteFileInfo.call('image', dataIndex, this.functions.onImageUpload);
+        this.plugins.fileManager.deleteInfo.call('image', dataIndex, this.functions.onImageUpload);
 
         // history stack
         this.history.push(false);

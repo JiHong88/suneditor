@@ -600,7 +600,7 @@ export default {
      * @overriding fileManager
      */
     resetFileInfo: function () {
-        this.plugins.fileManager.resetInfo.call(this, 'video');
+        this.plugins.fileManager.resetInfo.call(this, 'video', this.functions.onVideoUpload);
     },
 
     /**
@@ -809,7 +809,7 @@ export default {
         this.focusEdge(focusEl);
 
         // event
-        this.plugins.fileManager.deleteFileInfo.call('video', dataIndex, this.functions.onVideoUpload);
+        this.plugins.fileManager.deleteInfo.call('video', dataIndex, this.functions.onVideoUpload);
 
         // history stack
         this.history.push(false);

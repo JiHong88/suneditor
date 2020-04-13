@@ -328,11 +328,11 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
 };
 ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
-    // console.log(`targetElement:${targetElement}, index:${index}, state:${state}`)
-    console.log(`videoInfo-----`, videoInfo)
+    // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
+    console.log('videoInfo-----', videoInfo)
 }
 // ss.onVideoUploadError = function (messge, result, core) {
-//     console.log(`video error-----`, messge)
+//     console.log('video error-----', messge)
 //     return true
 // }
 ss.onVideoUploadBefore = function (files, info, core) {

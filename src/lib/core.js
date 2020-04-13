@@ -5956,6 +5956,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         setOptions: function (_options) {
             event._removeEvent();
+            core._resetComponents();
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [_options, _options].reduce(function (init, option) {
