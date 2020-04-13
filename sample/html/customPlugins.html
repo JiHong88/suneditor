@@ -1611,7 +1611,7 @@
     };
 
     // ex) A link dialog plugin with used [fileManager] module
-    var plugin_dialog = {
+    var plugin_dialog_fileManager = {
         // @Required @Unique
         // plugin name
         name: 'customAudio',
@@ -1631,54 +1631,53 @@
 
             // @Required
             // Registering a namespace for caching as a plugin name in the context object
-            const context = core.context;
-            context.customLink = {
+            const context = core.context.customAudio = {
                 focusElement: null, // @Overriding // This element has focus when the dialog is opened.
                 targetSelect: null,
                 linkAnchorText: null,
                 _linkAnchor: null
             };
 
-            /** link dialog */
-            let link_dialog = this.setDialog.call(core);
-            context.customLink.modal = link_dialog;
-            context.customLink.focusElement = link_dialog.querySelector('._se_link_url');
-            context.customLink.linkAnchorText = link_dialog.querySelector('._se_link_text');
-            context.customLink.targetSelect = link_dialog.querySelector('.se-input-select');
+            // language code
+            const langCode = core.lang.code;
+            // buton title
+            const titleList = {
+                en: 'Audio',
+                ko: '오디오'
+            }
 
-            /** link controller */
-            let link_controller = this.setController_LinkButton.call(core);
-            context.customLink.linkController = link_controller;
-            context.customLink._linkAnchor = null;
+            /** dialog */
+            let audio_dialog = this.setDialog.call(core);
+            context.customAudio.modal = audio_dialog;
+            context.customAudio.focusElement = audio_dialog.querySelector('._se_audio_files');
+
+            /** controller */
+            let audio_controller = this.setController.call(core);
+            context.customAudio.controller = audio_controller;
+            context.customAudio._linkAnchor = null;
             // @Required
             // You must register the event propagation stop code in the "mousedown" event of the controller.
-            link_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+            audio_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
             /** add event listeners */
-            link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-            link_controller.addEventListener('click', this.onClick_linkController.bind(core));
+            video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, context.focusElement));
+            audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+            audio_controller.addEventListener('click', this.onClick_controller.bind(core));
 
             /** append html */
-            context.dialog.modal.appendChild(link_dialog);
+            context.dialog.modal.appendChild(audio_dialog);
 
             /** append controller */
-            context.element.relative.appendChild(link_controller);
+            context.element.relative.appendChild(audio_controller);
 
             /** empty memory */
-            link_dialog = null, link_controller = null;
+            audio_dialog = null, audio_controller = null;
         },
 
         /** dialog */
         setDialog: function () {
             const lang = this.lang;
             const dialog = this.util.createElement('DIV');
-            const targetList = [
-                { target: '_blank', name: 'New window'},
-                { target: '_parent', name: 'Parent frame'},
-                { target: '_top', name: 'First frame', selected: true},
-                { target: 'AnyFrame', name: 'Frame name'},
-                { target: '_dialog', name: 'Self defined dialog'}
-            ];
 
             dialog.className = 'se-dialog-content';
             dialog.style.display = 'none';
@@ -1692,20 +1691,15 @@
                     '</div>' +
                     '<div class="se-dialog-body">' +
                         '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.linkBox.url + '</label>' +
-                            '<input class="se-input-form _se_link_url" type="text" />' +
+                            '<label>' + lang.dialogBox.imageBox.file + '</label>' +
+                            '<div class="se-dialog-form-files">' +
+                                '<input class="se-input-form _se_audio_files" type="file" accept="image/*" multiple="multiple" />' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                            '</div>' +
                         '</div>' +
                         '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
-                        '</div>' +
-                        '<div class="se-dialog-form se-dialog-form-footer">' +
-                            '<select class="se-input-select" title="links">';
-                                for (let i = 0, len = targetList.length, t, selected; i < len; i++) {
-                                    t = targetList[i];
-                                    selected = t.selected ? ' selected' : '';
-                                    html += '<option value="' + t.target + '"' + selected + '>' + t.name + '</option>';
-                                }
-                            html += '</select>' +
+                            '<label>' + lang.dialogBox.linkBox.text + '</label>' + 
+                            '<input class="se-input-form _se_link_text" type="text" />' +
                         '</div>' +
                     '</div>' +
                     '<div class="se-dialog-footer">' +
@@ -1720,7 +1714,7 @@
         },
 
         /** modify controller button */
-        setController_LinkButton: function () {
+        setController: function () {
             const lang = this.lang;
             const icons = this.icons;
             const link_btn = this.util.createElement('DIV');
@@ -1748,12 +1742,16 @@
             return link_btn;
         },
 
+        _removeSelectedFiles: function (fileInput) {
+            fileInput.value = '';
+        },
+
         // @Required, @Overriding dialog
         // This method is called when the plugin button is clicked.
         // Open the modal window here.
         open: function () {
             // open.call(core, pluginName, isModify)
-            this.plugins.dialog.open.call(this, 'customLink', 'customLink' === this.currentControllerName);
+            this.plugins.dialog.open.call(this, 'customAudio', 'customAudio' === this.currentControllerName);
         },
 
         submit: function (e) {
@@ -1763,11 +1761,11 @@
             e.stopPropagation();
 
             const submitAction = function () {
-                if (this.context.customLink.focusElement.value.trim().length === 0) return false;
+                if (this.context.customAudio.focusElement.value.trim().length === 0) return false;
 
-                const contextLink = this.context.customLink;
-                const url = contextLink.focusElement.value;
-                const anchor = contextLink.linkAnchorText;
+                const context = this.context.customAudio;
+                const url = context.focusElement.value;
+                const anchor = context.linkAnchorText;
                 const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
                 // When opened for modification "this.context.dialog.updateModal" is true
@@ -1775,7 +1773,7 @@
                     const oA = this.util.createElement('A');
                     oA.href = url;
                     oA.textContent = anchorText;
-                    oA.target = contextLink.targetSelect.selectedOptions[0].value;
+                    oA.target = context.targetSelect.selectedOptions[0].value;
 
                     const selectedFormats = this.getSelectedElements();
                     if (selectedFormats.length > 1) {
@@ -1788,19 +1786,18 @@
 
                     this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
                 } else {
-                    contextLink._linkAnchor.href = url;
-                    contextLink._linkAnchor.textContent = anchorText;
-                    contextLink._linkAnchor.target = contextLink.targetSelect.selectedOptions[0].value;
+                    context._linkAnchor.href = url;
+                    context._linkAnchor.textContent = anchorText;
+                    context._linkAnchor.target = contextLink.targetSelect.selectedOptions[0].value;
 
                     // set range
-                    this.setRange(contextLink._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
+                    this.setRange(context._linkAnchor.childNodes[0], 0, contextLink._linkAnchor.childNodes[0], contextLink._linkAnchor.textContent.length);
                 }
 
                 // history stack
                 this.history.push(false);
 
-                contextLink.focusElement.value = '';
-                contextLink.linkAnchorText.value = '';
+                context.focusElement.value = '';
             }.bind(this);
 
             try {
@@ -1819,12 +1816,12 @@
         // Called each time the selection is moved.
         active: function (element) {
             if (!element) {
-                if (this.controllerArray.indexOf(this.context.customLink.linkController) > -1) {
+                if (this.controllerArray.indexOf(this.context.customAudio.linkController) > -1) {
                     this.controllersOff();
                 }
             } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-                if (this.controllerArray.indexOf(this.context.customLink.linkController) < 0) {
-                    this.plugins.customLink.call_controller.call(this, element);
+                if (this.controllerArray.indexOf(this.context.customAudio.linkController) < 0) {
+                    this.plugins.customAudio.call_controller.call(this, element);
                 }
                 return true;
             }
@@ -1837,21 +1834,21 @@
         // If "update" argument is true, it is not a new call, but a call to modify an already created element.
         on: function (update) {
             if (!update) {
-                this.plugins.customLink.init.call(this);
-                this.context.customLink.linkAnchorText.value = this.getSelection().toString();
-            } else if (this.context.customLink._linkAnchor) {
+                this.plugins.customAudio.init.call(this);
+                this.context.customAudio.linkAnchorText.value = this.getSelection().toString();
+            } else if (this.context.customAudio._linkAnchor) {
                 // "update" and "this.context.dialog.updateModal" are always the same value.
                 // This code is an exception to the "link" plugin.
                 this.context.dialog.updateModal = true;
-                this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;
-                this.context.customLink.linkAnchorText.value = this.context.customLink._linkAnchor.textContent;
-                this.context.customLink.targetSelect.value = this.context.customLink._linkAnchor.target || '';
+                this.context.customAudio.focusElement.value = this.context.customAudio._linkAnchor.href;
+                this.context.customAudio.linkAnchorText.value = this.context.customAudio._linkAnchor.textContent;
+                this.context.customAudio.targetSelect.value = this.context.customAudio._linkAnchor.target || '';
             }
         },
 
         call_controller: function (selectionATag) {
-            this.editLink = this.context.customLink._linkAnchor = selectionATag;
-            const linkBtn = this.context.customLink.linkController;
+            this.editLink = this.context.customAudio._linkAnchor = selectionATag;
+            const linkBtn = this.context.customAudio.linkController;
             const link = linkBtn.querySelector('a');
 
             link.href = selectionATag.href;
@@ -1873,10 +1870,10 @@
             }
             
             // Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-            this.controllersOn(linkBtn, selectionATag, 'customLink');
+            this.controllersOn(linkBtn, selectionATag, 'customAudio');
         },
 
-        onClick_linkController: function (e) {
+        onClick_controller: function (e) {
             e.stopPropagation();
 
             const command = e.target.getAttribute('data-command');
@@ -1885,22 +1882,22 @@
             e.preventDefault();
 
             if (/update/.test(command)) {
-                const contextLink = this.context.customLink;
-                contextLink.focusElement.value = contextLink._linkAnchor.href;
-                contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
-                contextLink.targetSelect.value = contextLink.targetSelect.value;
-                this.plugins.dialog.open.call(this, 'customLink', true);
+                const context = this.context.customAudio;
+                context.focusElement.value = context._linkAnchor.href;
+                context.linkAnchorText.value = context._linkAnchor.textContent;
+                context.targetSelect.value = context.targetSelect.value;
+                this.plugins.dialog.open.call(this, 'customAudio', true);
             }
             else if (/unlink/.test(command)) {
-                const sc = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-                const ec = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+                const sc = this.util.getChildElement(this.context.customAudio._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+                const ec = this.util.getChildElement(this.context.customAudio._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
                 this.setRange(sc, 0, ec, ec.textContent.length);
                 this.nodeChange(null, null, ['A'], false);
             }
             else {
                 /** delete */
-                this.util.removeItem(this.context.customLink._linkAnchor);
-                this.context.customLink._linkAnchor = null;
+                this.util.removeItem(this.context.customAudio._linkAnchor);
+                this.context.customAudio._linkAnchor = null;
                 this.focus();
 
                 // history stack
@@ -1914,12 +1911,12 @@
         // This method is called when the dialog window is closed.
         // Initialize the properties.
         init: function () {
-            const contextLink = this.context.customLink;
-            contextLink.linkController.style.display = 'none';
-            contextLink._linkAnchor = null;
-            contextLink.focusElement.value = '';
-            contextLink.linkAnchorText.value = '';
-            contextLink.targetSelect.selectedIndex = 0;
+            const context = this.context.customAudio;
+            context.linkController.style.display = 'none';
+            context._linkAnchor = null;
+            context.focusElement.value = '';
+            context.linkAnchorText.value = '';
+            context.targetSelect.selectedIndex = 0;
         }
     };
 

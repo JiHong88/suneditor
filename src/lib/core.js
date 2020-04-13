@@ -5083,7 +5083,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             }
 
                             // resizing component
-                            if (util.hasClass(nextEl, 'se-component') || /^(IMG|IFRAME)$/i.test(nextEl.nodeName)) {
+                            if (util.hasClass(nextEl, 'se-component') || /^(IMG|IFRAME|VIDEO)$/i.test(nextEl.nodeName)) {
                                 e.stopPropagation();
                                 if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
                                     nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
