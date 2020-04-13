@@ -55,8 +55,8 @@
             context.dialog.modal = dialog_area;
 
             /** add event listeners */
-            context.dialog.modal.addEventListener('mousedown', this.onMouseDown_dialog.bind(core));
-            context.dialog.modal.addEventListener('click', this.onClick_dialog.bind(core));
+            context.dialog.modal.addEventListener('mousedown', this._onMouseDown_dialog.bind(core));
+            context.dialog.modal.addEventListener('click', this._onClick_dialog.bind(core));
             
             /** append html */
             context.element.relative.appendChild(dialog_div);
@@ -68,8 +68,9 @@
         /**
          * @description Event to control the behavior of closing the dialog
          * @param {MouseEvent} e Event object
+         * @private
          */
-        onMouseDown_dialog: function (e) {
+        _onMouseDown_dialog: function (e) {
             if (/se-dialog-inner/.test(e.target.className)) {
                 this.context.dialog._closeSignal = true;
             } else {
@@ -80,8 +81,9 @@
         /**
          * @description Event to close the window when the outside area of the dialog or close button is click
          * @param {MouseEvent} e Event object
+         * @private
          */
-        onClick_dialog: function (e) {
+        _onClick_dialog: function (e) {
             e.stopPropagation();
 
             if (/close/.test(e.target.getAttribute('data-command')) || this.context.dialog._closeSignal) {

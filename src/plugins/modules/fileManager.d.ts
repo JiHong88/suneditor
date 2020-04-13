@@ -1,5 +1,11 @@
 import { Module } from '../Module';
 
+/**
+ * @description Require context properties when fileManager module
+    _infoList: [],
+    _infoIndex: 0,
+    _uploadFileLength: 0
+*/
 declare interface fileManager extends Module {
     /**
      * @description Upload the file to the server.
