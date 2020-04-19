@@ -331,6 +331,14 @@ interface Core {
      * @returns
      */
     insertComponent(element: Element, notHistoryPush: boolean): Element;
+    
+    /**
+     * @description Gets the file component and that plugin name
+     * return: {component, pluginName} | null
+     * @param element Target element (figure tag, component div, file tag)
+     * @returns
+     */
+    getFileComponent(element: Element): Record<string, string | Element> | null;
 
     /**
      * @description The component(image, video) is selected and the resizing module is called.

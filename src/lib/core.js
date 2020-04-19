@@ -5447,7 +5447,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             /** when format tag deleted */
-            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '') {
+            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
                 e.preventDefault();
                 e.stopPropagation();
 
