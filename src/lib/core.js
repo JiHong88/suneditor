@@ -662,15 +662,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         focusEdge: function (focusEl) {
             if (!focusEl) focusEl = context.element.wysiwyg.lastElementChild;
 
-            if (util.isComponent(focusEl)) {
-                const imageComponent = focusEl.querySelector('IMG');
-                const videoComponent = focusEl.querySelector('IFRAME') || focusEl.querySelector('VIDEO');
-    
-                if (imageComponent) {
-                    this.selectComponent(imageComponent, 'image');
-                } else if (videoComponent) {
-                    this.selectComponent(videoComponent, 'video');
-                }
+            const fileComponentInfo = this.getFileComponent(focusEl);
+            if (fileComponentInfo) {
+                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
             } else if (focusEl) {
                 focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
                 if (!focusEl) this.nativeFocus();
