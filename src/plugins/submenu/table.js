@@ -1080,7 +1080,7 @@ export default {
         let icon, span, sizeIcon, text;
 
         if (styles.indexOf('width') > -1) {
-            icon =  contextTable.resizeButton.querySelector('svg');
+            icon =  contextTable.resizeButton.firstElementChild;
             span = contextTable.resizeText;
 
             if (!contextTable._maxWidth) {

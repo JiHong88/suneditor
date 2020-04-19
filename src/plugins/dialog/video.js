@@ -205,6 +205,18 @@ export default {
     },
 
     /**
+     * @overriding fileManager
+     */
+    fileTags: ['iframe', 'video'],
+
+    /**
+     * @overriding core, resizing, fileManager
+     */
+    select: function (element) {
+        this.plugins.video.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'video'));
+    },
+
+    /**
      * @overriding dialog
      */
     open: function () {
@@ -780,13 +792,6 @@ export default {
         contextVideo._align = 'none';
         contextVideo._cover.style.margin = '0';
         this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-    },
-
-    /**
-     * @overriding core, resizing, fileManager
-     */
-    select: function (element) {
-        this.plugins.video.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'video'));
     },
 
     /**

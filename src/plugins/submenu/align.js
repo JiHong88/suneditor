@@ -80,7 +80,7 @@ export default {
      */
     active: function (element) {
         const targetButton = this.context.align.targetButton;
-        const target = targetButton.querySelector('svg');
+        const target = targetButton.firstElementChild;
 
         if (!element) {
             this.util.changeElement(target, this.context.align.icons.left);

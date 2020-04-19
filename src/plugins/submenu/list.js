@@ -64,7 +64,7 @@ export default {
      */
     active: function (element) {
         const button = this.context.list.targetButton;
-        const icon = button.querySelector('svg');
+        const icon = button.firstElementChild;
         const util = this.util;
 
         if (!element) {

@@ -124,12 +124,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         container: null,
 
         /**
-         * @description current resizing component name
-         * @private
-         */
-        _resizingName: '',
-
-        /**
          * @description current subment name
          * @private
          */
@@ -292,6 +286,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * "checkFileInfo" method is always call just before the "change" event.
          */
         fileInfoPlugins: null,
+
+        /**
+         * @description Variables for file component management
+         * @private
+         */
+        _fileManager: {
+            tags: null,
+            regExp: null,
+            queryString: null,
+            pluginRegExp: null,
+            pluginMap: null
+        },
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -536,11 +542,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {*} arguments controller elements, functions..
          */
         controllersOn: function () {
-            if (this._bindControllersOff) {
-                const tempName = this._resizingName;
-                this._bindControllersOff();
-                this._resizingName = tempName;
-            }
+            if (this._bindControllersOff) this._bindControllersOff();
 
             for (let i = 0, arg; i < arguments.length; i++) {
                 arg = arguments[i];
@@ -573,9 +575,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
          */
         controllersOff: function (e) {
-            if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
+            if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
 
-            this._resizingName = '';
             this.currentControllerName = '';
             this.currentControllerTarget = null;
             this.effectNode = null;
@@ -1095,6 +1096,33 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!notHistoryPush) this.history.push(1);
 
             return oNode;
+        },
+
+        /**
+         * @description Gets the file component and that plugin name
+         * return: {component, pluginName} | null
+         * @param {Element} element Target element (figure tag, component div, file tag)
+         * @returns {Object|null}
+         */
+        getFileComponent: function (element) {
+            let fileComponent, pluginName;
+            if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
+                fileComponent = element.querySelector(core._fileManager.queryString);
+            } else if (element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
+                fileComponent = element;
+            }
+
+            if (fileComponent) {
+                pluginName = core._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
+                if (pluginName) {
+                    return {
+                        component: fileComponent,
+                        pluginName: pluginName
+                    };
+                }
+            }
+
+            return null;
         },
 
         /**
@@ -3690,7 +3718,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                util.changeElement(element.querySelector('svg'), icons.reduction);
+                util.changeElement(element.firstElementChild, icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3722,7 +3750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-                util.changeElement(element.querySelector('svg'), icons.expansion);
+                util.changeElement(element.firstElementChild, icons.expansion);
             }
         },
 
@@ -4218,9 +4246,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 INDENT: context.tool.indent
             };
 
-            // Command plugins registration
+            // Command and file plugins registration
             this.activePlugins = [];
             this.fileInfoPlugins = [];
+            this._fileManager.tags = [];
+            this._fileManager.pluginMap = {};
+
+            let filePluginRegExp = [];
             let plugin, button;
             for (let key in plugins) {
                 plugin = plugins[key];
@@ -4232,8 +4264,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this.callPlugin(key, null, button);
                     this.fileInfoPlugins.push(plugin);
                 }
+                if (plugin.fileTags) {
+                    this.callPlugin(key, null, button);
+                    this._fileManager.tags = this._fileManager.tags.concat(plugin.fileTags);
+                    filePluginRegExp.push(key);
+                    for (let tag in plugin.fileTags) {
+                        this._fileManager.pluginMap[plugin.fileTags[tag]] = key.toLowerCase();
+                    }
+                }
             }
 
+            this._fileManager.queryString = this._fileManager.tags.join(',');
+            this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
+            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  filePluginRegExp.join('|') + ')$', 'i');
+            
+            // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
             this._lineBreaker = context.element.lineBreaker;
@@ -4331,7 +4376,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _setDefaultFormat: function (formatName) {
-            if (!!this._resizingName) return;
+            if (this._fileManager.pluginRegExp.test(this.currentControllerName)) return;
 
             const range = this.getRange();
             const commonCon = range.commonAncestorContainer;
@@ -4339,7 +4384,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const rangeEl = util.getRangeFormatElement(commonCon, null);
             let focusNode, offset, format;
 
-            if (util.getParentElement(commonCon, util.isComponent)) return;
+            const fileComponent = util.getParentElement(commonCon, util.isComponent);
+            if (fileComponent && !util.isTable(fileComponent)) return;
             if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
 
             if (rangeEl) {
@@ -4369,7 +4415,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     br = util.createTextNode(util.zeroWidthSpace);
                     commonCon.appendChild(br);
                 }
+
                 this.setRange(br, 1, br, 1);
+                return;
             }
 
             this.execCommand('formatBlock', false, (formatName || 'P'));
@@ -4391,9 +4439,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 focusNode = zeroWidth;
             }
 
-            offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
             this.effectNode = null;
-            this.setRange(focusNode, offset, focusNode, offset);
+            this.nativeFocus();
         }
     };
 
@@ -4625,19 +4672,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
 
-            if (/^FIGURE$/i.test(targetElement.nodeName)) {
-                const imageComponent = targetElement.querySelector('IMG');
-                const videoComponent = targetElement.querySelector('IFRAME') || targetElement.querySelector('VIDEO');
-
-                if (imageComponent) {
-                    e.preventDefault();
-                    core.selectComponent(imageComponent, 'image');
-                    return;
-                } else if (videoComponent) {
-                    e.preventDefault();
-                    core.selectComponent(videoComponent, 'video');
-                    return;
-                }
+            const fileComponentInfo = core.getFileComponent(targetElement);
+            if (fileComponentInfo) {
+                e.preventDefault();
+                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                return;
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -4894,7 +4933,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-            const resizingName = core._resizingName;
+            const resizingName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
             let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
             let rangeEl = util.getRangeFormatElement(formatEl, null);
 
@@ -5038,14 +5077,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     // component
                     if (!selectRange && range.startOffset === 0) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
-                            let previousEl = formatEl.previousSibling;
-                            if (util.hasClass(previousEl, 'se-image-container') || /^IMG$/i.test(previousEl.nodeName)) {
-                                previousEl = /^IMG$/i.test(previousEl.nodeName) ? previousEl : previousEl.querySelector('img');
-                                core.selectComponent(previousEl, 'image');
-                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
-                            } else if (util.hasClass(previousEl, 'se-video-container')) {
-                                core.selectComponent(previousEl.querySelector('iframe') || previousEl.querySelector('video'), 'video');
-                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
+                            const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
+                            if (fileComponentInfo) {
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                                if (formatEl.textContent.length === 0) util.removeItem(formatEl);
                             }
                             break;
                         }
@@ -5082,15 +5117,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 }
                             }
 
-                            // resizing component
-                            if (util.hasClass(nextEl, 'se-component') || /^(IMG|IFRAME|VIDEO)$/i.test(nextEl.nodeName)) {
+                            // component
+                            const fileComponentInfo = core.getFileComponent(nextEl);
+                            if (fileComponentInfo) {
                                 e.stopPropagation();
-                                if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
-                                    nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
-                                    core.selectComponent(nextEl, 'image');
-                                } else if (util.hasClass(nextEl, 'se-video-container')) {
-                                    core.selectComponent(nextEl.querySelector('iframe') || nextEl.querySelector('video'), 'video');
-                                }
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
 
                             break;

@@ -438,7 +438,7 @@
     
             // align icon
             const alignList = contextResizing.alignMenuList;
-            this.util.changeElement(contextResizing.alignButton.querySelector('svg'), contextResizing.alignIcons[align]);
+            this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
             for (let i = 0, len = alignList.length; i < len; i++) {
                 if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
                 else this.util.removeClass(alignList[i], 'on');
@@ -469,7 +469,6 @@
                 }
             }
     
-            this._resizingName = plugin;
             this.util.toggleDisabledButtons(true, this.resizingDisabledButtons);
             this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.toggleDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
     

@@ -216,6 +216,18 @@ export default {
     },
 
     /**
+     * @overriding fileManager
+     */
+    fileTags: ['img'],
+
+    /**
+     * @overriding core, resizing, fileManager
+     */
+    select: function (element) {
+        this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
+    },
+
+    /**
      * @overriding dialog
      */
     open: function () {
@@ -894,13 +906,6 @@ export default {
         contextImage._align = 'none';
         contextImage._cover.style.margin = '0';
         this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
-    },
-
-    /**
-     * @overriding core, resizing, fileManager
-     */
-    select: function (element) {
-        this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
     },
 
     /**
