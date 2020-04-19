@@ -518,8 +518,8 @@ imageUploadHeader : Http Header when uploading images.              default: nul
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
                   request format: {
-                            "file-0": {},
-                            "file-1": {}
+                            "file-0": File,
+                            "file-1": File
                         }
                   When not used, it enters base64 data
                   response format: {
@@ -568,8 +568,8 @@ videoUploadHeader : Http Header when uploading videos.              default: nul
 videoUploadUrl  : The video upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadVideo.ajax"
                   request format: {
-                            "file-0": {},
-                            "file-1": {}
+                            "file-0": File,
+                            "file-1": File
                         }
                   Use video tags. (supported video formats: '.mp4', '.webm', '.ogg')
                   response format: {
@@ -750,11 +750,13 @@ editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
 editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
-editor.onChange = function (contents, core) { console.log('onChange', contents) }
-
 editor.onFocus = function (e, core) { console.log('onFocus', e) }
 
 editor.onBlur = function (e, core) { console.log('onBlur', e) }
+
+// onchange event
+// contents: core.getContents(), Core object
+editor.onChange = function (contents, core) { console.log('onChange', contents) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
