@@ -216,7 +216,7 @@ export default {
     },
 
     /**
-     * @overriding fileManager
+     * @overriding @required fileManager
      */
     fileTags: ['img'],
 
