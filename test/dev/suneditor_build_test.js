@@ -13,6 +13,7 @@ import custom_plugin_dialog from './custom_plugin_dialog';
 import Resolutions from './Resolutions';
 // import subLib from './sub_lib';
 import custom_container from './custom_container';
+import custom_audio from './custom_audio';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
@@ -27,17 +28,17 @@ const align = require('../../src/plugins/submenu/align')
 
 
 let ssss = suneditor.create(("sample1"), {
-    plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
-    font: [
-        'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
-    ],
+    plugins: [custom_audio], //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
+    // font: [
+    //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
+    // ],
     buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize'],
-        ['fontColor', 'bold', 'underline', 'italic'],
-        ['align'],
-        ['link'],
-        ['table'],
+        ['undo', 'redo', 'customAudio'],
+        // ['font', 'fontSize'],
+        // ['fontColor', 'bold', 'underline', 'italic'],
+        // ['align'],
+        // ['link'],
+        // ['table'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',

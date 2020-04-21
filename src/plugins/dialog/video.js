@@ -217,6 +217,32 @@ export default {
     },
 
     /**
+     * @overriding fileManager, resizing
+     */
+    destroy: function (element) {
+        const frame = element || this.context.video._element;
+        const container = this.context.video._container;
+        const dataIndex = frame.getAttribute('data-index') * 1;
+        let focusEl = (container.previousElementSibling || container.nextElementSibling);
+
+        const emptyDiv = container.parentNode;
+        this.util.removeItem(container);
+        this.plugins.video.init.call(this);
+        this.controllersOff();
+
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+
+        // focus
+        this.focusEdge(focusEl);
+
+        // event
+        this.plugins.fileManager.deleteInfo.call('video', dataIndex, this.functions.onVideoUpload);
+
+        // history stack
+        this.history.push(false);
+    },
+
+    /**
      * @overriding dialog
      */
     open: function () {
@@ -792,32 +818,6 @@ export default {
         contextVideo._align = 'none';
         contextVideo._cover.style.margin = '0';
         this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-    },
-
-    /**
-     * @overriding resizing
-     */
-    destroy: function (element) {
-        const frame = element || this.context.video._element;
-        const container = this.context.video._container;
-        const dataIndex = frame.getAttribute('data-index') * 1;
-        let focusEl = (container.previousElementSibling || container.nextElementSibling);
-
-        const emptyDiv = container.parentNode;
-        this.util.removeItem(container);
-        this.plugins.video.init.call(this);
-        this.controllersOff();
-
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
-
-        // focus
-        this.focusEdge(focusEl);
-
-        // event
-        this.plugins.fileManager.deleteInfo.call('video', dataIndex, this.functions.onVideoUpload);
-
-        // history stack
-        this.history.push(false);
     },
 
     /**

@@ -1102,7 +1102,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
                 fileComponent = element.querySelector(core._fileManager.queryString);
-            } else if (element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
+            }
+            if (!fileComponent && element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
                 fileComponent = element;
             }
 
@@ -4263,7 +4264,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this._fileManager.tags = this._fileManager.tags.concat(plugin.fileTags);
                     filePluginRegExp.push(key);
                     for (let tag in plugin.fileTags) {
-                        this._fileManager.pluginMap[plugin.fileTags[tag]] = key.toLowerCase();
+                        this._fileManager.pluginMap[plugin.fileTags[tag].toLowerCase()] = key;
                     }
                 }
             }

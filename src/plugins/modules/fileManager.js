@@ -225,7 +225,7 @@
             info.delete = plguin.destroy.bind(this, element);
             info.select = function (element) {
                 element.scrollIntoView(true);
-                this._w.setTimeout(this.plugins.image.select.bind(this, element));
+                this._w.setTimeout(plguin.select.bind(this, element));
             }.bind(this, element);
     
             if (resizing) {

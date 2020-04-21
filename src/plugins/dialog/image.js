@@ -221,10 +221,36 @@ export default {
     fileTags: ['img'],
 
     /**
-     * @overriding core, resizing, fileManager
+     * @overriding core, fileManager, resizing
      */
     select: function (element) {
         this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
+    },
+
+    /**
+     * @overriding fileManager, resizing
+     */
+    destroy: function (element) {
+        const imageEl = element || this.context.image._element;
+        const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
+        const dataIndex = imageEl.getAttribute('data-index') * 1;
+        let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
+        
+        const emptyDiv = imageContainer.parentNode;
+        this.util.removeItem(imageContainer);
+        this.plugins.image.init.call(this);
+        this.controllersOff();
+
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+
+        // focus
+        this.focusEdge(focusEl);
+        
+        // event
+        this.plugins.fileManager.deleteInfo.call('image', dataIndex, this.functions.onImageUpload);
+
+        // history stack
+        this.history.push(false);
     },
 
     /**
@@ -906,32 +932,6 @@ export default {
         contextImage._align = 'none';
         contextImage._cover.style.margin = '0';
         this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
-    },
-
-    /**
-     * @overriding resizing, fileManager
-     */
-    destroy: function (element) {
-        const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
-        const dataIndex = imageEl.getAttribute('data-index') * 1;
-        let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
-        
-        const emptyDiv = imageContainer.parentNode;
-        this.util.removeItem(imageContainer);
-        this.plugins.image.init.call(this);
-        this.controllersOff();
-
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
-
-        // focus
-        this.focusEdge(focusEl);
-        
-        // event
-        this.plugins.fileManager.deleteInfo.call('image', dataIndex, this.functions.onImageUpload);
-
-        // history stack
-        this.history.push(false);
     },
 
     /**

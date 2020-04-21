@@ -420,6 +420,12 @@
     max-width: 100%;
 }
 
+/** audio */
+.sun-editor-editable audio {
+    width: 300px;
+    height: 54px;
+}
+
 /** --- show blocks mode */
 .sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
 .sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
