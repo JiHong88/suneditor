@@ -543,6 +543,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         controllersOn: function () {
             if (this._bindControllersOff) this._bindControllersOff();
+            this.controllerArray = [];
 
             for (let i = 0, arg; i < arguments.length; i++) {
                 arg = arguments[i];
@@ -551,7 +552,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     continue;
                 }
                 if (typeof arg === 'function') {
-                    this.controllerArray[i] = arg;
+                    this.controllerArray.push(arg);
                     continue;
                 }
                 if (!util.hasClass(arg, 'se-controller')) {
@@ -559,7 +560,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     continue;
                 }
                 if (arg.style) arg.style.display = 'block';
-                this.controllerArray[i] = arg;
+                this.controllerArray.push(arg);
             }
 
             this._bindControllersOff = this.controllersOff.bind(this);
