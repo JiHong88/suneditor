@@ -29,6 +29,7 @@
                     <dd><span style="color: #f4b124;">+</span> These are modules that can be used in plugins.</dd>
                     <dd><span style="color: #f4b124;">+</span> For detailed usage, please refer to the code of the plugins using the module.</dd>
                     <dd><span style="color: #f4b124;">- dialog : </span> all dialog plugins (<a style="color:#ff5565" href="../customPlugins.html#dialog">example</a>)</dd>
+                    <dd><span style="color: #f4b124;">- component : </span> image, video</dd>
                     <dd><span style="color: #f4b124;">- fileManager : </span> image, video</dd>
                     <dd><span style="color: #f4b124;">- resizing : </span> image, video</dd>
                 </dl>
@@ -37,8 +38,7 @@
             <div class="description">
             </div>
 
-<!-- readme -->
-<div id="readme" class="Box-body readme blob js-code-block-container px-5">
+<div class="Box-body readme blob js-code-block-container px-5">
     <article class="markdown-body entry-content" itemprop="text">
 <h3 class="subsection-title" id="titleModule" style="color: #ffe4c4;">Module - Properties that all module plugins inherit</h3>
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">export</span> <span class="pl-k">interface</span> <span class="pl-smi">Module</span> <span class="pl-kos">{</span>
@@ -50,10 +50,12 @@
     <span class="pl-c">/**</span>
 <span class="pl-c">     * <span class="pl-k">@description</span> Constructor, It will run automatically.</span>
 <span class="pl-c">     * <span class="pl-k">@param</span> core Core object </span>
-<span class="pl-c">     * <span class="pl-k">@example</span> core.addModule([dialog, resizing, fileManager])</span>
+<span class="pl-c">     * <span class="pl-k">@example</span> core.addModule([dialog, component, resizing, fileManager])</span>
 <span class="pl-c">     */</span>
     <span class="pl-c1">add</span>?: <span class="pl-kos">(</span><span class="pl-s1">core</span>: <span class="pl-smi">SunEditor</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 <span class="pl-kos">}</span></pre></div>
+
+<!-- dialog -->
 <h3 class="subsection-title" id="titleDialog">dialog</h3>
 <div class="highlight highlight-source-ts"><pre>
 <span class="pl-c">/**</span>
@@ -75,6 +77,36 @@
 <span class="pl-c">     */</span>
     <span class="pl-c1">close</span><span class="pl-kos">(</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 <span class="pl-kos">}</span></pre></div>
+
+<!-- component -->
+<h3 class="subsection-title" id="titleComponent">component</h3>
+<div class="highlight highlight-source-ts"><pre>
+<span class="pl-c">/**</span>
+<span class="pl-c"> * <span class="pl-k">@description</span> These are functions that can be used in the "component" module.</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">declare</span> <span class="pl-k">interface</span> <span class="pl-smi">component</span> <span class="pl-k">extends</span> <span class="pl-smi">Module</span> <span class="pl-kos">{</span>
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Create a container for the resizing component and insert the element.</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> cover Cover element (FIGURE)</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> className Class name of container (fixed: se-component)</span>
+<span class="pl-c">     * <span class="pl-k">@returns</span> Created container element</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">set_container</span><span class="pl-kos">(</span><span class="pl-s1">cover</span>: <span class="pl-smi">Element</span><span class="pl-kos">,</span> <span class="pl-s1">className</span>: <span class="pl-smi">string</span><span class="pl-kos">)</span>: <span class="pl-smi">Element</span><span class="pl-kos">;</span>
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Cover the target element with a FIGURE element.</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> element Target element</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">set_cover</span><span class="pl-kos">(</span><span class="pl-s1">element</span>: <span class="pl-smi">Element</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
+    
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Return HTML string of caption(FIGCAPTION) element</span>
+<span class="pl-c">     * <span class="pl-k">@returns</span></span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">create_caption</span><span class="pl-kos">(</span><span class="pl-kos">)</span>: <span class="pl-smi">string</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+
+<!-- fileManager -->
 <h3 class="subsection-title" id="titleFileManager">fileManager</h3>
 <div class="highlight highlight-source-ts"><pre><span class="pl-c">/**</span>
 <span class="pl-c"> * <span class="pl-k">@description</span> Require context properties when fileManager module</span>
@@ -139,6 +171,8 @@
 <span class="pl-c">     */</span>
     <span class="pl-c1">resetInfo</span><span class="pl-kos">(</span><span class="pl-s1">pluginName</span>: <span class="pl-smi">string</span><span class="pl-kos">,</span> <span class="pl-s1">uploadEventHandler</span>: <span class="pl-smi">Function</span> | <span class="pl-smi">null</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 <span class="pl-kos">}</span></pre></div>
+
+<!-- resizing -->
 <h3 class="subsection-title" id="titleResizing">resizing</h3>
 <div class="highlight highlight-source-ts"><pre><span class="pl-c">/**</span>
 <span class="pl-c"> * <span class="pl-k">@description</span> Require context properties when resizing module</span>
@@ -241,26 +275,6 @@
     <span class="pl-c1">openAlignMenu</span><span class="pl-kos">(</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 
     <span class="pl-c">/**</span>
-<span class="pl-c">     * <span class="pl-k">@description</span> Return HTML string of caption(FIGCAPTION) element</span>
-<span class="pl-c">     * <span class="pl-k">@returns</span></span>
-<span class="pl-c">     */</span>
-    <span class="pl-c1">create_caption</span><span class="pl-kos">(</span><span class="pl-kos">)</span>: <span class="pl-smi">string</span><span class="pl-kos">;</span>
-
-    <span class="pl-c">/**</span>
-<span class="pl-c">     * <span class="pl-k">@description</span> Cover the target element with a FIGURE element.</span>
-<span class="pl-c">     * <span class="pl-k">@param</span> element Target element</span>
-<span class="pl-c">     */</span>
-    <span class="pl-c1">set_cover</span><span class="pl-kos">(</span><span class="pl-s1">element</span>: <span class="pl-smi">Element</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
-
-    <span class="pl-c">/**</span>
-<span class="pl-c">     * <span class="pl-k">@description</span> Create a container for the resizing component and insert the element.</span>
-<span class="pl-c">     * <span class="pl-k">@param</span> cover Cover element (FIGURE)</span>
-<span class="pl-c">     * <span class="pl-k">@param</span> className Class name of container (fixed: se-component)</span>
-<span class="pl-c">     * <span class="pl-k">@returns</span> Created container element</span>
-<span class="pl-c">     */</span>
-    <span class="pl-c1">set_container</span><span class="pl-kos">(</span><span class="pl-s1">cover</span>: <span class="pl-smi">Element</span><span class="pl-kos">,</span> <span class="pl-s1">className</span>: <span class="pl-smi">string</span><span class="pl-kos">)</span>: <span class="pl-smi">Element</span><span class="pl-kos">;</span>
-
-    <span class="pl-c">/**</span>
 <span class="pl-c">     * <span class="pl-k">@description</span> Click event of resizing toolbar</span>
 <span class="pl-c">     * Performs the action of the clicked toolbar button.</span>
 <span class="pl-c">     * <span class="pl-k">@param</span> e Event object</span>
@@ -325,6 +339,7 @@
     <ul>
         <li><a href="document-module.html#titleModule" style="color: #ffe4c4;">Module</a></li>
         <li><a href="document-module.html#titleDialog">dialog</a></li>
+        <li><a href="document-module.html#titleComponent">component</a></li>
         <li><a href="document-module.html#titleFileManager">fileManager</a></li>
         <li><a href="document-module.html#titleResizing">resizing</a></li>
     </ul>

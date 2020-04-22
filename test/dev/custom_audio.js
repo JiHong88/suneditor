@@ -1,7 +1,8 @@
 import dialog from '../../src/plugins/modules/dialog';
+import component from '../../src/plugins/modules/component';
 import fileManager from '../../src/plugins/modules/fileManager';
 
-// ex) A link dialog plugin with used [fileManager] module
+// ex) A link dialog plugin with used [dialog, component, fileManager] module
 export default {
     // @Required @Unique
     // plugin name
@@ -18,7 +19,7 @@ export default {
     add: function (core) {
 
         // If you are using a module, you must register the module using the "addModule" method.
-        core.addModule([dialog, fileManager]);
+        core.addModule([dialog, component, fileManager]);
 
         // @Required
         // Registering a namespace for caching as a plugin name in the context object
@@ -85,7 +86,7 @@ export default {
         audio_dialog = null, audio_controller = null;
     },
 
-    /** dialog */
+    /** HTML - dialog */
     setDialog: function () {
         const lang = this.lang;
         const dialog = this.util.createElement('DIV');
@@ -123,7 +124,7 @@ export default {
         return dialog;
     },
 
-    /** modify controller button */
+    /** HTML - controller */
     setController: function () {
         const lang = this.lang;
         const icons = this.icons;
@@ -177,6 +178,16 @@ export default {
 
         // history stack
         this.history.push(false);
+    },
+
+    // @overriding fileManager
+    checkFileInfo: function () {
+        this.plugins.fileManager.checkInfo.call(this, 'customAudio', ['audio'], null, this.plugins.customAudio.updateCover.bind(this), false);
+    },
+
+    // @overriding fileManager
+    resetFileInfo: function () {
+        this.plugins.fileManager.resetInfo.call(this, 'customAudio', null);
     },
 
     // @Required, @Overriding dialog
@@ -258,7 +269,6 @@ export default {
             } else {
                 this.util.createElement('AUDIO');
                 oAudio.setAttribute('controls', true);
-                oAudio.className = 'se-component';
             }
 
             for (let i = 0, len = fileList.length, file; i < len; i++) {
@@ -271,7 +281,7 @@ export default {
     },
 
     callBack_error: function (errorMessage, response, core) {
-        core._w.alert(errorMessage | response.toString());
+        core.functions.noticeOpen(errorMessage | response.toString());
     },
 
     setupUrl: function () {
@@ -284,7 +294,6 @@ export default {
 
             const oAudio = this.util.createElement('AUDIO');
             oAudio.setAttribute('controls', true);
-            oAudio.className = 'se-component';
 
             // When opened for modification "this.context.dialog.updateModal" is true
             this.plugins.customAudio.create_audio.call(this, oAudio, src, null, this.context.dialog.updateModal);
@@ -301,7 +310,12 @@ export default {
         // create new tag
         if (!isUpdate) {
             element.src = src;
-            this.insertComponent(element, false);
+
+            // In order to use it in the form of components such as images and videos, 
+            // you need to create component tags by calling the "set_cover" and "set_container" functions of the "component" module.
+            const cover = this.plugins.component.set_cover.call(this, element);
+            const container = this.plugins.component.set_container.call(this, cover, '');
+            this.insertComponent(container, false);
         } // update
         else if (context._element.src !== src) {
             element = context._element;
@@ -311,9 +325,32 @@ export default {
             return;
         }
 
+        // call fileManager.setInfo when updated tag
         // (pluginName, element, uploadEventHandler, file, "using resizing module")
         this.plugins.fileManager.setInfo.call(this, 'customAudio', element, null, file, false);
         this.history.push(false);
+    },
+
+    updateCover: function (element) {
+        const context = this.context.customAudio;
+        element.setAttribute('controls', true);
+        
+        // find component element
+        const existElement = this.util.getParentElement(element, this.util.isMediaComponent) || 
+            this.util.getParentElement(element, function (current) {
+                return this.isWysiwygDiv(current.parentNode);
+            }.bind(this.util));
+
+        // clone element
+        context._element = element = element.cloneNode(false);
+        const cover = this.plugins.component.set_cover.call(this, element);
+        const container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
+
+        existElement.parentNode.replaceChild(container, existElement);
+
+        // call fileManager.setInfo when updated tag
+        // (pluginName, element, uploadEventHandler, file, "using resizing module")
+        this.plugins.fileManager.setInfo.call(this, 'customAudio', element, null, null, false);
     },
 
     // @Overriding dialog
@@ -331,7 +368,7 @@ export default {
     },
 
     call_controller: function (selectionTag) {
-        selectionTag.style.border = '2px solid #80bdff';
+        selectionTag.style.border = '1px solid #80bdff';
         this.context.customAudio._element = selectionTag;
         const controller = this.context.customAudio.controller;
 
@@ -361,21 +398,15 @@ export default {
 
         e.preventDefault();
 
+        const context = this.context.customAudio;
         if (/update/.test(command)) {
-            const context = this.context.customAudio;
-            context.fileInput.value = context._element.href;
+            context.urlInput.value = context._element.src;
             this.plugins.dialog.open.call(this, 'customAudio', true);
         }
-        else if (/unlink/.test(command)) {
-            const sc = this.util.getChildElement(this.context.customAudio._element, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-            const ec = this.util.getChildElement(this.context.customAudio._element, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-            this.setRange(sc, 0, ec, ec.textContent.length);
-            this.nodeChange(null, null, ['A'], false);
-        }
-        else {
-            /** delete */
-            this.util.removeItem(this.context.customAudio._element);
-            this.context.customAudio._element = null;
+        else { /** delete */
+            const container = this.util.getParentElement(context._element, this.util.isMediaComponent);
+            this.util.removeItem(container);
+            context._element = null;
             this.focus();
 
             // history stack
@@ -389,6 +420,8 @@ export default {
     // This method is called when the dialog window is closed.
     // Initialize the properties.
     init: function () {
+        if (this.context.dialog.updateModal) return;
+
         const context = this.context.customAudio;
         if (context._element) context._element.style.border = '';
         context.controller.style.display = 'none';

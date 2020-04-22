@@ -107,7 +107,7 @@
                     let infoUpdate = false;
                     for (let i = 0, len = infoList.length, info; i < len; i++) {
                         info = infoList[i];
-                        if (tags.filter(function (img) { return info.src === img.src && info.index.toString() === img.getAttribute('data-index'); }).length === 0) {
+                        if (tags.filter(function (t) { return info.src === t.src && info.index.toString() === t.getAttribute('data-index'); }).length === 0) {
                             infoUpdate = true;
                             break;
                         }

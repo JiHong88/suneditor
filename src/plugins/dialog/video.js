@@ -8,6 +8,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
+import component from '../modules/component';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
@@ -15,7 +16,7 @@ export default {
     name: 'video',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, resizing, fileManager]);
+        core.addModule([dialog, component, resizing, fileManager]);
 
         const context = core.context;
         const contextVideo = context.video = {
@@ -462,8 +463,8 @@ export default {
             init = true;
             oFrame.src = src;
             contextVideo._element = oFrame;
-            cover = this.plugins.resizing.set_cover.call(this, oFrame);
-            container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
+            cover = this.plugins.component.set_cover.call(this, oFrame);
+            container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
         }
 
         /** rendering */
@@ -520,8 +521,8 @@ export default {
             }.bind(this.util));
 
         contextVideo._element = oIframe = oIframe.cloneNode(false);
-        const cover = contextVideo._cover = this.plugins.resizing.set_cover.call(this, oIframe);
-        const container = contextVideo._container = this.plugins.resizing.set_container.call(this, cover, 'se-video-container');
+        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oIframe);
+        const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
         const figcaption = existElement.querySelector('figcaption');
         let caption = null;
@@ -630,8 +631,7 @@ export default {
      * @overriding fileManager
      */
     checkFileInfo: function () {
-        const videoPlugin = this.plugins.video;
-        this.plugins.fileManager.checkInfo.call(this, 'video', ['iframe', 'video'], this.functions.onVideoUpload, videoPlugin._update_videoCover.bind(this), true);
+        this.plugins.fileManager.checkInfo.call(this, 'video', ['iframe', 'video'], this.functions.onVideoUpload, this.plugins.video._update_videoCover.bind(this), true);
     },
 
     /**

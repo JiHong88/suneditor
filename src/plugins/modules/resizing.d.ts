@@ -101,26 +101,6 @@ declare interface resizing extends Module {
     openAlignMenu(): void;
 
     /**
-     * @description Return HTML string of caption(FIGCAPTION) element
-     * @returns
-     */
-    create_caption(): string;
-
-    /**
-     * @description Cover the target element with a FIGURE element.
-     * @param element Target element
-     */
-    set_cover(element: Element): void;
-
-    /**
-     * @description Create a container for the resizing component and insert the element.
-     * @param cover Cover element (FIGURE)
-     * @param className Class name of container (fixed: se-component)
-     * @returns Created container element
-     */
-    set_container(cover: Element, className: string): Element;
-
-    /**
      * @description Click event of resizing toolbar
      * Performs the action of the clicked toolbar button.
      * @param e Event object

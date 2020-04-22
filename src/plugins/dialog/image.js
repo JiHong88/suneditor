@@ -8,6 +8,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
+import component from '../modules/component';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
@@ -15,7 +16,7 @@ export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, resizing, fileManager]);
+        core.addModule([dialog, component, resizing, fileManager]);
         
         const context = core.context;
         const contextImage = context.image = {
@@ -533,12 +534,12 @@ export default {
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         }
 
-        const cover = this.plugins.resizing.set_cover.call(this, oImg);
-        const container = this.plugins.resizing.set_container.call(this, cover, 'se-image-container');
+        const cover = this.plugins.component.set_cover.call(this, oImg);
+        const container = this.plugins.component.set_container.call(this, cover, 'se-image-container');
 
         // caption
         if (contextImage._captionChecked) {
-            contextImage._caption = this.plugins.resizing.create_caption.call(this);
+            contextImage._caption = this.plugins.component.create_caption.call(this);
             contextImage._caption.setAttribute('contenteditable', false);
             cover.appendChild(contextImage._caption);
         }
@@ -569,14 +570,14 @@ export default {
         if (cover === null) {
             isNewContainer = true;
             imageEl = contextImage._element.cloneNode(true);
-            cover = this.plugins.resizing.set_cover.call(this, imageEl);
+            cover = this.plugins.component.set_cover.call(this, imageEl);
         }
 
         if (container === null) {
             cover = cover.cloneNode(true);
             imageEl = cover.querySelector('img');
             isNewContainer = true;
-            container = this.plugins.resizing.set_container.call(this, cover, 'se-image-container');
+            container = this.plugins.component.set_container.call(this, cover, 'se-image-container');
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
@@ -598,7 +599,7 @@ export default {
         // caption
         if (contextImage._captionChecked) {
             if (!contextImage._caption) {
-                contextImage._caption = this.plugins.resizing.create_caption.call(this);
+                contextImage._caption = this.plugins.component.create_caption.call(this);
                 cover.appendChild(contextImage._caption);
             }
         } else {

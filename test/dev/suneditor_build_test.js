@@ -64,7 +64,7 @@ let ssss = suneditor.create(("sample1"), {
         //         innerHTML: NPS_FONT_SIZE_ICON
         //     }
         // ],
-        ['codeView']
+        ['codeView', 'preview']
     ],
     // lang: langToUse
 });
@@ -91,6 +91,7 @@ let s1 = suneditor.create('editor', {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
+    imageFileInput: false,
     icons: {
         undo: 'U',
         bold: '<span class="se-icon-text">B</span>'
