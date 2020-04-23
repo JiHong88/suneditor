@@ -33,7 +33,7 @@ let ssss = suneditor.create(("sample1"), {
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
     buttonList: [
-        ['undo', 'redo', 'customAudio'],
+        ['undo', 'redo', 'customAudio', plugins.image],
         // ['font', 'fontSize'],
         // ['fontColor', 'bold', 'underline', 'italic'],
         // ['align'],

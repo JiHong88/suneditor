@@ -76,7 +76,7 @@ export default {
     },
 
     /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         const targetButton = this.context.align.targetButton;
@@ -98,7 +98,7 @@ export default {
     },
 
     /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const alignContext = this.context.align;

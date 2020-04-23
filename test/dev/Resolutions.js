@@ -76,7 +76,7 @@ export default {
         return listDiv;
     },
 
-    // @Overriding
+    // @Override
     // Plugins with active methods load immediately when the editor loads.
     // Called each time the selection is moved.
     active: function (element) {
@@ -95,7 +95,7 @@ export default {
         return false;
     },
 
-    // @Overriding
+    // @Override
     // Called after the submenu has been rendered
     on: function () {
         this.context.customSubmenu.textElement.focus();

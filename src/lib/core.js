@@ -4929,17 +4929,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-            const resizingName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
+            const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
             let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
             let rangeEl = util.getRangeFormatElement(formatEl, null);
 
             switch (keyCode) {
                 case 8: /** backspace key */
                     if (!selectRange) {
-                        if (resizingName) {
+                        if (fileComponentName) {
                             e.preventDefault();
                             e.stopPropagation();
-                            core.plugins[resizingName].destroy.call(core);
+                            core.plugins[fileComponentName].destroy.call(core);
                             break;
                         }
                     }
@@ -5084,10 +5084,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 46: /** delete key */
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        core.plugins[resizingName].destroy.call(core);
+                        core.plugins[fileComponentName].destroy.call(core);
                         break;
                     }
 
@@ -5162,7 +5162,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 9: /** tab key */
-                    if (resizingName) break;
+                    if (fileComponentName) break;
                     e.preventDefault();
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
@@ -5366,10 +5366,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
 
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const compContext = context[resizingName];
+                        const compContext = context[fileComponentName];
                         const container = compContext._container;
                         const sibling = container.previousElementSibling || container.nextElementSibling;
 
@@ -5383,15 +5383,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                         container.parentNode.insertBefore(newEl, container);
                         
-                        core.callPlugin(resizingName, function () {
-                            const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
-                            core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
+                        core.callPlugin(fileComponentName, function () {
+                            const size = (core.plugins.resizing && core.context[fileComponentName]._resizing !== undefined) ? core.plugins.resizing.call_controller_resize.call(core, compContext._element, fileComponentName) : null;
+                            core.plugins[fileComponentName].onModifyMode.call(core, compContext._element, size);
                         }, null);
                     }
                     
                     break;
                 case 27:
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.controllersOff();

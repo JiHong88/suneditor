@@ -74,7 +74,7 @@ export default {
     },
 
      /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         let formatTitle = this.lang.toolbar.formats;
@@ -110,7 +110,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const formatContext = this.context.formatBlock;

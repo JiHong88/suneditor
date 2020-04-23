@@ -62,7 +62,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const lineHeightContext = this.context.lineHeight;

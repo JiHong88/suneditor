@@ -83,7 +83,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const paragraphContext = this.context.paragraphStyle;

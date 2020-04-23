@@ -20,21 +20,22 @@ export default {
         
         const context = core.context;
         const contextImage = context.image = {
-            _infoList: [], // @overriding fileManager
-            _infoIndex: 0, // @overriding fileManager
-            _uploadFileLength: 0, // @overriding fileManager
+            _infoList: [], // @Override fileManager
+            _infoIndex: 0, // @Override fileManager
+            _uploadFileLength: 0, // @Override fileManager
             sizeUnit: context.option._imageSizeUnit,
             _altText: '',
             _linkElement: null,
             _linkValue: '',
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
-            // @overriding resizing properties
+            // @require @Override component
+            _element: null,
+            _cover: null,
+            _container: null,
+            // @Override resizing properties
             inputX: null,
             inputY: null,
-            _container: null,
-            _cover: null,
-            _element: null,
             _element_w: 1,
             _element_h: 1,
             _element_l: 0,
@@ -217,19 +218,19 @@ export default {
     },
 
     /**
-     * @overriding @required fileManager
+     * @Override @Required fileManager
      */
     fileTags: ['img'],
 
     /**
-     * @overriding core, fileManager, resizing
+     * @Override core, fileManager, resizing
      */
     select: function (element) {
         this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
     },
 
     /**
-     * @overriding fileManager, resizing
+     * @Override fileManager, resizing
      */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
@@ -255,7 +256,22 @@ export default {
     },
 
     /**
-     * @overriding dialog
+     * @Required @Override dialog
+     */
+    on: function (update) {
+        const contextImage = this.context.image;
+        
+        if (!update) {
+            contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
+            contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
+            if (contextImage.imgInputFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
+        } else {
+            if (contextImage.imgInputFile) contextImage.imgInputFile.removeAttribute('multiple');
+        }
+    },
+
+    /**
+     * @Required @Override dialog
      */
     open: function () {
         this.plugins.dialog.open.call(this, 'image', 'image' === this.currentControllerName);
@@ -413,8 +429,6 @@ export default {
                 }
             }
         }
-
-        this.closeLoading();
     },
 
     setup_reader: function (files, imgLinkValue, newWindowCheck, width, height, align, filesLen, isUpdate) {
@@ -478,7 +492,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      * @param {String} xy 'x': width, 'y': height
      * @param {KeyboardEvent} e Event object
      */
@@ -492,14 +506,14 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setRatio: function () {
         this.plugins.resizing._module_setRatio.call(this, this.context.image);
     },
 
     /**
-     * @overriding fileManager
+     * @Override fileManager
      */
     checkFileInfo: function () {
         const imagePlugin = this.plugins.image;
@@ -514,7 +528,7 @@ export default {
     },
 
     /**
-     * @overriding fileManager
+     * @Override fileManager
      */
     resetFileInfo: function () {
         this.plugins.fileManager.resetInfo.call(this, 'image', this.functions.onImageUpload);
@@ -689,7 +703,7 @@ export default {
     },
 
     /**
-     * @overriding resizing, fileManager
+     * @Required @Override fileManager, resizing
      */
     onModifyMode: function (element, size) {
         if (!element) return;
@@ -721,7 +735,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Required @Override fileManager, resizing
      */
     openModify: function (notOpen) {
         const contextImage = this.context.image;
@@ -741,29 +755,14 @@ export default {
     },
 
     /**
-     * @overriding dialog
-     */
-    on: function (update) {
-        const contextImage = this.context.image;
-        
-        if (!update) {
-            contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
-            contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
-            if (contextImage.imgInputFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
-        } else {
-            if (contextImage.imgInputFile) contextImage.imgInputFile.removeAttribute('multiple');
-        }
-    },
-
-    /**
-     * @overriding resizing
+     * @Override resizing
      */
     sizeRevert: function () {
         this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     applySize: function (w, h) {
         const contextImage = this.context.image;
@@ -784,7 +783,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
@@ -804,7 +803,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setAutoSize: function () {
         const contextImage = this.context.image;
@@ -826,7 +825,7 @@ export default {
     },
     
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setOriginSize: function () {
         const contextImage = this.context.image;
@@ -852,7 +851,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
@@ -877,7 +876,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
@@ -894,7 +893,7 @@ export default {
     },
 
     /**
-     * @overriding resizing
+     * @Override resizing
      */
     setAlign: function (align, element, cover, container) {
         const contextImage = this.context.image;
@@ -936,7 +935,7 @@ export default {
     },
 
     /**
-     * @overriding dialog
+     * @Override dialog
      */
     init: function () {
         const contextImage = this.context.image;

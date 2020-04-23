@@ -115,7 +115,7 @@ export default {
     },
 
     /**
-     * @overriding dialog
+     * @Override dialog
      */
     open: function () {
         this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
@@ -180,7 +180,7 @@ export default {
     },
 
     /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         if (!element) {
@@ -198,7 +198,7 @@ export default {
     },
 
     /**
-     * @overriding dialog
+     * @Override dialog
      */
     on: function (update) {
         if (!update) {
@@ -273,7 +273,7 @@ export default {
     },
 
     /**
-     * @overriding dialog
+     * @Override dialog
      */
     init: function () {
         const contextLink = this.context.link;
