@@ -4699,17 +4699,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if ((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
-                if (util.isList(rangeEl)) {
-                    const oLi = util.createElement('LI');
-                    const prevLi = selectionNode.nextElementSibling;
-                    oLi.appendChild(selectionNode);
-                    rangeEl.insertBefore(oLi, prevLi);
-                } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode)) {
-                    core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+            if (((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false')) {
+                const range = core.getRange();
+                if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
+                    if (util.isList(rangeEl)) {
+                        const oLi = util.createElement('LI');
+                        const prevLi = selectionNode.nextElementSibling;
+                        oLi.appendChild(selectionNode);
+                        rangeEl.insertBefore(oLi, prevLi);
+                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode)) {
+                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                    }
+                    
+                    e.preventDefault();
+                    core.focus();
                 }
-                e.preventDefault();
-                core.focus();
             } else {
                 event._applyTagEffects();
             }
