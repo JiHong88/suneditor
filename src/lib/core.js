@@ -5162,7 +5162,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 9: /** tab key */
-                    if (fileComponentName) break;
+                    if (fileComponentName || options.tabDisable) break;
                     e.preventDefault();
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 

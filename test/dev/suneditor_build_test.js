@@ -32,6 +32,7 @@ let ssss = suneditor.create(("sample1"), {
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
+    tabDisable: true,
     buttonList: [
         ['undo', 'redo', 'customAudio', plugins.image],
         // ['font', 'fontSize'],

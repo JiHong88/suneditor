@@ -585,6 +585,9 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 
+// Key actions
+tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
+
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
                   Arguments - (contents).                            default: functions.save {Function}

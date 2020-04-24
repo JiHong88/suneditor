@@ -272,6 +272,9 @@
             <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
             
             <br>
+            <h4 style="color: #b94a48;">--Key actions</h4>
+            <label><input type="checkbox" id="tabDisable">&nbsp;&nbsp;tabDisable</label><br>
+
             <h4 style="color: #b94a48;">--Defining save button</h4>
             <label><input type="checkbox" id="callBackSave">&nbsp;&nbsp;callBackSave</label><br>
             <span>function (contents) { alert(contents) }</span>
@@ -460,6 +463,7 @@ function sun_create () {
         videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
+        tabDisable: document.getElementById('tabDisable').checked,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
         paragraphStyles: document.getElementById('paragraphStyles').checked ? ['spaced', {name: 'Box', class: '__se__customClass'}] : undefined,

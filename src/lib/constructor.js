@@ -408,7 +408,7 @@ export default {
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
-        // options.fullPage = options.fullPage;
+        options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
@@ -473,6 +473,8 @@ export default {
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = options.videoUploadUrl || null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
+        /** Key actions */
+        options.tabDisable = !!options.tabDisable;
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;
         /** Templates Array */
