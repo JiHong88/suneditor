@@ -1946,13 +1946,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (range.collapsed && !isRemoveFormat) {
-                if (startCon.nodeType === 1 && !util.isBreak(startCon)) {
+                if (startCon.nodeType === 1 && !util.isBreak(startCon) && !util.isComponent(startCon)) {
                     let afterNode = null;
                     const focusNode = startCon.childNodes[startOff];
 
                     if (focusNode) {
                         if (!focusNode.nextSibling) {
-                            startCon.removeChild(focusNode);
                             afterNode = null;
                         } else {
                             afterNode = util.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
