@@ -1575,6 +1575,19 @@ const util = {
             t.parentNode.insertBefore(tp, t);
             this.removeItem(t);
         }
+
+        // table cells without format
+        const withoutFormatCells = this.getListChildren(documentFragment, function (current) {
+            return this.isCell(current) && !this.isFormatElement(current.firstElementChild);
+        }.bind(this));
+
+        for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
+            t = withoutFormatCells[i];
+
+            f = this.createElement('DIV');
+            f.innerHTML = t.innerHTML;
+            t.innerHTML = f.outerHTML;
+        }
     },
 
     _setDefaultOptionStyle: function (options) {
