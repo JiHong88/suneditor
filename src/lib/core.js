@@ -4976,6 +4976,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         }
                     }
 
+                    if (event._tableDelete()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
+                    }
+
                     if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -5120,6 +5126,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         e.preventDefault();
                         e.stopPropagation();
                         core.plugins[fileComponentName].destroy.call(core);
+                        break;
+                    }
+
+                    if (event._tableDelete()) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         break;
                     }
 
@@ -5658,6 +5670,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         _codeViewAutoHeight: function () {
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
+        },
+
+        _tableDelete: function () {
+            const range = core.getRange();
+            const sCell = util.getRangeFormatElement(range.startContainer);
+            const eCell = util.getRangeFormatElement(range.endContainer);
+
+            if (util.isCell(sCell) && util.isCell(eCell) && !sCell.previousElementSibling && !eCell.nextElementSibling) {
+                const table = util.getParentElement(sCell, util.isComponent);
+                util.removeItem(table);
+                core.nativeFocus();
+                return true;
+            }
+
+            return false;
         },
 
         onPaste_wysiwyg: function (e) {
