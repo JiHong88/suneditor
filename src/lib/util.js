@@ -36,8 +36,8 @@ const util = {
      * @private
      */
     _HTMLConvertor: function (contents) {
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
-        return contents.replace(/&|\u00A0|'|<|>/g, function (m) {
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
+        return contents.replace(/&|\u00A0|'|"|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
     },
