@@ -2177,14 +2177,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 // mid
-                for (let i = endLength - 1; i > 0; i--) {
+                for (let i = endLength - 1, renewedEndContainer; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
-                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
+                    renewedEndContainer = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+                    if (renewedEndContainer) end.container = renewedEndContainer;
                 }
 
                 // start
                 newNode = appendNode.cloneNode(false);
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
+
+                if (start.endContainer) end.container = start.endContainer;
 
                 if (endLength <= 0) {
                     end = start;
@@ -2695,10 +2698,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Number} startOff The startOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {Object} { container, offset }
+         * @returns {null|Node} If end container is renewed, returned renewed node
+         * @returns {Object} { container, offset, endContainer }
          * @private
          */
-        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -2741,7 +2745,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
-                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
                     const child = childNodes[i];
                     if (!child) continue;
                     let coverNode = ancestor;
@@ -2750,9 +2754,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                cloneChild = child.cloneNode(true);
+                                pNode.appendChild(cloneChild);
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
+
+                                // end container
+                                if (_endContainer && child.contains(_endContainer)) {
+                                    const endPath = util.getNodePath(_endContainer, child);
+                                    _endContainer = util.getNodeFromPath(endPath, cloneChild);
+                                }
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2903,7 +2914,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
                     container: startCon,
-                    offset: startOff
+                    offset: startOff,
+                    endContainer: _endContainer
                 };
             }
 
@@ -2959,7 +2971,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             return {
                 container: container,
-                offset: offset
+                offset: offset,
+                endContainer: _endContainer
             };
         },
 
@@ -2970,11 +2983,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Function} validation Check if the node should be stripped.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+         * @param {Node} _endContainer Offset node of last line already modified (end.container)
+         * @returns {null|Node} If end container is renewed, returned renewed node
          * @private
          */
-        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
+        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
             // not add tag
             if (!isRemoveNode) {
+                // end container path
+                let endPath = null;
+                if (_endContainer && element.contains(_endContainer)) endPath = util.getNodePath(_endContainer, element);
+
                 const tempNode = element.cloneNode(true);
                 const newNodeName = newInnerNode.nodeName;
                 const newCssText = newInnerNode.style.cssText;
@@ -3002,7 +3021,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (len > 0 && i === len) {
                     element.innerHTML = tempNode.innerHTML;
-                    return;
+                    return endPath ? util.getNodeFromPath(endPath, element) : null;
                 }
             }
 
@@ -3015,7 +3034,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
-                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
                     let child = childNodes[i];
                     if (!child) continue;
                     let coverNode = ancestor;
@@ -3025,10 +3044,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             pNode.appendChild(newInnerNode);
                             newInnerNode = newInnerNode.cloneNode(false);
                         }
-                        pNode.appendChild(child.cloneNode(true));
+                        
+                        cloneChild = child.cloneNode(true);
+                        pNode.appendChild(cloneChild);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
+
+                        // end container
+                        if (_endContainer && child.contains(_endContainer)) {
+                            const endPath = util.getNodePath(_endContainer, child);
+                            _endContainer = util.getNodeFromPath(endPath, cloneChild);
+                        }
+
                         continue;
                     } else {
                         vNode = validation(child);
@@ -3044,7 +3072,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             })(element, newInnerNode);
 
             // not remove tag
-            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return _endContainer;
 
             pNode.appendChild(newInnerNode);
 
@@ -3069,6 +3097,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // node change
             element.parentNode.replaceChild(pNode, element);
+            return _endContainer;
         },
 
         /**
