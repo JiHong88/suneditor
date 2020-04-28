@@ -400,7 +400,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('aaaaa')
+    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" />', true)
 }
 
 window.sun_getContents = function () {

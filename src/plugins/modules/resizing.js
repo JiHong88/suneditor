@@ -247,9 +247,9 @@
             if (!cover) cover = contextPlugin._cover;
             if (!container) container = contextPlugin._container;
     
-            if (!container || !cover || !element) return '';
+            if (!element) return '';
     
-            return !/%$/.test(element.style.width) ? element.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
+            return !/%$/.test(element.style.width) ? element.style.width : ((container && this.util.getNumber(container.style.width, 2)) || 100) + '%';
         },
     
         /**
@@ -265,9 +265,9 @@
             if (!cover) cover = contextPlugin._cover;
             if (!container) container = contextPlugin._container;
     
-            if (!container || !cover || !element) return '';
+            if (!container || !cover) return (element && element.style.height) || '';
     
-            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
+            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : ((container && this.util.getNumber(container.style.height, 2)) || 100) + '%');
         },
 
         /**
