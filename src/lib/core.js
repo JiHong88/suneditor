@@ -5672,6 +5672,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
+        // FireFox - table delete
         _tableDelete: function () {
             const range = core.getRange();
             const sCell = util.getRangeFormatElement(range.startContainer);
@@ -5688,11 +5689,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onPaste_wysiwyg: function (e) {
-            const clipboardData = e.clipboardData;
+            const isIE = util.isIE;
+            const clipboardData = isIE ? _w.clipboardData : e.clipboardData;
             if (!clipboardData) return true;
 
-            const plainText = clipboardData.getData('text/plain').replace(/\n/g, '');
-            const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
+            let plainText, cleanData;
+            if (isIE) {
+                plainText = clipboardData.getData('Text');
+                
+                const range = core.getRange();
+                const tempDiv = util.createElement('DIV');
+                const tempRange = {
+                    sc: range.startContainer,
+                    so: range.startOffset,
+                    ec: range.endContainer,
+                    eo: range.endOffset
+                };
+
+                tempDiv.setAttribute('contenteditable', true);
+                tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
+                
+                context.element.relative.appendChild(tempDiv);
+                tempDiv.focus();
+                core._editorRange();
+
+                _w.setTimeout(function () {
+                    cleanData = tempDiv.innerHTML;
+                    util.removeItem(tempDiv);
+                    core.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
+                    event._setClipboardData(e, plainText, cleanData);
+                });
+
+                return true;
+            } else {
+                plainText = clipboardData.getData('text/plain');
+                cleanData = clipboardData.getData('text/html');
+                return event._setClipboardData(e, plainText, cleanData);
+            }
+        },
+
+        _setClipboardData: function (e, plainText, cleanData) {
+            cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
+            plainText = plainText.replace(/\n/g, '');
             const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
@@ -5711,9 +5749,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 e.stopPropagation();
                 e.preventDefault();
                 functions.insertHTML(cleanData, true);
-            } else {
-                // history stack
-                core.history.push(true);
+                return false;
             }
         },
 
