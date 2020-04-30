@@ -70,7 +70,11 @@ export default {
         /** add event listeners */
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        image_dialog.querySelector('.se-dialog-files-remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+
+        /** If option.imageFileInput is false .se-dialog-files-remove will not exist */
+        let seDialogFilesRemove = image_dialog.querySelector('.se-dialog-files-remove');
+        if (seDialogFilesRemove) seDialogFilesRemove.addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
         
         contextImage.proportion = {};
