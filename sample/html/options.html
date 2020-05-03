@@ -270,6 +270,10 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoUploadSizeLimit">&nbsp;&nbsp;videoUploadSizeLimit</label>
             <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+
+            <br>
+            <h4 style="color: #b94a48;">--Table</h4>
+            <label><input type="checkbox" id="tableCellController" checked>&nbsp;&nbsp;tableCellController</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
@@ -463,6 +467,7 @@ function sun_create () {
         videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
+        tableCellController: document.getElementById('tableCellController').checked,
         tabDisable: document.getElementById('tabDisable').checked,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,

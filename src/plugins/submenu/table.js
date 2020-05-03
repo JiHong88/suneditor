@@ -304,26 +304,23 @@ export default {
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
         const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
 
         if (!this.getSelection().isCollapsed && !tablePlugin._selectedCell) {
             this.controllersOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
-        
-        const contextTable = this.context.table;
-        const tableController = contextTable.tableController;
-        
-        tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
+        tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
+        
         const tableElement = contextTable._element;
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
         tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
 
         tablePlugin.setPositionControllerTop.call(this, tableElement);
-
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), tdElement, 'table');
+        if (!tablePlugin._shift || !this.context.options.tableCellController) this.controllersOn((this.context.options.tableCellController ? contextTable.resizeDiv : null), contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerTop: function (tableElement) {
@@ -336,22 +333,24 @@ export default {
 
     setPositionControllerDiv: function (tdElement, reset) {
         const contextTable = this.context.table;
-        const resizeDiv = contextTable.resizeDiv;
         
         this.plugins.table.setCellInfo.call(this, tdElement, reset);
-
-        resizeDiv.style.display = 'block';
-
-        const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
-        resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-        resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
-
-        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
-        if (overLeft < 0) {
-            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
-            resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
-        } else {
-            resizeDiv.firstElementChild.style.left = '20px';
+        
+        if (this.context.options.tableCellController) {
+            const resizeDiv = contextTable.resizeDiv;
+            resizeDiv.style.display = 'block';
+    
+            const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
+            resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
+            resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
+    
+            const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+            if (overLeft < 0) {
+                resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
+                resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
+            } else {
+                resizeDiv.firstElementChild.style.left = '20px';
+            }
         }
     },
 
@@ -1344,32 +1343,35 @@ export default {
         tablePlugin._shift = shift;
         tablePlugin._fixedCell = tdElement;
         tablePlugin._fixedCellName = tdElement.nodeName;
-        tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
+        tablePlugin._selectedTable = this.context.table._element = this.util.getParentElement(tdElement, 'TABLE');
 
-        const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
-        for (let i = 0, len = selectedCells.length; i < len; i++) {
-            this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
-        }
-
-        this.util.addClass(tdElement, 'se-table-selected-cell');
-        
-        tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
-        tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
-
-        if (!shift) {
-            this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
+        if (this.context.options.tableCellController) {
+            const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
+            for (let i = 0, len = selectedCells.length; i < len; i++) {
+                this.util.removeClass(selectedCells[i], 'se-table-selected-cell');
+            }
+    
+            this.util.addClass(tdElement, 'se-table-selected-cell');
+            
+            tablePlugin._bindOnSelect = tablePlugin._onCellMultiSelect.bind(this);
+            tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
+    
+            if (!shift) {
+                this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
+            } else {
+                tablePlugin._bindOffShift = function () {
+                    this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this), tdElement, 'table');
+                    if (!tablePlugin._ref) this.controllersOff();
+                }.bind(this);
+    
+                this._wd.addEventListener('keyup', tablePlugin._bindOffShift, false);
+                this._wd.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
+            }
         } else {
-            tablePlugin._bindOffShift = function () {
-                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), this.focus.bind(this), tdElement, 'table');
-                if (!tablePlugin._ref) this.controllersOff();
-            }.bind(this);
-
-            this._wd.addEventListener('keyup', tablePlugin._bindOffShift, false);
-            this._wd.addEventListener('mousedown', tablePlugin._bindOnSelect, false);
+            tablePlugin._bindOffSelect = tablePlugin._offCellMultiSelect.bind(this);
         }
 
         this._wd.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
-
         tablePlugin._initBind = tablePlugin.init.bind(this);
         this._wd.addEventListener('touchmove', tablePlugin._initBind, false);
     },

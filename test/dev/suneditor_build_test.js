@@ -277,6 +277,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     videoFileInput: true,
     videoUploadUrl: 'http://localhost:3000/editor/upload',
     imageUploadUrl: 'http://localhost:3000/editor/upload',
+    tableCellController: false,
     // attributesWhitelist: {
     //     table: "style",
     //     tbody: "style",

@@ -299,6 +299,14 @@ export interface SunEditorOptions {
      */
     videoUploadSizeLimit?: number;
     /**
+     * Table
+     * =====
+     */
+    /**
+     * Choose whether to display the table cell controller.
+     */
+    tableCellController?: boolean;
+    /**
      * Defining save button
      * ====================
      */

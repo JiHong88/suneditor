@@ -473,6 +473,8 @@ export default {
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = options.videoUploadUrl || null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
+        /** Table */
+        options.tableCellController = options.tableCellController === undefined ? true : options.tableCellController;
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
         /** Defining save button */

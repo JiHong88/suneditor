@@ -547,6 +547,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             for (let i = 0, arg; i < arguments.length; i++) {
                 arg = arguments[i];
+                if (!arg) continue;
+                
                 if (typeof arg === 'string') {
                     this.currentControllerName = arg;
                     continue;
@@ -4735,7 +4737,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         const prevLi = selectionNode.nextElementSibling;
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
-                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode)) {
+                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
                         core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                     }
                     
