@@ -283,7 +283,7 @@ export default {
                 for (let f = 0, len = linkNames.length, path; f < len; f++) {
                     path = [];
 
-                    if (/^https?:\/\//.test(linkNames[f])) {
+                    if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
                         path.push(linkNames[f]);
                     } else {
                         const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\.css(?:\\?.*|;.*)?$', 'i');
