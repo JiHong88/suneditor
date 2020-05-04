@@ -601,12 +601,7 @@
                     currentModule.openModify.call(this, true);
                     currentContext._captionChecked = currentContext.captionCheckEl.checked = caption;
     
-                    if (pluginName === 'image') {
-                        currentModule.update_image.call(this, false, false, false);
-                    } else if (pluginName === 'video') {
-                        this.context.dialog.updateModal = true;
-                        currentModule.submitAction.call(this);
-                    }
+                    currentModule.update_image.call(this, false, false, false);
     
                     if (caption) {
                         const captionText = this.util.getChildElement(currentContext._caption, function (current) {

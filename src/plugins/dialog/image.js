@@ -611,15 +611,18 @@ export default {
         imageEl.alt = contextImage._altText;
         
         // caption
+        let modifiedCaption = false;
         if (contextImage._captionChecked) {
             if (!contextImage._caption) {
                 contextImage._caption = this.plugins.component.create_caption.call(this);
                 cover.appendChild(contextImage._caption);
+                modifiedCaption = true;
             }
         } else {
             if (contextImage._caption) {
                 this.util.removeItem(contextImage._caption);
                 contextImage._caption = null;
+                modifiedCaption = true;
             }
         }
 
@@ -658,7 +661,7 @@ export default {
         }
 
         // transform
-        if (!contextImage._onlyPercentage && changeSize) {
+        if (modifiedCaption || (!contextImage._onlyPercentage && changeSize)) {
             if (!init && (/\d+/.test(imageEl.style.height) || (this.context.resizing._rotateVertical && contextImage._captionChecked))) {
                 if (/%$/.test(contextImage.inputX.value) || /%$/.test(contextImage.inputY.value)) {
                     this.plugins.resizing.resetTransform.call(this, imageEl);
