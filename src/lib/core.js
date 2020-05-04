@@ -5115,6 +5115,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
                             const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
                             if (fileComponentInfo) {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
                             }
@@ -5138,7 +5140,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
 
                     // component
-                    if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null) && range.startOffset === selectionNode.textContent.length) {
+                    if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null || (util.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
                         let nextEl = formatEl.nextElementSibling;
                         if (!nextEl) {
                             e.preventDefault();
