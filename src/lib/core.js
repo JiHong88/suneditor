@@ -5772,6 +5772,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
 
+            if (typeof functions.onDrop === 'function' && !functions.onDrop(e, dataTransfer, core)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             // files
             const files = dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
@@ -5790,8 +5796,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     functions.insertHTML(cleanData, true);
                 }
             }
-
-            if (functions.onDrop) functions.onDrop(e, core);
         },
 
         onmouseMove_wysiwyg: function (e) {

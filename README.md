@@ -585,10 +585,10 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 
-// Table
+// Table----------------------------------------------------------------------------------------------------------
 tableCellController : Choose whether to display the table cell controller.      default: true {Boolean}
 
-// Key actions
+// Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
@@ -754,8 +754,6 @@ editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 
 editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
-editor.onDrop = function (e, core) { console.log('onDrop', e) }
-
 editor.onFocus = function (e, core) { console.log('onFocus', e) }
 
 editor.onBlur = function (e, core) { console.log('onBlur', e) }
@@ -775,11 +773,22 @@ editor.onload = function (core, reload) {
 // Called before the editor's default event action.
 // If it returns false, it stops without executing the rest of the action.
 /**
- * cleanData : HTML string modified for editor format
- * maxCharCount : maxChartCount option (true if max character is exceeded)
+ * e: Event object
+ * cleanData: HTML string modified for editor format
+ * maxCharCount: maxChartCount option (true if max character is exceeded)
  * core: Core object
-*/
+ */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Drop event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
+/**
+ * e: Event object
+ * dataTransfer: e.dataTransfer
+ * core: Core object
+ */
+editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
 // Called before the image is uploaded
 // If false is returned, no image upload is performed.
