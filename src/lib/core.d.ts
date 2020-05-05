@@ -546,8 +546,9 @@ interface Toolbar {
 
 type EventFn = (e: Event, core: Core) => void;
 
-type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentImage: any };
-type videoInputInformation = { inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentVideo: any };
+type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
+type videoInputInformation = { inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
+type audioInputInformation = { isUpdate: boolean, element: any };
 
 export default class SunEditor {
     constructor(context: Context,
@@ -599,7 +600,7 @@ export default class SunEditor {
      * - inputHeight: Value of height input
      * - align: Align Check Value
      * - isUpdate: Update image if true, create image if false
-     * - currentImage: If isUpdate is true, the currently selected image.
+     * - element: If isUpdate is true, the currently selected image.
      * @param core Core object
      */
     imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
@@ -625,6 +626,16 @@ export default class SunEditor {
     onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean;
 
     /**
+     * @description Called before the audio is uploaded
+     * If false is returned, no audio upload is performed.
+     * @param files Files array
+     * @param info Input information
+     * @param core Core object
+     * @returns
+     */
+    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core) => boolean;
+
+    /**
      * @description Called when the image is uploaded, updated, deleted
      * @param targetElement Target element
      * @param index Uploaded index
@@ -641,7 +652,6 @@ export default class SunEditor {
      * @param core Core object
      */
     onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
-
 
     /**
      * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -662,6 +672,24 @@ export default class SunEditor {
     onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
+     * @description Called when the audio is uploaded, updated, deleted
+     * @param targetElement Target element
+     * @param index Uploaded index
+     * @param state Upload status ('create', 'update', 'delete')
+     * @param info Info object
+     * - index: data index
+     * - name: file name
+     * - size: file size
+     * - select: select function
+     * - delete: delete function
+     * - element: target element
+     * - src: src attribute of tag
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
+     * @param core Core object
+     */
+    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+
+    /**
      * @description Called when the image is upload failed
      * @param errorMessage Error message
      * @param result Response Object
@@ -678,6 +706,15 @@ export default class SunEditor {
      * @returns
      */
     onVideoUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Called when the audio upload failed
+     * @param errorMessage Error message
+     * @param result Response Object
+     * @param core Core object
+     * @returns
+     */
+    onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
 
     /**
      * @description Add or reset option property

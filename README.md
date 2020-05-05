@@ -585,8 +585,36 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 
+// Audio----------------------------------------------------------------------------------------------------------
+audioWidth      : The default width size of the audio frame.           default: '300px' {String}
+audioHeight     : The default height size of the audio frame.          default: '54px' {String}
+audioSizeOnlyPercentage : If true, audio size can only be scaled by percentage.   default: false {Boolean}
+audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {Boolean}
+audioUrlInput   : Choose whether to create a audio url input tag in the audio upload window.
+                  If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
+audioUploadHeader : Http Header when uploading audios.              default: null {Object}
+audioUploadUrl  : The audio upload to server mapping address.       default: null {String}
+                  ex) "/editor/uploadAudio.ajax"
+                  request format: {
+                            "file-0": File,
+                            "file-1": File
+                        }
+                  Use audio tags. (supported audio formats: '.mp4', '.webm', '.ogg')
+                  response format: {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "url": "/download/editorAudios/test_audio.mp3",
+                                    "name": "test_audio.mp3",
+                                    "size": "561276"
+                                }
+                            ]
+                        }
+audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
+                      Invokes the "onAudioUploadError" method.  default: null {Number}
+
 // Table----------------------------------------------------------------------------------------------------------
-tableCellController : Choose whether to display the table cell controller.      default: true {Boolean}
+tableCellControllerPosition : Define position to the table cell controller('cell', 'top').   default: 'cell' {String}
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
@@ -801,7 +829,7 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  * - inputHeight: Value of height input
  * - align: Align Check Value
  * - isUpdate: Update image if true, create image if false
- * - currentImage: If isUpdate is true, the currently selected image.
+ * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object
  * return {Boolean}
@@ -813,16 +841,35 @@ editor.onImageUploadBefore: function (files, info, core) {
 }
 // Called before the video is uploaded
 // If false is returned, no video(iframe, video) upload is performed.
-// -- arguments is same "onImageUploadBefore" --
-/** info: {
+/** 
+ * files: Files array
+ * info: {
  * - inputWidth: Value of width input
  * - inputHeight: Value of height input
  * - align: Align Check Value
  * - isUpdate: Update video if true, create video if false
- * - currentVideo: If isUpdate is true, the currently selected video.
-* }
-*/
+ * - element: If isUpdate is true, the currently selected video.
+ * }
+ * core: Core object
+ * return {Boolean}
+ */
 editor.onVideoUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
+// Called before the audio is uploaded
+// If false is returned, no audio upload is performed.
+/** 
+* files: Files array
+* info: {
+* - isUpdate: Update audio if true, create audio if false
+* - currentaudio: If isUpdate is true, the currently selected audio.
+* }
+* core: Core object
+* return {Boolean}
+*/
+editor.onAudioUploadBefore: function (files, info, core) {
     console.log('files', files);
     console.log('info', info);
     return Boolean
@@ -855,6 +902,12 @@ editor.onVideoUpload = function (targetElement, index, state, info, remainingFil
     console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
     console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
 }
+// Called when the audio is is uploaded, updated, deleted
+// -- arguments is same "onImageUpload" --
+editor.onAudioUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
+}
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
@@ -874,6 +927,12 @@ editor.onVideoUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
     return Boolean
 }
+// Called when the audio upload failed
+// -- arguments is same "onImageUploadError" --
+editor.onAudioUploadError = function (errorMessage, result, core) {
+    alert(errorMessage)
+    return Boolean
+}
 
 // It replaces the default callback function of the image upload
 /**
@@ -885,7 +944,7 @@ editor.onVideoUploadError = function (errorMessage, result, core) {
  * - inputHeight: Value of height input
  * - align: Align Check Value
  * - isUpdate: Update image if true, create image if false
- * - currentImage: If isUpdate is true, the currently selected image.
+ * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object
  */
@@ -911,7 +970,7 @@ editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
             file = {name: fileList[i].name, size: fileList[i].size};
             // For existing image updates, the "info" attributes are predefined in the element.
             // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
-            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.currentImage, file);
+            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.element, file);
             // The image is created and a format element(p, div..) is added below it.
             else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
         }

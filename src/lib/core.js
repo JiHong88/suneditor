@@ -6022,7 +6022,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - inputHeight: Value of height input
          * - align: Align Check Value
          * - isUpdate: Update image if true, create image if false
-         * - currentImage: If isUpdate is true, the currently selected image.
+         * - element: If isUpdate is true, the currently selected image.
          * @param {Object} core Core object
          */
         imageUploadHandler: null,
@@ -6031,7 +6031,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Called before the image is uploaded
          * If false is returned, no image upload is performed.
          * @param {Array} files Files array
-         * @param {Object} info Input information
+         * @param {Object} info info: {
+         * - linkValue: Link url value
+         * - linkNewWindow: Open in new window Check Value
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update image if true, create image if false
+         * - element: If isUpdate is true, the currently selected image.
+         * }
          * @param {Object} core Core object
          * @returns {Boolean}
          */
@@ -6039,9 +6047,30 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the video is uploaded
          * If false is returned, no video(iframe, video) upload is performed.
-         * -- arguments is same "onImageUploadBefore" --
+         * @param {Array} files Files array
+         * @param {Object} info info: {
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update video if true, create video if false
+         * - element: If isUpdate is true, the currently selected video.
+         * }
+         * @param {Object} core Core object
+         * @returns {Boolean}
          */
         onVideoUploadBefore: null,
+        /**
+         * @description Called before the audio is uploaded
+         * If false is returned, no audio upload is performed.
+         * @param {Array} files Files array
+         * @param {Object} info info: {
+         * - isUpdate: Update audio if true, create audio if false
+         * - element: If isUpdate is true, the currently selected audio.
+         * }
+         * @param {Object} core Core object
+         * @returns {Boolean}
+         */
+        onAudioUploadBefore: null,
 
         /**
          * @description Called when the image is uploaded, updated, deleted
@@ -6065,6 +6094,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * -- arguments is same "onImageUpload" --
          */
         onVideoUpload: null,
+         /**
+         * @description Called when the audio is is uploaded, updated, deleted
+         * -- arguments is same "onImageUpload" --
+         */
+        onAudioUpload: null,
 
         /**
          * @description Called when the image is upload failed
@@ -6079,6 +6113,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * -- arguments is same "onImageUploadError" --
          */
         onVideoUploadError: null,
+        /**
+         * @description Called when the audio upload failed
+         * -- arguments is same "onImageUploadError" --
+         */
+        onAudioUploadError: null,
 
         /**
          * @description Add or reset option property

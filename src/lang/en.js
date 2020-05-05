@@ -98,6 +98,11 @@
                 file: 'Select from files',
                 url: 'Media embed URL, YouTube'
             },
+            audioBox: {
+                title: 'Insert Audio',
+                file: 'Select from files',
+                url: 'Audio URL'
+            },
             caption: 'Insert description',
             close: 'Close',
             submitButton: 'Submit',

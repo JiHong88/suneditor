@@ -1051,7 +1051,6 @@
             <span class="pl-c1">_uploadFileLength</span>: <span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-c">// <span class="pl-k">@Override</span> fileManager</span>
             <span class="pl-c1">focusElement</span>: null<span class="pl-kos">,</span> <span class="pl-c">// <span class="pl-k">@Override</span> // This element has focus when the dialog is opened.</span>
             <span class="pl-c1">targetSelect</span>: null<span class="pl-kos">,</span>
-            <span class="pl-c1">linkAnchorText</span>: null<span class="pl-kos">,</span>
             <span class="pl-c">// <span class="pl-k">@require</span> <span class="pl-k">@Override</span> component</span>
             <span class="pl-c1">_element</span>: null<span class="pl-kos">,</span>
             <span class="pl-c1">_cover</span>: null<span class="pl-kos">,</span>
@@ -1305,7 +1304,6 @@
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">_uploadFileLength</span> <span class="pl-c1">=</span> <span class="pl-s1">files</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span>
         <span class="pl-k">const</span> <span class="pl-s1">filesLen</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">updateModal</span> ? <span class="pl-c1">1</span> : <span class="pl-s1">files</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span>
         <span class="pl-k">const</span> <span class="pl-s1">info</span> <span class="pl-c1">=</span> <span class="pl-kos">{</span>
-            <span class="pl-c1">align</span>: <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">_align</span><span class="pl-kos">,</span>
             <span class="pl-c1">isUpdate</span>: <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">context</span><span class="pl-kos">.</span><span class="pl-c1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">updateModal</span><span class="pl-kos">,</span>
             <span class="pl-c1">element</span>: <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">_element</span>
         <span class="pl-kos">}</span><span class="pl-kos">;</span>
@@ -1332,7 +1330,7 @@
             <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">info</span><span class="pl-kos">.</span><span class="pl-c1">isUpdate</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
                 <span class="pl-s1">oAudio</span> <span class="pl-c1">=</span> <span class="pl-s1">info</span><span class="pl-kos">.</span><span class="pl-c1">element</span><span class="pl-kos">;</span>
             <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
-                <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'AUDIO'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+                <span class="pl-s1">oAudio</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'AUDIO'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
                 <span class="pl-s1">oAudio</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'controls'</span><span class="pl-kos">,</span> <span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
             <span class="pl-kos">}</span>
 
@@ -1381,7 +1379,7 @@
             <span class="pl-k">const</span> <span class="pl-s1">container</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">plugins</span><span class="pl-kos">.</span><span class="pl-c1">component</span><span class="pl-kos">.</span><span class="pl-c1">set_container</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">,</span> <span class="pl-s1">cover</span><span class="pl-kos">,</span> <span class="pl-s">''</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
             <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">insertComponent</span><span class="pl-kos">(</span><span class="pl-s1">container</span><span class="pl-kos">,</span> <span class="pl-c1">false</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-kos">}</span> <span class="pl-c">// update</span>
-        <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">_element</span><span class="pl-kos">.</span><span class="pl-c1">src</span> !== <span class="pl-s1">src</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">else</span> <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-c1">element</span><span class="pl-s1"> && </span><span class="pl-c1">element</span><span class="pl-kos">.</span><span class="pl-c1">src</span> !== <span class="pl-s1">src</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
             <span class="pl-s1">element</span> <span class="pl-c1">=</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">_element</span><span class="pl-kos">;</span>
             <span class="pl-s1">element</span><span class="pl-kos">.</span><span class="pl-c1">src</span> <span class="pl-c1">=</span> <span class="pl-s1">src</span>
         <span class="pl-kos">}</span> <span class="pl-c">// not changed</span>
@@ -2532,7 +2530,6 @@
             context._uploadFileLength = files.length;
             const filesLen = this.context.dialog.updateModal ? 1 : files.length;
             const info = {
-                align: context._align,
                 isUpdate: this.context.dialog.updateModal,
                 element: context._element
             };
@@ -2559,7 +2556,7 @@
                 if (info.isUpdate) {
                     oAudio = info.element;
                 } else {
-                    this.util.createElement('AUDIO');
+                    oAudio = this.util.createElement('AUDIO');
                     oAudio.setAttribute('controls', true);
                 }
 
@@ -2608,12 +2605,13 @@
                 const container = this.plugins.component.set_container.call(this, cover, '');
                 this.insertComponent(container, false);
             } // update
-            else if (context._element.src !== src) {
-                element = context._element;
-                element.src = src
-            } // not changed
             else {
-                return;
+                if (context._element) element = context._element;
+                if (element && element.src !== src) {
+                    element.src = src
+                } else {
+                    return;
+                }
             }
 
             // call fileManager.setInfo when updated tag

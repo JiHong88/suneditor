@@ -75,6 +75,11 @@ export interface Lang {
       file: string,
       url: string
     },
+    audioBox: {
+      title: string,
+      file: string,
+      url: string
+    },
     caption: string,
     close: string,
     submitButton: string,

@@ -389,7 +389,7 @@ export default {
             inputHeight: contextImage.inputY.value,
             align: contextImage._align,
             isUpdate: this.context.dialog.updateModal,
-            currentImage: contextImage._element
+            element: contextImage._element
         };
 
         if (typeof this.functions.onImageUploadBefore === 'function' && !this.functions.onImageUploadBefore(files, info, this)) return;
@@ -421,7 +421,7 @@ export default {
                 for (let i = 0, len = fileList.length, file; i < len; i++) {
                     file = { name: fileList[i].name, size: fileList[i].size };
                     if (info.isUpdate) {
-                        this.plugins.image.update_src.call(this, fileList[i].url, info.currentImage, file);
+                        this.plugins.image.update_src.call(this, fileList[i].url, info.element, file);
                         break;
                     } else {
                         this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);

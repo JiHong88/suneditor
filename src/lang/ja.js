@@ -98,6 +98,11 @@
                 file: 'ファイルの選択',
                 url: 'メディア埋め込まアドレス,YouTube'
             },
+            audioBox: {
+                title: 'オーディオを挿入',
+                file: 'ファイルの選択',
+                url: 'オーディオアドレス'
+            },
             caption: '説明付け',
             close: '閉じる',
             submitButton: '確認',

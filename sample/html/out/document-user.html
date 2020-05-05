@@ -856,7 +856,7 @@
                         <strong>inputHeight</strong>: Value of height input<br>
                         <strong>align</strong>: Align Check Value<br>
                         <strong>isUpdate</strong>: Update image if true, create image if false<br>
-                        <strong>currentImage</strong>: If isUpdate is true, the currently selected image<br>
+                        <strong>element</strong>: If isUpdate is true, the currently selected image<br>
                     </td>
                 </tr>
                 <tr>
@@ -1014,7 +1014,7 @@
                         <strong>inputHeight:</strong> Value of height input<br>
                         <strong>align:</strong> Align Check Value<br>
                         <strong>isUpdate:</strong> Update image if true, create image if false<br>
-                        <strong>currentImage:</strong> If isUpdate is true, the currently selected image.
+                        <strong>element:</strong> If isUpdate is true, the currently selected image.
                     </td>
                 </tr>
                 <tr>
@@ -1061,7 +1061,7 @@
                         <strong>inputHeight</strong>: Value of height input<br>
                         <strong>align</strong>: Align Check Value<br>
                         <strong>isUpdate</strong>: Update video if true, create video if false<br>
-                        <strong>currentVideo</strong>: If isUpdate is true, the currently selected video<br>
+                        <strong>element</strong>: If isUpdate is true, the currently selected video<br>
                     </td>
                 </tr>
                 <tr>
@@ -1075,7 +1075,7 @@
             </table>
             <dl class="details"></dl>
 
-
+            
             <h4 class="name" id="onVideoUpload"><span class="type-signature"></span>onVideoUpload<span
                     class="signature">(targetElement, index, state, info, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1149,6 +1149,159 @@
                     class="signature">(errorMessage, result, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
                 Called when the video(iframe, video) upload failed
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>errorMessage</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Error message to show</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>result</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Response object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onAudioUploadBefore"><span class="type-signature"></span>onAudioUploadBefore<span
+                    class="signature">(files, info, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                Called before the audio is uploaded.<br>
+                If false is returned, no audio upload is performed.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>files</code></td>
+                    <td class="type">
+                        <span class="param-type">FileList</span>
+                    </td>
+                    <td class="description last">Files array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>info</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        <strong>isUpdate</strong>: Update audio if true, create audio if false<br>
+                        <strong>element</strong>: If isUpdate is true, the currently selected audio<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onAudioUpload"><span class="type-signature"></span>onAudioUpload<span
+                    class="signature">(targetElement, index, state, info, remainingFilesCount, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Called when the audio is uploaded, updated, deleted
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>targetElement</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Target element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>index</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Uploaded index (key value)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>state</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Upload status ('create', 'update', 'delete')</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>info</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        <strong>index</strong>: data index<br>
+                        <strong>name</strong>: file name<br>
+                        <strong>size</strong>: file size<br>
+                        <strong>select</strong>: select function<br>
+                        <strong>delete</strong>: delete function<br>
+                        <strong>element</strong>: target element<br>
+                        <strong>src</strong>: src attribute of tag<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>remainingFilesCount</code></td>
+                    <td class="type">
+                        <span class="param-type">Number</span>
+                    </td>
+                    <td class="description last">Count of remaining files to upload (0 when added as a url)</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onAudioUploadError"><span class="type-signature"></span>onAudioUploadError<span
+                    class="signature">(errorMessage, result, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                Called when the audio upload failed
             </div>
             <table class="params">
                 <thead>
@@ -1314,6 +1467,9 @@
         <li><a href="document-user.html#onVideoUploadBefore">onVideoUploadBefore</a></li>
         <li><a href="document-user.html#onVideoUpload">onVideoUpload</a></li>
         <li><a href="document-user.html#onVideoUploadError">onVideoUploadError</a></li>
+        <li><a href="document-user.html#onAudioUploadBefore">onAudioUploadBefore</a></li>
+        <li><a href="document-user.html#onAudioUpload">onAudioUpload</a></li>
+        <li><a href="document-user.html#onAudioUploadError">onAudioUploadError</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>
         <li><a href="document-user.html#showController">showController</a></li>
     </ul>

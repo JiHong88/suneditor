@@ -98,6 +98,11 @@
                 file: 'Seleziona da file',
                 url: 'Indirizzo video, YouTube'
             },
+            audioBox: {
+                title: 'Insertar Audio',
+                file: 'Seleziona da file',
+                url: 'Indirizzo audio'
+            },
             caption: 'Inserisci descrizione',
             close: 'ClChiudiose',
             submitButton: 'Invia',

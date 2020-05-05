@@ -260,7 +260,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
         'table', 
-        'link', 'image', 'video', 'math',
+        'link', 'image', 'video', 'audio', 'math',
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ],
@@ -277,7 +277,11 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     videoFileInput: true,
     videoUploadUrl: 'http://localhost:3000/editor/upload',
     imageUploadUrl: 'http://localhost:3000/editor/upload',
-    tableCellController: false,
+    audioUploadUrl: 'http://localhost:3000/editor/upload',
+    audioFileInput: true,
+    audioWidth: '100px',
+    audioHeight: '30px',
+    tableCellControllerPosition: 'top',
     // attributesWhitelist: {
     //     table: "style",
     //     tbody: "style",
@@ -331,7 +335,7 @@ ss.onKeyUp = function (e) {
 ss.onDrop = function (e) {
     // console.log('onDrop', e);
 };
-ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
+ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
     console.log('videoInfo-----', videoInfo)
 }
@@ -339,10 +343,10 @@ ss.onVideoUpload = function (targetElement, index, state, videoInfo) {
 //     console.log('video error-----', messge)
 //     return true
 // }
-ss.onVideoUploadBefore = function (files, info, core) {
+ss.onAudioUploadBefore = function (files, info, core) {
     console.log('before-----', files)
     console.log('before----info-', info)
-    return false
+    return true
 }
 ss.onChange = function (contents, core) {
     console.log('change', core.context.video._infoList)

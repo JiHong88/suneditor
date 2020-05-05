@@ -366,7 +366,7 @@ export default {
             inputHeight: contextVideo.inputY.value,
             align: contextVideo._align,
             isUpdate: this.context.dialog.updateModal,
-            currentVideo: contextVideo._element
+            element: contextVideo._element
         };
 
         if (typeof this.functions.onVideoUploadBefore === 'function' && !this.functions.onVideoUploadBefore(files, info, this)) return;
@@ -399,7 +399,7 @@ export default {
 
                 for (let i = 0, len = fileList.length, file; i < len; i++) {
                     file = { name: fileList[i].name, size: fileList[i].size };
-                    this.plugins.video.create_video.call(this, (info.isUpdate ? info.currentVideo : videoTag.cloneNode(false)), fileList[i].url, info.inputWidth, info.inputHeight, info.align, file, info.isUpdate);
+                    this.plugins.video.create_video.call(this, (info.isUpdate ? info.element : videoTag.cloneNode(false)), fileList[i].url, info.inputWidth, info.inputHeight, info.align, file, info.isUpdate);
                 }
             }
         }

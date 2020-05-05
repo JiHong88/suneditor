@@ -98,6 +98,11 @@
                 file: '上传图片',
                 url: '嵌入网址'
             },
+            audioBox: {
+                title: '插入音频',
+                file: '上传图片',
+                url: '音频网址'
+            },
             caption: '标题',
             close: '取消',
             submitButton: '确定',

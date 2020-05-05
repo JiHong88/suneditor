@@ -98,6 +98,11 @@
                 file: 'Sélectionner le fichier',
                 url: 'URL d’intégration du média, YouTube'
             },
+            audioBox: {
+                title: 'Insertar une l\'audio',
+                file: 'Sélectionner le fichier',
+                url: 'Adresse URL du fichier'
+            },
             caption: 'Insérer une description',
             close: 'Fermer',
             submitButton: 'Appliquer',

@@ -99,6 +99,11 @@
                 file: 'Selecionar arquivos',
                 url: 'URL do YouTube'
             },
+            audioBox: {
+                title: 'Inserir audio',
+                file: 'Selecionar arquivos',
+                url: 'URL da audio'
+            },
             caption: 'Inserir descrição',
             close: 'Fechar',
             submitButton: 'Enviar',

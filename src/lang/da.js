@@ -101,6 +101,11 @@
                 file: 'Indsæt fra fil',
                 url: 'Indlejr video / YouTube'
             },
+            audioBox: {
+                title: 'Indsæt Audio',
+                file: 'Indsæt fra fil',
+                url: 'Indsæt fra URL'
+            },
             caption: 'Indsæt beskrivelse',
             close: 'Luk',
             submitButton: 'Gennemfør',

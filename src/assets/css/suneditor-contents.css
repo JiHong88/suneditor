@@ -425,6 +425,9 @@
     width: 300px;
     height: 54px;
 }
+.sun-editor-editable audio.active {
+    outline: 2px solid #80bdff;
+}
 
 /** --- show blocks mode */
 .sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 

@@ -98,6 +98,11 @@
                 file: 'Datei auswählen',
                 url: 'Video-URL, YouTube'
             },
+            audioBox: {
+                title: 'Audio enfügen',
+                file: 'Datei auswählen',
+                url: 'Audio-URL'
+            },
             caption: 'Beschreibung eingeben',
             close: 'Schließen',
             submitButton: 'Übernehmen',

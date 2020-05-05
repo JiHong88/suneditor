@@ -299,13 +299,45 @@ export interface SunEditorOptions {
      */
     videoUploadSizeLimit?: number;
     /**
+     * Audio
+     * =====
+     */
+    /**
+     * The default width size of the audio frame
+     */
+    audioWidth?: string;
+    /**
+     * The default height size of the audio frame
+     */
+    audioHeight?: string;
+    /**
+     * Choose whether to create a file input tag in the audio upload window
+     */
+    audioFileInput?: boolean;
+    /**
+     * Choose whether to create a audio url input tag in the audio upload window
+     */
+    audioUrlInput?: boolean;
+    /**
+     * Http Header when uploading audios.
+     */
+    audioUploadHeader?: Record<string, string>;
+    /**
+     * The audio upload to server mapping address
+     */
+    audioUploadUrl?: string;
+    /**
+     * The size of the total uploadable audios (in bytes)
+     */
+    audioUploadSizeLimit?: number;
+    /**
      * Table
      * =====
      */
     /**
-     * Choose whether to display the table cell controller.
+     * Define position to the table cell controller. ('cell', 'top')
      */
-    tableCellController?: boolean;
+    tableCellControllerPosition?: string;
     /**
      * Defining save button
      * ====================
