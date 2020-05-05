@@ -473,8 +473,16 @@ export default {
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = options.videoUploadUrl || null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
+        /** Audio */
+        options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
+        options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
+        options.audioFileInput = !!options.audioFileInput;
+        options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
+        options.audioUploadHeader = options.audioUploadHeader || null;
+        options.audioUploadUrl = options.audioUploadUrl || null;
+        options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
         /** Table */
-        options.tableCellController = options.tableCellController === undefined ? true : options.tableCellController;
+        options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
         /** Defining save button */
@@ -549,6 +557,7 @@ export default {
             link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
             image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
             video: ['', lang.toolbar.video, 'video', 'dialog', icons.video],
+            audio: ['', lang.toolbar.audio, 'audio', 'dialog', icons.audio],
             math: ['', lang.toolbar.math, 'math', 'dialog', icons.math]
         };
     },
