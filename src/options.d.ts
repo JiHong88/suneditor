@@ -49,9 +49,9 @@ export interface SunEditorOptions {
      */
     fullPage?: boolean;
     /**
-     * Name of the CSS file to apply inside the iframe.
+     * Name of the CSS file(s) to apply inside the iframe.
      */
-    iframeCSSFileName?: string;
+    iframeCSSFileName?: string | string[];
     /**
      * CodeMirror core object
      */
