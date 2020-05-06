@@ -782,15 +782,20 @@ export default class SunEditor {
     getImagesInfo(): fileInfo[];
 
     /**
-     * @description Gets uploaded videos(iframe, video) informations
+     * @description Gets uploaded files(plugin using fileManager) information list.
+     * image: [img], video: [video, iframe], audio: [audio]
+     * When the argument value is 'image', it is the same function as "getImagesInfo".
      * - index: data index
+     * - name: file name
+     * - size: file size
      * - select: select function
      * - delete: delete function
-     * - element: target element
-     * - src: src attribute of tag
+     * - element: img element
+     * - src: src attribute of img tag
+     * @param pluginName Plugin name (image, video, audio)
      * @returns
      */
-    getVideosInfo(): fileInfo[];
+    getFilesInfo(pluginName: string): fileInfo[];
 
      /**
      * @description Upload images using image plugin

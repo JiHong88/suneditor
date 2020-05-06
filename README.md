@@ -721,6 +721,23 @@ editor.getContents(onlyContents: Boolean);
  **/
 editor.getImagesInfo();
 
+// Gets uploaded files(plugin using fileManager) information list.
+// image: [img], video: [video, iframe], audio: [audio]
+// When the argument value is 'image', it is the same function as "getImagesInfo".
+/** 
+ * {
+ *  element: image element
+ *  src: imgage src
+ *  index: data index
+ *  name: file name
+ *  size: file size
+ *  select: select function
+ *  delete: delete function
+ * }
+ * pluginName: Plugin name (image, video, audio)
+ **/
+editor.getFilesInfo(pluginName);
+
 // Upload images using image plugin
 // document.getElementById('example_files_input').files
 editor.insertImage(FileList);

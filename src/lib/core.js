@@ -6304,9 +6304,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         getImagesInfo: function () {
             return context.image ? context.image._infoList : [];
         },
-
+        
         /**
-         * @description Gets uploaded videos(iframe, video) informations
+         * @description Gets uploaded files(plugin using fileManager) information list.
+         * image: [img], video: [video, iframe], audio: [audio]
+         * When the argument value is 'image', it is the same function as "getImagesInfo".
          * - index: data index
          * - name: file name
          * - size: file size
@@ -6314,10 +6316,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - delete: delete function
          * - element: target element
          * - src: src attribute of tag
+         * @param {String} pluginName Plugin name (image, video, audio)
          * @returns {Array}
          */
-        getVideosInfo: function () {
-            return context.video ? context.video._infoList : [];
+        getFilesInfo: function (pluginName) {
+            return context[pluginName] ? context[pluginName]._infoList : [];
         },
 
         /**

@@ -178,7 +178,7 @@
         <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
-        <button type="button" class="btn btn-md btn-success" onclick="sun_getVideosInfo()">getVideosInfo</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getFilesInfo('video')">getFilesInfo('video')</button>
         <div>
             <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
             <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
@@ -625,8 +625,8 @@
         console.log(suneditor.getImagesInfo());
     }
 
-    function sun_getVideosInfo() {
-        console.log(suneditor.getVideosInfo());
+    function sun_getFilesInfo(pluginName) {
+        console.log(suneditor.getFilesInfo(pluginName));
     }
 
     function sun_insertImage() {
