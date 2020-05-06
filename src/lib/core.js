@@ -4282,7 +4282,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
-            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
+            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
