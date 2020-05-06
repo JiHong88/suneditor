@@ -51,6 +51,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _ww: null,
+        
+        /**
+         * @description Closest ShadowRoot to editor if found
+         * @private
+         */
+        _shadowRoot: null,
 
         /**
          * @description Util object
@@ -748,7 +754,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object}
          */
         getSelection: function () {
-            return this._ww.getSelection();
+            return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this._ww.getSelection();
         },
 
         /**
@@ -4233,6 +4239,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
+            
+            if (!options.iframe && typeof ShadowRoot === 'function') {
+                let child = context.element.wysiwygFrame
+                while (child) {
+                    if (child.shadowRoot) {
+                        this._shadowRoot = child.shadowRoot
+                        break
+                    } else if (child instanceof ShadowRoot) {
+                        this._shadowRoot = child
+                        break
+                    }
+                    child = child.parentNode
+                }
+            }
             
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
