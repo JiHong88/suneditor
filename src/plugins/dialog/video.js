@@ -60,7 +60,7 @@ export default {
         contextVideo.modal = video_dialog;
         contextVideo.videoInputFile = video_dialog.querySelector('._se_video_file');
         contextVideo.videoUrlFile = video_dialog.querySelector('.se-input-url');
-        contextVideo.focusElement = (contextVideo.videoUrlFile || contextVideo.videoInputFile);
+        contextVideo.focusElement = contextVideo.videoUrlFile || contextVideo.videoInputFile;
 
         /** add event listeners */
         video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
@@ -106,7 +106,7 @@ export default {
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
         let html = '' +
-            '<form class="editor_video">' +
+            '<form method="post" enctype="multipart/form-data">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         this.icons.cancel +
@@ -114,24 +114,25 @@ export default {
                     '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
                 '</div>' +
                 '<div class="se-dialog-body">';
-            if (option.videoFileInput) {
-                html += '' +
-                    '<div class="se-dialog-form">' +
-                        '<label>' + lang.dialogBox.videoBox.file + '</label>' +
-                        '<div class="se-dialog-form-files">' +
-                            '<input class="se-input-form _se_video_file" type="file" accept="video/*" multiple="multiple" />' +
-                            '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
-                        '</div>' +
-                    '</div>' ;
-            }
 
-            if (option.videoUrlInput) {
-                html += '' + 
-                    '<div class="se-dialog-form">' +
-                        '<label>' + lang.dialogBox.videoBox.url + '</label>' +
-                        '<input class="se-input-form se-input-url" type="text" />' +
-                    '</div>';
-            }
+                if (option.videoFileInput) {
+                    html += '' +
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.videoBox.file + '</label>' +
+                            '<div class="se-dialog-form-files">' +
+                                '<input class="se-input-form _se_video_file" type="file" accept="video/*" multiple="multiple" />' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                            '</div>' +
+                        '</div>' ;
+                }
+    
+                if (option.videoUrlInput) {
+                    html += '' +
+                        '<div class="se-dialog-form">' +
+                            '<label>' + lang.dialogBox.videoBox.url + '</label>' +
+                            '<input class="se-input-form se-input-url" type="text" />' +
+                        '</div>';
+                }
 
             if (option.videoResizing) {
                 const ratioList = option.videoRatioList || [{name: '16:9', value: 0.5625}, {name: '4:3', value: 0.75}, {name: '21:9', value: 0.4285}];

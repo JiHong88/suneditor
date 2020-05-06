@@ -46,8 +46,9 @@ export default {
         audio_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
+        audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         if (contextAudio.audioInputFile) audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, context.audioInputFile, context.audioUrlFile));
-        if (contextAudio.audioInputFile && contextAudio.audioUrlFile) audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        if (contextAudio.audioInputFile && contextAudio.audioUrlFile) contextAudio.audioFileInput.addEventListener('change', this._fileInputChange.bind(contextAudio));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));
 
         /** append html */
@@ -69,7 +70,7 @@ export default {
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
         let html = '' +
-            '<form class="editor_link">' +
+            '<form method="post" enctype="multipart/form-data">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         this.icons.cancel +
@@ -77,6 +78,7 @@ export default {
                     '<span class="se-modal-title">' + lang.dialogBox.audioBox.title + '</span>' +
                 '</div>' +
                 '<div class="se-dialog-body">';
+
                 if (option.audioFileInput) {
                     html += '' +
                         '<div class="se-dialog-form">' +
@@ -131,6 +133,12 @@ export default {
             '</div>';
 
         return link_btn;
+    },
+
+    // Disable url input when uploading files
+    _fileInputChange: function () {
+        if (!this.audioInputFile.value) this.audioUrlFile.removeAttribute('disabled');
+        else this.audioUrlFile.setAttribute('disabled', true);
     },
 
     // Disable url input when uploading files
@@ -230,10 +238,10 @@ export default {
         e.stopPropagation();
 
         try {
-            if (context.audioInputFile.files.length > 0) {
+            if (context.audioInputFile && context.audioInputFile.files.length > 0) {
                 // upload files
                 this.plugins.audio.submitAction.call(this, context.audioInputFile.files);
-            } else if (context.audioUrlFile.value.trim().length > 0) {
+            } else if (context.audioUrlFile && context.audioUrlFile.value.trim().length > 0) {
                 // url
                 this.plugins.audio.setupUrl.call(this, context.audioUrlFile);
             }
@@ -318,12 +326,10 @@ export default {
         }
     },
 
-    setupUrl: function () {
+    setupUrl: function (urlFile) {
         try {
             this.showLoading();
-            const context = this.context.audio;
-            const src = context.audioUrlFile.value.trim();
-
+            const src = urlFile.value.trim();
             if (src.length === 0) return false;
 
             this.plugins.audio.create_audio.call(this, this.plugins.audio._createAudioTag.call(this), src, null, this.context.dialog.updateModal);
@@ -409,7 +415,7 @@ export default {
      * @Required @Override fileManager, resizing
      */
     openModify: function (notOpen) {
-        this.context.audio.audioUrlFile.value = this.context.audio._element.src;
+        if (this.context.audio.audioUrlFile) this.context.audio.audioUrlFile.value = this.context.audio._element.src;
         if (!notOpen) this.plugins.dialog.open.call(this, 'audio', true);
     },
 

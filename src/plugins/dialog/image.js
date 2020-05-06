@@ -63,7 +63,7 @@ export default {
         contextImage.modal = image_dialog;
         contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
         contextImage.imgUrlFile = image_dialog.querySelector('.se-input-url');
-        contextImage.focusElement = (contextImage.imgInputFile || contextImage.imgUrlFile);
+        contextImage.focusElement = contextImage.imgInputFile || contextImage.imgUrlFile;
         contextImage.altText = image_dialog.querySelector('._se_image_alt');
         contextImage.imgLink = image_dialog.querySelector('._se_image_link');
         contextImage.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
@@ -122,30 +122,30 @@ export default {
                 '<button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
                 '<button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
-            '<form class="editor_image" method="post" enctype="multipart/form-data">' +
+            '<form method="post" enctype="multipart/form-data">' +
                 '<div class="_se_tab_content _se_tab_content_image">' +
                     '<div class="se-dialog-body"><div style="border-bottom: 1px dashed #ccc;">';
-
-            if (option.imageFileInput) {
-                html += '' +
-                        '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.imageBox.file + '</label>' +
-                            '<div class="se-dialog-form-files">' +
-                                '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
-                            '</div>' +
-                        '</div>' ;
-            }
-
-            if (option.imageUrlInput) {
-                html += '' +
-                        '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.imageBox.url + '</label>' +
-                            '<input class="se-input-form se-input-url" type="text" />' +
-                        '</div>';
-            }
-
-            html += '</div>' +
+                    
+                    if (option.imageFileInput) {
+                        html += '' +
+                            '<div class="se-dialog-form">' +
+                                '<label>' + lang.dialogBox.imageBox.file + '</label>' +
+                                '<div class="se-dialog-form-files">' +
+                                    '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                                    '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                '</div>' +
+                            '</div>' ;
+                    }
+        
+                    if (option.imageUrlInput) {
+                        html += '' +
+                            '<div class="se-dialog-form">' +
+                                '<label>' + lang.dialogBox.imageBox.url + '</label>' +
+                                '<input class="se-input-form se-input-url" type="text" />' +
+                            '</div>';
+                    }
+        
+                    html += '</div>' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
                         '</div>';

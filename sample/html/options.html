@@ -488,7 +488,7 @@ function sun_create () {
         videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
-        audioFileInput: document.getElementById('audioFileInput').checked ? undefined : false,
+        audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
         audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
         audioWidth: document.getElementById('audioWidth').checked ? document.getElementById('audioWidth_value').value : undefined,
         audioHeight: document.getElementById('audioHeight').checked ? document.getElementById('audioHeight_value').value : undefined,

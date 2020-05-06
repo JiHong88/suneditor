@@ -57,7 +57,7 @@ export default {
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
         dialog.innerHTML = '' +
-        '<form class="editor_math">' +
+        '<form>' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                     this.icons.cancel +

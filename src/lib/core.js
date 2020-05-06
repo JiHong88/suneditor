@@ -4240,17 +4240,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._wd = _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
-            if (!options.iframe && typeof ShadowRoot === 'function') {
-                let child = context.element.wysiwygFrame
+            if (!options.iframe && typeof _w.ShadowRoot === 'function') {
+                let child = context.element.wysiwygFrame;
                 while (child) {
                     if (child.shadowRoot) {
-                        this._shadowRoot = child.shadowRoot
-                        break
-                    } else if (child instanceof ShadowRoot) {
-                        this._shadowRoot = child
-                        break
+                        this._shadowRoot = child.shadowRoot;
+                        break;
+                    } else if (child instanceof _w.ShadowRoot) {
+                        this._shadowRoot = child;
+                        break;
                     }
-                    child = child.parentNode
+                    child = child.parentNode;
                 }
             }
             
