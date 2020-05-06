@@ -287,11 +287,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         activePlugins: null,
 
         /**
-         * @description Plugins array with "checkFileInfo" and "resetFileInfo" methods.
+         * @description Array of "checkFileInfo" functions with the core bound
+         * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
          * "fileInfoPlugins" runs the "add" method when creating the editor.
          * "checkFileInfo" method is always call just before the "change" event.
+         * @private
          */
-        fileInfoPlugins: null,
+        _fileInfoPluginsCheck: null,
+
+        /**
+         * @description Array of "resetFileInfo" functions with the core bound
+         * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
+         * "checkFileInfo" method is always call just before the "functions.setOptions" method.
+         * @private
+         */
+        _fileInfoPluginsReset: null,
 
         /**
          * @description Variables for file component management
@@ -4193,8 +4203,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _checkComponents: function () {
-            for (let i in this.fileInfoPlugins) {
-                this.fileInfoPlugins[i].checkFileInfo.call(this);
+            for (let i in this._fileInfoPluginsCheck) {
+                this._fileInfoPluginsCheck[i]();
             }
         },
 
@@ -4203,8 +4213,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resetComponents: function () {
-            for (let i in this.fileInfoPlugins) {
-                this.fileInfoPlugins[i].resetFileInfo.call(this);
+            for (let i in this._fileInfoPluginsReset) {
+                this._fileInfoPluginsReset[i]();
             }
         },
 
@@ -4292,9 +4302,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 INDENT: context.tool.indent
             };
 
+            // file components
+            this._fileInfoPluginsCheck = [];
+            this._fileInfoPluginsReset = [];
+
             // Command and file plugins registration
             this.activePlugins = [];
-            this.fileInfoPlugins = [];
             this._fileManager.tags = [];
             this._fileManager.pluginMap = {};
 
@@ -4308,7 +4321,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
                 if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
                     this.callPlugin(key, null, button);
-                    this.fileInfoPlugins.push(plugin);
+                    this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
+                    this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
                 }
                 if (plugin.fileTags) {
                     this.callPlugin(key, null, button);
