@@ -1027,6 +1027,9 @@ editor.showController = function (name, controllers, core) {
             <td align="left">video</td>
         </tr>
         <tr>
+            <td align="left">audio</td>
+        </tr>
+        <tr>
             <td align="left">math</td>
         </tr>
         <tr>
