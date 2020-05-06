@@ -1033,7 +1033,7 @@ const util = {
         try {
             item.remove();
         } catch (e) {
-            item.parentNode.removeChild(item);
+            if (item.parentNode) item.parentNode.removeChild(item);
         }
     },
 
