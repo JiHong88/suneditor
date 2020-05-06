@@ -312,7 +312,7 @@ export default {
             return;
         }
 
-        const tableElement = contextTable._element;
+        const tableElement = contextTable._element || this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
         tablePlugin.setPositionControllerTop.call(this, tableElement);
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
@@ -1350,7 +1350,7 @@ export default {
         tablePlugin._shift = shift;
         tablePlugin._fixedCell = tdElement;
         tablePlugin._fixedCellName = tdElement.nodeName;
-        tablePlugin._selectedTable = this.context.table._element = this.util.getParentElement(tdElement, 'TABLE');
+        tablePlugin._selectedTable = this.util.getParentElement(tdElement, 'TABLE');
 
         const selectedCells = tablePlugin._selectedTable.querySelectorAll('.se-table-selected-cell');
         for (let i = 0, len = selectedCells.length; i < len; i++) {
