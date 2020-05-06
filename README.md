@@ -146,7 +146,7 @@ suneditor.create('sample', {
         '/', // Line break
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
-        ['table', 'link', 'image', 'video', /** 'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
+        ['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template']
@@ -202,7 +202,7 @@ const initEditor = suneditor.init({
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video', /** 'math' */, // You must add the 'katex' library at options to use the 'math' plugin.
+        'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ]
@@ -306,6 +306,7 @@ plugins: [
     image,
     link,
     video,
+    audio,
     math // You must add the 'katex' library at options to use the 'math' plugin.
 ]               : Plugins array.     default: null {Array}
 
