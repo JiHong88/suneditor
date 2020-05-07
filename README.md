@@ -589,7 +589,6 @@ videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
 // Audio----------------------------------------------------------------------------------------------------------
 audioWidth      : The default width size of the audio frame.           default: '300px' {String}
 audioHeight     : The default height size of the audio frame.          default: '54px' {String}
-audioSizeOnlyPercentage : If true, audio size can only be scaled by percentage.   default: false {Boolean}
 audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {Boolean}
 audioUrlInput   : Choose whether to create a audio url input tag in the audio upload window.
                   If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
@@ -615,7 +614,7 @@ audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
                       Invokes the "onAudioUploadError" method.  default: null {Number}
 
 // Table----------------------------------------------------------------------------------------------------------
-tableCellControllerPosition : Define position to the table cell controller('cell', 'top').   default: 'cell' {String}
+tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
