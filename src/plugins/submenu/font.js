@@ -69,7 +69,7 @@ export default {
     },
 
      /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         const target = this.context.font.targetText;
@@ -90,7 +90,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const fontContext = this.context.font;

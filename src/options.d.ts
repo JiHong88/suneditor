@@ -49,9 +49,9 @@ export interface SunEditorOptions {
      */
     fullPage?: boolean;
     /**
-     * Name of the CSS file to apply inside the iframe.
+     * Name of the CSS file(s) to apply inside the iframe.
      */
-    iframeCSSFileName?: string;
+    iframeCSSFileName?: string | string[];
     /**
      * CodeMirror core object
      */
@@ -278,6 +278,66 @@ export interface SunEditorOptions {
      * The query string of a YouTube embedded URL
      */
     youtubeQuery?: string;
+    /**
+     * Choose whether to create a file input tag in the video upload window
+     */
+    videoFileInput?: boolean;
+    /**
+     * Choose whether to create a video url input tag in the video upload window
+     */
+    videoUrlInput?: boolean;
+    /**
+     * Http Header when uploading videos.
+     */
+    videoUploadHeader?: Record<string, string>;
+    /**
+     * The video upload to server mapping address
+     */
+    videoUploadUrl?: string;
+    /**
+     * The size of the total uploadable videos (in bytes)
+     */
+    videoUploadSizeLimit?: number;
+    /**
+     * Audio
+     * =====
+     */
+    /**
+     * The default width size of the audio frame
+     */
+    audioWidth?: string;
+    /**
+     * The default height size of the audio frame
+     */
+    audioHeight?: string;
+    /**
+     * Choose whether to create a file input tag in the audio upload window
+     */
+    audioFileInput?: boolean;
+    /**
+     * Choose whether to create a audio url input tag in the audio upload window
+     */
+    audioUrlInput?: boolean;
+    /**
+     * Http Header when uploading audios.
+     */
+    audioUploadHeader?: Record<string, string>;
+    /**
+     * The audio upload to server mapping address
+     */
+    audioUploadUrl?: string;
+    /**
+     * The size of the total uploadable audios (in bytes)
+     */
+    audioUploadSizeLimit?: number;
+    /**
+     * Table
+     * =====
+     */
+    /**
+     * Define position to the table cell controller. ('cell', 'top')
+     */
+    tableCellControllerPosition?: string;
     /**
      * Defining save button
      * ====================

@@ -24,4 +24,5 @@ test/
 karma.conf.js
 bower.json
 webpack.*.js
+tsconfig.json
 package-lock.json

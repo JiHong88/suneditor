@@ -95,7 +95,13 @@
             },
             videoBox: {
                 title: 'Вставить видео',
+                file: 'Выберите файл',
                 url: 'Ссылка на видео'
+            },
+            audioBox: {
+                title: 'Вставить аудио',
+                file: 'Выберите файл',
+                url: 'Адрес аудио'
             },
             caption: 'Добавить подпись',
             close: 'Закрыть',
@@ -150,10 +156,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.ru = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'ru', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

@@ -51,6 +51,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _ww: null,
+        
+        /**
+         * @description Closest ShadowRoot to editor if found
+         * @private
+         */
+        _shadowRoot: null,
 
         /**
          * @description Util object
@@ -122,12 +128,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description container element
          */
         container: null,
-
-        /**
-         * @description current resizing component name
-         * @private
-         */
-        _resizingName: '',
 
         /**
          * @description current subment name
@@ -281,64 +281,39 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _componentsInfoReset: false,
 
         /**
-         * @description An user event function before image uploaded
-         * @private
-         */
-        _imageUploadBefore: function (files, info) {
-            if (typeof functions.onImageUploadBefore === 'function') return functions.onImageUploadBefore(files, info, this);
-            return true;
-        },
-
-        /**
-         * @description An user event function when image info is changed
-         * @private
-         */
-        _imageUpload: function (targetElement, index, state, imageInfo, remainingFilesCount) {
-            if (typeof functions.onImageUpload === 'function') functions.onImageUpload(targetElement, index * 1, state, imageInfo, remainingFilesCount, this);
-        },
-
-        /**
-         * @description An user event function when image upload failed
-         * @private
-         */
-        _imageUploadError: function (errorMessage, result) {
-            if (typeof functions.onImageUploadError === 'function') return functions.onImageUploadError(errorMessage, result, this);
-            return true;
-        },
-
-        /**
-         * @description An user callback function of the image upload
-         * @private
-         */
-        _imageUploadHandler: function (response, info) {
-            if (typeof functions.imageUploadHandler === 'function') {
-                functions.imageUploadHandler(response, info, this);
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
-         * @description An user event function when video info is changed
-         * @private
-         */
-        _videoUpload: function (targetElement, index, state, videoInfo, remainingFilesCount) {
-            if (typeof functions.onVideoUpload === 'function') functions.onVideoUpload(targetElement, index * 1, state, videoInfo, remainingFilesCount, this);
-        },
-
-        /**
          * @description Plugins array with "active" method.
          * "activePlugins" runs the "add" method when creating the editor.
          */
         activePlugins: null,
 
         /**
-         * @description Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.
-         * "componentInfoPlugins" runs the "add" method when creating the editor.
-         * "checkComponentInfo" method is always call just before the "change" event.
+         * @description Array of "checkFileInfo" functions with the core bound
+         * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
+         * "fileInfoPlugins" runs the "add" method when creating the editor.
+         * "checkFileInfo" method is always call just before the "change" event.
+         * @private
          */
-        componentInfoPlugins: null,
+        _fileInfoPluginsCheck: null,
+
+        /**
+         * @description Array of "resetFileInfo" functions with the core bound
+         * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
+         * "checkFileInfo" method is always call just before the "functions.setOptions" method.
+         * @private
+         */
+        _fileInfoPluginsReset: null,
+
+        /**
+         * @description Variables for file component management
+         * @private
+         */
+        _fileManager: {
+            tags: null,
+            regExp: null,
+            queryString: null,
+            pluginRegExp: null,
+            pluginMap: null
+        },
 
         /**
          * @description Elements that need to change text or className for each selection change
@@ -436,6 +411,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 moduleName = moduleArray[i].name;
                 if (!this.plugins[moduleName]) {
                     this.plugins[moduleName] = moduleArray[i];
+                }
+                if (!this.initPlugins[moduleName]) {
+                    this.initPlugins[moduleName] = true;
                     if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
                 }
             }
@@ -466,20 +444,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindControllersOff) this.controllersOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
+            const submenu = this.submenu = element.nextElementSibling;
 
-            this.submenu = element.nextElementSibling;
-            this.submenu.style.top = '-10000px';
-            this.submenu.style.visibility = 'hidden';
-            this.submenu.style.display = 'block';
+            submenu.style.top = '-10000px';
+            submenu.style.visibility = 'hidden';
+            submenu.style.display = 'block';
             util.addClass(element, 'on');
             this.submenuActiveButton = element;
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
-            const menuW = this.submenu.offsetWidth;
+            const menuW = submenu.offsetWidth;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) this.submenu.style.left = overLeft + 'px';
-            else this.submenu.style.left = '1px';
+            if (overLeft < 0) submenu.style.left = overLeft + 'px';
+            else submenu.style.left = '1px';
 
 
             let t = 0;
@@ -495,14 +473,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 t -= element.offsetHeight;
             }
 
-            const space = t + this.submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
+            const space = t + submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
             if (space > 0 && event._getPageBottomSpace() < space) {
-                this.submenu.style.top = (-1 * (this.submenu.offsetHeight + 3)) + 'px';
+                submenu.style.top = (-1 * (submenu.offsetHeight + 3)) + 'px';
             } else {
-                this.submenu.style.top = '';
+                submenu.style.top = '';
             }
 
-            this.submenu.style.visibility = '';
+            submenu.style.visibility = '';
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
@@ -537,17 +515,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindedContainerOff) this._bindedContainerOff();
 
             const containerName = this._containerName = element.getAttribute('data-command');
+            const container = this.container = element.nextElementSibling;
 
-            this.container = element.nextElementSibling;
-            this.container.style.display = 'block';
+            container.style.display = 'block';
             util.addClass(element, 'on');
             this.containerActiveButton = element;
 
             const toolbarW = this.context.element.toolbar.offsetWidth;
-            const menuW = this.container.offsetWidth;
+            const menuW = container.offsetWidth;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) this.container.style.left = overLeft + 'px';
-            else this.container.style.left = '1px';
+            if (overLeft < 0) container.style.left = overLeft + 'px';
+            else container.style.left = '1px';
 
             this._bindedContainerOff = this.containerOff.bind(this);
             this.addDocEvent('mousedown', this._bindedContainerOff, false);
@@ -580,20 +558,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {*} arguments controller elements, functions..
          */
         controllersOn: function () {
-            if (this._bindControllersOff) {
-                const tempName = this._resizingName;
-                this._bindControllersOff();
-                this._resizingName = tempName;
-            }
+            if (this._bindControllersOff) this._bindControllersOff();
+            this.controllerArray = [];
 
             for (let i = 0, arg; i < arguments.length; i++) {
                 arg = arguments[i];
+                if (!arg) continue;
+                
                 if (typeof arg === 'string') {
                     this.currentControllerName = arg;
                     continue;
                 }
                 if (typeof arg === 'function') {
-                    this.controllerArray[i] = arg;
+                    this.controllerArray.push(arg);
                     continue;
                 }
                 if (!util.hasClass(arg, 'se-controller')) {
@@ -601,7 +578,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     continue;
                 }
                 if (arg.style) arg.style.display = 'block';
-                this.controllerArray[i] = arg;
+                this.controllerArray.push(arg);
             }
 
             this._bindControllersOff = this.controllersOff.bind(this);
@@ -617,9 +594,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
          */
         controllersOff: function (e) {
-            if (this._resizingName && e && e.type === 'keydown' && e.keyCode !== 27) return;
+            if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
 
-            this._resizingName = '';
             this.currentControllerName = '';
             this.currentControllerTarget = null;
             this.effectNode = null;
@@ -705,15 +681,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         focusEdge: function (focusEl) {
             if (!focusEl) focusEl = context.element.wysiwyg.lastElementChild;
 
-            if (util.isComponent(focusEl)) {
-                const imageComponent = focusEl.querySelector('IMG');
-                const videoComponent = focusEl.querySelector('IFRAME');
-    
-                if (imageComponent) {
-                    this.selectComponent(imageComponent, 'image');
-                } else if (videoComponent) {
-                    this.selectComponent(videoComponent, 'video');
-                }
+            const fileComponentInfo = this.getFileComponent(focusEl);
+            if (fileComponentInfo) {
+                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
             } else if (focusEl) {
                 focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
                 if (!focusEl) this.nativeFocus();
@@ -794,7 +764,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object}
          */
         getSelection: function () {
-            return this._ww.getSelection();
+            return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this._ww.getSelection();
         },
 
         /**
@@ -1142,33 +1112,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description The component(image, video) is selected and the resizing module is called.
-         * @param {Element} element Element tag (img or iframe)
-         * @param {String} componentName Component name (image or video)
+         * @description Gets the file component and that plugin name
+         * return: {component, pluginName} | null
+         * @param {Element} element Target element (figure tag, component div, file tag)
+         * @returns {Object|null}
          */
-        selectComponent: function (element, componentName) {
-            if (componentName === 'image') {
-                if (!core.plugins.image) return;
-
-                core.removeRange();
-                core.callPlugin('image', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'image');
-                    core.plugins.image.onModifyMode.call(core, element, size);
-                    
-                    if (!util.getParentElement(element, '.se-image-container')) {
-                        core.plugins.image.openModify.call(core, true);
-                        core.plugins.image.update_image.call(core, true, true, true);
-                    }
-                }, null);
-            } else if (componentName === 'video') {
-                if (!core.plugins.video) return;
-
-                core.removeRange();
-                core.callPlugin('video', function () {
-                    const size = core.plugins.resizing.call_controller_resize.call(core, element, 'video');
-                    core.plugins.video.onModifyMode.call(core, element, size);
-                }, null);
+        getFileComponent: function (element) {
+            let fileComponent, pluginName;
+            if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
+                fileComponent = element.querySelector(core._fileManager.queryString);
             }
+            if (!fileComponent && element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
+                fileComponent = element;
+            }
+
+            if (fileComponent) {
+                pluginName = core._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
+                if (pluginName) {
+                    return {
+                        component: fileComponent,
+                        pluginName: pluginName
+                    };
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * @description The component(image, video) is selected and the resizing module is called.
+         * @param {Element} element Element tag (img, iframe, video)
+         * @param {String} pluginName Plugin name (image, video)
+         */
+        selectComponent: function (element, pluginName) {
+            const plugin = core.plugins[pluginName];
+            if (!plugin || !plugin.select) return;
+            this.callPlugin(pluginName, plugin.select.bind(this, element), null);
         },
 
         /**
@@ -1985,13 +1964,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (range.collapsed && !isRemoveFormat) {
-                if (startCon.nodeType === 1 && !util.isBreak(startCon)) {
+                if (startCon.nodeType === 1 && !util.isBreak(startCon) && !util.isComponent(startCon)) {
                     let afterNode = null;
                     const focusNode = startCon.childNodes[startOff];
 
                     if (focusNode) {
                         if (!focusNode.nextSibling) {
-                            startCon.removeChild(focusNode);
                             afterNode = null;
                         } else {
                             afterNode = util.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
@@ -2217,14 +2195,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 // mid
-                for (let i = endLength - 1; i > 0; i--) {
+                for (let i = endLength - 1, renewedEndContainer; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
-                    this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck);
+                    renewedEndContainer = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+                    if (renewedEndContainer) end.container = renewedEndContainer;
                 }
 
                 // start
                 newNode = appendNode.cloneNode(false);
-                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+                start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
+
+                if (start.endContainer) end.container = start.endContainer;
 
                 if (endLength <= 0) {
                     end = start;
@@ -2735,10 +2716,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Number} startOff The startOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {Object} { container, offset }
+         * @returns {null|Node} If end container is renewed, returned renewed node
+         * @returns {Object} { container, offset, endContainer }
          * @private
          */
-        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+        _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
             // not add tag
             let parentCon = startCon.parentNode;
             while (!parentCon.nextSibling && !parentCon.previousSibling && !util.isFormatElement(parentCon.parentNode) && !util.isWysiwygDiv(parentCon.parentNode)) {
@@ -2781,7 +2763,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
-                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
                     const child = childNodes[i];
                     if (!child) continue;
                     let coverNode = ancestor;
@@ -2790,9 +2772,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         if (child.nodeType === 1) {
                             if (util._isIgnoreNodeChange(child)) {
                                 newInnerNode = newInnerNode.cloneNode(false);
-                                pNode.appendChild(child.cloneNode(true));
+                                cloneChild = child.cloneNode(true);
+                                pNode.appendChild(cloneChild);
                                 pNode.appendChild(newInnerNode);
                                 nNodeArray.push(newInnerNode);
+
+                                // end container
+                                if (_endContainer && child.contains(_endContainer)) {
+                                    const endPath = util.getNodePath(_endContainer, child);
+                                    _endContainer = util.getNodeFromPath(endPath, cloneChild);
+                                }
                             } else {
                                 recursionFunc(child, child);
                             }
@@ -2943,7 +2932,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
                     container: startCon,
-                    offset: startOff
+                    offset: startOff,
+                    endContainer: _endContainer
                 };
             }
 
@@ -2999,7 +2989,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             return {
                 container: container,
-                offset: offset
+                offset: offset,
+                endContainer: _endContainer
             };
         },
 
@@ -3010,11 +3001,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Function} validation Check if the node should be stripped.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+         * @param {Node} _endContainer Offset node of last line already modified (end.container)
+         * @returns {null|Node} If end container is renewed, returned renewed node
          * @private
          */
-        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck) {
+        _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
             // not add tag
             if (!isRemoveNode) {
+                // end container path
+                let endPath = null;
+                if (_endContainer && element.contains(_endContainer)) endPath = util.getNodePath(_endContainer, element);
+
                 const tempNode = element.cloneNode(true);
                 const newNodeName = newInnerNode.nodeName;
                 const newCssText = newInnerNode.style.cssText;
@@ -3042,7 +3039,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (len > 0 && i === len) {
                     element.innerHTML = tempNode.innerHTML;
-                    return;
+                    return endPath ? util.getNodeFromPath(endPath, element) : null;
                 }
             }
 
@@ -3055,7 +3052,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             (function recursionFunc(current, ancestor) {
                 const childNodes = current.childNodes;
 
-                for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
+                for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
                     let child = childNodes[i];
                     if (!child) continue;
                     let coverNode = ancestor;
@@ -3065,10 +3062,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             pNode.appendChild(newInnerNode);
                             newInnerNode = newInnerNode.cloneNode(false);
                         }
-                        pNode.appendChild(child.cloneNode(true));
+                        
+                        cloneChild = child.cloneNode(true);
+                        pNode.appendChild(cloneChild);
                         pNode.appendChild(newInnerNode);
                         nNodeArray.push(newInnerNode);
                         ancestor = newInnerNode;
+
+                        // end container
+                        if (_endContainer && child.contains(_endContainer)) {
+                            const endPath = util.getNodePath(_endContainer, child);
+                            _endContainer = util.getNodeFromPath(endPath, cloneChild);
+                        }
+
                         continue;
                     } else {
                         vNode = validation(child);
@@ -3084,7 +3090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             })(element, newInnerNode);
 
             // not remove tag
-            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return;
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return _endContainer;
 
             pNode.appendChild(newInnerNode);
 
@@ -3109,6 +3115,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // node change
             element.parentNode.replaceChild(pNode, element);
+            return _endContainer;
         },
 
         /**
@@ -3753,7 +3760,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = _var.innerHeight_fullScreen + 'px';
 
-                util.changeElement(element.querySelector('svg'), icons.reduction);
+                util.changeElement(element.firstElementChild, icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -3785,7 +3792,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (this._isInline) event._showToolbarInline();
 
                 event.onScroll_window();
-                util.changeElement(element.querySelector('svg'), icons.expansion);
+                util.changeElement(element.firstElementChild, icons.expansion);
             }
         },
 
@@ -4196,8 +4203,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _checkComponents: function () {
-            for (let i in this.componentInfoPlugins) {
-                this.componentInfoPlugins[i].checkComponentInfo.call(this);
+            for (let i in this._fileInfoPluginsCheck) {
+                this._fileInfoPluginsCheck[i]();
             }
         },
 
@@ -4206,8 +4213,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resetComponents: function () {
-            for (let i in this.componentInfoPlugins) {
-                this.componentInfoPlugins[i].resetComponentInfo.call(this);
+            for (let i in this._fileInfoPluginsReset) {
+                this._fileInfoPluginsReset[i]();
             }
         },
 
@@ -4243,6 +4250,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._wd = _d;
             if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
             
+            if (!options.iframe && typeof _w.ShadowRoot === 'function') {
+                let child = context.element.wysiwygFrame;
+                while (child) {
+                    if (child.shadowRoot) {
+                        this._shadowRoot = child.shadowRoot;
+                        break;
+                    } else if (child instanceof _w.ShadowRoot) {
+                        this._shadowRoot = child;
+                        break;
+                    }
+                    child = child.parentNode;
+                }
+            }
+            
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
@@ -4261,7 +4282,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
-            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
+            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
@@ -4281,22 +4302,43 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 INDENT: context.tool.indent
             };
 
-            // Command plugins registration
+            // file components
+            this._fileInfoPluginsCheck = [];
+            this._fileInfoPluginsReset = [];
+
+            // Command and file plugins registration
             this.activePlugins = [];
-            this.componentInfoPlugins = [];
-            let c, button;
+            this._fileManager.tags = [];
+            this._fileManager.pluginMap = {};
+
+            let filePluginRegExp = [];
+            let plugin, button;
             for (let key in plugins) {
-                c = plugins[key];
+                plugin = plugins[key];
                 button = pluginCallButtons[key];
-                if (c.active && button) {
+                if (plugin.active && button) {
                     this.callPlugin(key, null, button);
                 }
-                if (typeof c.checkComponentInfo === 'function' && typeof c.resetComponentInfo === 'function') {
+                if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
                     this.callPlugin(key, null, button);
-                    this.componentInfoPlugins.push(c);
+                    this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
+                    this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
+                }
+                if (plugin.fileTags) {
+                    this.callPlugin(key, null, button);
+                    this._fileManager.tags = this._fileManager.tags.concat(plugin.fileTags);
+                    filePluginRegExp.push(key);
+                    for (let tag in plugin.fileTags) {
+                        this._fileManager.pluginMap[plugin.fileTags[tag].toLowerCase()] = key;
+                    }
                 }
             }
 
+            this._fileManager.queryString = this._fileManager.tags.join(',');
+            this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
+            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  filePluginRegExp.join('|') + ')$', 'i');
+            
+            // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
             this._placeholder = context.element.placeholder;
             this._lineBreaker = context.element.lineBreaker;
@@ -4304,6 +4346,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // Excute history function
             this.history = _history(this, event._onChange_historyStack);
+
+            // register notice module
+            this.addModule([_notice]);
 
             // Init, validate
             if (!options.iframe) this._initWysiwygArea(reload, _initHTML);
@@ -4391,7 +4436,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _setDefaultFormat: function (formatName) {
-            if (!!this._resizingName) return;
+            if (this._fileManager.pluginRegExp.test(this.currentControllerName)) return;
 
             const range = this.getRange();
             const commonCon = range.commonAncestorContainer;
@@ -4399,7 +4444,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const rangeEl = util.getRangeFormatElement(commonCon, null);
             let focusNode, offset, format;
 
-            if (util.getParentElement(commonCon, util.isComponent)) return;
+            const fileComponent = util.getParentElement(commonCon, util.isComponent);
+            if (fileComponent && !util.isTable(fileComponent)) return;
             if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
 
             if (rangeEl) {
@@ -4429,7 +4475,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     br = util.createTextNode(util.zeroWidthSpace);
                     commonCon.appendChild(br);
                 }
+
                 this.setRange(br, 1, br, 1);
+                return;
             }
 
             this.execCommand('formatBlock', false, (formatName || 'P'));
@@ -4451,9 +4499,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 focusNode = zeroWidth;
             }
 
-            offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
             this.effectNode = null;
-            this.setRange(focusNode, offset, focusNode, offset);
+            this.nativeFocus();
         }
     };
 
@@ -4685,19 +4732,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const targetElement = e.target;
             if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
 
-            if (/^FIGURE$/i.test(targetElement.nodeName)) {
-                const imageComponent = targetElement.querySelector('IMG');
-                const videoComponent = targetElement.querySelector('IFRAME');
-
-                if (imageComponent) {
-                    e.preventDefault();
-                    core.selectComponent(imageComponent, 'image');
-                    return;
-                } else if (videoComponent) {
-                    e.preventDefault();
-                    core.selectComponent(videoComponent, 'video');
-                    return;
-                }
+            const fileComponentInfo = core.getFileComponent(targetElement);
+            if (fileComponentInfo) {
+                e.preventDefault();
+                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                return;
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
@@ -4724,17 +4763,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if ((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false') {
-                if (util.isList(rangeEl)) {
-                    const oLi = util.createElement('LI');
-                    const prevLi = selectionNode.nextElementSibling;
-                    oLi.appendChild(selectionNode);
-                    rangeEl.insertBefore(oLi, prevLi);
-                } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode)) {
-                    core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+            if (((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false')) {
+                const range = core.getRange();
+                if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
+                    if (util.isList(rangeEl)) {
+                        const oLi = util.createElement('LI');
+                        const prevLi = selectionNode.nextElementSibling;
+                        oLi.appendChild(selectionNode);
+                        rangeEl.insertBefore(oLi, prevLi);
+                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
+                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                    }
+                    
+                    e.preventDefault();
+                    core.focus();
                 }
-                e.preventDefault();
-                core.focus();
             } else {
                 event._applyTagEffects();
             }
@@ -4954,19 +4997,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-            const resizingName = core._resizingName;
+            const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
             let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
             let rangeEl = util.getRangeFormatElement(formatEl, null);
 
             switch (keyCode) {
                 case 8: /** backspace key */
                     if (!selectRange) {
-                        if (resizingName) {
+                        if (fileComponentName) {
                             e.preventDefault();
                             e.stopPropagation();
-                            core.plugins[resizingName].destroy.call(core);
+                            core.plugins[fileComponentName].destroy.call(core);
                             break;
                         }
+                    }
+
+                    if (event._tableDelete()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
                     }
 
                     if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
@@ -5098,14 +5147,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     // component
                     if (!selectRange && range.startOffset === 0) {
                         if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
-                            let previousEl = formatEl.previousSibling;
-                            if (util.hasClass(previousEl, 'se-image-container') || /^IMG$/i.test(previousEl.nodeName)) {
-                                previousEl = /^IMG$/i.test(previousEl.nodeName) ? previousEl : previousEl.querySelector('img');
-                                core.selectComponent(previousEl, 'image');
-                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
-                            } else if (util.hasClass(previousEl, 'se-video-container')) {
-                                core.selectComponent(previousEl.querySelector('iframe'), 'video');
-                                if(formatEl.textContent.length === 0) util.removeItem(formatEl);
+                            const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
+                            if (fileComponentInfo) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                                if (formatEl.textContent.length === 0) util.removeItem(formatEl);
                             }
                             break;
                         }
@@ -5113,15 +5160,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 46: /** delete key */
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        core.plugins[resizingName].destroy.call(core);
+                        core.plugins[fileComponentName].destroy.call(core);
+                        break;
+                    }
+
+                    if (event._tableDelete()) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         break;
                     }
 
                     // component
-                    if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null) && range.startOffset === selectionNode.textContent.length) {
+                    if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null || (util.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
                         let nextEl = formatEl.nextElementSibling;
                         if (!nextEl) {
                             e.preventDefault();
@@ -5142,15 +5195,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 }
                             }
 
-                            // resizing component
-                            if (util.hasClass(nextEl, 'se-component') || /^(IMG|IFRAME)$/i.test(nextEl.nodeName)) {
+                            // component
+                            const fileComponentInfo = core.getFileComponent(nextEl);
+                            if (fileComponentInfo) {
                                 e.stopPropagation();
-                                if (util.hasClass(nextEl, 'se-image-container') || /^IMG$/i.test(nextEl.nodeName)) {
-                                    nextEl = /^IMG$/i.test(nextEl.nodeName) ? nextEl : nextEl.querySelector('img');
-                                    core.selectComponent(nextEl, 'image');
-                                } else if (util.hasClass(nextEl, 'se-video-container')) {
-                                    core.selectComponent(nextEl.querySelector('iframe'), 'video');
-                                }
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
 
                             break;
@@ -5195,7 +5244,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     break;
                 case 9: /** tab key */
-                    if (resizingName) break;
+                    if (fileComponentName || options.tabDisable) break;
                     e.preventDefault();
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
@@ -5399,10 +5448,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
 
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const compContext = context[resizingName];
+                        const compContext = context[fileComponentName];
                         const container = compContext._container;
                         const sibling = container.previousElementSibling || container.nextElementSibling;
 
@@ -5416,15 +5465,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                         container.parentNode.insertBefore(newEl, container);
                         
-                        core.callPlugin(resizingName, function () {
-                            const size = core.plugins.resizing.call_controller_resize.call(core, compContext._element, resizingName);
-                            core.plugins[resizingName].onModifyMode.call(core, compContext._element, size);
+                        core.callPlugin(fileComponentName, function () {
+                            const size = (core.plugins.resizing && core.context[fileComponentName]._resizing !== undefined) ? core.plugins.resizing.call_controller_resize.call(core, compContext._element, fileComponentName) : null;
+                            core.plugins[fileComponentName].onModifyMode.call(core, compContext._element, size);
                         }, null);
                     }
                     
                     break;
                 case 27:
-                    if (resizingName) {
+                    if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
                         core.controllersOff();
@@ -5476,7 +5525,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             /** when format tag deleted */
-            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '') {
+            if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -5661,12 +5710,65 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
+        // FireFox - table delete
+        _tableDelete: function () {
+            const range = core.getRange();
+            const sCell = util.getRangeFormatElement(range.startContainer);
+            const eCell = util.getRangeFormatElement(range.endContainer);
+
+            if (util.isCell(sCell) && util.isCell(eCell) && !sCell.previousElementSibling && !eCell.nextElementSibling) {
+                const table = util.getParentElement(sCell, util.isComponent);
+                util.removeItem(table);
+                core.nativeFocus();
+                return true;
+            }
+
+            return false;
+        },
+
         onPaste_wysiwyg: function (e) {
-            const clipboardData = e.clipboardData;
+            const isIE = util.isIE;
+            const clipboardData = isIE ? _w.clipboardData : e.clipboardData;
             if (!clipboardData) return true;
 
-            const plainText = clipboardData.getData('text/plain').replace(/\n/g, '');
-            const cleanData = core.cleanHTML(clipboardData.getData('text/html'), core.pasteTagsWhitelistRegExp);
+            let plainText, cleanData;
+            if (isIE) {
+                plainText = clipboardData.getData('Text');
+                
+                const range = core.getRange();
+                const tempDiv = util.createElement('DIV');
+                const tempRange = {
+                    sc: range.startContainer,
+                    so: range.startOffset,
+                    ec: range.endContainer,
+                    eo: range.endOffset
+                };
+
+                tempDiv.setAttribute('contenteditable', true);
+                tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
+                
+                context.element.relative.appendChild(tempDiv);
+                tempDiv.focus();
+                core._editorRange();
+
+                _w.setTimeout(function () {
+                    cleanData = tempDiv.innerHTML;
+                    util.removeItem(tempDiv);
+                    core.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
+                    event._setClipboardData(e, plainText, cleanData);
+                });
+
+                return true;
+            } else {
+                plainText = clipboardData.getData('text/plain');
+                cleanData = clipboardData.getData('text/html');
+                return event._setClipboardData(e, plainText, cleanData);
+            }
+        },
+
+        _setClipboardData: function (e, plainText, cleanData) {
+            cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
+            plainText = plainText.replace(/\n/g, '');
             const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
@@ -5685,9 +5787,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 e.stopPropagation();
                 e.preventDefault();
                 functions.insertHTML(cleanData, true);
-            } else {
-                // history stack
-                core.history.push(true);
+                return false;
             }
         },
 
@@ -5706,15 +5806,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
 
+            if (typeof functions.onDrop === 'function' && !functions.onDrop(e, dataTransfer, core)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             // files
             const files = dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
                 event._setDropLocationSelection(e);
-                core.callPlugin('image', function () {
-                    context.image.imgInputFile.files = files;
-                    core.plugins.image.onRender_imgInput.call(core);
-                    context.image.imgInputFile.files = null;
-                }, null);
+                core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
             // check char count
             } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
@@ -5728,8 +5830,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     functions.insertHTML(cleanData, true);
                 }
             }
-
-            if (functions.onDrop) functions.onDrop(e, core);
         },
 
         onmouseMove_wysiwyg: function (e) {
@@ -5956,7 +6056,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - inputHeight: Value of height input
          * - align: Align Check Value
          * - isUpdate: Update image if true, create image if false
-         * - currentImage: If isUpdate is true, the currently selected image.
+         * - element: If isUpdate is true, the currently selected image.
          * @param {Object} core Core object
          */
         imageUploadHandler: null,
@@ -5965,54 +6065,93 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Called before the image is uploaded
          * If false is returned, no image upload is performed.
          * @param {Array} files Files array
-         * @param {Object} info Input information
+         * @param {Object} info info: {
+         * - linkValue: Link url value
+         * - linkNewWindow: Open in new window Check Value
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update image if true, create image if false
+         * - element: If isUpdate is true, the currently selected image.
+         * }
          * @param {Object} core Core object
          * @returns {Boolean}
          */
         onImageUploadBefore: null,
+        /**
+         * @description Called before the video is uploaded
+         * If false is returned, no video(iframe, video) upload is performed.
+         * @param {Array} files Files array
+         * @param {Object} info info: {
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update video if true, create video if false
+         * - element: If isUpdate is true, the currently selected video.
+         * }
+         * @param {Object} core Core object
+         * @returns {Boolean}
+         */
+        onVideoUploadBefore: null,
+        /**
+         * @description Called before the audio is uploaded
+         * If false is returned, no audio upload is performed.
+         * @param {Array} files Files array
+         * @param {Object} info info: {
+         * - isUpdate: Update audio if true, create audio if false
+         * - element: If isUpdate is true, the currently selected audio.
+         * }
+         * @param {Object} core Core object
+         * @returns {Boolean}
+         */
+        onAudioUploadBefore: null,
 
         /**
          * @description Called when the image is uploaded, updated, deleted
-         * @param {Element} targetElement Current img element
+         * @param {Element} targetElement Target element
          * @param {Number} index Uploaded index
          * @param {String} state Upload status ('create', 'update', 'delete')
-         * @param {Object} imageInfo Image info object
+         * @param {Object} info Image info object
          * - index: data index
          * - name: file name
          * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: img element
-         * - src: src attribute of img tag
+         * - element: target element
+         * - src: src attribute of tag
          * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
          * @param {Object} core Core object
          */
         onImageUpload: null,
+         /**
+         * @description Called when the video(iframe, video) is is uploaded, updated, deleted
+         * -- arguments is same "onImageUpload" --
+         */
+        onVideoUpload: null,
+         /**
+         * @description Called when the audio is is uploaded, updated, deleted
+         * -- arguments is same "onImageUpload" --
+         */
+        onAudioUpload: null,
 
         /**
          * @description Called when the image is upload failed
          * @param {String} errorMessage Error message
-         * @param {Object} result Result info Object
+         * @param {Object} result Response Object
          * @param {Object} core Core object
          * @returns {Boolean}
          */
         onImageUploadError: null,
-
         /**
-         * @description Called when the video(iframe) is is uploaded, updated, deleted
-         * @param {Element} targetElement Current iframe element
-         * @param {Number} index Uploaded index
-         * @param {String} state Upload status ('create', 'update', 'delete')
-         * @param {Object} videoInfo Video info object
-         * - index: data index
-         * - select: select function
-         * - delete: delete function
-         * - element: iframe element
-         * - src: src attribute of iframe tag
-         * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
-         * @param {Object} core Core object
+         * @description Called when the video(iframe, video) upload failed
+         * -- arguments is same "onImageUploadError" --
          */
-        onVideoUpload: null,
+        onVideoUploadError: null,
+        /**
+         * @description Called when the audio upload failed
+         * -- arguments is same "onImageUploadError" --
+         */
+        onAudioUploadError: null,
 
         /**
          * @description Add or reset option property
@@ -6020,6 +6159,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         setOptions: function (_options) {
             event._removeEvent();
+            core._resetComponents();
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [_options, _options].reduce(function (init, option) {
@@ -6036,6 +6176,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 return init;
             }, {});
 
+            // set option
             const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
 
             if (cons.callButtons) {
@@ -6156,25 +6297,30 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: img element
-         * - src: src attribute of img tag
+         * - element: target element
+         * - src: src attribute of tag
          * @returns {Array}
          */
         getImagesInfo: function () {
-            return context.image ? context.image._imagesInfo : [];
+            return context.image ? context.image._infoList : [];
         },
-
+        
         /**
-         * @description Gets uploaded videos informations
+         * @description Gets uploaded files(plugin using fileManager) information list.
+         * image: [img], video: [video, iframe], audio: [audio]
+         * When the argument value is 'image', it is the same function as "getImagesInfo".
          * - index: data index
+         * - name: file name
+         * - size: file size
          * - select: select function
          * - delete: delete function
-         * - element: iframe element
-         * - src: src attribute of iframe tag
+         * - element: target element
+         * - src: src attribute of tag
+         * @param {String} pluginName Plugin name (image, video, audio)
          * @returns {Array}
          */
-        getVideosInfo: function () {
-            return context.video ? context.video._videosInfo : [];
+        getFilesInfo: function (pluginName) {
+            return context[pluginName] ? context[pluginName]._infoList : [];
         },
 
         /**
@@ -6378,9 +6524,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
     // functionss
     core.functions = functions;
-
-    // register notice module
-    core.addModule([_notice]);
 
     return functions;
 }

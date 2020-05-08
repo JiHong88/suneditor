@@ -60,11 +60,11 @@ export default {
     },
 
      /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         const button = this.context.list.targetButton;
-        const icon = button.querySelector('svg');
+        const icon = button.firstElementChild;
         const util = this.util;
 
         if (!element) {
@@ -88,7 +88,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const listContext = this.context.list;

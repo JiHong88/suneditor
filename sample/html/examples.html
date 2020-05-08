@@ -102,7 +102,7 @@
         </textarea>
 
         <!-- char count, button groups -->
-        <a id="groups" href="#groups"><h4 class="sub-title" style="margin-top: 60px;">Char count, Button groups</h4></a>
+        <a id="groups" href="#groups"><h4 class="sub-title">Char count, Button groups</h4></a>
         <p></p>
         <textarea id="lineBreak" style="width:100%; height:100px;">
             <div><span style="font-weight: bold;"><span style="color: rgb(0, 130, 153);">SUNEDITOR</span>.<span style="color: rgb(61, 0, 153);">create</span></span>(<span style="color: rgb(152, 0, 0);">'lineBreak'</span>, {</div>
@@ -158,8 +158,46 @@
             <div>});</div>
         </textarea>
 
+        <!-- user function -->
+        <a id="functions" href="#functions"><h4 class="sub-title">User Functions</h4></a>
+        <p></p>
+        <textarea id="exampleFunction" style="width:100%; height:250px;">
+            <p>User Function Test</p>
+        </textarea>
+        <p></p>
+        <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
+        <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
+        <button type="button" class="btn btn-md btn-default" onclick="sun_setOptions()" id="opt1">setOptions</button>
+        <button type="button" class="btn btn-md btn-link" onclick="sun_resetOptions()" id="opt2" style="display: none;">resetOptions</button>
+        <button type="button" class="btn btn-md btn-default" onclick="sun_setDefaultStyle()" id="ds1">setDefaultStyle</button>
+        <button type="button" class="btn btn-md btn-link" onclick="sun_resetDefaultStyle()" id="ds2" style="display: none;">resetDefaultStyle</button>
+        <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
+        <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
+        <div></div>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getFilesInfo('video')">getFilesInfo('video')</button>
+        <div>
+            <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
+            <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
+        </div>
+        <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/docs/icon_js.svg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
+        <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
+        <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
+        <div></div>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disabled()">Disabled toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enabled()">Enabled toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_hide()">Hide toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
+
         <!-- image management editor-->
-        <a id="image" href="#image"><h4 class="sub-title" style="margin-top: 60px;">Image management</h4></a>
+        <a id="image" href="#image"><h4 class="sub-title">Image management</h4></a>
         <p></p>
         <textarea id="imageManagement" style="display: none;">
             <p>cat</p>
@@ -168,7 +206,7 @@
             <div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px; width: 300px;"><img src="http://suneditor.com/docs/s-cat1.jpg" data-align="none" alt="" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" origin-size="300,200" data-origin="300,200" data-file-name="s-cat1.jpg" data-file-size="52000" style="width: 300px; height: 174px; transform: rotate(0deg);" data-size="300px,174px" data-index="2"><figcaption style="margin-top: 0px;"><div>Insert description</div></figcaption></figure></div>
             <p><br></p>
         </textarea>
-        <div class="image-list">
+        <div class="component-list">
             <div class="file-list-info">
                 <span>Attached files</span>
                 <span class="xefu-btn">
@@ -183,434 +221,208 @@
                 </ul>
             </div>
         </div>
-        <div class="image-list">
+        <div class="component-list">
             <div class="file-list-info">
                 <span>Video list</span>
             </div>
-            <div class="video-file-list">
+            <div class="component-file-list">
                 <ul id="video_list">
                 </ul>
             </div>
         </div>
 
 <!-- image management html-->
-<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">div</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_wrapper<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>image-list<span class="pl-pds">"</span></span>&gt;
-    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list-info<span class="pl-pds">"</span></span>&gt;
-        &lt;<span class="pl-ent">span</span>&gt;Attached files&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>xefu-btn<span class="pl-pds">"</span></span>&gt;
-            &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text<span class="pl-pds">"</span></span>&gt;Attach image&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">input</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>file<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>files_upload<span class="pl-pds">"</span></span> <span class="pl-e">accept</span>=<span class="pl-s"><span class="pl-pds">"</span>image/*<span class="pl-pds">"</span></span> <span class="pl-e">multiple</span>=<span class="pl-s"><span class="pl-pds">"</span>multiple<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>files-text files-input<span class="pl-pds">"</span></span>/&gt;
-        &lt;<span class="pl-ent">span</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_size<span class="pl-pds">"</span></span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>total-size text-small-2<span class="pl-pds">"</span></span>&gt;0KB&lt;/<span class="pl-ent">span</span>&gt;
-        &lt;<span class="pl-ent">button</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>btn btn-md btn-danger<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_remove<span class="pl-pds">"</span></span> <span class="pl-e">disabled</span> <span class="pl-e">onclick</span>=<span class="pl-s"><span class="pl-pds">"</span>deleteCheckedImages()<span class="pl-pds">"</span></span>&gt;Remove&lt;/<span class="pl-ent">button</span>&gt;
-    &lt;/<span class="pl-ent">div</span>&gt;
-    &lt;<span class="pl-ent">div</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>file-list<span class="pl-pds">"</span></span>&gt;
-        &lt;<span class="pl-ent">ul</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>image_list<span class="pl-pds">"</span></span>&gt;
-        &lt;/<span class="pl-ent">ul</span>&gt;
-    &lt;/<span class="pl-ent">div</span>&gt;
-&lt;/<span class="pl-ent">div</span>&gt;</pre></div>
+<div class="highlight highlight-text-html-basic"><pre><span class="pl-c">&lt;!-- image list --&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">id</span>="<span class="pl-s">image_wrapper</span>" <span class="pl-c1">class</span>="<span class="pl-s">component-list</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">file-list-info</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>Attached files<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">class</span>="<span class="pl-s">xefu-btn</span>"<span class="pl-kos">&gt;</span>
+            <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">class</span>="<span class="pl-s">files-text</span>"<span class="pl-kos">&gt;</span>Attach image<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">input</span> <span class="pl-c1">type</span>="<span class="pl-s">file</span>" <span class="pl-c1">id</span>="<span class="pl-s">files_upload</span>" <span class="pl-c1">accept</span>="<span class="pl-s">image/*</span>" <span class="pl-c1">multiple</span>="<span class="pl-s">multiple</span>" <span class="pl-c1">class</span>="<span class="pl-s">files-text files-input</span>"/&gt;
+        <span class="pl-kos">&lt;</span><span class="pl-ent">span</span> <span class="pl-c1">id</span>="<span class="pl-s">image_size</span>" <span class="pl-c1">class</span>="<span class="pl-s">total-size text-small-2</span>"<span class="pl-kos">&gt;</span>0KB<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">button</span> <span class="pl-c1">class</span>="<span class="pl-s">btn btn-md btn-danger</span>" <span class="pl-c1">id</span>="<span class="pl-s">image_remove</span>" <span class="pl-c1">disabled</span> <span class="pl-c1">onclick</span>="<span class="pl-s">deleteCheckedImages()</span>"<span class="pl-kos">&gt;</span>Remove<span class="pl-kos">&lt;/</span><span class="pl-ent">button</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">file-list</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">ul</span> <span class="pl-c1">id</span>="<span class="pl-s">image_list</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">ul</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+<span class="pl-c">&lt;!-- video list --&gt;</span>
+<span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">component-list</span>"<span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">file-list-info</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>Video list<span class="pl-kos">&lt;/</span><span class="pl-ent">span</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;</span><span class="pl-ent">div</span> <span class="pl-c1">class</span>="<span class="pl-s">component-file-list</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;</span><span class="pl-ent">ul</span> <span class="pl-c1">id</span>="<span class="pl-s">video_list</span>"<span class="pl-kos">&gt;</span>
+        <span class="pl-kos">&lt;/</span><span class="pl-ent">ul</span><span class="pl-kos">&gt;</span>
+    <span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span>
+<span class="pl-kos">&lt;/</span><span class="pl-ent">div</span><span class="pl-kos">&gt;</span></pre></div>
 
 <!-- image management js-->
-<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-c1">imageWrapper</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_wrapper<span class="pl-pds">'</span></span>);
-<span class="pl-k">const</span> <span class="pl-c1">imageSize</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_size<span class="pl-pds">'</span></span>);
-<span class="pl-k">const</span> <span class="pl-c1">imageRemove</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_remove<span class="pl-pds">'</span></span>);
-<span class="pl-k">const</span> <span class="pl-c1">imageTable</span> <span class="pl-k">=</span> <span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>image_list<span class="pl-pds">'</span></span>);
+<div class="highlight highlight-source-js"><pre><span class="pl-k">const</span> <span class="pl-s1">imageWrapper</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'image_wrapper'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">const</span> <span class="pl-s1">imageSize</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'image_size'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">const</span> <span class="pl-s1">imageRemove</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'image_remove'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">const</span> <span class="pl-s1">imageTable</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'image_list'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">let</span> <span class="pl-s1">imageList</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+<span class="pl-k">let</span> <span class="pl-s1">selectedImages</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
 
-<span class="pl-k">let</span> imageList <span class="pl-k">=</span> [];
-<span class="pl-k">let</span> selectedImages <span class="pl-k">=</span> [];
+<span class="pl-k">const</span> <span class="pl-s1">videoTable</span> <span class="pl-c1">=</span> <span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'video_list'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-k">let</span> <span class="pl-s1">videoList</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
 
-<span class="pl-k">const</span> <span class="pl-c1">editorImageSample</span> <span class="pl-k">=</span> <span class="pl-c1">SUNEDITOR</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>imageManagement<span class="pl-pds">'</span></span>, {
-    buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>formatBlock<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>horizontalRule<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>table<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>video<span class="pl-pds">'</span></span>],
-        [<span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>]
-    ],
-})
+<span class="pl-c">// Array.prototype.findIndex (IE)</span>
+<span class="pl-k">function</span> <span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">arr</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">let</span> <span class="pl-s1">idx</span> <span class="pl-c1">=</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">;</span>
 
-<span class="pl-smi">editorImageSample</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>) {
-    <span class="pl-k">if</span> (state <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>delete<span class="pl-pds">'</span></span>) {
-        <span class="pl-smi">imageList</span>.<span class="pl-c1">splice</span>(<span class="pl-en">findIndex</span>(imageList, index), <span class="pl-c1">1</span>)
-    } <span class="pl-k">else</span> {
-        <span class="pl-k">if</span> (state <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>create<span class="pl-pds">'</span></span>) {
-            <span class="pl-smi">imageList</span>.<span class="pl-c1">push</span>(<span class="pl-c1">imageInfo</span>)
-        } <span class="pl-k">else</span> { <span class="pl-c"><span class="pl-c">//</span> update</span> }
-    }
+    <span class="pl-s1">arr</span><span class="pl-kos">.</span><span class="pl-en">some</span><span class="pl-kos">(</span><span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">a</span><span class="pl-kos">,</span> <span class="pl-s1">i</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-kos">(</span><span class="pl-k">typeof</span> <span class="pl-s1">a</span> <span class="pl-c1">===</span> <span class="pl-s">'number'</span> ? <span class="pl-s1">a</span> : <span class="pl-s1">a</span><span class="pl-kos">.</span><span class="pl-c1">index</span><span class="pl-kos">)</span> <span class="pl-c1">===</span> <span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">idx</span> <span class="pl-c1">=</span> <span class="pl-s1">i</span><span class="pl-kos">;</span>
+            <span class="pl-k">return</span> <span class="pl-c1">true</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+        <span class="pl-k">return</span> <span class="pl-c1">false</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span><span class="pl-kos">)</span>
 
-    <span class="pl-k">if</span> (remainingFilesCount <span class="pl-k">===</span> <span class="pl-c1">0</span>) {
-        <span class="pl-en">setImageList</span>(imageList)
-    }
-}
+    <span class="pl-k">return</span> <span class="pl-s1">idx</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Upload from outside the editor</span>
-<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">'</span>files_upload<span class="pl-pds">'</span></span>).<span class="pl-c1">addEventListener</span>(<span class="pl-s"><span class="pl-pds">'</span>change<span class="pl-pds">'</span></span>, <span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
-    <span class="pl-k">if</span> (<span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-smi">files</span>) {
-        <span class="pl-smi">editorImageSample</span>.<span class="pl-en">insertImage</span>(<span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-smi">files</span>)
-        <span class="pl-smi">e</span>.<span class="pl-c1">target</span>.<span class="pl-c1">value</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>
-    }
-})
+<span class="pl-c">/** event registration */</span>
+<span class="pl-s1">editorImageSample</span><span class="pl-kos">.</span><span class="pl-c1">onImageUpload</span> <span class="pl-c1">=</span> <span class="pl-s1">imageUpload</span><span class="pl-kos">;</span>
+<span class="pl-s1">editorImageSample</span><span class="pl-kos">.</span><span class="pl-c1">onVideoUpload</span> <span class="pl-c1">=</span> <span class="pl-s1">videoUpload</span><span class="pl-kos">;</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Edit image list</span>
-<span class="pl-k">function</span> <span class="pl-en">setImageList</span> () {
-    <span class="pl-k">let</span> list <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;
-    <span class="pl-k">let</span> size <span class="pl-k">=</span> <span class="pl-c1">0</span>;
+<span class="pl-c">/** --- image list --- */</span>
+<span class="pl-k">const</span> <span class="pl-s1">editorImageSample</span> <span class="pl-c1">=</span> <span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-s">'imageManagement'</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
+    <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
+        <span class="pl-kos">[</span><span class="pl-s">'undo'</span><span class="pl-kos">,</span> <span class="pl-s">'redo'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'formatBlock'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'horizontalRule'</span><span class="pl-kos">,</span> <span class="pl-s">'list'</span><span class="pl-kos">,</span> <span class="pl-s">'table'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'image'</span><span class="pl-kos">,</span> <span class="pl-s">'video'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'showBlocks'</span><span class="pl-kos">,</span> <span class="pl-s">'fullScreen'</span><span class="pl-kos">,</span> <span class="pl-s">'preview'</span><span class="pl-kos">,</span> <span class="pl-s">'print'</span><span class="pl-kos">]</span>
+    <span class="pl-kos">]</span><span class="pl-kos">,</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span>
 
-    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>, image, fixSize; i <span class="pl-k">&amp;lt;</span> <span class="pl-smi">imageList</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
-        image <span class="pl-k">=</span> imageList[i];
-        fixSize <span class="pl-k">=</span> (<span class="pl-smi">image</span>.<span class="pl-c1">size</span> <span class="pl-k">/</span> <span class="pl-c1">1000</span>).<span class="pl-en">toFixed</span>(<span class="pl-c1">1</span>) <span class="pl-k">*</span> <span class="pl-c1">1</span>
+<span class="pl-s1">editorImageSample</span><span class="pl-kos">.</span><span class="pl-en">onImageUpload</span> <span class="pl-c1">=</span> <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">targetElement</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">,</span> <span class="pl-s1">state</span><span class="pl-kos">,</span> <span class="pl-s1">imageInfo</span><span class="pl-kos">,</span> <span class="pl-s1">remainingFilesCount</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">state</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">imageList</span><span class="pl-kos">.</span><span class="pl-en">splice</span><span class="pl-kos">(</span><span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">imageList</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-c1">1</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">state</span> <span class="pl-c1">===</span> <span class="pl-s">'create'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">imageList</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-s1">imageInfo</span><span class="pl-kos">)</span>
+        <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span> <span class="pl-c">// update }</span>
+    <span class="pl-kos">}</span>
+
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">remainingFilesCount</span> <span class="pl-c1">===</span> <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-en">setImageList</span><span class="pl-kos">(</span><span class="pl-s1">imageList</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
+
+<span class="pl-c">// Upload from outside the editor</span>
+<span class="pl-smi">document</span><span class="pl-kos">.</span><span class="pl-en">getElementById</span><span class="pl-kos">(</span><span class="pl-s">'files_upload'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'change'</span><span class="pl-kos">,</span> <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">target</span><span class="pl-kos">.</span><span class="pl-c1">files</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">editorImageSample</span><span class="pl-kos">.</span><span class="pl-en">insertImage</span><span class="pl-kos">(</span><span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">target</span><span class="pl-kos">.</span><span class="pl-c1">files</span><span class="pl-kos">)</span>
+        <span class="pl-s1">e</span><span class="pl-kos">.</span><span class="pl-c1">target</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-s">''</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span>
+
+<span class="pl-c">// Edit image list</span>
+<span class="pl-k">function</span> <span class="pl-en">setImageList</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">let</span> <span class="pl-s1">list</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
+    <span class="pl-k">let</span> <span class="pl-s1">size</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span>
+
+    <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">image</span><span class="pl-kos">,</span> <span class="pl-s1">fixSize</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> &amp;<span class="pl-s1">lt</span><span class="pl-kos">;</span> <span class="pl-s1">imageList</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">image</span> <span class="pl-c1">=</span> <span class="pl-s1">imageList</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+        <span class="pl-s1">fixSize</span> <span class="pl-c1">=</span> <span class="pl-kos">(</span><span class="pl-s1">image</span><span class="pl-kos">.</span><span class="pl-c1">size</span> / <span class="pl-c1">1000</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">toFixed</span><span class="pl-kos">(</span><span class="pl-c1">1</span><span class="pl-kos">)</span> * <span class="pl-c1">1</span>
             
-        list <span class="pl-k">+=</span> <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;li id="img_<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div onclick="checkImage(<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                        <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div class="image-wrapper"&amp;gt;&amp;lt;img src="<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-smi">src</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>"&amp;gt;&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;a href="javascript:void(0)" onclick="selectImage(<span class="pl-cce">\'</span>select<span class="pl-cce">\'</span>,<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-smi">image</span>.<span class="pl-c1">index</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>)" class="image-size"&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span> fixSize <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>KB&amp;lt;/a&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                    <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;div class="image-check"&amp;gt;&amp;lt;svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""&amp;gt;&amp;lt;path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/svg&amp;gt;&amp;lt;/div&amp;gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span>
-                <span class="pl-s"><span class="pl-pds">'</span>&amp;lt;/li&amp;gt;<span class="pl-pds">'</span></span>;
+        <span class="pl-s1">list</span> <span class="pl-c1">+=</span> <span class="pl-s">'&amp;lt;li id="img_'</span> <span class="pl-c1">+</span> <span class="pl-s1">image</span><span class="pl-kos">.</span><span class="pl-c1">index</span> <span class="pl-c1">+</span> <span class="pl-s">'"&amp;gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&amp;lt;div onclick="checkImage('</span> <span class="pl-c1">+</span> <span class="pl-s1">image</span><span class="pl-kos">.</span><span class="pl-c1">index</span> <span class="pl-c1">+</span> <span class="pl-s">')"&amp;gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&amp;lt;div class="image-wrapper"&amp;gt;&amp;lt;img src="'</span> <span class="pl-c1">+</span> <span class="pl-s1">image</span><span class="pl-kos">.</span><span class="pl-c1">src</span> <span class="pl-c1">+</span> <span class="pl-s">'"&amp;gt;&amp;lt;/div&amp;gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&amp;lt;/div&amp;gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&amp;lt;a href="javascript:void(0)" onclick="selectImage(\'select\','</span> <span class="pl-c1">+</span> <span class="pl-s1">image</span><span class="pl-kos">.</span><span class="pl-c1">index</span> <span class="pl-c1">+</span> <span class="pl-s">')" class="image-size"&amp;gt;'</span> <span class="pl-c1">+</span> <span class="pl-s1">fixSize</span> <span class="pl-c1">+</span> <span class="pl-s">'KB&amp;lt;/a&amp;gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&amp;lt;div class="image-check"&amp;gt;&amp;lt;svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""&amp;gt;&amp;lt;path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"&amp;gt;&amp;lt;/path&amp;gt;&amp;lt;/svg&amp;gt;&amp;lt;/div&amp;gt;'</span> <span class="pl-c1">+</span>
+                <span class="pl-s">'&amp;lt;/li&amp;gt;'</span><span class="pl-kos">;</span>
         
-        size <span class="pl-k">+=</span> fixSize;
-    }
+        <span class="pl-s1">size</span> <span class="pl-c1">+=</span> <span class="pl-s1">fixSize</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
 
-    <span class="pl-smi">imageSize</span>.<span class="pl-smi">innerText</span> <span class="pl-k">=</span> <span class="pl-smi">size</span>.<span class="pl-en">toFixed</span>(<span class="pl-c1">1</span>) <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>KB<span class="pl-pds">'</span></span>;
-    <span class="pl-smi">imageTable</span>.<span class="pl-smi">innerHTML</span> <span class="pl-k">=</span> list;
-}
+    <span class="pl-s1">imageSize</span><span class="pl-kos">.</span><span class="pl-c1">innerText</span> <span class="pl-c1">=</span> <span class="pl-s1">size</span><span class="pl-kos">.</span><span class="pl-en">toFixed</span><span class="pl-kos">(</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-c1">+</span> <span class="pl-s">'KB'</span><span class="pl-kos">;</span>
+    <span class="pl-s1">imageTable</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s1">list</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Array.prototype.findIndex</span>
-<span class="pl-k">function</span> <span class="pl-en">findIndex</span>(<span class="pl-smi">arr</span>, <span class="pl-smi">index</span>) {
-    <span class="pl-k">let</span> idx <span class="pl-k">=</span> <span class="pl-k">-</span><span class="pl-c1">1</span>;
+<span class="pl-c">// Click the file size</span>
+<span class="pl-k">function</span> <span class="pl-en">selectImage</span> <span class="pl-kos">(</span><span class="pl-s1">type</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-s1">imageList</span><span class="pl-kos">[</span><span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">imageList</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span><span class="pl-kos">]</span><span class="pl-kos">[</span><span class="pl-s1">type</span><span class="pl-kos">]</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
 
-    <span class="pl-smi">arr</span>.<span class="pl-en">some</span>(<span class="pl-k">function</span> (<span class="pl-smi">a</span>, <span class="pl-smi">i</span>) {
-        <span class="pl-k">if</span> ((<span class="pl-k">typeof</span> a <span class="pl-k">===</span> <span class="pl-s"><span class="pl-pds">'</span>number<span class="pl-pds">'</span></span> <span class="pl-k">?</span> a <span class="pl-k">:</span> <span class="pl-smi">a</span>.<span class="pl-c1">index</span>) <span class="pl-k">===</span> index) {
-            idx <span class="pl-k">=</span> i;
-            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
-        }
-        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
-    })
+<span class="pl-c">// Image check</span>
+<span class="pl-k">function</span> <span class="pl-en">checkImage</span> <span class="pl-kos">(</span><span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">const</span> <span class="pl-s1">li</span> <span class="pl-c1">=</span> <span class="pl-s1">imageTable</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'#img_'</span> <span class="pl-c1">+</span> <span class="pl-s1">index</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-k">const</span> <span class="pl-s1">currentImageIdx</span> <span class="pl-c1">=</span> <span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">selectedImages</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span>
 
-    <span class="pl-k">return</span> idx;
-}
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">currentImageIdx</span> &amp;<span class="pl-s1">gt</span><span class="pl-kos">;</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">selectedImages</span><span class="pl-kos">.</span><span class="pl-en">splice</span><span class="pl-kos">(</span><span class="pl-s1">currentImageIdx</span><span class="pl-kos">,</span> <span class="pl-c1">1</span><span class="pl-kos">)</span>
+        <span class="pl-s1">li</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">selectedImages</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-s1">index</span><span class="pl-kos">)</span>
+        <span class="pl-s1">li</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'checked'</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Click the file size</span>
-<span class="pl-k">function</span> <span class="pl-en">selectImage</span> (<span class="pl-smi">type</span>, <span class="pl-smi">index</span>) {
-    imageList[<span class="pl-en">findIndex</span>(imageList, index)][type]();
-}
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">selectedImages</span><span class="pl-kos">.</span><span class="pl-c1">length</span> &amp;<span class="pl-s1">gt</span><span class="pl-kos"></span><span class="pl-kos">;</span> <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">imageRemove</span><span class="pl-kos">.</span><span class="pl-en">removeAttribute</span><span class="pl-kos">(</span><span class="pl-s">'disabled'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span> <span class="pl-s1">else</span><span class="pl-kos"></span> <span class="pl-kos">{</span>
+        <span class="pl-s1">imageRemove</span><span class="pl-kos">.</span><span class="pl-en">setAttribute</span><span class="pl-kos">(</span><span class="pl-s">'disabled'</span><span class="pl-kos">,</span> <span class="pl-c1">true</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Image check</span>
-<span class="pl-k">function</span> <span class="pl-en">checkImage</span> (<span class="pl-smi">index</span>) {
-    <span class="pl-k">const</span> <span class="pl-c1">li</span> <span class="pl-k">=</span> <span class="pl-smi">imageTable</span>.<span class="pl-c1">querySelector</span>(<span class="pl-s"><span class="pl-pds">'</span>#img_<span class="pl-pds">'</span></span> <span class="pl-k">+</span> index);
-    <span class="pl-k">const</span> <span class="pl-c1">currentImageIdx</span> <span class="pl-k">=</span> <span class="pl-en">findIndex</span>(selectedImages, index)
+<span class="pl-c">// Click the remove button</span>
+<span class="pl-k">function</span> <span class="pl-en">deleteCheckedImages</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">const</span> <span class="pl-s1">iamgesInfo</span> <span class="pl-c1">=</span> <span class="pl-s1">editorImageSample</span><span class="pl-kos">.</span><span class="pl-en">getImagesInfo</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
-    <span class="pl-k">if</span> (currentImageIdx <span class="pl-k">&amp;gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
-        <span class="pl-smi">selectedImages</span>.<span class="pl-c1">splice</span>(currentImageIdx, <span class="pl-c1">1</span>)
-        <span class="pl-smi">li</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;
-    } <span class="pl-k">else</span> {
-        <span class="pl-smi">selectedImages</span>.<span class="pl-c1">push</span>(index)
-        <span class="pl-smi">li</span>.<span class="pl-c1">className</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>checked<span class="pl-pds">'</span></span>;
-    }
+    <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> &amp;<span class="pl-s1">lt</span><span class="pl-kos">;</span> <span class="pl-s1">iamgesInfo</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">selectedImages</span><span class="pl-kos">.</span><span class="pl-en">indexOf</span><span class="pl-kos">(</span><span class="pl-s1">iamgesInfo</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-c1">index</span><span class="pl-kos">)</span> &amp;<span class="pl-s1">gt</span><span class="pl-kos">;</span> <span class="pl-c1">-</span><span class="pl-c1">1</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">iamgesInfo</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">.</span><span class="pl-en">delete</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+            <span class="pl-s1">i</span><span class="pl-c1">--</span><span class="pl-kos">;</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span>
 
-    <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">length</span> <span class="pl-k">&amp;gt;</span> <span class="pl-c1">0</span>) {
-        <span class="pl-smi">imageRemove</span>.<span class="pl-c1">removeAttribute</span>(<span class="pl-s"><span class="pl-pds">'</span>disabled<span class="pl-pds">'</span></span>);
-    } <span class="pl-k">else</span> {
-        <span class="pl-smi">imageRemove</span>.<span class="pl-c1">setAttribute</span>(<span class="pl-s"><span class="pl-pds">'</span>disabled<span class="pl-pds">'</span></span>, <span class="pl-c1">true</span>);
-    }
-}
+    <span class="pl-s1">selectedImages</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span><span class="pl-kos">]</span>
+<span class="pl-kos">}</span>
 
-<span class="pl-c"><span class="pl-c">//</span> Click the remove button</span>
-<span class="pl-k">function</span> <span class="pl-en">deleteCheckedImages</span>() {
-    <span class="pl-k">const</span> <span class="pl-c1">iamgesInfo</span> <span class="pl-k">=</span> <span class="pl-smi">editorImageSample</span>.<span class="pl-en">getImagesInfo</span>();
+<span class="pl-c">/** --- video list --- */</span>
+<span class="pl-k">function</span> <span class="pl-en">videoUpload</span> <span class="pl-kos">(</span><span class="pl-s1">targetElement</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">,</span> <span class="pl-s1">state</span><span class="pl-kos">,</span> <span class="pl-s1">videoInfo</span><span class="pl-kos">,</span> <span class="pl-s1">remainingFilesCount</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">'videoInfo'</span><span class="pl-kos">,</span> <span class="pl-s1">videoInfo</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
-    <span class="pl-k">for</span> (<span class="pl-k">let</span> i <span class="pl-k">=</span> <span class="pl-c1">0</span>; i <span class="pl-k">&amp;lt;</span> <span class="pl-smi">iamgesInfo</span>.<span class="pl-c1">length</span>; i<span class="pl-k">++</span>) {
-        <span class="pl-k">if</span> (<span class="pl-smi">selectedImages</span>.<span class="pl-c1">indexOf</span>(iamgesInfo[i].<span class="pl-c1">index</span>) <span class="pl-k">&amp;gt;</span> <span class="pl-k">-</span><span class="pl-c1">1</span>) {
-            iamgesInfo[i].<span class="pl-c1">delete</span>();
-            i<span class="pl-k">--</span>;
-        }
-    }
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">state</span> <span class="pl-c1">===</span> <span class="pl-s">'delete'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">videoList</span><span class="pl-kos">.</span><span class="pl-en">splice</span><span class="pl-kos">(</span><span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">videoList</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span><span class="pl-kos">,</span> <span class="pl-c1">1</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span>
+        <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">state</span> <span class="pl-c1">===</span> <span class="pl-s">'create'</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-s1">videoList</span><span class="pl-kos">.</span><span class="pl-en">push</span><span class="pl-kos">(</span><span class="pl-s1">videoInfo</span><span class="pl-kos">)</span>
+        <span class="pl-kos">}</span> <span class="pl-k">else</span> <span class="pl-kos">{</span> <span class="pl-c">// update</span>
+            <span class="pl-c">//</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span>
 
-    selectedImages <span class="pl-k">=</span> []
-}</pre></div>
+    <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">remainingFilesCount</span> <span class="pl-c1">===</span> <span class="pl-c1">0</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-smi">console</span><span class="pl-kos">.</span><span class="pl-en">log</span><span class="pl-kos">(</span><span class="pl-s">'videoList'</span><span class="pl-kos">,</span> <span class="pl-s1">videoList</span><span class="pl-kos">)</span>
+        <span class="pl-en">setVideoList</span><span class="pl-kos">(</span><span class="pl-s1">videoList</span><span class="pl-kos">)</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span>
 
+<span class="pl-k">function</span> <span class="pl-en">setVideoList</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-k">let</span> <span class="pl-s1">list</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
 
-<!-- user function -->
-<a id="functions" href="#functions"><h4 class="sub-title" style="margin-top: 60px;">User Functions</h4></a>
+    <span class="pl-k">for</span> <span class="pl-kos">(</span><span class="pl-k">let</span> <span class="pl-s1">i</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span><span class="pl-kos">,</span> <span class="pl-s1">video</span><span class="pl-kos">;</span> <span class="pl-s1">i</span> <span class="pl-c1">&lt;</span> <span class="pl-s1">videoList</span><span class="pl-kos">.</span><span class="pl-c1">length</span><span class="pl-kos">;</span> <span class="pl-s1">i</span><span class="pl-c1">++</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-s1">video</span> <span class="pl-c1">=</span> <span class="pl-s1">videoList</span><span class="pl-kos">[</span><span class="pl-s1">i</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
+            
+        <span class="pl-s1">list</span> <span class="pl-c1">+=</span> <span class="pl-s">'&lt;li&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;button title="delete" onclick="selectVideo(\'delete\','</span> <span class="pl-c1">+</span> <span class="pl-s1">video</span><span class="pl-kos">.</span><span class="pl-c1">index</span> <span class="pl-c1">+</span> <span class="pl-s">')"&gt;X&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                    <span class="pl-s">'&lt;a href="javascript:void(0)" onclick="selectVideo(\'select\','</span> <span class="pl-c1">+</span> <span class="pl-s1">video</span><span class="pl-kos">.</span><span class="pl-c1">index</span> <span class="pl-c1">+</span> <span class="pl-s">')"&gt;'</span> <span class="pl-c1">+</span> <span class="pl-s1">video</span><span class="pl-kos">.</span><span class="pl-c1">src</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/a&gt;'</span> <span class="pl-c1">+</span>
+                <span class="pl-s">'&lt;/li&gt;'</span><span class="pl-kos">;</span>
+    <span class="pl-kos">}</span>
 
-<form id="frm" name="frm">
-    <textarea id="exampleFunction" style="width:100%; height:250px;">
-        <p>User Function Test</p>
-    </textarea>
-    <p></p>
-    <button type="button" class="btn btn-md btn-default" onclick="sun_destroy()">Destroy</button>
-    <button type="button" class="btn btn-md btn-default" onclick="sun_create()">Create</button>
-    <button type="button" class="btn btn-md btn-default" onclick="sun_setOptions()" id="opt1">setOptions</button>
-    <button type="button" class="btn btn-md btn-link" onclick="sun_resetOptions()" id="opt2" style="display: none;">resetOptions</button>
-    <button type="button" class="btn btn-md btn-default" onclick="sun_setDefaultStyle()" id="ds1">setDefaultStyle</button>
-    <button type="button" class="btn btn-md btn-link" onclick="sun_resetDefaultStyle()" id="ds2" style="display: none;">resetDefaultStyle</button>
-    <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeOpen('test notice')">noticeOpen</button>
-    <button type="button" class="btn btn-md btn-danger" onclick="sun_noticeClose()">noticeClose</button>
-    <div></div>
-    <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
-    <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
-    <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
-    <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
-    <button type="button" class="btn btn-md btn-success" onclick="sun_getVideosInfo()">getVideosInfo</button>
-    <div>
-        <input type="file" id="example_files_input" accept="image/*" multiple="multiple" style="display: inline-block; background: #fff;"/>
-        <button type="button" class="btn btn-md btn-success" onclick="sun_insertImage()">insertImage</button>
-    </div>
-    <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
-    <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
-    <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
-    <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
-    <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
-    <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
-    <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
-    <div></div>
-    <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disabled()">Disabled toolbar</button>
-    <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enabled()">Enabled toolbar</button>
-    <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_hide()">Hide toolbar</button>
-    <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
-</form>
+    <span class="pl-s1">videoTable</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s1">list</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span>
 
-<div class="highlight highlight-source-js"><pre><span class="pl-k">import</span> <span class="pl-smi">suneditor</span> <span class="pl-k">from</span> <span class="pl-s"><span class="pl-pds">'</span>suneditor<span class="pl-pds">'</span></span>
-
-<span class="pl-k">function</span> <span class="pl-en">sun_setOptions</span>() {
-    <span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
-        mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>inline<span class="pl-pds">'</span></span>,
-        minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
-        colorList<span class="pl-k">:</span> [
-            [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
-        ],
-        buttonList<span class="pl-k">:</span> [
-            [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
-        ]
-    });
-}
-
-<span class="pl-k">function</span> <span class="pl-en">sun_resetOptions</span>() {
-    <span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
-        mode<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>classic<span class="pl-pds">'</span></span>,
-        minHeight<span class="pl-k">:</span> <span class="pl-c1">null</span>,
-        colorList<span class="pl-k">:</span> <span class="pl-c1">null</span>,
-        buttonList<span class="pl-k">:</span> [
-            [<span class="pl-s"><span class="pl-pds">'</span>undo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>redo<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>bold<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>underline<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>italic<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>strike<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>subscript<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>superscript<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>removeFormat<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>outdent<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>indent<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>fullScreen<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>showBlocks<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>codeView<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>preview<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>print<span class="pl-pds">'</span></span>],
-            [<span class="pl-s"><span class="pl-pds">'</span>image<span class="pl-pds">'</span></span>]
-        ],
-    });
-}
-
-<span class="pl-k">function</span> <span class="pl-en">sun_setDefaultStyle</span>() {
-    <span class="pl-smi">editor</span>.<span class="pl-en">setDefaultStyle</span>(<span class="pl-s"><span class="pl-pds">'</span>font-family: cursive; font-size: 10px;<span class="pl-pds">'</span></span>);
-}
-
-<span class="pl-k">function</span> <span class="pl-en">sun_resetDefaultStyle</span>() {
-    <span class="pl-smi">editor</span>.<span class="pl-en">setDefaultStyle</span>(<span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>);
-}
-
-<span class="pl-k">const</span> <span class="pl-c1">editor</span> <span class="pl-k">=</span> <span class="pl-smi">suneditor</span>.<span class="pl-en">create</span>(<span class="pl-s"><span class="pl-pds">'</span>example<span class="pl-pds">'</span></span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Add or reset option property</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">setOptions</span>({
-    minHeight<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>300px<span class="pl-pds">'</span></span>,
-    buttonList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>fontColor<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>hiliteColor<span class="pl-pds">'</span></span>]
-    ],
-    colorList<span class="pl-k">:</span> [
-        [<span class="pl-s"><span class="pl-pds">'</span>#ccc<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>#dedede<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>OrangeRed<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Orange<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>RoyalBlue<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>SaddleBrown<span class="pl-pds">'</span></span>]
-    ]
-});
-
-<span class="pl-c"><span class="pl-c">//</span> Open a notice area</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">noticeOpen</span>(<span class="pl-s"><span class="pl-pds">'</span>test notice<span class="pl-pds">'</span></span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Close a notice area</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">noticeClose</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Copies the contents of the suneditor into a [textarea]</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">save</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Gets the suneditor's context object. Contains settings, plugins, and cached element objects</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">getContext</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Gets the contents of the suneditor</span>
-<span class="pl-c"><span class="pl-c">//</span> onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">getContents</span>(onlyContents<span class="pl-k">:</span> <span class="pl-c1">Boolean</span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Gets uploaded images informations</span>
-<span class="pl-c"><span class="pl-c">/**</span> </span>
-<span class="pl-c"> * {</span>
-<span class="pl-c"> *  index: data index</span>
-<span class="pl-c"> *  name: file name</span>
-<span class="pl-c"> *  size: file size</span>
-<span class="pl-c"> *  select: select function</span>
-<span class="pl-c"> *  delete: delete function</span>
-<span class="pl-c"> *  element: image element</span>
-<span class="pl-c"> *  src: imgage src</span>
-<span class="pl-c"> * }</span>
-<span class="pl-c"> *<span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">getImagesInfo</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Gets uploaded videos informations</span>
-<span class="pl-c"><span class="pl-c">/**</span> </span>
-<span class="pl-c"> * {</span>
-<span class="pl-c"> *  index: data index</span>
-<span class="pl-c"> *  select: select function</span>
-<span class="pl-c"> *  delete: delete function</span>
-<span class="pl-c"> *  src: iframe src</span>
-<span class="pl-c"> *  element: iframe element</span>
-<span class="pl-c"> * }</span>
-<span class="pl-c"> *<span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">getVideosInfo</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Upload images using image plugin</span>
-<span class="pl-c"><span class="pl-c">//</span> document.getElementById('example_files_input').files</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">insertImage</span>(<span class="pl-c1">FileList</span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Inserts an HTML element or HTML string or plain string at the current cursor position</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">insertHTML</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;img src="http://suneditor.com/sample/img/sunset.jpg"&gt;<span class="pl-pds">'</span></span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Change the contents of the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">setContents</span>(<span class="pl-s"><span class="pl-pds">'</span>set contents<span class="pl-pds">'</span></span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Add content to the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">appendContents</span>(<span class="pl-s"><span class="pl-pds">'</span>append contents<span class="pl-pds">'</span></span>);
-
-<span class="pl-c"><span class="pl-c">//</span> Disable the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">disabled</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Enabled the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">enabled</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Hide the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">hide</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Show the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">show</span>();
-    
-<span class="pl-c"><span class="pl-c">//</span> Destroy the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">destroy</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Toolbar methods</span>
-<span class="pl-c"><span class="pl-c">//</span> Disable the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">toolbar</span>.<span class="pl-c1">disabled</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Enabled the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">toolbar</span>.<span class="pl-en">enabled</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Hide the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">toolbar</span>.<span class="pl-en">hide</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Show the suneditor</span>
-<span class="pl-smi">editor</span>.<span class="pl-c1">toolbar</span>.<span class="pl-en">show</span>();
-
-<span class="pl-c"><span class="pl-c">//</span> Event functions -------------------------------------------------------------------------------------</span>
-<span class="pl-c"><span class="pl-c">//</span> It can be redefined by receiving event object as parameter.</span>
-<span class="pl-c"><span class="pl-c">//</span> It is not called in exceptional cases and is called after the default event function has finished.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onScroll</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onScroll<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onClick</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onClick<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onMouseDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onMouseDown<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onInput</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onInput<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onKeyDown</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyDown<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onKeyUp</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onKeyUp<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onDrop</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onDrop<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onChange</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">contents</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onChange<span class="pl-pds">'</span></span>, contents) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onFocus</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onFocus<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-smi">editor</span>.<span class="pl-en">onBlur</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onBlur<span class="pl-pds">'</span></span>, e) }
-
-<span class="pl-c"><span class="pl-c">//</span> onload event</span>
-<span class="pl-c"><span class="pl-c">//</span> When reloaded with the "setOptions" method, the value of the "reload" argument is true.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">core</span>, <span class="pl-smi">reload</span>) { 
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-core<span class="pl-pds">'</span></span>, core)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onload-reload<span class="pl-pds">'</span></span>, reload)
-}
-
-<span class="pl-c"><span class="pl-c">//</span> Paste event.</span>
-<span class="pl-c"><span class="pl-c">//</span> Called before the editor's default event action.</span>
-<span class="pl-c"><span class="pl-c">//</span> If it returns false, it stops without executing the rest of the action.</span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * cleanData : HTML string modified for editor format</span>
-<span class="pl-c"> * maxCharCount : maxChartCount option (true if max character is exceeded)</span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onPaste</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">e</span>, <span class="pl-smi">cleanData</span>, <span class="pl-smi">maxCharCount</span>, <span class="pl-smi">core</span>) { <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>onPaste<span class="pl-pds">'</span></span>, e, cleanData, maxCharCount) }
-
-<span class="pl-c"><span class="pl-c">//</span> Called when the image is uploaded, updated, deleted.</span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * targetElement: Current img element</span>
-<span class="pl-c"> * index: Uploaded index (key value)</span>
-<span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
-<span class="pl-c"> * imageInfo: Image infomation (getImagesInfo)</span>
-<span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">imageInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>imageInfo:<span class="pl-s1"><span class="pl-pse">${</span>imageInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-}
-
-<span class="pl-c"><span class="pl-c">//</span> Called when the image is upload failed.</span>
-<span class="pl-c"><span class="pl-c">//</span> If you return false, the default notices are not called.</span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * errorMessage: Error message to show</span>
-<span class="pl-c"> * result: Result object </span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadError</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">errorMessage</span>, <span class="pl-smi">result</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">alert</span>(errorMessage)
-}
-
-<span class="pl-c"><span class="pl-c">//</span> Called before the image is uploaded.</span>
-<span class="pl-c"><span class="pl-c">//</span> If false is returned, no image upload is performed.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUploadBefore</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
-
-<span class="pl-c"><span class="pl-c">//</span> It replaces the default callback function of the image upload.</span>
-<span class="pl-smi">editor</span>.<span class="pl-en">imageUploadHandler</span> <span class="pl-k">=</span> <span class="pl-c1">null</span>
-
-<span class="pl-c"><span class="pl-c">//</span> Called when the videos(iframe) is uploaded, updated, deleted.</span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * targetElement: Current iframe element</span>
-<span class="pl-c"> * index: Uploaded index (key value)</span>
-<span class="pl-c"> * state: Upload status ('create', 'update', 'delete')</span>
-<span class="pl-c"> * videoInfo: Video infomation (getVideosInfo)</span>
-<span class="pl-c"> * remainingFilesCount: Count of remaining files to upload (0 when added as a url)</span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">onImageUpload</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">targetElement</span>, <span class="pl-smi">index</span>, <span class="pl-smi">state</span>, <span class="pl-smi">videoInfo</span>, <span class="pl-smi">remainingFilesCount</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>targetElement:<span class="pl-s1"><span class="pl-pse">${</span>targetElement<span class="pl-pse">}</span></span>, index:<span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>, state('create', 'update', 'delete'):<span class="pl-s1"><span class="pl-pse">${</span>state<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">`</span>videoInfo:<span class="pl-s1"><span class="pl-pse">${</span>videoInfo<span class="pl-pse">}</span></span>, remainingFilesCount:<span class="pl-s1"><span class="pl-pse">${</span>remainingFilesCount<span class="pl-pse">}</span></span><span class="pl-pds">`</span></span>)
-}
-
-<span class="pl-c"><span class="pl-c">// Called just before the inline toolbar is positioned and displayed on the screen.</span></span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * toolbar: Toolbar Element</span>
-<span class="pl-c"> * context: The editor's context object (editor.getContext()|core.context)</span>
-<span class="pl-c"> * core: Core object</span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">showInline</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">toolbar</span>, <span class="pl-smi">context</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>toolbar<span class="pl-pds">'</span></span>, toolbar);
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>context<span class="pl-pds">'</span></span>, context);
-}
-
-<span class="pl-c"><span class="pl-c">// Called just after the controller is positioned and displayed on the screen.</span></span>
-<span class="pl-c"><span class="pl-c">// controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]</span></span>
-<span class="pl-c"><span class="pl-c">/**</span></span>
-<span class="pl-c"> * name: The name of the plugin that called the controller</span>
-<span class="pl-c"> * controllers: Array of Controller elements</span>
-<span class="pl-c"> * core: Core object</span>
-<span class="pl-c"><span class="pl-c">*/</span></span>
-<span class="pl-smi">editor</span>.<span class="pl-en">showController</span> <span class="pl-k">=</span> <span class="pl-k">function</span> (<span class="pl-smi">name</span>, <span class="pl-smi">controllers</span>, <span class="pl-smi">core</span>) {
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>plugin name<span class="pl-pds">'</span></span>, name);
-    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>controller elements<span class="pl-pds">'</span></span>, controllers);
-}</pre></div>
-        
+<span class="pl-k">function</span> <span class="pl-en">selectVideo</span> <span class="pl-kos">(</span><span class="pl-s1">type</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+    <span class="pl-s1">videoList</span><span class="pl-kos">[</span><span class="pl-en">findIndex</span><span class="pl-kos">(</span><span class="pl-s1">videoList</span><span class="pl-kos">,</span> <span class="pl-s1">index</span><span class="pl-kos">)</span><span class="pl-kos">]</span><span class="pl-kos">[</span><span class="pl-s1">type</span><span class="pl-kos">]</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span><span class="pl-kos"></span></pre></div>        
     </article>
 
     <footer>
@@ -813,8 +625,8 @@
         console.log(suneditor.getImagesInfo());
     }
 
-    function sun_getVideosInfo() {
-        console.log(suneditor.getVideosInfo());
+    function sun_getFilesInfo(pluginName) {
+        console.log(suneditor.getFilesInfo(pluginName));
     }
 
     function sun_insertImage() {

@@ -7,8 +7,9 @@ export interface Module {
     name: string;
     
     /**
-     * @description Constructor
+     * @description Constructor, It will run automatically.
      * @param core Core object 
+     * @example core.addModule([dialog, resizing, fileManager])
      */
-    add: (core: SunEditor) => void;
+    add?: (core: SunEditor) => void;
 }

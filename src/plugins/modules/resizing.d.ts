@@ -34,9 +34,9 @@ declare interface resizing extends Module {
     /**
      * @description Gets the width size
      * @param contextPlugin context object of plugin (core.context[plugin])
-     * @param element Target element
-     * @param cover Cover element (FIGURE)
-     * @param container Container element (DIV.se-component)
+     * @param element Target element [default: "this.plugin[plugin]._element"]
+     * @param cover Cover element (FIGURE) [default: "this.plugin[plugin]._cover"]
+     * @param container Container element (DIV.se-component) [default: "this.plugin[plugin]._container"]
      * @returns
      */
     _module_getSizeX(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
@@ -44,9 +44,9 @@ declare interface resizing extends Module {
     /**
      * @description Gets the height size
      * @param contextPlugin context object of plugin (core.context[plugin])
-     * @param element Target element
-     * @param cover Cover element (FIGURE)
-     * @param container Container element (DIV.se-component)
+     * @param element Target element [default: "this.plugin[plugin]._element"]
+     * @param cover Cover element (FIGURE) [default: "this.plugin[plugin]._cover"]
+     * @param container Container element (DIV.se-component) [default: "this.plugin[plugin]._container"]
      * @returns
      */
     _module_getSizeY(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
@@ -99,26 +99,6 @@ declare interface resizing extends Module {
      * @description Open align submenu of module
      */
     openAlignMenu(): void;
-
-    /**
-     * @description Return HTML string of caption(FIGCAPTION) element
-     * @returns
-     */
-    create_caption(): string;
-
-    /**
-     * @description Cover the target element with a FIGURE element.
-     * @param element Target element
-     */
-    set_cover(element: Element): void;
-
-    /**
-     * @description Create a container for the resizing component and insert the element.
-     * @param cover Cover element (FIGURE)
-     * @param className Class name of container (fixed: se-component)
-     * @returns Created container element
-     */
-    set_container(cover: Element, className: string): Element;
 
     /**
      * @description Click event of resizing toolbar

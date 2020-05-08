@@ -76,11 +76,11 @@ export default {
     },
 
     /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         const targetButton = this.context.align.targetButton;
-        const target = targetButton.querySelector('svg');
+        const target = targetButton.firstElementChild;
 
         if (!element) {
             this.util.changeElement(target, this.context.align.icons.left);
@@ -98,7 +98,7 @@ export default {
     },
 
     /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const alignContext = this.context.align;

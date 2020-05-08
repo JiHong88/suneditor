@@ -146,7 +146,7 @@ suneditor.create('sample', {
         '/', // Line break
         ['outdent', 'indent'],
         ['align', 'horizontalRule', 'list', 'lineHeight'],
-        ['table', 'link', 'image', 'video', /** 'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
+        ['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template']
@@ -202,7 +202,7 @@ const initEditor = suneditor.init({
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
-        'table', 'link', 'image', 'video', /** 'math' */, // You must add the 'katex' library at options to use the 'math' plugin.
+        'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template']
     ]
@@ -306,6 +306,7 @@ plugins: [
     image,
     link,
     video,
+    audio,
     math // You must add the 'katex' library at options to use the 'math' plugin.
 ]               : Plugins array.     default: null {Array}
 
@@ -318,7 +319,7 @@ pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhit
                         ex) 'p|h[1-6]'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
                         // -- Fixed whitelist --
-                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type'
+                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
                         ex) {
                             'all': 'style', // Apply to all tags
@@ -518,8 +519,8 @@ imageUploadHeader : Http Header when uploading images.              default: nul
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadImage.ajax"
                   request format: {
-                            "file-0": {},
-                            "file-1": {}
+                            "file-0": File,
+                            "file-1": File
                         }
                   When not used, it enters base64 data
                   response format: {
@@ -536,7 +537,7 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 
 // Video----------------------------------------------------------------------------------------------------------
-videoResizing   : Can resize the video iframe.                         default: true {Boolean}
+videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
 videoWidth      : The default width size of the video frame.           default: '100%' {String}
@@ -561,6 +562,62 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
+videoFileInput  : Choose whether to create a file input tag in the video upload window.  default: false {Boolean}
+videoUrlInput   : Choose whether to create a video url input tag in the video upload window.
+                  If the value of videoFileInput is false, it will be unconditionally.   default: true {Boolean}
+videoUploadHeader : Http Header when uploading videos.              default: null {Object}
+videoUploadUrl  : The video upload to server mapping address.       default: null {String}
+                  ex) "/editor/uploadVideo.ajax"
+                  request format: {
+                            "file-0": File,
+                            "file-1": File
+                        }
+                  Use video tags. (supported video formats: '.mp4', '.webm', '.ogg')
+                  response format: {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "url": "/download/editorVideos/test_video.mp4",
+                                    "name": "test_video.mp4",
+                                    "size": "561276"
+                                }
+                            ]
+                        }
+videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
+                      Invokes the "onVideoUploadError" method.  default: null {Number}
+
+// Audio----------------------------------------------------------------------------------------------------------
+audioWidth      : The default width size of the audio frame.           default: '300px' {String}
+audioHeight     : The default height size of the audio frame.          default: '54px' {String}
+audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {Boolean}
+audioUrlInput   : Choose whether to create a audio url input tag in the audio upload window.
+                  If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
+audioUploadHeader : Http Header when uploading audios.              default: null {Object}
+audioUploadUrl  : The audio upload to server mapping address.       default: null {String}
+                  ex) "/editor/uploadAudio.ajax"
+                  request format: {
+                            "file-0": File,
+                            "file-1": File
+                        }
+                  Use audio tags. (supported audio formats: '.mp4', '.webm', '.ogg')
+                  response format: {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "url": "/download/editorAudios/test_audio.mp3",
+                                    "name": "test_audio.mp3",
+                                    "size": "561276"
+                                }
+                            ]
+                        }
+audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
+                      Invokes the "onAudioUploadError" method.  default: null {Number}
+
+// Table----------------------------------------------------------------------------------------------------------
+tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
+
+// Key actions----------------------------------------------------------------------------------------------------
+tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
@@ -614,6 +671,9 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
+editor.core; // core object (The core object contains "util" and "functions".)
+editor.util; // util object
+
 // Add or reset option property
 editor.setOptions({
     minHeight: '300px',
@@ -659,6 +719,23 @@ editor.getContents(onlyContents: Boolean);
  * }
  **/
 editor.getImagesInfo();
+
+// Gets uploaded files(plugin using fileManager) information list.
+// image: [img], video: [video, iframe], audio: [audio]
+// When the argument value is 'image', it is the same function as "getImagesInfo".
+/** 
+ * {
+ *  element: image element
+ *  src: imgage src
+ *  index: data index
+ *  name: file name
+ *  size: file size
+ *  select: select function
+ *  delete: delete function
+ * }
+ * pluginName: Plugin name (image, video, audio)
+ **/
+editor.getFilesInfo(pluginName);
 
 // Upload images using image plugin
 // document.getElementById('example_files_input').files
@@ -722,13 +799,13 @@ editor.onKeyDown = function (e, core) { console.log('onKeyDown', e) }
 
 editor.onKeyUp = function (e, core) { console.log('onKeyUp', e) }
 
-editor.onDrop = function (e, core) { console.log('onDrop', e) }
-
-editor.onChange = function (contents, core) { console.log('onChange', contents) }
-
 editor.onFocus = function (e, core) { console.log('onFocus', e) }
 
 editor.onBlur = function (e, core) { console.log('onBlur', e) }
+
+// onchange event
+// contents: core.getContents(), Core object
+editor.onChange = function (contents, core) { console.log('onChange', contents) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
@@ -741,17 +818,36 @@ editor.onload = function (core, reload) {
 // Called before the editor's default event action.
 // If it returns false, it stops without executing the rest of the action.
 /**
- * cleanData : HTML string modified for editor format
- * maxCharCount : maxChartCount option (true if max character is exceeded)
+ * e: Event object
+ * cleanData: HTML string modified for editor format
+ * maxCharCount: maxChartCount option (true if max character is exceeded)
  * core: Core object
-*/
+ */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Drop event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
+/**
+ * e: Event object
+ * dataTransfer: e.dataTransfer
+ * core: Core object
+ */
+editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
 // Called before the image is uploaded
 // If false is returned, no image upload is performed.
 /**
  * files: Files array
- * info: Input information
+ * info: {
+ * - linkValue: Link url value
+ * - linkNewWindow: Open in new window Check Value
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update image if true, create image if false
+ * - element: If isUpdate is true, the currently selected image.
+ * }
  * core: Core object
  * return {Boolean}
  */
@@ -760,34 +856,81 @@ editor.onImageUploadBefore: function (files, info, core) {
     console.log('info', info);
     return Boolean
 }
+// Called before the video is uploaded
+// If false is returned, no video(iframe, video) upload is performed.
+/** 
+ * files: Files array
+ * info: {
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update video if true, create video if false
+ * - element: If isUpdate is true, the currently selected video.
+ * }
+ * core: Core object
+ * return {Boolean}
+ */
+editor.onVideoUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
+// Called before the audio is uploaded
+// If false is returned, no audio upload is performed.
+/** 
+* files: Files array
+* info: {
+* - isUpdate: Update audio if true, create audio if false
+* - currentaudio: If isUpdate is true, the currently selected audio.
+* }
+* core: Core object
+* return {Boolean}
+*/
+editor.onAudioUploadBefore: function (files, info, core) {
+    console.log('files', files);
+    console.log('info', info);
+    return Boolean
+}
 
 // Called when the image is uploaded, updated, deleted.
 /**
- * targetElement: Current img element
+ * targetElement: Target element
  * index: Uploaded index (key value)
  * state: Upload status ('create', 'update', 'delete')
- * imageInfo: {
+ * info: {
  * - index: data index
  * - name: file name
  * - size: file size
  * - select: select function
  * - delete: delete function
- * - element: img element
- * - src: src attribute of img tag
+ * - element: Target element
+ * - src: src attribute of tag
  * }
  * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
  * core: Core object
 */
-editor.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount, core) {
+editor.onImageUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
     console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`imageInfo:${imageInfo}, remainingFilesCount:${remainingFilesCount}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
+}
+// Called when the video(iframe, video) is is uploaded, updated, deleted
+// -- arguments is same "onImageUpload" --
+editor.onVideoUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
+}
+// Called when the audio is is uploaded, updated, deleted
+// -- arguments is same "onImageUpload" --
+editor.onAudioUpload = function (targetElement, index, state, info, remainingFilesCount, core) {
+    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
+    console.log(`info:${info}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called when the image is upload failed.
 // If you return false, the default notices are not called.
 /**
- * errorMessage: Error message to show
- * result: Result object 
+ * errorMessage: Error message
+ * result: Response Objectz
  * core: Core object
  * return {Boolean}
 */
@@ -795,10 +938,22 @@ editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
     return Boolean
 }
+// Called when the video(iframe, video) upload failed
+// -- arguments is same "onImageUploadError" --
+editor.onVideoUploadError = function (errorMessage, result, core) {
+    alert(errorMessage)
+    return Boolean
+}
+// Called when the audio upload failed
+// -- arguments is same "onImageUploadError" --
+editor.onAudioUploadError = function (errorMessage, result, core) {
+    alert(errorMessage)
+    return Boolean
+}
 
 // It replaces the default callback function of the image upload
 /**
- * response: Response object
+ * xmlHttpRequest: xmlHttpRequest object
  * info (Input information): {
  * - linkValue: Link url value
  * - linkNewWindow: Open in new window Check Value
@@ -806,30 +961,21 @@ editor.onImageUploadError = function (errorMessage, result, core) {
  * - inputHeight: Value of height input
  * - align: Align Check Value
  * - isUpdate: Update image if true, create image if false
- * - currentImage: If isUpdate is true, the currently selected image.
+ * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object
  */
-editor.imageUploadHandler = function (response, info, core) {
+editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
     // Example of upload method
-    const res = JSON.parse(response.responseText);
+    const res = JSON.parse(xmlHttpRequest.responseText);
     
     // Error
     if (res.errorMessage) {
-        if (typeof editor.onImageUploadError === 'function') {
-            if (core.onImageUploadError(res.errorMessage, res.result)) {
-                core.notice.open.call(core, res.errorMessage);
-            }
+        if (core.functions.onImageUploadError !== 'function' || core.functions.onImageUploadError(res.errorMessage, res, core)) {
+            core.notice.open.call(core, res.errorMessage);
         } else {
             core.notice.open.call(core, res.errorMessage);
         }
-        /** 
-         * You can do the same thing using the core private function.
-         * The core._imageUploadError function returns false when "editor.onImageUploadError" function is not defined.
-        */
-        // if (core._imageUploadError(res.errorMessage, res.result)) {
-        //     core.notice.open.call(core, res.errorMessage);
-        // }
     }
     // Success
     else {
@@ -841,31 +987,11 @@ editor.imageUploadHandler = function (response, info, core) {
             file = {name: fileList[i].name, size: fileList[i].size};
             // For existing image updates, the "info" attributes are predefined in the element.
             // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
-            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.currentImage, file);
+            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.element, file);
             // The image is created and a format element(p, div..) is added below it.
             else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
         }
     }
-}
-
-// Called when the video(iframe) is is uploaded, updated, deleted
-/**
- * targetElement: Current iframe element
- * index: Uploaded index
- * state: Upload status ('create', 'update', 'delete')
- * videoInfo: {
- * - index: data index
- * - select: select function
- * - delete: delete function
- * - element: iframe element
- * - src: src attribute of iframe tag
- * }
- * remainingFilesCount: Count of remaining files to upload (0 when added as a url)
- * core: Core object
- */
-editor.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount, core) {
-    console.log(`targetElement:${targetElement}, index:${index}, state('create', 'update', 'delete'):${state}`)
-    console.log(`videoInfo:${videoInfo}, remainingFilesCount:${remainingFilesCount}`)
 }
 
 // Called just before the inline toolbar is positioned and displayed on the screen.
@@ -916,6 +1042,9 @@ editor.showController = function (name, controllers, core) {
         </tr>
         <tr>
             <td align="left">video</td>
+        </tr>
+        <tr>
+            <td align="left">audio</td>
         </tr>
         <tr>
             <td align="left">math</td>

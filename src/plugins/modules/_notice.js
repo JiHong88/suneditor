@@ -38,7 +38,7 @@ export default {
         notice_button.addEventListener('click', this.onClick_cancel.bind(core));
         
         /** append html */
-        context.element.relative.insertBefore(notice_div, context.element.editorArea);
+        context.element.editorArea.appendChild(notice_div);
         
         /** empty memory */
         notice_div = null;

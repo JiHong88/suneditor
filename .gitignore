@@ -4,8 +4,8 @@
 # project files
 .vscode/**
 .idea/**
-out
-gen
+.out/**
+.gen/**
 
 # modules
 node_modules/**

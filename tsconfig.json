@@ -13,6 +13,7 @@
     "sample",
     "test",
     "dist",
-    "src"
+    "src",
+    "webpack.*.js"
   ]
 }

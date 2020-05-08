@@ -95,8 +95,14 @@
 			},
 			videoBox: {
 				title: 'Insertar Video',
+				file: 'Seleccionar desde los archivos',
 				url: '¿URL del vídeo? Youtube'
 			},
+			audioBox: {
+                title: 'Insertar Audio',
+                file: 'Seleccionar desde los archivos',
+                url: 'URL de la audio'
+            },
 			caption: 'Insertar descripción',
 			close: 'Cerrar',
 			submitButton: 'Enviar',
@@ -150,10 +156,20 @@
 
 	if (typeof noGlobal === typeof undefined) {
 		if (!window.SUNEDITOR_LANG) {
-			window.SUNEDITOR_LANG = {};
-		}
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
+        }
 
-		window.SUNEDITOR_LANG.es = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'es', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
 	}
 
 	return lang;

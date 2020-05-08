@@ -20,6 +20,7 @@ export default {
             _tableXY: [],
             _maxWidth: true,
             _fixedColumn: false,
+            cellControllerTop: context.options.tableCellControllerPosition === 'top',
             resizeText: null,
             headerButton: null,
             mergeButton: null,
@@ -59,7 +60,7 @@ export default {
         tableController.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** set resizing */
-        let resizeDiv = this.setController_tableEditor.call(core);
+        let resizeDiv = this.setController_tableEditor.call(core, context.table.cellControllerTop);
         context.table.resizeDiv = resizeDiv;
         context.table.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
         context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
@@ -130,14 +131,13 @@ export default {
         return tableResize;
     },
 
-    setController_tableEditor: function () {
+    setController_tableEditor: function (cellControllerTop) {
         const lang = this.lang;
         const icons = this.icons;
         const tableResize = this.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';
-        tableResize.innerHTML = '' +
-            '<div class="se-arrow se-arrow-up"></div>' +
+        tableResize.innerHTML = (cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>') +
             '<div class="se-btn-group">' +
                 '<button type="button" data-command="insert" data-value="row" data-option="up" class="se-btn se-tooltip _se_table_insert_row_a">' +
                     icons.insert_row_above +
@@ -304,26 +304,23 @@ export default {
     /** table edit controller */
     call_controller_tableEdit: function (tdElement) {
         const tablePlugin = this.plugins.table;
+        const contextTable = this.context.table;
 
         if (!this.getSelection().isCollapsed && !tablePlugin._selectedCell) {
             this.controllersOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
-        
-        const contextTable = this.context.table;
-        const tableController = contextTable.tableController;
-        
-        tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
 
-        const tableElement = contextTable._element;
+        const tableElement = contextTable._element || this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
+        tablePlugin.setPositionControllerTop.call(this, tableElement);
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
         tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
 
-        tablePlugin.setPositionControllerTop.call(this, tableElement);
-
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, tableController, tablePlugin.init.bind(this), tdElement, 'table');
+        tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
+        
+        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerTop: function (tableElement) {
@@ -339,20 +336,29 @@ export default {
         const resizeDiv = contextTable.resizeDiv;
         
         this.plugins.table.setCellInfo.call(this, tdElement, reset);
-
+        
+        resizeDiv.style.visibility = 'hidden';
         resizeDiv.style.display = 'block';
 
-        const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
-        resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-        resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
-
-        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
-        if (overLeft < 0) {
-            resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
-            resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
+        if (contextTable.cellControllerTop) {
+            const offset = this.util.getOffset(contextTable._element, this.context.element.wysiwygFrame);
+            resizeDiv.style.top = (offset.top - resizeDiv.offsetHeight - 2) + 'px';
+            resizeDiv.style.left = (offset.left + contextTable.tableController.offsetWidth) + 'px';
         } else {
-            resizeDiv.firstElementChild.style.left = '20px';
+            const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
+            resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
+            resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
+    
+            const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
+            if (overLeft < 0) {
+                resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
+                resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
+            } else {
+                resizeDiv.firstElementChild.style.left = '20px';
+            }
         }
+
+        resizeDiv.style.visibility = '';
     },
 
     setCellInfo: function (tdElement, reset) {
@@ -1080,7 +1086,7 @@ export default {
         let icon, span, sizeIcon, text;
 
         if (styles.indexOf('width') > -1) {
-            icon =  contextTable.resizeButton.querySelector('svg');
+            icon =  contextTable.resizeButton.firstElementChild;
             span = contextTable.resizeText;
 
             if (!contextTable._maxWidth) {
@@ -1369,7 +1375,6 @@ export default {
         }
 
         this._wd.addEventListener('mouseup', tablePlugin._bindOffSelect, false);
-
         tablePlugin._initBind = tablePlugin.init.bind(this);
         this._wd.addEventListener('touchmove', tablePlugin._initBind, false);
     },

@@ -8,17 +8,10 @@ import { Module } from '../plugins/Module';
 import _Notice from '../plugins/modules/_notice';
 
 type Controllers = Array<string | Function | Element>;
-type ImageInfo =  {
+type fileInfo =  {
     index: number;
     name: string;
     size: string | number;
-    select: Function;
-    delete: Function;
-    element: Element;
-    src: string;
-};
-type VideoInfo = {
-    index: number;
     select: Function;
     delete: Function;
     element: Element;
@@ -150,11 +143,11 @@ interface Core {
     activePlugins: Plugin[];
 
     /**
-     * @description Plugins array with "checkComponentInfo" and "resetComponentInfo" methods.
-     * "componentInfoPlugins" runs the "add" method when creating the editor.
-     * "checkComponentInfo" method is always call just before the "change" event.
+     * @description Plugins array with "checkFiletInfo" and "resetFileInfo" methods.
+     * "fileInfoPlugins" runs the "add" method when creating the editor.
+     * "checkFileInfo" method is always call just before the "change" event.
      */
-    componentInfoPlugins: Function[],
+    fileInfoPlugins: Function[],
 
     /**
      * @description Elements that need to change text or className for each selection change
@@ -338,13 +331,21 @@ interface Core {
      * @returns
      */
     insertComponent(element: Element, notHistoryPush: boolean): Element;
+    
+    /**
+     * @description Gets the file component and that plugin name
+     * return: {component, pluginName} | null
+     * @param element Target element (figure tag, component div, file tag)
+     * @returns
+     */
+    getFileComponent(element: Element): Record<string, string | Element> | null;
 
     /**
      * @description The component(image, video) is selected and the resizing module is called.
-     * @param element Element tag (img or iframe)
-     * @param componentName Component name (image or video)
+     * @param element Element tag (img, iframe, video)
+     * @param pluginName Plugin name (image, video)
      */
-    selectComponent(element: Element, componentName: string): void;
+    selectComponent(element: Element, pluginName: string): void;
 
     /**
      * @description Delete selected node and insert argument value node
@@ -545,7 +546,9 @@ interface Toolbar {
 
 type EventFn = (e: Event, core: Core) => void;
 
-type InputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, currentImage: any };
+type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
+type videoInputInformation = { inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
+type audioInputInformation = { isUpdate: boolean, element: any };
 
 export default class SunEditor {
     constructor(context: Context,
@@ -567,7 +570,7 @@ export default class SunEditor {
     onKeyUp: EventFn;
     onDrop: EventFn;
     onChange: (contents: string, core: Core) => void;
-    onBlur: EventFn;
+    onBlur: (e: FocusEvent, core: Core) => void;
     onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => void;
 
     /**
@@ -589,7 +592,7 @@ export default class SunEditor {
 
     /**
      * @description It replaces the default callback function of the image upload
-     * @param response Response object
+     * @param xmlHttpRequest xmlHttpRequest object
      * @param info Input information
      * - linkValue: Link url value
      * - linkNewWindow: Open in new window Check Value
@@ -597,10 +600,10 @@ export default class SunEditor {
      * - inputHeight: Value of height input
      * - align: Align Check Value
      * - isUpdate: Update image if true, create image if false
-     * - currentImage: If isUpdate is true, the currently selected image.
+     * - element: If isUpdate is true, the currently selected image.
      * @param core Core object
      */
-    imageUploadHandler: (response: Response, info: InputInformation, core: Core) => void;
+    imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
 
     /**
      * @description Called before the image is uploaded
@@ -610,50 +613,108 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onImageUploadBefore: (files: any[], info: InputInformation, core: Core) => boolean;
+    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core) => boolean;
+
+    /**
+     * @description Called before the video is uploaded
+     * If false is returned, no video upload is performed.
+     * @param files Files array
+     * @param info Input information
+     * @param core Core object
+     * @returns
+     */
+    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean;
+
+    /**
+     * @description Called before the audio is uploaded
+     * If false is returned, no audio upload is performed.
+     * @param files Files array
+     * @param info Input information
+     * @param core Core object
+     * @returns
+     */
+    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core) => boolean;
 
     /**
      * @description Called when the image is uploaded, updated, deleted
-     * @param targetElement Current img element
+     * @param targetElement Target element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
-     * @param imageInfo Image info object
+     * @param info Info object
      * - index: data index
      * - name: file name
      * - size: file size
      * - select: select function
      * - delete: delete function
-     * - element: img element
-     * - src: src attribute of img tag
+     * - element: target element
+     * - src: src attribute of tag
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, imageInfo: ImageInfo, remainingFilesCount: number, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
-     * @description Called when the video(iframe) is is uploaded, updated, deleted
-     * @param targetElement Current iframe element
+     * @description Called when the video(iframe, video) is uploaded, updated, deleted
+     * @param targetElement Target element
      * @param index Uploaded index
      * @param state Upload status ('create', 'update', 'delete')
-     * @param videoInfo Video info object
+     * @param info Info object
      * - index: data index
+     * - name: file name
+     * - size: file size
      * - select: select function
      * - delete: delete function
-     * - element: iframe element
-     * - src: src attribute of iframe tag
+     * - element: target element
+     * - src: src attribute of tag
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onVideoUpload: (targetElement: HTMLIFrameElement, index: number, state: string, videoInfo: VideoInfo, remainingFilesCount: number, core: Core) => void;
+    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+
+    /**
+     * @description Called when the audio is uploaded, updated, deleted
+     * @param targetElement Target element
+     * @param index Uploaded index
+     * @param state Upload status ('create', 'update', 'delete')
+     * @param info Info object
+     * - index: data index
+     * - name: file name
+     * - size: file size
+     * - select: select function
+     * - delete: delete function
+     * - element: target element
+     * - src: src attribute of tag
+     * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
+     * @param core Core object
+     */
+    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed
      * @param errorMessage Error message
-     * @param result Result info Object
+     * @param result Response Object
      * @param core Core object
      * @returns
      */
     onImageUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Called when the video(iframe, video) upload failed
+     * @param errorMessage Error message
+     * @param result Response Object
+     * @param core Core object
+     * @returns
+     */
+    onVideoUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Called when the audio upload failed
+     * @param errorMessage Error message
+     * @param result Response Object
+     * @param core Core object
+     * @returns
+     */
+    onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
 
     /**
      * @description Add or reset option property
@@ -718,18 +779,23 @@ export default class SunEditor {
      * - src: src attribute of img tag
      * @returns
      */
-    getImagesInfo(): ImageInfo[];
+    getImagesInfo(): fileInfo[];
 
     /**
-     * @description Gets uploaded videos informations
+     * @description Gets uploaded files(plugin using fileManager) information list.
+     * image: [img], video: [video, iframe], audio: [audio]
+     * When the argument value is 'image', it is the same function as "getImagesInfo".
      * - index: data index
+     * - name: file name
+     * - size: file size
      * - select: select function
      * - delete: delete function
-     * - element: iframe element
-     * - src: src attribute of iframe tag
+     * - element: img element
+     * - src: src attribute of img tag
+     * @param pluginName Plugin name (image, video, audio)
      * @returns
      */
-    getVideosInfo(): VideoInfo[];
+    getFilesInfo(pluginName: string): fileInfo[];
 
      /**
      * @description Upload images using image plugin

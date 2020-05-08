@@ -57,7 +57,7 @@ export default {
     },
 
      /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         if (!element) {
@@ -71,7 +71,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const fontSizeContext = this.context.fontSize;

@@ -87,6 +87,7 @@
                 <option value="en" selected>en</option>
                 <option value="es">es</option>
                 <option value="fr">fr</option>
+                <option value="it">it</option>
                 <option value="ja">ja</option>
                 <option value="ko">ko</option>
                 <option value="pt_br">pt_br</option>
@@ -223,7 +224,7 @@
             <label><input type="radio" id="radio_imageRotation_2" name="radio_imageRotation" value="%">&nbsp;&nbsp;false</label>
             <br><br>
             <label><input type="checkbox" id="imageUploadHeader">&nbsp;&nbsp;imageUploadHeader</label>
-            <textarea id="imageUploadHeader_value" placeholder='{"Access-Control-Allow-Origin": "*"}' style="width: 300px; vertical-align: top;"></textarea>
+            <textarea id="imageUploadHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
             <br><br>
             <label><input type="checkbox" id="imageUploadUrl">&nbsp;&nbsp;imageUploadUrl</label>
             <input type="text" id="imageUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
@@ -233,10 +234,10 @@
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
-            <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoResizing" checked>&nbsp;&nbsp;videoResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoFileInput">&nbsp;&nbsp;videoFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoUrlInput" checked>&nbsp;&nbsp;videoUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoRatioShow" checked>&nbsp;&nbsp;videoRatioShow</label>
             <br><br>
             <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
@@ -261,8 +262,45 @@
             <br><br>
             <label><input type="checkbox" id="youtubeQuery">&nbsp;&nbsp;youtubeQuery</label>
             <input type="text" id="youtubeQuery_value" placeholder="String.. (autoplay=1&mute=1)" style="width:220px">
+            <br><br>
+            <label><input type="checkbox" id="videoUploadHeader">&nbsp;&nbsp;videoUploadHeader</label>
+            <textarea id="videoUploadHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
+            <br><br>
+            <label><input type="checkbox" id="videoUploadUrl">&nbsp;&nbsp;videoUploadUrl</label>
+            <input type="text" id="videoUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoUploadSizeLimit">&nbsp;&nbsp;videoUploadSizeLimit</label>
+            <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+
+            <br>
+            <h4 style="color: #b94a48;">--Audio</h4>
+            <label><input type="checkbox" id="audioFileInput">&nbsp;&nbsp;audioFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="audioUrlInput" checked>&nbsp;&nbsp;audioUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
+            <label><input type="checkbox" id="audioWidth">&nbsp;&nbsp;audioWidth</label>
+            <input type="text" id="audioWidth_value" placeholder="String.. (300px)">
+            <br><br>
+            <label><input type="checkbox" id="audioHeight">&nbsp;&nbsp;audioHeight</label>
+            <input type="text" id="audioHeight_value" placeholder="String.. (54px)">
+            <br><br>
+            <label><input type="checkbox" id="audioUploadHeader">&nbsp;&nbsp;audioUploadHeader</label>
+            <textarea id="audioUploadHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
+            <br><br>
+            <label><input type="checkbox" id="audioUploadUrl">&nbsp;&nbsp;audioUploadUrl</label>
+            <input type="text" id="audioUploadUrl_value" placeholder="Server upload URL" style="width: 200px">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="audioUploadSizeLimit">&nbsp;&nbsp;audioUploadSizeLimit</label>
+            <input type="text" id="audioUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+
+            <br>
+            <h4 style="color: #b94a48;">--Table</h4>
+            <label><input type="checkbox" id="tableCellControllerPosition">&nbsp;&nbsp;tableCellControllerPosition</label>
+            <input type="text" id="tableCellControllerPosition_value" placeholder="String.. (cell, top)">
             
             <br>
+            <h4 style="color: #b94a48;">--Key actions</h4>
+            <label><input type="checkbox" id="tabDisable">&nbsp;&nbsp;tabDisable</label><br>
+
             <h4 style="color: #b94a48;">--Defining save button</h4>
             <label><input type="checkbox" id="callBackSave">&nbsp;&nbsp;callBackSave</label><br>
             <span>function (contents) { alert(contents) }</span>
@@ -296,7 +334,7 @@
         <button type="button" class="btn btn-md btn-primary" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
 
-        <div class="image-list">
+        <div class="component-list">
             <div class="file-list-info">
                 <span>Attached files</span>
                 <span class="xefu-btn">
@@ -353,6 +391,7 @@
 <script src="../../src/lang/en.js"></script>
 <script src="../../src/lang/es.js"></script>
 <script src="../../src/lang/fr.js"></script>
+<script src="../../src/lang/it.js"></script>
 <script src="../../src/lang/ja.js"></script>
 <script src="../../src/lang/ko.js"></script>
 <script src="../../src/lang/pt_br.js"></script>
@@ -436,6 +475,8 @@ function sun_create () {
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
+        videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,
+        videoUrlInput: document.getElementById('videoUrlInput').checked ? undefined : false,
         videoRatioShow: document.getElementById('videoRatioShow').checked ? undefined : false,
         videoWidth: document.getElementById('videoWidth').checked ? document.getElementById('videoWidth_value').value : undefined,
         videoHeight: document.getElementById('videoHeight').checked ? document.getElementById('videoHeight_value').value : undefined,
@@ -446,6 +487,18 @@ function sun_create () {
             {name: 'Classic Film 3:2', value: 0.6666}, {name: 'HD', value: 0.5625}
         ],
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
+        videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
+        videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
+        videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
+        audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
+        audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
+        audioWidth: document.getElementById('audioWidth').checked ? document.getElementById('audioWidth_value').value : undefined,
+        audioHeight: document.getElementById('audioHeight').checked ? document.getElementById('audioHeight_value').value : undefined,
+        audioUploadHeader: document.getElementById('audioUploadHeader').checked ? JSON.parse(document.getElementById('audioUploadHeader_value').value) : undefined,
+        audioUploadUrl: document.getElementById('audioUploadUrl').checked ? document.getElementById('audioUploadUrl_value').value : undefined,
+        audioUploadSizeLimit: document.getElementById('audioUploadSizeLimit').checked ? document.getElementById('audioUploadSizeLimit_value').value : undefined,
+        tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
+        tabDisable: document.getElementById('tabDisable').checked,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
         paragraphStyles: document.getElementById('paragraphStyles').checked ? ['spaced', {name: 'Box', class: '__se__customClass'}] : undefined,
@@ -462,7 +515,7 @@ function sun_create () {
             'removeFormat',
             'outdent', 'indent',
             'align', 'horizontalRule', 'list', 'lineHeight',
-            'table', 'link', 'image', 'video', 'math',
+            'table', 'link', 'image', 'video', 'audio', 'math',
             'fullScreen', 'showBlocks', 'codeView',
             'preview', 'print', 'save', 'template']
         ],

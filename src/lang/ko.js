@@ -95,7 +95,13 @@
             },
             videoBox: {
                 title: '동영상 삽입',
+                file: '파일 선택',
                 url: '미디어 임베드 주소, 유튜브'
+            },
+            audioBox: {
+                title: '오디오 삽입',
+                file: '파일 선택',
+                url: '오디오 파일 주소'
             },
             caption: '설명 넣기',
             close: '닫기',
@@ -150,10 +156,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_LANG) {
-            window.SUNEDITOR_LANG = {};
+            Object.defineProperty(window, 'SUNEDITOR_LANG', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_LANG.ko = lang;
+        Object.defineProperty(window.SUNEDITOR_LANG, 'ko', {
+            enumerable: true,
+            writable: true,
+            configurable: true,
+            value: lang
+        });
     }
 
     return lang;

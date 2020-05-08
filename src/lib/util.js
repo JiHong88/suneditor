@@ -36,8 +36,8 @@ const util = {
      * @private
      */
     _HTMLConvertor: function (contents) {
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&quot;', '<': '&lt;', '>': '&gt;'};
-        return contents.replace(/&|\u00A0|'|<|>/g, function (m) {
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
+        return contents.replace(/&|\u00A0|'|"|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
     },
@@ -1033,7 +1033,7 @@ const util = {
         try {
             item.remove();
         } catch (e) {
-            item.parentNode.removeChild(item);
+            if (item.parentNode) item.parentNode.removeChild(item);
         }
     },
 
@@ -1517,14 +1517,20 @@ const util = {
      * @private
      */
     _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+        /**
+         * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
+         * So check the node type and exclude the text no (current.nodeType !== 1)
+         */
         // empty whitelist
         const emptyWhitelistTags = [];
         // wrong position
-        const wrongTags = this.getListChildren(documentFragment, function (current) {
+        const wrongTags = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
                 emptyWhitelistTags.push(current);
                 return false;
             }
+
             return current.parentNode !== documentFragment &&
              (this.isFormatElement(current) || this.isComponent(current) || this.isList(current) || (((this.isMedia(current) && !this.isAnchor(current.parentNode)) || (this.isMedia(current.firstElementChild) && this.isAnchor(current))) && !this.getParentElement(current, this.isComponent))) &&
               !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
@@ -1550,7 +1556,8 @@ const util = {
         }
 
         // remove empty tags
-        const emptyTags = this.getListChildren(documentFragment, function (current) {
+        const emptyTags = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !util.getParentElement(current, '.katex');
         }.bind(this));
 
@@ -1559,7 +1566,8 @@ const util = {
         }
 
         // wrong list
-        const wrongList = this.getListChildren(documentFragment, function (current) {
+        const wrongList = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             return this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current);
         }.bind(this));
 
@@ -1574,6 +1582,20 @@ const util = {
             
             t.parentNode.insertBefore(tp, t);
             this.removeItem(t);
+        }
+
+        // table cells without format
+        const withoutFormatCells = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
+            return this.isCell(current) && !this.isFormatElement(current.firstElementChild);
+        }.bind(this));
+
+        for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
+            t = withoutFormatCells[i];
+
+            f = this.createElement('DIV');
+            f.innerHTML = t.innerHTML;
+            t.innerHTML = f.outerHTML;
         }
     },
 

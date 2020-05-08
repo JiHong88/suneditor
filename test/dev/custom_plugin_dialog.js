@@ -30,7 +30,7 @@ export default {
         // Registering a namespace for caching as a plugin name in the context object
         const context = core.context;
         context.customLink = {
-            focusElement: null, // @Overriding // This element has focus when the dialog is opened.
+            focusElement: null, // @Override // This element has focus when the dialog is opened.
             targetSelect: null,
             linkAnchorText: null,
             _linkAnchor: null
@@ -210,7 +210,7 @@ export default {
         return false;
     },
 
-    // @Overriding
+    // @Override
     // Plugins with active methods load immediately when the editor loads.
     // Called each time the selection is moved.
     active: function (element) {
@@ -228,7 +228,7 @@ export default {
         return false;
     },
 
-    // @Overriding
+    // @Override
     // This method is called just before the dialog opens.
     // If "update" argument is true, it is not a new call, but a call to modify an already created element.
     on: function (update) {

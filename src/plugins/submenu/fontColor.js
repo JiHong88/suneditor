@@ -51,7 +51,7 @@ export default {
     },
 
      /**
-     * @overriding submenu
+     * @Override submenu
      */
     on: function () {
         const contextPicker = this.context.colorPicker;
@@ -66,7 +66,7 @@ export default {
     },
 
      /**
-     * @overriding _colorPicker
+     * @Override _colorPicker
      */
     onChangeInput: function (e) {
         this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);

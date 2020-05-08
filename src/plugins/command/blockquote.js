@@ -19,7 +19,7 @@ export default {
     },
 
     /**
-     * @overriding core
+     * @Override core
      */
     active: function (element) {
         if (!element) {
@@ -33,7 +33,7 @@ export default {
     },
 
     /**
-     * @overriding core
+     * @Override core
      */
     action: function () {
         const currentBlockquote = this.util.getParentElement(this.getSelectionNode(), 'blockquote');

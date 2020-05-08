@@ -121,7 +121,7 @@
             resize_div_container = null, resize_button = null, resize_handles = null;
         },
     
-        /** resize controller, button (image, iframe) */
+        /** resize controller, button (image, iframe, video) */
         setController_resize: function () {
             const resize_container = this.util.createElement('DIV');
             
@@ -247,9 +247,9 @@
             if (!cover) cover = contextPlugin._cover;
             if (!container) container = contextPlugin._container;
     
-            if (!container || !cover || !element) return '';
+            if (!element) return '';
     
-            return !/%$/.test(element.style.width) ? element.style.width : (this.util.getNumber(container.style.width, 2) || 100) + '%';
+            return !/%$/.test(element.style.width) ? element.style.width : ((container && this.util.getNumber(container.style.width, 2)) || 100) + '%';
         },
     
         /**
@@ -265,9 +265,9 @@
             if (!cover) cover = contextPlugin._cover;
             if (!container) container = contextPlugin._container;
     
-            if (!container || !cover || !element) return '';
+            if (!container || !cover) return (element && element.style.height) || '';
     
-            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : (this.util.getNumber(container.style.height, 2) || 100) + '%');
+            return this.util.getNumber(cover.style.paddingBottom, 0) > 0 && !this.context.resizing._rotateVertical ? cover.style.height : (!/%$/.test(element.style.height) || !/%$/.test(element.style.width) ? element.style.height : ((container && this.util.getNumber(container.style.height, 2)) || 100) + '%');
         },
 
         /**
@@ -438,7 +438,7 @@
     
             // align icon
             const alignList = contextResizing.alignMenuList;
-            this.util.changeElement(contextResizing.alignButton.querySelector('svg'), contextResizing.alignIcons[align]);
+            this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
             for (let i = 0, len = alignList.length; i < len; i++) {
                 if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
                 else this.util.removeClass(alignList[i], 'on');
@@ -469,7 +469,6 @@
                 }
             }
     
-            this._resizingName = plugin;
             this.util.toggleDisabledButtons(true, this.resizingDisabledButtons);
             this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.toggleDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
     
@@ -517,43 +516,6 @@
             }.bind(this);
     
             this.addDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
-        },
-    
-        /**
-         * @description Return HTML string of caption(FIGCAPTION) element
-         * @returns {String}
-         */
-        create_caption: function () {
-            const caption = this.util.createElement('FIGCAPTION');
-            caption.setAttribute('contenteditable', true);
-            caption.innerHTML = '<div>' + this.lang.dialogBox.caption + '</div>';
-            return caption;
-        },
-    
-        /**
-         * @description Cover the target element with a FIGURE element.
-         * @param {Element} element Target element
-         */
-        set_cover: function (element) {
-            const cover = this.util.createElement('FIGURE');
-            cover.appendChild(element);
-    
-            return cover;
-        },
-    
-        /**
-         * @description Create a container for the resizing component and insert the element.
-         * @param {Element} cover Cover element (FIGURE)
-         * @param {String} className Class name of container (fixed: se-component)
-         * @returns {Element} Created container element
-         */
-        set_container: function (cover, className) {
-            const container = this.util.createElement('DIV');
-            container.className = 'se-component ' + className;
-            container.setAttribute('contenteditable', false);
-            container.appendChild(cover);
-    
-            return container;
         },
     
         /**
@@ -639,12 +601,7 @@
                     currentModule.openModify.call(this, true);
                     currentContext._captionChecked = currentContext.captionCheckEl.checked = caption;
     
-                    if (pluginName === 'image') {
-                        currentModule.update_image.call(this, false, false, false);
-                    } else if (pluginName === 'video') {
-                        this.context.dialog.updateModal = true;
-                        currentModule.submitAction.call(this);
-                    }
+                    currentModule.update_image.call(this, false, false, false);
     
                     if (caption) {
                         const captionText = this.util.getChildElement(currentContext._caption, function (current) {
@@ -915,10 +872,20 @@
 
     if (typeof noGlobal === typeof undefined) {
         if (!window.SUNEDITOR_MODULES) {
-            window.SUNEDITOR_MODULES = {};
+            Object.defineProperty(window, 'SUNEDITOR_MODULES', {
+                enumerable: true,
+                writable: false,
+                configurable: false,
+                value: {}
+            });
         }
 
-        window.SUNEDITOR_MODULES.resizing = resizing;
+        Object.defineProperty(window.SUNEDITOR_MODULES, 'resizing', {
+            enumerable: true,
+            writable: false,
+            configurable: false,
+            value: resizing
+        });
     }
 
     return resizing;
