@@ -3989,7 +3989,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && (util.isTextStyleElement(t) || (!util.isBreak(t) && !util._notAllowedTags(t)))) {
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
                     requireFormat = true;
                     break;
                 }

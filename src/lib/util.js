@@ -1517,14 +1517,20 @@ const util = {
      * @private
      */
     _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+        /**
+         * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
+         * So check the node type and exclude the text no (current.nodeType !== 1)
+         */
         // empty whitelist
         const emptyWhitelistTags = [];
         // wrong position
-        const wrongTags = this.getListChildren(documentFragment, function (current) {
+        const wrongTags = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
                 emptyWhitelistTags.push(current);
                 return false;
             }
+
             return current.parentNode !== documentFragment &&
              (this.isFormatElement(current) || this.isComponent(current) || this.isList(current) || (((this.isMedia(current) && !this.isAnchor(current.parentNode)) || (this.isMedia(current.firstElementChild) && this.isAnchor(current))) && !this.getParentElement(current, this.isComponent))) &&
               !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
@@ -1550,7 +1556,8 @@ const util = {
         }
 
         // remove empty tags
-        const emptyTags = this.getListChildren(documentFragment, function (current) {
+        const emptyTags = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !util.getParentElement(current, '.katex');
         }.bind(this));
 
@@ -1559,7 +1566,8 @@ const util = {
         }
 
         // wrong list
-        const wrongList = this.getListChildren(documentFragment, function (current) {
+        const wrongList = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             return this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current);
         }.bind(this));
 
@@ -1577,7 +1585,8 @@ const util = {
         }
 
         // table cells without format
-        const withoutFormatCells = this.getListChildren(documentFragment, function (current) {
+        const withoutFormatCells = this.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
             return this.isCell(current) && !this.isFormatElement(current.firstElementChild);
         }.bind(this));
 
