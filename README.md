@@ -1035,7 +1035,7 @@ editor.showController = function (name, controllers, core) {
         </tr>
         <tr>
             <td align="left">image</td>
-            <td align="left" rowspan="4"><strong>dialog</strong></td>
+            <td align="left" rowspan="5"><strong>dialog</strong></td>
         </tr>
         <tr>
             <td align="left">link</td>
