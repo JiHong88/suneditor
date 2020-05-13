@@ -339,6 +339,14 @@ export interface SunEditorOptions {
      */
     tableCellControllerPosition?: string;
     /**
+     * Key actions
+     * =====
+     */
+    /**
+     * If true, disables the interaction of the editor and tab key
+     */
+    tabDisable?: boolean;
+    /**
      * Defining save button
      * ====================
      */
