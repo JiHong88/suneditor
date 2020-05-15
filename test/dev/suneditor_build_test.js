@@ -34,7 +34,7 @@ let ssss = suneditor.create(("sample1"), {
     // ],
     tabDisable: true,
     buttonList: [
-        ['undo', 'redo', 'customAudio', plugins.image],
+        [':command1-html1-title1', 'undo', 'redo', 'customAudio', plugins.image],
         // ['font', 'fontSize'],
         // ['fontColor', 'bold', 'underline', 'italic'],
         // ['align'],
@@ -65,12 +65,13 @@ let ssss = suneditor.create(("sample1"), {
         //         innerHTML: NPS_FONT_SIZE_ICON
         //     }
         // ],
-        ['codeView', 'preview']
+        [':command2-<span class="txt">title2fdsa fda</span>-title2 space', 'codeView', 'preview'],
+        ['outdent', 'indent']
     ],
     // lang: langToUse
 });
 
-ssss.setContents('dddddd')
+ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
 let s1 = suneditor.create('editor', {

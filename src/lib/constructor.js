@@ -647,16 +647,19 @@ export default {
         let pluginName = '';
         let vertical = false;
         const oneModule = buttonList.length === 1;
+        const moreLayer = util.createElement('DIV');
+        moreLayer.className = 'se-toolbar-more-layer';
 
-        for (let i = 0; i < buttonList.length; i++) {
-
+        for (let i = 0, more, moreContainer, moreCommand; i < buttonList.length; i++) {
+            more = false;
             const buttonGroup = buttonList[i];
             moduleElement = this._createModuleGroup(oneModule);
 
-            /** button object */
+            // button object
             if (typeof buttonGroup === 'object') {
-                for (let j = 0; j < buttonGroup.length; j++) {
-
+                // buttons loop
+                for (let j = 0, moreButton; j < buttonGroup.length; j++) {
+                    moreButton = false;
                     button = buttonGroup[j];
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
@@ -668,7 +671,18 @@ export default {
                             module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
-                        module = defaultButtonList[button];
+                        // more button
+                        if (/^\:/.test(button)) {
+                            moreButton = true;
+                            const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
+                            moreCommand = '__se__' + matched[1];
+                            const innerHTML = matched[2];
+                            const title = matched[3];
+                            module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
+                        } else {
+                            module = defaultButtonList[button];
+                        }
+
                         pluginName = button;
                         if (!module) {
                             const custom = plugins[pluginName];
@@ -678,10 +692,20 @@ export default {
                     }
 
                     buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
-                    moduleElement.ul.appendChild(buttonElement.li);
+                    (more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {
                         pluginCallButtons[pluginName] = buttonElement.button;
+                    }
+
+                    // more button
+                    if (moreButton) {
+                        more = true;
+                        moreContainer = util.createElement('DIV');
+                        moreContainer.className = 'se-more-layer ' + moreCommand;
+                        moreContainer.innerHTML = '<div class="se-more-form"></div>';
+                        moreLayer.appendChild(moreContainer);
+                        moreContainer = moreContainer.firstElementChild;
                     }
                 }
 
@@ -697,6 +721,8 @@ export default {
                 vertical = false;
             }
         }
+
+        if (moreLayer.children.length > 0) tool_bar.appendChild(moreLayer);
 
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'se-toolbar-cover';

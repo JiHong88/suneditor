@@ -183,6 +183,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         resizingDisabledButtons: null,
 
         /**
+         * @description active more layer element in submenu
+         * @private
+         */
+        _moreLayerActiveButton: null,
+
+        /**
          * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
          * ^(options._editorTagsWhitelist)$
          * @private
@@ -3428,7 +3434,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         actionCall: function (command, display, target) {
             // call plugins
             if (display) {
-                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== this.submenuActiveButton)) {
+                if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
+                    const layer = context.element.toolbar.querySelector('.' + command);
+                    if (layer) {
+                        if (this._moreLayerActiveButton) (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                        this._moreLayerActiveButton = target;
+                        layer.style.display = 'block';
+                    }
+                    return;
+                } else if (/submenu/.test(display) && (target.nextElementSibling === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
                 } else if (/dialog/.test(display)) {
@@ -3445,7 +3459,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this.commandHandler(target, command);
             }
 
-            if (/submenu/.test(display)) {
+            if (/more/i.test(display)) {
+                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                if (layer) {
+                    this._moreLayerActiveButton = null;
+                    layer.style.display = 'none';
+                }
+            } else if (/submenu/.test(display)) {
                 this.submenuOff();
             } else {
                 this.submenuOff();

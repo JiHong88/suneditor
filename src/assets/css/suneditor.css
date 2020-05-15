@@ -135,7 +135,13 @@
 .sun-editor .se-toolbar.se-toolbar-sticky {position:fixed; top:0px;}
 .sun-editor .se-toolbar-sticky-dummy {display:none; position:static; z-index:-1;}
 
-/** --- tool bar module group ----------------------------------------------------------  */
+/** --- tool bar button, module, group ----------------------------------------------------------  */
+/* more layer */
+.sun-editor .se-toolbar-more-layer {background-color:#f9f9f9;}
+.sun-editor .se-toolbar-more-layer .se-more-layer {display:none;}
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:flex; width:100%; height:auto; padding:4px;}
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form .se-btn-more {width:auto;}
+/* module */
 .sun-editor .se-btn-module {display:inline-block;}
 .sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px;}
 .sun-editor .se-btn-module-enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
