@@ -603,6 +603,7 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        oButton.setAttribute('tabindex', '-1');
         
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
         if (/^default\./i.test(innerHTML)) {
