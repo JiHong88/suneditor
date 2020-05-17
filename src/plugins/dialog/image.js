@@ -595,6 +595,9 @@ export default {
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
+            contextImage._cover = cover;
+            contextImage._element = imageEl;
+            isNewContainer = false;
         }
 
         // check size

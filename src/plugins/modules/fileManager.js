@@ -128,7 +128,7 @@
             
             for (let i = 0, len = tags.length, tag; i < len; i++) {
                 tag = tags[i];
-                if (!this.util.getParentElement(tag, this.util.isMediaComponent)) {
+                if (!this.util.getParentElement(tag, this.util.isMediaComponent) || !/FIGURE/i.test(tag.parentElement.nodeName)) {
                     currentTags.push(context._infoIndex);
                     modifyHandler(tag);
                 } else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
