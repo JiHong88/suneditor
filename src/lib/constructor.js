@@ -38,6 +38,7 @@ export default {
     
         // toolbar
         const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options.lang);
+        tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
@@ -115,6 +116,7 @@ export default {
             options: options,
             plugins: tool_bar.plugins,
             pluginCallButtons: tool_bar.pluginCallButtons,
+            _responsiveButtons: tool_bar.responsiveButtons,
             _icons: this.icons
         };
     },
@@ -234,7 +236,8 @@ export default {
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
-            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null
+            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
+            toolbar: tool_bar
         };
     },
 
@@ -600,7 +603,16 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
+        if (/^default\./i.test(innerHTML)) {
+            innerHTML = this.icons[innerHTML.replace(/^default\./i, '')];
+        }
+        if (/^text\./i.test(innerHTML)) {
+            innerHTML = innerHTML.replace(/^text\./i, '');
+            oButton.className += ' se-btn-more-text';
+        }
+
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
@@ -618,7 +630,9 @@ export default {
      * @description Create editor HTML
      * @param {Array} doc document object
      * @param {Array} buttonList option.buttonList
+     * @param {Array|Object|null} _plugins Plugins
      * @param {Array} lang option.lang
+     * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
      * @private
      */
     _createToolBar: function (doc, buttonList, _plugins, lang) {
@@ -631,6 +645,7 @@ export default {
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang);
         const pluginCallButtons = {};
+        const responsiveButtons = [];
         const plugins = {};
         if (_plugins) {
             const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
@@ -650,6 +665,7 @@ export default {
         const moreLayer = util.createElement('DIV');
         moreLayer.className = 'se-toolbar-more-layer';
 
+        buttonGroupLoop:
         for (let i = 0, more, moreContainer, moreCommand; i < buttonList.length; i++) {
             more = false;
             const buttonGroup = buttonList[i];
@@ -659,8 +675,16 @@ export default {
             if (typeof buttonGroup === 'object') {
                 // buttons loop
                 for (let j = 0, moreButton; j < buttonGroup.length; j++) {
-                    moreButton = false;
                     button = buttonGroup[j];
+                    moreButton = false;
+
+                    if (/^\%\d+/.test(button) && j === 0) {
+                        buttonGroup[0] = button.replace(/[^\d]/g, '');
+                        responsiveButtons.push(buttonGroup);
+                        buttonList.splice(i--, 1);
+                        continue buttonGroupLoop;
+                    }
+                    
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
                             pluginName = button.name;
@@ -675,9 +699,9 @@ export default {
                         if (/^\:/.test(button)) {
                             moreButton = true;
                             const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
-                            moreCommand = '__se__' + matched[1];
-                            const innerHTML = matched[2];
-                            const title = matched[3];
+                            moreCommand = '__se__' + matched[1].trim();
+                            const title = matched[2].trim();
+                            const innerHTML = matched[3].trim();
                             module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
                         } else {
                             module = defaultButtonList[button];
@@ -703,9 +727,9 @@ export default {
                         more = true;
                         moreContainer = util.createElement('DIV');
                         moreContainer.className = 'se-more-layer ' + moreCommand;
-                        moreContainer.innerHTML = '<div class="se-more-form"></div>';
+                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"></ul></div>';
                         moreLayer.appendChild(moreContainer);
-                        moreContainer = moreContainer.firstElementChild;
+                        moreContainer = moreContainer.firstElementChild.firstElementChild;
                     }
                 }
 
@@ -722,6 +746,7 @@ export default {
             }
         }
 
+        if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) tool_bar.appendChild(moreLayer);
 
         const tool_cover = doc.createElement('DIV');
@@ -731,7 +756,8 @@ export default {
         return {
             'element': tool_bar,
             'plugins': plugins,
-            'pluginCallButtons': pluginCallButtons
+            'pluginCallButtons': pluginCallButtons,
+            'responsiveButtons': responsiveButtons
         };
     }
 };

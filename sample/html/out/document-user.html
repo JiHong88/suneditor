@@ -33,10 +33,37 @@
             <div class="description">
             </div>
 
+            <h4 class="name" id="setToolbarButtons"><span class="type-signature"></span>setToolbarButtons<span
+                    class="signature">(buttonList)</span></h4>
+            <div class="description">
+                Reset the buttons on the toolbar. (Editor is not reloaded)<br>
+                You cannot set a new plugin for the button.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>buttonList</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Button list</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions<span
                     class="signature">(options)</span></h4>
             <div class="description">
-                Add or reset option property.
+                Add or reset option property. (Editor is reloaded)
             </div>
             <table class="params">
                 <thead>
@@ -1449,6 +1476,7 @@
     <h3>Functions & Events</h3>
     <ul>
         <li><a href="document-user.html#titleFunction"><h4 class="subsection-title" style="font-size: 20px;">functions</h4></a></li>
+        <li><a href="document-user.html#setToolbarButtons">setToolbarButtons</a></li>
         <li><a href="document-user.html#setOptions">setOptions</a></li>
         <li><a href="document-user.html#noticeOpen">noticeOpen</a></li>
         <li><a href="document-user.html#noticeClose">noticeClose</a></li>

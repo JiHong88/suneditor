@@ -717,6 +717,13 @@ export default class SunEditor {
     onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
 
     /**
+     * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+     * You cannot set a new plugin for the button.
+     * @param buttonList Button list 
+     */
+    setToolbarButtons(buttonList: Array): void;
+
+    /**
      * @description Add or reset option property
      * @param options Options
      */

@@ -663,6 +663,40 @@ buttonList      : Defines button list to array {Array}
                     // ['save', 'template'],
                     // '/', Line break
                   ]
+                  ex) More button: 
+                  // The more button is defined as a string starting with a colon.(":").
+                  // :Identifier - Title attribute - Button's innerHTML
+                  /**
+                   * "Identifier": The button's identifier. Please specify uniquely.
+                   * "Title attribute": Title attribute of the button to be displayed as a tooltip.
+                   * "Button's innerHTML": Define the button's "innerHTML".
+                   * default.xxx -> Use the attributes of "defaultIcons".
+                   * text.xxx -> Use the text.
+                   * xxx -> HTML
+                   */
+                  [
+                    ['undo', 'redo'],
+                    [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'italic'],
+                    [':moreInsert-Insert-text.Insert', 'image', 'video', 'audio'],
+                    [':moreOthers-More Others-<i class="xxx"></i>', 'fullScreen', 'showBlocks'],
+                    ['preview', 'print']
+                  ]
+                  ex) Responsive setting: 
+                  // You can specify the arrangement of buttons according to the screen size in advance.
+                  // Responsive settings start with a percent sign.("%").
+                  // %510(Number based on "px")
+                  [
+                    // Default
+                    ['undo', 'redo'],
+                    ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                    // (min-width:510px)
+                    ['%510', [
+                        ['undo', 'redo'],
+                        [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'italic'],
+                        [':moreInsert-Insert-text.Insert', 'image', 'video', 'audio'],
+                    ]]
+                  ]
+                  
 ```
 
 ## Functions
@@ -674,7 +708,14 @@ const editor = suneditor.create('example');
 editor.core; // core object (The core object contains "util" and "functions".)
 editor.util; // util object
 
-// Add or reset option property
+// Reset the buttons on the toolbar. (Editor is not reloaded)
+// You cannot set a new plugin for the button.
+editor.setToolbarButtons([
+    [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'strike', 'subscript', 'superscript'],
+    ['undo', 'redo']
+]);
+
+// Add or reset option property. (Editor is reloaded)
 editor.setOptions({
     minHeight: '300px',
     buttonList: [

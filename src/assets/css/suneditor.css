@@ -136,11 +136,15 @@
 .sun-editor .se-toolbar-sticky-dummy {display:none; position:static; z-index:-1;}
 
 /** --- tool bar button, module, group ----------------------------------------------------------  */
-/* more layer */
+/* ---more - layer */
 .sun-editor .se-toolbar-more-layer {background-color:#f9f9f9;}
 .sun-editor .se-toolbar-more-layer .se-more-layer {display:none;}
-.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:flex; width:100%; height:auto; padding:4px;}
-.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form .se-btn-more {width:auto;}
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:flex; position:relative; width:100%; height:auto; padding:4px;}
+/* ---more - button */
+.sun-editor .se-btn-module .se-btn-more.se-btn-more-text {width:auto; padding:0 4px;}
+.sun-editor .se-btn-module .se-btn-more:hover, .sun-editor .se-btn-module .se-btn-more:focus {color:#000; background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-btn-module .se-btn-more.on {color:#333; background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-btn-module .se-btn-more.on:hover {color:#000; background-color:#c1c1c1; border-color:#b1b1b1; outline:0 none;}
 /* module */
 .sun-editor .se-btn-module {display:inline-block;}
 .sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px;}

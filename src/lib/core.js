@@ -25,7 +25,7 @@ import _notice from '../plugins/modules/_notice';
  * @param {Object} _icons
  * @returns {Object} functions Object
  */
-export default function (context, pluginCallButtons, plugins, lang, options, _icons) {
+export default function (context, pluginCallButtons, plugins, lang, options, _icons, _responsiveButtons) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
@@ -3437,7 +3437,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
                     const layer = context.element.toolbar.querySelector('.' + command);
                     if (layer) {
-                        if (this._moreLayerActiveButton) (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                        if (this._moreLayerActiveButton) {
+                            (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                            util.removeClass(this._moreLayerActiveButton, 'on');
+                        }
+
+                        util.addClass(target, 'on');
                         this._moreLayerActiveButton = target;
                         layer.style.display = 'block';
                     }
@@ -3462,6 +3467,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (/more/i.test(display)) {
                 const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
                 if (layer) {
+                    util.removeClass(this._moreLayerActiveButton, 'on');
                     this._moreLayerActiveButton = null;
                     layer.style.display = 'none';
                 }
@@ -4528,6 +4534,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
      * @description event function
      */
     const event = {
+        _responsiveCurrentSize: 'default',
+        _responsiveButtonSize: null,
+        _responsiveButtons: null,
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
@@ -5637,6 +5646,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         onResize_window: function () {
             core.controllersOff();
+
+            const responsiveSize = event._responsiveButtonSize;
+            if (responsiveSize) {
+                const windowWidth = _w.innerWidth;
+                let responsiveWidth = 'default';
+                for (let i = 1, len = responsiveSize.length; i < len; i++) {
+                    if (windowWidth < responsiveSize[i]) {
+                        responsiveWidth = responsiveSize[i] + '';
+                    }
+                }
+
+                if (event._responsiveCurrentSize !== responsiveWidth) {
+                    event._responsiveCurrentSize = responsiveWidth;
+                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
+                }
+            }
+
             if (context.element.toolbar.offsetWidth === 0) return;
 
             if (core._variable.isFullScreen) {
@@ -5975,6 +6001,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
             
             /** window event */
+            event._setResponsiveToolbar();
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
 
@@ -6020,6 +6047,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
+        },
+
+        _setResponsiveToolbar: function () {
+            if (_responsiveButtons.length === 0) {
+                _responsiveButtons = null;
+                return;
+            }
+
+            const sizeArray = event._responsiveButtonSize = ['default'];
+            const buttonsObj = event._responsiveButtons = {default: _responsiveButtons[0]};
+            for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
+                buttonGroup = _responsiveButtons[i];
+                size = buttonGroup[0] * 1;
+                sizeArray.push(size);
+                buttonsObj[size] = buttonGroup[1];
+            }
         }
     };
 
@@ -6174,7 +6217,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onAudioUploadError: null,
 
         /**
-         * @description Add or reset option property
+         * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+         * You cannot set a new plugin for the button.
+         * @param {Array} buttonList Button list 
+         */
+        setToolbarButtons: function (buttonList) {
+            const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options.lang);
+            context.element.toolbar.innerHTML = newToolbar.element.innerHTML;
+            _responsiveButtons = newToolbar.responsiveButtons;
+            event._setResponsiveToolbar();
+        },
+
+        /**
+         * @description Add or reset option property (Editor is reloaded)
          * @param {Object} options Options
          */
         setOptions: function (_options) {
@@ -6230,15 +6285,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _arrow: el._arrow
             };
             
+            _responsiveButtons = cons.toolbar.responsiveButtons;
             options = mergeOptions;
             core.lang = lang = options.lang;
             core.context = context = _Context(context.element.originElement, constructed, options);
-
             core._componentsInfoReset = true;
+
+            // initialize core and add event listeners
             core._init(true, _initHTML);
             event._addEvent();
             core._charCount('');
-
             event._offStickyToolbar();
             event.onResize_window();
         },
@@ -6537,10 +6593,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         }
     };
 
-    /** initialize core and add event listeners */
+    // initialize core and add event listeners
     core._init(false, null);
     event._addEvent();
     core._charCount('');
+    event._offStickyToolbar();
+    event.onResize_window();
+
+    // toolbar visibility
+    context.element.toolbar.style.visibility = '';
 
     // functionss
     core.functions = functions;

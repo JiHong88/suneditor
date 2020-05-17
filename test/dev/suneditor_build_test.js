@@ -28,18 +28,17 @@ const align = require('../../src/plugins/submenu/align')
 
 
 let ssss = suneditor.create(("sample1"), {
-    plugins: [custom_audio], //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
+    plugins: {...plugins, custom_audio}, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
     tabDisable: true,
     buttonList: [
-        [':command1-html1-title1', 'undo', 'redo', 'customAudio', plugins.image],
-        // ['font', 'fontSize'],
-        // ['fontColor', 'bold', 'underline', 'italic'],
-        // ['align'],
-        // ['link'],
-        // ['table'],
+        ['font', 'fontSize'],
+        ['fontColor', 'bold', 'underline', 'italic'],
+        ['align'],
+        ['link'],
+        ['table'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',
@@ -65,13 +64,16 @@ let ssss = suneditor.create(("sample1"), {
         //         innerHTML: NPS_FONT_SIZE_ICON
         //     }
         // ],
-        [':command2-<span class="txt">title2fdsa fda</span>-title2 space', 'codeView', 'preview'],
-        ['outdent', 'indent']
+        ['%510', [
+            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'customAudio', 'image'],
+            [':command2-title2-text.Insert', 'codeView', 'preview', 'font', 'fontSize', 'formatBlock'],
+            ['outdent', 'indent'],
+        ]]
     ],
     // lang: langToUse
 });
 
-ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
+// ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
 let s1 = suneditor.create('editor', {
@@ -91,7 +93,12 @@ let s1 = suneditor.create('editor', {
         'align', 'horizontalRule', 'lineHeight',
         'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template']
+        'preview', 'print', 'save', 'template'],
+        ['%510', [
+            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
+            [':command2-title2-text.Insert', 'codeView', 'preview'],
+            ['outdent', 'indent'],
+        ]]
     ],
     imageFileInput: false,
     icons: {
@@ -456,11 +463,16 @@ window.sun_hide = function () {
 }
 
 window.sun_destroy = function () {
-    ss.destroy();
+    // ss.destroy();
+    ss.setToolbarButtons([
+        [':command2-title2-text.Insert', 'codeView', 'preview'],
+        ['outdent', 'indent']
+    ])
 }
 
 window.sun_create = function () {
     ss = suneditor.create('editor1', {
+        plugins: plugins,
         height: 148
     });
 }
