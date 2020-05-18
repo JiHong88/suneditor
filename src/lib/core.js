@@ -110,6 +110,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _targetPlugins: {},
 
         /**
+         * @description Save rendered submenus and containers
+         * @private
+         */
+        _menuTray: {},
+
+        /**
          * @description loaded language
          */
         lang: lang,
@@ -436,8 +442,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!target) {
                 this._targetPlugins[pluginName] = menu;
             } else {
-                target.parentNode.appendChild(menu);
+                context.element._menuTray.appendChild(menu);
                 this._targetPlugins[pluginName] = true;
+                this._menuTray[target.getAttribute('data-command')] = menu;
             }
         },
 
@@ -450,43 +457,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindControllersOff) this.controllersOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
-            const submenu = this.submenu = element.nextElementSibling;
-
-            submenu.style.top = '-10000px';
-            submenu.style.visibility = 'hidden';
-            submenu.style.display = 'block';
-            util.addClass(element, 'on');
+            const menu = this.submenu = this._menuTray[submenuName];
             this.submenuActiveButton = element;
-
-            const toolbar = this.context.element.toolbar;
-            const toolbarW = toolbar.offsetWidth;
-            const menuW = submenu.offsetWidth;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) submenu.style.left = overLeft + 'px';
-            else submenu.style.left = '1px';
-
-
-            let t = 0;
-            let offsetEl = element;
-            while (offsetEl && offsetEl !== toolbar) {
-                t += offsetEl.offsetTop;
-                offsetEl = offsetEl.offsetParent;
-            }
-
-            if (this._isBalloon) {
-                t += toolbar.offsetTop + element.offsetHeight;
-            } else {
-                t -= element.offsetHeight;
-            }
-
-            const space = t + submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
-            if (space > 0 && event._getPageBottomSpace() < space) {
-                submenu.style.top = (-1 * (submenu.offsetHeight + 3)) + 'px';
-            } else {
-                submenu.style.top = '';
-            }
-
-            submenu.style.visibility = '';
+            this._setMenuPosition(element, menu);
+            
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
@@ -521,18 +495,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindedContainerOff) this._bindedContainerOff();
 
             const containerName = this._containerName = element.getAttribute('data-command');
-            const container = this.container = element.nextElementSibling;
-
-            container.style.display = 'block';
-            util.addClass(element, 'on');
+            const menu = this.container = this._menuTray[containerName];
             this.containerActiveButton = element;
-
-            const toolbarW = this.context.element.toolbar.offsetWidth;
-            const menuW = container.offsetWidth;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) container.style.left = overLeft + 'px';
-            else container.style.left = '1px';
-
+            this._setMenuPosition(element, menu);
+            
             this._bindedContainerOff = this.containerOff.bind(this);
             this.addDocEvent('mousedown', this._bindedContainerOff, false);
 
@@ -557,6 +523,50 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             this._antiBlur = false;
+        },
+
+        /**
+         * @description Set the menu position. (submenu, container)
+         * @param {*} element Button element
+         * @param {*} menu Menu element
+         * @private
+         */
+        _setMenuPosition: function (element, menu) {
+            menu.style.top = '-10000px';
+            menu.style.visibility = 'hidden';
+            menu.style.display = 'block';
+            util.addClass(element, 'on');
+
+            const offset = util.getOffset(element, context.element._menuTray);
+            const toolbar = this.context.element.toolbar;
+            const toolbarW = toolbar.offsetWidth;
+            const menuW = menu.offsetWidth;
+            const l = offset.left;
+            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
+            if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
+            else menu.style.left = l + 'px';
+
+            let t = 0;
+            let offsetEl = element;
+            while (offsetEl && offsetEl !== toolbar) {
+                t += offsetEl.offsetTop;
+                offsetEl = offsetEl.offsetParent;
+            }
+
+            if (this._isBalloon) {
+                t += toolbar.offsetTop + element.offsetHeight;
+            } else {
+                t -= element.offsetHeight;
+            }
+
+            const space = t + menu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
+            if (space > 0 && event._getPageBottomSpace() < space) {
+                menu.style.top = (-1 * (menu.offsetHeight + 3)) + 'px';
+            } else {
+                menu.style.top = (offset.top + element.parentElement.offsetHeight) + 'px';
+            }
+
+            menu.style.visibility = '';
         },
 
         /**
@@ -3447,7 +3457,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         layer.style.display = 'block';
                     }
                     return;
-                } else if (/submenu/.test(display) && (target.nextElementSibling === null || target !== this.submenuActiveButton)) {
+                } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
                 } else if (/dialog/.test(display)) {
@@ -3455,7 +3465,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     return;
                 } else if (/command/.test(display)) {
                     this.callPlugin(command, this.plugins[command].action.bind(this), target);
-                } else if (/container/.test(display) && (target.nextElementSibling === null || target !== this.containerActiveButton)) {
+                } else if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
                     this.callPlugin(command, this.containerOn.bind(this, target), target);
                     return;
                 }                
@@ -4687,7 +4697,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.removeEventListener('blur', event._cancelCaptionEdit);
         },
 
-        onMouseDown_toolbar: function (e) {
+        _buttonsEventHandler: function (e) {
             let target = e.target;
             if (core._bindControllersOff) e.stopPropagation();
 
@@ -4704,7 +4714,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 let command = target.getAttribute('data-command');
                 let className = target.className;
     
-                while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
+                while (!command && !/se-menu-list/.test(className) && !/sun-editor-common/.test(className)) {
                     target = target.parentNode;
                     command = target.getAttribute('data-command');
                     className = target.className;
@@ -5878,7 +5888,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
-        onmouseMove_wysiwyg: function (e) {
+        onMouseMove_wysiwyg: function (e) {
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
 
@@ -5958,7 +5968,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
 
             /** toolbar event */
-            context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
+            context.element.toolbar.addEventListener('mousedown', event._buttonsEventHandler, false);
+            context.element._menuTray.addEventListener('mousedown', event._buttonsEventHandler, false);
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
             /** editor area */
             eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
@@ -5975,7 +5986,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** line breaker */
-            eventWysiwyg.addEventListener('mousemove', event.onmouseMove_wysiwyg, false);
+            eventWysiwyg.addEventListener('mousemove', event.onMouseMove_wysiwyg, false);
             core._lineBreakerButton.addEventListener('mousedown', event._onMouseDown_lineBreak, false);
             core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
 
@@ -6014,7 +6025,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _removeEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
 
-            context.element.toolbar.removeEventListener('mousedown', event.onMouseDown_toolbar);
+            context.element.toolbar.removeEventListener('mousedown', event._buttonsEventHandler);
+            context.element._menuTray.removeEventListener('mousedown', event._buttonsEventHandler);
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
             eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
@@ -6028,7 +6040,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
 
-            eventWysiwyg.removeEventListener('mousemove', event.onmouseMove_wysiwyg);
+            eventWysiwyg.removeEventListener('mousemove', event.onMouseMove_wysiwyg);
             core._lineBreakerButton.removeEventListener('mousedown', event._onMouseDown_lineBreak);
             core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
             
@@ -6222,6 +6234,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Array} buttonList Button list 
          */
         setToolbarButtons: function (buttonList) {
+            core.submenuOff();
+            core.containerOff();
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options.lang);
             context.element.toolbar.innerHTML = newToolbar.element.innerHTML;
             _responsiveButtons = newToolbar.responsiveButtons;
@@ -6270,6 +6284,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _top: el.topArea,
                 _relative: el.relative,
                 _toolBar: el.toolbar,
+                _menuTray: el._menuTray,
                 _editorArea: el.editorArea,
                 _wysiwygArea: el.wysiwygFrame,
                 _codeArea: el.code,
@@ -6284,6 +6299,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _stickyDummy: el._stickyDummy,
                 _arrow: el._arrow
             };
+
+            if (el._menuTray.children.length === 0) this._menuTray = {};
             
             _responsiveButtons = cons.toolbar.responsiveButtons;
             options = mergeOptions;

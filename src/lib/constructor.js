@@ -14,7 +14,7 @@ import util from './util';
 export default {
     icons: null,
     /**
-     * @description document create - call _createToolBar()
+     * @description document create
      * @param {Element} element Textarea
      * @param {Object} options Options
      * @returns {Object}
@@ -42,6 +42,10 @@ export default {
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
+
+        // menu tray
+        const _menuTray = doc.createElement('DIV');
+        _menuTray.className = 'se-menu-tray sun-editor-common';
 
         // sticky toolbar dummy
         const sticky_dummy = doc.createElement('DIV');
@@ -84,6 +88,7 @@ export default {
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
         relative.appendChild(tool_bar.element);
+        relative.appendChild(_menuTray);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
@@ -99,6 +104,7 @@ export default {
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar.element,
+                _menuTray: _menuTray,
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
@@ -204,6 +210,8 @@ export default {
             relative.replaceChild(tool_bar.element, el.toolbar);
             el.toolbar = tool_bar.element;
             el._arrow = arrow;
+            // menu tray
+            el._menuTray.innerHTML = '';
         }
         
         const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow);

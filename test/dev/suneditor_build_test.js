@@ -28,7 +28,7 @@ const align = require('../../src/plugins/submenu/align')
 
 
 let ssss = suneditor.create(("sample1"), {
-    plugins: {...plugins, custom_audio}, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
+    plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
@@ -39,6 +39,7 @@ let ssss = suneditor.create(("sample1"), {
         ['align'],
         ['link'],
         ['table'],
+        [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'font', 'fontSize', 'formatBlock'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',
@@ -65,7 +66,7 @@ let ssss = suneditor.create(("sample1"), {
         //     }
         // ],
         ['%510', [
-            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'customAudio', 'image'],
+            [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'image'],
             [':command2-title2-text.Insert', 'codeView', 'preview', 'font', 'fontSize', 'formatBlock'],
             ['outdent', 'indent'],
         ]]
