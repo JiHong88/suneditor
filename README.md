@@ -663,6 +663,13 @@ buttonList      : Defines button list to array {Array}
                     // ['save', 'template'],
                     // '/', Line break
                   ]
+
+                  ex) When do not use group.
+                  // If you don't want to use a group, put all the buttons in one array.
+                  [
+                    ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
+                  ]
+
                   ex) More button: 
                   // The more button is defined as a string starting with a colon.(":").
                   // :Identifier - Title attribute - Button's innerHTML
@@ -675,12 +682,20 @@ buttonList      : Defines button list to array {Array}
                    * xxx -> HTML
                    */
                   [
-                    ['undo', 'redo'],
-                    [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'italic'],
-                    [':moreInsert-Insert-text.Insert', 'image', 'video', 'audio'],
-                    [':moreOthers-More Others-<i class="xxx"></i>', 'fullScreen', 'showBlocks'],
-                    ['preview', 'print']
+                    ['undo', 'redo', 'removeFormat'],
+                    [
+                        ':moreText-More Text-default.more_text', 'bold', 'underline', 'italic',
+                        'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
+                    ],
+                    [
+                        ':moreParagraph-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock',
+                        'paragraphStyle', 'blockquote', 'align', 'horizontalRule', 'list', 'lineHeight'
+                    ],
+                    [':moreRich-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'math'],
+                    [':moreView-View-text.View', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                    [':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'],
                   ]
+
                   ex) Responsive setting: 
                   // You can specify the arrangement of buttons according to the screen size in advance.
                   // Responsive settings start with a percent sign.("%").
@@ -689,11 +704,22 @@ buttonList      : Defines button list to array {Array}
                     // Default
                     ['undo', 'redo'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                    // (min-width:510px)
-                    ['%510', [
+                    // (min-width:992px)
+                    ['%992', [
                         ['undo', 'redo'],
-                        [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'italic'],
-                        [':moreInsert-Insert-text.Insert', 'image', 'video', 'audio'],
+                        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                        [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
+                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                    ]],
+                    // (min-width:768px)
+                    ['%768', [
+                        ['undo', 'redo'],
+                        [
+                            ':moreText-More Text-default.more_text', 'bold', 'underline', 'italic',
+                            'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
+                        ],
+                        [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
+                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]]
                   ]
                   

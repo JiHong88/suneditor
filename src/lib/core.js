@@ -3451,7 +3451,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
                             util.removeClass(this._moreLayerActiveButton, 'on');
                         }
-
                         util.addClass(target, 'on');
                         this._moreLayerActiveButton = target;
                         layer.style.display = 'block';
@@ -4321,22 +4320,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
-            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
-            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
             this._isInline = /inline/i.test(options.mode);
             this._isBalloon = /balloon|balloon-always/i.test(options.mode);
             this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
-            this.commandMap = {
-                STRONG: context.tool.bold,
-                U: context.tool.underline,
-                EM: context.tool.italic,
-                DEL: context.tool.strike,
-                SUB: context.tool.subscript,
-                SUP: context.tool.superscript,
-                OUTDENT: context.tool.outdent,
-                INDENT: context.tool.indent
-            };
+            this._cachingButtons();
 
             // file components
             this._fileInfoPluginsCheck = [];
@@ -4406,6 +4394,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (typeof functions.onload === 'function') return functions.onload(this, reload);
             }.bind(this));
+        },
+
+        _cachingButtons: function () {
+            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
+            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
+            this.commandMap = {
+                STRONG: context.tool.bold,
+                U: context.tool.underline,
+                EM: context.tool.italic,
+                DEL: context.tool.strike,
+                SUB: context.tool.subscript,
+                SUP: context.tool.superscript,
+                OUTDENT: context.tool.outdent,
+                INDENT: context.tool.indent
+            };
         },
 
         /**
@@ -4537,6 +4540,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this.effectNode = null;
             this.nativeFocus();
+        },
+
+        /**
+         * @description Create and return an object to cache the new context.
+         * @param {Element} contextEl context.element
+         * @returns {Object}
+         * @private
+         */
+        _getConstructed: function (contextEl) {
+            return {
+                _top: contextEl.topArea,
+                _relative: contextEl.relative,
+                _toolBar: contextEl.toolbar,
+                _menuTray: contextEl._menuTray,
+                _editorArea: contextEl.editorArea,
+                _wysiwygArea: contextEl.wysiwygFrame,
+                _codeArea: contextEl.code,
+                _placeholder: contextEl.placeholder,
+                _resizingBar: contextEl.resizingBar,
+                _navigation: contextEl.navigation,
+                _charCounter: contextEl.charCounter,
+                _charWrapper: contextEl.charWrapper,
+                _loading: contextEl.loading,
+                _lineBreaker: contextEl.lineBreaker,
+                _resizeBack: contextEl.resizeBackground,
+                _stickyDummy: contextEl._stickyDummy,
+                _arrow: contextEl._arrow
+            };
         }
     };
 
@@ -6236,10 +6267,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         setToolbarButtons: function (buttonList) {
             core.submenuOff();
             core.containerOff();
+            
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options.lang);
             context.element.toolbar.innerHTML = newToolbar.element.innerHTML;
+
+            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
+            context.element = newContext.element;
+            context.tool = newContext.tool;
+
             _responsiveButtons = newToolbar.responsiveButtons;
+            core._cachingButtons();
             event._setResponsiveToolbar();
+            core.history._resetCachingButton();
         },
 
         /**
@@ -6280,32 +6319,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // reset context
             const _initHTML = context.element.wysiwyg.innerHTML;
             const el = context.element;
-            const constructed = {
-                _top: el.topArea,
-                _relative: el.relative,
-                _toolBar: el.toolbar,
-                _menuTray: el._menuTray,
-                _editorArea: el.editorArea,
-                _wysiwygArea: el.wysiwygFrame,
-                _codeArea: el.code,
-                _placeholder: el.placeholder,
-                _resizingBar: el.resizingBar,
-                _navigation: el.navigation,
-                _charCounter: el.charCounter,
-                _charWrapper: el.charWrapper,
-                _loading: el.loading,
-                _lineBreaker: el.lineBreaker,
-                _resizeBack: el.resizeBackground,
-                _stickyDummy: el._stickyDummy,
-                _arrow: el._arrow
-            };
 
             if (el._menuTray.children.length === 0) this._menuTray = {};
             
             _responsiveButtons = cons.toolbar.responsiveButtons;
             options = mergeOptions;
             core.lang = lang = options.lang;
-            core.context = context = _Context(context.element.originElement, constructed, options);
+            core.context = context = _Context(context.element.originElement, core._getConstructed(el), options);
             core._componentsInfoReset = true;
 
             // initialize core and add event listeners
