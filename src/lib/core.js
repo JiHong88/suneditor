@@ -6278,7 +6278,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const oldCallButtons = pluginCallButtons;
             pluginCallButtons = newToolbar.pluginCallButtons;
             let plugin, button, oldButton;
-            for (let key in plugins) {
+            for (let key in pluginCallButtons) {
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
                 if (plugin.active && button) {
