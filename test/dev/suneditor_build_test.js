@@ -34,7 +34,6 @@ let ssss = suneditor.create(("sample1"), {
     // ],
     tabDisable: true,
     buttonList: [
-        ['font', 'fontSize'],
         ['fontColor', 'bold', 'underline', 'italic'],
         ['align'],
         ['link'],

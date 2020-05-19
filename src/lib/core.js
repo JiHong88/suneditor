@@ -6269,15 +6269,33 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.containerOff();
             
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options.lang);
-            context.element.toolbar.innerHTML = newToolbar.element.innerHTML;
+            _responsiveButtons = newToolbar.responsiveButtons;
+            core._moreLayerActiveButton = null;
+            core._cachingButtons();
+            event._setResponsiveToolbar();
+            
+            core.activePlugins = [];
+            const oldCallButtons = pluginCallButtons;
+            pluginCallButtons = newToolbar.pluginCallButtons;
+            let plugin, button, oldButton;
+            for (let key in plugins) {
+                plugin = plugins[key];
+                button = pluginCallButtons[key];
+                if (plugin.active && button) {
+                    oldButton = oldCallButtons[key];
+                    core.callPlugin(key, null, oldButton || button);
+                    if (oldButton) {
+                        button.parentElement.replaceChild(oldButton, button);
+                        pluginCallButtons[key] = oldButton;
+                    }
+                }
+            }
 
             const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
             context.element = newContext.element;
             context.tool = newContext.tool;
+            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
 
-            _responsiveButtons = newToolbar.responsiveButtons;
-            core._cachingButtons();
-            event._setResponsiveToolbar();
             core.history._resetCachingButton();
         },
 

@@ -651,6 +651,10 @@ export default {
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'se-toolbar sun-editor-common';
 
+        const _buttonTray = doc.createElement('DIV');
+        _buttonTray.className = 'se-toolbar-btn-tray';
+        tool_bar.appendChild(_buttonTray);
+
         /** create button list */
         const defaultButtonList = this._defaultButtons(lang);
         const pluginCallButtons = {};
@@ -742,21 +746,21 @@ export default {
                     }
                 }
 
-                if (vertical) tool_bar.appendChild(separator_vertical.cloneNode(false));
-                tool_bar.appendChild(moduleElement.div);
+                if (vertical) _buttonTray.appendChild(separator_vertical.cloneNode(false));
+                _buttonTray.appendChild(moduleElement.div);
                 vertical = true;
             }
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
                 const enterDiv = doc.createElement('DIV');
                 enterDiv.className = 'se-btn-module-enter';
-                tool_bar.appendChild(enterDiv);
+                _buttonTray.appendChild(enterDiv);
                 vertical = false;
             }
         }
 
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
-        if (moreLayer.children.length > 0) tool_bar.appendChild(moreLayer);
+        if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'se-toolbar-cover';
@@ -766,7 +770,8 @@ export default {
             'element': tool_bar,
             'plugins': plugins,
             'pluginCallButtons': pluginCallButtons,
-            'responsiveButtons': responsiveButtons
+            'responsiveButtons': responsiveButtons,
+            '_buttonTray': _buttonTray
         };
     }
 };
