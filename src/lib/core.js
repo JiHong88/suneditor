@@ -4906,7 +4906,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const editorWidth = context.element.topArea.offsetWidth;
-            const offsets = event._getEditorOffsets();
+            const offsets = event._getEditorOffsets(null);
             const stickyTop = offsets.top;
             const editorLeft = offsets.left;
             
@@ -4974,7 +4974,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
             let resetTop = false;
-            const space = t + (isDirTop ? (event._getEditorOffsets().top) : (toolbar.offsetHeight - context.element.wysiwyg.offsetHeight));
+            const space = t + (isDirTop ? (event._getEditorOffsets(null).top) : (toolbar.offsetHeight - context.element.wysiwyg.offsetHeight));
             if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
                 isDirTop = true;
                 resetTop = true;
@@ -5731,7 +5731,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
-            const editorTop = event._getEditorOffsets().top - (core._isInline ? element.toolbar.offsetHeight : 0);
+            const editorTop = event._getEditorOffsets(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
             
             if (y < editorTop) {
                 event._offStickyToolbar();
@@ -5745,8 +5745,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
-        _getEditorOffsets: function () {
-            let offsetEl = context.element.topArea;
+        _getEditorOffsets: function (container) {
+            let offsetEl = container || context.element.topArea;
             let t = 0, l = 0, s = 0;
 
             while (offsetEl) {
@@ -5764,7 +5764,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         _getPageBottomSpace: function () {
-            return _d.documentElement.scrollHeight - (event._getEditorOffsets().top + context.element.topArea.offsetHeight);
+            return _d.documentElement.scrollHeight - (event._getEditorOffsets(null).top + context.element.topArea.offsetHeight);
         },
 
         _onStickyToolbar: function () {
@@ -5932,7 +5932,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 } while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
                 const wScroll = context.element.wysiwyg.scrollTop;
-                const offsets = event._getEditorOffsets();
+                const offsets = event._getEditorOffsets(null);
                 const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
                 const y = e.pageY + scrollTop + (options.iframe ? context.element.toolbar.offsetHeight : 0);
                 const c = componentTop + (options.iframe ? scrollTop : offsets.top);
@@ -6301,14 +6301,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description Add or reset option property (Editor is reloaded)
-         * @param {Object} options Options
+         * @param {Object} _options Options
          */
         setOptions: function (_options) {
             event._removeEvent();
             core._resetComponents();
 
             core.plugins = _options.plugins || core.plugins;
-            const mergeOptions = [_options, _options].reduce(function (init, option) {
+            const mergeOptions = [options, _options].reduce(function (init, option) {
                 for (let key in option) {
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
@@ -6323,7 +6323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }, {});
 
             // set option
-            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
+            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
@@ -6592,6 +6592,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             event._removeEvent();
             
             /** remove element */
+            util.removeItem(context.element.toolbar);
             util.removeItem(context.element.topArea);
 
             /** remove object reference */

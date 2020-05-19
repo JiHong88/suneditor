@@ -32,6 +32,7 @@ let ssss = suneditor.create(("sample1"), {
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
+    toolbarContainer: document.getElementById('test_tool2'),
     tabDisable: true,
     buttonList: [
         ['fontColor', 'bold', 'underline', 'italic'],
@@ -588,6 +589,7 @@ const newOption = {
 const newOption2 = {
     plugins: [plugins.align],
     mode: 'classic',
+    toolbarContainer: document.getElementById('test_tool'),
     maxHeight: '400px',
     height: 150,
     imageWidth: '100%',

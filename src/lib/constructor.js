@@ -82,12 +82,18 @@ export default {
         // resize operation background
         const resize_back = doc.createElement('DIV');
         resize_back.className = 'se-resizing-back';
+
+        // toolbar container
+        const toolbarContainer = options.toolbarContainer;
+        if (toolbarContainer) {
+            toolbarContainer.appendChild(tool_bar.element);
+        }
     
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
-        relative.appendChild(tool_bar.element);
+        if (!toolbarContainer) relative.appendChild(tool_bar.element);
         relative.appendChild(_menuTray);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
@@ -198,7 +204,8 @@ export default {
         const el = context.element;
         const relative = el.relative;
         const editorArea = el.editorArea;
-        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode;
+        const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
+        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
         const isNewPlugins = !!mergeOptions.plugins;
 
         const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions.lang);
@@ -207,10 +214,16 @@ export default {
         arrow.className = 'se-arrow';
 
         if (isNewToolbar) {
-            relative.replaceChild(tool_bar.element, el.toolbar);
+            // toolbar container
+            if (isNewToolbarContainer) {
+                mergeOptions.toolbarContainer.appendChild(tool_bar.element);
+                el.toolbar.parentElement.removeChild(el.toolbar);
+            } else {
+                el.toolbar.parentElement.replaceChild(tool_bar.element, el.toolbar);
+            }
+
             el.toolbar = tool_bar.element;
             el._arrow = arrow;
-            // menu tray
             el._menuTray.innerHTML = '';
         }
         
@@ -233,7 +246,6 @@ export default {
         editorArea.appendChild(wysiwygFrame);
         editorArea.appendChild(code);
 
-        if (el.placeholder) editorArea.removeChild(el.placeholder);
         if (placeholder_span) editorArea.appendChild(placeholder_span);
 
         code = this._checkCodeMirror(mergeOptions, code);
@@ -418,6 +430,7 @@ export default {
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
+        // options.toolbarContainer = options.toolbarContainer;
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
