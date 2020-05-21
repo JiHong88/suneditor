@@ -219,6 +219,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         hasFocus: false,
 
         /**
+         * @description Boolean value of whether the editor is disabled
+         */
+        isDisabled: false,
+
+        /**
          * @description Attributes whitelist used by the cleanHTML method
          * @private
          */
@@ -5920,6 +5925,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onMouseMove_wysiwyg: function (e) {
+            if (core.isDisabled) return;
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
 
@@ -6544,6 +6550,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         disabled: function () {
             context.tool.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
+            core.isDisabled = true;
 
             if (options.codeMirrorEditor) {
                 options.codeMirrorEditor.setOption('readOnly', true);
@@ -6558,6 +6565,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         enabled: function () {
             context.tool.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
+            core.isDisabled = false;
 
             if (options.codeMirrorEditor) {
                 options.codeMirrorEditor.setOption('readOnly', false);

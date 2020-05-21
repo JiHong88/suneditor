@@ -74,6 +74,8 @@ let ssss = suneditor.create(("sample1"), {
     // lang: langToUse
 });
 
+// ssss.disabled();
+
 // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
