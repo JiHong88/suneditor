@@ -6599,6 +6599,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Destroy the suneditor
          */
         destroy: function () {
+            /** off menus */
+            core.submenuOff();
+            core.containerOff();
+            core.controllersOff();
+            if (core.notice) core.notice.close.call(core);
+            if (core.modalForm) core.plugins.dialog.close.call(core);
+
             /** remove history */
             core.history._destroy();
 

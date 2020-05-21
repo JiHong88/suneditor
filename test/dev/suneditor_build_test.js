@@ -214,8 +214,10 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    // s1.destroy()
-    s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+    s1.destroy()
+
+    // s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+
     // '<head>'+
@@ -236,12 +238,12 @@ window.sun_destroy1 = function () {
 
 window.sun_create1 = function () {
     // s1.destroy();
-    // s1 = suneditor.create('editor', {
-    //     plugins: [align, plugins.link],
-    //     buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
-    //     width: '100%',
-    //     height: 'auto'
-    //   })
+    s1 = suneditor.create('editor', {
+        plugins: [align, plugins.link],
+        buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
+        width: '100%',
+        height: 'auto'
+      })
 }
 
 s1.onKeyDown = function (e, core) {
