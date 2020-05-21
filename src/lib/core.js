@@ -3459,6 +3459,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         util.addClass(target, 'on');
                         this._moreLayerActiveButton = target;
                         layer.style.display = 'block';
+
+                        event._showToolbarBalloon();
+                        event._showToolbarInline();
                     }
                     return;
                 } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
@@ -3484,6 +3487,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     util.removeClass(this._moreLayerActiveButton, 'on');
                     this._moreLayerActiveButton = null;
                     layer.style.display = 'none';
+
+                    event._showToolbarBalloon();
+                    event._showToolbarInline();
                 }
             } else if (/submenu/.test(display)) {
                 this.submenuOff();

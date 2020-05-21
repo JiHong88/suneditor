@@ -591,9 +591,9 @@ export default {
      * @returns {Object}
      * @private
      */
-    _createModuleGroup: function (oneModule) {
+    _createModuleGroup: function () {
         const oDiv = util.createElement('DIV');
-        oDiv.className = 'se-btn-module' + (oneModule ? '' : ' se-btn-module-border');
+        oDiv.className = 'se-btn-module se-btn-module-border';
 
         const oUl = util.createElement('UL');
         oUl.className = 'se-menu-list';
@@ -687,15 +687,14 @@ export default {
         let buttonElement = null;
         let pluginName = '';
         let vertical = false;
-        const oneModule = buttonList.length === 1;
         const moreLayer = util.createElement('DIV');
         moreLayer.className = 'se-toolbar-more-layer';
 
         buttonGroupLoop:
-        for (let i = 0, more, moreContainer, moreCommand; i < buttonList.length; i++) {
+        for (let i = 0, more, moreContainer, moreCommand, buttonGroup; i < buttonList.length; i++) {
             more = false;
-            const buttonGroup = buttonList[i];
-            moduleElement = this._createModuleGroup(oneModule);
+            buttonGroup = buttonList[i];
+            moduleElement = this._createModuleGroup();
 
             // button object
             if (typeof buttonGroup === 'object') {
@@ -772,6 +771,7 @@ export default {
             }
         }
 
+        if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
