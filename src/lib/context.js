@@ -22,7 +22,7 @@ const _Context = function (element, cons, options) {
             topArea: cons._top,
             relative: cons._relative,
             toolbar: cons._toolBar,
-            _buttonTray: cons._toolBar.querySelector('.se-toolbar-btn-tray'),
+            _buttonTray: cons._toolBar.querySelector('.se-btn-tray'),
             _menuTray: cons._menuTray,
             resizingBar: cons._resizingBar,
             navigation: cons._navigation,

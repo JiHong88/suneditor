@@ -26,6 +26,8 @@ import Katex from 'katex';
 
 const align = require('../../src/plugins/submenu/align')
 
+let shadowApp = document.getElementById('app')
+shadowApp.attachShadow({ mode: 'open' })
 
 let ssss = suneditor.create(("sample1"), {
     plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],

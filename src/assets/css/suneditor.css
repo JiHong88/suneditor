@@ -143,7 +143,7 @@
 /* ---more - layer */
 .sun-editor .se-toolbar-more-layer {margin:0 -3px; background-color:#f3f3f3;}
 .sun-editor .se-toolbar-more-layer .se-more-layer {display:none;  border-top:1px solid #dadada;}
-.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:flex; position:relative; width:100%; height:auto; padding:4px;}
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:inline-block; width:100%; height:auto; padding:4px 3px 0 3px;}
 /* ---more - button */
 .sun-editor .se-btn-module .se-btn-more.se-btn-more-text {width:auto; padding:0 4px;}
 .sun-editor .se-btn-module .se-btn-more:hover, .sun-editor .se-btn-module .se-btn-more:focus {color:#000; background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
@@ -160,8 +160,8 @@
 .sun-editor .se-btn-select.se-btn-tool-size {width:80px;}
 
 /** --- menu tray -------------------------------------------------------------- */
-.sun-editor .se-toolbar-btn-tray {position:relative; width:100%; height:100%; margin:0; padding:0;}
-.sun-editor .se-menu-tray {position:absolute; top:0px; left:0px; width:100%; height:0px; z-index:2147483647;}
+.sun-editor .se-btn-tray {position:relative; width:100%; height:100%; margin:0; padding:0;}
+.sun-editor .se-menu-tray {position:absolute; top:0px; left:0px; width:100%; height:0px;}
 
 /** --- submenu layer ---------------------------------------------------------- */
 .sun-editor .se-list-layer {display:none; position:absolute; top:0px; left:0px; z-index:5; border:1px solid #bababa; border-radius:4px; padding:6px 0; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}

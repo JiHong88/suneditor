@@ -542,21 +542,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             menu.style.display = 'block';
             util.addClass(element, 'on');
 
-            const offset = util.getOffset(element, context.element._menuTray);
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
             const menuW = menu.offsetWidth;
-            const l = offset.left;
+            const l = element.parentElement.offsetLeft + 3;
             const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
             if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
             else menu.style.left = l + 'px';
 
-            let t = 0;
+            let t = 0, bt = 0;
             let offsetEl = element;
             while (offsetEl && offsetEl !== toolbar) {
                 t += offsetEl.offsetTop;
                 offsetEl = offsetEl.offsetParent;
             }
+            bt = t;
 
             if (this._isBalloon) {
                 t += toolbar.offsetTop + element.offsetHeight;
@@ -568,7 +568,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (space > 0 && event._getPageBottomSpace() < space) {
                 menu.style.top = (-1 * (menu.offsetHeight + 3)) + 'px';
             } else {
-                menu.style.top = (offset.top + element.parentElement.offsetHeight) + 'px';
+                menu.style.top = (bt + element.parentElement.offsetHeight) + 'px';
             }
 
             menu.style.visibility = '';
@@ -3827,7 +3827,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     util.removeClass(toolbar, 'se-toolbar-sticky');
                 }
 
-                if (_var._fullScreenAttrs.sticky) {
+                if (_var._fullScreenAttrs.sticky && !options.toolbarContainer) {
                     _var._fullScreenAttrs.sticky = false;
                     context.element._stickyDummy.style.display = 'block';
                     util.addClass(toolbar, "se-toolbar-sticky");
@@ -5017,10 +5017,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!core._isInline) return;
 
             const toolbar = context.element.toolbar;
+            if (options.toolbarContainer) toolbar.style.position = 'relative';
+            else toolbar.style.position = 'absolute';
+            
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
             core._inlineToolbarAttr.width = toolbar.style.width = options.toolbarWidth;
-            core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            core._inlineToolbarAttr.top = toolbar.style.top = (options.toolbarContainer ? 0 : (-1 - toolbar.offsetHeight)) + 'px';
             
             if (typeof functions.showInline === 'function') functions.showInline(toolbar, context, core);
 
@@ -5781,7 +5784,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _onStickyToolbar: function () {
             const element = context.element;
 
-            if (!core._isInline) {
+            if (!core._isInline && !options.toolbarContainer) {
                 element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
                 element._stickyDummy.style.display = 'block';
             }
@@ -5946,7 +5949,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const wScroll = context.element.wysiwyg.scrollTop;
                 const offsets = event._getEditorOffsets(null);
                 const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
-                const y = e.pageY + scrollTop + (options.iframe ? context.element.toolbar.offsetHeight : 0);
+                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? context.element.toolbar.offsetHeight : 0);
                 const c = componentTop + (options.iframe ? scrollTop : offsets.top);
 
                 let dir = '', top = '';
@@ -6303,10 +6306,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
+            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
+
             const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
             context.element = newContext.element;
             context.tool = newContext.tool;
-            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
 
             core.history._resetCachingButton();
         },
@@ -6336,6 +6340,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // set option
             const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);
+            cons.toolbar.element.style.visibility = '';
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;

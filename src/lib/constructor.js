@@ -43,10 +43,6 @@ export default {
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
 
-        // menu tray
-        const _menuTray = doc.createElement('DIV');
-        _menuTray.className = 'se-menu-tray sun-editor-common';
-
         // sticky toolbar dummy
         const sticky_dummy = doc.createElement('DIV');
         sticky_dummy.className = 'se-toolbar-sticky-dummy';
@@ -94,7 +90,6 @@ export default {
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
         if (!toolbarContainer) relative.appendChild(tool_bar.element);
-        relative.appendChild(_menuTray);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
@@ -110,7 +105,7 @@ export default {
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar.element,
-                _menuTray: _menuTray,
+                _menuTray: tool_bar._menuTray,
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
@@ -214,6 +209,7 @@ export default {
         arrow.className = 'se-arrow';
 
         if (isNewToolbar) {
+            tool_bar.element.style.visibility = 'hidden';
             // toolbar container
             if (isNewToolbarContainer) {
                 mergeOptions.toolbarContainer.appendChild(tool_bar.element);
@@ -223,8 +219,8 @@ export default {
             }
 
             el.toolbar = tool_bar.element;
+            el._menuTray = tool_bar._menuTray;
             el._arrow = arrow;
-            el._menuTray.innerHTML = '';
         }
         
         const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow);
@@ -430,7 +426,7 @@ export default {
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
-        // options.toolbarContainer = options.toolbarContainer;
+        options.toolbarContainer = /balloon/i.test(options.mode) ? null : options.toolbarContainer;
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
@@ -665,7 +661,7 @@ export default {
         tool_bar.className = 'se-toolbar sun-editor-common';
 
         const _buttonTray = doc.createElement('DIV');
-        _buttonTray.className = 'se-toolbar-btn-tray';
+        _buttonTray.className = 'se-btn-tray';
         tool_bar.appendChild(_buttonTray);
 
         /** create button list */
@@ -775,6 +771,12 @@ export default {
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
+        // menu tray
+        const _menuTray = doc.createElement('DIV');
+        _menuTray.className = 'se-menu-tray';
+        tool_bar.appendChild(_menuTray);
+
+        // cover
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'se-toolbar-cover';
         tool_bar.appendChild(tool_cover);
@@ -784,6 +786,7 @@ export default {
             'plugins': plugins,
             'pluginCallButtons': pluginCallButtons,
             'responsiveButtons': responsiveButtons,
+            '_menuTray': _menuTray,
             '_buttonTray': _buttonTray
         };
     }

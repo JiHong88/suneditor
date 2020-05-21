@@ -185,7 +185,7 @@ export default function (core, change) {
 
             if (stackIndex === 0) {
                 if (undo) undo.setAttribute('disabled', true);
-                if (redo) redo.setAttribute('disabled', true);
+                if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
                 if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
             } else if (stackIndex === stack.length - 1) {
                 if (redo) redo.setAttribute('disabled', true);
