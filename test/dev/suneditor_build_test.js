@@ -7,6 +7,7 @@ import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
 import { ko } from '../../src/lang';
 import lang from '../../src/lang';
+import u from '../../src/lib/util';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 import custom_plugin_dialog from './custom_plugin_dialog';
@@ -26,8 +27,17 @@ import Katex from 'katex';
 
 const align = require('../../src/plugins/submenu/align')
 
-let shadowApp = document.getElementById('app')
-shadowApp.attachShadow({ mode: 'open' })
+const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
+const appEl = document.createElement('textarea')
+const appStyle = document.createElement('style')
+appStyle.textContent = u.getPageStyle();
+
+shadow.appendChild(appStyle);
+shadow.appendChild(appEl);
+suneditor.create(appEl, {
+    width: '400px',
+    height: 500
+})
 
 let ssss = suneditor.create(("sample1"), {
     plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],

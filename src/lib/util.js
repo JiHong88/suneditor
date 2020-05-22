@@ -1532,8 +1532,9 @@ const util = {
             }
 
             return current.parentNode !== documentFragment &&
-             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current) || (((this.isMedia(current) && !this.isAnchor(current.parentNode)) || (this.isMedia(current.firstElementChild) && this.isAnchor(current))) && !this.getParentElement(current, this.isComponent))) &&
-              !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
+             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
+             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) && !this.getParentElement(current, this.isComponent) &&
+             !this.getParentElement(current, '.__se__tag');
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {
