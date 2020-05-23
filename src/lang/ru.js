@@ -26,9 +26,9 @@
         toolbar: {
             default: 'По умолчанию',
             save: 'Сохранить',
-            font: 'Гарнитура',
+            font: 'Шрифт',
             formats: 'Стиль абзаца',
-            fontSize: 'Кегль',
+            fontSize: 'Размер шрифта',
             bold: 'Полужирный',
             underline: 'Подчёркнутый',
             italic: 'Курсив',
