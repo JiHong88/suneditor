@@ -352,7 +352,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/image/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -392,7 +392,11 @@ export default {
             element: contextImage._element
         };
 
-        if (typeof this.functions.onImageUploadBefore === 'function' && !this.functions.onImageUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onImageUploadBefore === 'function') {
+            const result = this.functions.onImageUploadBefore(files, info, this);
+            if (!result) return;
+            if (typeof result === 'object' && result.length > 0) files = result;
+        }
 
         // server upload
         if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {

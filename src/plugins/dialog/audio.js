@@ -258,7 +258,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/audio/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -295,7 +295,11 @@ export default {
             element: context._element
         };
 
-        if (typeof this.functions.onAudioUploadBefore === 'function' && !this.functions.onAudioUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onAudioUploadBefore === 'function') {
+            const result = this.functions.onAudioUploadBefore(files, info, this);
+            if (!result) return;
+            if (typeof result === 'object' && result.length > 0) files = result;
+        }
 
         // create formData
         const formData = new FormData();

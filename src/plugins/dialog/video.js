@@ -332,7 +332,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/video/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -370,7 +370,11 @@ export default {
             element: contextVideo._element
         };
 
-        if (typeof this.functions.onVideoUploadBefore === 'function' && !this.functions.onVideoUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onVideoUploadBefore === 'function') {
+            const result = this.functions.onVideoUploadBefore(files, info, this);
+            if (!result) return;
+            if (typeof result === 'object' && result.length > 0) files = result;
+        }
 
         // server upload
         if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {

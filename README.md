@@ -904,6 +904,7 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
 
 // Called before the image is uploaded
 // If false is returned, no image upload is performed.
+// If new fileList are returned,  replaced the previous fileList
 /**
  * files: Files array
  * info: {
@@ -916,15 +917,19 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object
- * return {Boolean}
+ * return {Boolean|Array}
  */
 editor.onImageUploadBefore: function (files, info, core) {
     console.log('files', files);
     console.log('info', info);
-    return Boolean
+
+    return Boolean;
+    // or
+    return [] // (new files);
 }
 // Called before the video is uploaded
 // If false is returned, no video(iframe, video) upload is performed.
+// If new fileList are returned,  replaced the previous fileList
 /** 
  * files: Files array
  * info: {
@@ -940,10 +945,14 @@ editor.onImageUploadBefore: function (files, info, core) {
 editor.onVideoUploadBefore: function (files, info, core) {
     console.log('files', files);
     console.log('info', info);
-    return Boolean
+    
+    return Boolean;
+    // or
+    return [] // (new files);
 }
 // Called before the audio is uploaded
 // If false is returned, no audio upload is performed.
+// If new fileList are returned,  replaced the previous fileList
 /** 
 * files: Files array
 * info: {
@@ -956,7 +965,10 @@ editor.onVideoUploadBefore: function (files, info, core) {
 editor.onAudioUploadBefore: function (files, info, core) {
     console.log('files', files);
     console.log('info', info);
-    return Boolean
+
+    return Boolean;
+    // or
+    return [] // (new files);
 }
 
 // Called when the image is uploaded, updated, deleted.

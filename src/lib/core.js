@@ -6185,6 +6185,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the image is uploaded
          * If false is returned, no image upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - linkValue: Link url value
@@ -6202,6 +6203,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the video is uploaded
          * If false is returned, no video(iframe, video) upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - inputWidth: Value of width input
@@ -6217,6 +6219,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the audio is uploaded
          * If false is returned, no audio upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - isUpdate: Update audio if true, create audio if false
