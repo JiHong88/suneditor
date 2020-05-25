@@ -793,8 +793,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (!this._variable._selectionNode || util.isWysiwygDiv(this._variable._selectionNode)) this._editorRange();
-            return this._variable._selectionNode || context.element.wysiwyg.firstChild;
+            if (util.isWysiwygDiv(this._variable._selectionNode)) this._editorRange();
+            if (!this._variable._selectionNode) {
+                const selectionNode = util.getChildElement(context.element.wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+                if (!selectionNode) {
+                    this._editorRange();
+                } else {
+                    this._variable._selectionNode = selectionNode;
+                    return selectionNode;
+                }
+            }
+            return this._variable._selectionNode;
         },
 
         /**
