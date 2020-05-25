@@ -5868,8 +5868,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         _setClipboardData: function (e, plainText, cleanData) {
+            // MS word
+            if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
+                cleanData = cleanData.replace(/\n/g, ' ');
+                plainText = plainText.replace(/\n/g, ' ');
+            } else {
+                plainText = plainText.replace(/\n/g, '');
+            }
+
             cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
-            plainText = plainText.replace(/\n/g, '');
             const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
