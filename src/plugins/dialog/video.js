@@ -529,20 +529,20 @@ export default {
         }
     },
 
-    _update_videoCover: function (oIframe) {
-        if (!oIframe) return;
+    _update_videoCover: function (oFrame) {
+        if (!oFrame) return;
 
         const contextVideo = this.context.video;
-        oIframe.frameBorder = '0';
-        oIframe.allowFullscreen = true;
+        oFrame.frameBorder = '0';
+        oFrame.allowFullscreen = true;
         
-        const existElement = this.util.getParentElement(oIframe, this.util.isMediaComponent) || 
-            this.util.getParentElement(oIframe, function (current) {
+        const existElement = this.util.getParentElement(oFrame, this.util.isMediaComponent) || 
+            this.util.getParentElement(oFrame, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
-        contextVideo._element = oIframe = oIframe.cloneNode(false);
-        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oIframe);
+        contextVideo._element = oFrame = oFrame.cloneNode(true);
+        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
         const figcaption = existElement.querySelector('figcaption');
@@ -553,12 +553,12 @@ export default {
             this.util.removeItem(figcaption);
         }
 
-        const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
+        const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
         this.plugins.video.applySize.call(this, size[0], size[1]);
 
         existElement.parentNode.replaceChild(container, existElement);
         if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
-        this.plugins.fileManager.setInfo.call(this, 'video', oIframe, this.functions.onVideoUpload, null, true);
+        this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
     },
 
     /**
@@ -597,7 +597,7 @@ export default {
     openModify: function (notOpen) {
         const contextVideo = this.context.video;
 
-        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = contextVideo._element.src;
+        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = (contextVideo._element.src || (contextVideo._element.querySelector('source') || '').src || '');
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
         if (contextVideo._resizing) {
