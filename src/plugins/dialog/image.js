@@ -11,12 +11,13 @@ import dialog from '../modules/dialog';
 import component from '../modules/component';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
+import browser from '../modules/browser';
 
 export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, component, resizing, fileManager]);
+        core.addModule([dialog, component, resizing, fileManager, browser]);
         
         const context = core.context;
         const contextImage = context.image = {
@@ -72,7 +73,8 @@ export default {
         /** add event listeners */
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        if (contextImage.imgInputFile) image_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+        if (contextImage.imgInputFile) image_dialog.querySelector('.__se__file_remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+        if (contextImage.imgUrlFile && context.option.imageGalleryUrl) image_dialog.querySelector('.__se__gallery').addEventListener('click', this._openGallery.bind(core));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
         
         contextImage.proportion = {};
@@ -132,7 +134,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
-                                    '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-dialog-files-edge-button __se__file_remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
@@ -141,7 +143,10 @@ export default {
                         html += '' +
                             '<div class="se-dialog-form">' +
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
-                                '<input class="se-input-form se-input-url" type="text" />' +
+                                '<div class="se-dialog-form-files">' +
+                                    '<input class="se-input-form se-input-url" type="text" />' +
+                                    (option.imageGalleryUrl ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.controller.remove + '">' + this.icons.image_gallery + '</button>' : '') +
+                                '</div>' +
                             '</div>';
                     }
         
@@ -215,6 +220,10 @@ export default {
     _removeSelectedFiles: function (fileInput, urlInput) {
         fileInput.value = '';
         if (urlInput) urlInput.removeAttribute('disabled');
+    },
+
+    _openGallery: function () {
+        this.plugins.browser.open.call(this, 'image');
     },
 
     /**

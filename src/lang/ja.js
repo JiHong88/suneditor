@@ -72,7 +72,8 @@
             template: 'テンプレート',
             lineHeight: '行の高さ',
             paragraphStyle: '段落スタイル',
-            textStyle: 'テキストスタイル'
+            textStyle: 'テキストスタイル',
+            imageGallery: 'イメージギャラリー'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +103,10 @@
                 title: 'オーディオを挿入',
                 file: 'ファイルの選択',
                 url: 'オーディオアドレス'
+            },
+            browser: {
+                tags: 'タグ',
+                search: '探す',
             },
             caption: '説明付け',
             close: '閉じる',

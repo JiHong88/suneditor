@@ -75,7 +75,8 @@
             template: 'Schablone',
             lineHeight: 'Linjehøjde',
             paragraphStyle: 'Afsnitstil',
-            textStyle: 'Tekststil'
+            textStyle: 'Tekststil',
+            imageGallery: 'Billedgalleri'
         },
         dialogBox: {
             linkBox: {
@@ -105,6 +106,10 @@
                 title: 'Indsæt Audio',
                 file: 'Indsæt fra fil',
                 url: 'Indsæt fra URL'
+            },
+            browser: {
+                tags: 'Tags',
+                search: 'Søg',
             },
             caption: 'Indsæt beskrivelse',
             close: 'Luk',

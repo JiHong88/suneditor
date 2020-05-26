@@ -51,7 +51,7 @@ let ssss = suneditor.create(("sample1"), {
         ['align'],
         ['link'],
         ['table'],
-        [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'font', 'fontSize', 'formatBlock'],
+        [':moreText-More Text-default.more_text', 'undo', 'redo', 'font', 'fontSize', 'formatBlock'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',
@@ -271,7 +271,7 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    // lang: lang.ko,
+    lang: lang.ko,
     plugins: plugins,
     height: '500px',
     // mode: 'balloon-always',
@@ -295,6 +295,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     fullPage: true,
+    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
     // videoHeight: '56.22%',
     videoRatio: 0.75,
     // imageHeight: 400,

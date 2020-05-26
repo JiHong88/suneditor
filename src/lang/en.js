@@ -72,7 +72,8 @@
             template: 'Template',
             lineHeight: 'Line height',
             paragraphStyle: 'Paragraph style',
-            textStyle: 'Text style'
+            textStyle: 'Text style',
+            imageGallery: 'Image gallery'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +103,10 @@
                 title: 'Insert Audio',
                 file: 'Select from files',
                 url: 'Audio URL'
+            },
+            browser: {
+                tags: 'Tags',
+                search: 'Search',
             },
             caption: 'Insert description',
             close: 'Close',

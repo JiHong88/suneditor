@@ -72,7 +72,8 @@
             template: 'Шаблон',
             lineHeight: 'Высота линии',
             paragraphStyle: 'Стиль абзаца',
-            textStyle: 'Стиль текста'
+            textStyle: 'Стиль текста',
+            imageGallery: 'Галерея'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +103,10 @@
                 title: 'Вставить аудио',
                 file: 'Выберите файл',
                 url: 'Адрес аудио'
+            },
+            browser: {
+                tags: 'Теги',
+                search: 'Поиск',
             },
             caption: 'Добавить подпись',
             close: 'Закрыть',

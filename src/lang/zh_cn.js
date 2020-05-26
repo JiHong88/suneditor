@@ -72,7 +72,8 @@
             template: '模板',
             lineHeight: '行高',
             paragraphStyle: '段落样式',
-            textStyle: '文字样式'
+            textStyle: '文字样式',
+            imageGallery: '图片库'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +103,10 @@
                 title: '插入音频',
                 file: '上传图片',
                 url: '音频网址'
+            },
+            browser: {
+                tags: '标签',
+                search: '搜索',
             },
             caption: '标题',
             close: '取消',
