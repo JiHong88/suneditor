@@ -540,6 +540,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             menu.style.top = '-10000px';
             menu.style.visibility = 'hidden';
             menu.style.display = 'block';
+            menu.style.height = '';
             util.addClass(element, 'on');
 
             const toolbar = this.context.element.toolbar;
@@ -550,23 +551,46 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
             else menu.style.left = l + 'px';
 
-            let t = 0, bt = 0;
+            // get element top
+            let t = 0;
             let offsetEl = element;
             while (offsetEl && offsetEl !== toolbar) {
                 t += offsetEl.offsetTop;
                 offsetEl = offsetEl.offsetParent;
             }
-            bt = t;
 
+            const bt = t;
             if (this._isBalloon) {
                 t += toolbar.offsetTop + element.offsetHeight;
             } else {
                 t -= element.offsetHeight;
             }
 
-            const space = t + menu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
-            if (space > 0 && event._getPageBottomSpace() < space) {
-                menu.style.top = (-1 * (menu.offsetHeight + 3)) + 'px';
+            // set menu position
+            const toolbarTop = event._getEditorOffsets(context.element.toolbar).top;
+            let menuHeight = menu.offsetHeight;
+            let el = context.element.topArea;
+            let scrollTop = 0;
+            while (!!el) {
+                scrollTop += el.scrollTop;
+                el = el.parentElement;
+            }
+
+            const menuHeight_bottom = _w.innerHeight - (toolbarTop - scrollTop + bt + element.parentElement.offsetHeight);
+            if (menuHeight_bottom < menuHeight) {
+                let menuTop = -1 * (menuHeight - bt + 3);
+                const insTop = toolbarTop - scrollTop + menuTop;
+                const h_top = menuHeight + (insTop < 0 ? insTop : 0);
+                
+                if (h_top > menuHeight_bottom) {
+                    menu.style.height = h_top + 'px';
+                    menuTop = -1 * (h_top - bt + 3);
+                } else {
+                    menu.style.height = menuHeight_bottom + 'px';
+                    menuTop = bt + element.parentElement.offsetHeight;
+                }
+
+                menu.style.top = menuTop + 'px';
             } else {
                 menu.style.top = (bt + element.parentElement.offsetHeight) + 'px';
             }

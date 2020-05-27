@@ -28,26 +28,23 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-line';
         listDiv.innerHTML = '' +
-            '<div class="se-list-inner se-list-line">' +
+            '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li>' +
-                        '<button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="solid">' +
+                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="solid" title="' + lang.toolbar.hr_solid + '">' +
                             '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-                            '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_solid + '</span></span>' +
                         '</button>' +
                     '</li>' +
                     '<li>' +
-                        '<button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="dotted">' +
+                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="dotted" title="' + lang.toolbar.hr_dotted + '">' +
                             '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-                            '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dotted + '</span></span>' +
                         '</button>' +
                     '</li>' +
                     '<li>' +
-                        '<button type="button" class="se-btn-list btn_line se-tooltip" data-command="horizontalRule" data-value="dashed">' +
+                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="dashed" title="' + lang.toolbar.hr_dashed + '">' +
                             '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
-                            '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.toolbar.hr_dashed + '</span></span>' +
                         '</button>' +
                     '</li>' +
                 '</ul>' +
