@@ -37,10 +37,10 @@ export default {
     setSubmenu: function () {
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-align';
         listDiv.style.display = 'none';
         listDiv.innerHTML = '' +
-            '<div class="se-list-inner se-list-align">' +
+            '<div class="se-list-inner">' +
             '   <ul class="se-list-basic">' +
             // '       <li><input class="se-input-form" type="text" placeholder="insert text" style="width: 100%; border: 1px solid #CCC;" /></li>' +
             '       <li><select><option>111</option><option>222</option></select></li>' +

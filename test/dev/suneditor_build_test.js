@@ -116,6 +116,28 @@ let ssss = suneditor.create(("sample1"), {
 // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
+suneditor.create('scrolleditor', {
+    plugins: plugins,
+    // mode: 'balloon-always',
+    katex: Katex,
+    fontSize: fs,
+    // attributesWhitelist: 'style',
+    buttonList: [
+        ['undo', 'redo',
+        'font', 'fontSize', 'formatBlock',
+        'blockquote', 'paragraphStyle',
+        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
+        'fontColor', 'hiliteColor', 'textStyle',
+        'removeFormat',
+        'outdent', 'indent',
+        'list',
+        'align', 'horizontalRule', 'lineHeight',
+        'table', 'link', 'image', 'video', 'math',
+        'fullScreen', 'showBlocks', 'codeView',
+        'preview', 'print', 'save', 'template'],
+    ],
+})
+
 let s1 = suneditor.create('editor', {
     plugins: plugins,
     mode: 'balloon-always',

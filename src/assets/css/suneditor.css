@@ -188,24 +188,24 @@
 .sun-editor .se-list-layer.se-list-font-family .default {border-bottom:1px solid #CCC;}
 /* submenu layer - hr */
 .sun-editor .se-list-layer.se-list-line {width:125px;}
-/** submenu layer - format block, paragraph style, text style */
-.sun-editor .se-list-layer .se-list-format {min-width:156px;}
-.sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list {line-height:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
-.sun-editor .se-list-layer .se-list-format p {font-size:13px;}
-.sun-editor .se-list-layer .se-list-format div {font-size:13px; padding:4px 2px;}
-.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
-.sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:4px;}
 /* submenu layer - align */
-.sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
+.sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px; width:125px;}
+/** submenu layer - format block, paragraph style, text style */
+.sun-editor .se-list-layer.se-list-format {min-width:156px;}
+.sun-editor .se-list-layer.se-list-format li {padding:0; width:100%;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list {line-height:100%;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value="h1"] {height:40px;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value="h2"] {height:34px;}
+.sun-editor .se-list-layer.se-list-format ul p {font-size:13px;}
+.sun-editor .se-list-layer.se-list-format ul div {font-size:13px; padding:4px 2px;}
+.sun-editor .se-list-layer.se-list-format ul h1 {font-size:2em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h2 {font-size:1.5em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h3 {font-size:1.17em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h4 {font-size:1em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h5 {font-size:0.83em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h6 {font-size:0.67em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
+.sun-editor .se-list-layer.se-list-format ul pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:4px;}
 /* submenu layer --- table selector */
 .sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:5; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
@@ -213,7 +213,7 @@
 .sun-editor .se-selector-table .se-table-size-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAADJmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4QTZCNzMzN0I3RUYxMUU4ODcwQ0QwMjM1NTgzRTJDNyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4QTZCNzMzNkI3RUYxMUU4ODcwQ0QwMjM1NTgzRTJDNyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOCAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0MzYyNEUxRUI3RUUxMUU4ODZGQzgwRjNBODgyNTdFOSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0MzYyNEUxRkI3RUUxMUU4ODZGQzgwRjNBODgyNTdFOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pl0yAuwAAABBSURBVDhPY/wPBAxUAGCDGvdBeWSAeicIDTfIXREiQArYeR9hEBOEohyMGkQYjBpEGAxjg6ib+yFMygCVvMbAAABj0hwMTNeKJwAAAABJRU5ErkJggg==') repeat;}
 .sun-editor .se-selector-table .se-table-size-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:10em; height:10em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat;}
 .sun-editor .se-selector-table .se-table-size-display {padding-left:5px;}
-/* submenu layer --- color selector module */
+/* submenu layer --- color selector button */
 .sun-editor .se-list-layer .se-selector-color {display:flex; width:max-content; max-width:270px; height:auto; padding:0; margin:auto;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}

@@ -37,12 +37,12 @@ export default {
         const option = this.context.option;
         const lang_toolbar = this.lang.toolbar;
         const listDiv = this.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
         const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
 
-        let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
+        let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
             format = formatList[i];
             

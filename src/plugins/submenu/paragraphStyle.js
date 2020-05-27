@@ -34,7 +34,7 @@ export default {
     setSubmenu: function () {
         const option = this.context.option;
         const listDiv = this.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const menuLang = this.lang.menu;
         const defaultList = {
@@ -56,7 +56,7 @@ export default {
         };
         const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'neon'] : option.paragraphStyles;
 
-        let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
+        let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
             p = paragraphStyles[i];
 
