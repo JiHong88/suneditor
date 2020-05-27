@@ -123,18 +123,7 @@ suneditor.create('scrolleditor', {
     fontSize: fs,
     // attributesWhitelist: 'style',
     buttonList: [
-        ['undo', 'redo',
-        'font', 'fontSize', 'formatBlock',
-        'blockquote', 'paragraphStyle',
-        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor', 'textStyle',
-        'removeFormat',
-        'outdent', 'indent',
-        'list',
-        'align', 'horizontalRule', 'lineHeight',
-        'table', 'link', 'image', 'video', 'math',
-        'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template'],
+        ['font', 'fontSize', 'formatBlock'],
     ],
 })
 

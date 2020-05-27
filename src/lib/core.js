@@ -5753,6 +5753,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (context.element.toolbar.offsetWidth === 0) return;
 
+            if (core.submenuActiveButton && core.submenu) {
+                core._setMenuPosition(core.submenuActiveButton, core.submenu);
+            }
+
             if (core._variable.isFullScreen) {
                 core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
