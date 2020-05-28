@@ -580,11 +580,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (menuHeight_bottom < menuHeight) {
                 let menuTop = -1 * (menuHeight - bt + 3);
                 const insTop = toolbarTop - scrollTop + menuTop;
-                const h_top = menuHeight + (insTop < 0 ? insTop : 0);
+                const menuHeight_top = menuHeight + (insTop < 0 ? insTop : 0);
                 
-                if (h_top > menuHeight_bottom) {
-                    menu.style.height = h_top + 'px';
-                    menuTop = -1 * (h_top - bt + 3);
+                if (menuHeight_top > menuHeight_bottom) {
+                    menu.style.height = menuHeight_top + 'px';
+                    menuTop = -1 * (menuHeight_top - bt + 3);
                 } else {
                     menu.style.height = menuHeight_bottom + 'px';
                     menuTop = bt + element.parentElement.offsetHeight;

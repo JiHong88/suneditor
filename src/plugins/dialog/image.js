@@ -11,13 +11,13 @@ import dialog from '../modules/dialog';
 import component from '../modules/component';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
-import browser from '../modules/browser';
+import fileBrowser from '../modules/fileBrowser';
 
 export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, component, resizing, fileManager, browser]);
+        core.addModule([dialog, component, resizing, fileManager, fileBrowser]);
         
         const context = core.context;
         const contextImage = context.image = {
@@ -223,7 +223,7 @@ export default {
     },
 
     _openGallery: function () {
-        this.plugins.browser.open.call(this, 'image');
+        this.plugins.fileBrowser.open.call(this, 'se-image-list');
     },
 
     /**

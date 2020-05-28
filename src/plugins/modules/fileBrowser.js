@@ -21,35 +21,35 @@
         factory(global);
     }
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
-    const browser = {
-        name: 'browser',
+    const fileBrowser = {
+        name: 'fileBrowser',
         /**
          * @description Constructor
          * @param {Object} core Core object 
          */
         add: function (core) {
             const context = core.context;
-            context.browser = {
+            context.fileBrowser = {
                 _closeSignal: false
             };
 
-            /** browser */
+            /** fileBrowser */
             let browser_div = core.util.createElement('DIV');
-            browser_div.className = 'se-browser sun-editor-common';
+            browser_div.className = 'se-file-browser sun-editor-common';
 
             let back = core.util.createElement('DIV');
-            back.className = 'se-browser-back';
+            back.className = 'se-file-browser-back';
 
             let content = core.util.createElement('DIV');
-            content.className = 'se-browser-inner';
+            content.className = 'se-file-browser-inner';
             content.innerHTML = this.set_browser(core);
 
             browser_div.appendChild(back);
             browser_div.appendChild(content);
 
-            context.browser.area = browser_div;
-            context.browser.list = content.querySelector('.se-browser-lis');
-            context.browser.tags = content.querySelector('.se-browser-tags');
+            context.fileBrowser.area = browser_div;
+            context.fileBrowser.list = content.querySelector('.se-file-browser-list');
+            context.fileBrowser.tags = content.querySelector('.se-file-browser-tags');
 
             /** add event listeners */
             content.addEventListener('mousedown', this._onMouseDown_browser.bind(core));
@@ -65,16 +65,16 @@
         set_browser: function (core) {
             const lang = core.lang;
 
-            return '<div class="se-browser-content">' +
-                    '<div class="se-browser-header">' +
-                        '<button type="button" data-command="close" class="se-btn se-browser-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+            return '<div class="se-file-browser-content">' +
+                    '<div class="se-file-browser-header">' +
+                        '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         core.icons.cancel +
                         '</button>' +
-                        '<span class="se-browser-title">' + lang.toolbar.imageGallery + '</span>' +
-                        '<div class="se-browser-tags"><a>aaa</a><a>bbb</a><a>ccc</a><a>ddd</a></div>' +
+                        '<span class="se-file-browser-title">' + lang.toolbar.imageGallery + '</span>' +
+                        '<div class="se-file-browser-tags"><a>aaa</a><a>bbb</a><a>ccc</a><a>ddd</a></div>' +
                     '</div>' +
-                    '<div class="se-browser-body">' +
-                        '<div class="se-browser-list"></div>' +
+                    '<div class="se-file-browser-body">' +
+                        '<div class="se-file-browser-list"></div>' +
                     '</div>' +
                 '</div>';
         },
@@ -85,10 +85,10 @@
          * @private
          */
         _onMouseDown_browser: function (e) {
-            if (/se-browser-inner/.test(e.target.className)) {
-                this.context.browser._closeSignal = true;
+            if (/se-file-browser-inner/.test(e.target.className)) {
+                this.context.fileBrowser._closeSignal = true;
             } else {
-                this.context.browser._closeSignal = false;
+                this.context.fileBrowser._closeSignal = false;
             }
         },
 
@@ -100,8 +100,8 @@
         _onClick_browser: function (e) {
             e.stopPropagation();
 
-            if (/close/.test(e.target.getAttribute('data-command')) || this.context.browser._closeSignal) {
-                this.plugins.browser.close.call(this);
+            if (/close/.test(e.target.getAttribute('data-command')) || this.context.fileBrowser._closeSignal) {
+                this.plugins.fileBrowser.close.call(this);
             }
         },
 
@@ -109,40 +109,44 @@
          * @description Open a browser plugin
          * @param {String} styles browser style
          */
-        open: function (styles)  {
-            if (this.plugins.browser._bindClose) {
-                this._d.removeEventListener('keydown', this.plugins.browser._bindClose);
-                this.plugins.browser._bindClose = null;
+        open: function (listClassName)  {
+            if (this.plugins.fileBrowser._bindClose) {
+                this._d.removeEventListener('keydown', this.plugins.fileBrowser._bindClose);
+                this.plugins.fileBrowser._bindClose = null;
             }
 
-            this.plugins.browser._bindClose = function (e) {
+            this.plugins.fileBrowser._bindClose = function (e) {
                 if (!/27/.test(e.keyCode)) return;
-                this.plugins.browser.close.call(this);
+                this.plugins.fileBrowser.close.call(this);
             }.bind(this);
-            this._d.addEventListener('keydown', this.plugins.browser._bindClose);
+            this._d.addEventListener('keydown', this.plugins.fileBrowser._bindClose);
+
+            if (!this.util.hasClass(this.context.fileBrowser.list, listClassName)) {
+                this.context.fileBrowser.list.className = 'se-file-browser-list ' + listClassName;
+            }
 
             if (this.context.option.popupDisplay === 'full') {
-                this.context.browser.area.style.position = 'fixed';
+                this.context.fileBrowser.area.style.position = 'fixed';
             } else {
-                this.context.browser.area.style.position = 'absolute';
+                this.context.fileBrowser.area.style.position = 'absolute';
             }
 
-            this.context.browser.area.style.display = 'block';
+            this.context.fileBrowser.area.style.display = 'block';
         },
 
         _bindClose: null,
         
         /**
-         * @description Close a browser plugin
+         * @description Close a fileBrowser plugin
          * The plugin's "init" method is called.
          */
         close: function () {
-            if (this.plugins.browser._bindClose) {
-                this._d.removeEventListener('keydown', this.plugins.browser._bindClose);
-                this.plugins.browser._bindClose = null;
+            if (this.plugins.fileBrowser._bindClose) {
+                this._d.removeEventListener('keydown', this.plugins.fileBrowser._bindClose);
+                this.plugins.fileBrowser._bindClose = null;
             }
 
-            this.context.browser.area.style.display = 'none';
+            this.context.fileBrowser.area.style.display = 'none';
         }
     };
 
@@ -156,13 +160,13 @@
             });
         }
 
-        Object.defineProperty(window.SUNEDITOR_MODULES, 'browser', {
+        Object.defineProperty(window.SUNEDITOR_MODULES, 'fileBrowser', {
             enumerable: true,
             writable: false,
             configurable: false,
-            value: browser
+            value: fileBrowser
         });
     }
 
-    return browser;
+    return fileBrowser;
 }));

@@ -27,17 +27,17 @@ import Katex from 'katex';
 
 const align = require('../../src/plugins/submenu/align')
 
-const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
-const appEl = document.createElement('textarea')
-const appStyle = document.createElement('style')
-appStyle.textContent = u.getPageStyle();
+// const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
+// const appEl = document.createElement('textarea')
+// const appStyle = document.createElement('style')
+// appStyle.textContent = u.getPageStyle();
 
-shadow.appendChild(appStyle);
-shadow.appendChild(appEl);
-suneditor.create(appEl, {
-    width: '400px',
-    height: 500
-})
+// shadow.appendChild(appStyle);
+// shadow.appendChild(appEl);
+// suneditor.create(appEl, {
+//     width: '400px',
+//     height: 500
+// })
 
 const fs = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
     ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
