@@ -329,7 +329,11 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
-                  'inline' or 'balloon' mode. default: 'auto' {Number|String}
+                  'inline' or 'balloon' mode.     default: 'auto' {Number|String}
+toolbarContainer: A custom HTML selector placing the toolbar inside.
+                  The class name of the element must be 'sun-editor'.
+                  Element or querySelector argument.     default: null {Element|String}
+                  ex) document.querySelector('#id') || '#id'
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
@@ -535,6 +539,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                         }
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
+// Image - image gallery
+imageGalleryUrl     : The url of the image gallery, if you use the image gallery.   default: null {String}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
