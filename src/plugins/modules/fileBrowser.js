@@ -30,7 +30,14 @@
         add: function (core) {
             const context = core.context;
             context.fileBrowser = {
-                _closeSignal: false
+                _closeSignal: false,
+                area: null,
+                header: null,
+                tags: null,
+                body: null,
+                list: null,
+                selectorHandler: null,
+                contextPlugin: ''
             };
 
             /** fileBrowser */
@@ -49,11 +56,12 @@
 
             context.fileBrowser.area = browser_div;
             context.fileBrowser.header = content.querySelector('.se-file-browser-header');
+            context.fileBrowser.tags = content.querySelector('.se-file-browser-tags');
             context.fileBrowser.body = content.querySelector('.se-file-browser-body');
             context.fileBrowser.list = content.querySelector('.se-file-browser-list');
-            context.fileBrowser.tags = content.querySelector('.se-file-browser-tags');
 
             /** add event listeners */
+            context.fileBrowser.list.addEventListener('click', this.onClickFile.bind(core));
             content.addEventListener('mousedown', this._onMouseDown_browser.bind(core));
             content.addEventListener('click', this._onClick_browser.bind(core));
             
@@ -111,11 +119,15 @@
          * @description Open a browser plugin
          * @param {String} styles browser style
          */
-        open: function (listClassName)  {
+        open: function (pluginName, selectorHandler)  {
             if (this.plugins.fileBrowser._bindClose) {
                 this._d.removeEventListener('keydown', this.plugins.fileBrowser._bindClose);
                 this.plugins.fileBrowser._bindClose = null;
             }
+
+            const fileBrowserContext = this.context.fileBrowser;
+            fileBrowserContext.contextPlugin = pluginName;
+            fileBrowserContext.selectorHandler = selectorHandler;
 
             this.plugins.fileBrowser.drawFileList.call(this);
 
@@ -125,20 +137,21 @@
             }.bind(this);
             this._d.addEventListener('keydown', this.plugins.fileBrowser._bindClose);
 
-            if (!this.util.hasClass(this.context.fileBrowser.list, listClassName)) {
-                this.context.fileBrowser.list.className = 'se-file-browser-list ' + listClassName;
+            const listClassName = this.context[pluginName].listClass;
+            if (!this.util.hasClass(fileBrowserContext.list, listClassName)) {
+                fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
             }
 
             if (this.context.option.popupDisplay === 'full') {
-                this.context.fileBrowser.area.style.position = 'fixed';
+                fileBrowserContext.area.style.position = 'fixed';
             } else {
-                this.context.fileBrowser.area.style.position = 'absolute';
+                fileBrowserContext.area.style.position = 'absolute';
             }
 
-            this.context.fileBrowser.area.style.visibility = 'hidden';
-            this.context.fileBrowser.area.style.display = 'block';
-            this.context.fileBrowser.body.style.height = (this._w.innerHeight - this.context.fileBrowser.header.offsetHeight - 40) + 'px';
-            this.context.fileBrowser.area.style.visibility = '';
+            fileBrowserContext.area.style.visibility = 'hidden';
+            fileBrowserContext.area.style.display = 'block';
+            fileBrowserContext.body.style.height = (this._w.innerHeight - fileBrowserContext.header.offsetHeight - 40) + 'px';
+            fileBrowserContext.area.style.visibility = '';
         },
 
         _bindClose: null,
@@ -153,8 +166,13 @@
                 this.plugins.fileBrowser._bindClose = null;
             }
 
-            this.context.fileBrowser.area.style.display = 'none';
+            const fileBrowserContext = this.context.fileBrowser;
+            fileBrowserContext.area.style.display = 'none';
+            fileBrowserContext.selectorHandler = null;
+            fileBrowserContext.contextPlugin = '';
         },
+
+        _tags: [],
 
         drawFileList: function () {
             const temp = [
@@ -225,26 +243,46 @@
             const len = items.length;
             const splitSize = Math.round(len/3) || 1;
             
-            let html = '';//'<div class="se-file-item-column">';
+            let html = '<div class="se-file-item-column">';
             let columns = 1;
             for (let i = 0, item; i < len; i++) {
                 item = items[i];
-                html += '<div class="se-file-item-img"><img src="' + item.src + '"></div>';
-                // if ((i + 1) % splitSize === 0 && columns < 3) {
-                //     columns++;
-                //     html += '</div><div class="se-file-item-column">'
-                // }
+                html += '<div class="se-file-item-img"><img src="' + item.src + '" data-command="pick"></div>';
+                if ((i + 1) % splitSize === 0 && columns < 3) {
+                    columns++;
+                    html += '</div><div class="se-file-item-column">';
+                }
 
                 if (item.tag && this._tags.indexOf(item.tag) === -1) {
                     this._tags.push(item.tag);
                 }
             }
-            // html += '</div>';
+            html += '</div>';
 
             return html;
         },
 
-        _tags: []
+        onClickFile: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const fileBrowserContext = this.context.fileBrowser;
+            const listTag = fileBrowserContext.list;
+            let target = e.target;
+            let command = null;
+
+            while (listTag !== target.parentNode) {
+                command = target.getAttribute('data-command');
+                if (command) break;
+                target = target.parentNode;
+            }
+
+            if (!command) return;
+
+            (fileBrowserContext.selectorHandler || this.context[fileBrowserContext.contextPlugin].selectorHandler)(target);
+
+            this.plugins.fileBrowser.close.call(this);
+        }
     };
 
     if (typeof noGlobal === typeof undefined) {

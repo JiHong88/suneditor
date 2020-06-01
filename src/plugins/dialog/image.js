@@ -11,13 +11,12 @@ import dialog from '../modules/dialog';
 import component from '../modules/component';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
-import fileBrowser from '../modules/fileBrowser';
 
 export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, component, resizing, fileManager, fileBrowser]);
+        core.addModule([dialog, component, resizing, fileManager]);
         
         const context = core.context;
         const contextImage = context.image = {
@@ -74,8 +73,10 @@ export default {
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         if (contextImage.imgInputFile) image_dialog.querySelector('.__se__file_remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
-        if (contextImage.imgUrlFile && context.option.imageGalleryUrl) image_dialog.querySelector('.__se__gallery').addEventListener('click', this._openGallery.bind(core));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
+
+        const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
+        if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
         
         contextImage.proportion = {};
         contextImage.inputX = {};
@@ -145,7 +146,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form se-input-url" type="text" />' +
-                                    (option.imageGalleryUrl ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
+                                    ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                             '</div>';
                     }
@@ -223,7 +224,12 @@ export default {
     },
 
     _openGallery: function () {
-        this.plugins.fileBrowser.open.call(this, 'se-image-list');
+        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this, this.context.image.imgUrlFile)), null);
+    },
+
+    _setUrlInput: function (urlInput, target) {
+        urlInput.value = target.src;
+        urlInput.focus();
     },
 
     /**

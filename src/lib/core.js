@@ -1436,7 +1436,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     startCon = endCon = commonCon;
                 } else {
                     startCon = endCon = childNodes[0];
-                    if (util.isBreak(startCon)) {
+                    if (util.isBreak(startCon) || util.onlyZeroWidthSpace(startCon)) {
                         return {
                             container: startCon,
                             offset: 0
@@ -3508,7 +3508,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 } else if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
                     this.callPlugin(command, this.containerOn.bind(this, target), target);
                     return;
-                }                
+                } else if (/fileBrowser/.test(display)) {
+                    this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
+                }
             } // default command
             else if (command) {
                 this.commandHandler(target, command);

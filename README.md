@@ -286,9 +286,9 @@ suneditor.create('sample', {
 ## Options
 ```java
 plugins: [
-    // command
+    /** command */
     blockquote,
-    // Submenu
+    /** Submenu */
     align,
     font,
     fontColor,
@@ -302,13 +302,19 @@ plugins: [
     table,
     template,
     textStyle,
-    // Dialog
+    /** Dialog */
     image,
     link,
     video,
     audio,
-    math // You must add the 'katex' library at options to use the 'math' plugin.
-]               : Plugins array.     default: null {Array}
+    math, // You must add the 'katex' library at options to use the 'math' plugin.
+    /** File browser */
+    // You must add the "imageGalleryUrl".
+    // A button is added to the image modal.
+    // You can also use image gallery by adding it directly to the button list. (You must add "image" plugin.)
+    imageGallery
+]
+: Plugins array.     default: null {Array}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
@@ -540,7 +546,9 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 // Image - image gallery
-imageGalleryUrl     : The url of the image gallery, if you use the image gallery.   default: null {String}
+imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
+                      When "imageUrlInput" is true, an image gallery button is created in the image modal.
+                      You can also use it by adding "imageGallery" to the button list.   default: null {String}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
@@ -663,7 +671,7 @@ buttonList      : Defines button list to array {Array}
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
-                    // ['table', 'link', 'image', 'video', 'math'],
+                    // ['table', 'link', 'image', 'video', 'math'/** ,'imageGallery' */],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
@@ -1180,6 +1188,10 @@ editor.showController = function (name, controllers, core) {
         </tr>
         <tr>
             <td align="left">textStyle</td>
+        </tr>
+        <tr>
+            <td align="left">imageGallery</td>
+            <td align="left"><strong>fileBrowser</strong></td>
         </tr>
     </tbody>
 </table>
