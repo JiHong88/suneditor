@@ -98,6 +98,8 @@
             <label><input type="checkbox" id="toolbarWidth">&nbsp;&nbsp;toolbarWidth</label>
             <input type="text" id="toolbarWidth_value" placeholder="Number, ...px, ...%">
             <br><br>
+            <label><input type="checkbox" id="toolbarContainer">&nbsp;&nbsp;toolbarContainer</label> "#custom_toolbar"
+            <br><br>
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
             <br><br>
@@ -231,6 +233,10 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageUploadSizeLimit">&nbsp;&nbsp;imageUploadSizeLimit</label>
             <input type="text" id="imageUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br>
+            <h4 style="color: #b94a48;">--Image - image gallery</h4>
+            <label><input type="checkbox" id="imageGalleryUrl">&nbsp;&nbsp;imageGalleryUrl</label>
+            <input type="text" id="imageGalleryUrl_value" placeholder="String(URL address)" style="width: 200px">
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
@@ -333,6 +339,7 @@
         
         <button type="button" class="btn btn-md btn-primary" onclick="sun_create()">Create</button>
         <textarea id="sample_editor" style="display: none;"></textarea>
+        <div id="custom_toolbar" class="sun-editor" style="margin-top: 20px;"></div>
 
         <div class="component-list">
             <div class="file-list-info">
@@ -395,6 +402,7 @@
 <script src="../../src/lang/ja.js"></script>
 <script src="../../src/lang/ko.js"></script>
 <script src="../../src/lang/pt_br.js"></script>
+<script src="../../src/lang/ro.js"></script>
 <script src="../../src/lang/ru.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
@@ -425,6 +433,7 @@ function sun_create () {
         },
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
+        toolbarContainer: document.getElementById('toolbarContainer').checked ? '#custom_toolbar' : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
         iframe: document.getElementById('iframe').checked ? true : undefined,
         fullPage: document.getElementById('fullPage').checked? true : undefined,
@@ -473,6 +482,7 @@ function sun_create () {
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
+        imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
         videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,

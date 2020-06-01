@@ -426,7 +426,7 @@ export default {
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
-        options.toolbarContainer = /balloon/i.test(options.mode) ? null : options.toolbarContainer;
+        options.toolbarContainer = /balloon/i.test(options.mode) ? null : (typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer);
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
@@ -474,8 +474,9 @@ export default {
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
-        options.imageUploadUrl = options.imageUploadUrl || null;
+        options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
+        /** Image - image gallery */
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
@@ -492,7 +493,7 @@ export default {
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
         options.videoUploadHeader = options.videoUploadHeader || null;
-        options.videoUploadUrl = options.videoUploadUrl || null;
+        options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
@@ -500,7 +501,7 @@ export default {
         options.audioFileInput = !!options.audioFileInput;
         options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
         options.audioUploadHeader = options.audioUploadHeader || null;
-        options.audioUploadUrl = options.audioUploadUrl || null;
+        options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
@@ -688,8 +689,9 @@ export default {
         moreLayer.className = 'se-toolbar-more-layer';
 
         buttonGroupLoop:
-        for (let i = 0, more, moreContainer, moreCommand, buttonGroup; i < buttonList.length; i++) {
+        for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
             more = false;
+            align = '';
             buttonGroup = buttonList[i];
             moduleElement = this._createModuleGroup();
 
@@ -717,6 +719,13 @@ export default {
                             module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
+                        // align
+                        if (/^\./.test(button)) {
+                            align = button.substr(1);
+                            moduleElement.div.style.float = align;
+                            continue;
+                        }
+                        
                         // more button
                         if (/^\:/.test(button)) {
                             moreButton = true;
@@ -725,7 +734,9 @@ export default {
                             const title = matched[2].trim();
                             const innerHTML = matched[3].trim();
                             module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
-                        } else {
+                        }
+                        // buttons
+                        else {
                             module = defaultButtonList[button];
                         }
 
@@ -749,13 +760,18 @@ export default {
                         more = true;
                         moreContainer = util.createElement('DIV');
                         moreContainer.className = 'se-more-layer ' + moreCommand;
-                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"></ul></div>';
+                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
                         moreLayer.appendChild(moreContainer);
                         moreContainer = moreContainer.firstElementChild.firstElementChild;
                     }
                 }
 
-                if (vertical) _buttonTray.appendChild(separator_vertical.cloneNode(false));
+                if (vertical) {
+                    const sv =  separator_vertical.cloneNode(false);
+                    if (align) sv.style.float = align;
+                    _buttonTray.appendChild(sv);
+                }
+                
                 _buttonTray.appendChild(moduleElement.div);
                 vertical = true;
             }

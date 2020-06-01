@@ -72,11 +72,12 @@ let ssss = suneditor.create(("sample1"), {
     tabDisable: true,
     fontSize: fs,
     buttonList: [
-        ['fontColor', 'bold', 'underline', 'italic'],
         ['align'],
-        ['link'],
-        ['table'],
-        [':moreText-More Text-default.more_text', 'undo', 'redo', 'font', 'fontSize', 'formatBlock'],
+        ['.right', 'link'],
+        ['.right', 'table'],
+        ['.right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
+        [':more2-More Text-default.more_paragraph', 'fontColor', 'bold', 'underline', 'italic'],
+        [':more3-More Text-default.more_plus', 'undo', 'redo', 'image'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',

@@ -329,7 +329,11 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
 lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
-                  'inline' or 'balloon' mode. default: 'auto' {Number|String}
+                  'inline' or 'balloon' mode.     default: 'auto' {Number|String}
+toolbarContainer: A custom HTML selector placing the toolbar inside.
+                  The class name of the element must be 'sun-editor'.
+                  Element or querySelector argument.     default: null {Element|String}
+                  ex) document.querySelector('#id') || '#id'
 stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
                   It can also be used when there is another fixed toolbar at the top.
                   Set to 0, '0px', '50px', etc.
@@ -535,6 +539,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                         }
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
+// Image - image gallery
+imageGalleryUrl     : The url of the image gallery, if you use the image gallery.   default: null {String}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
@@ -670,6 +676,13 @@ buttonList      : Defines button list to array {Array}
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
+                  ex) Alignment of button groups.
+                  // Set ".align" to the first item in the group. (default: left)
+                  [
+                      ['bold', 'underline', 'italic', 'strike'],
+                      ['.right', 'undo', 'redo']
+                  ]
+
                   ex) More button: 
                   // The more button is defined as a string starting with a colon.(":").
                   // :Identifier - Title attribute - Button's innerHTML
@@ -693,7 +706,7 @@ buttonList      : Defines button list to array {Array}
                     ],
                     [':moreRich-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'math'],
                     [':moreView-View-text.View', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
-                    [':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'],
+                    ['.right', ':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
 
                   ex) Responsive setting: 
@@ -709,7 +722,7 @@ buttonList      : Defines button list to array {Array}
                         ['undo', 'redo'],
                         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]],
                     // (min-width:768px)
                     ['%768', [
@@ -719,7 +732,7 @@ buttonList      : Defines button list to array {Array}
                             'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
                         ],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]]
                   ]
                   
